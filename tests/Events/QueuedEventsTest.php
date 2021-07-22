@@ -67,6 +67,23 @@ class QueuedEventsTest extends TestCase
         $fakeQueue->assertPushedOn('some_other_queue', CallQueuedListener::class);
     }
 
+    public function testQueueIsSetByGetConnection()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $queue->shouldReceive('connection')->once()->with('some_other_connection')->andReturnSelf();
+
+        $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
+
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
+
+        $d->listen('some.event', TestDispatcherGetConnection::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+    }
+
     public function testQueuePropagateRetryUntilAndMaxExceptions()
     {
         $d = new Dispatcher;
@@ -120,6 +137,21 @@ class TestDispatcherGetQueue implements ShouldQueue
     public function viaQueue()
     {
         return 'some_other_queue';
+    }
+}
+
+class TestDispatcherGetConnection implements ShouldQueue
+{
+    public $connection = 'my_connection';
+
+    public function handle()
+    {
+        //
+    }
+
+    public function viaConnection()
+    {
+        return 'some_other_connection';
     }
 }
 
