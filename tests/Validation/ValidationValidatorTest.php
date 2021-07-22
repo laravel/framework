@@ -3541,6 +3541,51 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateColor()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $colors = [
+            'black',
+            'silver',
+            'gray',
+            'white',
+            'maroon',
+            'red',
+            'purple',
+            'fuchsia',
+            'green',
+            'lime',
+            'olive',
+            'yellow',
+            'navy',
+            'blue',
+            'teal',
+            'aqua',
+            'orange',
+        ];
+
+        foreach ($colors as $color) {
+            $v = new Validator($trans, ['x' => $color], ['x' => 'color']);
+            $this->assertTrue($v->passes());
+        }
+
+        $v = new Validator($trans, ['x' => '#000'], ['x' => 'color']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '#00g'], ['x' => 'color']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '#f9f9f9'], ['x' => 'color']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '#f9f9g9'], ['x' => 'color']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'invalid'], ['x' => 'color']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateRegex()
     {
         $trans = $this->getIlluminateArrayTranslator();

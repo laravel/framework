@@ -349,6 +349,36 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the string is a CSS 2.1 color name or an hexadecimal value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateColor($attribute, $value)
+    {
+        return in_array($value, [
+                'black',
+                'silver',
+                'gray',
+                'white',
+                'maroon',
+                'red',
+                'purple',
+                'fuchsia',
+                'green',
+                'lime',
+                'olive',
+                'yellow',
+                'navy',
+                'blue',
+                'teal',
+                'aqua',
+                'orange',
+            ], true) || $this->validateRegex($attribute, $value, ['/^#?([0-9a-f]{6}|[0-9a-f]{3})$/i']);
+    }
+
+    /**
      * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute
