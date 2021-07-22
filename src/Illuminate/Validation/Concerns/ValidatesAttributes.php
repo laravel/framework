@@ -349,7 +349,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate the string is a CSS 2.1 color name or an hexadecimal value.
+     * Validate that a string is a CSS 2.1 color name or an hexadecimal color.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -375,7 +375,7 @@ trait ValidatesAttributes
                 'teal',
                 'aqua',
                 'orange',
-            ], true) || $this->validateRegex($attribute, $value, ['/^#?([0-9a-f]{6}|[0-9a-f]{3})$/i']);
+            ], true) || $this->validateRegex($attribute, $value, ['/^#[0-9a-f]{6}$/i']);
     }
 
     /**

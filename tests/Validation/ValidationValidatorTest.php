@@ -3571,7 +3571,7 @@ class ValidationValidatorTest extends TestCase
         }
 
         $v = new Validator($trans, ['x' => '#000'], ['x' => 'color']);
-        $this->assertTrue($v->passes());
+        $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => '#00g'], ['x' => 'color']);
         $this->assertFalse($v->passes());
@@ -3583,6 +3583,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['x' => 'invalid'], ['x' => 'color']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'f9f9f9'], ['x' => 'color']);
         $this->assertFalse($v->passes());
     }
 
