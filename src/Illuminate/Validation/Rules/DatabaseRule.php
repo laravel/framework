@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use Closure;
+use Illuminate\Database\Eloquent\Helpers\Helper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -90,7 +91,7 @@ trait DatabaseRule
             return $this->whereIn($column, $value);
         }
 
-        if ($column instanceof Closure) {
+        if (Helper::is_closure($column)) {
             return $this->using($column);
         }
 
