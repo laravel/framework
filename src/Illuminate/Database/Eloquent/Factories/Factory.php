@@ -256,7 +256,7 @@ abstract class Factory
         $query = $this->newModel()->newQuery();
 
         $attributes = array_merge(
-            array_map(function($resolver) {
+            array_map(function ($resolver) {
                 return $resolver();
             }, $this->parentResolvers()),
             $attributes
