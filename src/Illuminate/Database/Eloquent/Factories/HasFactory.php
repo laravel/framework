@@ -7,16 +7,17 @@ trait HasFactory
     /**
      * Get a new factory instance for the model.
      *
-     * @param  mixed  $parameters
+     * @param  callable|array|int|null  $count
+     * @param  callable|array  $state
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public static function factory(...$parameters)
+    public static function factory($count = null, $state = [])
     {
         $factory = static::newFactory() ?: Factory::factoryForModel(get_called_class());
 
         return $factory
-                    ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : null)
-                    ->state(is_array($parameters[0] ?? null) ? $parameters[0] : ($parameters[1] ?? []));
+                    ->count(is_numeric($count) ? $count : null)
+                    ->state(is_callable($count) || is_array($count) ? $count : $state);
     }
 
     /**

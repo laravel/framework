@@ -111,44 +111,17 @@ class PusherBroadcaster extends Broadcaster
     {
         $socket = Arr::pull($payload, 'socket');
 
-        if ($this->pusherServerIsVersionFiveOrGreater()) {
-            $parameters = $socket !== null ? ['socket_id' => $socket] : [];
+        $parameters = $socket !== null ? ['socket_id' => $socket] : [];
 
-            try {
-                $this->pusher->trigger(
-                    $this->formatChannels($channels), $event, $payload, $parameters
-                );
-            } catch (ApiErrorException $e) {
-                throw new BroadcastException(
-                    sprintf('Pusher error: %s.', $e->getMessage())
-                );
-            }
-        } else {
-            $response = $this->pusher->trigger(
-                $this->formatChannels($channels), $event, $payload, $socket, true
+        try {
+            $this->pusher->trigger(
+                $this->formatChannels($channels), $event, $payload, $parameters
             );
-
-            if ((is_array($response) && $response['status'] >= 200 && $response['status'] <= 299)
-                || $response === true) {
-                return;
-            }
-
+        } catch (ApiErrorException $e) {
             throw new BroadcastException(
-                ! empty($response['body'])
-                    ? sprintf('Pusher error: %s.', $response['body'])
-                    : 'Failed to connect to Pusher.'
+                sprintf('Pusher error: %s.', $e->getMessage())
             );
         }
-    }
-
-    /**
-     * Determine if the Pusher PHP server is version 5.0 or greater.
-     *
-     * @return bool
-     */
-    protected function pusherServerIsVersionFiveOrGreater()
-    {
-        return class_exists(ApiErrorException::class);
     }
 
     /**

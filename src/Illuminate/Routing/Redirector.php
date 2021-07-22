@@ -115,11 +115,13 @@ class Redirector
      * Set the intended url.
      *
      * @param  string  $url
-     * @return void
+     * @return $this
      */
     public function setIntendedUrl($url)
     {
         $this->session->put('url.intended', $url);
+
+        return $this;
     }
 
     /**

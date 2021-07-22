@@ -111,11 +111,14 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface
     /**
      * Flush all of the failed jobs from storage.
      *
+     * @param  int|null  $hours
      * @return void
      */
-    public function flush()
+    public function flush($hours = null)
     {
-        $this->getTable()->delete();
+        $this->getTable()->when($hours, function ($query, $hours) {
+            $query->where('failed_at', '<=', Date::now()->subHours($hours));
+        })->delete();
     }
 
     /**

@@ -88,7 +88,7 @@ class DatabaseConnectorTest extends TestCase
     public function testPostgresSearchPathIsSet()
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
-        $config = ['host' => 'foo', 'database' => 'bar', 'schema' => 'public', 'charset' => 'utf8'];
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => 'public', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
@@ -104,13 +104,45 @@ class DatabaseConnectorTest extends TestCase
     public function testPostgresSearchPathArraySupported()
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
-        $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', 'user'], 'charset' => 'utf8'];
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => ['public', '"user"'], 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
         $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($connection);
+        $connection->shouldReceive('execute')->twice();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresSearchPathCommaSeparatedValueSupported()
+    {
+        $dsn = 'pgsql:host=foo;dbname=bar';
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => 'public, "user"', 'charset' => 'utf8'];
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock('stdClass');
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($connection);
+        $connection->shouldReceive('execute')->twice();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresSearchPathVariablesSupported()
+    {
+        $dsn = 'pgsql:host=foo;dbname=bar';
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => '"$user", public, user', 'charset' => 'utf8'];
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock('stdClass');
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "$user", "public", "user"')->andReturn($connection);
         $connection->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 

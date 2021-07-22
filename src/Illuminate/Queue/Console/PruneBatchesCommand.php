@@ -17,6 +17,15 @@ class PruneBatchesCommand extends Command
     protected $signature = 'queue:prune-batches {--hours=24 : The number of hours to retain batch data}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:prune-batches';
+
+    /**
      * The console command description.
      *
      * @var string

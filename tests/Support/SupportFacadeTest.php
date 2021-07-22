@@ -70,6 +70,16 @@ class SupportFacadeTest extends TestCase
         FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
         $this->assertSame('bar', FacadeStub::foo());
     }
+
+    public function testExpectsReturnsAMockeryMockWithExpectationRequired()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes(['foo' => new stdClass]);
+        FacadeStub::setFacadeApplication($app);
+
+        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
+        $this->assertSame('baz', $app['foo']->foo('bar'));
+    }
 }
 
 class FacadeStub extends Facade

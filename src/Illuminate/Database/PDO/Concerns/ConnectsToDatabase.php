@@ -10,10 +10,13 @@ trait ConnectsToDatabase
     /**
      * Create a new database connection.
      *
-     * @param  array  $params
+     * @param  mixed[]  $params
+     * @param  string|null  $username
+     * @param  string|null  $password
+     * @param  mixed[]  $driverOptions
      * @return \Illuminate\Database\PDO\Connection
      */
-    public function connect(array $params)
+    public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
     {
         if (! isset($params['pdo']) || ! $params['pdo'] instanceof PDO) {
             throw new \InvalidArgumentException('Laravel requires the "pdo" property to be set and be a PDO instance.');
