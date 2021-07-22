@@ -80,7 +80,7 @@ class BroadcastEvent implements ShouldQueue
      */
     protected function getPayloadFromEvent($event)
     {
-        if (method_exists($event, 'broadcastWith')) {
+        if (method_exists($event, 'broadcastWith') && ! is_null($event->broadcastWith())) {
             return array_merge(
                 $event->broadcastWith(), ['socket' => data_get($event, 'socket')]
             );
