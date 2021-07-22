@@ -62,7 +62,9 @@ class PendingBatch
      */
     public function add($jobs)
     {
-        $this->jobs->push($jobs);
+        foreach ($jobs as $job) {
+            $this->jobs->push($job);
+        }
 
         return $this;
     }
