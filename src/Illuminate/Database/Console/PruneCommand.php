@@ -62,7 +62,7 @@ class PruneCommand extends Command
     /**
      * Determine the models that should be pruned.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     protected function models()
     {
