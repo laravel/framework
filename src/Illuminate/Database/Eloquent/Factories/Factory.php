@@ -246,6 +246,30 @@ abstract class Factory
     }
 
     /**
+     * Get an existing model or create one.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+     */
+    public function existingOrCreateOne($attributes = [])
+    {
+        $query = $this->newModel()->newQuery();
+
+        $attributes = array_merge(
+            array_map(fn($resolver) => $resolver(), $this->parentResolvers()),
+            $attributes
+        );
+
+        if (! empty($attributes)) {
+            $query = $query->where($attributes);
+        }
+
+        return $query->inRandomOrder()->firstOr(
+            fn() => $this->createOne($attributes)
+        );
+    }
+
+    /**
      * Create a callback that persists a model in the database when invoked.
      *
      * @param  array  $attributes

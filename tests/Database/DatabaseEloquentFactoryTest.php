@@ -164,6 +164,55 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('Test Title', $post['title']);
     }
 
+    public function test_existing_or_create_one_can_create_models()
+    {
+        $this->assertSame(0, FactoryTestUser::query()->count());
+
+        $post = FactoryTestPostFactory::new([
+            'title' => 'Test Title',
+            'user_id' => FactoryTestUserFactory::new()->existingOrCreateOne()
+        ])->raw();
+        $this->assertIsArray($post);
+        $this->assertIsInt($post['user_id']);
+        $this->assertSame('Test Title', $post['title']);
+
+        $this->assertSame(1, FactoryTestUser::query()->count());
+    }
+
+    public function test_existing_or_create_one_will_reuse_existing_models()
+    {
+        $user = FactoryTestUserFactory::new()->create();
+
+        $this->assertSame(1, FactoryTestUser::query()->count());
+
+        $posts = FactoryTestPostFactory::new([
+            'user_id' => FactoryTestUserFactory::new()->existingOrCreateOne()
+        ])->count(4)->raw();
+
+        foreach ($posts as $post) {
+            $this->assertIsArray($post);
+            $this->assertIsInt($post['user_id']);
+            $this->assertSame($user['id'], $post['user_id']);
+        }
+
+        $this->assertSame(1, FactoryTestUser::query()->count());
+    }
+
+    public function test_existing_or_create_one_will_respect_parent_relationship()
+    {
+        $users = FactoryTestUserFactory::new()->count(10)->create();
+
+        $user = $users->first();
+
+        $posts = FactoryTestPostFactory::new()->for($user)->count(10)->raw();
+
+        foreach ($posts as $post) {
+            $this->assertIsArray($post);
+            $this->assertIsInt($post['user_id']);
+            $this->assertSame($user['id'], $post['user_id']);
+        }
+    }
+
     public function test_lazy_model_attributes_can_be_created()
     {
         $userFunction = FactoryTestUserFactory::new()->lazy();
