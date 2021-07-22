@@ -39,6 +39,18 @@ class UrlSigningTest extends TestCase
         $this->assertSame('invalid', $this->get($url)->original);
     }
 
+    public function testTemporarySignedUrlsWithExpiresParameter()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1, 'expires' => 253402300799]));
+        Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
+        $this->assertSame('invalid', $this->get($url)->original);
+    }
+
     public function testSignedUrlWithUrlWithoutSignatureParameter()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
