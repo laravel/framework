@@ -170,7 +170,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $post = FactoryTestPostFactory::new([
             'title' => 'Test Title',
-            'user_id' => FactoryTestUserFactory::new()->existingOrCreateOne()
+            'user_id' => FactoryTestUserFactory::new()->existingOrCreateOne(),
         ])->raw();
         $this->assertIsArray($post);
         $this->assertIsInt($post['user_id']);
@@ -186,7 +186,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(1, FactoryTestUser::query()->count());
 
         $posts = FactoryTestPostFactory::new([
-            'user_id' => FactoryTestUserFactory::new()->existingOrCreateOne()
+            'user_id' => FactoryTestUserFactory::new()->existingOrCreateOne(),
         ])->count(4)->raw();
 
         foreach ($posts as $post) {

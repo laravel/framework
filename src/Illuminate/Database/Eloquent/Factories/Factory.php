@@ -256,7 +256,9 @@ abstract class Factory
         $query = $this->newModel()->newQuery();
 
         $attributes = array_merge(
-            array_map(fn($resolver) => $resolver(), $this->parentResolvers()),
+            array_map(function($resolver) {
+                return $resolver();
+            }, $this->parentResolvers()),
             $attributes
         );
 
@@ -264,9 +266,9 @@ abstract class Factory
             $query = $query->where($attributes);
         }
 
-        return $query->inRandomOrder()->firstOr(
-            fn() => $this->createOne($attributes)
-        );
+        return $query->inRandomOrder()->firstOr(function () use ($attributes) {
+            return $this->createOne($attributes);
+        });
     }
 
     /**
