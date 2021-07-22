@@ -664,6 +664,27 @@ class RoutingUrlGeneratorTest extends TestCase
 
         Request::create($url->signedRoute('foo', ['signature' => 'bar']));
     }
+
+    public function testSignedUrlParameterCannotBeNamedExpires()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{expires}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable

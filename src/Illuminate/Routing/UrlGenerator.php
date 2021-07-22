@@ -328,6 +328,12 @@ class UrlGenerator implements UrlGeneratorContract
             );
         }
 
+        if (array_key_exists('expires', $parameters)) {
+            throw new InvalidArgumentException(
+                '"Expires" is a reserved parameter when generating signed routes. Please rename your route parameter.'
+            );
+        }
+
         if ($expiration) {
             $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
         }
