@@ -28,6 +28,21 @@ class TrimStringsTest extends TestCase
             $this->assertSame('  010  ', $request->get('bar'));
         });
     }
+
+    public function testTrimStringsNBSP()
+    {
+        $middleware = new TrimStrings;
+        $symfonyRequest = new SymfonyRequest([
+            // Here has some NBSP, but it still display to space.
+            'abc' => '   123    ',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('123', $request->get('abc'));
+        });
+    }
 }
 
 class TrimStringsWithExceptAttribute extends TrimStrings
