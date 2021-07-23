@@ -39,7 +39,7 @@ class PruneCommand extends Command
         $models = $this->models();
 
         if ($models->isEmpty()) {
-            $this->info('No prunable Models found.');
+            $this->info('No prunable models found.');
 
             return;
         }
