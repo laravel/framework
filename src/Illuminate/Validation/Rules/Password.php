@@ -270,7 +270,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     {
         $validator = Validator::make($this->data, [
             $attribute => 'string|min:'.$this->min,
-        ]);
+        ], $this->validator->customMessages, $this->validator->customAttributes);
 
         if ($validator->fails()) {
             return $this->fail($validator->messages()->all());
