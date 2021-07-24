@@ -56,7 +56,7 @@ class Unique
 
         return $this;
     }
-    
+
     /**
      * Ignore trashed models during the unique check.
      *
