@@ -5,6 +5,8 @@ namespace Illuminate\Database\Console\Migrations;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class MigrateMakeCommand extends BaseCommand
 {
@@ -13,12 +15,7 @@ class MigrateMakeCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'make:migration {name : The name of the migration}
-        {--create= : The table to be created}
-        {--table= : The table to migrate}
-        {--path= : The location where the migration file should be created}
-        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration}';
+    protected $name = 'make:migration';
 
     /**
      * The console command description.
@@ -131,5 +128,23 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
+    }
+
+    protected function getArguments()
+    {
+        return [
+            ['name', InputArgument::REQUIRED, 'The name of the migration'],
+        ];
+    }
+
+    protected function getOptions()
+    {
+        return [
+            ['create', '', InputOption::VALUE_REQUIRED, 'The table to be created'],
+            ['table', '', InputOption::VALUE_REQUIRED, 'The table to migrate'],
+            ['path', '', InputOption::VALUE_REQUIRED, 'The location where the migration file should be created'],
+            ['realpath', '', InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+            ['fullpath', '', InputOption::VALUE_NONE, 'Output the full path of the migration}'],
+        ];
     }
 }
