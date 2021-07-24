@@ -56,6 +56,19 @@ class Unique
 
         return $this;
     }
+    
+    /**
+     * Ignore trashed models during the unique check.
+     *
+     * @param  string|null  $deletedAtColumn
+     * @return $this
+     */
+    public function ignoreTrashed($deletedAtColumn = null)
+    {
+        $this->whereNull($deletedAtColumn ?? 'deleted_at');
+
+        return $this;
+    }
 
     /**
      * Convert the rule to a validation string.
