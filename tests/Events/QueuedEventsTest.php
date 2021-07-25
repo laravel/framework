@@ -101,6 +101,24 @@ class QueuedEventsTest extends TestCase
             return $job->maxExceptions === 1 && $job->retryUntil !== null;
         });
     }
+
+    public function testQueuePropagateMiddleware()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherMiddleware::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return count($job->middleware) === 1 && $job->middleware[0] instanceof TestMiddleware;
+        });
+    }
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
@@ -167,5 +185,26 @@ class TestDispatcherOptions implements ShouldQueue
     public function handle()
     {
         //
+    }
+}
+
+class TestDispatcherMiddleware implements ShouldQueue
+{
+    public function middleware()
+    {
+        return [new TestMiddleware()];
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestMiddleware
+{
+    public function handle($job, $next)
+    {
+        $next($job);
     }
 }

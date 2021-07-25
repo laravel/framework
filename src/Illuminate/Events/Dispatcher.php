@@ -557,6 +557,13 @@ class Dispatcher implements DispatcherContract
                     ? $listener->viaQueue()
                     : $listener->queue ?? null;
 
+        $job->through(
+            array_merge(
+                method_exists($listener, 'middleware') ? $listener->middleware() : [],
+                $listener->middleware ?? []
+            )
+        );
+
         isset($listener->delay)
                     ? $connection->laterOn($queue, $listener->delay, $job)
                     : $connection->pushOn($queue, $job);
