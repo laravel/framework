@@ -3599,6 +3599,36 @@ SQL;
         ]), $result);
     }
 
+    public function testPaginateWithMinusOnePerPage()
+    {
+        $perPage = -1;
+        $pageName = 'page';
+        $page = 1;
+        $builder = $this->getMockQueryBuilder();
+        $path = 'http://foo.bar?page=1';
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(2);
+        $builder->shouldReceive('forPage')->once()->with($page, 2)->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn($results);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->paginate($perPage);
+
+        $this->assertEquals(new LengthAwarePaginator($results, 2, 2, $page, [
+            'path' => $path,
+            'pageName' => $pageName,
+        ]), $result);
+    }
+
     public function testPaginateWhenNoResults()
     {
         $perPage = 15;
