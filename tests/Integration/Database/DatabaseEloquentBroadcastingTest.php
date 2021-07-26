@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Model;
@@ -198,7 +199,12 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                     && Arr::get($payload, 'model.id') === $event->model->id;
             })->getMock();
 
-        (new BroadcastEvent($event))->handle($broadcaster);
+        $manager = m::mock(BroadcastingFactory::class)
+            ->shouldReceive('connection')
+            ->andReturn($broadcaster)
+            ->getMock();
+
+        (new BroadcastEvent($event))->handle($manager);
 
         return true;
     }
