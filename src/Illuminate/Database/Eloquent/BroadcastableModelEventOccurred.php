@@ -82,9 +82,13 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
      */
     public function broadcastAs()
     {
-        return method_exists($this->model, 'broadcastAs')
-            ? $this->model->broadcastAs()
-            : class_basename($this->model) . ucfirst($this->event);
+        $default = class_basename($this->model) . ucfirst($this->event);
+
+        if (! method_exists($this->model, 'broadcastAs')) {
+            return $default;
+        }
+
+        return $this->model->broadcastAs($this->event) ?: $default;
     }
 
     /**
@@ -95,7 +99,7 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public function broadcastWith()
     {
         return method_exists($this->model, 'broadcastWith')
-            ? $this->model->broadcastWith()
+            ? $this->model->broadcastWith($this->event)
             : null;
     }
 
