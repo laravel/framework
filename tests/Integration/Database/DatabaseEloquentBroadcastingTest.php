@@ -20,8 +20,6 @@ use Mockery as m;
  */
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
-    protected $broadcaster;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -45,6 +43,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUser
                     && count($event->broadcastOn()) === 1
+                    && $event->model->name === 'Taylor'
                     && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model->id}";
         });
     }
@@ -70,6 +69,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
             return $event->model instanceof SoftDeletableTestEloquentBroadcastUser
                 && $event->event() == 'trashed'
                 && count($event->broadcastOn()) === 1
+                && $event->model->name === 'Bean'
                 && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.{$event->model->id}";
         });
     }
@@ -86,6 +86,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
                 && $event->event() == 'created'
                 && count($event->broadcastOn()) === 1
+                && $event->model->name === 'James'
                 && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUserOnSpecificEventsOnly.{$event->model->id}";
         });
 
@@ -94,6 +95,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertNotDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
+                && $event->model->name === 'Graham'
                 && $event->event() == 'updated';
         });
 
@@ -101,6 +103,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertNotDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
+                && $event->model->name === 'Graham'
                 && $event->event() == 'deleted';
         });
     }
@@ -115,6 +118,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUser
+                && $event->model->name === 'Mohamed'
                 && $event->broadcastAs() === 'TestEloquentBroadcastUserCreated';
         });
     }
@@ -129,6 +133,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastName
+                && $event->model->name === 'Nuno'
                 && $event->broadcastAs() === 'foo';
         });
 
@@ -137,6 +142,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastName
+                && $event->model->name === 'Dries'
                 && $event->broadcastAs() === 'TestEloquentBroadcastUserWithSpecificBroadcastNameUpdated';
         });
 
@@ -144,6 +150,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastName
+                && $event->model->name === 'Dries'
                 && $event->broadcastAs() === 'TestEloquentBroadcastUserWithSpecificBroadcastNameDeleted';
         });
     }
@@ -160,7 +167,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
             return $event->model instanceof TestEloquentBroadcastUser
                 && $event->model->name === 'Nuno'
                 && is_null($event->broadcastWith())
-                && $this->assertHandldedBroadcastableModelEventHasDefaultPayload($event);
+                && $this->assertHandldedEventPayloadHasKeys($event, ['model', 'connection', 'queue', 'socket']);
         });
     }
 
@@ -175,7 +182,8 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastPayload
                 && $event->model->name === 'Dries'
-                && Arr::get($event->broadcastWith(), 'foo') === 'bar';
+                && $event->broadcastWith() === ['foo' => 'bar']
+                && $this->assertHandldedEventPayloadHasKeys($event, ['foo', 'socket']);
         });
 
         $model->name = 'Graham';
@@ -185,24 +193,20 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastPayload
                 && $event->model->name === 'Graham'
                 && is_null($event->broadcastWith())
-                && $this->assertHandldedBroadcastableModelEventHasDefaultPayload($event);
+                && $this->assertHandldedEventPayloadHasKeys($event, ['model', 'connection', 'queue', 'socket']);
         });
     }
 
-    private function assertHandldedBroadcastableModelEventHasDefaultPayload(BroadcastableModelEventOccurred $event)
+    private function assertHandldedEventPayloadHasKeys(BroadcastableModelEventOccurred $event, array $expected)
     {
-        $broadcaster = m::mock(Broadcaster::class)
-            ->shouldReceive('broadcast')
-            ->once()
-            ->withArgs(function (array $channels, $eventName, array $payload) use ($event) {
-                return Arr::has($payload, ['model', 'connection', 'queue', 'socket'])
-                    && Arr::get($payload, 'model.id') === $event->model->id;
-            })->getMock();
+        $broadcaster = m::mock(Broadcaster::class);
+        $broadcaster->shouldReceive('broadcast')->once()
+            ->withArgs(function (array $channels, $eventName, array $payload) use ($expected) {
+                return Arr::has($payload, $expected);
+            });
 
-        $manager = m::mock(BroadcastingFactory::class)
-            ->shouldReceive('connection')
-            ->andReturn($broadcaster)
-            ->getMock();
+        $manager = m::mock(BroadcastingFactory::class);
+        $manager->shouldReceive('connection')->once()->with(null)->andReturn($broadcaster);
 
         (new BroadcastEvent($event))->handle($manager);
 
