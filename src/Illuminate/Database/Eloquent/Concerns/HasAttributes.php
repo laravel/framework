@@ -1590,7 +1590,13 @@ trait HasAttributes
      */
     public function changingTo($attribute, $to, $from = null)
     {
-        $bool = $this->isDirty($attribute) && $this->getAttribute($attribute) === $to;
+        $bool = $this->isDirty($attribute);
+
+        if (is_callable($to)) {
+            $bool = $bool && ($to)($this->getAttribute($attribute));
+        } else {
+            $bool = $bool && $this->getAttribute($attribute) === $to;
+        }
 
         if (! is_null($from)) {
             $bool = $bool && $this->getOriginal($attribute) === $from;
@@ -1625,7 +1631,13 @@ trait HasAttributes
      */
     public function changedTo($attribute, $to, $from = null)
     {
-        $bool = $this->wasChanged($attribute) && $this->getAttribute($attribute) === $to;
+        $bool = $this->wasChanged($attribute);
+
+        if (is_callable($to)) {
+            $bool = $bool && ($to)($this->getAttribute($attribute));
+        } else {
+            $bool = $bool && $this->getAttribute($attribute) === $to;
+        }
 
         if (! is_null($from)) {
             $bool = $bool && $this->getPrevious($attribute) === $from;
