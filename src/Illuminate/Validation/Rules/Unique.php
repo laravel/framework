@@ -58,14 +58,14 @@ class Unique
     }
 
     /**
-     * Ignore trashed models during the unique check.
+     * Ignore soft deleted models during the unique check.
      *
-     * @param  string|null  $deletedAtColumn
+     * @param  string  $deletedAtColumn
      * @return $this
      */
-    public function ignoreTrashed($deletedAtColumn = null)
+    public function withoutTrashed($deletedAtColumn = 'deleted_at')
     {
-        $this->whereNull($deletedAtColumn ?? 'deleted_at');
+        $this->whereNull($deletedAtColumn);
 
         return $this;
     }
