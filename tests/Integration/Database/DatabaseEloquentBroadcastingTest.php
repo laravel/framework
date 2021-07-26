@@ -217,7 +217,7 @@ class TestEloquentBroadcastUserOnSpecificEventsOnly extends Model
 
     public function broadcastOn($event)
     {
-        switch ($event)  {
+        switch ($event) {
             case 'created':
                 return [$this];
         }
