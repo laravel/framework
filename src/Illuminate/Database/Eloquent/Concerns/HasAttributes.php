@@ -48,7 +48,7 @@ trait HasAttributes
      *
      * @var array
      */
-    protected $previousAttributes = [];
+    public $previousAttributes = [];
 
     /**
      * The attributes that should be cast.
@@ -1590,18 +1590,29 @@ trait HasAttributes
      */
     public function changingTo($attribute, $to, $from = null)
     {
-        if (! $this->isDirty($attribute)) {
-            return false;
+        $bool = $this->isDirty($attribute) && $this->getAttribute($attribute) === $to;
+
+        if (! is_null($from)) {
+            $bool = $bool && $this->getOriginal($attribute) === $from;
         }
 
-        $oldValue = is_null($this->original[$attribute]) ? null : (string) $this->original[$attribute];
-        $newValue = is_null($this->attributes[$attribute]) ? null : (string) $this->attributes[$attribute];
+        return $bool;
+    }
 
-        if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
-            return false;
+    public function changingToAny($attribute, $to, $from = null)
+    {
+        $to = is_array($to) ? $to : [$to];
+        $from = is_array($from) ? $from : [$from];
+
+        foreach ($to as $t) {
+            foreach ($from as $f) {
+                if ($this->changingTo($attribute, $t, $f)) {
+                    return true;
+                }
+            }
         }
 
-        return in_array($newValue, is_array($to) ? $to : [$to]);
+        return false;
     }
 
     /**
@@ -1614,19 +1625,29 @@ trait HasAttributes
      */
     public function changedTo($attribute, $to, $from = null)
     {
-        if (! array_key_exists($attribute, $this->previousAttributes) ||
-            ! array_key_exists($attribute, $this->changes)) {
-            return false;
+        $bool = $this->wasChanged($attribute) && $this->getAttribute($attribute) === $to;
+
+        if (! is_null($from)) {
+            $bool = $bool && $this->getPrevious($attribute) === $from;
         }
 
-        $oldValue = is_null($this->previousAttributes[$attribute]) ? null : (string) $this->previousAttributes[$attribute];
-        $newValue = is_null($this->changes[$attribute]) ? null : (string) $this->changes[$attribute];
+        return $bool;
+    }
 
-        if (func_num_args() == 3 && ! in_array($oldValue, is_array($from) ? $from : [$from])) {
-            return false;
+    public function changedToAny($attribute, $to, $from = null)
+    {
+        $to = is_array($to) ? $to : [$to];
+        $from = is_array($from) ? $from : [$from];
+
+        foreach ($to as $t) {
+            foreach ($from as $f) {
+                if ($this->changedTo($attribute, $t, $f)) {
+                    return true;
+                }
+            }
         }
 
-        return in_array($newValue, is_array($to) ? $to : [$to]);
+        return false;
     }
 
     /**
@@ -1659,6 +1680,23 @@ trait HasAttributes
         }
 
         return $dirty;
+    }
+
+    /**
+     * Get previous attributes.
+     *
+     * @param string|null
+     * @return array|mixed
+     */
+    public function getPrevious($key = null)
+    {
+        $previous = $this->wormhole();
+
+        if (! is_null($key)) {
+            return $previous->getAttribute($key);
+        }
+
+        return $previous->toArray();
     }
 
     /**

@@ -88,14 +88,14 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertTrue($user->changedTo('name', 'zain'));
         $this->assertTrue($user->changedTo('name', 'zain', 'mohamed'));
-        $this->assertTrue($user->changedTo('name', 'zain', ['mohamed', 'said']));
-        $this->assertTrue($user->changedTo('name', ['zain', 'lara'], ['mohamed', 'said']));
-        $this->assertTrue($user->changedTo('name', ['zain', 'lara'], 'mohamed'));
+        $this->assertTrue($user->changedToAny('name', 'zain', ['mohamed', 'said']));
+        $this->assertTrue($user->changedToAny('name', ['zain', 'lara'], ['mohamed', 'said']));
+        $this->assertTrue($user->changedToAny('name', ['zain', 'lara'], 'mohamed'));
         $this->assertFalse($user->changedTo('name', 'zain', 'said'));
 
         $this->assertTrue($user->changedTo('title', 'A'));
         $this->assertTrue($user->changedTo('title', 'A', null));
-        $this->assertTrue($user->changedTo('title', ['A', 'C'], ['BB', null]));
+        $this->assertTrue($user->changedToAny('title', ['A', 'C'], ['BB', null]));
         $this->assertFalse($user->changedTo('title', 'A', 'B'));
 
         $user->title = null;
@@ -124,8 +124,8 @@ class EloquentModelTest extends DatabaseTestCase
 
         $user->save();
 
-        $this->assertTrue($user->changedTo('items', json_encode([1, 2])));
-        $this->assertTrue($user->changedTo('items', json_encode([1, 2]), json_encode([0, 1])));
+        $this->assertTrue($user->changedTo('items', [1, 2]));
+        $this->assertTrue($user->changedTo('items', [1, 2]), json_encode([0, 1]));
     }
 
     public function testAttributeTransitioningFromTo()
@@ -142,12 +142,12 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertTrue($user->changingTo('name', 'zain'));
         $this->assertTrue($user->changingTo('name', 'zain', 'mohamed'));
-        $this->assertTrue($user->changingTo('name', 'zain', ['mohamed', 'said']));
+        $this->assertTrue($user->changingToAny('name', 'zain', ['mohamed', 'said']));
         $this->assertFalse($user->changingTo('name', 'zain', 'said'));
 
         $this->assertTrue($user->changingTo('title', 'A'));
         $this->assertTrue($user->changingTo('title', 'A', null));
-        $this->assertTrue($user->changingTo('title', ['A', 'C'], ['BB', null]));
+        $this->assertTrue($user->changingToAny('title', ['A', 'C'], ['BB', null]));
         $this->assertFalse($user->changingTo('title', 'A', 'B'));
 
         $user->save();
@@ -174,8 +174,8 @@ class EloquentModelTest extends DatabaseTestCase
 
         $user->items = [1, 2];
 
-        $this->assertTrue($user->changingTo('items', json_encode([1, 2])));
-        $this->assertTrue($user->changingTo('items', json_encode([1, 2]), json_encode([0, 1])));
+        $this->assertTrue($user->changingTo('items', [1, 2]));
+        $this->assertTrue($user->changingTo('items', [1, 2], [0, 1]));
     }
 
     public function testWormhole()
