@@ -35,9 +35,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         Event::fake([BroadcastableModelEventOccurred::class]);
 
-        $model = new TestEloquentBroadcastUser;
-        $model->name = 'Taylor';
-        $model->save();
+        TestEloquentBroadcastUser::create(['name' => 'Taylor']);
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUser
@@ -57,10 +55,8 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         Event::fake([BroadcastableModelEventOccurred::class]);
 
-        $model = new SoftDeletableTestEloquentBroadcastUser;
-        $model->name = 'Bean';
+        $model = SoftDeletableTestEloquentBroadcastUser::make(['name' => 'Bean']);
         $model->saveQuietly();
-
         $model->delete();
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
@@ -75,9 +71,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         Event::fake([BroadcastableModelEventOccurred::class]);
 
-        $model = new TestEloquentBroadcastUserOnSpecificEventsOnly;
-        $model->name = 'James';
-        $model->save();
+        $model = TestEloquentBroadcastUserOnSpecificEventsOnly::create(['name' => 'James']);
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
@@ -86,8 +80,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                 && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUserOnSpecificEventsOnly.{$event->model->id}";
         });
 
-        $model->name = 'Graham';
-        $model->save();
+        $model->update(['name' => 'Graham']);
 
         Event::assertNotDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserOnSpecificEventsOnly
@@ -106,9 +99,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         Event::fake([BroadcastableModelEventOccurred::class]);
 
-        $model = new TestEloquentBroadcastUser;
-        $model->name = 'Mohamed';
-        $model->save();
+        TestEloquentBroadcastUser::create(['name' => 'Mohamed']);
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUser
@@ -120,17 +111,14 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         Event::fake([BroadcastableModelEventOccurred::class]);
 
-        $model = new TestEloquentBroadcastUserWithSpecificBroadcastName;
-        $model->name = 'Nuno';
-        $model->save();
+        $model = TestEloquentBroadcastUserWithSpecificBroadcastName::create(['name' => 'Nuno']);
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastName
                 && $event->broadcastAs() === 'foo';
         });
 
-        $model->name = 'Dries';
-        $model->save();
+        $model->update(['name' => 'Dries']);
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastName
@@ -159,9 +147,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                 );
         });
 
-        $model = new TestEloquentBroadcastUser;
-        $model->name = 'Nuno';
-        $model->save();
+        TestEloquentBroadcastUser::create(['name' => 'Nuno']);
     }
 
     public function testBroadcastPayloadCanBeDefined()
@@ -186,12 +172,9 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
                 );
         });
 
-        $model = new TestEloquentBroadcastUserWithSpecificBroadcastPayload;
-        $model->name = 'Nuno';
-        $model->save();
+        $model = TestEloquentBroadcastUserWithSpecificBroadcastPayload::create(['name' => 'Nuno']);
 
-        $model->name = 'Dries';
-        $model->save();
+        $model->update(['name' => 'Dries']);
     }
 }
 
@@ -200,6 +183,8 @@ class TestEloquentBroadcastUser extends Model
     use BroadcastsEvents;
 
     protected $table = 'test_eloquent_broadcasting_users';
+
+    protected static $unguarded = true;
 }
 
 class SoftDeletableTestEloquentBroadcastUser extends Model
@@ -207,6 +192,8 @@ class SoftDeletableTestEloquentBroadcastUser extends Model
     use BroadcastsEvents, SoftDeletes;
 
     protected $table = 'test_eloquent_broadcasting_users';
+
+    protected static $unguarded = true;
 }
 
 class TestEloquentBroadcastUserOnSpecificEventsOnly extends Model
@@ -214,6 +201,8 @@ class TestEloquentBroadcastUserOnSpecificEventsOnly extends Model
     use BroadcastsEvents;
 
     protected $table = 'test_eloquent_broadcasting_users';
+
+    protected static $unguarded = true;
 
     public function broadcastOn($event)
     {
@@ -230,6 +219,8 @@ class TestEloquentBroadcastUserWithSpecificBroadcastName extends Model
 
     protected $table = 'test_eloquent_broadcasting_users';
 
+    protected static $unguarded = true;
+
     public function broadcastAs($event)
     {
         switch ($event) {
@@ -244,6 +235,8 @@ class TestEloquentBroadcastUserWithSpecificBroadcastPayload extends Model
     use BroadcastsEvents;
 
     protected $table = 'test_eloquent_broadcasting_users';
+
+    protected static $unguarded = true;
 
     public function broadcastWith($event)
     {
