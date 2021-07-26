@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred;
 use Illuminate\Database\Eloquent\BroadcastsEvents;
@@ -12,7 +13,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
-use Mockery\MockInterface;
 
 /**
  * @group integration
@@ -149,47 +149,58 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     public function testBroadcastPayloadDefault()
     {
-        $this->partialMock(Broadcaster::class, function (MockInterface $mock) {
-            $mock->shouldReceive('broadcast')
-                ->once()
-                ->with(
-                    m::type('array'),
-                    'TestEloquentBroadcastUserCreated',
-                    m::on(function ($argument) {
-                        return Arr::has($argument, ['model', 'connection', 'queue', 'socket']);
-                    })
-                );
-        });
+        Event::fake([BroadcastableModelEventOccurred::class]);
 
         $model = new TestEloquentBroadcastUser;
         $model->name = 'Nuno';
         $model->save();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof TestEloquentBroadcastUser
+                && $event->model->name === 'Nuno'
+                && is_null($event->broadcastWith())
+                && $this->assertHandldedBroadcastableModelEventHasDefaultPayload($event);
+        });
     }
 
     public function testBroadcastPayloadCanBeDefined()
     {
-        $this->markTestSkipped();
-
-        // $this->broadcaster->expects('broadcast')->once()->with(
-        //     m::type('array'),
-        //     'TestEloquentBroadcastUserWithSpecificBroadcastPayloadCreated',
-        //     ['foo' => 'bar', 'socket' => null]
-        // );
+        Event::fake([BroadcastableModelEventOccurred::class]);
 
         $model = new TestEloquentBroadcastUserWithSpecificBroadcastPayload;
-        $model->name = 'Nuno';
-        $model->save();
-
-        // $this->broadcaster->expects('broadcast')->once()->with(
-        //     m::type('array'),
-        //     'TestEloquentBroadcastUserWithSpecificBroadcastPayloadUpdated',
-        //     m::on(function ($argument) {
-        //         return Arr::has($argument, ['model', 'connection', 'queue', 'socket']);
-        //     })
-        // );
-
         $model->name = 'Dries';
         $model->save();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastPayload
+                && $event->model->name === 'Dries'
+                && Arr::get($event->broadcastWith(), 'foo') === 'bar';
+        });
+
+        $model->name = 'Graham';
+        $model->save();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof TestEloquentBroadcastUserWithSpecificBroadcastPayload
+                && $event->model->name === 'Graham'
+                && is_null($event->broadcastWith())
+                && $this->assertHandldedBroadcastableModelEventHasDefaultPayload($event);
+        });
+    }
+
+    private function assertHandldedBroadcastableModelEventHasDefaultPayload(BroadcastableModelEventOccurred $event)
+    {
+        $broadcaster = m::mock(Broadcaster::class)
+            ->shouldReceive('broadcast')
+            ->once()
+            ->withArgs(function (array $channels, $eventName, array $payload) use ($event) {
+                return Arr::has($payload, ['model', 'connection', 'queue', 'socket'])
+                    && Arr::get($payload, 'model.id') === $event->model->id;
+            })->getMock();
+
+        (new BroadcastEvent($event))->handle($broadcaster);
+
+        return true;
     }
 }
 
