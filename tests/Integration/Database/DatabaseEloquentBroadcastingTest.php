@@ -12,16 +12,19 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
-use Mockery\MockInterface;
 
 /**
  * @group integration
  */
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
+    protected $broadcaster;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->broadcaster = $this->mock(Broadcaster::class);
 
         Schema::create('test_eloquent_broadcasting_users', function (Blueprint $table) {
             $table->increments('id');
@@ -147,17 +150,13 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     public function testBroadcastPayloadDefault()
     {
-        $this->mock(Broadcaster::class, function (MockInterface $mock) {
-            $mock->shouldReceive('broadcast')
-                ->once()
-                ->with(
-                    m::type('array'),
-                    'TestEloquentBroadcastUserCreated',
-                    m::on(function ($argument) {
-                        return Arr::has($argument, ['model', 'connection', 'queue', 'socket']);
-                    })
-                );
-        });
+        $this->broadcaster->expects('broadcast')->once()->with(
+            m::type('array'),
+            'TestEloquentBroadcastUserCreated',
+            m::on(function ($argument) {
+                return Arr::has($argument, ['model', 'connection', 'queue', 'socket']);
+            })
+        );
 
         $model = new TestEloquentBroadcastUser;
         $model->name = 'Nuno';
@@ -166,29 +165,23 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     public function testBroadcastPayloadCanBeDefined()
     {
-        $this->mock(Broadcaster::class, function (MockInterface $mock) {
-            $mock->shouldReceive('broadcast')
-                ->once()
-                ->with(
-                    m::type('array'),
-                    'TestEloquentBroadcastUserWithSpecificBroadcastPayloadCreated',
-                    ['foo' => 'bar', 'socket' => null]
-                );
-
-            $mock->shouldReceive('broadcast')
-                ->once()
-                ->with(
-                    m::type('array'),
-                    'TestEloquentBroadcastUserWithSpecificBroadcastPayloadUpdated',
-                    m::on(function ($argument) {
-                        return Arr::has($argument, ['model', 'connection', 'queue', 'socket']);
-                    })
-                );
-        });
+        $this->broadcaster->expects('broadcast')->once()->with(
+            m::type('array'),
+            'TestEloquentBroadcastUserWithSpecificBroadcastPayloadCreated',
+            ['foo' => 'bar', 'socket' => null]
+        );
 
         $model = new TestEloquentBroadcastUserWithSpecificBroadcastPayload;
         $model->name = 'Nuno';
         $model->save();
+
+        $this->broadcaster->expects('broadcast')->once()->with(
+            m::type('array'),
+            'TestEloquentBroadcastUserWithSpecificBroadcastPayloadUpdated',
+            m::on(function ($argument) {
+                return Arr::has($argument, ['model', 'connection', 'queue', 'socket']);
+            })
+        );
 
         $model->name = 'Dries';
         $model->save();
