@@ -150,6 +150,8 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
     public function testBroadcastPayloadDefault()
     {
+        dd(config('broadcasting.default'));
+
         $this->broadcaster->expects('broadcast')->once()->with(
             m::type('array'),
             'TestEloquentBroadcastUserCreated',
