@@ -48,7 +48,7 @@ trait HasAttributes
      *
      * @var array
      */
-    public $previousAttributes = [];
+    protected $previousAttributes = [];
 
     /**
      * The attributes that should be cast.
