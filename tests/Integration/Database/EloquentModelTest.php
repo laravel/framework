@@ -119,7 +119,9 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->changedTo('score', 1));
         $this->assertTrue($user->changedTo('score', 1, 0));
         $this->assertFalse($user->changedTo('score', 1, 2));
+
         $this->assertTrue($user->changedTo('score', fn ($score) => $score > 0));
+        $this->assertFalse($user->changedTo('score', fn ($score) => $score < 0));
 
         $user->items = [1, 2];
 
@@ -172,7 +174,9 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->changingTo('score', 1));
         $this->assertTrue($user->changingTo('score', 1, 0));
         $this->assertFalse($user->changingTo('score', 1, 2));
+
         $this->assertTrue($user->changingTo('score', fn ($score) => $score > 0));
+        $this->assertFalse($user->changingTo('score', fn ($score) => $score < 0));
 
         $user->items = [1, 2];
 
