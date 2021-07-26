@@ -125,7 +125,7 @@ class EloquentModelTest extends DatabaseTestCase
         $user->save();
 
         $this->assertTrue($user->changedTo('items', [1, 2]));
-        $this->assertTrue($user->changedTo('items', [1, 2]), json_encode([0, 1]));
+        $this->assertTrue($user->changedTo('items', [1, 2], [0, 1]));
     }
 
     public function testAttributeTransitioningFromTo()
