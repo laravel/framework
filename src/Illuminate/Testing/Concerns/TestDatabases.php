@@ -27,15 +27,13 @@ trait TestDatabases
     protected function bootTestDatabase()
     {
         ParallelTesting::setUpProcess(function () {
-            if (! ParallelTesting::option('skip_database_creation')) {
-                $this->whenNotUsingInMemoryDatabase(function ($database) {
-                    if (ParallelTesting::option('recreate_databases')) {
-                        Schema::dropDatabaseIfExists(
-                            $this->testDatabase($database)
-                        );
-                    }
-                });
-            }
+            $this->whenNotUsingInMemoryDatabase(function ($database) {
+                if (ParallelTesting::option('recreate_databases')) {
+                    Schema::dropDatabaseIfExists(
+                        $this->testDatabase($database)
+                    );
+                }
+            });
         });
 
         ParallelTesting::setUpTestCase(function ($testCase) {
