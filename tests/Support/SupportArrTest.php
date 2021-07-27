@@ -393,9 +393,10 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has([], ['']));
 
         $array = [
-            'products' => [ 'desk.0' => [ 'price' => 10 ] ]
+            'products' => [ 
+                'desk.0' => [ 'price' => 10 ] 
+            ]
         ];
-        
         $this->assertTrue(Arr::has($array, 'products."desk.0"'));
         $this->assertTrue(Arr::has($array, 'products."desk.0".price'));
         $this->assertFalse(Arr::has($array, 'products.desk.0'));

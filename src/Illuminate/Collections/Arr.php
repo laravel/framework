@@ -346,7 +346,6 @@ class Arr
         return true;
     }
 
-
     /**
      * Determine if any of the keys exist in an array using "dot" notation.
      *
