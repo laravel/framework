@@ -334,7 +334,7 @@ class Arr
                 continue;
             }
 
-            foreach (explode('.', $key) as $segment) {
+            foreach (str_getcsv($key, ".", '"') as $segment) {
                 if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
                     $subKeyArray = $subKeyArray[$segment];
                 } else {
