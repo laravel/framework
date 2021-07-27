@@ -711,7 +711,7 @@ class Arr
      * @param  mixed  $default
      * @return array
      */
-    public static function mergeByAppending(array $toAppendOn, array $toAppend, $returnDefault = true, $default = null)
+    public static function mergeByAppending(array $toAppendOn, array $toAppend, $returnDefault = false, $default = null)
     {
         return array_map(function ($value) use ($toAppend, $returnDefault, $default) {
             return static::get(
