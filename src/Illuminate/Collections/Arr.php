@@ -334,7 +334,7 @@ class Arr
                 continue;
             }
 
-            foreach (str_getcsv($key, ".", '"') as $segment) {
+            foreach (str_getcsv($key, '.', '"') as $segment) {
                 if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
                     $subKeyArray = $subKeyArray[$segment];
                 } else {
@@ -345,6 +345,7 @@ class Arr
 
         return true;
     }
+
 
     /**
      * Determine if any of the keys exist in an array using "dot" notation.
