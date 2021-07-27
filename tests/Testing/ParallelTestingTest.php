@@ -56,21 +56,21 @@ class ParallelTestingTest extends TestCase
         $parallelTesting = new ParallelTesting(Container::getInstance());
 
         $this->assertFalse($parallelTesting->option('recreate_databases'));
-        $this->assertFalse($parallelTesting->option('skip_database_creation'));
+        $this->assertFalse($parallelTesting->option('without_databases'));
 
         $parallelTesting->resolveOptionsUsing(function ($option) {
             return $option === 'recreate_databases';
         });
 
         $this->assertFalse($parallelTesting->option('recreate_caches'));
-        $this->assertFalse($parallelTesting->option('skip_database_creation'));
+        $this->assertFalse($parallelTesting->option('without_databases'));
         $this->assertTrue($parallelTesting->option('recreate_databases'));
 
         $parallelTesting->resolveOptionsUsing(function ($option) {
-            return $option === 'skip_database_creation';
+            return $option === 'without_databases';
         });
 
-        $this->assertTrue($parallelTesting->option('skip_database_creation'));
+        $this->assertTrue($parallelTesting->option('without_databases'));
     }
 
     public function testToken()

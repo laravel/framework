@@ -46,7 +46,7 @@ trait TestDatabases
             ];
 
             if (Arr::hasAny($uses, $databaseTraits)) {
-                if (! ParallelTesting::option('skip_database_creation')) {
+                if (! ParallelTesting::option('without_databases')) {
                     $this->whenNotUsingInMemoryDatabase(function ($database) use ($uses) {
                         [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
 
