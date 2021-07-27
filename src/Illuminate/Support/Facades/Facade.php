@@ -24,6 +24,13 @@ abstract class Facade
     protected static $resolvedInstance;
 
     /**
+     * Indicates if the resolved instance should be cached.
+     *
+     * @var bool
+     */
+    protected static $cached = true;
+
+    /**
      * Run a Closure when the facade has been resolved.
      *
      * @param  \Closure  $callback
@@ -84,10 +91,26 @@ abstract class Facade
         $name = static::getFacadeAccessor();
 
         $mock = static::isMock()
-                    ? static::$resolvedInstance[$name]
-                    : static::createFreshMockInstance();
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
 
         return $mock->shouldReceive(...func_get_args());
+    }
+
+    /**
+     * Initiate a mock expectation on the facade.
+     *
+     * @return \Mockery\Expectation
+     */
+    public static function expects()
+    {
+        $name = static::getFacadeAccessor();
+
+        $mock = static::isMock()
+            ? static::$resolvedInstance[$name]
+            : static::createFreshMockInstance();
+
+        return $mock->expects(...func_get_args());
     }
 
     /**
@@ -181,21 +204,21 @@ abstract class Facade
     /**
      * Resolve the facade root instance from the container.
      *
-     * @param  object|string  $name
+     * @param  string  $name
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
     {
-        if (is_object($name)) {
-            return $name;
-        }
-
         if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }
 
         if (static::$app) {
-            return static::$resolvedInstance[$name] = static::$app[$name];
+            if (static::$cached) {
+                return static::$resolvedInstance[$name] = static::$app[$name];
+            }
+
+            return static::$app[$name];
         }
     }
 

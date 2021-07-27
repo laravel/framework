@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Exceptions;
+namespace Illuminate\Foundation\Exceptions\Whoops;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
@@ -19,8 +19,8 @@ class WhoopsHandler
             $handler->handleUnconditionally(true);
 
             $this->registerApplicationPaths($handler)
-                 ->registerBlacklist($handler)
-                 ->registerEditor($handler);
+                ->registerBlacklist($handler)
+                ->registerEditor($handler);
         });
     }
 

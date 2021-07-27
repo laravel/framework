@@ -170,16 +170,6 @@ class Command extends SymfonyCommand
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setHidden(bool $hidden)
-    {
-        parent::setHidden($this->hidden = $hidden);
-
-        return $this;
-    }
-
-    /**
      * Get the Laravel application instance.
      *
      * @return \Illuminate\Contracts\Foundation\Application

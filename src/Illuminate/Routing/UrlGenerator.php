@@ -358,11 +358,12 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $absolute
+     * @param  array  $ignoreQuery
      * @return bool
      */
-    public function hasValidSignature(Request $request, $absolute = true)
+    public function hasValidSignature(Request $request, $absolute = true, array $ignoreQuery = [])
     {
-        return $this->hasCorrectSignature($request, $absolute)
+        return $this->hasCorrectSignature($request, $absolute, $ignoreQuery)
             && $this->signatureHasNotExpired($request);
     }
 
@@ -370,11 +371,12 @@ class UrlGenerator implements UrlGeneratorContract
      * Determine if the given request has a valid signature for a relative URL.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  array  $ignoreQuery
      * @return bool
      */
-    public function hasValidRelativeSignature(Request $request)
+    public function hasValidRelativeSignature(Request $request, array $ignoreQuery = [])
     {
-        return $this->hasValidSignature($request, false);
+        return $this->hasValidSignature($request, false, $ignoreQuery);
     }
 
     /**
@@ -382,15 +384,22 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $absolute
+     * @param  array  $ignoreQuery
      * @return bool
      */
-    public function hasCorrectSignature(Request $request, $absolute = true)
+    public function hasCorrectSignature(Request $request, $absolute = true, array $ignoreQuery = [])
     {
+        $ignoreQuery[] = 'signature';
+
         $url = $absolute ? $request->url() : '/'.$request->path();
 
-        $queryString = ltrim(preg_replace('/(^|&)signature=[^&]+/', '', $request->server->get('QUERY_STRING')), '&');
+        $queryString = collect(explode('&', $request->server->get('QUERY_STRING')))
+            ->reject(fn ($parameter) => in_array(Str::before($parameter, '='), $ignoreQuery))
+            ->join('&');
 
-        $signature = hash_hmac('sha256', rtrim($url.'?'.$queryString, '?'), call_user_func($this->keyResolver));
+        $original = rtrim($url.'?'.$queryString, '?');
+
+        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 
         return hash_equals($signature, (string) $request->query('signature', ''));
     }

@@ -53,7 +53,7 @@ class TrimStrings extends TransformsRequest
             return $value;
         }
 
-        return is_string($value) ? trim($value) : $value;
+        return is_string($value) ? trim($value, "  \t\n\r\0\x0B") : $value;
     }
 
     /**

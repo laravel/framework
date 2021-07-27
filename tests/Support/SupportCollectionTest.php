@@ -4317,10 +4317,13 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([1, 2, 3]);
 
         $fromTap = [];
-        $data = $data->tap(function ($data) use (&$fromTap) {
+        $tappedInstance = null;
+        $data = $data->tap(function ($data) use (&$fromTap, &$tappedInstance) {
             $fromTap = $data->slice(0, 1)->toArray();
+            $tappedInstance = $data;
         });
 
+        $this->assertSame($data, $tappedInstance);
         $this->assertSame([1], $fromTap);
         $this->assertSame([1, 2, 3], $data->toArray());
     }
@@ -4370,8 +4373,8 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(['michael', 'tom']);
 
-        $data = $data->whenEmpty(function ($collection) {
-            return $data->concat(['adam']);
+        $data = $data->whenEmpty(function () {
+            throw new Exception('whenEmpty() should not trigger on a collection with items');
         });
 
         $this->assertSame(['michael', 'tom'], $data->toArray());
@@ -4437,6 +4440,54 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHigherOrderWhenAndUnless($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when(true)->concat(['chris']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->when(false)->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->unless(false)->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
+
+        $data = $data->unless(true)->concat(['bogdan']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHigherOrderWhenAndUnlessWithProxy($collection)
+    {
+        $data = new $collection(['michael', 'tom']);
+
+        $data = $data->when->contains('michael')->concat(['chris']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->when->contains('missing')->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris'], $data->toArray());
+
+        $data = $data->unless->contains('missing')->concat(['adam']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
+
+        $data = $data->unless->contains('adam')->concat(['bogdan']);
+
+        $this->assertSame(['michael', 'tom', 'chris', 'adam'], $data->toArray());
     }
 
     /**

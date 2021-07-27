@@ -1437,6 +1437,44 @@ class TestResponseTest extends TestCase
         $response->assertCookieMissing('cookie-name');
     }
 
+    public function testGetDecryptedCookie()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie('cookie-name', 'cookie-value'))
+        );
+
+        $cookie = $response->getCookie('cookie-name', false);
+
+        $this->assertInstanceOf(Cookie::class, $cookie);
+        $this->assertEquals('cookie-name', $cookie->getName());
+        $this->assertEquals('cookie-value', $cookie->getValue());
+    }
+
+    public function testGetEncryptedCookie()
+    {
+        $container = Container::getInstance();
+        $encrypter = new Encrypter(str_repeat('a', 16));
+        $container->singleton('encrypter', function () use ($encrypter) {
+            return $encrypter;
+        });
+
+        $cookieName = 'cookie-name';
+        $cookieValue = 'cookie-value';
+        $encryptedValue = $encrypter->encrypt(
+            CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false
+        );
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response())->withCookie(new Cookie($cookieName, $encryptedValue))
+        );
+
+        $cookie = $response->getCookie($cookieName);
+
+        $this->assertInstanceOf(Cookie::class, $cookie);
+        $this->assertEquals($cookieName, $cookie->getName());
+        $this->assertEquals($cookieValue, $cookie->getValue());
+    }
+
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {

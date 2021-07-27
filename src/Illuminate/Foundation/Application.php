@@ -33,7 +33,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
+<<<<<<< HEAD
     const VERSION = '8.52.0';
+=======
+    const VERSION = '9.x-dev';
+>>>>>>> 709714d3d296b1557038e362b9405b9d65528572
 
     /**
      * The base path for the Laravel installation.
@@ -1304,6 +1308,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'cookie' => [\Illuminate\Cookie\CookieJar::class, \Illuminate\Contracts\Cookie\Factory::class, \Illuminate\Contracts\Cookie\QueueingFactory::class],
             'db' => [\Illuminate\Database\DatabaseManager::class, \Illuminate\Database\ConnectionResolverInterface::class],
             'db.connection' => [\Illuminate\Database\Connection::class, \Illuminate\Database\ConnectionInterface::class],
+            'db.schema' => [\Illuminate\Database\Schema\Builder::class],
             'encrypter' => [\Illuminate\Encryption\Encrypter::class, \Illuminate\Contracts\Encryption\Encrypter::class, \Illuminate\Contracts\Encryption\StringEncrypter::class],
             'events' => [\Illuminate\Events\Dispatcher::class, \Illuminate\Contracts\Events\Dispatcher::class],
             'files' => [\Illuminate\Filesystem\Filesystem::class],

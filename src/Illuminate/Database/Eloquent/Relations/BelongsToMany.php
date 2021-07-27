@@ -596,9 +596,9 @@ class BelongsToMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
+        if (is_null($instance = $this->related->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes);
         }
 
@@ -609,14 +609,15 @@ class BelongsToMany extends Relation
      * Get the first related record matching the attributes or create it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @param  array  $joining
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes, array $joining = [], $touch = true)
+    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create($attributes, $joining, $touch);
+        if (is_null($instance = $this->related->where($attributes)->first())) {
+            $instance = $this->create($attributes + $values, $joining, $touch);
         }
 
         return $instance;
@@ -633,8 +634,8 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            return $this->create($values, $joining, $touch);
+        if (is_null($instance = $this->related->where($attributes)->first())) {
+            return $this->create(array_merge($attributes, $values), $joining, $touch);
         }
 
         $instance->fill($values);

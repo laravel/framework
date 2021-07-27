@@ -1027,6 +1027,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
     }
 
+    public function testAddingUuidDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uuid();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `uuid` char(36) not null', $statements[0]);
+    }
+
     public function testAddingForeignUuid()
     {
         $blueprint = new Blueprint('users');
@@ -1058,6 +1068,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` varchar(45) not null', $statements[0]);
     }
 
+    public function testAddingIpAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->ipAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `ip_address` varchar(45) not null', $statements[0]);
+    }
+
     public function testAddingMacAddress()
     {
         $blueprint = new Blueprint('users');
@@ -1066,6 +1086,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `foo` varchar(17) not null', $statements[0]);
+    }
+
+    public function testAddingMacAddressDefaultsColumnName()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->macAddress();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `mac_address` varchar(17) not null', $statements[0]);
     }
 
     public function testAddingGeometry()
@@ -1178,32 +1208,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
     }
 
-    public function testDropAllTables()
-    {
-        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
-
-        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
-    }
-
-    public function testDropAllViews()
-    {
-        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
-
-        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
-    }
-
-    public function testGrammarsAreMacroable()
-    {
-        // compileReplace macro.
-        $this->getGrammar()::macro('compileReplace', function () {
-            return true;
-        });
-
-        $c = $this->getGrammar()::compileReplace();
-
-        $this->assertTrue($c);
-    }
-
     public function testCreateDatabase()
     {
         $connection = $this->getConnection();
@@ -1229,6 +1233,94 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         );
     }
 
+    public function testCreateTableWithVirtualAsColumn()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_column');
+        $blueprint->string('my_other_column')->virtualAs('my_column');
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_column` varchar(255) not null, `my_other_column` varchar(255) as (my_column)) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_json_column');
+        $blueprint->string('my_other_column')->virtualAsJson('my_json_column->some_attribute');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))))", $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_json_column');
+        $blueprint->string('my_other_column')->virtualAsJson('my_json_column->some_attribute->nested');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))))", $statements[0]);
+    }
+
+    public function testCreateTableWithStoredAsColumn()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $conn->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $conn->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_column');
+        $blueprint->string('my_other_column')->storedAs('my_column');
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_column` varchar(255) not null, `my_other_column` varchar(255) as (my_column) stored) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_json_column');
+        $blueprint->string('my_other_column')->storedAsJson('my_json_column->some_attribute');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))) stored)", $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('my_json_column');
+        $blueprint->string('my_other_column')->storedAsJson('my_json_column->some_attribute->nested');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))) stored)", $statements[0]);
+    }
+
     public function testDropDatabaseIfExists()
     {
         $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
@@ -1244,6 +1336,32 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
             'drop database if exists `my_database_b`',
             $statement
         );
+    }
+
+    public function testDropAllTables()
+    {
+        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+
+        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testDropAllViews()
+    {
+        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
+
+        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
     }
 
     protected function getConnection()

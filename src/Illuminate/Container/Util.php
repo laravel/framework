@@ -33,11 +33,12 @@ class Util
      * From global value() helper in Illuminate\Support.
      *
      * @param  mixed  $value
+     * @param  mixed  ...$args
      * @return mixed
      */
-    public static function unwrapIfClosure($value)
+    public static function unwrapIfClosure($value, ...$args)
     {
-        return $value instanceof Closure ? $value() : $value;
+        return $value instanceof Closure ? $value(...$args) : $value;
     }
 
     /**
