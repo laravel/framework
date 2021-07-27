@@ -72,7 +72,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->wasChanged('name'));
     }
 
-    public function testAttributeTransitionedFromTo()
+    public function testAttributeChangedTo()
     {
         $user = TestModel2::create([
             'name' => 'mohamed',
@@ -131,7 +131,7 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->changedTo('items', [1, 2], [0, 1]));
     }
 
-    public function testAttributeTransitioningFromTo()
+    public function testAttributeChangingTo()
     {
         $user = TestModel2::create([
             'name' => 'mohamed',
