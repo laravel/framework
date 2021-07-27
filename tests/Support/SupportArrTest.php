@@ -393,7 +393,7 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has([], ['']));
 
         $array = [
-            'products' => [ 
+            'products' => [
                 'desk.0' => ['price' => 10]
             ]
         ];
