@@ -1363,7 +1363,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('friend', $johnWithFriends->friends->find(3)->pivot->level->level);
         $this->assertSame('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
     }
-    
+
     public function testBelongsToManyCustomPivotUsingWithAttribute()
     {
         $john = EloquentTestUserWithCustomFriendPivotUsingWithAttribute::create(['id' => 1, 'name' => 'John Doe', 'email' => 'johndoe@example.com']);
