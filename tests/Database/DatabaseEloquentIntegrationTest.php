@@ -1363,6 +1363,20 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('friend', $johnWithFriends->friends->find(3)->pivot->level->level);
         $this->assertSame('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
     }
+    
+    public function testBelongsToManyCustomPivotUsingWithAttribute()
+    {
+        $john = EloquentTestUserWithCustomFriendPivotUsingWithAttribute::create(['id' => 1, 'name' => 'John Doe', 'email' => 'johndoe@example.com']);
+        $jane = EloquentTestUserWithCustomFriendPivotUsingWithAttribute::create(['id' => 2, 'name' => 'Jane Doe', 'email' => 'janedoe@example.com']);
+
+        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
+
+        $john->friends()->attach($jane, ['friend_level_id' => 1]);
+
+        $johnWithFriends = EloquentTestUserWithCustomFriendPivotUsingWithAttribute::with('friends')->find(1);
+
+        $this->assertTrue($johnWithFriends->friends->first()->pivot->relationLoaded('level'));
+    }
 
     public function testIsAfterRetrievingTheSameModel()
     {
@@ -1987,6 +2001,15 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
     }
 }
 
+class EloquentTestUserWithCustomFriendPivotUsingWithAttribute extends EloquentTestUser
+{
+    public function friends()
+    {
+        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
+                        ->using(EloquentTestFriendPivotUsingWithAttribute::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
+    }
+}
+
 class EloquentTestUserWithSpaceInColumnName extends EloquentTestUser
 {
     protected $table = 'users_with_space_in_colum_name';
@@ -2164,6 +2187,11 @@ class EloquentTestFriendPivot extends Pivot
     {
         return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
     }
+}
+
+class EloquentTestFriendPivotUsingWithAttribute extends EloquentTestFriendPivot
+{
+    protected $with = ['level'];
 }
 
 class EloquentTouchingUser extends Eloquent
