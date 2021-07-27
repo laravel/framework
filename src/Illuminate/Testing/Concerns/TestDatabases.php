@@ -27,13 +27,15 @@ trait TestDatabases
     protected function bootTestDatabase()
     {
         ParallelTesting::setUpProcess(function () {
-            $this->whenNotUsingInMemoryDatabase(function ($database) {
-                if (ParallelTesting::option('recreate_databases')) {
-                    Schema::dropDatabaseIfExists(
-                        $this->testDatabase($database)
-                    );
-                }
-            });
+            if (! ParallelTesting::option('skip_database_creation')) {
+                $this->whenNotUsingInMemoryDatabase(function ($database) {
+                    if (ParallelTesting::option('recreate_databases')) {
+                        Schema::dropDatabaseIfExists(
+                            $this->testDatabase($database)
+                        );
+                    }
+                });
+            }
         });
 
         ParallelTesting::setUpTestCase(function ($testCase) {
@@ -46,19 +48,21 @@ trait TestDatabases
             ];
 
             if (Arr::hasAny($uses, $databaseTraits)) {
-                $this->whenNotUsingInMemoryDatabase(function ($database) use ($uses) {
-                    [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
+                if (! ParallelTesting::option('skip_database_creation')) {
+                    $this->whenNotUsingInMemoryDatabase(function ($database) use ($uses) {
+                        [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
 
-                    $this->switchToDatabase($testDatabase);
+                        $this->switchToDatabase($testDatabase);
 
-                    if (isset($uses[Testing\DatabaseTransactions::class])) {
-                        $this->ensureSchemaIsUpToDate();
-                    }
+                        if (isset($uses[Testing\DatabaseTransactions::class])) {
+                            $this->ensureSchemaIsUpToDate();
+                        }
 
-                    if ($created) {
-                        ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
-                    }
-                });
+                        if ($created) {
+                            ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
+                        }
+                    });
+                }
             }
         });
     }
