@@ -213,10 +213,6 @@ class TestResponse implements ArrayAccess
      */
     protected function statusMessageWithException($expected, $actual, $exception)
     {
-        if ($exception instanceof ValidationException) {
-            return $this->statusMessageWithValidationErrors($expected, $actual, $exception);
-        }
-
         $exception = (string) $exception;
 
         return <<<EOF
