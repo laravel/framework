@@ -17,7 +17,6 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Illuminate\Validation\ValidationException;
 use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
