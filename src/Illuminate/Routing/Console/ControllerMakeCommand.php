@@ -50,6 +50,7 @@ class ControllerMakeCommand extends GeneratorCommand
         if ($type = $this->option('type')) {
             $stub = "/stubs/controller.{$type}.stub";
         } elseif ($this->option('parent')) {
+            $this->ensureModelOptionHasValue();
             $stub = '/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             $stub = '/stubs/controller.model.stub';
@@ -213,5 +214,18 @@ class ControllerMakeCommand extends GeneratorCommand
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
         ];
+    }
+
+    /**
+     * ensure that model option has value 
+     *
+     * @return void
+     */
+    public function ensureModelOptionHasValue()
+    {
+        if ( ! $this->option('model')) {
+            $this->error('The model option is required while using nested resource controller.');
+            exit(1);
+        }
     }
 }
