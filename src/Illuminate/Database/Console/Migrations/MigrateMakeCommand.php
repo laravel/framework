@@ -110,7 +110,7 @@ class MigrateMakeCommand extends BaseCommand
             $name, $this->getMigrationPath(), $table, $create
         );
 
-        if (! $this->option('fullpath')) {
+        if (! $this->hasOption('fullpath')) {
             $file = pathinfo($file, PATHINFO_FILENAME);
         }
 
