@@ -707,7 +707,7 @@ class Arr
      *
      * @param  array  $toAppendOn
      * @param  array  $toAppend
-     * @param  boolean  $returnDefault
+     * @param  bool  $returnDefault
      * @param  mixed  $default
      * @return array
      */
