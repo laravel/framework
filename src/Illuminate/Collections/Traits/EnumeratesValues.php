@@ -548,6 +548,10 @@ trait EnumeratesValues
      */
     public function where($key, $operator = null, $value = null)
     {
+        if (is_array($key)) {
+            throw new Exception("Arrays are not supported in this where clause.");
+        }
+
         return $this->filter($this->operatorForWhere(...func_get_args()));
     }
 
