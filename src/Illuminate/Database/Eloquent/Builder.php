@@ -465,7 +465,7 @@ class Builder
             return $instance;
         }
 
-        return $this->newModelInstance($attributes + $values);
+        return $this->newModelInstance($values + $attributes);
     }
 
     /**
@@ -481,7 +481,7 @@ class Builder
             return $instance;
         }
 
-        return tap($this->newModelInstance($attributes + $values), function ($instance) {
+        return tap($this->newModelInstance($values + $attributes), function ($instance) {
             $instance->save();
         });
     }
