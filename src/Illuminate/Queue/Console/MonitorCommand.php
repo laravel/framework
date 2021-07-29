@@ -17,21 +17,14 @@ class MonitorCommand extends Command
      */
     protected $signature = 'queue:monitor
                        {queues : The names of the queues to monitor}
-                       {--threshold=1000 : The maximum threshold before firing events}';
+                       {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Monitor the size of the queue.';
-
-    /**
-     * The table headers for the command.
-     *
-     * @var string[]
-     */
-    protected $headers = ['Connection', 'Queue', 'Size', 'Status'];
+    protected $description = 'Monitor the size of the specified queues';
 
     /**
      * The queue manager instance.
@@ -48,10 +41,18 @@ class MonitorCommand extends Command
     protected $events;
 
     /**
+     * The table headers for the command.
+     *
+     * @var string[]
+     */
+    protected $headers = ['Connection', 'Queue', 'Size', 'Status'];
+
+    /**
      * Create a new queue listen command.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return void
      */
     public function __construct(Factory $manager, Dispatcher $events)
     {
@@ -72,7 +73,7 @@ class MonitorCommand extends Command
 
         $this->displaySizes($queues);
 
-        $this->fireEvents($queues);
+        $this->dispatchEvents($queues);
     }
 
     /**
@@ -88,14 +89,14 @@ class MonitorCommand extends Command
 
             if (! isset($queue)) {
                 $queue = $connection;
-                $connection = config('queue.default');
+                $connection = $this->laravel['config']['queue.default'];
             }
 
             return [
                 'connection' => $connection,
                 'queue' => $queue,
                 'size' => $size = $this->manager->connection($connection)->size($queue),
-                'status' => $size >= $this->option('threshold') ? '<fg=red>ALERT</>' : 'OK',
+                'status' => $size >= $this->option('max') ? '<fg=red>ALERT</>' : 'OK',
             ];
         });
     }
@@ -117,7 +118,7 @@ class MonitorCommand extends Command
      * @param  \Illuminate\Support\Collection  $queues
      * @return void
      */
-    protected function fireEvents(Collection $queues)
+    protected function dispatchEvents(Collection $queues)
     {
         foreach ($queues as $queue) {
             if ($queue['status'] == 'OK') {
