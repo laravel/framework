@@ -201,7 +201,7 @@ class NonNullableString implements CastsAttributes
      */
     public function get($model, $key, $value, $attributes)
     {
-        return ($value <> '') ? $value : null;
+        return ($value != '') ? $value : null;
     }
 
     /**
