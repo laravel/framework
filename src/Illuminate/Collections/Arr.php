@@ -122,7 +122,7 @@ class Arr
     }
 
     /**
-     * Expand an array using "dot" notation to a multi-dimensional associative array
+     * Expand an array using "dot" notation to a multi-dimensional associative array.
      *
      * @param  iterable  $array
      * @return array
