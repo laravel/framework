@@ -3,8 +3,8 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Queue\Events\QueueBusy;
 use Illuminate\Support\Collection;
 
