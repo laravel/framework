@@ -113,6 +113,33 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
+    public function testUnDot()
+    {
+        $array = Arr::undot(['foo.bar' => 'baz']);
+        $this->assertEquals(['foo' => ['bar' => 'baz']], $array);
+
+        $array = Arr::undot([]);
+        $this->assertEquals([], $array);
+
+        $array = Arr::undot(['foo' => []]);
+        $this->assertEquals(['foo' => []], $array);
+
+        $array = Arr::undot(['foo','bar']);
+        $this->assertEquals(['foo','bar'], $array);
+
+        $array = Arr::undot(['foo.bar' => []]);
+        $this->assertEquals(['foo' => ['bar' => []]], $array);
+
+        $array = Arr::undot(['name' => 'taylor', 'languages.php' => true]);
+        $this->assertEquals(['name' => 'taylor', 'languages' => ['php' => true]], $array);
+
+        $array = Arr::undot(['name' => 'taylor', 'languages' => ['php' => true]]);
+        $this->assertEquals(['name' => 'taylor', 'languages' => ['php' => true]], $array);
+
+        $array = Arr::undot(['foo.bar.baz' => ['boo' => ['bor','boz']]]);
+        $this->assertEquals(['foo' => ['bar' => ['baz' => ['boo' => ['bor','boz']]]]], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
