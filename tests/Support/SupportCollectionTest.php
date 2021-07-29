@@ -921,6 +921,10 @@ class SupportCollectionTest extends TestCase
             [['v' => 1], ['v' => 2]],
             $c->where('v')->values()->all()
         );
+
+        $this->expectException(Exception::class);
+        $c = new $collection([['v' => 1], ['v' => 2], ['v' => null]]);
+        $c->where(['v' => 1])->values()->all();
     }
 
     /**
