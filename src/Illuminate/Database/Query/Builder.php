@@ -90,6 +90,13 @@ class Builder
     public $distinct = false;
 
     /**
+     * Function to be called immediately after query.
+     *
+     * @var callable|null
+     */
+    public $foundRowsCallable = null;
+
+    /**
      * The table which the query is targeting.
      *
      * @var string
@@ -2346,9 +2353,16 @@ class Builder
      */
     protected function runSelect()
     {
-        return $this->connection->select(
+        $results = $this->connection->select(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
+
+        if ($this->foundRowsCallable) {
+            ($this->foundRowsCallable)($this);
+            $this->foundRowsCallable = null;
+        }
+
+        return $results;
     }
 
     /**
@@ -2364,9 +2378,23 @@ class Builder
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $total = $this->getCountForPagination();
+        if ($this->getConnection() instanceof \Illuminate\Database\MySqlConnection) {
+            $total = 0;
+            $this->foundRowsCallable = function (\Illuminate\Database\Query\Builder $query) use (&$total) {
+                $result = $query->getConnection()->selectOne('select found_rows() as total');
+                $total = is_object($result) ? $result->total : $result['total'];
+            };
 
-        $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
+            $results = $this->forPage($page, $perPage)->get($columns);
+
+            if ($total <= 0) {
+                $results = collect();
+            }
+        } else {
+            $total = $this->getCountForPagination();
+
+            $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
+        }
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),

@@ -140,6 +140,10 @@ class Grammar extends BaseGrammar
             $select = 'select ';
         }
 
+        if ($query->foundRowsCallable !== null) {
+            $select = preg_replace('/select /', 'select sql_calc_found_rows ', $select, 1);
+        }
+
         return $select.$this->columnize($columns);
     }
 

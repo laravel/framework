@@ -782,9 +782,24 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = ($total = $this->toBase()->getCountForPagination())
-                                    ? $this->forPage($page, $perPage)->get($columns)
-                                    : $this->model->newCollection();
+        if ($this->getConnection() instanceof \Illuminate\Database\MySqlConnection) {
+            $total = 0;
+
+            $this->getQuery()->foundRowsCallable = function (\Illuminate\Database\Query\Builder $query) use (&$total) {
+                $result = $query->getConnection()->selectOne('select found_rows() as total');
+                $total = is_object($result) ? $result->total : $result['total'];
+            };
+
+            $results = $this->forPage($page, $perPage)->get($columns);
+
+            if ($total <= 0) {
+                $results = $this->model->newCollection();
+            }
+        } else {
+            $results = ($total = $this->toBase()->getCountForPagination())
+                ? $this->forPage($page, $perPage)->get($columns)
+                : $this->model->newCollection();
+        }
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
