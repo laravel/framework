@@ -652,6 +652,26 @@ class Builder
     }
 
     /**
+     * Checks if method with case sensitive name exists on model.
+     *
+     * @param  string  $name
+     * @return boolean
+     */
+    public function existsCaseSensitiveMethod($name) {
+        if (!$model = $this->getModel()) {
+            return false;
+        }
+
+        if (!$instance = $model->newInstance()) {
+            return false;
+        }
+
+        $classMethods = get_class_methods($instance);
+
+        return false !== array_search($name, $classMethods, true);
+    }
+
+    /**
      * Get the relation instance for the given relation name.
      *
      * @param  string  $name
@@ -663,11 +683,11 @@ class Builder
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
         $relation = Relation::noConstraints(function () use ($name) {
-            try {
-                return $this->getModel()->newInstance()->$name();
-            } catch (BadMethodCallException $e) {
+            if (!$this->existsCaseSensitiveMethod($name)) {
                 throw RelationNotFoundException::make($this->getModel(), $name);
             }
+
+            return $this->getModel()->newInstance()->$name();
         });
 
         $nested = $this->relationsNestedUnder($name);
