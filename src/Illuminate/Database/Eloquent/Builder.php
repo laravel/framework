@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
@@ -655,14 +654,15 @@ class Builder
      * Checks if method with case sensitive name exists on model.
      *
      * @param  string  $name
-     * @return boolean
+     * @return bool
      */
-    public function existsCaseSensitiveMethod($name) {
-        if (!$model = $this->getModel()) {
+    public function existsCaseSensitiveMethod($name)
+    {
+        if (! $model = $this->getModel()) {
             return false;
         }
 
-        if (!$instance = $model->newInstance()) {
+        if (! $instance = $model->newInstance()) {
             return false;
         }
 
@@ -683,7 +683,7 @@ class Builder
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
         $relation = Relation::noConstraints(function () use ($name) {
-            if (!$this->existsCaseSensitiveMethod($name)) {
+            if (! $this->existsCaseSensitiveMethod($name)) {
                 throw RelationNotFoundException::make($this->getModel(), $name);
             }
 
