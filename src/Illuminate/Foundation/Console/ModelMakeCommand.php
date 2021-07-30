@@ -63,6 +63,10 @@ class ModelMakeCommand extends GeneratorCommand
         if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
             $this->createController();
         }
+
+        if ($this->option('observe')) {
+            $this->createObserver();
+        }
     }
 
     /**
@@ -114,6 +118,21 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create an observer file for the model.
+     *
+     * @return void
+     */
+    protected function createObserver()
+    {
+        $observer = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:observer', [
+            'name' => "{$observer}Observer",
+            '--model' => $observer,
+        ]);
+    }
+
+    /**
      * Create a controller for the model.
      *
      * @return void
@@ -125,7 +144,7 @@ class ModelMakeCommand extends GeneratorCommand
         $modelName = $this->qualifyClass($this->getNameInput());
 
         $this->call('make:controller', array_filter([
-            'name' => "{$controller}Controller",
+            'name'  => "{$controller}Controller",
             '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
             '--api' => $this->option('api'),
         ]));
@@ -184,6 +203,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
+            ['observe', 'o', InputOption::VALUE_NONE, 'Create a new observer file for the model'],
         ];
     }
 }
