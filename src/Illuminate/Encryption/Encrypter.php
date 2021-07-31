@@ -85,7 +85,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     public function encrypt($value, $serialize = true)
     {
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
-        $tag = "";
+        $tag = '';
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
