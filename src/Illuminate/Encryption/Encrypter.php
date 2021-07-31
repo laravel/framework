@@ -90,10 +90,16 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
         // value can be verified later as not having been changed by the users.
-        $value = \openssl_encrypt(
-            $serialize ? serialize($value) : $value,
-            $this->cipher, $this->key, 0, $iv, $tag
-        );
+        $value =
+            in_array($this->cipher, ['AES-128-GCM', 'AES-256-GCM']) ?
+                \openssl_encrypt(
+                    $serialize ? serialize($value) : $value,
+                    $this->cipher, $this->key, 0, $iv, $tag
+                ) :
+                \openssl_encrypt(
+                    $serialize ? serialize($value) : $value,
+                    $this->cipher, $this->key, 0, $iv
+                );
 
         if ($value === false) {
             throw new EncryptException('Could not encrypt the data.');
