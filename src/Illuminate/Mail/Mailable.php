@@ -9,6 +9,8 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -150,6 +152,13 @@ class Mailable implements MailableContract, Renderable
     public $mailer;
 
     /**
+     * The middleware the mail should be sent through.
+     *
+     * @var array
+     */
+    public $middleware = [];
+
+    /**
      * The rendered mailable views for testing / assertions.
      *
      * @var array
@@ -171,19 +180,21 @@ class Mailable implements MailableContract, Renderable
      */
     public function send($mailer)
     {
-        $this->withLocale($this->locale, function () use ($mailer) {
-            Container::getInstance()->call([$this, 'build']);
+        $this->throughMiddleware()->then(function ($mailable) use ($mailer) {
+            $this->withLocale($this->locale, function () use ($mailer, $mailable) {
+                Container::getInstance()->call([$mailable, 'build']);
 
-            $mailer = $mailer instanceof MailFactory
-                            ? $mailer->mailer($this->mailer)
-                            : $mailer;
+                $mailer = $mailer instanceof MailFactory
+                                ? $mailer->mailer($mailable->mailer)
+                                : $mailer;
 
-            return $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
-                $this->buildFrom($message)
-                     ->buildRecipients($message)
-                     ->buildSubject($message)
-                     ->runCallbacks($message)
-                     ->buildAttachments($message);
+                return $mailer->send($mailable->buildView(), $mailable->buildViewData(), function ($message) use ($mailable) {
+                    $mailable->buildFrom($message)
+                         ->buildRecipients($message)
+                         ->buildSubject($message)
+                         ->runCallbacks($message)
+                         ->buildAttachments($message);
+                });
             });
         });
     }
@@ -225,6 +236,21 @@ class Mailable implements MailableContract, Renderable
         return $queue->connection($connection)->laterOn(
             $queueName ?: null, $delay, $this->newQueuedJob()
         );
+    }
+
+    /**
+     * Send this mailable through its specified middleware.
+     *
+     * @return \Illuminate\Pipeline\Pipeline
+     */
+    protected function throughMiddleware()
+    {
+        return (new Pipeline(Container::getInstance()))
+            ->send($this)
+            ->through(array_merge(
+                method_exists($this, 'middleware') ? $this->middleware() : [],
+                $this->middleware ?? []
+            ));
     }
 
     /**
@@ -993,6 +1019,19 @@ class Mailable implements MailableContract, Renderable
     public static function buildViewDataUsing(callable $callback)
     {
         static::$viewDataCallback = $callback;
+    }
+
+    /**
+     * Specify the middleware the mail should be sent through.
+     *
+     * @param array|object|string $middleware
+     * @return $this
+     */
+    public function through($middleware)
+    {
+        $this->middleware = Arr::wrap($middleware);
+
+        return $this;
     }
 
     /**

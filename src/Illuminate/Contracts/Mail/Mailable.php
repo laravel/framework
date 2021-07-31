@@ -73,4 +73,12 @@ interface Mailable
      * @return $this
      */
     public function mailer($mailer);
+
+    /**
+     * Specify the middleware the mail should be sent through.
+     *
+     * @param  array|object|string  $middleware
+     * @return $this
+     */
+    public function through($middleware);
 }

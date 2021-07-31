@@ -3,11 +3,13 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Mail\Factory;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\MailQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -341,7 +343,9 @@ class MailFake implements Factory, Mailer, MailQueue
             return $this->queue($view, $data);
         }
 
-        $this->mailables[] = $view;
+        $this->throughMiddleware($view)->then(function ($view) {
+            $this->mailables[] = $view;
+        });
     }
 
     /**
@@ -361,7 +365,9 @@ class MailFake implements Factory, Mailer, MailQueue
 
         $this->currentMailer = null;
 
-        $this->queuedMailables[] = $view;
+        $this->throughMiddleware($view)->then(function ($view) {
+            $this->queuedMailables[] = $view;
+        });
     }
 
     /**
@@ -385,5 +391,20 @@ class MailFake implements Factory, Mailer, MailQueue
     public function failures()
     {
         return [];
+    }
+
+    /**
+     * Send this mailable through its specified middleware.
+     *
+     * @return \Illuminate\Pipeline\Pipeline
+     */
+    protected function throughMiddleware(Mailable $mailable)
+    {
+        return (new Pipeline(Container::getInstance()))
+            ->send($mailable)
+            ->through(array_merge(
+                method_exists($mailable, 'middleware') ? $mailable->middleware() : [],
+                $mailable->middleware ?? []
+            ));
     }
 }

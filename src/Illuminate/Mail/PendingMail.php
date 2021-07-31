@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Support\Arr;
 
 class PendingMail
 {
@@ -42,6 +43,13 @@ class PendingMail
      * @var array
      */
     protected $bcc = [];
+
+    /**
+     * The middleware the mail should be sent through.
+     *
+     * @var array
+     */
+    public $middleware = [];
 
     /**
      * Create a new mailable mailer instance.
@@ -111,6 +119,19 @@ class PendingMail
     }
 
     /**
+     * Specify the middleware the mail should be sent through.
+     *
+     * @param  array|object|string  $middleware
+     * @return $this
+     */
+    public function through($middleware)
+    {
+        $this->middleware = Arr::wrap($middleware);
+
+        return $this;
+    }
+
+    /**
      * Send a new mailable message instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
@@ -152,12 +173,16 @@ class PendingMail
      */
     protected function fill(MailableContract $mailable)
     {
-        return tap($mailable->to($this->to)
-            ->cc($this->cc)
-            ->bcc($this->bcc), function (MailableContract $mailable) {
+        return tap(
+            $mailable->to($this->to)
+                ->cc($this->cc)
+                ->bcc($this->bcc)
+                ->through($this->middleware),
+            function (MailableContract $mailable) {
                 if ($this->locale) {
                     $mailable->locale($this->locale);
                 }
-            });
+            }
+        );
     }
 }
