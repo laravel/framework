@@ -191,7 +191,10 @@ class TestResponse implements ArrayAccess
             }
         }
 
-        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
+        if (
+            $this->baseResponse->headers->get('Content-Type') === 'application/json'
+            && !$this->baseResponse->headers->has('content-encoding')
+        ) {
             $json = $this->json();
 
             if (isset($json['errors'])) {

@@ -554,6 +554,19 @@ class TestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
+    public function testAssertNotValidatedJsonForEncoding()
+    {
+        $expectedStatusCode = 200;
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('content-type', 'application/json');
+            $response->header('content-encoding', 'gzip');
+            $response->setContent('b"x£½V*.I,)-V▓R╩¤V¬\x05\x00+ü\x059"');
+        });
+
+        TestResponse::fromBaseResponse($baseResponse)->assertStatus($expectedStatusCode);
+    }
+
     public function testAssertStatusShowsErrorsOnUnexpectedErrorRedirect()
     {
         $statusCode = 302;
