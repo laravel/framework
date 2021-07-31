@@ -192,10 +192,10 @@ class TestResponse implements ArrayAccess
         }
 
         if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
-            $json = $this->json();
+            $testJson = new AssertableJsonString($this->getContent());
 
-            if (isset($json['errors'])) {
-                return $this->statusMessageWithErrors($expected, $actual, $json);
+            if (isset($testJson['errors'])) {
+                return $this->statusMessageWithErrors($expected, $actual, $testJson->json());
             }
         }
 

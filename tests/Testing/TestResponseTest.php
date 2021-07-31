@@ -599,6 +599,14 @@ class TestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
+    public function testAssertStatusWhenJsonIsFalse()
+    {
+        $baseResponse = new Response('false', 200, ['Content-Type' => 'application/json']);
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus(200);
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);
