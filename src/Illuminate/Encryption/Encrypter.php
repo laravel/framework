@@ -85,7 +85,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     public function encrypt($value, $serialize = true)
     {
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
-        $tag = '';
+        $tag = in_array($this->cipher, ['AES-128-GCM', 'AES-256-GCM']) ? '' : null;
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
@@ -102,7 +102,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // Once we get the encrypted value we'll go ahead and base64_encode the input
         // vector and create the MAC for the encrypted value so we can then verify
         // its authenticity. Then, we'll JSON the data into the "payload" array.
-        $mac = $this->hash($iv = base64_encode($iv), $value, $tag = base64_encode($tag));
+        $mac = $this->hash($iv = base64_encode($iv), $value, $tag = $tag ? base64_encode($tag) : null);
 
         $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
 
@@ -140,7 +140,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         $payload = $this->getJsonPayload($payload);
 
         $iv = base64_decode($payload['iv']);
-        $tag = base64_decode($payload['tag']);
+        $tag = empty($payload['tag']) ? null : base64_decode($payload['tag']);
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
@@ -215,7 +215,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function validPayload($payload)
     {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac'], $payload['tag']) &&
+        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
             strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
     }
 
