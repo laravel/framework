@@ -108,7 +108,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // Once we get the encrypted value we'll go ahead and base64_encode the input
         // vector and create the MAC for the encrypted value so we can then verify
         // its authenticity. Then, we'll JSON the data into the "payload" array.
-        $mac = $this->hash($iv = base64_encode($iv), $value, $tag = $tag ? base64_encode($tag) : null);
+        $mac = $this->hash($iv = base64_encode($iv), $value, $tag = $tag ? base64_encode($tag) : '');
 
         $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
 
