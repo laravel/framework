@@ -234,7 +234,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     protected function validMac(array $payload)
     {
         return hash_equals(
-            $this->hash($payload['iv'], $payload['value'], $payload['tag']), $payload['mac']
+            $this->hash($payload['iv'], $payload['value'], $payload['tag'] ?? ''), $payload['mac']
         );
     }
 
