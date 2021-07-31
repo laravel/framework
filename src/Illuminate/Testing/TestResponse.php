@@ -193,7 +193,7 @@ class TestResponse implements ArrayAccess
 
         if (
             $this->baseResponse->headers->get('Content-Type') === 'application/json'
-            && !$this->baseResponse->headers->has('content-encoding')
+            && ! $this->baseResponse->headers->has('content-encoding')
         ) {
             $json = $this->json();
 
