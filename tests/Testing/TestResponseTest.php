@@ -559,8 +559,8 @@ class TestResponseTest extends TestCase
         $expectedStatusCode = 200;
 
         $baseResponse = tap(new Response, function ($response) {
-            $response->header('content-type', 'application/json');
-            $response->header('content-encoding', 'gzip');
+            $response->header('Content-Type', 'application/json');
+            $response->header('Content-Encoding', 'gzip');
             $response->setContent('b"x£½V*.I,)-V▓R╩¤V¬\x05\x00+ü\x059"');
         });
 
