@@ -228,7 +228,7 @@ EOF;
      *
      * @param  string|int  $expected
      * @param  string|int  $actual
-     * @param  array $errors;
+     * @param  array  $errors
      * @return string
      */
     protected function statusMessageWithErrors($expected, $actual, $errors)

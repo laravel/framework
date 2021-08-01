@@ -125,7 +125,7 @@ trait CompilesEchos
     /**
      * Add an instance of the blade echo handler to the start of the compiled string.
      *
-     * @param string $result
+     * @param  string  $result
      * @return string
      */
     protected function addBladeCompilerVariable($result)
@@ -153,7 +153,7 @@ trait CompilesEchos
     /**
      * Apply the echo handler for the value if it exists.
      *
-     * @param  $value  string
+     * @param  string  $value
      * @return string
      */
     public function applyEchoHandler($value)

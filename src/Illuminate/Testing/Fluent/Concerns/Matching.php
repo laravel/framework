@@ -66,7 +66,7 @@ trait Matching
      * Asserts that the property is of the expected type.
      *
      * @param  string  $key
-     * @param  string|array $expected
+     * @param  string|array  $expected
      * @return $this
      */
     public function whereType(string $key, $expected): self
@@ -106,8 +106,8 @@ trait Matching
     /**
      * Asserts that the property contains the expected values.
      *
-     * @param string       $key
-     * @param array|string $expected
+     * @param  string  $key
+     * @param  array|string  $expected
      *
      * @return $this
      */
