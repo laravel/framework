@@ -283,6 +283,61 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every two days.
+     *
+     * @return $this
+     */
+    public function everyTwoDays()
+    {
+        return $this->everyXDays(2);
+    }
+
+    /**
+     * Schedule the event to run every five days.
+     *
+     * @return $this
+     */
+    public function everyFiveDays()
+    {
+        return $this->everyXDays(5);
+    }
+
+    /**
+     * Schedule the event to run every ten days.
+     *
+     * @return $this
+     */
+    public function everyTenDays()
+    {
+        return $this->everyXDays(10);
+    }
+
+    /**
+     * Schedule the event to run every X days.
+     *
+     * @param  int  $days
+     * @return $this
+     */
+    public function everyXDays($days)
+    {
+        return $this->everyXDaysAt($days);
+    }
+
+    /**
+     * Schedule the event to run every X days at a given time (10:00, 16:31, etc).
+     *
+     * @param  $days
+     * @param  string  $time
+     * @return $this
+     */
+    public function everyXDaysAt($days, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, '*/'.$days);
+    }
+
+    /**
      * Schedule the event to run only on weekdays.
      *
      * @return $this

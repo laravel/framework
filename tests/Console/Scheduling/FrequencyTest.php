@@ -62,6 +62,25 @@ class FrequencyTest extends TestCase
         $this->assertSame('5 3,15 * * *', $this->event->twiceDailyAt(3, 15, 5)->getExpression());
     }
 
+    public function testEveryXDays()
+    {
+        $this->assertSame('0 0 */2 * *', $this->event->everyTwoDays()->getExpression());
+        $this->assertSame('0 0 */5 * *', $this->event->everyFiveDays()->getExpression());
+        $this->assertSame('0 0 */10 * *', $this->event->everyTenDays()->getExpression());
+        $this->assertSame('0 0 */3 * *', $this->event->everyXDays(3)->getExpression());
+        $this->assertSame('0 0 */8 * *', $this->event->everyXDays(8)->getExpression());
+        $this->assertSame('0 0 */13 * *', $this->event->everyXDays(13)->getExpression());
+    }
+
+    public function testEveryXDaysAt()
+    {
+        $this->assertSame('10 13 */2 * *', $this->event->everyXDaysAt(2, '13:10')->getExpression());
+        $this->assertSame('50 9 */3 * *', $this->event->everyXDaysAt(3, '9:50')->getExpression());
+        $this->assertSame('31 16 */4 * *', $this->event->everyXDaysAt(4, '16:31')->getExpression());
+        $this->assertSame('43 15 */5 * *', $this->event->everyXDaysAt(5, '15:43')->getExpression());
+        $this->assertSame('6 6 */6 * *', $this->event->everyXDaysAt(6, '6:6')->getExpression());
+    }
+
     public function testWeekly()
     {
         $this->assertSame('0 0 * * 0', $this->event->weekly()->getExpression());
