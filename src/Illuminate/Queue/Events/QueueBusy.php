@@ -28,8 +28,8 @@ class QueueBusy
     /**
      * Create a new event instance.
      *
-     * @param  string $connection
-     * @param  string $queue
+     * @param  string  $connection
+     * @param  string  $queue
      * @param  int  $size
      * @return void
      */
