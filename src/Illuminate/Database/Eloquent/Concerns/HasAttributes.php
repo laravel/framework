@@ -245,11 +245,13 @@ trait HasAttributes
             // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
             if ($attributes[$key] &&
-                ($value === 'date' || $value === 'datetime' || $value === 'immutable_date' || $value === 'immutable_datetime')) {
+                ($value === 'date' || $value === 'datetime' ||
+                 $value === 'immutable_date' || $value === 'immutable_datetime')) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if ($attributes[$key] && ($this->isCustomDateTimeCast($value) || $this->isImmutableCustomDateTimeCast($value))) {
+            if ($attributes[$key] && ($this->isCustomDateTimeCast($value) ||
+                $this->isImmutableCustomDateTimeCast($value))) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
