@@ -179,7 +179,7 @@ trait HasAttributes
     protected function addDateAttributesToArray(array $attributes)
     {
         foreach ($this->getDates() as $key) {
-            if (!isset($attributes[$key])) {
+            if (! isset($attributes[$key])) {
                 continue;
             }
 
@@ -204,7 +204,7 @@ trait HasAttributes
             // We want to spin through all the mutated attributes for this model and call
             // the mutator for the attribute. We cache off every mutated attributes so
             // we don't have to constantly check on attributes that actually change.
-            if (!array_key_exists($key, $attributes)) {
+            if (! array_key_exists($key, $attributes)) {
                 continue;
             }
 
@@ -229,7 +229,7 @@ trait HasAttributes
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
         foreach ($this->getCasts() as $key => $value) {
-            if (!array_key_exists($key, $attributes) ||
+            if (! array_key_exists($key, $attributes) ||
                 in_array($key, $mutatedAttributes)) {
                 continue;
             }
@@ -287,7 +287,7 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
-        if (!count($this->appends)) {
+        if (! count($this->appends)) {
             return [];
         }
 
@@ -377,7 +377,7 @@ trait HasAttributes
      */
     public function getAttribute($key)
     {
-        if (!$key) {
+        if (! $key) {
             return;
         }
 
@@ -438,7 +438,7 @@ trait HasAttributes
             return $this->relations[$key];
         }
 
-        if (!$this->isRelation($key)) {
+        if (! $this->isRelation($key)) {
             return;
         }
 
@@ -491,7 +491,7 @@ trait HasAttributes
     {
         $relation = $this->$method();
 
-        if (!$relation instanceof Relation) {
+        if (! $relation instanceof Relation) {
             if (is_null($relation)) {
                 throw new LogicException(sprintf(
                     '%s::%s must return a relationship instance, but "null" was returned. Was the "return" keyword used?', static::class, $method
@@ -587,7 +587,7 @@ trait HasAttributes
         switch ($castType) {
             case 'int':
             case 'integer':
-                return (int)$value;
+                return (int) $value;
             case 'real':
             case 'float':
             case 'double':
@@ -595,10 +595,10 @@ trait HasAttributes
             case 'decimal':
                 return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
             case 'string':
-                return (string)$value;
+                return (string) $value;
             case 'bool':
             case 'boolean':
-                return (bool)$value;
+                return (bool) $value;
             case 'object':
                 return $this->fromJson($value, true);
             case 'array':
@@ -645,7 +645,7 @@ trait HasAttributes
                 ? $value
                 : $caster->get($this, $key, $value, $this->attributes);
 
-            if ($caster instanceof CastsInboundAttributes || !is_object($value)) {
+            if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
                 unset($this->classCastCache[$key]);
             } else {
                 $this->classCastCache[$key] = $value;
@@ -771,7 +771,7 @@ trait HasAttributes
             return $this;
         }
 
-        if (!is_null($value) && $this->isJsonCastable($key)) {
+        if (! is_null($value) && $this->isJsonCastable($key)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
 
@@ -782,7 +782,7 @@ trait HasAttributes
             return $this->fillJsonAttribute($key, $value);
         }
 
-        if (!is_null($value) && $this->isEncryptedCastable($key)) {
+        if (! is_null($value) && $this->isEncryptedCastable($key)) {
             $value = $this->castAttributeAsEncryptedString($key, $value);
         }
 
@@ -876,7 +876,7 @@ trait HasAttributes
             );
         }
 
-        if ($caster instanceof CastsInboundAttributes || !is_object($value)) {
+        if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
             unset($this->classCastCache[$key]);
         } else {
             $this->classCastCache[$key] = $value;
@@ -906,7 +906,7 @@ trait HasAttributes
      */
     protected function getArrayAttributeByKey($key)
     {
-        if (!isset($this->attributes[$key])) {
+        if (! isset($this->attributes[$key])) {
             return [];
         }
 
@@ -957,7 +957,7 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value, !$asObject);
+        return json_decode($value, ! $asObject);
     }
 
     /**
@@ -1002,7 +1002,7 @@ trait HasAttributes
      */
     public function fromFloat($value)
     {
-        switch ((string)$value) {
+        switch ((string) $value) {
             case 'Infinity':
                 return INF;
             case '-Infinity':
@@ -1010,7 +1010,7 @@ trait HasAttributes
             case 'NaN':
                 return NAN;
             default:
-                return (float)$value;
+                return (float) $value;
         }
     }
 
@@ -1144,7 +1144,7 @@ trait HasAttributes
      */
     public function getDates()
     {
-        if (!$this->usesTimestamps()) {
+        if (! $this->usesTimestamps()) {
             return $this->dates;
         }
 
@@ -1189,7 +1189,7 @@ trait HasAttributes
     public function hasCast($key, $types = null)
     {
         if (array_key_exists($key, $this->getCasts())) {
-            return $types ? in_array($this->getCastType($key), (array)$types, true) : true;
+            return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
         }
 
         return false;
@@ -1252,7 +1252,7 @@ trait HasAttributes
      */
     protected function isClassCastable($key)
     {
-        if (!array_key_exists($key, $this->getCasts())) {
+        if (! array_key_exists($key, $this->getCasts())) {
             return false;
         }
 
@@ -1552,7 +1552,7 @@ trait HasAttributes
      */
     public function isClean($attributes = null)
     {
-        return !$this->isDirty(...func_get_args());
+        return ! $this->isDirty(...func_get_args());
     }
 
     /**
@@ -1606,7 +1606,7 @@ trait HasAttributes
         $dirty = [];
 
         foreach ($this->getAttributes() as $key => $value) {
-            if (!$this->originalIsEquivalent($key)) {
+            if (! $this->originalIsEquivalent($key)) {
                 $dirty[$key] = $value;
             }
         }
@@ -1632,7 +1632,7 @@ trait HasAttributes
      */
     public function originalIsEquivalent($key)
     {
-        if (!array_key_exists($key, $this->original)) {
+        if (! array_key_exists($key, $this->original)) {
             return false;
         }
 
@@ -1661,7 +1661,7 @@ trait HasAttributes
         }
 
         return is_numeric($attribute) && is_numeric($original)
-            && strcmp((string)$attribute, (string)$original) === 0;
+            && strcmp((string) $attribute, (string) $original) === 0;
     }
 
     /**
@@ -1746,7 +1746,7 @@ trait HasAttributes
     {
         $class = static::class;
 
-        if (!isset(static::$mutatorCache[$class])) {
+        if (! isset(static::$mutatorCache[$class])) {
             static::cacheMutatedAttributes($class);
         }
 
