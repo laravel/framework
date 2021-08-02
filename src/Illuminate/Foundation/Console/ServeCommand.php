@@ -100,7 +100,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL'])
+            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL', 'PHP_CLI_SERVER_WORKERS'])
                     ? [$key => $value]
                     : [$key => false];
         })->all());
