@@ -33,7 +33,7 @@ class ServeCommand extends Command
 
     /**
      * The environment variables that are passed thru to the built-in PHP webserver.
-     * 
+     *
      * @var array
      */
     protected $passthruEnvVars;
@@ -42,7 +42,7 @@ class ServeCommand extends Command
      * Create a new serve command instance.
      *
      * @param  array  $passthruEnvVars
-     * 
+     *
      * @return void
      */
     public function __construct(array $passthruEnvVars = ['APP_ENV', 'LARAVEL_SAIL'])
