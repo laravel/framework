@@ -80,6 +80,14 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php \$component->withAttributes([':title' => 'user.name']); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
     }
 
+    public function testClassAttributeAcceptsArray()
+    {
+        $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :class="[\'string\', \'include\' => true, \'exclude\' => false]" user-id="1"></x-profile>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestProfileComponent', 'profile', ['userId' => '1'])
+<?php \$component->withAttributes(['class' => \Illuminate\Support\Arr::toCssClasses(['string', 'include' => true, 'exclude' => false])]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
     public function testColonAttributesIsEscapedIfStrings()
     {
         $result = $this->compiler(['profile' => TestProfileComponent::class])->compileTags('<x-profile :src="\'foo\'"></x-profile>');

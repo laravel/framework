@@ -553,7 +553,9 @@ class ComponentTagCompiler
         return collect($attributes)
                 ->map(function (string $value, string $attribute) use ($escapeBound) {
                     return $escapeBound && isset($this->boundAttributes[$attribute]) && $value !== 'true' && ! is_numeric($value)
-                                ? "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
+                                ? $attribute === 'class'
+                                    ? "'{$attribute}' => \Illuminate\Support\Arr::toCssClasses({$value})"
+                                    : "'{$attribute}' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute({$value})"
                                 : "'{$attribute}' => {$value}";
                 })
                 ->implode(',');
