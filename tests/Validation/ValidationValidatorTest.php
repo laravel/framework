@@ -1806,8 +1806,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
-        $this->assertTrue($v->passes());     
-       
+        $this->assertTrue($v->passes());         
     }
 
     public function testValidateEndsWith()
