@@ -42,9 +42,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute was "accepted" when another attribute has a given value
-     *
-     * This validation rule implies the attribute is "required".
+     * Validate that an attribute was "accepted" when another attribute has a given value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
