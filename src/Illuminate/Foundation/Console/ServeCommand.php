@@ -32,6 +32,27 @@ class ServeCommand extends Command
     protected $portOffset = 0;
 
     /**
+     * The environment variables that are passed thru to the built-in PHP webserver.
+     * 
+     * @var array
+     */
+    protected $passthruEnvVars;
+
+    /**
+     * Create a new serve command instance.
+     *
+     * @param  array  $passthruEnvVars
+     * 
+     * @return void
+     */
+    public function __construct(array $passthruEnvVars = ['APP_ENV', 'LARAVEL_SAIL'])
+    {
+        parent::__construct();
+
+        $this->passthruEnvVars = $passthruEnvVars;
+    }
+
+    /**
      * Execute the console command.
      *
      * @return int
@@ -100,7 +121,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL'])
+            return in_array($key, $this->passthruEnvVars)
                     ? [$key => $value]
                     : [$key => false];
         })->all());
