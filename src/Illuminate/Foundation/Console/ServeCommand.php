@@ -42,7 +42,6 @@ class ServeCommand extends Command
      * Create a new serve command instance.
      *
      * @param  array  $passthruEnvVars
-     *
      * @return void
      */
     public function __construct(array $passthruEnvVars = ['APP_ENV', 'LARAVEL_SAIL', 'PHP_CLI_SERVER_WORKERS'])
