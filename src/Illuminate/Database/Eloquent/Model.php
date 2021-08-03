@@ -1912,6 +1912,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * @param  mixed  $offset
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return ! is_null($this->getAttribute($offset));
@@ -1923,6 +1924,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * @param  mixed  $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getAttribute($offset);
@@ -1935,6 +1937,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * @param  mixed  $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->setAttribute($offset, $value);
@@ -1946,6 +1949,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * @param  mixed  $offset
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset], $this->relations[$offset]);
