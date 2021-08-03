@@ -4,7 +4,7 @@ namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class {{ class }} extends Pivot
+final class {{ class }} extends Pivot
 {
     //
 }
