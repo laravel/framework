@@ -192,10 +192,10 @@ class TestResponse implements ArrayAccess
         }
 
         if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
-            $json = $this->json();
+            $testJson = new AssertableJsonString($this->getContent());
 
-            if (isset($json['errors'])) {
-                return $this->statusMessageWithErrors($expected, $actual, $json);
+            if (isset($testJson['errors'])) {
+                return $this->statusMessageWithErrors($expected, $actual, $testJson->json());
             }
         }
 
@@ -228,7 +228,7 @@ EOF;
      *
      * @param  string|int  $expected
      * @param  string|int  $actual
-     * @param  array $errors;
+     * @param  array  $errors
      * @return string
      */
     protected function statusMessageWithErrors($expected, $actual, $errors)
@@ -1306,6 +1306,7 @@ EOF;
      * @param  string  $offset
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->responseHasView()
@@ -1319,6 +1320,7 @@ EOF;
      * @param  string  $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->responseHasView()
@@ -1335,6 +1337,7 @@ EOF;
      *
      * @throws \LogicException
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         throw new LogicException('Response data may not be mutated using array access.');
@@ -1348,6 +1351,7 @@ EOF;
      *
      * @throws \LogicException
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         throw new LogicException('Response data may not be mutated using array access.');

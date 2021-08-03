@@ -222,7 +222,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Move the order bindings to be after the "select" statement to account for a order by subquery.
+     * Move the order bindings to be after the "select" statement to account for an order by subquery.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return array

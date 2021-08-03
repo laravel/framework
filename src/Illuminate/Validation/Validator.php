@@ -201,6 +201,7 @@ class Validator implements ValidatorContract
      */
     protected $implicitRules = [
         'Accepted',
+        'AcceptedIf',
         'Filled',
         'Present',
         'Required',
@@ -231,6 +232,7 @@ class Validator implements ValidatorContract
         'Gte',
         'Lt',
         'Lte',
+        'AcceptedIf',
         'RequiredIf',
         'RequiredUnless',
         'RequiredWith',
