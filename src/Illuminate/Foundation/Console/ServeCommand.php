@@ -45,7 +45,7 @@ class ServeCommand extends Command
      *
      * @return void
      */
-    public function __construct(array $passthruEnvVars = ['APP_ENV', 'LARAVEL_SAIL'])
+    public function __construct(array $passthruEnvVars = ['APP_ENV', 'LARAVEL_SAIL', 'PHP_CLI_SERVER_WORKERS'])
     {
         parent::__construct();
 
