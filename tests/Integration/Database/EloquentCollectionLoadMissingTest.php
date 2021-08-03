@@ -79,7 +79,7 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertCount(2, DB::getQueryLog());
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('revisions'));
-        $this->assertArrayNotHasKey('id', $posts[0]->comments[1]->parent->revisions[0]->getAttributes());
+        $this->assertArrayHasKey('id', $posts[0]->comments[1]->parent->revisions[0]->getAttributes());
     }
 
     public function testLoadMissingWithClosure()
