@@ -422,24 +422,24 @@ abstract class HasOneOrMany extends Relation
     {
         return $this->localKey;
     }
-    
+
     /**
      * Since eager loading returns empty relationship collections
      * when foreignKey or localKey are missing, make sure, they are
-     * included in the $columns array
+     * included in the $columns array.
      *
      * @param  array  $columns
      * @return  array
      */
     private function ensureKeyExistence($columns = ['*'])
-    {        
+    {
         if ($columns !== ['*'] && ! in_array($this->foreignKey, $columns)) {
             $columns[] = $this->foreignKey;
         }
         if ($columns !== ['*'] && ! in_array($this->localKey, $columns)) {
             $columns[] = $this->localKey;
         }
-        
+
         return $columns;
     }
 
@@ -455,7 +455,6 @@ abstract class HasOneOrMany extends Relation
 
         return parent::get($columns);
     }
-
  
     /**
      * Set the columns to be selected.
@@ -468,7 +467,7 @@ abstract class HasOneOrMany extends Relation
         $columns = $this->ensureKeyExistence($columns);
 
         parent::select($columns);
-        
+
         return $this;
     }
 }
