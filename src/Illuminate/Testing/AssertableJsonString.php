@@ -334,6 +334,7 @@ class AssertableJsonString implements ArrayAccess, Countable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->decoded);

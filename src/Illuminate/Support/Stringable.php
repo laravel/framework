@@ -7,7 +7,6 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
-use ReturnTypeWillChange;
 use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable
@@ -783,7 +782,7 @@ class Stringable implements JsonSerializable
      *
      * @return string
      */
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->__toString();
