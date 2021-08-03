@@ -100,7 +100,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL', 'PHP_CLI_SERVER_WORKERS'])
+            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL', 'PHP_CLI_SERVER_WORKERS', 'XDEBUG_MODE', 'XDEBUG_CONFIG'])
                     ? [$key => $value]
                     : [$key => false];
         })->all());
