@@ -455,7 +455,7 @@ abstract class HasOneOrMany extends Relation
 
         return parent::get($columns);
     }
- 
+
     /**
      * Set the columns to be selected.
      *
