@@ -235,8 +235,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     protected function resolveResourceResponse(): ResourceResponse
     {
-        return tap($this->resourceResponse, function ($resourceResponse) {
-
+        return tap($this->resourceResponse ? new $this->resourceResponse($this) : null, function ($resourceResponse) {
             if (!$resourceResponse) {
                 $resourceResponse = $this->isResourcePaginated()
                     ? new PaginatedResourceResponse($this)
