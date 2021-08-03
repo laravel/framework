@@ -437,6 +437,7 @@ abstract class HasOneOrMany extends Relation
         if ($columns !== ['*'] && ! in_array($this->localKey, $columns)) {
             $columns[] = $this->localKey;
         }
+
         return $this->query->get($columns);
     }
 }
