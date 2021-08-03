@@ -32,7 +32,10 @@ class UrlSigningTest extends TestCase
             return ['slug' => $slug, 'valid' => $request->hasValidSignature() ? 'valid' : 'invalid'];
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['post' => new RoutableInterfaceStub]));
+        $model = new RoutableInterfaceStub;
+        $model->routable = 'routable';
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['post' => $model]));
         $this->assertSame('valid', $this->get($url)->original['valid']);
         $this->assertSame('routable-slug', $this->get($url)->original['slug']);
     }
