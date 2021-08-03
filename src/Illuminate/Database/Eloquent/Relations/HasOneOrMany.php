@@ -431,7 +431,7 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $columns
      * @return  array
      */
-    private function ensureKeyExistence($columns = ['*'])
+    protected function ensureKeyExistence($columns = ['*'])
     {
         if ($columns !== ['*'] && ! in_array($this->foreignKey, $columns)) {
             $columns[] = $this->foreignKey;
