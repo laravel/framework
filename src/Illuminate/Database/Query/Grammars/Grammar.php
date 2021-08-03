@@ -1171,6 +1171,15 @@ class Grammar extends BaseGrammar
             return $this->wrapJsonSelector($value);
         }
 
+        // If a database from another connection is passed and it contains dots.
+        $segments = explode('`.', $value);
+
+        if (count($segments) === 2) {
+            $database = $segments[0];
+
+            return $database.'`.'.$this->wrapSegments(explode('.', $segments[1]));
+        }
+
         return $this->wrapSegments(explode('.', $value));
     }
 
