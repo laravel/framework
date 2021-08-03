@@ -467,7 +467,7 @@ abstract class HasOneOrMany extends Relation
     {
         $columns = $this->ensureKeyExistence($columns);
 
-        parent::get($columns);
+        parent::select($columns);
         
         return $this;
     }
