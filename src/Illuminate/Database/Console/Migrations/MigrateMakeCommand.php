@@ -114,6 +114,8 @@ class MigrateMakeCommand extends BaseCommand
             $file = pathinfo($file, PATHINFO_FILENAME);
         }
 
+        $file = $this->getMigrationPath().DIRECTORY_SEPARATOR.$file.'.php';
+
         $this->line("<info>Created Migration:</info> {$file}");
     }
 
