@@ -546,6 +546,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return $this->items->count();
