@@ -110,18 +110,19 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     public function toResponse($request)
     {
-        if ($this->resource instanceof AbstractPaginator || $this->resource instanceof AbstractCursorPaginator) {
-            return $this->preparePaginatedResponse($request);
+        if ($this->isResourcePaginated()) {
+            $this->preparePaginatedResponse($request);
         }
 
-        return parent::toResponse($request);
+        $this->resolveResourceResponse()
+            ->toResponse($request);
     }
 
     /**
      * Create a paginate-aware HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
     protected function preparePaginatedResponse($request)
     {
@@ -130,7 +131,5 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
         } elseif (! is_null($this->queryParameters)) {
             $this->resource->appends($this->queryParameters);
         }
-
-        return (new PaginatedResourceResponse($this))->toResponse($request);
     }
 }

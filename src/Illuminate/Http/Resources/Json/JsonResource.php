@@ -10,6 +10,8 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Pagination\AbstractCursorPaginator;
+use Illuminate\Pagination\AbstractPaginator;
 use JsonSerializable;
 
 class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
@@ -22,6 +24,12 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * @var mixed
      */
     public $resource;
+
+    /**
+     * The responsable class to created when responding back.
+     * @var Responsable|null
+     */
+    public $resourceResponse;
 
     /**
      * The additional data that should be added to the top-level resource array.
@@ -218,7 +226,37 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toResponse($request)
     {
-        return (new ResourceResponse($this))->toResponse($request);
+        return $this->resolveResourceResponse()
+            ->toResponse($request);
+    }
+
+    /**
+     * @return ResourceResponse
+     */
+    protected function resolveResourceResponse(): ResourceResponse
+    {
+        return tap($this->resourceResponse, function ($resourceResponse) {
+
+            if (!$resourceResponse) {
+                $resourceResponse = $this->isResourcePaginated()
+                    ? new PaginatedResourceResponse($this)
+                    : new ResourceResponse($this);
+            }
+
+            if (!$resourceResponse instanceof ResourceResponse) {
+                throw new \InvalidArgumentException('Resource resource must be a instance of ResourceResponse.');
+            }
+
+            return $resourceResponse;
+        });
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isResourcePaginated()
+    {
+        return $this->resource instanceof AbstractPaginator || $this->resource instanceof AbstractCursorPaginator;
     }
 
     /**
