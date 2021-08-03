@@ -1773,7 +1773,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateAcceptedIf()
     {
-
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
@@ -1806,7 +1805,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
-        $this->assertTrue($v->passes());         
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateEndsWith()

@@ -51,7 +51,6 @@ trait ValidatesAttributes
      */
     public function validateAcceptedIf($attribute, $value, $parameters)
     {
-
         $acceptable = ['yes', 'on', '1', 1, true, 'true'];
 
         $this->requireParameterCount(2, $parameters, 'accepted_if');
