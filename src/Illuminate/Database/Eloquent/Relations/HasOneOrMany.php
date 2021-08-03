@@ -422,6 +422,26 @@ abstract class HasOneOrMany extends Relation
     {
         return $this->localKey;
     }
+    
+    /**
+     * Since eager loading returns empty relationship collections
+     * when foreignKey or localKey are missing, make sure, they are
+     * included in the $columns array
+     *
+     * @param  array  $columns
+     * @return  array
+     */
+    private function ensureKeyExistence($columns = ['*'])
+    {        
+        if ($columns !== ['*'] && ! in_array($this->foreignKey, $columns)) {
+            $columns[] = $this->foreignKey;
+        }
+        if ($columns !== ['*'] && ! in_array($this->localKey, $columns)) {
+            $columns[] = $this->localKey;
+        }
+        
+        return $columns;
+    }
 
     /**
      * Execute the query as a "select" statement.
@@ -431,13 +451,24 @@ abstract class HasOneOrMany extends Relation
      */
     public function get($columns = ['*'])
     {
-        if ($columns !== ['*'] && ! in_array($this->foreignKey, $columns)) {
-            $columns[] = $this->foreignKey;
-        }
-        if ($columns !== ['*'] && ! in_array($this->localKey, $columns)) {
-            $columns[] = $this->localKey;
-        }
+        $columns = $this->ensureKeyExistence($columns);
 
-        return $this->query->get($columns);
+        return parent::get($columns);
+    }
+
+ 
+    /**
+     * Set the columns to be selected.
+     *
+     * @param  array|mixed  $columns
+     * @return $this
+     */
+    public function select($columns = ['*'])
+    {
+        $columns = $this->ensureKeyExistence($columns);
+
+        parent::get($columns);
+        
+        return $this;
     }
 }
