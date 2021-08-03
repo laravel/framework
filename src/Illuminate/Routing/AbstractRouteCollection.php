@@ -237,6 +237,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      *
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->getRoutes());

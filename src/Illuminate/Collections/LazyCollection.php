@@ -1401,6 +1401,7 @@ class LazyCollection implements Enumerable
      *
      * @return \Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->makeIterator($this->source);
