@@ -67,6 +67,13 @@ class Factory implements FactoryContract
     protected $fallbackMessages = [];
 
     /**
+     * Indicates that unvalidated array keys should be excluded, even if the parent array was validated.
+     *
+     * @var bool
+     */
+    protected $excludeUnvalidatedArrayKeys;
+
+    /**
      * The Validator resolver instance.
      *
      * @var \Closure
@@ -114,6 +121,8 @@ class Factory implements FactoryContract
         if (! is_null($this->container)) {
             $validator->setContainer($this->container);
         }
+
+        $validator->excludeUnvalidatedArrayKeys = $this->excludeUnvalidatedArrayKeys;
 
         $this->addExtensions($validator);
 
@@ -237,6 +246,16 @@ class Factory implements FactoryContract
     public function replacer($rule, $replacer)
     {
         $this->replacers[$rule] = $replacer;
+    }
+
+    /**
+     * Indicate that unvalidated array keys should be excluded, even if the parent array was validated.
+     *
+     * @return void
+     */
+    public function excludeUnvalidatedArrayKeys()
+    {
+        $this->excludeUnvalidatedArrayKeys = true;
     }
 
     /**

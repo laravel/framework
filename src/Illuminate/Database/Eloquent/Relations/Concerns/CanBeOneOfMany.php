@@ -205,6 +205,8 @@ trait CanBeOneOfMany
     protected function addOneOfManyJoinSubQuery(Builder $parent, Builder $subQuery, $on)
     {
         $parent->beforeQuery(function ($parent) use ($subQuery, $on) {
+            $subQuery->applyBeforeQueryCallbacks();
+
             $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
                 $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
 

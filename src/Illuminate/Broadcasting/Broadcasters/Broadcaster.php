@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
+use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
@@ -40,13 +41,19 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Register a channel authenticator.
      *
-     * @param  string  $channel
+     * @param  \Illuminate\Contracts\Broadcasting\HasBroadcastChannel|string  $channel
      * @param  callable|string  $callback
      * @param  array  $options
      * @return $this
      */
     public function channel($channel, $callback, $options = [])
     {
+        if ($channel instanceof HasBroadcastChannel) {
+            $channel = $channel->broadcastChannelRoute();
+        } elseif (is_string($channel) && class_exists($channel) && is_a($channel, HasBroadcastChannel::class, true)) {
+            $channel = (new $channel)->broadcastChannelRoute();
+        }
+
         $this->channels[$channel] = $callback;
 
         $this->channelOptions[$channel] = $options;

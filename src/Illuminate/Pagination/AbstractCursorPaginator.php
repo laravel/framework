@@ -6,17 +6,21 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\Tappable;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
 abstract class AbstractCursorPaginator implements Htmlable
 {
-    use ForwardsCalls;
+    use ForwardsCalls, Tappable;
 
     /**
      * All of the items being paginated.
@@ -194,14 +198,60 @@ abstract class AbstractCursorPaginator implements Htmlable
         return collect($this->parameters)
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
-                if ($item instanceof ArrayAccess || is_array($item)) {
-                    return $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')];
+                if ($item instanceof JsonResource) {
+                    $item = $item->resource;
+                }
+
+                if ($item instanceof Model &&
+                    ! is_null($parameter = $this->getPivotParameterForItem($item, $parameterName))) {
+                    return $parameter;
+                } elseif ($item instanceof ArrayAccess || is_array($item)) {
+                    return $this->ensureParameterIsPrimitive(
+                        $item[$parameterName] ?? $item[Str::afterLast($parameterName, '.')]
+                    );
                 } elseif (is_object($item)) {
-                    return $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')};
+                    return $this->ensureParameterIsPrimitive(
+                        $item->{$parameterName} ?? $item->{Str::afterLast($parameterName, '.')}
+                    );
                 }
 
                 throw new Exception('Only arrays and objects are supported when cursor paginating items.');
             })->toArray();
+    }
+
+    /**
+     * Get the cursor parameter value from a pivot model if applicable.
+     *
+     * @param  \ArrayAccess|\stdClass  $item
+     * @param  string  $parameterName
+     * @return string|null
+     */
+    protected function getPivotParameterForItem($item, $parameterName)
+    {
+        $table = Str::beforeLast($parameterName, '.');
+
+        foreach ($item->getRelations() as $relation) {
+            if ($relation instanceof Pivot && $relation->getTable() === $table) {
+                return $this->ensureParameterIsPrimitive(
+                    $relation->getAttribute(Str::afterLast($parameterName, '.'))
+                );
+            }
+        }
+    }
+
+    /**
+     * Ensure the parameter is a primitive type.
+     *
+     * This can resolve issues that arise the developer uses a value object for an attribute.
+     *
+     * @param  mixed  $parameter
+     * @return mixed
+     */
+    protected function ensureParameterIsPrimitive($parameter)
+    {
+        return is_object($parameter) && method_exists($parameter, '__toString')
+                        ? (string) $parameter
+                        : $parameter;
     }
 
     /**

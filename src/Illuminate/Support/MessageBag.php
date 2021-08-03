@@ -369,6 +369,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->messages, COUNT_RECURSIVE) - count($this->messages);
@@ -389,6 +390,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

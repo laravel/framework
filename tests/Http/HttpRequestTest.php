@@ -304,7 +304,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $bar = false;
 
         $request->whenHas('name', function ($value) use (&$name) {
             $name = $value;
@@ -322,17 +322,24 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenHas('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertSame('', $age);
         $this->assertNull($city);
         $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testWhenFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $bar = false;
 
         $request->whenFilled('name', function ($value) use (&$name) {
             $name = $value;
@@ -350,10 +357,17 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenFilled('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertFalse($age);
         $this->assertFalse($city);
         $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testMissingMethod()

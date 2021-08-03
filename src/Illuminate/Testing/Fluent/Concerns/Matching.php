@@ -66,7 +66,7 @@ trait Matching
      * Asserts that the property is of the expected type.
      *
      * @param  string  $key
-     * @param  string|array $expected
+     * @param  string|array  $expected
      * @return $this
      */
     public function whereType(string $key, $expected): self
@@ -99,6 +99,40 @@ trait Matching
         foreach ($bindings as $key => $value) {
             $this->whereType($key, $value);
         }
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the property contains the expected values.
+     *
+     * @param  string  $key
+     * @param  array|string  $expected
+     *
+     * @return $this
+     */
+    public function whereContains(string $key, $expected)
+    {
+        $actual = Collection::make(
+            $this->prop($key) ?? $this->prop()
+        );
+
+        $missing = Collection::make($expected)->reject(function ($search) use ($key, $actual) {
+            if ($actual->containsStrict($key, $search)) {
+                return true;
+            }
+
+            return $actual->containsStrict($search);
+        })->toArray();
+
+        PHPUnit::assertEmpty(
+            $missing,
+            sprintf(
+                'Property [%s] does not contain [%s].',
+                $key,
+                implode(', ', array_values($missing))
+            )
+        );
 
         return $this;
     }

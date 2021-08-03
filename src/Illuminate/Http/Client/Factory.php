@@ -3,7 +3,10 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use GuzzleHttp\TransferStats;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -55,6 +58,13 @@ class Factory
     }
 
     /**
+     * The event dispatcher implementation.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    protected $dispatcher;
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -85,10 +95,13 @@ class Factory
     /**
      * Create a new factory instance.
      *
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct()
+    public function __construct(Dispatcher $dispatcher = null)
     {
+        $this->dispatcher = $dispatcher;
+
         $this->stubCallbacks = collect();
     }
 
@@ -151,11 +164,20 @@ class Factory
         }
 
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([
-            $callback instanceof Closure
-                    ? $callback
-                    : function () use ($callback) {
-                        return $callback;
-                    },
+            function ($request, $options) use ($callback) {
+                $response = $callback instanceof Closure
+                                ? $callback($request, $options)
+                                : $callback;
+
+                if ($response instanceof PromiseInterface) {
+                    $options['on_stats'](new TransferStats(
+                        $request->toPsrRequest(),
+                        $response->wait(),
+                    ));
+                }
+
+                return $response;
+            },
         ]));
 
         return $this;
@@ -338,6 +360,16 @@ class Factory
     protected function newPendingRequest()
     {
         return new PendingRequest($this);
+    }
+
+    /**
+     * Get the current event dispatcher implementation.
+     *
+     * @return \Illuminate\Contracts\Events\Dispatcher|null
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 
     /**

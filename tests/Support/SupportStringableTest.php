@@ -165,6 +165,34 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testUnlessTruthy()
+    {
+        $this->assertSame('unless', (string) $this->stringable('unless')->unless(1, function ($stringable, $value) {
+            return $stringable->append($value)->append('true');
+        }));
+
+        $this->assertSame('unless true fallbacks to default with value 1',
+            (string) $this->stringable('unless true ')->unless(1, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable, $value) {
+                return $stringable->append('fallbacks to default with value ')->append($value);
+            }));
+    }
+
+    public function testUnlessFalsy()
+    {
+        $this->assertSame('unless 0', (string) $this->stringable('unless ')->unless(0, function ($stringable, $value) {
+            return $stringable->append($value);
+        }));
+
+        $this->assertSame('gets the value 0',
+            (string) $this->stringable('gets the value ')->unless(0, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable) {
+                return $stringable->append('fallbacks to default');
+            }));
+    }
+
     public function testTrimmedOnlyWhereNecessary()
     {
         $this->assertSame(' Taylor Otwell ', (string) $this->stringable(' Taylor Otwell ')->words(3));

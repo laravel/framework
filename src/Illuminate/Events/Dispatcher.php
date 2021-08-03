@@ -549,9 +549,9 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
-        $connection = $this->resolveQueue()->connection(
-            $listener->connection ?? null
-        );
+        $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
+                    ? $listener->viaConnection()
+                    : $listener->connection ?? null);
 
         $queue = method_exists($listener, 'viaQueue')
                     ? $listener->viaQueue()
@@ -589,22 +589,18 @@ class Dispatcher implements DispatcherContract
     protected function propagateListenerOptions($listener, $job)
     {
         return tap($job, function ($job) use ($listener) {
+            $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff() : ($listener->backoff ?? null);
+            $job->maxExceptions = $listener->maxExceptions ?? null;
+            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil() : null;
+            $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
+            $job->timeout = $listener->timeout ?? null;
             $job->tries = $listener->tries ?? null;
 
-            $job->maxExceptions = $listener->maxExceptions ?? null;
-
-            $job->backoff = method_exists($listener, 'backoff')
-                                ? $listener->backoff() : ($listener->backoff ?? null);
-
-            $job->timeout = $listener->timeout ?? null;
-
-            $job->afterCommit = property_exists($listener, 'afterCommit')
-                                ? $listener->afterCommit : null;
-
-            $job->retryUntil = method_exists($listener, 'retryUntil')
-                                ? $listener->retryUntil() : null;
-
-            $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
+            $job->through(array_merge(
+                method_exists($listener, 'middleware') ? $listener->middleware() : [],
+                $listener->middleware ?? []
+            ));
         });
     }
 

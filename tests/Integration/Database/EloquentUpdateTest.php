@@ -71,7 +71,7 @@ class EloquentUpdateTest extends TestCase
             TestUpdateModel1::create();
         }
 
-        TestUpdateModel1::latest('id')->limit(3)->update(['title'=>'Dr.']);
+        TestUpdateModel1::latest('id')->limit(3)->update(['title' => 'Dr.']);
 
         $this->assertSame('Dr.', TestUpdateModel1::find(8)->title);
         $this->assertNotSame('Dr.', TestUpdateModel1::find(7)->title);
@@ -91,7 +91,7 @@ class EloquentUpdateTest extends TestCase
         TestUpdateModel2::join('test_model1', function ($join) {
             $join->on('test_model1.id', '=', 'test_model2.id')
                 ->where('test_model1.title', '=', 'Mr.');
-        })->update(['test_model2.name' => 'Abdul', 'job'=>'Engineer']);
+        })->update(['test_model2.name' => 'Abdul', 'job' => 'Engineer']);
 
         $record = TestUpdateModel2::find(1);
 

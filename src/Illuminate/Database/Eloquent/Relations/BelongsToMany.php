@@ -773,7 +773,7 @@ class BelongsToMany extends Relation
     public function get($columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
-        // the proper columns. Then, we will get the results and hydrate out pivot
+        // the proper columns. Then, we will get the results and hydrate our pivot
         // models with the result of those columns as a separate model relation.
         $builder = $this->query->applyScopes();
 
@@ -858,6 +858,24 @@ class BelongsToMany extends Relation
         $this->query->addSelect($this->shouldSelect($columns));
 
         return tap($this->query->simplePaginate($perPage, $columns, $pageName, $page), function ($paginator) {
+            $this->hydratePivotRelation($paginator->items());
+        });
+    }
+
+    /**
+     * Paginate the given query into a cursor paginator.
+     *
+     * @param  int|null  $perPage
+     * @param  array  $columns
+     * @param  string  $cursorName
+     * @param  string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     */
+    public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    {
+        $this->query->addSelect($this->shouldSelect($columns));
+
+        return tap($this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor), function ($paginator) {
             $this->hydratePivotRelation($paginator->items());
         });
     }

@@ -718,6 +718,100 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateCurrentPassword()
+    {
+        // Fails when user is not logged in.
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(true);
+
+        $hasher = m::mock(Hasher::class);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertFalse($v->passes());
+
+        // Fails when password is incorrect.
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(false);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertFalse($v->passes());
+
+        // Succeeds when password is correct.
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(true);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password']);
+        $v->setContainer($container);
+
+        $this->assertTrue($v->passes());
+
+        // We can use a specific guard.
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword');
+
+        $auth = m::mock(Guard::class);
+        $auth->shouldReceive('guard')->with('custom')->andReturn($auth);
+        $auth->shouldReceive('guest')->andReturn(false);
+        $auth->shouldReceive('user')->andReturn($user);
+
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->andReturn(true);
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('make')->with('auth')->andReturn($auth);
+        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
+
+        $trans = $this->getTranslator();
+        $trans->shouldReceive('get')->andReturnArg(0);
+
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'current_password:custom']);
+        $v->setContainer($container);
+
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateFilled()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1674,6 +1768,43 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Accepted']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateAcceptedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => false, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => true, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertTrue($v->passes());
     }
 
@@ -3065,7 +3196,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $file2], ['x' => 'image']);
         $this->assertTrue($v->passes());
 
-        $file2 = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2 = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file2->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file2->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
         $v = new Validator($trans, ['x' => $file2], ['x' => 'image']);
@@ -3240,17 +3371,17 @@ class ValidationValidatorTest extends TestCase
         $file->expects($this->any())->method('guessExtension')->willReturn('rtf');
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('rtf');
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('text/rtf');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('application/pdf');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/rtf']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['getMimeType'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('getMimeType')->willReturn('image/jpeg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:image/jpeg']);
         $this->assertTrue($v->passes());
@@ -3273,13 +3404,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => $file2], ['x' => 'mimes:pdf']);
         $this->assertFalse($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:jpeg']);
         $this->assertTrue($v->passes());
 
-        $file = $this->getMockBuilder(UploadedFile::class)->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->onlyMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->willReturn('jpg');
         $file->expects($this->any())->method('getClientOriginalExtension')->willReturn('jpeg');
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:jpg']);
@@ -4955,6 +5086,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertNull($explicit_no_connection[0]);
         $this->assertSame('explicits', $explicit_no_connection[1]);
 
+        $explicit_model_with_prefix = $v->parseTable(ExplicitPrefixedTableModel::class);
+        $this->assertNull($explicit_model_with_prefix[0]);
+        $this->assertSame('prefix.explicits', $explicit_model_with_prefix[1]);
+
+        $explicit_table_with_connection_prefix = $v->parseTable('connection.table');
+        $this->assertSame('connection', $explicit_table_with_connection_prefix[0]);
+        $this->assertSame('table', $explicit_table_with_connection_prefix[1]);
+
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
         $this->assertNull($noneloquent_no_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
@@ -6044,6 +6183,71 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
+    public function testExcludingArrays()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array', 'users.*.name' => 'string']
+        );
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['admin' => ['name' => 'Mohamed', 'location' => 'cairo'], 'users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['admin' => 'array', 'admin.name' => 'string', 'users' => 'array', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['admin' => ['name' => 'Mohamed'], 'users' => [['name' => 'Mohamed']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['users' => 'array']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => ['mohamed', 'zain']],
+            ['users' => 'array', 'users.*' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => ['mohamed', 'zain']], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']], 'unvalidated' => 'foobar']],
+            ['users' => 'array', 'users.admins' => 'array', 'users.admins.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => ['admins' => [['name' => 'mohamed']]]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['users' => [1, 2, 3]],
+            ['users' => 'array|max:10']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['users' => [1, 2, 3]], $validator->validated());
+    }
+
     public function testExcludeUnless()
     {
         $validator = new Validator(
@@ -6204,6 +6408,13 @@ class ImplicitTableModel extends Model
 class ExplicitTableModel extends Model
 {
     protected $table = 'explicits';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class ExplicitPrefixedTableModel extends Model
+{
+    protected $table = 'prefix.explicits';
     protected $guarded = [];
     public $timestamps = false;
 }

@@ -1190,6 +1190,40 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testOrderBysSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderBy('age', 'desc');
+        $this->assertSame('select * from [users] order by [email] asc, [age] desc', $builder->toSql());
+
+        $builder->orders = null;
+        $this->assertSame('select * from [users]', $builder->toSql());
+
+        $builder->orders = [];
+        $this->assertSame('select * from [users]', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email');
+        $this->assertSame('select * from [users] order by [email] asc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderByDesc('name');
+        $this->assertSame('select * from [users] order by [name] desc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderByRaw('[age] asc');
+        $this->assertSame('select * from [users] order by [age] asc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderByRaw('[age] ? desc', ['foo']);
+        $this->assertSame('select * from [users] order by [email] asc, [age] ? desc', $builder->toSql());
+        $this->assertEquals(['foo'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->skip(25)->take(10)->orderByRaw('[email] desc');
+        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 26 and 35 order by row_num', $builder->toSql());
+    }
+
     public function testReorder()
     {
         $builder = $this->getBuilder();
@@ -3037,6 +3071,15 @@ SQL;
         $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
+        $subQueryBuilder = $this->getSqlServerBuilder();
+        $subQuery = function ($query) {
+            return $query->select('created_at')->from('logins')->where('users.name', 'nameBinding')->whereColumn('user_id', 'users.id')->limit(1);
+        };
+        $builder->select('*')->from('users')->where('email', 'emailBinding')->orderBy($subQuery)->skip(10)->take(10);
+        $this->assertSame('select * from (select *, row_number() over (order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc) as row_num from [users] where [email] = ?) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
+        $this->assertEquals(['nameBinding', 'emailBinding'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take('foo');
         $this->assertSame('select * from [users]', $builder->toSql());
 
@@ -3619,13 +3662,24 @@ SQL;
         $columns = ['test'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['test' => 'bar']);
-        $builder = $this->getMockQueryBuilder()->orderBy('test');
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy('test');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('where')->with('test', '>', 'bar')->once()->andReturnSelf();
-        $builder->shouldReceive('get')->once()->andReturn($results);
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("test" > ?) order by "test" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
 
         Paginator::currentPathResolver(function () use ($path) {
             return $path;
@@ -3643,16 +3697,28 @@ SQL;
     public function testCursorPaginateMultipleOrderColumns()
     {
         $perPage = 16;
-        $columns = ['test'];
+        $columns = ['test', 'another'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['test' => 'bar', 'another' => 'foo']);
-        $builder = $this->getMockQueryBuilder()->orderBy('test')->orderBy('another');
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy('test')->orderBy('another');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
-        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+        $results = collect([['test' => 'foo', 'another' => 1], ['test' => 'bar', 'another' => 2]]);
 
-        $builder->shouldReceive('whereRowValues')->with(['test', 'another'], '>', ['bar', 'foo'])->once()->andReturnSelf();
-        $builder->shouldReceive('get')->once()->andReturn($results);
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("test" > ? or ("test" = ? and ("another" > ?))) order by "test" asc, "another" asc limit 17',
+                $builder->toSql()
+            );
+            $this->assertEquals(['bar', 'bar', 'foo'], $builder->bindings['where']);
+
+            return $results;
+        });
 
         Paginator::currentPathResolver(function () use ($path) {
             return $path;
@@ -3672,12 +3738,24 @@ SQL;
         $perPage = 15;
         $cursorName = 'cursor';
         $cursor = new Cursor(['test' => 'bar']);
-        $builder = $this->getMockQueryBuilder()->orderBy('test');
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy('test');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
         $path = 'http://foo.bar?cursor='.$cursor->encode();
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
-        $builder->shouldReceive('get')->once()->andReturn($results);
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("test" > ?) order by "test" asc limit 16',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
 
         CursorPaginator::currentCursorResolver(function () use ($cursor) {
             return $cursor;
@@ -3730,12 +3808,24 @@ SQL;
         $columns = ['id', 'name'];
         $cursorName = 'cursor-name';
         $cursor = new Cursor(['id' => 2]);
-        $builder = $this->getMockQueryBuilder()->orderBy('id');
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy('id');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
         $path = 'http://foo.bar?cursor=3';
 
         $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
 
-        $builder->shouldReceive('get')->once()->andReturn($results);
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("id" > ?) order by "id" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([2], $builder->bindings['where']);
+
+            return $results;
+        });
 
         Paginator::currentPathResolver(function () use ($path) {
             return $path;
@@ -3747,6 +3837,45 @@ SQL;
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['id'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithMixedOrders()
+    {
+        $perPage = 16;
+        $columns = ['foo', 'bar', 'baz'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['foo' => 1, 'bar' => 2, 'baz' => 3]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->orderBy('foo')->orderByDesc('bar')->orderBy('baz');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['foo' => 1, 'bar' => 2, 'baz' => 4], ['foo' => 1, 'bar' => 1, 'baz' => 1]]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select * from "foobar" where ("foo" > ? or ("foo" = ? and ("bar" < ? or ("bar" = ? and ("baz" > ?))))) order by "foo" asc, "bar" desc, "baz" asc limit 17',
+                $builder->toSql()
+            );
+            $this->assertEquals([1, 1, 2, 2, 3], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['foo', 'bar', 'baz'],
         ]), $result);
     }
 
@@ -4130,7 +4259,7 @@ SQL;
         $grammar = new SqlServerGrammar;
         $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+        return new Builder($this->getConnection(), $grammar, $processor);
     }
 
     protected function getMySqlBuilderWithProcessor()
@@ -4142,7 +4271,7 @@ SQL;
     }
 
     /**
-     * @return m\MockInterface
+     * @return \Mockery\MockInterface|\Illuminate\Database\Query\Builder
      */
     protected function getMockQueryBuilder()
     {

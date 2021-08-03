@@ -130,11 +130,13 @@ trait InteractsWithDatabase
     {
         if ($value instanceof Jsonable) {
             $value = $value->toJson();
-        } elseif (is_array($value)) {
+        } elseif (is_array($value) || is_object($value)) {
             $value = json_encode($value);
         }
 
-        return DB::raw("CAST('$value' AS JSON)");
+        $value = DB::connection()->getPdo()->quote($value);
+
+        return DB::raw("CAST($value AS JSON)");
     }
 
     /**

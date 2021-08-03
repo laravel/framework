@@ -2,8 +2,12 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Illuminate\Support\Traits\Conditionable;
+
 class Dimensions
 {
+    use Conditionable;
+
     /**
      * The constraints for the dimensions rule.
      *

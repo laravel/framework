@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
-use Illuminate\Pagination\CursorPaginationException;
-use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -283,7 +281,7 @@ class Builder
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return \Illuminate\Database\Eloquent\Model|static|null
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -351,10 +349,12 @@ class Builder
     {
         $instance = $this->newModelInstance();
 
-        return $instance->newCollection(array_map(function ($item) use ($instance) {
+        return $instance->newCollection(array_map(function ($item) use ($items, $instance) {
             $model = $instance->newFromBuilder($item);
 
-            $model->preventsLazyLoading = Model::preventsLazyLoading();
+            if (count($items) > 1) {
+                $model->preventsLazyLoading = Model::preventsLazyLoading();
+            }
 
             return $model;
         }, $items));
@@ -824,39 +824,14 @@ class Builder
      * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $cursorName
-     * @param  string|null  $cursor
-     * @return \Illuminate\Contracts\Pagination\Paginator
-     * @throws \Illuminate\Pagination\CursorPaginationException
+     * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\CursorPaginator
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
-        $cursor = $cursor ?: CursorPaginator::resolveCurrentCursor($cursorName);
-
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $orders = $this->ensureOrderForCursorPagination(! is_null($cursor) && $cursor->pointsToPreviousItems());
-
-        $orderDirection = $orders->first()['direction'] ?? 'asc';
-
-        $comparisonOperator = $orderDirection === 'asc' ? '>' : '<';
-
-        $parameters = $orders->pluck('column')->toArray();
-
-        if (! is_null($cursor)) {
-            if (count($parameters) === 1) {
-                $this->where($column = $parameters[0], $comparisonOperator, $cursor->parameter($column));
-            } elseif (count($parameters) > 1) {
-                $this->whereRowValues($parameters, $comparisonOperator, $cursor->parameters($parameters));
-            }
-        }
-
-        $this->take($perPage + 1);
-
-        return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
-            'path' => Paginator::resolveCurrentPath(),
-            'cursorName' => $cursorName,
-            'parameters' => $parameters,
-        ]);
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
     }
 
     /**
@@ -864,18 +839,12 @@ class Builder
      *
      * @param  bool  $shouldReverse
      * @return \Illuminate\Support\Collection
-     *
-     * @throws \Illuminate\Pagination\CursorPaginationException
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
-        $orderDirections = collect($this->query->orders)->pluck('direction')->unique();
+        $orders = collect($this->query->orders);
 
-        if ($orderDirections->count() > 1) {
-            throw new CursorPaginationException('Only a single order by direction is supported when using cursor pagination.');
-        }
-
-        if ($orderDirections->count() === 0) {
+        if ($orders->count() === 0) {
             $this->enforceOrderBy();
         }
 
@@ -1137,7 +1106,9 @@ class Builder
             // Next we'll pass the scope callback to the callScope method which will take
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
-            $builder = $builder->callNamedScope($scope, (array) $parameters);
+            $builder = $builder->callNamedScope(
+                $scope, Arr::wrap($parameters)
+            );
         }
 
         return $builder;

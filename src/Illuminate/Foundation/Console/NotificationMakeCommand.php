@@ -87,8 +87,21 @@ class NotificationMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('markdown')
-                        ? __DIR__.'/stubs/markdown-notification.stub'
-                        : __DIR__.'/stubs/notification.stub';
+            ? $this->resolveStubPath('/stubs/markdown-notification.stub')
+            : $this->resolveStubPath('/stubs/notification.stub');
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

@@ -7,8 +7,10 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
@@ -35,6 +37,13 @@ class TestResponse implements ArrayAccess
     public $baseResponse;
 
     /**
+     * The collection of logged exceptions for the request.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $exceptions;
+
+    /**
      * The streamed content of the response.
      *
      * @var string
@@ -50,6 +59,7 @@ class TestResponse implements ArrayAccess
     public function __construct($response)
     {
         $this->baseResponse = $response;
+        $this->exceptions = new Collection;
     }
 
     /**
@@ -72,7 +82,7 @@ class TestResponse implements ArrayAccess
     {
         PHPUnit::assertTrue(
             $this->isSuccessful(),
-            'Response status code ['.$this->getStatusCode().'] is not a successful status code.'
+            $this->statusMessageWithDetails('>=200, <300', $this->getStatusCode())
         );
 
         return $this;
@@ -85,12 +95,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertOk()
     {
-        PHPUnit::assertTrue(
-            $this->isOk(),
-            'Response status code ['.$this->getStatusCode().'] does not match expected 200 status code.'
-        );
-
-        return $this;
+        return $this->assertStatus(200);
     }
 
     /**
@@ -100,14 +105,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertCreated()
     {
-        $actual = $this->getStatusCode();
-
-        PHPUnit::assertSame(
-            201, $actual,
-            "Response status code [{$actual}] does not match expected 201 status code."
-        );
-
-        return $this;
+        return $this->assertStatus(201);
     }
 
     /**
@@ -132,12 +130,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertNotFound()
     {
-        PHPUnit::assertTrue(
-            $this->isNotFound(),
-            'Response status code ['.$this->getStatusCode().'] is not a not found status code.'
-        );
-
-        return $this;
+        return $this->assertStatus(404);
     }
 
     /**
@@ -147,12 +140,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertForbidden()
     {
-        PHPUnit::assertTrue(
-            $this->isForbidden(),
-            'Response status code ['.$this->getStatusCode().'] is not a forbidden status code.'
-        );
-
-        return $this;
+        return $this->assertStatus(403);
     }
 
     /**
@@ -162,14 +150,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertUnauthorized()
     {
-        $actual = $this->getStatusCode();
-
-        PHPUnit::assertSame(
-            401, $actual,
-            "Response status code [{$actual}] is not an unauthorized status code."
-        );
-
-        return $this;
+        return $this->assertStatus(401);
     }
 
     /**
@@ -180,14 +161,90 @@ class TestResponse implements ArrayAccess
      */
     public function assertStatus($status)
     {
-        $actual = $this->getStatusCode();
+        $message = $this->statusMessageWithDetails($status, $actual = $this->getStatusCode());
 
-        PHPUnit::assertSame(
-            $actual, $status,
-            "Expected status code {$status} but received {$actual}."
-        );
+        PHPUnit::assertSame($actual, $status, $message);
 
         return $this;
+    }
+
+    /**
+     * Get an assertion message for a status assertion containing extra details when available.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @return string
+     */
+    protected function statusMessageWithDetails($expected, $actual)
+    {
+        $lastException = $this->exceptions->last();
+
+        if ($lastException) {
+            return $this->statusMessageWithException($expected, $actual, $lastException);
+        }
+
+        if ($this->baseResponse instanceof RedirectResponse) {
+            $session = $this->baseResponse->getSession();
+
+            if (! is_null($session) && $session->has('errors')) {
+                return $this->statusMessageWithErrors($expected, $actual, $session->get('errors')->all());
+            }
+        }
+
+        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
+            $testJson = new AssertableJsonString($this->getContent());
+
+            if (isset($testJson['errors'])) {
+                return $this->statusMessageWithErrors($expected, $actual, $testJson->json());
+            }
+        }
+
+        return "Expected response status code [{$expected}] but received {$actual}.";
+    }
+
+    /**
+     * Get an assertion message for a status assertion that has an unexpected exception.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @param  \Throwable  $exception
+     * @return string
+     */
+    protected function statusMessageWithException($expected, $actual, $exception)
+    {
+        $exception = (string) $exception;
+
+        return <<<EOF
+Expected response status code [$expected] but received $actual.
+
+The following exception occurred during the request:
+
+$exception
+EOF;
+    }
+
+    /**
+     * Get an assertion message for a status assertion that contained errors.
+     *
+     * @param  string|int  $expected
+     * @param  string|int  $actual
+     * @param  array  $errors
+     * @return string
+     */
+    protected function statusMessageWithErrors($expected, $actual, $errors)
+    {
+        $errors = $this->baseResponse->headers->get('Content-Type') === 'application/json'
+            ? json_encode($errors, JSON_PRETTY_PRINT)
+            : implode(PHP_EOL, Arr::flatten($errors));
+
+        return <<<EOF
+Expected response status code [$expected] but received $actual.
+
+The following errors occurred during the request:
+
+$errors
+
+EOF;
     }
 
     /**
@@ -262,6 +319,54 @@ class TestResponse implements ArrayAccess
         );
 
         return $this;
+    }
+
+    /**
+     * Assert that the response offers a file download.
+     *
+     * @param  string|null  $filename
+     * @return $this
+     */
+    public function assertDownload($filename = null)
+    {
+        $contentDisposition = explode(';', $this->headers->get('content-disposition'));
+
+        if (trim($contentDisposition[0]) !== 'attachment') {
+            PHPUnit::fail(
+                'Response does not offer a file download.'.PHP_EOL.
+                'Disposition ['.trim($contentDisposition[0]).'] found in header, [attachment] expected.'
+            );
+        }
+
+        if (! is_null($filename)) {
+            if (isset($contentDisposition[1]) &&
+                trim(explode('=', $contentDisposition[1])[0]) !== 'filename') {
+                PHPUnit::fail(
+                    'Unsupported Content-Disposition header provided.'.PHP_EOL.
+                    'Disposition ['.trim(explode('=', $contentDisposition[1])[0]).'] found in header, [filename] expected.'
+                );
+            }
+
+            $message = "Expected file [{$filename}] is not present in Content-Disposition header.";
+
+            if (! isset($contentDisposition[1])) {
+                PHPUnit::fail($message);
+            } else {
+                PHPUnit::assertSame(
+                    $filename,
+                    isset(explode('=', $contentDisposition[1])[1])
+                        ? trim(explode('=', $contentDisposition[1])[1])
+                        : '',
+                    $message
+                );
+
+                return $this;
+            }
+        } else {
+            PHPUnit::assertTrue(true);
+
+            return $this;
+        }
     }
 
     /**
@@ -1158,6 +1263,19 @@ class TestResponse implements ArrayAccess
         $this->sendContent();
 
         return $this->streamedContent = ob_get_clean();
+    }
+
+    /**
+     * Set the previous exceptions on the response.
+     *
+     * @param  \Illuminate\Support\Collection  $exceptions
+     * @return $this
+     */
+    public function withExceptions(Collection $exceptions)
+    {
+        $this->exceptions = $exceptions;
+
+        return $this;
     }
 
     /**
