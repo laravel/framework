@@ -8,7 +8,6 @@ use Illuminate\Database\Query\Processors\Processor;
 use Mockery as m;
 use PDO;
 use PHPUnit\Framework\TestCase;
-use ReturnTypeWillChange;
 
 class DatabaseProcessorTest extends TestCase
 {
@@ -39,7 +38,7 @@ class ProcessorTestPDOStub extends PDO
         //
     }
 
-    #[ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function lastInsertId(string $sequence = null)
     {
         //
