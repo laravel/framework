@@ -1434,6 +1434,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->items);

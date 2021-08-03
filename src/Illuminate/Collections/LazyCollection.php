@@ -1412,6 +1412,7 @@ class LazyCollection implements Enumerable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         if (is_array($this->source)) {
