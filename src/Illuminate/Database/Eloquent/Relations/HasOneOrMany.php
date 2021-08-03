@@ -431,10 +431,10 @@ abstract class HasOneOrMany extends Relation
      */
     public function get($columns = ['*'])
     {
-        if ($columns !== ['*'] && !in_array($this->foreignKey, $columns)) {
+        if ($columns !== ['*'] && ! in_array($this->foreignKey, $columns)) {
             $columns[] = $this->foreignKey;
         }
-        if ($columns !== ['*'] && !in_array($this->localKey, $columns)) {
+        if ($columns !== ['*'] && ! in_array($this->localKey, $columns)) {
             $columns[] = $this->localKey;
         }
         return $this->query->get($columns);
