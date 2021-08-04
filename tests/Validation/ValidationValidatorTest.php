@@ -1837,7 +1837,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
-
     }
 
     public function testValidateEndsWith()
