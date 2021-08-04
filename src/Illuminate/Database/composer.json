@@ -20,6 +20,7 @@
         "illuminate/collections": "^9.0",
         "illuminate/container": "^9.0",
         "illuminate/contracts": "^9.0",
+        "illuminate/bootable": "^9.0",
         "illuminate/macroable": "^9.0",
         "illuminate/support": "^9.0",
         "symfony/console": "^5.3"

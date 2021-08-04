@@ -45,6 +45,7 @@
     },
     "replace": {
         "illuminate/auth": "self.version",
+        "illuminate/bootable": "self.version",
         "illuminate/broadcasting": "self.version",
         "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
@@ -106,7 +107,11 @@
         ],
         "psr-4": {
             "Illuminate\\": "src/Illuminate/",
-            "Illuminate\\Support\\": ["src/Illuminate/Macroable/", "src/Illuminate/Collections/"]
+            "Illuminate\\Support\\": [
+                "src/Illuminate/Bootable/",
+                "src/Illuminate/Collections/",
+                "src/Illuminate/Macroable/"
+            ]
         }
     },
     "autoload-dev": {

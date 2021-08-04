@@ -19,6 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Illuminate\Support\Traits\HasBootableTraits;
 use JsonSerializable;
 use LogicException;
 use ReturnTypeWillChange;
@@ -32,7 +33,8 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
-        ForwardsCalls;
+        ForwardsCalls,
+        HasBootableTraits;
 
     /**
      * The connection name for the model.
@@ -126,18 +128,11 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     protected static $dispatcher;
 
     /**
-     * The array of booted models.
+     * The event method name.
      *
-     * @var array
+     * @var string
      */
-    protected static $booted = [];
-
-    /**
-     * The array of trait initializers that will be called on each new instance.
-     *
-     * @var array
-     */
-    protected static $traitInitializers = [];
+    protected static $bootEventMethod = 'fireModelEvent';
 
     /**
      * The array of global scopes on the model.
@@ -199,107 +194,13 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
-     * Check if the model needs to be booted and if so, do it.
-     *
-     * @return void
-     */
-    protected function bootIfNotBooted()
-    {
-        if (! isset(static::$booted[static::class])) {
-            static::$booted[static::class] = true;
-
-            $this->fireModelEvent('booting', false);
-
-            static::booting();
-            static::boot();
-            static::booted();
-
-            $this->fireModelEvent('booted', false);
-        }
-    }
-
-    /**
-     * Perform any actions required before the model boots.
-     *
-     * @return void
-     */
-    protected static function booting()
-    {
-        //
-    }
-
-    /**
-     * Bootstrap the model and its traits.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        static::bootTraits();
-    }
-
-    /**
-     * Boot all of the bootable traits on the model.
-     *
-     * @return void
-     */
-    protected static function bootTraits()
-    {
-        $class = static::class;
-
-        $booted = [];
-
-        static::$traitInitializers[$class] = [];
-
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot'.class_basename($trait);
-
-            if (method_exists($class, $method) && ! in_array($method, $booted)) {
-                forward_static_call([$class, $method]);
-
-                $booted[] = $method;
-            }
-
-            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
-                static::$traitInitializers[$class][] = $method;
-
-                static::$traitInitializers[$class] = array_unique(
-                    static::$traitInitializers[$class]
-                );
-            }
-        }
-    }
-
-    /**
-     * Initialize any initializable traits on the model.
-     *
-     * @return void
-     */
-    protected function initializeTraits()
-    {
-        foreach (static::$traitInitializers[static::class] as $method) {
-            $this->{$method}();
-        }
-    }
-
-    /**
-     * Perform any actions required after the model boots.
-     *
-     * @return void
-     */
-    protected static function booted()
-    {
-        //
-    }
-
-    /**
      * Clear the list of booted models so they will be re-booted.
      *
      * @return void
      */
     public static function clearBootedModels()
     {
-        static::$booted = [];
+        static::clearBooted();
 
         static::$globalScopes = [];
     }
@@ -2027,17 +1928,5 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
         $this->classCastCache = [];
 
         return array_keys(get_object_vars($this));
-    }
-
-    /**
-     * When a model is being unserialized, check if it needs to be booted.
-     *
-     * @return void
-     */
-    public function __wakeup()
-    {
-        $this->bootIfNotBooted();
-
-        $this->initializeTraits();
     }
 }
