@@ -6,6 +6,8 @@ use Illuminate\Support\Arr;
 
 trait ConditionallyLoadsAttributes
 {
+    protected $wrapOnMerge = true;
+
     /**
      * Filter the given data, removing any optional values.
      *
@@ -34,6 +36,10 @@ trait ConditionallyLoadsAttributes
 
             if ($value instanceof self && is_null($value->resource)) {
                 $data[$key] = null;
+            }
+
+            if ($value instanceof MergeValue && !$this->wrapOnMerge) {
+                $data[$key] = $value->data;
             }
         }
 

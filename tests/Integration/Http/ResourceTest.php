@@ -19,6 +19,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithNoMergeWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
@@ -987,6 +988,24 @@ class ResourceTest extends TestCase
         $this->assertEquals([
             'name' => 'mohamed', 'location' => 'hurghada',
         ], $results);
+    }
+
+    public function testMergeIsNotWrapped()
+    {
+
+        $resource = new PostResourceWithNoMergeWrap(new Post(['name' => 'hello']));
+
+        $results = json_decode($resource->toResponse($this->app['request'])->getContent(), true);
+
+        $expected = [
+            'name' => 'hello',
+            'preferences' => [
+                'id' => '1',
+                'name' => 'shop all',
+            ],
+        ];
+
+        $this->assertEquals($expected, $results['data']);
     }
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
