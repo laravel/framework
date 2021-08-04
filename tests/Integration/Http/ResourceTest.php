@@ -684,7 +684,7 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function testResourceWithCustomResponsableClass()
+    public function testResourceWithCustomResponsable()
     {
         Route::get('/', function () {
                 $post = new Post(['id' => 5, 'title' => 'Test Title']);
@@ -696,7 +696,7 @@ class ResourceTest extends TestCase
         $response = $this->withoutExceptionHandling()->get(
             '/', ['Accept' => 'application/json']
         );
-
+        // the custom resource response is setup to always return 200 even when we freshly create a new model in the request.
         $response->assertStatus(200);
     }
 
