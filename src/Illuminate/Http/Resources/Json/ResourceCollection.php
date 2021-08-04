@@ -114,7 +114,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
             $this->preparePaginatedResponse($request);
         }
 
-        $this->resolveResourceResponse()
+        return $this->resolveResourceResponse()
             ->toResponse($request);
     }
 

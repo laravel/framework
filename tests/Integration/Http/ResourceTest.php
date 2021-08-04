@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\Cursor;
@@ -17,7 +19,9 @@ use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithCustomResponsable;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithCustomResponsable;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
@@ -677,6 +681,50 @@ class ResourceTest extends TestCase
                 'to' => 2,
                 'total' => 3,
             ],
+        ]);
+    }
+
+    public function testResourceWithCustomResponsableClass()
+    {
+        Route::get('/', function () {
+                $post = new Post(['id' => 5, 'title' => 'Test Title']);
+                $post->wasRecentlyCreated = true;
+
+            return new PostResourceWithCustomResponsable($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+    }
+
+    public function testResourceWithCustomPaginatedResponsableClass()
+    {
+        $cursor = new Cursor(['id' => 5]);
+
+        Route::get('/', function () use ($cursor) {
+            $paginator = new CursorPaginator(
+                collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]),
+                100, $cursor
+            );
+            return new PostCollectionResourceWithCustomResponsable($paginator);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                ],
+            ],
+            'cursor' => $cursor->encode(),
         ]);
     }
 
