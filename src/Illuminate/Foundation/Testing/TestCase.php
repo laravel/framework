@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Pagination\Cursor;
 use PHPUnit\Framework\TestCase;
 
