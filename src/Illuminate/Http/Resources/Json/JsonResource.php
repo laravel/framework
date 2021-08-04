@@ -236,13 +236,16 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     protected function resolveResourceResponse()
     {
         if ($this->resourceResponse) {
-            $resourceResponse = new $this->resourceResponse($this);
+            $resourceResponse = $this->resourceResponse;
         } else {
             $resourceResponse = $this->isResourcePaginated()
-                ? new PaginatedResourceResponse($this)
-                : new ResourceResponse($this);
+                ? PaginatedResourceResponse::class
+                : ResourceResponse::class;
         }
-        return $resourceResponse;
+
+        return Container::getInstance()->makeWith($resourceResponse, [
+            'resource' => $this,
+        ]);
     }
 
     /**
