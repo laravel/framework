@@ -15,7 +15,7 @@ class {{ class }} implements CastsAttributes
      * @param  array  $attributes
      * @return mixed
      */
-    public function get($model, $key, $value, $attributes)
+    public function get($model, string $key, $value, array $attributes)
     {
         return $value;
     }
@@ -29,7 +29,7 @@ class {{ class }} implements CastsAttributes
      * @param  array  $attributes
      * @return mixed
      */
-    public function set($model, $key, $value, $attributes)
+    public function set($model, string $key, $value, array $attributes)
     {
         return $value;
     }
