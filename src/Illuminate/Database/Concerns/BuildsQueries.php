@@ -315,11 +315,13 @@ trait BuildsQueries
                 $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
-                    $builder->where(
-                        $this->getOriginalColumnNameForCursorPagination($this, $column),
-                        $direction === 'asc' ? '>' : '<',
-                        $cursor->parameter($column)
-                    );
+                    if (! is_null($parameter = $cursor->parameter($column))) {
+                        $builder->where(
+                            $this->getOriginalColumnNameForCursorPagination($this, $column),
+                            $direction === 'asc' ? '>' : '<',
+                            $parameter
+                        );
+                    }
 
                     if ($i < $orders->count() - 1) {
                         $builder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
