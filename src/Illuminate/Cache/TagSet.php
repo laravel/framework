@@ -102,8 +102,7 @@ class TagSet
     protected function resetTags($tagIds)
     {
         $result = [];
-        foreach ($tagIds as $tagId)
-        {
+        foreach ($tagIds as $tagId) {
             if ($this->store->forever($tagId, $id = str_replace('.', '', uniqid('', true)))) {
                 $result[$tagId] = $id;
             }
