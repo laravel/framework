@@ -354,8 +354,10 @@ trait BuildsQueries
 
         if (! is_null($columns)) {
             foreach ($columns as $column) {
-                if (stripos($column, ' as ') !== false) {
-                    [$original, $alias] = explode(' as ', $column);
+                if (($position = stripos($column, ' as ')) !== false) {
+                    $as = substr($column, $position, 4);
+
+                    [$original, $alias] = explode($as, $column);
 
                     if ($parameter === $alias) {
                         return $original;
