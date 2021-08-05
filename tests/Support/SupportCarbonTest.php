@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -34,9 +35,9 @@ class SupportCarbonTest extends TestCase
 
     public function testInstance()
     {
-        $this->assertInstanceOf(DateTime::class, $this->now);
+        $this->assertInstanceOf(DateTimeImmutable::class, $this->now);
         $this->assertInstanceOf(DateTimeInterface::class, $this->now);
-        $this->assertInstanceOf(BaseCarbon::class, $this->now);
+        $this->assertInstanceOf(BaseCarbonImmutable::class, $this->now);
         $this->assertInstanceOf(Carbon::class, $this->now);
     }
 

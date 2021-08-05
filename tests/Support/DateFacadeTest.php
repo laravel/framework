@@ -64,7 +64,7 @@ class DateFacadeTest extends TestCase
         DateFactory::use(function (Carbon $date) {
             return $date->toImmutable();
         });
-        $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
+        $this->assertSame(Carbon::class, get_class(Date::now()));
         DateFactory::use(function ($date) {
             return $date;
         });

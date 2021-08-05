@@ -1374,8 +1374,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFreshMethodOnModel()
     {
-        $now = Carbon::now();
-        $nowSerialized = $now->startOfSecond()->toJSON();
+        $now = Carbon::now()->startOfSecond();
+        $nowSerialized = $now->toJSON();
         $nowWithFractionsSerialized = $now->toJSON();
         Carbon::setTestNow($now);
 
