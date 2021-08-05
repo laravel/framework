@@ -72,8 +72,44 @@ class TagSet
      * @return array
      */
     protected function tagIds()
+    {   
+        return $this->fillTagIds($this->store->many(array_map([$this, 'tagKey'], $this->names)));
+    }
+
+    protected function fillTagIds($tagIds)
     {
-        return array_map([$this, 'tagId'], $this->names);
+        $missingTagIds = $this->getMissingTagIds($tagIds);
+
+        if (!count($missingTagIds) || !($setTagIds = $this->resetTags($missingTagIds))) {
+            return $tagIds;
+        }
+
+        return array_merge($tagIds, $setTagIds);
+    }
+
+    protected function getMissingTagIds($tagIds)
+    {
+        $missingTagIds = [];
+        foreach($tagIds as $key => $value) {
+            if (is_null($value)) {
+                $missingTagIds[] = $key;
+            }
+        }
+
+        return $missingTagIds;
+    }
+
+    protected function resetTags($tagIds)
+    {
+        $result = [];
+        foreach($tagIds as $tagId)
+        {
+            if ($this->store->forever($tagId, $id = str_replace('.', '', uniqid('', true)))) {
+                $result[$tagId] = $id;
+            }
+        }
+
+        return $result;
     }
 
     /**
