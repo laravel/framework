@@ -72,7 +72,7 @@ class TagSet
      * @return array
      */
     protected function tagIds()
-    {   
+    {
         return $this->fillTagIds($this->store->many(array_map([$this, 'tagKey'], $this->names)));
     }
 
@@ -80,7 +80,7 @@ class TagSet
     {
         $missingTagIds = $this->getMissingTagIds($tagIds);
 
-        if (!count($missingTagIds) || !($setTagIds = $this->resetTags($missingTagIds))) {
+        if (! count($missingTagIds) || ! ($setTagIds = $this->resetTags($missingTagIds))) {
             return $tagIds;
         }
 
@@ -90,7 +90,7 @@ class TagSet
     protected function getMissingTagIds($tagIds)
     {
         $missingTagIds = [];
-        foreach($tagIds as $key => $value) {
+        foreach ($tagIds as $key => $value) {
             if (is_null($value)) {
                 $missingTagIds[] = $key;
             }
@@ -102,7 +102,7 @@ class TagSet
     protected function resetTags($tagIds)
     {
         $result = [];
-        foreach($tagIds as $tagId)
+        foreach ($tagIds as $tagId)
         {
             if ($this->store->forever($tagId, $id = str_replace('.', '', uniqid('', true)))) {
                 $result[$tagId] = $id;
