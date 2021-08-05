@@ -5,7 +5,7 @@ namespace Illuminate\Support;
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
 
-class Carbon extends BaseCarbon
+class Carbon extends BaseCarbonImmutable
 {
     /**
      * {@inheritdoc}
