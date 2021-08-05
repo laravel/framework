@@ -319,7 +319,7 @@ class UrlGenerator implements UrlGeneratorContract
     public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
     {
         $this->ensureSignedRouteParametersAreNotReserved(
-            $parameters = $this->formatParameters($parameters)
+            $parameters = Arr::wrap($parameters)
         );
 
         if ($expiration) {

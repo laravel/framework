@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
@@ -690,6 +691,28 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertFalse($url->hasValidSignature($request));
     }
 
+    public function testSignedUrlImplicitModelBinding()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{user:uuid}', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $user = new RoutingUrlGeneratorTestUser(['uuid' => '0231d4ac-e9e3-4452-a89a-4427cfb23c3e']);
+
+        $request = Request::create($url->signedRoute('foo', $user));
+
+        $this->assertTrue($url->hasValidSignature($request));
+    }
+
     public function testSignedRelativeUrl()
     {
         $url = new UrlGenerator(
@@ -791,4 +814,9 @@ class InvokableActionStub
     {
         return 'hello';
     }
+}
+
+class RoutingUrlGeneratorTestUser extends Model
+{
+    protected $fillable = ['uuid'];
 }
