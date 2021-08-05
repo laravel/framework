@@ -1806,6 +1806,37 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertTrue($v->passes());
+
+        // accepted_if:bar,aaa
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is aaa.', $v->messages()->first('foo'));
+
+        // accepted_if:bar,aaa,...
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'abc'], ['foo' => 'accepted_if:bar,aaa,bbb,abc']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is abc.', $v->messages()->first('foo'));
+
+        // accepted_if:bar,boolean
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => false], ['foo' => 'accepted_if:bar,false']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is false.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => true], ['foo' => 'accepted_if:bar,true']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
     }
 
     public function testValidateEndsWith()
