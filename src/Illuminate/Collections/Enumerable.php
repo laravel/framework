@@ -8,61 +8,79 @@ use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 use JsonSerializable;
 
+/**
+ * @template TKey of array-key
+ * @template TValue
+ * @template-extends \IteratorAggregate<TKey, TValue>
+ */
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     /**
      * Create a new collection instance if the value isn't one already.
      *
-     * @param  mixed  $items
-     * @return static
+     * @template TMakeKey of array-key
+     * @template TMakeValue
+     *
+     * @param  iterable<TMakeKey, TMakeValue>  $items
+     * @return static<TMakeKey, TMakeValue>
      */
     public static function make($items = []);
 
     /**
      * Create a new instance by invoking the callback a given amount of times.
      *
+     * @template TTimesValue
+     *
      * @param  int  $number
-     * @param  callable|null  $callback
-     * @return static
+     * @param  (callable(int): TTimesValue)|null  $callback
+     * @return static<int, TTimesValue>
      */
-    public static function times($number, callable $callback = null);
+    public static function times($number, callable $callback);
 
     /**
      * Create a collection with the given range.
      *
      * @param  int  $from
      * @param  int  $to
-     * @return static
+     * @return static<int, int>
      */
     public static function range($from, $to);
 
     /**
      * Wrap the given value in a collection if applicable.
      *
-     * @param  mixed  $value
-     * @return static
+     * @template TWrapValue
+     *
+     * @param  TWrapValue|iterable<TWrapValue>  $value
+     * @return static<array-key, TWrapValue>
      */
     public static function wrap($value);
 
     /**
      * Get the underlying items from the given collection if applicable.
      *
-     * @param  array|static  $value
-     * @return array
+     * @template TUnwrapKey of array-key
+     * @template TUnwrapValue
+     *
+     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>   $value
+     * @return array<TUnwrapKey, TUnwrapValue>
      */
     public static function unwrap($value);
 
     /**
      * Create a new instance with no items.
      *
-     * @return static
+     * @template TEmptyKey of array-key
+     * @template TEmptyValue
+     *
+     * @return static<TEmptyKey, TEmptyValue>
      */
     public static function empty();
 
     /**
      * Get all items in the enumerable.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function all();
 
@@ -228,7 +246,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Execute a callback over each item.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue): mixed  $callback
      * @return $this
      */
     public function each(callable $callback);
@@ -425,9 +443,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the first item from the enumerable passing the given truth test.
      *
-     * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @template TFirstDefaultValue
+     *
+     * @param  (callable(TValue): bool)|null  $callback
+     * @param  TFirstDefaultValue  $default
+     * @return TValue|TFirstDefaultValue
      */
     public function first(callable $callback = null, $default = null);
 
@@ -459,9 +479,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get an item from the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @template TGetDefaultValue
+     *
+     * @param  TKey  $key
+     * @param  TGetDefaultValue  $default
+     * @return TValue|TGetDefaultValue
      */
     public function get($key, $default = null);
 
