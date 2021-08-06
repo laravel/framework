@@ -5,7 +5,7 @@ use Illuminate\Support\Enumerable;
 use function PHPStan\Testing\assertType;
 
 /** @var Enumerable<int, User> $enumerable */
- // @phpstan-ignore-line
+$enumerable = collect([]);
 class User extends Authenticatable
 {
 }
