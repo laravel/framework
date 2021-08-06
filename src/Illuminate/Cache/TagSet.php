@@ -78,9 +78,9 @@ class TagSet
 
     /**
      * Finds and sets missing tag ids
-     * 
+     *
      * @param array $tagIds
-     * @return array  
+     * @return array
      */
     protected function setMissingTagIds($tagIds)
     {
