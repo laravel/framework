@@ -63,6 +63,23 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON search/find" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @param  string  $one_or_all
+     * @param  string  $escape_char
+     * @return string
+     */
+    protected function compileJsonFinds($column, $value, $one_or_all, $escape_char)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+        $escape_char = $escape_char === null ? 'NULL' : "'$escape_char'";
+
+        return 'json_search('.$field.', \''.$one_or_all.'\', '.$value.', '.$escape_char.$path.') != \'NULL\'';
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column

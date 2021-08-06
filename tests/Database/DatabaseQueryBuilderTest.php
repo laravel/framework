@@ -3904,6 +3904,39 @@ SQL;
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }
 
+    public function testWhereJsonFindsMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonFinds('options', 'en');
+        $this->assertSame('select * from `users` where json_search(`options`, \'one\', ?, NULL) != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('cities')->whereJsonFinds('name', 'New%');
+        $this->assertSame('select * from `cities` where json_search(`name`, \'one\', ?, NULL) != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['New%'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonFinds('options', 'en', 'all');
+        $this->assertSame('select * from `users` where json_search(`options`, \'all\', ?, NULL) != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonFinds('options', 'en', 'all', '-');
+        $this->assertSame('select * from `users` where json_search(`options`, \'all\', ?, \'-\') != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonFinds('users.options->languages', 'en');
+        $this->assertSame('select * from `users` where json_search(`users`.`options`, \'one\', ?, NULL, \'$."languages"\') != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonFinds('options->languages', new Raw("'e%'"));
+        $this->assertSame('select * from `users` where `id` = ? or json_search(`options`, \'one\', \'e%\', NULL, \'$."languages"\') != \'NULL\'', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
     public function testWhereJsonContainsMySql()
     {
         $builder = $this->getMySqlBuilder();
@@ -3963,6 +3996,24 @@ SQL;
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContains('options->languages', new Raw("'en'"));
         $this->assertSame('select * from [users] where [id] = ? or \'en\' in (select [value] from openjson([options], \'$."languages"\'))', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    public function testWhereJsonDoesntFindMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntFind('options->languages', 'en');
+        $this->assertSame('select * from `users` where not json_search(`options`, \'one\', ?, NULL, \'$."languages"\') != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntFind('options->languages', 'en', 'all', '-');
+        $this->assertSame('select * from `users` where not json_search(`options`, \'all\', ?, \'-\', \'$."languages"\') != \'NULL\'', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntFind('options->languages', new Raw("'e%'"));
+        $this->assertSame('select * from `users` where `id` = ? or not json_search(`options`, \'one\', \'e%\', NULL, \'$."languages"\') != \'NULL\'', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 

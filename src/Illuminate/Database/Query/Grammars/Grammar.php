@@ -560,6 +560,38 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where JSON search/find" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonFinds(Builder $query, $where)
+    {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonFinds(
+            $where['column'], $this->parameter($where['value']), $where['one_or_all'], $where['escape_char']
+        );
+    }
+
+    /**
+     * Compile a "JSON search/find" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @param  string  $one_or_all
+     * @param  string  $escape_char
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileJsonFinds($column, $value, $one_or_all, $escape_char)
+    {
+        throw new RuntimeException('This database engine does not support JSON search operations.');
+    }
+
+    /**
      * Compile a "where JSON contains" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

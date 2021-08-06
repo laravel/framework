@@ -1656,6 +1656,73 @@ class Builder
     }
 
     /**
+     * Add a "where JSON search/find" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $one_or_all
+     * @param  string  $escape_char
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereJsonFinds($column, $value = null, $one_or_all = 'one', $escape_char = null, $boolean = 'and', $not = false)
+    {
+        $type = 'JsonFinds';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'one_or_all', 'escape_char', 'boolean', 'not');
+
+        if (! $value instanceof Expression) {
+            $this->addBinding($this->flattenValue($value));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where JSON search/find" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $one_or_all
+     * @param  string  $escape_char
+     * @return $this
+     */
+    public function orWhereJsonFinds($column, $value, $one_or_all = 'one', $escape_char = null)
+    {
+        return $this->whereJsonFinds($column, $value, $one_or_all, $escape_char, 'or');
+    }
+
+    /**
+     * Add a "where JSON not search/find" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $one_or_all
+     * @param  string  $escape_char
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereJsonDoesntFind($column, $value, $one_or_all = 'one', $escape_char = null, $boolean = 'and')
+    {
+        return $this->whereJsonFinds($column, $value, $one_or_all, $escape_char, $boolean, true);
+    }
+
+    /**
+     * Add an "or where JSON not search/find" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $one_or_all
+     * @param  string  $escape_char
+     * @return $this
+     */
+    public function orWhereJsonDoesntFind($column, $value, $one_or_all = 'one', $escape_char = null)
+    {
+        return $this->whereJsonDoesntFind($column, $value, $one_or_all, $escape_char, 'or');
+    }
+
+    /**
      * Add a "where JSON contains" clause to the query.
      *
      * @param  string  $column
