@@ -35,7 +35,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  (callable(int): TTimesValue)|null  $callback
      * @return static<int, TTimesValue>
      */
-    public static function times($number, callable $callback);
+    public static function times($number, callable $callback = null);
 
     /**
      * Create a collection with the given range.
