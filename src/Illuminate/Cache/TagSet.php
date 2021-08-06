@@ -73,21 +73,16 @@ class TagSet
      */
     protected function tagIds()
     {
-        return $this->fillTagIds($this->store->many(array_map([$this, 'tagKey'], $this->names)));
+        return $this->setMissingTagIds($this->store->many(array_map([$this, 'tagKey'], $this->names)));
     }
 
-    protected function fillTagIds($tagIds)
-    {
-        $missingTagIds = $this->getMissingTagIds($tagIds);
-
-        if (! count($missingTagIds) || ! ($setTagIds = $this->resetTags($missingTagIds))) {
-            return $tagIds;
-        }
-
-        return array_merge($tagIds, $setTagIds);
-    }
-
-    protected function getMissingTagIds($tagIds)
+    /**
+     * Finds and sets missing tag ids
+     * 
+     * @param array $tagIds
+     * @return array  
+     */
+    protected function setMissingTagIds($tagIds)
     {
         $missingTagIds = [];
         foreach ($tagIds as $key => $value) {
@@ -96,9 +91,16 @@ class TagSet
             }
         }
 
-        return $missingTagIds;
+        if (! count($missingTagIds) || ! ($setTagIds = $this->resetTags($missingTagIds))) {
+            return $tagIds;
+        }
+
+        return array_merge($tagIds, $setTagIds);
     }
 
+    /**
+     * Resets multiple tags and once and returns the new identifier.
+     */
     protected function resetTags($tagIds)
     {
         $result = [];
