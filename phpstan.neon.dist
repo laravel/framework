@@ -1,6 +1,4 @@
 parameters:
-
-    paths:
-        - types
-
-    level: max
+  paths:
+    - types
+  level: max
