@@ -793,6 +793,10 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function pop($count = 1)
     {
+        if ($count < 1 || $this->count() === 0) {
+            return null;
+        } 
+
         if ($count === 1) {
             return array_pop($this->items);
         }
@@ -959,6 +963,10 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function shift($count = 1)
     {
+        if ($count < 1 || $this->count() === 0) {
+            return null;
+        }
+
         if ($count === 1) {
             return array_shift($this->items);
         }
