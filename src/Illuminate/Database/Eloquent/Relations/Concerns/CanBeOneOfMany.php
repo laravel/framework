@@ -185,7 +185,7 @@ trait CanBeOneOfMany
             $subQuery->groupBy($this->qualifyRelatedColumn($group));
         }
 
-        if (!is_null($column)) {
+        if (! is_null($column)) {
             $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($column).') as '.$subQuery->getQuery()->grammar->wrap($column));
         }
 
