@@ -240,6 +240,20 @@ class SupportCollectionTest extends TestCase
         $this->assertEmpty($c);
     }
 
+    public function testPopReturnsNullWhenParameterLessThanOne()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $this->assertNull($c->pop(0));
+        $this->assertCount(2, $c);
+    }
+
+    public function testPopReturnsNullWhenNoItemsInCollection()
+    {
+        $c = new Collection([]);
+        $this->assertNull($c->pop());
+        $this->assertCount(0, $c);
+    }
+
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);
@@ -263,6 +277,20 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
         $this->assertEquals(new Collection(['foo', 'bar']), $c->shift(3));
         $this->assertEmpty($c);
+    }
+
+    public function testShiftReturnsNullWhenParameterLessThanOne()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $this->assertNull($c->shift(0));
+        $this->assertCount(2, $c);
+    }
+
+    public function testShiftReturnsNullWhenNoItemsInCollection()
+    {
+        $c = new Collection([]);
+        $this->assertNull($c->shift());
+        $this->assertCount(0, $c);
     }
 
     /**
