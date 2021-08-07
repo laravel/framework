@@ -258,6 +258,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('baz', $data->first());
     }
 
+    public function testShiftOnlyReturnsCollectionItemsWhenParamGreaterThanCollectionLength()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $this->assertEquals(new Collection(['foo', 'bar']), $c->shift(3));
+        $this->assertEmpty($c);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
