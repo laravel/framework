@@ -797,6 +797,8 @@ class Collection implements ArrayAccess, Enumerable
             return array_pop($this->items);
         }
 
+        $count = $count > $this->count() ? $this->count() : $count;
+
         $results = [];
 
         foreach (range(1, $count) as $item) {
