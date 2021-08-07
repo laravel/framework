@@ -233,6 +233,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $c->first());
     }
 
+    public function testPopOnlyReturnsCollectionItemsWhenParamGreaterThanCollectionLength()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $this->assertEquals(new Collection(['bar', 'foo']), $c->pop(3));
+        $this->assertEmpty($c);
+    }
+
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);
