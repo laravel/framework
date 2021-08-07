@@ -154,7 +154,7 @@ class VerifyCsrfToken
 
         if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
             try {
-                $token = CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
+                $token = CookieValuePrefix::remove($this->encrypter->decrypt(urldecode($header), static::serialized()));
             } catch (DecryptException $e) {
                 $token = '';
             }
