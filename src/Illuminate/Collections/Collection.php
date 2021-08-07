@@ -795,7 +795,7 @@ class Collection implements ArrayAccess, Enumerable
     {
         if ($count < 1 || $this->count() === 0) {
             return null;
-        } 
+        }
 
         if ($count === 1) {
             return array_pop($this->items);
