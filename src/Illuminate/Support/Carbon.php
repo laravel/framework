@@ -40,8 +40,10 @@ class Carbon extends BaseCarbon implements UrlRoutable
     public function resolveRouteBinding($value, $field = null)
     {
         try {
-            return static::createFromFormat($field ?? 'Y-m-d', $value);
-        } catch (InvalidFormatException) {
+            return $field
+                ? static::createFromFormat($field, $value)
+                : static::createFromFormat('Y-m-d', $value)->startOfDay();
+        } catch (InvalidFormatException $e) {
             return null;
         }
     }
