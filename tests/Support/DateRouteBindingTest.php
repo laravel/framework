@@ -20,7 +20,7 @@ class DateRouteBindingTest extends TestCase
             return $date->toDateTimeString();
         })->middleware(SubstituteBindings::class);
 
-        $this->assertSame('2015-07-04 20:00:00', $this->get('foo/2015-07-04/bar')->original);
+        $this->assertSame('2015-07-04 00:00:00', $this->get('foo/2015-07-04/bar')->original);
         $this->get('foo/invalid/bar')->assertNotFound();
     }
 
@@ -29,10 +29,10 @@ class DateRouteBindingTest extends TestCase
         $date = Carbon::createFromTimestamp(1436040000)->format('YmdHis');
 
         Route::get('/foo/{date:YmdHis}/bar', function (Carbon $date) {
-            return $date->getTimestamp();
+            return $date->toDateTimeString();
         })->middleware(SubstituteBindings::class);
 
-        $this->assertSame(1436040000, $this->get("foo/$date/bar")->original);
+        $this->assertSame('2015-07-04 20:00:00', $this->get("foo/$date/bar")->original);
         $this->get('foo/invalid/bar')->assertNotFound();
     }
 }
