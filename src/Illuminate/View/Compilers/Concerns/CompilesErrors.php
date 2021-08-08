@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Support\Str;
+
 trait CompilesErrors
 {
     /**
@@ -13,12 +15,27 @@ trait CompilesErrors
     protected function compileError($expression)
     {
         $expression = $this->stripParentheses($expression);
+        $hasMultipleErrors = Str::startsWith($expression, '[');
 
-        return '<?php $__errorArgs = ['.$expression.'];
+        $conditionFunc = $hasMultipleErrors ? 'hasAny' : 'has';
+        $condition = 'if ($__bag->' . $conditionFunc . '($__errorArgs[0])) :';
+
+        return '<?php $__errorArgs = [' . $expression . '];
 $__bag = $errors->getBag($__errorArgs[1] ?? \'default\');
-if ($__bag->has($__errorArgs[0])) :
+' . $condition . '
 if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>';
+if (isset($messages)) { $__messagesOriginal = $messages; }
+' . ($hasMultipleErrors
+
+? '$messages = array_reduce($__errorArgs[0], function($carry, $__error) use($__bag) {
+    $newline = $__bag->first($__error);
+    if($newline) $carry[] = $newline;
+    return $carry;
+}, []);
+$message = implode('. ', $messages); ?>'
+            
+: '$message = $__bag->first($__errorArgs[0]); ?>'
+        );
     }
 
     /**
@@ -29,8 +46,9 @@ $message = $__bag->first($__errorArgs[0]); ?>';
      */
     protected function compileEnderror($expression)
     {
-        return '<?php unset($message);
+        return '<?php unset($message, $messages);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+if (isset($__messagesOriginal)) { $messages = $__messagesOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>';
     }
