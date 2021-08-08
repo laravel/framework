@@ -531,9 +531,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function insertAt($offset, $value)
     {
-        $this->splice($offset, 0, [$value]);
-
-        return $this;
+        return $this->splice($offset, 0, [$value]);
     }
 
     /**

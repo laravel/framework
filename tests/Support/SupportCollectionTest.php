@@ -1991,25 +1991,22 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor,dayle', $data->implode(','));
     }
 
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testInsertAt($collection)
+    public function testInsertAt()
     {
-        $data = new $collection(['taylor', 'jess', 'adam']);
-        $data = $data->insertAt(2, 'matt');
+        $data = new Collection(['taylor', 'jess', 'adam']);
+        $data->insertAt(2, 'matt');
         $this->assertEquals(['taylor', 'jess', 'matt', 'adam'], $data->all());
 
-        $data = new $collection(['taylor', 'jess', 'adam']);
-        $data = $data->insertAt(-1, 'sara');
+        $data = new Collection(['taylor', 'jess', 'adam']);
+        $data->insertAt(-1, 'sara');
         $this->assertEquals(['taylor', 'jess', 'sara', 'adam'], $data->all());
 
-        $data = new $collection(['taylor', 'jess', 'adam']);
-        $data = $data->insertAt(1, 'diana');
+        $data = new Collection(['taylor', 'jess', 'adam']);
+        $data->insertAt(1, 'diana');
         $this->assertEquals(['taylor', 'diana', 'jess', 'adam'], $data->all());
 
-        $data = new $collection(['taylor', 'jess', 'adam']);
-        $data = $data->insertAt(0, null);
+        $data = new Collection(['taylor', 'jess', 'adam']);
+        $data->insertAt(0, null);
         $this->assertEquals([null, 'taylor', 'jess', 'adam'], $data->all());
     }
 
