@@ -525,20 +525,6 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Inserts value at given key of collection
-     * and returns the updated collection.
-     *
-     * @param  int  $offset
-     * @param  mixed  $value
-     *
-     * @return $this
-     */
-    public function insertAt($offset, $value)
-    {
-        return $this->passthru('insertAt', func_get_args());
-    }
-
-    /**
      * Intersect the collection with the given items.
      *
      * @param  mixed  $items
