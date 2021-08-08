@@ -66,7 +66,7 @@ $messages = array_reduce($__errorArgs[0], function($carry, $__error) use($__bag)
     if($newline) $carry[] = $newline;
     return $carry;
 }, []);
-$message = implode('. ', $messages); ?>
+$message = implode('.', $messages); ?>
     <span><?php echo e($message); ?></span>
 <?php unset($message, $messages);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
