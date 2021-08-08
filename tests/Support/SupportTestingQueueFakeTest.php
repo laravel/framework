@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
@@ -39,6 +40,22 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         $this->fake->push($this->job);
+
+        $this->fake->assertPushed(JobStub::class);
+    }
+
+    public function testAssertPushedWithQueuedListener()
+    {
+        $queuedListener = new CallQueuedListener(JobStub::class, 'handle', []);
+
+        try {
+            $this->fake->assertPushed(JobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+        }
+
+        $this->fake->push($queuedListener);
 
         $this->fake->assertPushed(JobStub::class);
     }

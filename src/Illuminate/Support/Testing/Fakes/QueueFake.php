@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -229,7 +230,9 @@ class QueueFake extends QueueManager implements Queue
             return true;
         };
 
-        return collect($this->jobs[$job])->filter(function ($data) use ($callback) {
+        $jobs = collect($this->jobs[$job] ?? [])->merge($this->listeners($job));
+
+        return $jobs->filter(function ($data) use ($callback) {
             return $callback($data['job'], $data['queue']);
         })->pluck('job');
     }
@@ -242,7 +245,21 @@ class QueueFake extends QueueManager implements Queue
      */
     public function hasPushed($job)
     {
-        return isset($this->jobs[$job]) && ! empty($this->jobs[$job]);
+        return ! empty($this->jobs[$job]) || $this->listeners($job)->count() > 0;
+    }
+
+    /**
+     * Return queued listeners for a given class.
+     *
+     * @param  string  $job
+     * @return \Illuminate\Support\Collection
+     */
+    protected function listeners($job)
+    {
+        return collect($this->jobs[CallQueuedListener::class] ?? [])
+            ->filter(function($data) use ($job) {
+                return $data['job']->class == $job;
+            });
     }
 
     /**
