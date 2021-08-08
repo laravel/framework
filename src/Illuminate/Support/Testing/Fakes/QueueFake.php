@@ -257,7 +257,7 @@ class QueueFake extends QueueManager implements Queue
     protected function listeners($job)
     {
         return collect($this->jobs[CallQueuedListener::class] ?? [])
-            ->filter(function($data) use ($job) {
+            ->filter(function ($data) use ($job) {
                 return $data['job']->class == $job;
             });
     }
