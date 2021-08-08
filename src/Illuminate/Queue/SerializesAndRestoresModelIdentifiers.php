@@ -20,11 +20,14 @@ trait SerializesAndRestoresModelIdentifiers
     protected function getSerializedPropertyValue($value)
     {
         if ($value instanceof QueueableCollection) {
+            $model = $value->first();
+
             return new ModelIdentifier(
                 $value->getQueueableClass(),
                 $value->getQueueableIds(),
-                $value->getQueueableRelations(),
-                $value->getQueueableConnection()
+                $model ? $this->getQueueableRelations($model) : [],
+                $value->getQueueableConnection(),
+                $model ? $this->getModelAttributes($model) : ["*"]
             );
         }
 
@@ -32,8 +35,9 @@ trait SerializesAndRestoresModelIdentifiers
             return new ModelIdentifier(
                 get_class($value),
                 $value->getQueueableId(),
-                $value->getQueueableRelations(),
-                $value->getQueueableConnection()
+                $this->getQueueableRelations($value),
+                $value->getQueueableConnection(),
+                $this->getModelAttributes($value)
             );
         }
 
@@ -71,7 +75,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         $collection = $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
-        )->useWritePdo()->get();
+        )->useWritePdo()->get($value->attributes);
 
         if (is_a($value->class, Pivot::class, true) ||
             in_array(AsPivot::class, class_uses($value->class))) {
@@ -99,7 +103,7 @@ trait SerializesAndRestoresModelIdentifiers
     {
         return $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
-        )->useWritePdo()->firstOrFail()->load($value->relations ?? []);
+        )->useWritePdo()->firstOrFail($value->attributes)->load($value->relations ?? []);
     }
 
     /**
@@ -112,5 +116,53 @@ trait SerializesAndRestoresModelIdentifiers
     protected function getQueryForModelRestoration($model, $ids)
     {
         return $model->newQueryForRestoration($ids);
+    }
+
+    /**
+     * Get the model selected attributes.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @return array
+     */
+    protected function getModelAttributes($model)
+    {
+        return array_keys($model->getAttributes());
+    }
+
+    /**
+     * Get the relation with it's selected attributes as string.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  string $relation
+     * @return string
+     */
+    protected function getRelationAttributesString($model, $relation)
+    {
+        $relationModel = $model->getRelationValue($relation)->first();
+
+        $attributes = $this->getModelAttributes($relationModel);
+
+        $relation = $relation . ":" . implode(",", $attributes);
+
+        unset($attributes, $relationModel);
+
+        return $relation;
+    }
+
+    /**
+     * Get the queuebale relations.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $value
+     * @return array
+     */
+    protected function getQueueableRelations($value)
+    {
+        $relations = [];
+
+        foreach ($value->getQueueableRelations() as $relation) {
+            $relations[] = $this->getRelationAttributesString($value, $relation);
+        }
+
+        return $relations;
     }
 }
