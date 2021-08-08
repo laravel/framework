@@ -1994,6 +1994,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testInsertAt($collection)
+    {
+        $data = new $collection(['taylor', 'jeffrey', 'adam']);
+        $data = $data->insertAt(2, 'matt');
+        $this->assertEquals(['taylor', 'jeffrey', 'matt', 'adam'], $data->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testTake($collection)
     {
         $data = new $collection(['taylor', 'dayle', 'shawn']);

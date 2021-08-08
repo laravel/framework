@@ -522,6 +522,22 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Inserts value at given key of collection
+     * and returns the updated collection.
+     *
+     * @param  int  $offset
+     * @param  mixed  $value
+     *
+     * @return $this
+     */
+    public function insertAt($offset, $value)
+    {
+        $this->splice($offset, 0, [$value]);
+
+        return $this;
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  mixed  $items
