@@ -20,7 +20,7 @@ class DateRouteBindingTest extends TestCase
             return $date->toDateTimeString();
         })->middleware(SubstituteBindings::class);
 
-        $this->assertSame('2015-07-04 00:00:00', $this->get('foo/2015-07-04/bar')->original);
+        $this->assertSame('2015-07-04 20:00:00', $this->get('foo/2015-07-04/bar')->original);
         $this->get('foo/invalid/bar')->assertNotFound();
     }
 
