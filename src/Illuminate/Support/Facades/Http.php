@@ -45,6 +45,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static \Illuminate\Http\Client\ResponseSequence fakeSequence(string $urlPattern = '*')
  * @method static void assertSent(callable $callback)
+ * @method static void assertSentInOrder(array $callbacks)
  * @method static void assertNotSent(callable $callback)
  * @method static void assertNothingSent()
  * @method static void assertSentCount(int $count)
