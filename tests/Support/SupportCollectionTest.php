@@ -1996,9 +1996,21 @@ class SupportCollectionTest extends TestCase
      */
     public function testInsertAt($collection)
     {
-        $data = new $collection(['taylor', 'jeffrey', 'adam']);
+        $data = new $collection(['taylor', 'jess', 'adam']);
         $data = $data->insertAt(2, 'matt');
-        $this->assertEquals(['taylor', 'jeffrey', 'matt', 'adam'], $data->all());
+        $this->assertEquals(['taylor', 'jess', 'matt', 'adam'], $data->all());
+
+        $data = new $collection(['taylor', 'jess', 'adam']);
+        $data = $data->insertAt(-1, 'sara');
+        $this->assertEquals(['taylor', 'jess', 'sara', 'adam'], $data->all());
+
+        $data = new $collection(['taylor', 'jess', 'adam']);
+        $data = $data->insertAt(1, 'diana');
+        $this->assertEquals(['taylor', 'diana', 'jess', 'adam'], $data->all());
+
+        $data = new $collection(['taylor', 'jess', 'adam']);
+        $data = $data->insertAt(0, null);
+        $this->assertEquals([null, 'taylor', 'jess', 'adam'], $data->all());
     }
 
     /**
