@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
