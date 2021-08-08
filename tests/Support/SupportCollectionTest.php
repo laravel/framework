@@ -225,6 +225,14 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $c->first());
     }
 
+    public function testPopReturnsAndRemovesLastXItemsInCollection()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+
+        $this->assertEquals(new Collection(['baz', 'bar']), $c->pop(2));
+        $this->assertSame('foo', $c->first());
+    }
+
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);
@@ -233,6 +241,14 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('Otwell', $data->first());
         $this->assertSame('Otwell', $data->shift());
         $this->assertNull($data->first());
+    }
+
+    public function testShiftReturnsAndRemovesFirstXItemsInCollection()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+
+        $this->assertEquals(new Collection(['foo', 'bar']), $data->shift(2));
+        $this->assertSame('baz', $data->first());
     }
 
     /**

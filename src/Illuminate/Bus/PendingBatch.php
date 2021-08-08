@@ -57,7 +57,7 @@ class PendingBatch
     /**
      * Add jobs to the batch.
      *
-     * @param  array  $jobs
+     * @param  iterable  $jobs
      * @return $this
      */
     public function add($jobs)

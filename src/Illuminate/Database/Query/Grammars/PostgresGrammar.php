@@ -369,7 +369,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     *Wrap the given JSON selector for boolean values.
+     * Wrap the given JSON selector for boolean values.
      *
      * @param  string  $value
      * @return string

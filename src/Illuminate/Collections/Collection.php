@@ -786,13 +786,24 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get and remove the last item from the collection.
+     * Get and remove the last N items from the collection.
      *
+     * @param  int  $count
      * @return mixed
      */
-    public function pop()
+    public function pop($count = 1)
     {
-        return array_pop($this->items);
+        if ($count === 1) {
+            return array_pop($this->items);
+        }
+
+        $results = [];
+
+        foreach (range(1, $count) as $item) {
+            array_push($results, array_pop($this->items));
+        }
+
+        return new static($results);
     }
 
     /**
@@ -939,13 +950,24 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Get and remove the first item from the collection.
+     * Get and remove the first N items from the collection.
      *
+     * @param  int  $count
      * @return mixed
      */
-    public function shift()
+    public function shift($count = 1)
     {
-        return array_shift($this->items);
+        if ($count === 1) {
+            return array_shift($this->items);
+        }
+
+        $results = [];
+
+        foreach (range(1, $count) as $item) {
+            array_push($results, array_shift($this->items));
+        }
+
+        return new static($results);
     }
 
     /**
@@ -1401,6 +1423,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->items);
@@ -1411,6 +1434,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->items);
@@ -1456,6 +1480,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $key
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return isset($this->items[$key]);
@@ -1467,6 +1492,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->items[$key];
@@ -1479,6 +1505,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         if (is_null($key)) {
@@ -1494,6 +1521,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  string  $key
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         unset($this->items[$key]);

@@ -13,6 +13,29 @@ if (! isset($data['template'])) {
     return;
 }
 
+// Allow framework to handle request if request URI is in the exclude list...
+if (isset($data['except'])) {
+    $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
+
+    $uri = rawurldecode($uri !== '/' ? trim($uri, '/') : $uri);
+
+    foreach ((array) $data['except'] as $except) {
+        $except = $except !== '/' ? trim($except, '/') : $except;
+
+        if ($except == $uri) {
+            return;
+        }
+
+        $except = preg_quote($except, '#');
+
+        $except = str_replace('\*', '.*', $except);
+
+        if (preg_match('#^'.$except.'\z#u', $uri) === 1) {
+            return;
+        }
+    }
+}
+
 // Allow framework to handle maintenance mode bypass route...
 if (isset($data['secret']) && $_SERVER['REQUEST_URI'] === '/'.$data['secret']) {
     return;
