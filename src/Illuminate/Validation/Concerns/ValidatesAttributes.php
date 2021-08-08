@@ -1489,7 +1489,7 @@ trait ValidatesAttributes
      */
     public function validateProhibited($attribute, $value)
     {
-        return false;
+        return ! $this->validateRequired($attribute, $value);
     }
 
     /**

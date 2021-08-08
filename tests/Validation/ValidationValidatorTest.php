@@ -1347,6 +1347,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], ['name' => 'prohibited']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['name' => ''], ['name' => 'prohibited']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['last' => 'bar'], ['name' => 'prohibited']);
         $this->assertTrue($v->passes());
 
@@ -1355,7 +1358,7 @@ class ValidationValidatorTest extends TestCase
 
         $file = new File('', false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
-        $this->assertTrue($v->fails());
+        $this->assertTrue($v->passes());
 
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['name' => $file], ['name' => 'prohibited']);
@@ -1381,6 +1384,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => ''], ['last' => 'prohibited_if:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'taylor', 'last' => null], ['last' => 'prohibited_if:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'prohibited_if:first,taylor,jess']);
         $this->assertTrue($v->fails());
 
@@ -1394,6 +1405,28 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => true, 'bar' => 'baz'], ['bar' => 'prohibited_if:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File('', false);
+        $v = new Validator($trans, ['foo' => true, 'bar' => $file], ['bar' => 'prohibited_if:foo,true']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => true, 'bar' => $file], ['bar' => 'prohibited_if:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => true, 'files' => [$file, $file2]], ['files.0' => 'prohibited_if:foo,true', 'files.1' => 'prohibited_if:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => true, 'files' => [$file, $file2]], ['files' => 'prohibited_if:foo,true']);
         $this->assertTrue($v->fails());
 
         // error message when passed multiple values (prohibited_if:foo,bar,baz)
@@ -1419,6 +1452,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'jess', 'last' => ''], ['last' => 'prohibited_unless:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => 'jess', 'last' => null], ['last' => 'prohibited_unless:first,taylor']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['first' => 'taylor', 'last' => 'otwell'], ['last' => 'prohibited_unless:first,taylor,jess']);
         $this->assertTrue($v->passes());
 
@@ -1432,6 +1473,28 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => false, 'bar' => 'baz'], ['bar' => 'prohibited_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File('', false);
+        $v = new Validator($trans, ['foo' => false, 'bar' => $file], ['bar' => 'prohibited_unless:foo,true']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => false, 'bar' => $file], ['bar' => 'prohibited_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => false, 'files' => [$file, $file2]], ['files.0' => 'prohibited_unless:foo,true', 'files.1' => 'prohibited_unless:foo,true']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $file = new File(__FILE__, false);
+        $file2 = new File(__FILE__, false);
+        $v = new Validator($trans, ['foo' => false, 'files' => [$file, $file2]], ['files' => 'prohibited_unless:foo,true']);
         $this->assertTrue($v->fails());
 
         // error message when passed multiple values (prohibited_unless:foo,bar,baz)
