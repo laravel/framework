@@ -788,13 +788,12 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove the last N items from the collection.
      *
-     * @param  int  $count
+     * @param  int|null  $count
      * @return mixed
      */
-    public function pop($count = 1)
+    public function pop($count = null)
     {
-
-        if ($count === 1) {
+        if (is_null($count)) {
             return array_pop($this->items);
         }
 
@@ -959,12 +958,12 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove the first N items from the collection.
      *
-     * @param  int  $count
+     * @param  int|null  $count
      * @return mixed
      */
-    public function shift($count = 1)
+    public function shift($count = null)
     {
-        if ($count === 1) {
+        if (is_null($count)) {
             return array_shift($this->items);
         }
 

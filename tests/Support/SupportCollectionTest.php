@@ -248,10 +248,10 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $c->first());
     }
 
-    public function testPopReturnsNullWhenNoItemsInCollection()
+    public function testPopReturnsNullWhenNoItemsInCollectionAndParamSupplied()
     {
         $c = new Collection([]);
-        $this->assertNull($c->pop());
+        $this->assertEquals(new Collection([]), $c->pop(2));
         $this->assertCount(0, $c);
     }
 
@@ -287,10 +287,10 @@ class SupportCollectionTest extends TestCase
         $this->assertCount(2, $c);
     }
 
-    public function testShiftReturnsNullWhenNoItemsInCollection()
+    public function testShiftReturnsNullWhenNoItemsInCollectionAndParamSupplied()
     {
         $c = new Collection([]);
-        $this->assertNull($c->shift());
+        $this->assertEquals(new Collection([]), $c->shift(2));
         $this->assertCount(0, $c);
     }
 
