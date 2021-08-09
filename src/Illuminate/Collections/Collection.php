@@ -793,12 +793,13 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function pop($count = 1)
     {
-        if ($count < 1 || $this->count() === 0) {
-            return null;
-        }
 
         if ($count === 1) {
             return array_pop($this->items);
+        }
+
+        if ($count < 1 || $this->count() === 0) {
+            return new static([]);
         }
 
         $count = $count > $this->count() ? $this->count() : $count;
@@ -963,12 +964,12 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function shift($count = 1)
     {
-        if ($count < 1 || $this->count() === 0) {
-            return null;
-        }
-
         if ($count === 1) {
             return array_shift($this->items);
+        }
+
+        if ($count < 1 || $this->count() === 0) {
+            return new static([]);
         }
 
         $results = [];
