@@ -17,7 +17,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test that Symfony does indeed NOT trust X-Forwarded-*
-     * headers when not given trusted proxies
+     * headers when not given trusted proxies.
      *
      * This re-tests Symfony's Request class, but hopefully provides
      * some clarify to developers looking at the tests.
@@ -34,7 +34,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test that Symfony DOES indeed trust X-Forwarded-*
-     * headers when given trusted proxies
+     * headers when given trusted proxies.
      *
      * Again, this re-tests Symfony's Request class.
      */
@@ -51,7 +51,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test the next most typical usage of TrustedProxies:
-     * Trusted X-Forwarded-For header, wilcard for TrustedProxies
+     * Trusted X-Forwarded-For header, wilcard for TrustedProxies.
      */
     public function test_trusted_proxy_sets_trusted_proxies_with_wildcard()
     {
@@ -65,7 +65,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test the next most typical usage of TrustedProxies:
-     * Trusted X-Forwarded-For header, wilcard for TrustedProxies
+     * Trusted X-Forwarded-For header, wilcard for TrustedProxies.
      */
     public function test_trusted_proxy_sets_trusted_proxies_with_double_wildcard_for_backwards_compat()
     {
@@ -79,7 +79,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test the most typical usage of TrustProxies:
-     * Trusted X-Forwarded-For header
+     * Trusted X-Forwarded-For header.
      */
     public function test_trusted_proxy_sets_trusted_proxies()
     {
@@ -92,7 +92,7 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
-     * Test X-Forwarded-For header with multiple IP addresses
+     * Test X-Forwarded-For header with multiple IP addresses.
      */
     public function test_get_client_ips()
     {
@@ -105,7 +105,7 @@ class TrustProxiesTest extends TestCase
             '192.0.2.2,192.0.2.199',
         ];
 
-        foreach($forwardedFor as $forwardedForHeader) {
+        foreach ($forwardedFor as $forwardedForHeader) {
             $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedForHeader]);
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
@@ -116,7 +116,7 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
-     * Test X-Forwarded-For header with multiple IP addresses, with some of those being trusted
+     * Test X-Forwarded-For header with multiple IP addresses, with some of those being trusted.
      */
     public function test_get_client_ip_with_muliple_ip_addresses_some_of_which_are_trusted()
     {
@@ -129,7 +129,7 @@ class TrustProxiesTest extends TestCase
             '192.0.2.2,192.0.2.199',
         ];
 
-        foreach($forwardedFor as $forwardedForHeader) {
+        foreach ($forwardedFor as $forwardedForHeader) {
             $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedForHeader]);
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
@@ -139,7 +139,7 @@ class TrustProxiesTest extends TestCase
     }
 
     /**
-     * Test X-Forwarded-For header with multiple IP addresses, with * wildcard trusting of all proxies
+     * Test X-Forwarded-For header with multiple IP addresses, with * wildcard trusting of all proxies.
      */
     public function test_get_client_ip_with_muliple_ip_addresses_all_proxies_are_trusted()
     {
@@ -152,7 +152,7 @@ class TrustProxiesTest extends TestCase
             '99.99.99.99,192.0.2.199,192.0.2.2',
         ];
 
-        foreach($forwardedFor as $forwardedForHeader) {
+        foreach ($forwardedFor as $forwardedForHeader) {
             $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedForHeader]);
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
