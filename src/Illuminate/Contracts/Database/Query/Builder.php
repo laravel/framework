@@ -60,6 +60,8 @@ interface Builder
 
     /**
      * Force the query to only return distinct results.
+     *
+     * @param  mixed  ...$distinct
      * @return static
      */
     public function distinct();

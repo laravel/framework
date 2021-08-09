@@ -30,6 +30,7 @@ class HttpJsonResponseTest extends TestCase
             'JsonSerializable data' => [new JsonResponseTestJsonSerializeObject],
             'Arrayable data' => [new JsonResponseTestArrayableObject],
             'Array data' => [['foo' => 'bar']],
+            'stdClass data' => [(object) ['foo' => 'bar']],
         ];
     }
 

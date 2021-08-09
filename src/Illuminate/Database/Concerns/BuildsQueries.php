@@ -305,7 +305,11 @@ trait BuildsQueries
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 if (! is_null($previousColumn)) {
-                    $builder->where($previousColumn, '=', $cursor->parameter($previousColumn));
+                    $builder->where(
+                        $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                        '=',
+                        $cursor->parameter($previousColumn)
+                    );
                 }
 
                 $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
@@ -350,8 +354,10 @@ trait BuildsQueries
 
         if (! is_null($columns)) {
             foreach ($columns as $column) {
-                if (stripos($column, ' as ') !== false) {
-                    [$original, $alias] = explode(' as ', $column);
+                if (($position = stripos($column, ' as ')) !== false) {
+                    $as = substr($column, $position, 4);
+
+                    [$original, $alias] = explode($as, $column);
 
                     if ($parameter === $alias) {
                         return $original;

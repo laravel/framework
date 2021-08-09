@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -197,6 +198,10 @@ abstract class AbstractCursorPaginator implements Htmlable
         return collect($this->parameters)
             ->flip()
             ->map(function ($_, $parameterName) use ($item) {
+                if ($item instanceof JsonResource) {
+                    $item = $item->resource;
+                }
+
                 if ($item instanceof Model &&
                     ! is_null($parameter = $this->getPivotParameterForItem($item, $parameterName))) {
                     return $parameter;
@@ -510,6 +515,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->items->getIterator();
@@ -540,6 +546,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return $this->items->count();
@@ -584,6 +591,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $key
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return $this->items->has($key);
@@ -595,6 +603,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->items->get($key);
@@ -607,6 +616,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $this->items->put($key, $value);
@@ -618,6 +628,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $key
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         $this->items->forget($key);

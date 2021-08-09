@@ -2,13 +2,17 @@
 
 namespace Illuminate\Tests\Testing;
 
+use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\Store;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\TestResponse;
 use JsonSerializable;
@@ -393,7 +397,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 200 status code.');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -409,7 +413,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] does not match expected 201 status code.');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -424,7 +428,7 @@ class TestResponseTest extends TestCase
         $statusCode = 500;
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a not found status code.');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -440,7 +444,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not a forbidden status code.');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -456,7 +460,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage('Response status code ['.$statusCode.'] is not an unauthorized status code.');
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -472,7 +476,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage("Expected status code 204 but received {$statusCode}");
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -489,7 +493,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage("Expected status code {$expectedStatusCode} but received {$statusCode}");
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -521,7 +525,7 @@ class TestResponseTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->expectExceptionMessage("Expected status code {$expectedStatusCode} but received {$statusCode}");
+        $this->expectExceptionMessage('Expected response status code');
 
         $baseResponse = tap(new Response, function ($response) use ($statusCode) {
             $response->setStatusCode($statusCode);
@@ -529,6 +533,90 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertStatus($expectedStatusCode);
+    }
+
+    public function testAssertStatusShowsExceptionOnUnexpected500()
+    {
+        $statusCode = 500;
+        $expectedStatusCode = 200;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Test exception message');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+        $exceptions = collect([new Exception('Test exception message')]);
+
+        $response = TestResponse::fromBaseResponse($baseResponse)
+            ->withExceptions($exceptions);
+        $response->assertStatus($expectedStatusCode);
+    }
+
+    public function testAssertStatusShowsErrorsOnUnexpectedErrorRedirect()
+    {
+        $statusCode = 302;
+        $expectedStatusCode = 200;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('The first name field is required.');
+
+        $baseResponse = tap(new RedirectResponse('/', $statusCode), function ($response) {
+            $response->setSession(new Store('test-session', new ArraySessionHandler(1)));
+            $response->withErrors([
+                'first_name' => 'The first name field is required.',
+                'last_name' => 'The last name field is required.',
+            ]);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus($expectedStatusCode);
+    }
+
+    public function testAssertStatusShowsJsonErrorsOnUnexpected422()
+    {
+        $statusCode = 422;
+        $expectedStatusCode = 200;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('"The first name field is required."');
+
+        $baseResponse = new Response(
+            [
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'first_name' => 'The first name field is required.',
+                    'last_name' => 'The last name field is required.',
+                ],
+            ],
+            $statusCode
+        );
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus($expectedStatusCode);
+    }
+
+    public function testAssertStatusWhenJsonIsFalse()
+    {
+        $baseResponse = new Response('false', 200, ['Content-Type' => 'application/json']);
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus(200);
+    }
+
+    public function testAssertStatusWhenJsonIsEncoded()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Content-Type', 'application/json');
+            $response->header('Content-Encoding', 'gzip');
+            $response->setContent('b"x£½V*.I,)-V▓R╩¤V¬\x05\x00+ü\x059"');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertStatus(200);
     }
 
     public function testAssertHeader()

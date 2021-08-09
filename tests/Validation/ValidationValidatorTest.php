@@ -1771,6 +1771,74 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateAcceptedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => false, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => true, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        // accepted_if:bar,aaa
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is aaa.', $v->messages()->first('foo'));
+
+        // accepted_if:bar,aaa,...
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'abc'], ['foo' => 'accepted_if:bar,aaa,bbb,abc']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is abc.', $v->messages()->first('foo'));
+
+        // accepted_if:bar,boolean
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => false], ['foo' => 'accepted_if:bar,false']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is false.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => true], ['foo' => 'accepted_if:bar,true']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
+    }
+
     public function testValidateEndsWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -6167,6 +6235,15 @@ class ValidationValidatorTest extends TestCase
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
+            ['admin' => ['name' => 'Mohamed', 'location' => 'cairo'], 'users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
+            ['admin' => 'array', 'admin.name' => 'string', 'users' => 'array', 'users.*.name' => 'string']
+        );
+        $validator->excludeUnvalidatedArrayKeys = true;
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['admin' => ['name' => 'Mohamed'], 'users' => [['name' => 'Mohamed']]], $validator->validated());
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
             ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
             ['users' => 'array']
         );
@@ -6185,7 +6262,7 @@ class ValidationValidatorTest extends TestCase
 
         $validator = new Validator(
             $this->getIlluminateArrayTranslator(),
-            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']]]],
+            ['users' => ['admins' => [['name' => 'mohamed', 'job' => 'dev']], 'unvalidated' => 'foobar']],
             ['users' => 'array', 'users.admins' => 'array', 'users.admins.*.name' => 'string']
         );
         $validator->excludeUnvalidatedArrayKeys = true;

@@ -347,4 +347,16 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('ftp.example.com', $config['host']);
         $this->assertSame('admin', $config['username']);
     }
+
+    public function testMacroable()
+    {
+        $this->filesystem->write('foo.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->macro('getFoo', function () {
+            return $this->get('foo.txt');
+        });
+
+        $this->assertSame('Hello World', $filesystemAdapter->getFoo());
+    }
 }

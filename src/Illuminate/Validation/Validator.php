@@ -201,6 +201,7 @@ class Validator implements ValidatorContract
      */
     protected $implicitRules = [
         'Accepted',
+        'AcceptedIf',
         'Filled',
         'Present',
         'Required',
@@ -231,6 +232,7 @@ class Validator implements ValidatorContract
         'Gte',
         'Lt',
         'Lte',
+        'AcceptedIf',
         'RequiredIf',
         'RequiredUnless',
         'RequiredWith',
@@ -518,7 +520,7 @@ class Validator implements ValidatorContract
         foreach ($this->getRules() as $key => $rules) {
             if ($this->excludeUnvalidatedArrayKeys &&
                 in_array('array', $rules) &&
-                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.*/', array_keys($this->implicitAttributes)))) {
+                ! empty(preg_grep('/^'.preg_quote($key, '/').'\.+/', array_keys($this->getRules())))) {
                 continue;
             }
 

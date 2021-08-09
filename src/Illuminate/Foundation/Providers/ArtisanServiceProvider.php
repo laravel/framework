@@ -69,6 +69,7 @@ use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
 use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\MonitorCommand as QueueMonitorCommand;
 use Illuminate\Queue\Console\PruneBatchesCommand as QueuePruneBatchesCommand;
 use Illuminate\Queue\Console\PruneFailedJobsCommand as QueuePruneFailedJobsCommand;
 use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
@@ -112,6 +113,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueFlush' => FlushFailedQueueCommand::class,
         'QueueForget' => ForgetFailedQueueCommand::class,
         'QueueListen' => QueueListenCommand::class,
+        'QueueMonitor' => QueueMonitorCommand::class,
         'QueuePruneBatches' => QueuePruneBatchesCommand::class,
         'QueuePruneFailedJobs' => QueuePruneFailedJobsCommand::class,
         'QueueRestart' => QueueRestartCommand::class,
@@ -669,6 +671,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(QueueListenCommand::class, function ($app) {
             return new QueueListenCommand($app['queue.listener']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueMonitorCommand()
+    {
+        $this->app->singleton('command.queue.monitor', function ($app) {
+            return new QueueMonitorCommand($app['queue'], $app['events']);
         });
     }
 
