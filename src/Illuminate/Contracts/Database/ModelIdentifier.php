@@ -35,19 +35,28 @@ class ModelIdentifier
     public $connection;
 
     /**
+     * The model selected attributes.
+     *
+     * @var array
+     */
+    public $attributes;
+
+    /**
      * Create a new model identifier.
      *
      * @param  string  $class
      * @param  mixed  $id
      * @param  array  $relations
      * @param  mixed  $connection
+     * @param  array $attributes
      * @return void
      */
-    public function __construct($class, $id, array $relations, $connection)
+    public function __construct($class, $id, array $relations, $connection, array $attributes = ["*"])
     {
         $this->id = $id;
         $this->class = $class;
         $this->relations = $relations;
         $this->connection = $connection;
+        $this->attributes = $attributes;
     }
 }
