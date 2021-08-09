@@ -77,7 +77,7 @@ class TagSet
     }
 
     /**
-     * Finds and sets missing tag ids
+     * Finds and sets missing tag ids.
      *
      * @param array $tagIds
      * @return array
