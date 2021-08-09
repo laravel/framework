@@ -126,7 +126,7 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function getModelAttributes($model)
     {
-        return array_keys($model->getAttributes());
+        return array_keys($model->getOriginal());
     }
 
     /**
