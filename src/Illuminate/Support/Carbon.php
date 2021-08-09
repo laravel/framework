@@ -4,8 +4,8 @@ namespace Illuminate\Support;
 
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
-use Carbon\Exceptions\InvalidArgumentException;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use InvalidArgumentException;
 
 class Carbon extends BaseCarbon implements UrlRoutable
 {
