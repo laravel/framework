@@ -322,7 +322,7 @@ class Event
         $date = Date::now();
 
         if ($this->timezone) {
-            $date->setTimezone($this->timezone);
+            $date = $date->setTimezone($this->timezone);
         }
 
         return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
