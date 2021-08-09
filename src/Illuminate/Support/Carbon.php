@@ -4,9 +4,8 @@ namespace Illuminate\Support;
 
 use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
-use Carbon\Exceptions\InvalidFormatException;
+use Carbon\Exceptions\Exception;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use InvalidArgumentException;
 
 class Carbon extends BaseCarbon implements UrlRoutable
 {
@@ -42,7 +41,7 @@ class Carbon extends BaseCarbon implements UrlRoutable
     {
         try {
             return static::createFromFormat($field ?? '!Y-m-d', $value);
-        } catch (InvalidFormatException|InvalidArgumentException $e) {
+        } catch (Exception $e) {
             return null;
         }
     }
