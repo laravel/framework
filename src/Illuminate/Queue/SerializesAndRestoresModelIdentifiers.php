@@ -128,7 +128,7 @@ trait SerializesAndRestoresModelIdentifiers
     {
         $attributes = array_keys($model->getAttributes());
 
-        return !empty($attributes) ? $attributes : ['*'];
+        return ! empty($attributes) ? $attributes : ['*'];
     }
 
     /**
