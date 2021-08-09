@@ -6,6 +6,7 @@ use Carbon\Carbon as BaseCarbon;
 use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use InvalidArgumentException;
 
 class Carbon extends BaseCarbon implements UrlRoutable
 {
@@ -41,7 +42,7 @@ class Carbon extends BaseCarbon implements UrlRoutable
     {
         try {
             return static::createFromFormat($field ?? '!Y-m-d', $value);
-        } catch (InvalidFormatException $e) {
+        } catch (InvalidFormatException|InvalidArgumentException $e) {
             return null;
         }
     }
