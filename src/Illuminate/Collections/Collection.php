@@ -522,7 +522,7 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Inserts value at given offset of collection
+     * Inserts value at given offset of collection.
      *
      * @param  int  $offset
      * @param  mixed  $value
