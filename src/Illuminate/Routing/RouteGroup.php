@@ -28,7 +28,7 @@ class RouteGroup
         ]);
 
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['namespace', 'prefix', 'where', 'as', 'env']
         ), $new);
     }
 
