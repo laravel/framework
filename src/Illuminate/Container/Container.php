@@ -1008,7 +1008,7 @@ class Container implements ArrayAccess, ContainerContract
             return $parameter->getDefaultValue();
         }
 
-        $this->unresolvablePrimitive($parameter);
+        return $this->resolvablePrimitive($parameter);
     }
 
     /**
@@ -1087,6 +1087,27 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         throw new BindingResolutionException($message);
+    }
+
+    /**
+     * Trying to resolve a non-class hinted primitive dependency.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function resolvablePrimitive(ReflectionParameter $parameter)
+    {
+        $value = TypeDeclarationsEnum::default(
+            $parameter->getType()->getName()
+        );
+
+        if (!is_null($value)) return $value;
+
+        if ($parameter->getType()->allowsNull()) return null;
+
+        $this->unresolvablePrimitive($parameter);
     }
 
     /**
