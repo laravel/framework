@@ -27,7 +27,7 @@ trait SerializesAndRestoresModelIdentifiers
                 $value->getQueueableIds(),
                 $model ? $this->getQueueableRelations($model) : [],
                 $value->getQueueableConnection(),
-                $model ? $this->getModelAttributes($model) : ["*"]
+                $model ? $this->getModelAttributes($model) : ['*']
             );
         }
 
@@ -128,7 +128,7 @@ trait SerializesAndRestoresModelIdentifiers
     {
         $attributes = array_keys($model->getAttributes());
 
-        return !empty($attributes) ? $attributes : ["*"];
+        return !empty($attributes) ? $attributes : ['*'];
     }
 
     /**
@@ -140,7 +140,7 @@ trait SerializesAndRestoresModelIdentifiers
      */
     protected function getRelationAttributesString($model, $relation)
     {
-        if (str_contains($relation, ".")) {
+        if (str_contains($relation, '.')) {
             return $relation;
         }
 
@@ -148,7 +148,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         $attributes = $this->getModelAttributes($relationModel);
 
-        $relation = $relation . ":" . implode(",", $attributes);
+        $relation = $relation.':'.implode(',', $attributes);
 
         unset($attributes, $relationModel);
 

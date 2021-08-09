@@ -51,7 +51,7 @@ class ModelIdentifier
      * @param  array $attributes
      * @return void
      */
-    public function __construct($class, $id, array $relations, $connection, array $attributes = ["*"])
+    public function __construct($class, $id, array $relations, $connection, array $attributes = ['*'])
     {
         $this->id = $id;
         $this->class = $class;
