@@ -1099,6 +1099,9 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function resolvablePrimitive(ReflectionParameter $parameter)
     {
+        if (is_null($parameter->getType()))
+            $this->unresolvablePrimitive($parameter);
+
         $value = TypeDeclarationsEnum::default(
             $parameter->getType()->getName()
         );
