@@ -24,6 +24,7 @@ class RouteGroup
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
             'where' => static::formatWhere($new, $old),
+            'env' => static::formatEnvironment($new,$old),
         ]);
 
         return array_merge_recursive(Arr::except(
@@ -97,5 +98,23 @@ class RouteGroup
         }
 
         return $new;
+    }
+
+    /**
+     * Format the "env" clause of the new group attributes
+     *
+     * @param  array $new
+     * @param  array $old
+     * @return mixed|null
+     */
+    protected static function formatEnvironment(array $new, array $old)
+    {
+        if (isset($new['env'])) {
+            return $new['env'];
+        } elseif (isset($old['env'])) {
+            return $old['env'];
+        }
+
+        return null;
     }
 }

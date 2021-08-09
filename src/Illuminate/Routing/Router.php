@@ -452,7 +452,16 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function addRoute($methods, $uri, $action)
     {
-        return $this->routes->add($this->createRoute($methods, $uri, $action));
+        $route = $this->createRoute($methods, $uri, $action);
+        $currentEnv = env('APP_ENV', 'local');
+
+        // if the route env is not set or matches the APP_ENV, we will add the route
+        // to the underlying route collection
+        if (in_array($route->parameter('env', null), [null, $currentEnv])) {
+            return $this->routes->add($this->createRoute($methods, $uri, $action));
+        }
+
+        return null;
     }
 
     /**

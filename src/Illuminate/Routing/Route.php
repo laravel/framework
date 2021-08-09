@@ -1209,6 +1209,19 @@ class Route
     }
 
     /**
+     * Set route to work on specific environment
+     *
+     * @param string|null $env
+     * @return $this
+     */
+    public function env(string $env = null)
+    {
+        $this->action['env'] = $env;
+
+        return $this;
+    }
+
+    /**
      * Dynamically access route parameters.
      *
      * @param  string  $key
