@@ -5,7 +5,7 @@ namespace Illuminate\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-abstract class TrustProxies
+class TrustProxies
 {
     /**
      * The trusted proxies for the application.
