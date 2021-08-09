@@ -967,11 +967,11 @@ class Collection implements ArrayAccess, Enumerable
             return array_shift($this->items);
         }
 
-        $results = [];
-
         if ($this->isEmpty()) {
             return new static;
         }
+
+        $results = [];
 
         $collectionCount = $this->count();
 
