@@ -32,7 +32,7 @@ class TrustProxies
      */
     public function handle(Request $request, Closure $next)
     {
-        $request::setTrustedProxies([], $this->getTrustedHeaderNames()); // Reset trusted proxies between requests
+        $request::setTrustedProxies([], $this->getTrustedHeaderNames());
 
         $this->setTrustedProxyIpAddresses($request);
 
@@ -49,16 +49,12 @@ class TrustProxies
     {
         $trustedIps = $this->proxies;
 
-        // Trust any IP address that calls us
-        // `**` for backwards compatibility, but is deprecated
         if ($trustedIps === '*' || $trustedIps === '**') {
             return $this->setTrustedProxyIpAddressesToTheCallingIp($request);
         }
 
-        // Support IPs addresses separated by comma
         $trustedIps = is_string($trustedIps) ? array_map('trim', explode(',', $trustedIps)) : $trustedIps;
 
-        // Only trust specific IP addresses
         if (is_array($trustedIps)) {
             return $this->setTrustedProxyIpAddressesToSpecificIps($request, $trustedIps);
         }
