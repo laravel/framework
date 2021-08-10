@@ -173,6 +173,17 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testItIgnoresSoftDeletes()
+    {
+        $rule = new Exists('table');
+        $rule->withoutTrashed();
+        $this->assertSame('exists:table,NULL,deleted_at,"NULL"', (string) $rule);
+
+        $rule = new Exists('table');
+        $rule->withoutTrashed('softdeleted_at');
+        $this->assertSame('exists:table,NULL,softdeleted_at,"NULL"', (string) $rule);
+    }
+
     protected function createSchema()
     {
         $this->schema('default')->create('users', function ($table) {
