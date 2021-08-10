@@ -152,7 +152,7 @@ class MailFake implements Factory, Mailer, MailQueue
     /**
      * Determine if a mailable was not queued based on a truth-test callback.
      *
-     * @param  \Closure|string  $mailable
+     * @param  string|\Closure  $mailable
      * @param  callable|null  $callback
      * @return void
      */
