@@ -782,7 +782,7 @@ trait ValidatesAttributes
             $table, $column, $value, $id, $idColumn, $extra
         ) == 0;
     }
-    
+
     /**
      * Validate the uniqueness(without trashed) of an attribute value on a given database table.
      *
@@ -826,7 +826,7 @@ trait ValidatesAttributes
         }
 
         // Added Deleted at by default
-        $extra = array_merge($extra,['deleted_at' => NULL]);
+        $extra = array_merge($extra, ['deleted_at' => NULL]);
 
         return $verifier->getCount(
             $table, $column, $value, $id, $idColumn, $extra
