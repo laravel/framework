@@ -163,4 +163,26 @@ class RateLimiter
     {
         return max(0, $this->cache->get($key.':timer') - $this->currentTime());
     }
+
+    /**
+     * Attempts to execute a callback if it's available.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  \Closure  $callback
+     * @param  int  $decaySeconds
+     * @return bool
+     */
+    public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+    {
+        if ($this->tooManyAttempts($key, $maxAttempts)) {
+            return false;
+        }
+
+        $callback();
+
+        $this->hit($key, $decaySeconds);
+
+        return true;
+    }
 }
