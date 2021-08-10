@@ -61,6 +61,26 @@ class RateLimiter
     }
 
     /**
+     * Attempts to execute a callback if it's not limited.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @param  \Closure  $callback
+     * @param  int  $decaySeconds
+     * @return mixed
+     */
+    public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
+    {
+        if ($this->tooManyAttempts($key, $maxAttempts)) {
+            return false;
+        }
+
+        return tap($callback() ?: true, function () use ($key, $decaySeconds) {
+            $this->hit($key, $decaySeconds);
+        });
+    }
+
+    /**
      * Determine if the given key has been "accessed" too many times.
      *
      * @param  string  $key
@@ -162,27 +182,5 @@ class RateLimiter
     public function availableIn($key)
     {
         return max(0, $this->cache->get($key.':timer') - $this->currentTime());
-    }
-
-    /**
-     * Attempts to execute a callback if it's available.
-     *
-     * @param  string  $key
-     * @param  int  $maxAttempts
-     * @param  \Closure  $callback
-     * @param  int  $decaySeconds
-     * @return mixed
-     */
-    public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
-    {
-        if ($this->tooManyAttempts($key, $maxAttempts)) {
-            return false;
-        }
-
-        $result = $callback();
-
-        $this->hit($key, $decaySeconds);
-
-        return $result ?? true;
     }
 }
