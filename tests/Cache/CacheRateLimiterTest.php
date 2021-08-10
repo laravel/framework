@@ -89,7 +89,9 @@ class CacheRateLimiterTest extends TestCase
 
         $rateLimiter = new RateLimiter($cache);
 
-        $this->assertTrue($rateLimiter->attempt('key', 1, function() use (&$executed) { $executed = true; }, 1));
+        $this->assertTrue($rateLimiter->attempt('key', 1, function() use (&$executed) {
+            $executed = true;
+        }, 1));
         $this->assertTrue($executed);
     }
 
@@ -118,7 +120,9 @@ class CacheRateLimiterTest extends TestCase
 
         $rateLimiter = new RateLimiter($cache);
 
-        $this->assertFalse($rateLimiter->attempt('key', 1, function() use (&$executed) { $executed = true; }, 1));
+        $this->assertFalse($rateLimiter->attempt('key', 1, function() use (&$executed) {
+            $executed = true;
+        }, 1));
         $this->assertFalse($executed);
     }
 }
