@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Mockery as m;

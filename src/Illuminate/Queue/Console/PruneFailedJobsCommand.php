@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue\Console;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
+use Illuminate\Support\Carbon;
 
 class PruneFailedJobsCommand extends Command
 {
