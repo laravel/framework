@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Closure;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MergeValue;
@@ -29,6 +32,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -987,6 +991,15 @@ class ResourceTest extends TestCase
         $this->assertEquals([
             'name' => 'mohamed', 'location' => 'hurghada',
         ], $results);
+    }
+
+    public function testPostTooLargeException()
+    {
+        $this->expectException(PostTooLargeException::class);
+
+        $request = Mockery::mock(Request::class,['server'=>['CONTENT_LENGTH'=>'99999999999999999']]);
+        $post = new ValidatePostSize;
+        $post->handle($request, function(){return;});
     }
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
