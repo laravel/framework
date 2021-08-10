@@ -31,6 +31,12 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsUuid()
+    {
+        $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
+        $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());
