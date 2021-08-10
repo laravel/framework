@@ -9,7 +9,7 @@ class Exists
     use Conditionable, DatabaseRule;
 
     /**
-     * Ignore soft deleted models during the unique check.
+     * Ignore soft deleted models during the existence check.
      *
      * @param  string  $deletedAtColumn
      * @return $this
