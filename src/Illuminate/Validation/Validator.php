@@ -1346,7 +1346,7 @@ class Validator implements ValidatorContract
             throw new RuntimeException('Presence verifier has not been set.');
         }
 
-        if ($this->presenceVerifier instanceof DatabasePresenceVerifierInterface) {
+        if (! is_null($connection) && $this->presenceVerifier instanceof DatabasePresenceVerifierInterface) {
             $this->presenceVerifier->setConnection($connection);
         }
 
