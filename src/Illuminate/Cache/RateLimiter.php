@@ -171,7 +171,7 @@ class RateLimiter
      * @param  int  $maxAttempts
      * @param  \Closure  $callback
      * @param  int  $decaySeconds
-     * @return bool
+     * @return mixed
      */
     public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
     {
@@ -179,10 +179,10 @@ class RateLimiter
             return false;
         }
 
-        $callback();
+        $result = $callback();
 
         $this->hit($key, $decaySeconds);
 
-        return true;
+        return $result ?? true;
     }
 }

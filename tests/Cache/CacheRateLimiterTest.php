@@ -93,6 +93,21 @@ class CacheRateLimiterTest extends TestCase
         $this->assertTrue($executed);
     }
 
+    public function testAttemptsCallbackReturnsCallbackReturn()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(0);
+        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1);
+        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturns(1);
+        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertEquals('foo', $rateLimiter->attempt('key', 1, function() {
+            return 'foo';
+        }, 1));
+    }
+
     public function testAttemptsCallbackReturnsFalse()
     {
         $cache = m::mock(Cache::class);
