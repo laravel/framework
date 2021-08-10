@@ -92,8 +92,8 @@ class KeyGenerateCommand extends Command
     {
         $envContents = file_get_contents($this->laravel->environmentFilePath());
 
-        if(!preg_match($this->keyReplacementPattern(), $envContents)) {
-            throw new \RuntimeException($this->laravel->environmentFilePath() . " is missing APP_KEY");
+        if(! preg_match($this->keyReplacementPattern(), $envContents)) {
+            throw new \RuntimeException($this->laravel->environmentFilePath() . ' is missing APP_KEY');
         }
 
         file_put_contents($this->laravel->environmentFilePath(), preg_replace(
