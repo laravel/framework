@@ -401,7 +401,7 @@ class MailFake implements Factory, Mailer, MailQueue
     protected function prepareMailableAndCallback($mailable, $callback)
     {
         if ($mailable instanceof Closure) {
-            [$mailable, $callback] = [$this->firstClosureParameterType($mailable), $mailable];
+            return [$this->firstClosureParameterType($mailable), $mailable];
         }
 
         return [$mailable, $callback];
