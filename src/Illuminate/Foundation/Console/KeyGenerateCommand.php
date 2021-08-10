@@ -87,6 +87,9 @@ class KeyGenerateCommand extends Command
      *
      * @param  string  $key
      * @return void
+     * 
+     * @throws \RuntimeException
+     * 
      */
     protected function writeNewEnvironmentFileWith($key)
     {
