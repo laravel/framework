@@ -244,6 +244,7 @@ class Validator implements ValidatorContract
         'ProhibitedUnless',
         'Same',
         'Unique',
+        'UniqueWithoutTrashed',
     ];
 
     /**

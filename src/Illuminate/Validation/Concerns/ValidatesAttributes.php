@@ -782,6 +782,56 @@ trait ValidatesAttributes
             $table, $column, $value, $id, $idColumn, $extra
         ) == 0;
     }
+    
+    /**
+     * Validate the uniqueness(without trashed) of an attribute value on a given database table.
+     *
+     * If a database column is not specified, the attribute will be used.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateUniqueWithoutTrashed($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'unique_without_trashed');
+
+        [$connection, $table, $idColumn] = $this->parseTable($parameters[0]);
+
+        // The second parameter position holds the name of the column that needs to
+        // be verified as unique. If this parameter isn't specified we will just
+        // assume that this column to be verified shares the attribute's name.
+        $column = $this->getQueryColumn($parameters, $attribute);
+
+        $id = null;
+
+        if (isset($parameters[2])) {
+            [$idColumn, $id] = $this->getUniqueIds($idColumn, $parameters);
+
+            if (! is_null($id)) {
+                $id = stripslashes($id);
+            }
+        }
+
+        // The presence verifier is responsible for counting rows within this store
+        // mechanism which might be a relational database or any other permanent
+        // data store like Redis, etc. We will use it to determine uniqueness.
+        $verifier = $this->getPresenceVerifier($connection);
+
+        $extra = $this->getUniqueExtra($parameters);
+
+        if ($this->currentRule instanceof Unique) {
+            $extra = array_merge($extra, $this->currentRule->queryCallbacks());
+        }
+
+        // Added Deleted at by default
+        $extra = array_merge($extra,['deleted_at' => NULL]);
+
+        return $verifier->getCount(
+            $table, $column, $value, $id, $idColumn, $extra
+        ) == 0;
+    }
 
     /**
      * Get the excluded ID column and value for the unique rule.
