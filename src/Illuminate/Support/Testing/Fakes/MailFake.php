@@ -98,6 +98,17 @@ class MailFake implements Factory, Mailer, MailQueue
     }
 
     /**
+     * Assert that no mailables were sent or queued to be sent.
+     *
+     * @return void
+     */
+    public function assertNothingOutgoing()
+    {
+        $this->assertNothingSent();
+        $this->assertNothingQueued();
+    }
+
+    /**
      * Assert that no mailables were sent.
      *
      * @return void
