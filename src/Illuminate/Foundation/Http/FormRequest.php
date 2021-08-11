@@ -73,7 +73,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
-     * Request data that passed validation
+     * Request data that passed validation.
      *
      * @var array
      */
@@ -203,7 +203,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function validated(string $key = null, $default = null)
     {
-        if (!$this->validatedData) {
+        if (! $this->validatedData) {
             $this->validatedData = $this->validator->validated();
         }
 
