@@ -363,11 +363,19 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
+        $other = $this->getDisplayableAttribute($parameters[0]);
 
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+        $displayable_values = array_map(function ($value) use ($parameters) {
+            if ($value === 'null') {
+                $value = null;
+            } elseif ($value === 'true' || $value === 'false') {
+                $value = Arr::get($this->data, $parameters[0]);
+            }
 
-        return str_replace([':other', ':value'], $parameters, $message);
+            return $this->getDisplayableValue($parameters[0], $value);
+        }, array_slice($parameters, 1));
+
+        return str_replace([':other', ':value'], [$other, count($displayable_values) > 1 ? implode(', ', array_slice($displayable_values, 0, -1)).' or '.$displayable_values[count($displayable_values) - 1] : $displayable_values[0]], $message);
     }
 
     /**

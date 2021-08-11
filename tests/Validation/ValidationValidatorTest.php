@@ -1225,7 +1225,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
         $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredIf:first,taylor,dayle']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The last field is required when first is dayle.', $v->messages()->first('last'));
+        $this->assertSame('The last field is required when first is taylor or dayle.', $v->messages()->first('last'));
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
