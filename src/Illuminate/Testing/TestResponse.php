@@ -286,10 +286,10 @@ EOF;
         );
 
         if (! is_null($uri)) {
-            $expectedUri = $request->fullUrlWithQuery([
+            $expectedUri = rtrim($request->fullUrlWithQuery([
                 'signature' => null,
                 'expires'   => null,
-            ]);
+            ]), '?');
 
             PHPUnit::assertEquals(
                 app('url')->to($uri), $expectedUri
