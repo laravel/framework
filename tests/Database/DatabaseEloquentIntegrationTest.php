@@ -438,7 +438,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $user4 = EloquentTestUser::firstOrCreate(
             ['name' => 'Dries Vints'],
-            ['name' => 'Nuno Maduro']
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
         );
 
         $this->assertSame('Nuno Maduro', $user4->name);
