@@ -7,8 +7,10 @@ if (! function_exists('collect')) {
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed  $value
-     * @return \Illuminate\Support\Collection
+     * @template TKey as array-key
+     * @template TValue
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     function collect($value = null)
     {

@@ -43,6 +43,8 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $unless
  * @property-read HigherOrderCollectionProxy $until
  * @property-read HigherOrderCollectionProxy $when
+ * @template TKey as array-key
+ * @template TValue
  */
 trait EnumeratesValues
 {
@@ -51,7 +53,7 @@ trait EnumeratesValues
     /**
      * The methods that can be proxied.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected static $proxies = [
         'average',
@@ -86,8 +88,11 @@ trait EnumeratesValues
     /**
      * Create a new collection instance if the value isn't one already.
      *
-     * @param  mixed  $items
-     * @return static
+     * @template TMakeKey as array-key
+     * @template TMakeValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return static<TMakeKey, TMakeValue>
      */
     public static function make($items = [])
     {
@@ -97,8 +102,11 @@ trait EnumeratesValues
     /**
      * Wrap the given value in a collection if applicable.
      *
-     * @param  mixed  $value
-     * @return static
+     * @template TWrapKey as array-key
+     * @template TWrapValue
+     *
+     * @param  iterable<TWrapKey, TWrapValue>  $value
+     * @return static<TWrapKey, TWrapValue>
      */
     public static function wrap($value)
     {
@@ -110,8 +118,11 @@ trait EnumeratesValues
     /**
      * Get the underlying items from the given collection if applicable.
      *
-     * @param  array|static  $value
-     * @return array
+     * @template TUnwrapKey as array-key
+     * @template TUnwrapValue
+     *
+     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>   $value
+     * @return array<TUnwrapKey, TUnwrapValue>
      */
     public static function unwrap($value)
     {
@@ -121,7 +132,7 @@ trait EnumeratesValues
     /**
      * Create a new instance with no items.
      *
-     * @return static
+     * @return static<TKey, TValue>
      */
     public static function empty()
     {
@@ -131,9 +142,11 @@ trait EnumeratesValues
     /**
      * Create a new collection by invoking the callback a given amount of times.
      *
+     * @template TTimesValue
+     *
      * @param  int  $number
-     * @param  callable|null  $callback
-     * @return static
+     * @param  (callable(int): TTimesValue)|null  $callback
+     * @return static<int, TTimesValue>
      */
     public static function times($number, callable $callback = null)
     {
@@ -149,8 +162,8 @@ trait EnumeratesValues
     /**
      * Alias for the "avg" method.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int|null
      */
     public function average($callback = null)
     {
@@ -160,9 +173,9 @@ trait EnumeratesValues
     /**
      * Alias for the "contains" method.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  TValue|string|null  $operator
+     * @param  TValue|null  $value
      * @return bool
      */
     public function some($key, $operator = null, $value = null)
@@ -173,8 +186,8 @@ trait EnumeratesValues
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  TValue|null  $value
      * @return bool
      */
     public function containsStrict($key, $value = null)
@@ -202,7 +215,7 @@ trait EnumeratesValues
      * Dump the items and end the script.
      *
      * @param  mixed  ...$args
-     * @return void
+     * @return never
      */
     public function dd(...$args)
     {
@@ -230,7 +243,7 @@ trait EnumeratesValues
     /**
      * Execute a callback over each item.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue): mixed  $callback
      * @return $this
      */
     public function each(callable $callback)
@@ -788,7 +801,7 @@ trait EnumeratesValues
     /**
      * Get the collection of items as a plain array.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function toArray()
     {

@@ -8,13 +8,22 @@ use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 use JsonSerializable;
 
+/**
+ * @template TKey as array-key
+ * @template TValue
+ * @extends \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
+ * @extends \IteratorAggregate<TKey, TValue>
+ */
 interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     /**
      * Create a new collection instance if the value isn't one already.
      *
-     * @param  mixed  $items
-     * @return static
+     * @template TMakeKey as array-key
+     * @template TMakeValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return static<TMakeKey, TMakeValue>
      */
     public static function make($items = []);
 
@@ -39,23 +48,29 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Wrap the given value in a collection if applicable.
      *
-     * @param  mixed  $value
-     * @return static
+     * @template TWrapKey as array-key
+     * @template TWrapValue
+     *
+     * @param  iterable<TWrapKey, TWrapValue>  $value
+     * @return static<TWrapKey, TWrapValue>
      */
     public static function wrap($value);
 
     /**
      * Get the underlying items from the given collection if applicable.
      *
-     * @param  array|static  $value
-     * @return array
+     * @template TUnwrapKey as array-key
+     * @template TUnwrapValue
+     *
+     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>   $value
+     * @return array<TUnwrapKey, TUnwrapValue>
      */
     public static function unwrap($value);
 
     /**
      * Create a new instance with no items.
      *
-     * @return static
+     * @return static<TKey, TValue>
      */
     public static function empty();
 
@@ -69,40 +84,40 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Alias for the "avg" method.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int|null
      */
     public function average($callback = null);
 
     /**
      * Get the median of a given key.
      *
-     * @param  string|array|null  $key
-     * @return mixed
+     * @param  string|array<array-key, string>|null  $key
+     * @return float|int|null
      */
     public function median($key = null);
 
     /**
      * Get the mode of a given key.
      *
-     * @param  string|array|null  $key
-     * @return array|null
+     * @param  string|array<array-key, string>|null  $key
+     * @return array<int, float|int>|null
      */
     public function mode($key = null);
 
     /**
      * Collapse the items into a single enumerable.
      *
-     * @return static
+     * @return static<int, mixed>
      */
     public function collapse();
 
     /**
      * Alias for the "contains" method.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  TValue|string|null  $operator
+     * @param  TValue|null  $value
      * @return bool
      */
     public function some($key, $operator = null, $value = null);
@@ -110,8 +125,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  TValue|null  $value
      * @return bool
      */
     public function containsStrict($key, $value = null);
@@ -119,17 +134,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the average value of a given key.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue): float|int)|string|null  $callback
+     * @return float|int|null
      */
     public function avg($callback = null);
 
     /**
      * Determine if an item exists in the enumerable.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  TValue|string|null  $operator
+     * @param  TValue|null  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null);
@@ -137,8 +152,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Cross join with the given lists, returning all possible permutations.
      *
-     * @param  mixed  ...$lists
-     * @return static
+     * @template TCrossJoinKey
+     * @template TCrossJoinValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TCrossJoinKey, TCrossJoinValue>|iterable<TCrossJoinKey, TCrossJoinValue>  ...$lists
+     * @return static<int, array<int, TValue|TCrossJoinValue>>
      */
     public function crossJoin(...$lists);
 
@@ -146,7 +164,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Dump the collection and end the script.
      *
      * @param  mixed  ...$args
-     * @return void
+     * @return never
      */
     public function dd(...$args);
 
@@ -160,17 +178,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the items that are not present in the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function diff($items);
 
     /**
      * Get the items that are not present in the given items, using the callback.
      *
-     * @param  mixed  $items
-     * @param  callable  $callback
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>|iterable<array-key, TValue>  $items
+     * @param  callable(TValue): int  $callback
+     * @return static<TKey, TValue>
      */
     public function diffUsing($items, callable $callback);
 
@@ -459,9 +477,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get an item from the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  TKey  $key
+     * @param  TGetDefault  $default
+     * @return TValue|TGetDefault
      */
     public function get($key, $default = null);
 
