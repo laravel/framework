@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Closure;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
