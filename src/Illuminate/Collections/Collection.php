@@ -362,11 +362,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the first item from the collection passing the given truth test.
      *
-     * @template TFirstDefaultValue
+     * @template TFirstDefault
      *
      * @param  (callable(TValue): bool)|null  $callback
-     * @param  TFirstDefaultValue  $default
-     * @return TValue|TFirstDefaultValue
+     * @param  TFirstDefault  $default
+     * @return TValue|TFirstDefault
      */
     public function first(callable $callback = null, $default = null)
     {
