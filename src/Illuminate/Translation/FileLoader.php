@@ -4,6 +4,7 @@ namespace Illuminate\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use RuntimeException;
 
 class FileLoader implements Loader
@@ -145,7 +146,9 @@ class FileLoader implements Loader
                         throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
                     }
 
-                    $output = array_merge($output, $decoded);
+                    $flattened = Arr::dot($decoded);
+
+                    $output = array_merge($output, $flattened);
                 }
 
                 return $output;
