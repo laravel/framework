@@ -477,6 +477,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get an item from the collection by key.
      *
+     * @template TGetDefault
+     *
      * @param  TKey  $key
      * @param  TGetDefault  $default
      * @return TValue|TGetDefault
