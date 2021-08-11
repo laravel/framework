@@ -997,9 +997,10 @@ class ResourceTest extends TestCase
     {
         $this->expectException(PostTooLargeException::class);
 
-        $request = Mockery::mock(Request::class,['server'=>['CONTENT_LENGTH'=>'2147483640']]);
+        $request = Mockery::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
         $post = new ValidatePostSize;
-        $post->handle($request, function(){return;});
+        $post->handle($request, function () {
+        });
     }
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
