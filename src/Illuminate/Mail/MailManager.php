@@ -21,6 +21,7 @@ use Swift_DependencyContainer;
 use Swift_Mailer;
 use Swift_SendmailTransport as SendmailTransport;
 use Swift_SmtpTransport as SmtpTransport;
+use Swift_FailoverTransport as FailoverTransport;
 
 /**
  * @mixin \Illuminate\Mail\Mailer
@@ -339,6 +340,32 @@ class MailManager implements FactoryContract
         ), function ($transport) {
             $transport->registerPlugin(new ThrowExceptionOnFailurePlugin);
         });
+    }
+
+    /**
+     * Create an instance of the Failover Swift Transport driver.
+     *
+     * @param  array  $config
+     * @return \Swift_FailoverTransport
+     */
+    protected function createFailoverTransport(array $config)
+    {
+        $transports = [];
+        foreach ($config['mailers'] as $name) {
+            $config = $this->getConfig($name);
+
+            if (is_null($config)) {
+                throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
+            }
+
+            // Here we will check if the "driver" key exists and if it does we will set
+            // transport configuration parameter in order to  provide "BC" for any
+            // Laravel <= 6.x style mail configuration files.
+            $transports[] = $this->app['config']['mail.driver']
+                ? $this->createTransport(array_merge($config, ['transport' => $name]))
+                : $this->createTransport($config);
+        }
+        return new FailoverTransport($transports);
     }
 
     /**
