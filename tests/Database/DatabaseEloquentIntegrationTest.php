@@ -401,6 +401,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(CursorPaginator::class, $models);
     }
 
+    public function testFirstOrNew()
+    {
+        $user1 = EloquentTestUser::firstOrNew(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro']
+        );
+
+        $this->assertSame('Nuno Maduro', $user1->name);
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
@@ -425,6 +435,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotEquals($user3->id, $user1->id);
         $this->assertSame('abigailotwell@gmail.com', $user3->email);
         $this->assertSame('Abigail Otwell', $user3->name);
+
+        $user4 = EloquentTestUser::firstOrCreate(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro']
+        );
+
+        $this->assertSame('Nuno Maduro', $user4->name);
     }
 
     public function testUpdateOrCreate()
