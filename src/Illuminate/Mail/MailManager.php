@@ -18,10 +18,10 @@ use Postmark\ThrowExceptionOnFailurePlugin;
 use Postmark\Transport as PostmarkTransport;
 use Psr\Log\LoggerInterface;
 use Swift_DependencyContainer;
+use Swift_FailoverTransport as FailoverTransport;
 use Swift_Mailer;
 use Swift_SendmailTransport as SendmailTransport;
 use Swift_SmtpTransport as SmtpTransport;
-use Swift_FailoverTransport as FailoverTransport;
 
 /**
  * @mixin \Illuminate\Mail\Mailer
@@ -365,6 +365,7 @@ class MailManager implements FactoryContract
                 ? $this->createTransport(array_merge($config, ['transport' => $name]))
                 : $this->createTransport($config);
         }
+
         return new FailoverTransport($transports);
     }
 
