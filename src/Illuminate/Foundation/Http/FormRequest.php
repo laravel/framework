@@ -73,6 +73,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
+     * Request data that passed validation
+     *
+     * @var array
+     */
+    protected $validatedData;
+
+    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -188,11 +195,19 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the validated data from the request.
      *
-     * @return array
+     * @param  string|null  $key
+     * @param  mixed|null  $default
+     * @return  mixed
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function validated()
+    public function validated(string $key = null, $default = null)
     {
-        return $this->validator->validated();
+        if (!$this->validatedData) {
+            $this->validatedData = $this->validator->validated();
+        }
+
+        return data_get($this->validatedData, $key, $default);
     }
 
     /**

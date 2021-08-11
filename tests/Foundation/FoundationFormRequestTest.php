@@ -115,6 +115,25 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
+    public function testValidatedMethodReturnsSingleValidatedDataField()
+    {
+        $request = $this->createRequest(['name' => 'specified']);
+
+        $request->validateResolved();
+
+        $this->assertSame('specified', $request->validated('name'));
+    }
+
+    public function testValidatedMethodReturnsNullWhenFieldIsNotValidated()
+    {
+        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+
+        $request->validateResolved();
+
+        $this->assertSame('extras', $request->input('with'));
+        $this->assertNull($request->validated('with'));
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
