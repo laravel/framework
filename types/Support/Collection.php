@@ -9,7 +9,7 @@ class User extends Authenticatable
 {
 }
 
-$collection = Collection::make([new User]);
+$collection = collect([new User]);
 /** @var Arrayable<int, User> $arrayable */
 $arrayable = [];
 /** @var iterable<int, int> $iterable */
