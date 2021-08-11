@@ -370,7 +370,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string  $listener
+     * @param  \Closure|string|array  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
