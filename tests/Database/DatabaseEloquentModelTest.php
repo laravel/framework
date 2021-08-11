@@ -1217,6 +1217,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelStub::class, $relation->getMorphClass());
     }
 
+    public function testMorphOneCreatesProperRelationWhenUsingBasenames()
+    {
+        Relation::useClassBasenamesForMorphMap();
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+        $relation = $model->morphOne(EloquentModelSaveStub::class, 'morph');
+        $this->assertEquals('EloquentModelStub', $relation->getMorphClass());
+        Relation::$useClassBasenamesForMorphMap = false;
+    }
+
     public function testCorrectMorphClassIsReturned()
     {
         Relation::morphMap(['alias' => 'AnotherModel']);
