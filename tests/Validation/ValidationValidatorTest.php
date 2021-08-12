@@ -2697,7 +2697,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['id' => '1', 'email' => 'foo', 'type' => 'bar'], [
             'id' => 'Unique:users',
             'email' => 'Unique:another_connection.users',
-            'type' => 'Unique:types'
+            'type' => 'Unique:types',
         ]);
         $v->setConnection('connection');
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
@@ -2788,7 +2788,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['id' => '1', 'email' => 'foo', 'type' => 'bar'], [
             'id' => 'Exists:users',
             'email' => 'Exists:another_connection.users',
-            'type' => 'Exists:types'
+            'type' => 'Exists:types',
         ]);
         $v->setConnection('connection');
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
