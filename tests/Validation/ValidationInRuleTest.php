@@ -9,15 +9,19 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationInRuleTest extends TestCase
 {
-    public function testExistsMethodIsExistsObject(){
+    public function testExistsMethodIsExistsObject()
+    {
         $this->assertInstanceOf('Illuminate\Validation\Rules\Exists', Rule::exists('test'));
     }
 
-    public function testRequiredMethodIsRequiredObject(){
-        $this->assertInstanceOf('Illuminate\Validation\Rules\RequiredIf', Rule::requiredIf(function(){ }));
+    public function testRequiredMethodIsRequiredObject()
+    {
+        $this->assertInstanceOf('Illuminate\Validation\Rules\RequiredIf', Rule::requiredIf(function() {
+        }));
     }
 
-    public function testUniqueMethodIsUniqueObject(){
+    public function testUniqueMethodIsUniqueObject()
+    {
         $this->assertInstanceOf('Illuminate\Validation\Rules\Unique', Rule::unique('test'));
     }
 
