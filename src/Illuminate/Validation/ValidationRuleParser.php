@@ -289,14 +289,8 @@ class ValidationRuleParser
                 return [$attribute => $attributeRules];
             }
 
-            if ($attributeRules instanceof ConditionalRules &&
-                $attributeRules->passes()) {
-                return [$attribute => $attributeRules->rules()];
-            }
-
-            if ($attributeRules instanceof ConditionalRules &&
-                ! $attributeRules->passes()) {
-                return [$attribute => null];
+            if ($attributeRules instanceof ConditionalRules) {
+                return [$attribute => $attributeRules->passes() ? $attributeRules->rules() : null];
             }
 
             return [$attribute => collect($attributeRules)->map(function ($rule) {
