@@ -16,7 +16,7 @@ class ValidationInRuleTest extends TestCase
 
     public function testRequiredMethodIsRequiredObject()
     {
-        $this->assertInstanceOf('Illuminate\Validation\Rules\RequiredIf', Rule::requiredIf(function() {
+        $this->assertInstanceOf('Illuminate\Validation\Rules\RequiredIf', Rule::requiredIf(function () {
         }));
     }
 
