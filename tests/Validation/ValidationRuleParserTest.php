@@ -16,6 +16,7 @@ class ValidationRuleParserTest extends TestCase
             'password' => Rule::when(true, 'required|min:2'),
             'username' => ['required', Rule::when(true, ['min:2'])],
             'address' => ['required', Rule::when(false, ['min:2'])],
+            'city' => ['required', Rule::when(function (array $input) { return true; }, ['min:2'])],
         ]);
 
         $this->assertEquals([
@@ -23,6 +24,7 @@ class ValidationRuleParserTest extends TestCase
             'password' => ['required', 'min:2'],
             'username' => ['required', 'min:2'],
             'address' => ['required'],
+            'city' => ['required', 'min:2'],
         ], $rules);
     }
 }

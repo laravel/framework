@@ -7,7 +7,7 @@ class ConditionalRules
     /**
      * The boolean condition indicating if the rules should be added to the attribute.
      *
-     * @var bool
+     * @var callable|bool
      */
     protected $condition;
 
@@ -21,7 +21,7 @@ class ConditionalRules
     /**
      * Create a new conditional rules instance.
      *
-     * @param  bool  $condition
+     * @param  callable|bool  $condition
      * @param  array|string  $rules
      * @return void
      */
@@ -34,11 +34,14 @@ class ConditionalRules
     /**
      * Determine if the conditional rules should be added.
      *
+     * @param  array  $data
      * @return bool
      */
-    public function passes()
+    public function passes(array $data = [])
     {
-        return $this->condition;
+        return is_callable($this->condition)
+                    ? call_user_func($this->condition, $data)
+                    : $this->condition;
     }
 
     /**
