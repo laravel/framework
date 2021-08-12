@@ -268,7 +268,7 @@ EOF;
     }
 
     /**
-     * Assert whether the response is redirecting to a given signed URI.
+     * Assert whether the response is redirecting to a given signed route.
      *
      * @param  string|null  $name
      * @param  mixed  $parameters
@@ -293,7 +293,7 @@ EOF;
         if (! is_null($name)) {
             $expectedUri = rtrim($request->fullUrlWithQuery([
                 'signature' => null,
-                'expires'   => null,
+                'expires' => null,
             ]), '?');
 
             PHPUnit::assertEquals(
