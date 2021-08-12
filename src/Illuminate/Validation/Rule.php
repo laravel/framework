@@ -18,7 +18,7 @@ class Rule
     /**
      * Create a new conditional rule set.
      *
-     * @param  bool  $condition
+     * @param  callable|bool  $condition
      * @param  array|string  $rules
      * @return \Illuminate\Validation\ConditionalRules
      */
