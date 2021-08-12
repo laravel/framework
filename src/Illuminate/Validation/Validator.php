@@ -14,9 +14,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\ValidatedInput;
 use RuntimeException;
-use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use stdClass;
 
 class Validator implements ValidatorContract
 {
@@ -501,6 +502,16 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get a validated input container for the validated input.
+     *
+     * @return \Illuminate\Support\ValidatedInput
+     */
+    public function safe()
+    {
+        return new ValidatedInput($this->validated());
+    }
+
+    /**
      * Get the attributes and values that were validated.
      *
      * @return array
@@ -532,48 +543,6 @@ class Validator implements ValidatorContract
         }
 
         return $this->replacePlaceholders($results);
-    }
-
-    /**
-     * Get a subset containing the provided keys with values from the validated data.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function onlyValidated($keys)
-    {
-        $results = [];
-
-        $input = $this->validated();
-
-        $placeholder = new stdClass;
-
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = data_get($input, $key, $placeholder);
-
-            if ($value !== $placeholder) {
-                Arr::set($results, $key, $value);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Get all of the validated input except for a specified array of items.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function exceptValidated($keys)
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $results = $this->validated();
-
-        Arr::forget($results, $keys);
-
-        return $results;
     }
 
     /**

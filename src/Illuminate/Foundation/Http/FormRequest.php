@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\ValidatedInput;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -186,6 +187,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get a validated input container for the validated input.
+     *
+     * @return \Illuminate\Support\ValidatedInput
+     */
+    public function safe()
+    {
+        return new ValidatedInput($this->validated());
+    }
+
+    /**
      * Get the validated data from the request.
      *
      * @return array
@@ -193,30 +204,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function validated()
     {
         return $this->validator->validated();
-    }
-
-    /**
-     * Get only the given validated data from the request.
-     *
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function onlyValidated($keys)
-    {
-        return $this->validator->onlyValidated(is_array($keys) ? $keys : func_get_args());
-    }
-
-    /**
-     * Get the validated data from the request except for the given keys.
-     *
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
-    public function exceptValidated($keys)
-    {
-        return $this->validator->exceptValidated(is_array($keys) ? $keys : func_get_args());
     }
 
     /**
