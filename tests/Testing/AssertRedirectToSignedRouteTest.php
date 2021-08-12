@@ -65,7 +65,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
         $this->router->get('test-route-with-extra-param', function () {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route-with-param', [
                 'param' => 'foo',
-                'extra' => 'another'
+                'extra' => 'another',
             ]));
         });
 
@@ -75,7 +75,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
         $this->get('test-route-with-extra-param')
             ->assertRedirectToSignedRoute('signed-route-with-param', [
                 'param' => 'foo',
-                'extra' => 'another'
+                'extra' => 'another',
             ]);
     }
 
