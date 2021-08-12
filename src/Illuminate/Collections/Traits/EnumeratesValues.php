@@ -43,7 +43,7 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $unless
  * @property-read HigherOrderCollectionProxy $until
  * @property-read HigherOrderCollectionProxy $when
- * @template TKey as array-key
+ * @template TKey of array-key
  * @template TValue
  */
 trait EnumeratesValues
@@ -88,7 +88,7 @@ trait EnumeratesValues
     /**
      * Create a new collection instance if the value isn't one already.
      *
-     * @template TMakeKey as array-key
+     * @template TMakeKey of array-key
      * @template TMakeValue
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
@@ -102,7 +102,7 @@ trait EnumeratesValues
     /**
      * Wrap the given value in a collection if applicable.
      *
-     * @template TWrapKey as array-key
+     * @template TWrapKey of array-key
      * @template TWrapValue
      *
      * @param  iterable<TWrapKey, TWrapValue>  $value
@@ -118,7 +118,7 @@ trait EnumeratesValues
     /**
      * Get the underlying items from the given collection if applicable.
      *
-     * @template TUnwrapKey as array-key
+     * @template TUnwrapKey of array-key
      * @template TUnwrapValue
      *
      * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>   $value
@@ -260,8 +260,8 @@ trait EnumeratesValues
     /**
      * Execute a callback over each nested chunk of items.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param  callable(...mixed): mixed  $callback
+     * @return static<TKey, TValue>
      */
     public function eachSpread(callable $callback)
     {
@@ -275,9 +275,9 @@ trait EnumeratesValues
     /**
      * Determine if all items pass the given truth test.
      *
-     * @param  string|callable  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  TValue|string|null  $operator
+     * @param  TValue|null  $value
      * @return bool
      */
     public function every($key, $operator = null, $value = null)
@@ -303,7 +303,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return mixed
+     * @return TValue|null
      */
     public function firstWhere($key, $operator = null, $value = null)
     {
@@ -474,9 +474,11 @@ trait EnumeratesValues
     /**
      * Apply the callback if the collection is empty.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return static|mixed
+     * @template TWhenEmptyReturnType
+     *
+     * @param  (callable($this): TWhenEmptyReturnType)  $callback
+     * @param  (callable($this): TWhenEmptyReturnType)|null  $default
+     * @return $this|TWhenEmptyReturnType
      */
     public function whenEmpty(callable $callback, callable $default = null)
     {
@@ -486,9 +488,11 @@ trait EnumeratesValues
     /**
      * Apply the callback if the collection is not empty.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return static|mixed
+     * @template TWhenNotEmptyReturnType
+     *
+     * @param  callable($this): TWhenNotEmptyReturnType  $callback
+     * @param  (callable($this): TWhenNotEmptyReturnType)|null  $default
+     * @return $this|TWhenNotEmptyReturnType
      */
     public function whenNotEmpty(callable $callback, callable $default = null)
     {
@@ -498,9 +502,11 @@ trait EnumeratesValues
     /**
      * Apply the callback unless the collection is empty.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return static|mixed
+     * @template TUnlessEmptyReturnType
+     *
+     * @param  callable($this): TUnlessEmptyReturnType  $callback
+     * @param  (callable($this): TUnlessEmptyReturnType)|null  $default
+     * @return $this|TUnlessEmptyReturnType
      */
     public function unlessEmpty(callable $callback, callable $default = null)
     {
@@ -510,9 +516,11 @@ trait EnumeratesValues
     /**
      * Apply the callback unless the collection is not empty.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return static|mixed
+     * @template TUnlessNotEmptyReturnType
+     *
+     * @param  callable($this): TUnlessNotEmptyReturnType  $callback
+     * @param  (callable($this): TUnlessNotEmptyReturnType)|null  $default
+     * @return $this|TUnlessNotEmptyReturnType
      */
     public function unlessNotEmpty(callable $callback, callable $default = null)
     {
@@ -525,7 +533,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function where($key, $operator = null, $value = null)
     {
@@ -536,7 +544,7 @@ trait EnumeratesValues
      * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function whereNull($key = null)
     {
@@ -547,7 +555,7 @@ trait EnumeratesValues
      * Filter items where the value for the given key is not null.
      *
      * @param  string|null  $key
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function whereNotNull($key = null)
     {
@@ -559,7 +567,8 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return static
+     * @param  bool  $strict
+     * @return static<TKey, TValue>
      */
     public function whereStrict($key, $value)
     {
@@ -570,9 +579,9 @@ trait EnumeratesValues
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function whereIn($key, $values, $strict = false)
     {
@@ -587,8 +596,8 @@ trait EnumeratesValues
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  mixed  $values
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
+     * @return static<TKey, TValue>
      */
     public function whereInStrict($key, $values)
     {
@@ -599,8 +608,8 @@ trait EnumeratesValues
      * Filter items such that the value of the given key is between the given values.
      *
      * @param  string  $key
-     * @param  array  $values
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
+     * @return static<TKey, TValue>
      */
     public function whereBetween($key, $values)
     {
@@ -611,8 +620,8 @@ trait EnumeratesValues
      * Filter items such that the value of the given key is not between the given values.
      *
      * @param  string  $key
-     * @param  array  $values
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
+     * @return static<TKey, TValue>
      */
     public function whereNotBetween($key, $values)
     {
@@ -625,9 +634,9 @@ trait EnumeratesValues
      * Filter items by the given key value pair.
      *
      * @param  string  $key
-     * @param  mixed  $values
+     * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function whereNotIn($key, $values, $strict = false)
     {
@@ -642,8 +651,8 @@ trait EnumeratesValues
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  mixed  $values
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
+     * @return static<TKey, TValue>
      */
     public function whereNotInStrict($key, $values)
     {
@@ -653,8 +662,8 @@ trait EnumeratesValues
     /**
      * Filter the items, removing any items that don't match the given type(s).
      *
-     * @param  string|string[]  $type
-     * @return static
+     * @param  class-string|array<array-key, class-string>  $type
+     * @return static<TKey, TValue>
      */
     public function whereInstanceOf($type)
     {

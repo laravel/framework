@@ -9,7 +9,7 @@ use Illuminate\Support\Traits\Macroable;
 use stdClass;
 
 /**
- * @template TKey as array-key
+ * @template TKey of array-key
  * @template TValue
  * @implements \ArrayAccess<TKey, TValue>
  * @implements \Illuminate\Support\Enumerable<TKey, TValue>
@@ -226,8 +226,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the items in the collection whose keys and values are not present in the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function diffAssoc($items)
     {
@@ -237,9 +237,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the items in the collection whose keys and values are not present in the given items, using the callback.
      *
-     * @param  mixed  $items
-     * @param  callable  $callback
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @param  callable(TKey): int  $callback
+     * @return static<TKey, TValue>
      */
     public function diffAssocUsing($items, callable $callback)
     {
@@ -249,8 +249,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the items in the collection whose keys are not present in the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function diffKeys($items)
     {
@@ -260,9 +260,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the items in the collection whose keys are not present in the given items, using the callback.
      *
-     * @param  mixed  $items
-     * @param  callable  $callback
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @param  callable(TKey): int  $callback
+     * @return static<TKey, TValue>
      */
     public function diffKeysUsing($items, callable $callback)
     {
@@ -272,9 +272,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Retrieve duplicate items from the collection.
      *
-     * @param  callable|string|null  $callback
+     * @param  (callable(TValue): bool)|string|null  $callback
      * @param  bool  $strict
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function duplicates($callback = null, $strict = false)
     {
@@ -300,8 +300,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Retrieve duplicate items from the collection using strict comparison.
      *
-     * @param  callable|string|null  $callback
-     * @return static
+     * @param  (callable(TValue): bool)|string|null  $callback
+     * @return static<TKey, TValue>
      */
     public function duplicatesStrict($callback = null)
     {
@@ -312,7 +312,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get the comparison function to detect duplicates.
      *
      * @param  bool  $strict
-     * @return \Closure
+     * @return callable(TValue, TValue): bool
      */
     protected function duplicateComparator($strict)
     {
@@ -330,8 +330,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  \Illuminate\Support\Collection|mixed  $keys
-     * @return static
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>  $keys
+     * @return static<TKey, TValue>
      */
     public function except($keys)
     {
@@ -347,8 +347,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Run a filter over each of the items.
      *
-     * @param  callable|null  $callback
-     * @return static
+     * @param (callable(TValue): bool)|null  $callback
+     * @return static<TKey, TValue>
      */
     public function filter(callable $callback = null)
     {
@@ -377,7 +377,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function flatten($depth = INF)
     {
@@ -387,7 +387,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Flip the items in the collection.
      *
-     * @return static
+     * @return static<TValue, TKey>
      */
     public function flip()
     {
@@ -430,9 +430,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Group an associative array by a field or using a callback.
      *
-     * @param  array|callable|string  $groupBy
+     * @param  (callable(TValue, TKey): array-key)|array|string  $groupBy
      * @param  bool  $preserveKeys
-     * @return static
+     * @return static<array-key, array<array-key, TValue>>
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
@@ -476,8 +476,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @param  callable|string  $keyBy
-     * @return static
+     * @param  (callable(TValue, TKey): array-key)|array|string  $keyBy
+     * @return static<array-key, array<array-key, TValue>>
      */
     public function keyBy($keyBy)
     {
@@ -501,7 +501,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param  mixed  $key
+     * @param  TKey|array<array-key, TKey>  $key
      * @return bool
      */
     public function has($key)
@@ -538,8 +538,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Intersect the collection with the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function intersect($items)
     {
@@ -549,8 +549,8 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Intersect the collection with the given items by key.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function intersectByKeys($items)
     {
@@ -612,7 +612,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the keys of the collection items.
      *
-     * @return static
+     * @return static<int, TKey>
      */
     public function keys()
     {
@@ -622,9 +622,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the last item from the collection.
      *
-     * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @template TLastDefault
+     *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TLastDefault  $default
+     * @return TValue|TLastDefault
      */
     public function last(callable $callback = null, $default = null)
     {
@@ -646,8 +648,10 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Run a map over each of the items.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapValue
+     *
+     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @return static<TKey, TMapValue>
      */
     public function map(callable $callback)
     {
@@ -843,7 +847,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Push one or more items onto the end of the collection.
      *
-     * @param  mixed  $values [optional]
+     * @param  ...TValue  $values
      * @return $this
      */
     public function push(...$values)
