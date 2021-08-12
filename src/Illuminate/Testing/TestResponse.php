@@ -270,11 +270,16 @@ EOF;
     /**
      * Assert whether the response is redirecting to a given signed URI.
      *
-     * @param  string|null  $uri
+     * @param  string|null  $name
+     * @param  mixed  $parameters
      * @return $this
      */
-    public function assertRedirectToSignedRoute($uri = null)
+    public function assertRedirectToSignedRoute($name = null, $parameters = [])
     {
+        if (! is_null($name)) {
+            $uri = route($name, $parameters);
+        }
+
         PHPUnit::assertTrue(
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
@@ -285,7 +290,7 @@ EOF;
             $request->hasValidSignature(), 'The response is not a redirect to a signed route.'
         );
 
-        if (! is_null($uri)) {
+        if (! is_null($name)) {
             $expectedUri = rtrim($request->fullUrlWithQuery([
                 'signature' => null,
                 'expires'   => null,
