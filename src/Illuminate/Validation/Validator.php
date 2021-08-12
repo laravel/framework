@@ -16,8 +16,8 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ValidatedInput;
 use RuntimeException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use stdClass;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class Validator implements ValidatorContract
 {
