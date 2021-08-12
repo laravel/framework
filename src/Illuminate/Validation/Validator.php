@@ -535,6 +535,48 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get a subset containing the provided keys with values from the validated data.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function onlyValidated($keys)
+    {
+        $results = [];
+
+        $input = $this->validated();
+
+        $placeholder = new stdClass;
+
+        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+            $value = data_get($input, $key, $placeholder);
+
+            if ($value !== $placeholder) {
+                Arr::set($results, $key, $value);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get all of the validated input except for a specified array of items.
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function exceptValidated($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $results = $this->validated();
+
+        Arr::forget($results, $keys);
+
+        return $results;
+    }
+
+    /**
      * Validate a given attribute against a rule.
      *
      * @param  string  $attribute

@@ -196,6 +196,30 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get only the given validated data from the request.
+     *
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function onlyValidated($keys)
+    {
+        return $this->validator->onlyValidated(is_array($keys) ? $keys : func_get_args());
+    }
+
+    /**
+     * Get the validated data from the request except for the given keys.
+     *
+     *
+     * @param  array|mixed  $keys
+     * @return array
+     */
+    public function exceptValidated($keys)
+    {
+        return $this->validator->exceptValidated(is_array($keys) ? $keys : func_get_args());
+    }
+
+    /**
      * Get custom messages for validator errors.
      *
      * @return array
