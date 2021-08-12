@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Testing;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
 
 class AssertRedirectToSignedRouteTest extends TestCase
@@ -87,5 +88,12 @@ class AssertRedirectToSignedRouteTest extends TestCase
 
         $this->get('test-route')
             ->assertRedirectToSignedRoute('signed-route');
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        Facade::setFacadeApplication(null);
     }
 }
