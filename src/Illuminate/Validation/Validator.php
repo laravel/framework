@@ -45,6 +45,13 @@ class Validator implements ValidatorContract
     protected $presenceVerifier;
 
     /**
+     * The connection name for the validator.
+     *
+     * @var string|null
+     */
+    protected $connection;
+
+    /**
      * The failed validation rules.
      *
      * @var array
@@ -1333,6 +1340,19 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Set the connection associated with the validator.
+     *
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function setConnection($name)
+    {
+        $this->connection = $name;
+
+        return $this;
+    }
+
+    /**
      * Get the Presence Verifier implementation.
      *
      * @param  string|null  $connection
@@ -1347,7 +1367,7 @@ class Validator implements ValidatorContract
         }
 
         if ($this->presenceVerifier instanceof DatabasePresenceVerifierInterface) {
-            $this->presenceVerifier->setConnection($connection);
+            $this->presenceVerifier->setConnection($connection ?? $this->connection);
         }
 
         return $this->presenceVerifier;

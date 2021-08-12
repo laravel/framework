@@ -2693,6 +2693,21 @@ class ValidationValidatorTest extends TestCase
         })->andReturn(2);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['id' => '1', 'email' => 'foo', 'type' => 'bar'], [
+            'id' => 'Unique:users',
+            'email' => 'Unique:another_connection.users',
+            'type' => 'Unique:types'
+        ]);
+        $v->setConnection('connection');
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->twice()->with('connection');
+        $mock->shouldReceive('setConnection')->once()->with('another_connection');
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '1', null, null, [])->andReturn(0);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(0);
+        $mock->shouldReceive('getCount')->once()->with('types', 'type', 'bar', null, null, [])->andReturn(0);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
@@ -2767,6 +2782,21 @@ class ValidationValidatorTest extends TestCase
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
         $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getMultiCount')->once()->with('users', 'email_addr', ['foo', 'foo'], [])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['id' => '1', 'email' => 'foo', 'type' => 'bar'], [
+            'id' => 'Exists:users',
+            'email' => 'Exists:another_connection.users',
+            'type' => 'Exists:types'
+        ]);
+        $v->setConnection('connection');
+        $mock = m::mock(DatabasePresenceVerifierInterface::class);
+        $mock->shouldReceive('setConnection')->twice()->with('connection');
+        $mock->shouldReceive('setConnection')->once()->with('another_connection');
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '1', null, null, [])->andReturn(1);
+        $mock->shouldReceive('getCount')->once()->with('users', 'email', 'foo', null, null, [])->andReturn(1);
+        $mock->shouldReceive('getCount')->once()->with('types', 'type', 'bar', null, null, [])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
