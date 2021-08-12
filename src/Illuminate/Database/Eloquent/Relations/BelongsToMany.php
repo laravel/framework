@@ -594,12 +594,13 @@ class BelongsToMany extends Relation
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes = [])
+    public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
-            $instance = $this->related->newInstance($attributes);
+            $instance = $this->related->newInstance(array_merge($attributes, $values));
         }
 
         return $instance;
@@ -617,7 +618,7 @@ class BelongsToMany extends Relation
     public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
         if (is_null($instance = $this->related->where($attributes)->first())) {
-            $instance = $this->create($attributes + $values, $joining, $touch);
+            $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
         }
 
         return $instance;
