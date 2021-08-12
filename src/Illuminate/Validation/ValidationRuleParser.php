@@ -274,4 +274,38 @@ class ValidationRuleParser
                 return $rule;
         }
     }
+
+    /**
+     * Expand and conditional rules in the given array of rules.
+     *
+     * @param  array  $rules
+     * @return array
+     */
+    public static function filterConditionalRules($rules)
+    {
+        return collect($rules)->mapWithKeys(function ($attributeRules, $attribute) {
+            if (! is_array($attributeRules) &&
+                ! $attributeRules instanceof ConditionalRules) {
+                return [$attribute => $attributeRules];
+            }
+
+            if ($attributeRules instanceof ConditionalRules &&
+                $attributeRules->passes()) {
+                return [$attribute => $attributeRules->rules()];
+            }
+
+            if ($attributeRules instanceof ConditionalRules &&
+                ! $attributeRules->passes()) {
+                return [$attribute => null];
+            }
+
+            return [$attribute => collect($attributeRules)->map(function ($rule) {
+                if (! $rule instanceof ConditionalRules) {
+                    return [$rule];
+                }
+
+                return $rule->passes() ? $rule->rules() : null;
+            })->filter()->flatten(1)->values()->all()];
+        })->filter()->all();
+    }
 }
