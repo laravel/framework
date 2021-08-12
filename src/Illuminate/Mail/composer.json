@@ -37,7 +37,7 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.186.4).",
+        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.189.0).",
         "guzzlehttp/guzzle": "Required to use the Mailgun mail driver (^6.5.5|^7.0.1).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },
