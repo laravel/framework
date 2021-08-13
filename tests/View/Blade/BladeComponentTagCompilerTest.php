@@ -34,6 +34,22 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("@slot(\$foo, []) \n".' @endslot', trim($result));
     }
 
+    public function testSlotsWithAttributesCanBeCompiled()
+    {
+        $result = $this->compiler()->compileSlots('<x-slot name="foo" class="font-bold">
+</x-slot>');
+
+        $this->assertSame("@slot('foo', ['class' => 'font-bold']) \n".' @endslot', trim($result));
+    }
+
+    public function testSlotsWithDynamicAttributesCanBeCompiled()
+    {
+        $result = $this->compiler()->compileSlots('<x-slot name="foo" :class="$classes">
+</x-slot>');
+
+        $this->assertSame("@slot('foo', ['class' => \$classes]) \n".' @endslot', trim($result));
+    }
+
     public function testBasicComponentParsing()
     {
         $this->mockViewFactory();
