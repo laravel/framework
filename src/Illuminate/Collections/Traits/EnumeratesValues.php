@@ -462,7 +462,7 @@ trait EnumeratesValues
     /**
      * Get the sum of the given values.
      *
-     * @param  callable|string|null  $callback
+     * @param  (callable(TValue): mixed)|string|null  $callback
      * @return mixed
      */
     public function sum($callback = null)
@@ -690,8 +690,10 @@ trait EnumeratesValues
     /**
      * Pass the collection to the given callback and return the result.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @template TPipeReturnType
+     *
+     * @param  callable($this): TPipeReturnType  $callback
+     * @return TPipeReturnType
      */
     public function pipe(callable $callback)
     {
@@ -745,8 +747,8 @@ trait EnumeratesValues
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  callable|mixed  $callback
-     * @return static
+     * @param  (callable(TValue): bool)|bool  $callback
+     * @return static<TKey, TValue>
      */
     public function reject($callback = true)
     {
@@ -762,7 +764,7 @@ trait EnumeratesValues
     /**
      * Pass the collection to the given callback and then return it.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue): mixed  $callback
      * @return $this
      */
     public function tap(callable $callback)
@@ -775,9 +777,9 @@ trait EnumeratesValues
     /**
      * Return only unique items from the collection array.
      *
-     * @param  string|callable|null  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  bool  $strict
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function unique($key = null, $strict = false)
     {
@@ -797,8 +799,8 @@ trait EnumeratesValues
     /**
      * Return only unique items from the collection array using strict comparison.
      *
-     * @param  string|callable|null  $key
-     * @return static
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @return static<TKey, TValue>
      */
     public function uniqueStrict($key = null)
     {
@@ -808,7 +810,7 @@ trait EnumeratesValues
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function collect()
     {
