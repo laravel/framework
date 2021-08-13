@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Illuminate\View\ComponentSlot;
 use InvalidArgumentException;
 
 trait ManagesComponents
@@ -119,21 +120,20 @@ trait ManagesComponents
      * Start the slot rendering process.
      *
      * @param  string  $name
+     * @param  array  $attributes
      * @param  string|null  $content
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function slot($name, $content = null)
+    public function slot($name, $attributes = [], $content = null)
     {
-        if (func_num_args() > 2) {
-            throw new InvalidArgumentException('You passed too many arguments to the ['.$name.'] slot.');
-        } elseif (func_num_args() === 2) {
+        if (func_num_args() === 3) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
 
-            $this->slotStack[$this->currentComponent()][] = $name;
+            $this->slotStack[$this->currentComponent()][] = [$name, $attributes];
         }
     }
 
@@ -150,7 +150,9 @@ trait ManagesComponents
             $this->slotStack[$this->currentComponent()]
         );
 
-        $this->slots[$this->currentComponent()][$currentSlot] = new HtmlString(trim(ob_get_clean()));
+        [$currentSlotName, $currentSlotAttributes] = $currentSlot;
+
+        $this->slots[$this->currentComponent()][$currentSlotName] = new ComponentSlot(trim(ob_get_clean()), $currentSlotAttributes);
     }
 
     /**
