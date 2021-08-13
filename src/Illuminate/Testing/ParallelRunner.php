@@ -83,7 +83,7 @@ class ParallelRunner implements RunnerInterface
     }
 
     /**
-     * Set the application resolver callback.
+     * Set the runner resolver callback.
      *
      * @param  \Closure|null  $resolver
      * @return void
