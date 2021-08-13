@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\ValidatedInput;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -498,6 +499,16 @@ class Validator implements ValidatorContract
 
             throw $e;
         }
+    }
+
+    /**
+     * Get a validated input container for the validated input.
+     *
+     * @return \Illuminate\Support\ValidatedInput
+     */
+    public function safe()
+    {
+        return new ValidatedInput($this->validated());
     }
 
     /**
@@ -1082,7 +1093,7 @@ class Validator implements ValidatorContract
         // of the explicit rules needed for the given data. For example the rule
         // names.* would get expanded to names.0, names.1, etc. for this data.
         $response = (new ValidationRuleParser($this->data))
-                            ->explode($rules);
+                            ->explode(ValidationRuleParser::filterConditionalRules($rules, $this->data));
 
         $this->rules = array_merge_recursive(
             $this->rules, $response->rules

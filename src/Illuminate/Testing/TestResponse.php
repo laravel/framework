@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -262,6 +263,43 @@ EOF;
 
         if (! is_null($uri)) {
             $this->assertLocation($uri);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert whether the response is redirecting to a given signed route.
+     *
+     * @param  string|null  $name
+     * @param  mixed  $parameters
+     * @return $this
+     */
+    public function assertRedirectToSignedRoute($name = null, $parameters = [])
+    {
+        if (! is_null($name)) {
+            $uri = route($name, $parameters);
+        }
+
+        PHPUnit::assertTrue(
+            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
+        );
+
+        $request = Request::create($this->headers->get('Location'));
+
+        PHPUnit::assertTrue(
+            $request->hasValidSignature(), 'The response is not a redirect to a signed route.'
+        );
+
+        if (! is_null($name)) {
+            $expectedUri = rtrim($request->fullUrlWithQuery([
+                'signature' => null,
+                'expires' => null,
+            ]), '?');
+
+            PHPUnit::assertEquals(
+                app('url')->to($uri), $expectedUri
+            );
         }
 
         return $this;
