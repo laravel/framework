@@ -439,6 +439,36 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotNull($new->id);
     }
 
+    public function testFirstOrNewMethodWithValues()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+        $post->tags()->attach(Tag::all());
+
+        $existing = $post->tags()->firstOrNew(
+            ['name' => $tag->name],
+            ['type' => 'featured']
+        );
+
+        $this->assertEquals($tag->id, $existing->id);
+        $this->assertNotEquals('foo', $existing->name);
+
+        $new = $post->tags()->firstOrNew(
+            ['name' => 'foo'],
+            ['type' => 'featured']
+        );
+
+        $this->assertSame('foo', $new->name);
+        $this->assertSame('featured', $new->type);
+
+        $new = $post->tags()->firstOrNew(
+            ['name' => 'foo'],
+            ['name' => 'bar']
+        );
+
+        $this->assertSame('bar', $new->name);
+    }
+
     public function testFirstOrCreateMethodWithValues()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -460,6 +490,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertSame('foo', $new->name);
         $this->assertSame('featured', $new->type);
+        $this->assertNotNull($new->id);
+
+        $new = $post->tags()->firstOrCreate(
+            ['name' => 'qux'],
+            ['name' => 'bar']
+        );
+
+        $this->assertSame('bar', $new->name);
         $this->assertNotNull($new->id);
     }
 
