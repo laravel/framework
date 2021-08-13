@@ -22,7 +22,7 @@ class ParallelRunner implements RunnerInterface
     protected static $applicationResolver;
 
     /**
-     * The paratest runner resolver callback.
+     * The runner resolver callback.
      *
      * @var \Closure|null
      */
