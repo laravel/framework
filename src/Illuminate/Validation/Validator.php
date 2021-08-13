@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\ValidatedInput;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -498,6 +499,16 @@ class Validator implements ValidatorContract
 
             throw $e;
         }
+    }
+
+    /**
+     * Get a validated input container for the validated input.
+     *
+     * @return \Illuminate\Support\ValidatedInput
+     */
+    public function safe()
+    {
+        return new ValidatedInput($this->validated());
     }
 
     /**
