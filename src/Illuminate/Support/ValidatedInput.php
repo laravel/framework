@@ -99,6 +99,50 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Dynamically access input data.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->input[$name];
+    }
+
+    /**
+     * Dynamically set input data.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function __set($name, $value)
+    {
+        $this->input[$name] = $value;
+    }
+
+    /**
+     * Determine if an input key is set.
+     *
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($this->input[$name]);
+    }
+
+    /**
+     * Remove an input key.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+        unset($this->input[$name]);
+    }
+
+    /**
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key
