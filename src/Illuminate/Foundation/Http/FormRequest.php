@@ -9,7 +9,6 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\ValidatedInput;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -193,7 +192,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function safe()
     {
-        return new ValidatedInput($this->validated());
+        return $this->validator->safe();
     }
 
     /**
