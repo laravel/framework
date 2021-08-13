@@ -323,8 +323,10 @@ trait EnumeratesValues
     /**
      * Run a map over each nested chunk of items.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapSpreadValue
+     *
+     * @param  callable(mixed): TMapSpreadValue  $callback
+     * @return static<TKey, TMapSpreadValue>
      */
     public function mapSpread(callable $callback)
     {
@@ -340,8 +342,11 @@ trait EnumeratesValues
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapToGroupsKey of array-key
+     * @template TMapToGroupsValue
+     *
+     * @param  callable(TValue, TKey): array<TMapToGroupsKey, TMapToGroupsValue>   $callback
+     * @return static<TMapToGroupsKey, static<int, TMapToGroupsValue>>
      */
     public function mapToGroups(callable $callback)
     {
@@ -353,8 +358,8 @@ trait EnumeratesValues
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param callable(TValue, TKey): mixed $callback
+     * @return static<int, mixed>
      */
     public function flatMap(callable $callback)
     {
@@ -364,8 +369,8 @@ trait EnumeratesValues
     /**
      * Map the values into a new class.
      *
-     * @param  string  $class
-     * @return static
+     * @param  class-string $class
+     * @return static<TKey, mixed>
      */
     public function mapInto($class)
     {
@@ -377,8 +382,8 @@ trait EnumeratesValues
     /**
      * Get the min value of a given key.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue):mixed)|string|null  $callback
+     * @return TValue
      */
     public function min($callback = null)
     {
@@ -396,8 +401,8 @@ trait EnumeratesValues
     /**
      * Get the max value of a given key.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue):mixed)|string|null  $callback
+     * @return TValue
      */
     public function max($callback = null)
     {
@@ -429,10 +434,10 @@ trait EnumeratesValues
     /**
      * Partition the collection into two arrays using the given callback or key.
      *
-     * @param  callable|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return static
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  TValue|string|null $operator
+     * @param  TValue|null $value
+     * @return array<int, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null)
     {
@@ -707,9 +712,12 @@ trait EnumeratesValues
     /**
      * Reduce the collection to a single value.
      *
-     * @param  callable  $callback
-     * @param  mixed  $initial
-     * @return mixed
+     * @template TReduceInitial
+     * @template TReduceReturnType
+     *
+     * @param  callable(TReduceInitial|TReduceReturnType, TValue): TReduceReturnType $callback
+     * @param  TReduceInitial $initial
+     * @return TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null)
     {

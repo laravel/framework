@@ -62,7 +62,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TUnwrapKey of array-key
      * @template TUnwrapValue
      *
-     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>   $value
+     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>  $value
      * @return array<TUnwrapKey, TUnwrapValue>
      */
     public static function unwrap($value);
@@ -280,7 +280,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Run a filter over each of the items.
      *
-     * @param (callable(TValue): bool)|null  $callback
+     * @param  (callable(TValue): bool)|null  $callback
      * @return static<TKey, TValue>
      */
     public function filter(callable $callback = null);
@@ -603,8 +603,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Run a map over each nested chunk of items.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapSpreadValue
+     *
+     * @param  callable(...mixed): TMapSpreadValue  $callback
+     * @return static<TKey, TMapSpreadValue>
      */
     public function mapSpread(callable $callback);
 
@@ -613,8 +615,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapToDictionaryKey of array-key
+     * @template TMapToDictionaryValue
+     *
+     * @param  callable(TValue, TKey): array<TMapToDictionaryKey, TMapToDictionaryValue>  $callback
+     * @return static<TMapToDictionaryKey, array<int, TMapToDictionaryValue>>
      */
     public function mapToDictionary(callable $callback);
 
@@ -623,8 +628,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapToGroupsKey of array-key
+     * @template TMapToGroupsValue
+     *
+     * @param  callable(TValue, TKey): array<TMapToGroupsKey, TMapToGroupsValue>  $callback
+     * @return static<TMapToGroupsKey, static<int, TMapToGroupsValue>>
      */
     public function mapToGroups(callable $callback);
 
@@ -633,72 +641,77 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * The callback should return an associative array with a single key/value pair.
      *
-     * @param  callable  $callback
-     * @return static
+     * @template TMapWithKeysKey of array-key
+     * @template TMapWithKeysValue
+     *
+     * @param  callable(TValue, TKey): array<TMapWithKeysKey, TMapWithKeysValue>  $callback
+     * @return static<TMapWithKeysKey, TMapWithKeysValue>
      */
     public function mapWithKeys(callable $callback);
 
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable  $callback
-     * @return static
+     * @param  callable(TValue, TKey): mixed  $callback
+     * @return static<int, mixed>
      */
     public function flatMap(callable $callback);
 
     /**
      * Map the values into a new class.
      *
-     * @param  string  $class
-     * @return static
+     * @param  class-string $class
+     * @return static<TKey, mixed>
      */
     public function mapInto($class);
 
     /**
      * Merge the collection with the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function merge($items);
 
     /**
      * Recursively merge the collection with the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, array<int, TValue>>
      */
     public function mergeRecursive($items);
 
     /**
      * Create a collection by using this collection for keys and another for its values.
      *
-     * @param  mixed  $values
-     * @return static
+     * @template TCombineValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TCombineValue>|iterable<array-key, TCombineValue>  $values
+     * @return static<TKey, TCombineValue>
      */
     public function combine($values);
 
     /**
      * Union the collection with the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function union($items);
 
     /**
      * Get the min value of a given key.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue):mixed)|string|null  $callback
+     * @return TValue
      */
     public function min($callback = null);
 
     /**
      * Get the max value of a given key.
      *
-     * @param  callable|string|null  $callback
-     * @return mixed
+     * @param  (callable(TValue):mixed)|string|null  $callback
+     * @return TValue
      */
     public function max($callback = null);
 
@@ -707,15 +720,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  int  $step
      * @param  int  $offset
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function nth($step, $offset = 0);
 
     /**
      * Get the items with the specified keys.
      *
-     * @param  mixed  $keys
-     * @return static
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>  $keys
+     * @return static<TKey, TValue>
      */
     public function only($keys);
 
@@ -724,25 +737,25 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  int  $page
      * @param  int  $perPage
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function forPage($page, $perPage);
 
     /**
      * Partition the collection into two arrays using the given callback or key.
      *
-     * @param  callable|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return static
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  TValue|string|null  $operator
+     * @param  TValue|null  $value
+     * @return array<int, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null);
 
     /**
      * Push all of the given items onto the collection.
      *
-     * @param  iterable  $source
-     * @return static
+     * @param  iterable<array-key, TValue>  $source
+     * @return static<TKey, TValue>
      */
     public function concat($source);
 
@@ -750,7 +763,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return static|mixed
+     * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
      */
@@ -759,17 +772,20 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Reduce the collection to a single value.
      *
-     * @param  callable  $callback
-     * @param  mixed  $initial
-     * @return mixed
+     * @template TReduceInitial
+     * @template TReduceReturnType
+     *
+     * @param  callable(TReduceInitial|TReduceReturnType, TValue): TReduceReturnType  $callback
+     * @param  TReduceInitial  $initial
+     * @return TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null);
 
     /**
      * Replace the collection items with the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static<TKey, TValue>
      */
     public function replace($items);
 

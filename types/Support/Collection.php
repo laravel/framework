@@ -432,7 +432,128 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make(['str
         return (string) $string;
     }));
 
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string'])
+    ->mapSpread(function () {
+        return 'string';
+    }));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection::make(['string'])
+    ->mapSpread(function () {
+        return 1;
+    }));
+
+assertType('Illuminate\Support\Collection<string, array<int, int>>', $collection::make(['string', 'string'])
+    ->mapToDictionary(function ($stringValue, $stringKey) {
+        assertType('string', $stringValue);
+        assertType('int', $stringKey);
+
+        return ['string' => 1];
+    }));
+
+assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, int>>', $collection::make(['string', 'string'])
+    ->mapToGroups(function ($stringValue, $stringKey) {
+        assertType('string', $stringValue);
+        assertType('int', $stringKey);
+
+        return ['string' => 1];
+    }));
+
+assertType('Illuminate\Support\Collection<string, int>', $collection::make(['string'])
+    ->mapWithKeys(function ($string, $int) {
+        assertType('string', $string);
+        assertType('int', $int);
+
+        return ['string' => 1];
+    }));
+
+assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string'])
+    ->flatMap(function ($string, $int) {
+        assertType('string', $string);
+        assertType('int', $int);
+
+        return 1;
+    }));
+
+assertType('Illuminate\Support\Collection<int, mixed>', $collection->mapInto(User::class));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->merge([2]));
+assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->merge(['string']));
+
+assertType('Illuminate\Support\Collection<int, array<int, int>>', $collection->make([1])->mergeRecursive([2]));
+assertType('Illuminate\Support\Collection<int, array<int, string>>', $collection->make(['string'])->mergeRecursive(['string']));
+
+assertType('Illuminate\Support\Collection<string, int>', $collection->make(['string' => 'string'])->combine([2]));
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->combine([1]));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->union([1]));
+assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->union(['string' => 'string']));
+
+assertType('int', $collection->make([1])->min());
+assertType('int', $collection->make([1])->min('string'));
+assertType('int', $collection->make([1])->min(function ($int) {
+    assertType('int', $int);
+
+    return 1;
+}));
+
+assertType('int', $collection->make([1])->max());
+assertType('int', $collection->make([1])->max('string'));
+assertType('int', $collection->make([1])->max(function ($int) {
+    assertType('int', $int);
+
+    return 1;
+}));
+
+assertType('Illuminate\Support\Collection<int, User>', $collection->nth(1, 2));
+
+assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->only(['string']));
+assertType('Illuminate\Support\Collection<int, User>', $collection->only([1]));
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string'])
+    ->only($collection->keys()->toArray()));
+
+assertType('Illuminate\Support\Collection<int, User>', $collection->forPage(1, 2));
+
+assertType('array<int, Illuminate\Support\Collection<int, User>>', $collection->partition(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return true;
+}));
+
+assertType('array<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', '=', 'string'));
+assertType('array<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', 'string'));
+assertType('array<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->partition('string', ));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->concat([2]));
+assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->concat(['string']));
+
+assertType('Illuminate\Support\Collection<int, int>|int', $collection->make([1])->random(2));
+assertType('Illuminate\Support\Collection<int, string>|string', $collection->make(['string'])->random());
+
+assertType('int', $collection
+    ->reduce(function ($null, $user) {
+        assertType('User', $user);
+        assertType('int|null', $null);
+
+        return 1;
+    }));
+
+
+assertType('int', $collection
+    ->reduce(function ($int, $user) {
+        assertType('User', $user);
+        assertType('int', $int);
+
+        return 1;
+    }, 0));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([1])->replace([1]));
+assertType('Illuminate\Support\Collection<int, User>', $collection->replace([new User]));
+
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->push(2));
+
+
+
 
 assertType('array<int, User>', $collection->all());
 
