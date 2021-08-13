@@ -278,5 +278,4 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         return Rule::when($condition, $rules);
     }
-
 }

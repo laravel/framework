@@ -42,15 +42,23 @@ class ValidationRuleParserTest extends TestCase
                 'country' => 'required|string|size:2',
 
                 'airports.*' => [
-                    Rule::when(function($input) { return $input['country'] === 'US'; }, 'in:NYC'),
-                    Rule::when(function($input) { return $input['country'] === 'NL'; }, 'in:AMS'),
+                    Rule::when(function ($input) {
+                        return $input['country'] === 'US';
+                    }, 'in:NYC'),
+                    Rule::when(function ($input) {
+                        return $input['country'] === 'NL';
+                    }, 'in:AMS'),
                 ],
 
-                Rule::mergeWhen(function($input) { return $input['country'] === 'US'; }, [
+                Rule::mergeWhen(function ($input) {
+                    return $input['country'] === 'US';
+                }, [
                     'state' => 'required|size:2',
                 ]),
 
-                Rule::mergeWhen(function($input) { return $input['country'] === 'NL'; }, [
+                Rule::mergeWhen(function ($input) {
+                    return $input['country'] === 'NL';
+                }, [
                     'province' => 'required|size:2',
                 ]),
             ]),
