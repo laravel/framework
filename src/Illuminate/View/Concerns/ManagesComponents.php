@@ -123,9 +123,9 @@ trait ManagesComponents
      * @param  string|null  $content
      * @return void
      */
-    public function slot($name, $attributes = [], $content = null)
+    public function slot($name, $content = null, $attributes = [])
     {
-        if (func_num_args() === 3) {
+        if ($content) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
