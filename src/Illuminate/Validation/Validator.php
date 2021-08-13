@@ -1113,6 +1113,31 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Add conditions to a given nested field based on a Closure.
+     *
+     * @param  string  $parent
+     * @param  string|array  $attribute
+     * @param  string|array  $rules
+     * @param  callable  $callback
+     * @return $this
+     */
+    function sometimesNested(string $parent, $attribute, $rules, callable $callback)
+    {
+        foreach ((array) $this->getValue($parent) as $index => $item) {
+
+            $payload = new Fluent($item);
+
+            if ($callback($payload)) {
+                foreach ((array) $attribute as $key) {
+                    $this->addRules([$parent . '.' . $index . '.' . $key => $rules]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Instruct the validator to stop validating after the first rule failure.
      *
      * @param  bool  $stopOnFirstFailure
