@@ -11,6 +11,7 @@ use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @method array validate(array $rules, ...$params)
@@ -336,7 +337,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  $default
      * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return parent::get($key, $default);
     }
@@ -442,7 +443,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null): static
     {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
@@ -491,9 +492,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store|null
+     * @return \Illuminate\Session\Store
      */
-    public function getSession()
+    public function getSession(): SessionInterface
     {
         return $this->session;
     }
@@ -625,7 +626,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->all();
     }
