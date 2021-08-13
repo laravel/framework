@@ -7,7 +7,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentSlot;
-use InvalidArgumentException;
 
 trait ManagesComponents
 {
@@ -123,8 +122,6 @@ trait ManagesComponents
      * @param  array  $attributes
      * @param  string|null  $content
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
     public function slot($name, $attributes = [], $content = null)
     {
