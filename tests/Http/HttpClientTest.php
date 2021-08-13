@@ -940,6 +940,28 @@ class HttpClientTest extends TestCase
         m::close();
     }
 
+    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSentAsync()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake();
+        $factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('https://example.com'),
+                $pool->head('https://example.com'),
+                $pool->post('https://example.com'),
+                $pool->patch('https://example.com'),
+                $pool->delete('https://example.com'),
+            ];
+        });
+
+
+        m::close();
+    }
+
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
     {
         $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);
