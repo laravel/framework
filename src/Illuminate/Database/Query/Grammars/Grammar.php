@@ -1286,7 +1286,7 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Nulls are ordered first when ordring in ascending order
+     * Nulls are ordered first when ordring in ascending order.
      *
      * @return bool
      */
@@ -1294,5 +1294,4 @@ class Grammar extends BaseGrammar
     {
         return true;
     }
-
 }

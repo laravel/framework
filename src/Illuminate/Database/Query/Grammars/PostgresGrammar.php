@@ -411,7 +411,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Nulls are ordered first when ordring in ascending order
+     * Nulls are ordered first when ordring in ascending order.
      *
      * @return bool
      */
@@ -419,5 +419,4 @@ class PostgresGrammar extends Grammar
     {
         return false;
     }
-
 }

@@ -349,7 +349,7 @@ trait BuildsQueries
     }
 
     /**
-     * Handle creating a where clause for when a cursor value is null
+     * Handle creating a where clause for when a cursor value is null.
      *
      * @param  string  $column
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder  $builder
@@ -360,7 +360,7 @@ trait BuildsQueries
     {
         $ascending = $direction === 'asc';
         if (! $builder->getGrammar()->nullsAreOrderedFirst()) {
-            $ascending = !$ascending;
+            $ascending = ! $ascending;
         }
         if ($ascending) {
             $builder->whereNotNull($column);
