@@ -9,6 +9,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -253,4 +254,29 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         return $this;
     }
+
+    /**
+     * Merge rules based on a given condition.
+     *
+     * @param  callable|bool  $condition
+     * @param  callable|array  $rules
+     * @return \Illuminate\Validation\MergeRules
+     */
+    protected function mergeWhen($condition, $rules)
+    {
+        return Rule::mergeWhen($condition, $rules);
+    }
+
+    /**
+     * Create a new conditional rule set.
+     *
+     * @param  callable|bool  $condition
+     * @param  array|string  $rules
+     * @return \Illuminate\Validation\ConditionalRules
+     */
+    protected function when($condition, $rules)
+    {
+        return Rule::when($condition, $rules);
+    }
+
 }

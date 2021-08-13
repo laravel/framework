@@ -28,6 +28,18 @@ class Rule
     }
 
     /**
+     * Merge rules based on a given condition.
+     *
+     * @param  callable|bool  $condition
+     * @param  callable|array  $rules
+     * @return MergeRules
+     */
+    public static function mergeWhen($condition, $rules)
+    {
+        return new MergeRules($condition, $rules);
+    }
+
+    /**
      * Get a dimensions constraint builder instance.
      *
      * @param  array  $constraints

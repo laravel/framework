@@ -62,14 +62,26 @@ class ValidationRuleParser
      */
     protected function explodeRules($rules)
     {
+        $mergeable = [];
+
         foreach ($rules as $key => $rule) {
-            if (Str::contains($key, '*')) {
+            if ($rule instanceof MergeRules) {
+                $mergeable[$key] = $rule;
+
+                unset($rules[$key]);
+            } elseif (Str::contains($key, '*')) {
                 $rules = $this->explodeWildcardRules($rules, $key, [$rule]);
 
                 unset($rules[$key]);
             } else {
                 $rules[$key] = $this->explodeExplicitRule($rule);
             }
+        }
+
+        foreach ($mergeable as $rule) {
+            $rules = array_merge_recursive($rules, $this->explodeRules(
+                ValidationRuleParser::filterConditionalRules($rule->rules(), $this->data)
+            ));
         }
 
         return $rules;
@@ -285,6 +297,10 @@ class ValidationRuleParser
     public static function filterConditionalRules($rules, array $data = [])
     {
         return collect($rules)->mapWithKeys(function ($attributeRules, $attribute) use ($data) {
+            if ($attributeRules instanceof MergeRules) {
+                return [$attribute => $attributeRules->passes($data) ? $attributeRules : null];
+            }
+
             if (! is_array($attributeRules) &&
                 ! $attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules];
