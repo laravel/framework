@@ -200,6 +200,7 @@ class ValidatedInput implements ValidatedData
      *
      * @return \ArrayIterator
      */
+     #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->input);
