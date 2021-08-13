@@ -1284,4 +1284,15 @@ class Grammar extends BaseGrammar
     {
         return $this->operators;
     }
+
+    /**
+     * Nulls are ordered first when ordring in ascending order
+     *
+     * @return bool
+     */
+    public function nullsAreOrderedFirst()
+    {
+        return true;
+    }
+
 }

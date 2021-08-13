@@ -409,4 +409,15 @@ class PostgresGrammar extends Grammar
                         : "'$attribute'";
         }, $path);
     }
+
+    /**
+     * Nulls are ordered first when ordring in ascending order
+     *
+     * @return bool
+     */
+    public function nullsAreOrderedFirst()
+    {
+        return false;
+    }
+
 }
