@@ -171,7 +171,7 @@ class RetryCommand extends Command
             throw new RuntimeException('Unable to extract job payload.');
         }
 
-        if (is_object($instance) && method_exists($instance, 'retryUntil')) {
+        if (is_object($instance) && ! $instance instanceof \__PHP_Incomplete_Class && method_exists($instance, 'retryUntil')) {
             $retryUntil = $instance->retryUntil();
 
             $payload['retryUntil'] = $retryUntil instanceof DateTimeInterface
