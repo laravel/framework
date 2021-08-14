@@ -162,6 +162,23 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve an attribute when it's present.
+     * 
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenExists($attribute, $value = null, $default = null)
+    {
+        if (property_exists($this->resource, $attribute)) {
+            return func_num_args() >= 2 ? value($value) : $this->resource->{$attribute};
+        }
+
+        return func_num_args() === 3 ? value($default) : new MissingValue;
+    }
+
+    /**
      * Retrieve a relationship if it has been loaded.
      *
      * @param  string  $relationship
