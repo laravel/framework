@@ -66,7 +66,7 @@ EOF, str_replace("\r", '', $output->fetch()));
         $output = $this->artisan([
             '--model' => [
                 PrunableTestModelWithoutPrunableRecords::class, PrunableTestModelWithPrunableRecords::class,
-                NonPrunableTestModel::class
+                NonPrunableTestModel::class,
             ]
         ]);
 
