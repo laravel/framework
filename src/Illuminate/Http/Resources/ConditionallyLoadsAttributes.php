@@ -163,7 +163,7 @@ trait ConditionallyLoadsAttributes
 
     /**
      * Retrieve an attribute when it's present.
-     * 
+     *
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  mixed  $default
