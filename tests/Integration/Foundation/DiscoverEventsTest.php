@@ -8,7 +8,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
-use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\UnionListener;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener;
 use Orchestra\Testbench\TestCase;
 
 class DiscoverEventsTest extends TestCase
@@ -16,7 +16,6 @@ class DiscoverEventsTest extends TestCase
     public function testEventsCanBeDiscovered()
     {
         class_alias(Listener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener');
-        class_alias(UnionListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\UnionListener');
         class_alias(AbstractListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener');
         class_alias(ListenerInterface::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface');
 
@@ -26,10 +25,28 @@ class DiscoverEventsTest extends TestCase
             EventOne::class => [
                 Listener::class.'@handle',
                 Listener::class.'@handleEventOne',
-                UnionListener::class.'@handle',
             ],
             EventTwo::class => [
                 Listener::class.'@handleEventTwo',
+            ],
+        ], $events);
+    }
+
+    public function testUnionEventsCanBeDiscovered()
+    {
+        if (version_compare(phpversion(), '8.0.0', '<')) {
+            $this->markTestSkipped('Test uses union types.');
+        }
+
+        class_alias(UnionListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener');
+
+        $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/UnionListeners', getcwd());
+
+        $this->assertEquals([
+            EventOne::class => [
+                UnionListener::class.'@handle',
+            ],
+            EventTwo::class => [
                 UnionListener::class.'@handle',
             ],
         ], $events);
