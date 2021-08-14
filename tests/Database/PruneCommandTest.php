@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Artisan;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -55,7 +56,24 @@ EOF, str_replace("\r", '', $output->fetch()));
         $output = $this->artisan(['--model' => NonPrunableTestModel::class]);
 
         $this->assertEquals(<<<'EOF'
-No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
+No prunable models found.
+
+EOF, str_replace("\r", '', $output->fetch()));
+    }
+
+    public function testFilterNonPrunableFromInputModels()
+    {
+        $output = $this->artisan([
+            '--model' => [
+                PrunableTestModelWithoutPrunableRecords::class, PrunableTestModelWithPrunableRecords::class,
+                NonPrunableTestModel::class
+            ]
+        ]);
+
+        $this->assertEquals(<<<'EOF'
+No prunable [Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords] records found.
+10 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.
+20 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.
 
 EOF, str_replace("\r", '', $output->fetch()));
     }

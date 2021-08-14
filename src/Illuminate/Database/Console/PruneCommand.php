@@ -55,9 +55,7 @@ class PruneCommand extends Command
                             ? $instance->prunableChunkSize
                             : $this->option('chunk');
 
-            $total = $this->isPrunable($model)
-                        ? $instance->pruneAll($chunkSize)
-                        : 0;
+            $total = $instance->pruneAll($chunkSize);
 
             if ($total == 0) {
                 $this->info("No prunable [$model] records found.");
@@ -75,7 +73,10 @@ class PruneCommand extends Command
     protected function models()
     {
         if (! empty($models = $this->option('model'))) {
-            return collect($models);
+            return collect($models)
+                ->filter(function ($model) {
+                    return $this->isPrunable($model);
+                });
         }
 
         return collect((new Finder)->in(app_path('Models'))->files())
