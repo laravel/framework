@@ -74,7 +74,7 @@ class SupportReflectsClosuresTest extends TestCase
             ExampleParameter::class,
         ], $types);
 
-        $types = ReflectsClosuresClass::reflectFirstAll(function (ExampleParameter|AnotherExampleParameter $a, $b) {
+        $types = ReflectsClosuresClass::reflectFirstAll(function (ExampleParameter | AnotherExampleParameter $a, $b) {
             //
         });
 
