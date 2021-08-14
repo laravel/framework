@@ -1068,12 +1068,12 @@ EOF;
     /**
      * Assert that the response has the given validation errors.
      *
-     * @param  array  $keys
+     * @param  array  $errors
      * @param  string  $errorBag
      * @param  string  $responseKey
      * @return $this
      */
-    public function assertInvalid($errors = [],
+    public function assertInvalid($errors,
                                   $errorBag = 'default',
                                   $responseKey = 'errors')
     {
