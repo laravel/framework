@@ -948,10 +948,23 @@ class TestResponseTest extends TestCase
         $testResponse = TestResponse::fromBaseResponse(new Response);
 
         $testResponse->assertValid(['last_name']);
-        $testResponse->assertInvalid();
         $testResponse->assertInvalid(['first_name']);
         $testResponse->assertInvalid(['first_name' => 'required']);
         $testResponse->assertInvalid(['first_name' => 'character']);
+    }
+
+    public function testAssertSessionValidationErrorsUsingAssertValid()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+        ]));
+
+        $testResponse = TestResponse::fromBaseResponse(new Response);
+
+        $testResponse->assertValid();
     }
 
     public function testAssertJsonValidationErrorsCustomErrorsName()
