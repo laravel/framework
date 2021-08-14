@@ -70,19 +70,7 @@ class Reflector
             return;
         }
 
-        $name = $type->getName();
-
-        if (! is_null($class = $parameter->getDeclaringClass())) {
-            if ($name === 'self') {
-                return $class->getName();
-            }
-
-            if ($name === 'parent' && $parent = $class->getParentClass()) {
-                return $parent->getName();
-            }
-        }
-
-        return $name;
+        return static::getTypeName($parameter, $type);
     }
 
     /**
@@ -106,24 +94,34 @@ class Reflector
                 continue;
             }
 
-            $name = $listedType->getName();
-
-            if (! is_null($class = $parameter->getDeclaringClass())) {
-                if ($name === 'self') {
-                    $unionTypes[] = $class->getName();
-                    continue;
-                }
-
-                if ($name === 'parent' && $parent = $class->getParentClass()) {
-                    $unionTypes[] = $parent->getName();
-                    continue;
-                }
-            }
-
-            $unionTypes[] = $name;
+            $unionTypes[] = static::getTypeName($parameter, $listedType);
         }
 
         return $unionTypes;
+    }
+
+    /**
+     * Get the given type's class name.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @param  \ReflectionNamedType  $type
+     * @return string
+     */
+    protected static function getTypeName($parameter, $type)
+    {
+        $name = $type->getName();
+
+        if (! is_null($class = $parameter->getDeclaringClass())) {
+            if ($name === 'self') {
+                return $class->getName();
+            }
+
+            if ($name === 'parent' && $parent = $class->getParentClass()) {
+                return $parent->getName();
+            }
+        }
+
+        return $name;
     }
 
     /**
