@@ -808,7 +808,7 @@ class PendingRequest
     }
 
     /**
-     * add handlers to the handler stack
+     * add handlers to the handler stack.
      *
      * @param  \GuzzleHttp\HandlerStack  $handlerStack
      * @return \GuzzleHttp\HandlerStack
@@ -1046,7 +1046,7 @@ class PendingRequest
     }
 
     /**
-     * set the handler function
+     * set the handler function.
      *
      * @param  callable  $handler
      * @return $this

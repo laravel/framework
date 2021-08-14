@@ -958,7 +958,6 @@ class HttpClientTest extends TestCase
             ];
         });
 
-
         m::close();
     }
 
