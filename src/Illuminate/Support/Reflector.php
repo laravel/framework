@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionUnionType;
 
 class Reflector
 {
@@ -82,6 +83,47 @@ class Reflector
         }
 
         return $name;
+    }
+
+    /**
+     * Get the class names of the given parameter's type, including union types.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return array
+     */
+    public static function getParameterClassNames($parameter)
+    {
+        $type = $parameter->getType();
+
+        if (! $type instanceof ReflectionUnionType) {
+            return [static::getParameterClassName($parameter)];
+        }
+
+        $unionTypes = [];
+
+        foreach ($type->getTypes() as $listedType) {
+            if (! $listedType instanceof ReflectionNamedType || $listedType->isBuiltin()) {
+                continue;
+            }
+
+            $name = $listedType->getName();
+
+            if (! is_null($class = $parameter->getDeclaringClass())) {
+                if ($name === 'self') {
+                    $unionTypes[] = $class->getName();
+                    continue;
+                }
+
+                if ($name === 'parent' && $parent = $class->getParentClass()) {
+                    $unionTypes[] = $parent->getName();
+                    continue;
+                }
+            }
+
+            $unionTypes[] = $name;
+        }
+
+        return $unionTypes;
     }
 
     /**
