@@ -1104,6 +1104,62 @@ EOF;
     }
 
     /**
+     * Assert that the response has the given validation errors.
+     *
+     * @param  array  $keys
+     * @param  string  $errorBag
+     * @param  string  $responseKey
+     * @return $this
+     */
+    public function assertInvalid($errors = [],
+                                  $errorBag = 'default',
+                                  $responseKey = 'errors')
+    {
+        if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
+            return $this->assertJsonValidationErrors($errors, $responseKey);
+        }
+
+        $this->assertSessionHas('errors');
+
+        $keys = (array) $errors;
+
+        $sessionErrors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
+
+        $errorMessage = $sessionErrors
+                ? 'Response has the following validation errors in the session:'.
+                        PHP_EOL.PHP_EOL.json_encode($sessionErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
+                : 'Response does not have validation errors in the session.';
+
+        foreach ($errors as $key => $value) {
+            PHPUnit::assertArrayHasKey(
+                (is_int($key)) ? $value : $key,
+                $sessionErrors,
+                "Failed to find a validation error in session for key: '{$value}'".PHP_EOL.PHP_EOL.$errorMessage
+            );
+
+            if (! is_int($key)) {
+                $hasError = false;
+
+                foreach (Arr::wrap($sessionErrors[$key]) as $sessionErrorMessage) {
+                    if (Str::contains($sessionErrorMessage, $value)) {
+                        $hasError = true;
+
+                        break;
+                    }
+                }
+
+                if (! $hasError) {
+                    PHPUnit::fail(
+                        "Failed to find a validation error for key and message: '$key' => '$value'".PHP_EOL.PHP_EOL.$errorMessage
+                    );
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the session has the given errors.
      *
      * @param  string|array  $keys
