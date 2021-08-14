@@ -790,10 +790,40 @@ class PendingRequest
      */
     public function buildClient()
     {
-        return $this->client = $this->client ?: new Client([
-            'handler' => $this->buildHandlerStack(),
+        return $this->client = $this->client ?: $this->createClient($this->buildHandlerStack());
+    }
+
+    /**
+     * Create new Guzzle client.
+     *
+     * @param  \GuzzleHttp\HandlerStack  $handlerStack
+     * @return \GuzzleHttp\Client
+     */
+    public function createClient($handlerStack)
+    {
+        return new Client([
+            'handler' => $handlerStack,
             'cookies' => true,
         ]);
+    }
+
+    /**
+     * add handlers to the handler stack
+     *
+     * @param  \GuzzleHttp\HandlerStack  $handlerStack
+     * @return \GuzzleHttp\HandlerStack
+     */
+    public function pushHandlers($handlerStack)
+    {
+        return tap($handlerStack, function ($stack) {
+            $stack->push($this->buildBeforeSendingHandler());
+            $stack->push($this->buildRecorderHandler());
+            $stack->push($this->buildStubHandler());
+
+            $this->middleware->each(function ($middleware) use ($stack) {
+                $stack->push($middleware);
+            });
+        });
     }
 
     /**
@@ -803,15 +833,7 @@ class PendingRequest
      */
     public function buildHandlerStack()
     {
-        return tap(HandlerStack::create(), function ($stack) {
-            $stack->push($this->buildBeforeSendingHandler());
-            $stack->push($this->buildRecorderHandler());
-            $stack->push($this->buildStubHandler());
-
-            $this->middleware->each(function ($middleware) use ($stack) {
-                $stack->push($middleware);
-            });
-        });
+        return $this->pushHandlers(HandlerStack::create());
     }
 
     /**
@@ -1019,6 +1041,19 @@ class PendingRequest
     public function setClient(Client $client)
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * set the handler function
+     *
+     * @param  callable  $handler
+     * @return $this
+     */
+    public function setHandler($handler)
+    {
+        $this->client = $this->createClient($this->pushHandlers(HandlerStack::create($handler)));
 
         return $this;
     }
