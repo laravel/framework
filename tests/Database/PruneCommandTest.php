@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Artisan;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -67,7 +66,7 @@ EOF, str_replace("\r", '', $output->fetch()));
             '--model' => [
                 PrunableTestModelWithoutPrunableRecords::class, PrunableTestModelWithPrunableRecords::class,
                 NonPrunableTestModel::class,
-            ]
+            ],
         ]);
 
         $this->assertEquals(<<<'EOF'
