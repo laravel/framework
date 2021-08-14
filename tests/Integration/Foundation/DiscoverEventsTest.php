@@ -8,6 +8,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\AbstractListener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\Listener;
 use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Listeners\ListenerInterface;
+use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener;
 use Orchestra\Testbench\TestCase;
 
 class DiscoverEventsTest extends TestCase
@@ -27,6 +28,26 @@ class DiscoverEventsTest extends TestCase
             ],
             EventTwo::class => [
                 Listener::class.'@handleEventTwo',
+            ],
+        ], $events);
+    }
+
+    public function testUnionEventsCanBeDiscovered()
+    {
+        if (version_compare(phpversion(), '8.0.0', '<')) {
+            $this->markTestSkipped('Test uses union types.');
+        }
+
+        class_alias(UnionListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener');
+
+        $events = DiscoverEvents::within(__DIR__.'/Fixtures/EventDiscovery/UnionListeners', getcwd());
+
+        $this->assertEquals([
+            EventOne::class => [
+                UnionListener::class.'@handle',
+            ],
+            EventTwo::class => [
+                UnionListener::class.'@handle',
             ],
         ], $events);
     }
