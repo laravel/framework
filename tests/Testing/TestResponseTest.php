@@ -947,6 +947,8 @@ class TestResponseTest extends TestCase
 
         $testResponse = TestResponse::fromBaseResponse(new Response);
 
+        $testResponse->assertValid(['last_name']);
+        $testResponse->assertInvalid();
         $testResponse->assertInvalid(['first_name']);
         $testResponse->assertInvalid(['first_name' => 'required']);
         $testResponse->assertInvalid(['first_name' => 'character']);
