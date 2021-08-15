@@ -4108,7 +4108,7 @@ class ValidationValidatorTest extends TestCase
         ];
 
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, $data, ['first.4.value' => ['Required']]);
+        $v = new Validator($trans, $data, ['first.2.value' => ['Required'], 'first.4.value' => ['Required']]);
         $v->sometimesNested('first', 'value', 'String', function ($i) {
             return $i->type === 'url';
         });
@@ -4147,7 +4147,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimesNested('first', 'value', 'email:rfc,dns', function ($i) {
             return $i->type === 'email';
         });
-        $this->assertEquals(['first.0.value' => ['email:rfc,dns'], 'first.1.value' => ['email:rfc,dns'],'first.4.value' => ['Required']], $v->getRules());
+        $this->assertEquals(['first.0.value' => ['email:rfc,dns'], 'first.1.value' => ['email:rfc,dns'], 'first.4.value' => ['Required']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, $data, ['first.0.type' => ['Required']]);

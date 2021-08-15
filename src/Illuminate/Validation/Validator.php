@@ -1121,7 +1121,7 @@ class Validator implements ValidatorContract
      * @param  callable  $callback
      * @return $this
      */
-    function sometimesNested(string $parent, $attribute, $rules, callable $callback)
+    public function sometimesNested(string $parent, $attribute, $rules, callable $callback)
     {
         foreach ((array) $this->getValue($parent) as $index => $item) {
 
@@ -1129,7 +1129,7 @@ class Validator implements ValidatorContract
 
             if ($callback($payload)) {
                 foreach ((array) $attribute as $key) {
-                    $this->addRules([$parent . '.' . $index . '.' . $key => $rules]);
+                    $this->addRules([$parent.'.'.$index.'.'.$key => $rules]);
                 }
             }
         }
