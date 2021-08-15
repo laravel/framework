@@ -1124,7 +1124,6 @@ class Validator implements ValidatorContract
     public function sometimesNested(string $parent, $attribute, $rules, callable $callback)
     {
         foreach ((array) $this->getValue($parent) as $index => $item) {
-
             $payload = new Fluent($item);
 
             if ($callback($payload)) {
