@@ -1442,6 +1442,47 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The last field is prohibited unless first is in taylor, jess.', $v->messages()->first('last'));
     }
 
+    public function testProhibitedWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => ['foo']], ['email' => 'prohibited_with:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => []], ['email' => 'prohibited_with:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => ''], ['email' => 'prohibited_with:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => null], ['email' => 'prohibited_with:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => false], ['email' => 'prohibited_with:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => ['foo']], ['email' => 'prohibited_with:email_address,emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => 'prohibited_with:emails']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'other' => 'foo'], ['email' => 'prohibited_with:email_address,emails']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibited_with' => 'The :attribute field is prohibited with :other.'], 'en');
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibited_with:emails,email_address']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The email field is prohibited with emails / email address.', $v->messages()->first('email'));
+    }
+
     public function testFailedFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
