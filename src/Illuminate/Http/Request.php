@@ -11,7 +11,6 @@ use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @method array validate(array $rules, ...$params)
@@ -405,8 +404,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $request->setJson($from->json());
 
-        if ($from->hasSession()) {
-            $request->setLaravelSession($from->getSession());
+        if ($from->hasSession() && $session = $from->getSession()) {
+            $request->setLaravelSession($session);
         }
 
         $request->setUserResolver($from->getUserResolver());
@@ -486,16 +485,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->session;
-    }
-
-    /**
-     * Get the session associated with the request.
-     *
-     * @return \Illuminate\Session\Store
-     */
-    public function getSession(): SessionInterface
-    {
         return $this->session;
     }
 
