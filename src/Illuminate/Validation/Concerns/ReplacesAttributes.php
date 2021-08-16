@@ -433,6 +433,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the prohibited_with rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceProhibits($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':other', implode(' / ', $this->getAttributeList($parameters)), $message);
+    }
+
+    /**
      * Replace all place-holders for the same rule.
      *
      * @param  string  $message

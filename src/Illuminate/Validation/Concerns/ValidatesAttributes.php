@@ -1535,6 +1535,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that other attributes do not exist when this attribute exists.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibits($attribute, $value, $parameters)
+    {
+        foreach ($parameters as $other) {
+            if (Arr::has($this->data, $other)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Indicate that an attribute is excluded.
      *
      * @return bool
