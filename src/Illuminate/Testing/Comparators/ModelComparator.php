@@ -23,11 +23,11 @@ class ModelComparator extends Comparator
     /**
      * Asserts that expected and actual are the same model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $expected
-     * @param \Illuminate\Database\Eloquent\Model $actual
-     * @param float $delta
-     * @param bool $canonicalize
-     * @param bool $ignoreCase
+     * @param  \Illuminate\Database\Eloquent\Model  $expected
+     * @param  \Illuminate\Database\Eloquent\Model  $actual
+     * @param  float  $delta
+     * @param  bool  $canonicalize
+     * @param  bool  $ignoreCase
      * @return void
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false): void
