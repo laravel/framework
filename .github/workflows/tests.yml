@@ -40,7 +40,7 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--ignore-platform-req=php"
+            flags: "--ignore-platform-req=php --with symfony/process:^5.4 --with symfony/routing:^5.4"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
