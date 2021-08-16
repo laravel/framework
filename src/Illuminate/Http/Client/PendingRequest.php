@@ -808,7 +808,17 @@ class PendingRequest
     }
 
     /**
-     * add handlers to the handler stack.
+     * Build the Guzzle client handler stack.
+     *
+     * @return \GuzzleHttp\HandlerStack
+     */
+    public function buildHandlerStack()
+    {
+        return $this->pushHandlers(HandlerStack::create());
+    }
+
+    /**
+     * Add the necessary handlers to the given handler stack.
      *
      * @param  \GuzzleHttp\HandlerStack  $handlerStack
      * @return \GuzzleHttp\HandlerStack
@@ -824,16 +834,6 @@ class PendingRequest
                 $stack->push($middleware);
             });
         });
-    }
-
-    /**
-     * Build the before sending handler stack.
-     *
-     * @return \GuzzleHttp\HandlerStack
-     */
-    public function buildHandlerStack()
-    {
-        return $this->pushHandlers(HandlerStack::create());
     }
 
     /**
@@ -1046,14 +1046,16 @@ class PendingRequest
     }
 
     /**
-     * set the handler function.
+     * Create a new client instance using the given handler.
      *
      * @param  callable  $handler
      * @return $this
      */
     public function setHandler($handler)
     {
-        $this->client = $this->createClient($this->pushHandlers(HandlerStack::create($handler)));
+        $this->client = $this->createClient(
+            $this->pushHandlers(HandlerStack::create($handler))
+        );
 
         return $this;
     }
