@@ -1384,7 +1384,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $exception
      * @return void
-     * 
+     *
      * @throws InvalidArgumentException
      */
     public function setException($exception)
@@ -1394,7 +1394,6 @@ class Validator implements ValidatorContract
                 sprintf('Exception [%s] is invalid. It must extend [%s].', $exception, ValidationException::class)
             );
         }
-        
         $this->exception = $exception;
     }
 
