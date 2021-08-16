@@ -64,6 +64,9 @@ class SupportReflectsClosuresTest extends TestCase
         });
     }
 
+    /**
+     * @requires PHP 8
+     */
     public function testItWorksWithUnionTypes()
     {
         $types = ReflectsClosuresClass::reflectFirstAll(function (ExampleParameter $a, $b) {
@@ -74,9 +77,9 @@ class SupportReflectsClosuresTest extends TestCase
             ExampleParameter::class,
         ], $types);
 
-        $types = ReflectsClosuresClass::reflectFirstAll(function (ExampleParameter | AnotherExampleParameter $a, $b) {
-            //
-        });
+        $closure = require __DIR__.'/Fixtures/UnionTypesClosure.php';
+
+        $types = ReflectsClosuresClass::reflectFirstAll($closure);
 
         $this->assertEquals([
             ExampleParameter::class,
