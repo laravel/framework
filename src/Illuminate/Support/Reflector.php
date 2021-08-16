@@ -84,7 +84,7 @@ class Reflector
         $type = $parameter->getType();
 
         if (! $type instanceof ReflectionUnionType) {
-            return [static::getParameterClassName($parameter)];
+            return array_filter([static::getParameterClassName($parameter)]);
         }
 
         $unionTypes = [];
@@ -97,7 +97,7 @@ class Reflector
             $unionTypes[] = static::getTypeName($parameter, $listedType);
         }
 
-        return $unionTypes;
+        return array_filter($unionTypes);
     }
 
     /**
