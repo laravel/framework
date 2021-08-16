@@ -1520,7 +1520,7 @@ class Builder
     /**
      * Qualify the column's lists name by the model's table.
      *
-     * @param  array|mixed  $columns
+     * @param  array|\Illuminate\Database\Query\Expression  $columns
      * @return array
      */
     public function qualifyColumns($columns)
