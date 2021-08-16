@@ -443,13 +443,11 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     public function qualifyColumns($columns)
     {
         $columns = is_array($columns) ? $columns : func_get_args();
-        
         $qualifiedArray = [];
 
         foreach ($columns as $column) {
             $qualifiedArray[] = $this->qualifyColumn($column);
-        }
-        
+        }   
         return $qualifiedArray;
     }
 
