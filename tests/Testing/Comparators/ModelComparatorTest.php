@@ -74,6 +74,7 @@ class ModelComparatorTest extends TestCase
     }
 }
 
-class TestModel extends Model {
+class TestModel extends Model
+{
     protected $guarded = [];
 }

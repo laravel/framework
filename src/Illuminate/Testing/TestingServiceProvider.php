@@ -2,7 +2,6 @@
 
 namespace Illuminate\Testing;
 
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Comparators\ModelComparator;
 use SebastianBergmann\Comparator\Factory;
@@ -14,7 +13,7 @@ class TestingServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $comparatorFactory = Factory::getInstance();
         $comparatorFactory->register(new ModelComparator());
