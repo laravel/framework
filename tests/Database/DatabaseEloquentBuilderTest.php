@@ -203,8 +203,8 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->setModel(new EloquentModelStub);
 
-        $this->assertSame(['stub.column', 'stub.column2', 'stub.column3'], $builder->qualifyColumn('column', 'column2', 'column3'));
-        $this->assertSame(['stub.column', 'stub.column2', 'stub.column3'], $builder->qualifyColumn(...['column', 'column2', 'column3']));
+        $this->assertSame(['stub.column', 'stub.column2', 'stub.column3'], $builder->qualifyColumns('column', 'column2', 'column3'));
+        $this->assertSame(['stub.column', 'stub.column2', 'stub.column3'], $builder->qualifyColumns(...['column', 'column2', 'column3']));
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
