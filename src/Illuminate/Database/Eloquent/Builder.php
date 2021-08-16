@@ -1518,6 +1518,17 @@ class Builder
     }
 
     /**
+     * Qualify the column's lists name by the model's table.
+     *
+     * @param  array|mixed  $columns
+     * @return array
+     */
+    public function qualifyColumns($columns)
+    {
+        return $this->model->qualifyColumns($columns);
+    }
+
+    /**
      * Get the given macro by name.
      *
      * @param  string  $name
