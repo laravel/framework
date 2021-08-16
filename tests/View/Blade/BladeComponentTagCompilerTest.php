@@ -47,7 +47,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" :class="$classes">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => \$classes]) \n".' @endslot', trim($result));
+        $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot', trim($result));
     }
 
     public function testBasicComponentParsing()
