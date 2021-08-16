@@ -203,8 +203,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->setModel(new EloquentModelStub);
 
-        $this->assertEquals(['stub.column', 'stub.column2', 'stub.column3'], $builder->qualifyColumns('column', 'column2', 'column3'));
-        $this->assertEquals(['stub.column', 'stub.column2', 'stub.column3'], $builder->qualifyColumns(['column', 'column2', 'column3']));
+        $this->assertEquals(['stub.column'], $builder->qualifyColumns('column'));
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
