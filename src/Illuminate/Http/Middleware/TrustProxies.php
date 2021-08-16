@@ -10,7 +10,7 @@ class TrustProxies
     /**
      * The trusted proxies for the application.
      *
-     * @var string|array|null
+     * @var array|string|null
      */
     protected $proxies;
 
@@ -60,16 +60,6 @@ class TrustProxies
         if (is_array($trustedIps)) {
             return $this->setTrustedProxyIpAddressesToSpecificIps($request, $trustedIps);
         }
-    }
-
-    /**
-     * Get trusted proxies.
-     *
-     * @return string|array|null
-     */
-    protected function proxies()
-    {
-        return $this->proxies;
     }
 
     /**
@@ -132,5 +122,15 @@ class TrustProxies
         }
 
         return $this->headers;
+    }
+
+    /**
+     * Get the trusted proxies.
+     *
+     * @return array|string|null
+     */
+    protected function proxies()
+    {
+        return $this->proxies;
     }
 }
