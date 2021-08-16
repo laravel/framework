@@ -336,7 +336,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  $default
      * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return parent::get($key, $default);
     }
@@ -404,7 +404,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $request->setJson($from->json());
 
-        if ($session = $from->getSession()) {
+        if ($from->hasSession() && $session = $from->getSession()) {
             $request->setLaravelSession($session);
         }
 
@@ -442,7 +442,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null): static
     {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
@@ -485,16 +485,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->session;
-    }
-
-    /**
-     * Get the session associated with the request.
-     *
-     * @return \Illuminate\Session\Store|null
-     */
-    public function getSession()
-    {
         return $this->session;
     }
 
@@ -625,7 +615,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->all();
     }
