@@ -441,7 +441,7 @@ class ComponentTagCompiler
 
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
-            return " @slot({$name}, null, [".$this->attributesToString($attributes, $escapeBound = false).']) ';
+            return " @slot({$name}, null, [".$this->attributesToString($attributes).']) ';
         }, $value);
 
         return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);
