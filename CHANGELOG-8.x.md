@@ -1,6 +1,28 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.51.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.52.0...8.x)
+
+
+## [v8.52.0 (2021-07-27)](https://github.com/laravel/framework/compare/v8.51.0...v8.52.0)
+
+### Added
+- Allow shift() and pop() to take multiple items from a collection ([#38093](https://github.com/laravel/framework/pull/38093))
+- Added hook to configure broadcastable model event ([5ca5768](https://github.com/laravel/framework/commit/5ca5768db439887217c86031ff7dd3bdf56cc466), [aca6f90](https://github.com/laravel/framework/commit/aca6f90b7177361b8d1f4ca6eecea78403f32583))
+- Support a proxy URL for mix hot ([#38118](https://github.com/laravel/framework/pull/38118))
+- Added `Illuminate/Validation/Rules/Unique::withoutTrashed()` ([#38124](https://github.com/laravel/framework/pull/38124))
+- Support job middleware on queued listeners ([#38128](https://github.com/laravel/framework/pull/38128))
+- Model Broadcasting - Adding broadcastWith() and broadcastAs() support ([#38137](https://github.com/laravel/framework/pull/38137))
+- Allow parallel testing without database creation ([#38143](https://github.com/laravel/framework/pull/38143))
+
+### Fixed
+- Fixed display of validation errors occurred when asserting status ([#38088](https://github.com/laravel/framework/pull/38088))
+- Developer friendly message if no Prunable Models found ([#38108](https://github.com/laravel/framework/pull/38108))
+- Fix running schedule:test on CallbackEvent ([#38146](https://github.com/laravel/framework/pull/38146))
+
+### Changed
+- BelongsToMany->sync() will support touching for pivots when the result contains detached items ([#38085](https://github.com/laravel/framework/pull/38085))
+- Ability to specify the broadcaster to use when broadcasting an event ([#38086](https://github.com/laravel/framework/pull/38086))
+- Password Validator should inherit custom error message and attribute ([#38114](https://github.com/laravel/framework/pull/38114))
 
 
 ## [v8.51.0 (2021-07-20)](https://github.com/laravel/framework/compare/v8.50.0...v8.51.0)

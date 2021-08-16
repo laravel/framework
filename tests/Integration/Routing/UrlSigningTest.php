@@ -8,6 +8,7 @@ use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -31,7 +32,10 @@ class UrlSigningTest extends TestCase
             return ['slug' => $slug, 'valid' => $request->hasValidSignature() ? 'valid' : 'invalid'];
         })->name('foo');
 
-        $this->assertIsString($url = URL::signedRoute('foo', ['post' => new RoutableInterfaceStub]));
+        $model = new RoutableInterfaceStub;
+        $model->routable = 'routable-slug';
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['post' => $model]));
         $this->assertSame('valid', $this->get($url)->original['valid']);
         $this->assertSame('routable-slug', $this->get($url)->original['slug']);
     }
@@ -48,6 +52,18 @@ class UrlSigningTest extends TestCase
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
         $this->assertSame('invalid', $this->get($url)->original);
+    }
+
+    public function testTemporarySignedUrlsWithExpiresParameter()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1, 'expires' => 253402300799]);
     }
 
     public function testSignedUrlWithUrlWithoutSignatureParameter()

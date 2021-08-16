@@ -401,6 +401,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(CursorPaginator::class, $models);
     }
 
+    public function testFirstOrNew()
+    {
+        $user1 = EloquentTestUser::firstOrNew(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro']
+        );
+
+        $this->assertSame('Nuno Maduro', $user1->name);
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
@@ -425,6 +435,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotEquals($user3->id, $user1->id);
         $this->assertSame('abigailotwell@gmail.com', $user3->email);
         $this->assertSame('Abigail Otwell', $user3->name);
+
+        $user4 = EloquentTestUser::firstOrCreate(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
+        );
+
+        $this->assertSame('Nuno Maduro', $user4->name);
     }
 
     public function testUpdateOrCreate()
@@ -676,6 +693,36 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('abigailotwell@gmail.com', $models[0]->email);
         $this->assertSame('second_connection', $models[0]->getConnectionName());
         $this->assertCount(1, $models);
+    }
+
+    public function testFirstOrNewOnHasOneRelationShip()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post1 = $user1->post()->firstOrNew(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('New Post', $post1->name);
+
+        $user2 = EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        $post = $user2->post()->create(['name' => 'First Post']);
+        $post2 = $user2->post()->firstOrNew(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('First Post', $post2->name);
+        $this->assertSame($post->id, $post2->id);
+    }
+
+    public function testFirstOrCreateOnHasOneRelationShip()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post1 = $user1->post()->firstOrCreate(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('New Post', $post1->name);
+
+        $user2 = EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        $post = $user2->post()->create(['name' => 'First Post']);
+        $post2 = $user2->post()->firstOrCreate(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('First Post', $post2->name);
+        $this->assertSame($post->id, $post2->id);
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationship()

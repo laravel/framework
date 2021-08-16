@@ -181,7 +181,7 @@ class PendingRequest
     /**
      * Attach a raw body to the request.
      *
-     * @param  resource|string  $content
+     * @param  string  $content
      * @param  string  $contentType
      * @return $this
      */
@@ -220,7 +220,7 @@ class PendingRequest
      * Attach a file to the request.
      *
      * @param  string|array  $name
-     * @param  string  $contents
+     * @param  string|resource  $contents
      * @param  string|null  $filename
      * @param  array  $headers
      * @return $this

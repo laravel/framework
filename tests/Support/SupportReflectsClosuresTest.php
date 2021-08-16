@@ -64,6 +64,47 @@ class SupportReflectsClosuresTest extends TestCase
         });
     }
 
+    /**
+     * @requires PHP 8
+     */
+    public function testItWorksWithUnionTypes()
+    {
+        $types = ReflectsClosuresClass::reflectFirstAll(function (ExampleParameter $a, $b) {
+            //
+        });
+
+        $this->assertEquals([
+            ExampleParameter::class,
+        ], $types);
+
+        $closure = require __DIR__.'/Fixtures/UnionTypesClosure.php';
+
+        $types = ReflectsClosuresClass::reflectFirstAll($closure);
+
+        $this->assertEquals([
+            ExampleParameter::class,
+            AnotherExampleParameter::class,
+        ], $types);
+    }
+
+    public function testItWorksWithUnionTypesWithNoTypeHints()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $types = ReflectsClosuresClass::reflectFirstAll(function ($a, $b) {
+            //
+        });
+    }
+
+    public function testItWorksWithUnionTypesWithNoArguments()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $types = ReflectsClosuresClass::reflectFirstAll(function () {
+            //
+        });
+    }
+
     private function assertParameterTypes($expected, $closure)
     {
         $types = ReflectsClosuresClass::reflect($closure);
@@ -85,9 +126,19 @@ class ReflectsClosuresClass
     {
         return (new static)->firstClosureParameterType($closure);
     }
+
+    public static function reflectFirstAll($closure)
+    {
+        return (new static)->firstClosureParameterTypes($closure);
+    }
 }
 
 class ExampleParameter
+{
+    //
+}
+
+class AnotherExampleParameter
 {
     //
 }
