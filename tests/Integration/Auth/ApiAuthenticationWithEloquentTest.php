@@ -21,6 +21,12 @@ class ApiAuthenticationWithEloquentTest extends TestCase
         $app['config']->set('auth.defaults.guard', 'api');
         $app['config']->set('auth.providers.users.model', User::class);
 
+        $app['config']->set('auth.guards.api', [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
+        ]);
+
         // Database configuration
         $app['config']->set('database.default', 'testbench');
 
