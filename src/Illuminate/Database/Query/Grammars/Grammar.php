@@ -6,6 +6,7 @@ use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -1223,7 +1224,34 @@ class Grammar extends BaseGrammar
     {
         $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
 
-        return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
+        $jsonPath = collect(explode($delimiter, $value))
+            ->map(function ($segment) {
+                return $this->wrapJsonPathSegment($segment);
+            })
+            ->join('.');
+
+        return "'$".(str_starts_with($jsonPath, '[') ? '' : '.').$jsonPath."'";
+    }
+
+    /**
+     * Wrap the given JSON path segment.
+     *
+     * @param  string  $segment
+     * @return string
+     */
+    protected function wrapJsonPathSegment($segment)
+    {
+        if (preg_match('/(\[[^\]]+\])+$/', $segment, $parts)) {
+            $key = Str::beforeLast($segment, $parts[0]);
+
+            if (! empty($key)) {
+                return '"'.$key.'"'.$parts[0];
+            }
+
+            return $parts[0];
+        }
+
+        return '"'.$segment.'"';
     }
 
     /**
