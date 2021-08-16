@@ -448,6 +448,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
         foreach ($columns as $column) {
             $qualifiedArray[] = $this->qualifyColumn($column);
         }   
+        
         return $qualifiedArray;
     }
 
