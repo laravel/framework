@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Support\Fluent;
+
 class ConditionalRules
 {
     /**
@@ -40,7 +42,7 @@ class ConditionalRules
     public function passes(array $data = [])
     {
         return is_callable($this->condition)
-                    ? call_user_func($this->condition, $data)
+                    ? call_user_func($this->condition, new Fluent($data))
                     : $this->condition;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationRuleParser;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +17,7 @@ class ValidationRuleParserTest extends TestCase
             'password' => Rule::when(true, 'required|min:2'),
             'username' => ['required', Rule::when(true, ['min:2'])],
             'address' => ['required', Rule::when(false, ['min:2'])],
-            'city' => ['required', Rule::when(function (array $input) {
+            'city' => ['required', Rule::when(function (Fluent $input) {
                 return true;
             }, ['min:2'])],
         ]);

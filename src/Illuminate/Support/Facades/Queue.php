@@ -21,7 +21,6 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void assertPushed(string|\Closure $job, callable|int $callback = null)
  * @method static void assertPushedOn(string $queue, string|\Closure $job, callable|int $callback = null)
  * @method static void assertPushedWithChain(string $job, array $expectedChain = [], callable $callback = null)
- * @method static void popUsing(string $workerName, callable $callback)
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue
