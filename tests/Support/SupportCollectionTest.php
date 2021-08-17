@@ -238,6 +238,7 @@ class SupportCollectionTest extends TestCase
             })
         );
     }
+
     /**
      * @dataProvider collectionClassProvider
      */
