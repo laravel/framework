@@ -437,12 +437,11 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Qualify the column's lists name by the model's table.
      *
-     * @param  array|mixed  $columns
+     * @param  array  $columns
      * @return array
      */
     public function qualifyColumns($columns)
     {
-        $columns = is_array($columns) ? $columns : func_get_args();
         $qualifiedArray = [];
 
         foreach ($columns as $column) {
