@@ -83,7 +83,7 @@
         "filp/whoops": "^2.8",
         "guzzlehttp/guzzle": "^6.5.5|^7.0.1",
         "league/flysystem-cached-adapter": "^1.0",
-        "mockery/mockery": "^1.4.2",
+        "mockery/mockery": "1.4.x-dev",
         "orchestra/testbench-core": "^6.23",
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^8.5.8|^9.3.3",
