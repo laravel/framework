@@ -34,13 +34,13 @@ trait InteractsWithViews
     {
         $tempDirectory = sys_get_temp_dir();
 
-        if (!in_array($tempDirectory, ViewFacade::getFinder()->getPaths())) {
+        if (! in_array($tempDirectory, ViewFacade::getFinder()->getPaths())) {
             ViewFacade::addLocation(sys_get_temp_dir());
         }
 
         $tempFileInfo = pathinfo(tempnam($tempDirectory, 'laravel-blade'));
 
-        $tempFile = $tempFileInfo['dirname'] . '/' . $tempFileInfo['filename'] . '.blade.php';
+        $tempFile = $tempFileInfo['dirname'].'/'.$tempFileInfo['filename'] . '.blade.php';
 
         file_put_contents($tempFile, $template);
 
@@ -64,7 +64,7 @@ trait InteractsWithViews
             ? $view->with($component->data())
             : view($view, $component->data());
 
-        return (new TestComponent($component, $view));
+        return new TestComponent($component, $view);
     }
 
     /**
