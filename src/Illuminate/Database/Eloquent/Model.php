@@ -435,6 +435,19 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
+     * Qualify the given columns with the model's table.
+     *
+     * @param  array  $columns
+     * @return array
+     */
+    public function qualifyColumns($columns)
+    {
+        return collect($columns)->map(function ($column) {
+            return $this->qualifyColumn($column);
+        })->all();
+    }
+
+    /**
      * Create a new instance of the given model.
      *
      * @param  array  $attributes
