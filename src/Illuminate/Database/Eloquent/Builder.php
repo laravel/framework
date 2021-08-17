@@ -1518,7 +1518,7 @@ class Builder
     }
 
     /**
-     * Qualify the column's lists name by the model's table.
+     * Qualify the given columns with the model's table.
      *
      * @param  array|\Illuminate\Database\Query\Expression  $columns
      * @return array
