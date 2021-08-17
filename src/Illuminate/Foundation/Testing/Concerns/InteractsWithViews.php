@@ -40,7 +40,7 @@ trait InteractsWithViews
 
         $tempFileInfo = pathinfo(tempnam($tempDirectory, 'laravel-blade'));
 
-        $tempFile = $tempFileInfo['dirname'].'/'.$tempFileInfo['filename'] . '.blade.php';
+        $tempFile = $tempFileInfo['dirname'].'/'.$tempFileInfo['filename'].'.blade.php';
 
         file_put_contents($tempFile, $template);
 
