@@ -71,21 +71,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
-    {
-        $collection = new $collection([
-            ['name' => 'foo'],
-            ['name' => 'bar'],
-        ]);
-
-        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
-        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
-        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testSoleThrowsExceptionIfNoItemsExists($collection)
     {
         $this->expectException(ItemNotFoundException::class);
@@ -154,6 +139,105 @@ class SupportCollectionTest extends TestCase
         });
     }
 
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailReturnsFirstItemInCollection($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->firstOrFail());
+        $this->assertSame(['name' => 'foo'], $collection->firstOrFail('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->firstOrFail('name', 'foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailThrowsExceptionIfNoItemsExists($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->firstOrFail();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailDoesntThrowExceptionIfMoreThanOneItemExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->firstOrFail());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailReturnsFirstItemInCollectionIfOnlyOneExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->firstOrFail(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->firstOrFail(function ($value) {
+            return $value === 'invalid';
+        });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailDoesntThrowExceptionIfMoreThanOneItemExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'bar']);
+
+        $this->assertSame(
+            'bar',
+            $data->firstOrFail(function ($value) {
+                return $value === 'bar';
+            })
+        );
+    }
     /**
      * @dataProvider collectionClassProvider
      */
