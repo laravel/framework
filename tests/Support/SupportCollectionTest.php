@@ -71,7 +71,22 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleThrowsExceptionIfNoItemsExists($collection)
+    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testSoleThrowsExceptionIfNoItemsExist($collection)
     {
         $this->expectException(ItemNotFoundException::class);
 
@@ -114,7 +129,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    public function testSoleThrowsExceptionIfNoItemsExistWithCallback($collection)
     {
         $this->expectException(ItemNotFoundException::class);
 
@@ -157,7 +172,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testFirstOrFailThrowsExceptionIfNoItemsExists($collection)
+    public function testFirstOrFailThrowsExceptionIfNoItemsExist($collection)
     {
         $this->expectException(ItemNotFoundException::class);
 
@@ -198,22 +213,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
-    {
-        $collection = new $collection([
-            ['name' => 'foo'],
-            ['name' => 'bar'],
-        ]);
-
-        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->sole());
-        $this->assertSame(['name' => 'foo'], $collection->sole('name', '=', 'foo'));
-        $this->assertSame(['name' => 'foo'], $collection->sole('name', 'foo'));
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
-    public function testFirstOrFailThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    public function testFirstOrFailThrowsExceptionIfNoItemsExistWithCallback($collection)
     {
         $this->expectException(ItemNotFoundException::class);
 
