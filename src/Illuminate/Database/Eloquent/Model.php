@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -183,10 +184,10 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return void
      */
-    public function __construct(array $attributes = [])
+    public function __construct($attributes = [])
     {
         $this->bootIfNotBooted();
 
@@ -380,13 +381,17 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\MassAssignmentException
      */
-    public function fill(array $attributes)
+    public function fill($attributes)
     {
+        if ($attributes instanceof ValidatedData){
+            return $this->forceFill($attributes->toArray());
+        }
+
         $totallyGuarded = $this->totallyGuarded();
 
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
@@ -409,13 +414,15 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Fill the model with an array of attributes. Force mass assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return $this
      */
-    public function forceFill(array $attributes)
+    public function forceFill($attributes)
     {
         return static::unguarded(function () use ($attributes) {
-            return $this->fill($attributes);
+            return $this->fill(
+                $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes
+            );
         });
     }
 
@@ -437,7 +444,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Create a new instance of the given model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @param  bool  $exists
      * @return static
      */
@@ -446,7 +453,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static((array) $attributes);
+        $model = new static($attributes);
 
         $model->exists = $exists;
 
@@ -825,11 +832,11 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Update the model in the database.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function update(array $attributes = [], array $options = [])
+    public function update($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;
@@ -841,11 +848,11 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     /**
      * Update the model in the database without raising any events.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @param  array  $options
      * @return bool
      */
-    public function updateQuietly(array $attributes = [], array $options = [])
+    public function updateQuietly($attributes = [], array $options = [])
     {
         if (! $this->exists) {
             return false;

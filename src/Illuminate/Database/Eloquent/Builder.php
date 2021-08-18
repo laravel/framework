@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
@@ -101,10 +102,10 @@ class Builder implements BuilderContract
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function make(array $attributes = [])
+    public function make($attributes = [])
     {
         return $this->newModelInstance($attributes);
     }
@@ -428,49 +429,77 @@ class Builder implements BuilderContract
     /**
      * Get the first record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew($attributes = [], $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
+
+        if (! is_null($instance = $this->where($rawAttributes)->first())) {
             return $instance;
         }
 
-        return $this->newModelInstance(array_merge($attributes, $values));
+        return $this->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );
     }
 
     /**
      * Get the first record matching the attributes or create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function firstOrCreate(array $attributes = [], array $values = [])
+    public function firstOrCreate($attributes = [], $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
+
+        if (! is_null($instance = $this->where($rawAttributes)->first())) {
             return $instance;
         }
 
-        return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
-            $instance->save();
-        });
+        $instance = $this->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );
+
+        $instance->save();
+
+        return $instance;
     }
 
     /**
      * Create or update a record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate($attributes, $values = [])
     {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
+    }
+
+    /**
+     * Determines if the passed attributes are validated data.
+     *
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
+     * @return bool
+     */
+    protected function shouldForceAttributes($attributes, $values)
+    {
+        return $attributes instanceof ValidatedData && $values instanceof ValidatedData ||
+            ($attributes instanceof ValidatedData && empty($values)) ||
+            ($values instanceof ValidatedData && empty($attributes));
     }
 
     /**
@@ -835,11 +864,15 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
+        if ($attributes instanceof ValidatedData){
+            return $this->forceCreate($attributes->toArray());
+        }
+
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
         });
@@ -848,13 +881,15 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreate(array $attributes)
+    public function forceCreate($attributes)
     {
         return $this->model->unguarded(function () use ($attributes) {
-            return $this->newModelInstance()->create($attributes);
+            return $this->newModelInstance()->create(
+                $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes
+            );
         });
     }
 
@@ -1282,14 +1317,36 @@ class Builder implements BuilderContract
     /**
      * Create a new instance of the model being queried.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  bool  $unguard
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function newModelInstance($attributes = [])
+    public function newModelInstance($attributes = [], $unguard = false)
     {
+        if ($unguard) {
+            return $this->newForcedModelInstance($attributes);
+        }
+
         return $this->model->newInstance($attributes)->setConnection(
             $this->query->getConnection()->getName()
         );
+    }
+
+    /**
+     * Create a new instance of the model being queried. Allow mass-assignment.
+     *
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function newForcedModelInstance($attributes = [])
+    {
+        return $this->model->unguarded(function () use ($attributes) {
+            return $this->model->newInstance(
+                $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes
+            )->setConnection(
+                $this->query->getConnection()->getName()
+            );
+        });
     }
 
     /**
