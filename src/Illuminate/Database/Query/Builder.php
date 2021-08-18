@@ -687,6 +687,10 @@ class Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if (func_num_args() === 1 && is_string($column)) {
+            return $this->where($column, true, null, $boolean);
+        }
+
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
@@ -850,6 +854,34 @@ class Builder
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where not" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed|null  $value
+     * @return $this
+     */
+    public function whereNot($column, $value = null)
+    {
+        return func_num_args() === 1 && is_string($column)
+                    ? $this->where($column, false)
+                    : $this->where($column, '<>', $value);
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed|null  $value
+     * @return $this
+     */
+    public function orWhereNot($column, $value = null)
+    {
+        return func_num_args() === 1 && is_string($column)
+                    ? $this->orWhere($column, false)
+                    : $this->orWhere($column, '<>', $value);
     }
 
     /**
@@ -1112,6 +1144,17 @@ class Builder
     public function whereNotNull($columns, $boolean = 'and')
     {
         return $this->whereNull($columns, $boolean, true);
+    }
+
+    /**
+     * Add a "where" clause to the query that ensures a given column's value is true.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function whereTrue($column)
+    {
+        return $this->where($column, true);
     }
 
     /**

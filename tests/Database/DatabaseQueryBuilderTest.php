@@ -3128,6 +3128,27 @@ SQL;
         $this->assertSame('select * from "users" where "foo" is not null', $builder->toSql());
     }
 
+    public function testProvidingJustColumnNameAddsWhereTrueQuery()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo');
+        $this->assertSame('select * from "users" where "foo" = ?', $builder->toSql());
+        $this->assertSame([true], $builder->getBindings());
+    }
+
+    public function testWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot('foo', 'Taylor');
+        $this->assertSame('select * from "users" where "foo" <> ?', $builder->toSql());
+        $this->assertSame(['Taylor'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot('foo');
+        $this->assertSame('select * from "users" where "foo" = ?', $builder->toSql());
+        $this->assertSame([false], $builder->getBindings());
+    }
+
     public function testDynamicWhere()
     {
         $method = 'whereFooBarAndBazOrQux';
