@@ -4127,6 +4127,76 @@ class ValidationValidatorTest extends TestCase
             return is_null($i['foo'][0]['title']);
         });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [['type' => 'url'], ['type' => 'string']]], ['first.0.value' => ['Required'], 'first.1.value' => ['Required']]);
+        $v->sometimes('first.*.value', 'url', function ($i, $item) {
+            return $item->type !== 'url';
+        });
+        $this->assertEquals(['first.0.value' => ['Required'], 'first.1.value' => ['Required', 'url']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [[ 'type' => 'string']]], ['first.0.value' => ['Required']]);
+        $v->sometimes('first.*.value', 'String', function ($i, $item) {
+            return $item->type === 'string';
+        });
+        $this->assertEquals(['first.0.value' => ['Required', 'String']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [['type' => 'string']]], ['first.0.value' => ['Required']]);
+        $v->sometimes('first.*.value', 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.0.value' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [['type' => 'string']]], ['first.0.value' => ['Required']]);
+        $v->sometimes('first.*.value', 'String', function ($i, $item) {
+            return $item->type !== 'email';
+        });
+        $this->assertEquals(['first.0.value' => ['Required', 'String']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [['type' => 'email',], ['type' => null]]], ['first.0.value' => ['Required'], 'first.1.value' => ['Required', 'String']]);
+        $v->sometimes( 'first.*.value', 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.0.value' => ['Required', 'email:rfc,dns'], 'first.1.value' => ['Required', 'String']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [['type' => 'email'],['type' => 'email'],['type' => 'string']]], ['first.2.value' => ['Required']]);
+        $v->sometimes('first.*.value', 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.0.value' => ['email:rfc,dns'], 'first.1.value' => ['email:rfc,dns'], 'first.2.value' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => [[ 'type' => 'email'], ['type' => 'string']]], ['first.0.value' => ['Required'], 'first.1.value' => ['Required']]);
+        $v->sometimes('first.*.value', 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.0.value' => ['Required', 'email:rfc,dns'], 'first.1.value' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => ['second' => [['type' => 'email']]]], ['first.second.0.value' => ['Required'], 'first.second.1.value' => ['Required']]);
+        $v->sometimes('first.second.*.value', 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.second.0.value' => ['Required', 'email:rfc,dns'], 'first.second.1.value' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => ['second' => ['third' => [['type' => 'email'], ['type' => 'string']]]]], ['first.second.third.0.value' => ['Required'], 'first.second.third.1.value' => ['Required']]);
+        $v->sometimes('first.second.third.*.value', 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.second.third.0.value' => ['Required', 'email:rfc,dns'], 'first.second.third.1.value' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => ['second' => ['third' => [['type' => 'email'], ['type' => 'string']]]]], ['first.second.third.0.value' => ['Required'], 'first.second.third.0.email' => ['Required'], 'first.second.third.1.value' => ['Required']]);
+        $v->sometimes(['first.second.third.*.value', 'first.second.third.*.email'], 'email:rfc,dns', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['first.second.third.0.value' => ['Required', 'email:rfc,dns'], 'first.second.third.0.email' => ['Required', 'email:rfc,dns'],'first.second.third.1.value' => ['Required']], $v->getRules());
     }
 
     public function testCustomValidators()

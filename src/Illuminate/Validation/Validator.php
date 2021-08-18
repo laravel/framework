@@ -14,6 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -1103,11 +1104,29 @@ class Validator implements ValidatorContract
      */
     public function sometimes($attribute, $rules, callable $callback)
     {
-        $payload = new Fluent($this->getData());
+        $payload = new Fluent($this->data);
 
-        if ($callback($payload)) {
-            foreach ((array) $attribute as $key) {
-                $this->addRules([$key => $rules]);
+        foreach ((array) $attribute as $attributeEntry) {
+
+            if (Str::contains($attributeEntry, ['*'])) {
+
+                if (Str::endsWith($attributeEntry, '*')) {
+                    throw new InvalidArgumentException("The attribute [{$attributeEntry}] can not end with '*'.");
+                }
+
+                $dataGetTarget = str_replace(strrchr($attributeEntry, "."), '', $attributeEntry);
+
+                foreach ((array)data_get($this->data, $dataGetTarget) as $index => $item) {
+                    if ($callback($payload, new Fluent($item))) {
+                        $response = (new ValidationRuleParser($this->data))->explode([$attributeEntry => $rules]);
+                        $this->addRules([$response->implicitAttributes[$attributeEntry][$index] => $rules]);
+                    }
+                }
+
+            } elseif ($callback($payload)) {
+                foreach ((array)$attributeEntry as $key) {
+                    $this->addRules([$key => $rules]);
+                }
             }
         }
 
