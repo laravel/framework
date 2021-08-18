@@ -1,6 +1,28 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.53.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.54.0...8.x)
+
+
+## [v8.54.0 (2021-08-10)](https://github.com/laravel/framework/compare/v8.53.1...v8.54.0)
+
+### Added
+- Added support for GCM encryption ([#38190](https://github.com/laravel/framework/pull/38190), [827bc1d](https://github.com/laravel/framework/commit/827bc1de8b400fd7cc3edd3391124dc9003f1ddc))
+- Added exception as parameter to the missing() callbacks in `Illuminate/Routing/Middleware/SubstituteBindings.php` ([#38289](https://github.com/laravel/framework/pull/38289))
+- Implement TrustProxies middleware ([#38295](https://github.com/laravel/framework/pull/38295))
+- Added bitwise not operator to `Illuminate/Database/Query/Builder.php` ([#38316](https://github.com/laravel/framework/pull/38316))
+- Adds attempt method to RateLimiter ([#38313](https://github.com/laravel/framework/pull/38313))
+- Added withoutTrashed on Exists rule ([#38314](https://github.com/laravel/framework/pull/38314))
+
+### Changed
+- Wraps column name inside subQuery of hasOneOfMany-relationship ([#38263](https://github.com/laravel/framework/pull/38263))
+- Change Visibility of the Markdown property in Mailable ([#38320](https://github.com/laravel/framework/pull/38320))
+- Swap multiple logical OR for in_array when checking date casting ([#38307](https://github.com/laravel/framework/pull/38307))
+
+### Fixed
+- Fixed out of bounds shift and pop behavior in Collection ([bd89575](https://github.com/laravel/framework/commit/bd89575218afd14cbc12fde4be56607e40aeded9))
+- Fixed schedule timezone when using CarbonImmutable ([#38297](https://github.com/laravel/framework/pull/38297))
+- Fixed isDateCastable for the new immutable_date and immutable_datetime casts ([#38294](https://github.com/laravel/framework/pull/38294))
+- Fixed Factory hasMany method ([#38319](https://github.com/laravel/framework/pull/38319))
 
 
 ## [v8.53.1 (2021-08-05)](https://github.com/laravel/framework/compare/v8.53.0...v8.53.1)
