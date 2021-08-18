@@ -397,7 +397,9 @@ class SqlServerGrammar extends Grammar
         $sql .= 'using (values '.$parameters.') '.$this->wrapTable('laravel_source').' ('.$columns.') ';
 
         $on = collect($uniqueBy)->map(function ($column) use ($query) {
-            return $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column);
+            $srcCol = $this->wrap('laravel_source.'.$column);
+            $targetCol = $this->wrap($query->from.'.'.$column);
+            return '('.$srcCol.' = '.$targetCol.' or ('.$srcCol.' is null and '.$targetCol.' is null))';
         })->implode(' and ');
 
         $sql .= 'on '.$on.' ';
