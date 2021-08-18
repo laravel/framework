@@ -1093,7 +1093,7 @@ class LazyCollection implements Enumerable
         return $this
             ->when($filter)
             ->filter($filter)
-            ->take(2)
+            ->take(1)
             ->collect()
             ->firstOrFail();
     }
