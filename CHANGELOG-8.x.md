@@ -1,6 +1,31 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.52.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.53.0...8.x)
+
+
+## [v8.53.0 (2021-08-03)](https://github.com/laravel/framework/compare/v8.52.0...v8.53.0)
+
+### Added
+- Added cache_locks table to cache stub ([#38152](https://github.com/laravel/framework/pull/38152))
+- Added queue:monitor command ([#38168](https://github.com/laravel/framework/pull/38168))
+- Added twiceDailyAt schedule frequency ([#38174](https://github.com/laravel/framework/pull/38174))
+- Added immutable date and datetime casting ([#38199](https://github.com/laravel/framework/pull/38199))
+- Allow the php web server to run multiple workers ([#38208](https://github.com/laravel/framework/pull/38208))
+- Added accepted_if validation rule ([#38210](https://github.com/laravel/framework/pull/38210))
+
+### Fixed
+- Fixed signed routes with expires parameter ([#38111](https://github.com/laravel/framework/pull/38111), [732c0e0](https://github.com/laravel/framework/commit/732c0e0f64b222e7fc7daef6553f8e99007bb32c))
+- Remove call to deleted method in `Illuminate/Testing/TestResponse::statusMessageWithException()` ([cde3662](https://github.com/laravel/framework/commit/cde36626376e014390713ab03a01eb4dfe6488ce))
+- Fixed previous column for cursor pagination ([#38203](https://github.com/laravel/framework/pull/38203))
+
+### Changed
+- Prevent assertStatus() invalid JSON exception for valid JSON response content ([#38192](https://github.com/laravel/framework/pull/38192))
+- Bump AWS SDK to `^3.186.4` ([#38216](https://github.com/laravel/framework/pull/38216))
+- Implement `ReturnTypeWillChange` for some place ([#38221](https://github.com/laravel/framework/pull/38221), [#38212](https://github.com/laravel/framework/pull/38212), [#38226](https://github.com/laravel/framework/pull/38226))
+- Use actual countable interface on MessageBag ([#38227](https://github.com/laravel/framework/pull/38227))
+
+### Refactoring
+- Remove hardcoded Carbon reference from scheduler event ([#38063](https://github.com/laravel/framework/pull/38063))
 
 
 ## [v8.52.0 (2021-07-27)](https://github.com/laravel/framework/compare/v8.51.0...v8.52.0)
