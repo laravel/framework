@@ -22,10 +22,12 @@ class InteractsWithViewsTest extends TestCase
         $exampleComponent = new class extends Component
         {
             public $foo = 'bar';
+
             public function speak()
             {
                 return 'hello';
             }
+
             public function render()
             {
                 return 'rendered content';
