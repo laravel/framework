@@ -74,7 +74,7 @@ class Str
      */
     public static function afterLast($subject, $search)
     {
-        if ($search === '') {
+        if ((string) $search === '') {
             return $subject;
         }
 
@@ -108,7 +108,7 @@ class Str
      */
     public static function before($subject, $search)
     {
-        if ($search === '') {
+        if ((string) $search === '') {
             return $subject;
         }
 
@@ -126,7 +126,7 @@ class Str
      */
     public static function beforeLast($subject, $search)
     {
-        if ($search === '') {
+        if ((string) $search === '') {
             return $subject;
         }
 
@@ -149,7 +149,7 @@ class Str
      */
     public static function between($subject, $from, $to)
     {
-        if ($from === '' || $to === '') {
+        if ((string) $from === '' || (string) $to === '') {
             return $subject;
         }
 
@@ -586,7 +586,7 @@ class Str
      */
     public static function replaceFirst($search, $replace, $subject)
     {
-        if ($search === '') {
+        if ((string) $search === '') {
             return $subject;
         }
 
@@ -609,7 +609,7 @@ class Str
      */
     public static function replaceLast($search, $replace, $subject)
     {
-        if ($search === '') {
+        if ((string) $search === '') {
             return $subject;
         }
 
