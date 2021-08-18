@@ -54,9 +54,10 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $pos = strrpos($header, 'Bearer');
-        if ($pos !== false) {
-            $header = substr($header, $pos + 7);
+        $position = strrpos($header, 'Bearer');
+
+        if ($position !== false) {
+            $header = substr($header, $position + 7);
 
             return str_contains($header, ',') ? strstr(',', $header, true) : $header;
         }
