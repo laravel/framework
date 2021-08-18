@@ -52,7 +52,7 @@ trait InteractsWithViews
      *
      * @param  string  $componentClass
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @return \Illuminate\Testing\TestView
+     * @return \Illuminate\Testing\TestComponent
      */
     protected function component(string $componentClass, array $data = [])
     {
