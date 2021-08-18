@@ -4,7 +4,6 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
@@ -58,7 +57,8 @@ trait InteractsWithInput
         $pos = strrpos($header, 'Bearer');
         if ($pos !== false) {
             $header = substr($header, $pos + 7);
-            return str_contains($header, ',') ? strstr(',',$header, true) : $header;
+            
+            return str_contains($header, ',') ? strstr(',', $header, true) : $header;
         }
     }
 
