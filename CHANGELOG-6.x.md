@@ -1,6 +1,15 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.30...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.31...6.x)
+
+
+## [v6.20.31 (2021-08-03)](https://github.com/laravel/framework/compare/v6.20.30...v6.20.31)
+ 
+### Fixed
+- Fixed signed routes with expires parameter ([#38111](https://github.com/laravel/framework/pull/38111), [732c0e0](https://github.com/laravel/framework/commit/732c0e0f64b222e7fc7daef6553f8e99007bb32c))
+
+### Refactoring
+- Remove hardcoded Carbon reference from scheduler event ([#38063](https://github.com/laravel/framework/pull/38063))
 
 
 ## [v6.20.30 (2021-07-02)](https://github.com/laravel/framework/compare/v6.20.29...v6.20.30)
