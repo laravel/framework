@@ -1,6 +1,18 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.53.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.53.1...8.x)
+
+
+## [v8.53.1 (2021-08-05)](https://github.com/laravel/framework/compare/v8.53.0...v8.53.1)
+
+### Added
+- Added placeholders replace for accepted_if validation message ([#38240](https://github.com/laravel/framework/pull/38240))
+
+### Fixed
+- Use type hints in cast.stub to match interface ([#38234](https://github.com/laravel/framework/pull/38234))
+- Some PHP 8.1 fixes ([#38245](https://github.com/laravel/framework/pull/38245))
+- Fixed aliasing with cursor pagination ([#38251](https://github.com/laravel/framework/pull/38251))
+- Fixed signed routes ([#38249](https://github.com/laravel/framework/pull/38249))
 
 
 ## [v8.53.0 (2021-08-03)](https://github.com/laravel/framework/compare/v8.52.0...v8.53.0)
