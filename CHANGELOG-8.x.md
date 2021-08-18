@@ -1,6 +1,36 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.54.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.55.0...8.x)
+
+
+## [v8.55.0 (2021-08-17)](https://github.com/laravel/framework/compare/v8.54.0...v8.55.0)
+
+### Added
+- Added stringable support for isUuid ([#38330](https://github.com/laravel/framework/pull/38330))
+- Allow for closure reflection on all MailFake assertions ([#38328](https://github.com/laravel/framework/pull/38328))
+- Added `Illuminate/Support/Testing/Fakes/MailFake::assertNothingOutgoing()` ([363af47](https://github.com/laravel/framework/commit/363af4793bfac97f2d846f5fa6bb985ce6a5642e))
+- Added `Illuminate/Support/Testing/Fakes/MailFake::assertNotOutgoing()` ([a3658c9](https://github.com/laravel/framework/commit/a3658c93695b79b3f9a8fc72c04c6d928dcc51a9))
+- Added Support withTrashed on routes ([#38348](https://github.com/laravel/framework/pull/38348))
+- Added Failover Swift Transport driver ([#38344](https://github.com/laravel/framework/pull/38344))
+- Added Conditional rules ([#38361](https://github.com/laravel/framework/pull/38361))
+- Added assertRedirectToSignedRoute() method for testing responses ([#38349](https://github.com/laravel/framework/pull/38349))
+- Added Validated subsets ([#38366](https://github.com/laravel/framework/pull/38366))
+- Share handler instead of client between requests in pool to ensure ResponseReceived events are dispatched in async HTTP Request ([#38380](https://github.com/laravel/framework/pull/38380))
+- Support union types on event discovery ([#38383](https://github.com/laravel/framework/pull/38383))
+- Added Assert invalid in testResponse ([#38384](https://github.com/laravel/framework/pull/38384))
+- Add qualifyColumns method to Model class ([#38403](https://github.com/laravel/framework/pull/38403))
+- Added ability to throw a custom validation exception ([#38406](https://github.com/laravel/framework/pull/38406))
+- Support shorter subscription syntax ([#38408](https://github.com/laravel/framework/pull/38408))
+
+### Fixed
+- Handle exceptions in batch callbacks ([#38327](https://github.com/laravel/framework/pull/38327))
+- Bump AWS PHP SDK ([#38297](https://github.com/laravel/framework/pull/38297))
+- Fixed firstOrCreate and firstOrNew should merge attributes correctly ([#38346](https://github.com/laravel/framework/pull/38346))
+- Check for incomplete class to prevent unexpected error when class cannot be loaded in retry command ([#38379](https://github.com/laravel/framework/pull/38379))
+
+### Changed
+- Update the ParallelRunner to allow for a custom Runner to be resolved ([#38374](https://github.com/laravel/framework/pull/38374))
+- Use Fluent instead of array on Rule::when() ([#38397](https://github.com/laravel/framework/pull/38397))
 
 
 ## [v8.54.0 (2021-08-10)](https://github.com/laravel/framework/compare/v8.53.1...v8.54.0)
