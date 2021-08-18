@@ -3,7 +3,6 @@
 namespace Illuminate\View\Compilers;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -306,13 +305,9 @@ class ComponentTagCompiler
      */
     public function guessClassName(string $component)
     {
-        $namespace = Container::getInstance()
-                    ->make(Application::class)
-                    ->getNamespace();
-
         $class = $this->formatClassName($component);
 
-        return $namespace.'View\\Components\\'.$class;
+        return $this->blade->guessesComponentsInNamespace().$class;
     }
 
     /**

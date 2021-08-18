@@ -132,7 +132,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\View\Components';
+        return rtrim($this->laravel->make('blade.compiler')->guessesComponentsInNamespace(), "\\");
     }
 
     /**

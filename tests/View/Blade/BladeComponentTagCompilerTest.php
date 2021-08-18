@@ -157,6 +157,23 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         Container::setInstance(null);
     }
 
+    public function testClassNamesCanBeGuessedWithCustomNamespaces()
+    {
+        $this->compiler->guessComponentsInNamespace('App\\Http\\View\\Components');
+
+        $compiler = (new ComponentTagCompiler([], [], $this->compiler));
+
+        $result = $compiler->guessClassName('alert');
+
+        $this->assertSame("App\Http\View\Components\Alert", trim($result));
+
+        $result = $compiler->guessClassName('base.alert');
+
+        $this->assertSame("App\Http\View\Components\Base\Alert", trim($result));
+
+        $this->compiler->guessComponentsInNamespace(null);
+    }
+
     public function testComponentsCanBeCompiledWithHyphenAttributes()
     {
         $this->mockViewFactory();

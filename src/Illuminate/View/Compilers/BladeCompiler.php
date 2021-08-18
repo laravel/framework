@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -136,6 +138,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var bool
      */
     protected $compilesComponentTags = true;
+
+    /**
+     * The namespace from which the components should be guessed.
+     *
+     * @var string
+     */
+    protected $guessComponentsInNamespace;
 
     /**
      * Compile the view at the given path.
@@ -626,6 +635,34 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getClassComponentNamespaces()
     {
         return $this->classComponentNamespaces;
+    }
+
+    /**
+     * Set the namespace from which the components should be guessed.
+     *
+     * @param  string  $namespace
+     */
+    public function guessComponentsInNamespace($namespace)
+    {
+        $this->guessComponentsInNamespace = $namespace;
+    }
+
+    /**
+     * Get the namespace from which the components should be guessed.
+     *
+     * @return string
+     */
+    public function guessesComponentsInNamespace()
+    {
+        if (! $this->guessComponentsInNamespace) {
+            $namespace = Container::getInstance()
+                ->make(Application::class)
+                ->getNamespace();
+
+            $this->guessComponentsInNamespace = $namespace.'View\\Components';
+        }
+
+        return Str::finish($this->guessComponentsInNamespace, '\\');
     }
 
     /**
