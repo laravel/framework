@@ -1333,6 +1333,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid name.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateName($attribute, $value) 
+    {
+        return is_string($value) && preg_match('/^(?=.*(\pL|\pM))[\pL\pM\s]+$/u', $value);
+    }
+
+    /**
      * "Indicate" validation should pass if value is null.
      *
      * Always returns true, just lets us put "nullable" in rules.
