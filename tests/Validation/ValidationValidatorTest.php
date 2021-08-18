@@ -4157,7 +4157,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['first.0.value' => ['Required', 'String']], $v->getRules());
 
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['first' => [['type' => 'email',], ['type' => null]]], ['first.0.value' => ['Required'], 'first.1.value' => ['Required', 'String']]);
+        $v = new Validator($trans, ['first' => [['type' => 'email'], ['type' => null]]], ['first.0.value' => ['Required'], 'first.1.value' => ['Required', 'String']]);
         $v->sometimes( 'first.*.value', 'email:rfc,dns', function ($i, $item) {
             return $item->type === 'email';
         });
