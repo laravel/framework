@@ -135,6 +135,14 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * @return $this
+     */
+    public function assertNotAllowed()
+    {
+        return $this->assertStatus(405);
+    }
+
+    /**
      * Assert that the response has a forbidden status code.
      *
      * @return $this

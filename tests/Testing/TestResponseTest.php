@@ -440,6 +440,21 @@ class TestResponseTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function testAssertNotAllowed()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Expected response status code');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertNotAllowed();
+    }
+
     public function testAssertForbidden()
     {
         $statusCode = 500;
