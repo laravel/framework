@@ -21,16 +21,25 @@ class ConditionalRules
     protected $rules;
 
     /**
+     * The rules to be added to the attribute if the condition fails.
+     *
+     * @var array|string
+     */
+    protected $default;
+
+    /**
      * Create a new conditional rules instance.
      *
      * @param  callable|bool  $condition
      * @param  array|string  $rules
+     * @param  array|string  $default
      * @return void
      */
-    public function __construct($condition, $rules)
+    public function __construct($condition, $rules, $default = [])
     {
         $this->condition = $condition;
         $this->rules = $rules;
+        $this->default = $default;
     }
 
     /**
@@ -54,5 +63,15 @@ class ConditionalRules
     public function rules()
     {
         return is_string($this->rules) ? explode('|', $this->rules) : $this->rules;
+    }
+
+    /**
+     * Get the default rules.
+     *
+     * @return array
+     */
+    public function default()
+    {
+        return is_string($this->default) ? explode('|', $this->default) : $this->default;
     }
 }

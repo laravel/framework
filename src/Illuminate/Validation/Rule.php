@@ -20,11 +20,12 @@ class Rule
      *
      * @param  callable|bool  $condition
      * @param  array|string  $rules
+     * @param  array|string  $default
      * @return \Illuminate\Validation\ConditionalRules
      */
-    public static function when($condition, $rules)
+    public static function when($condition, $rules, $default = [])
     {
-        return new ConditionalRules($condition, $rules);
+        return new ConditionalRules($condition, $rules, $default);
     }
 
     /**
