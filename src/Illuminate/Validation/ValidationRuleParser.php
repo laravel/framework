@@ -293,7 +293,7 @@ class ValidationRuleParser
             if ($attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules->passes($data)
                                 ? $attributeRules->rules()
-                                : $attributeRules->defaultRules()];
+                                : $attributeRules->defaultRules(), ];
             }
 
             return [$attribute => collect($attributeRules)->map(function ($rule) use ($data) {
