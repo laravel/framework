@@ -1090,7 +1090,7 @@ EOF;
      * @param  string  $responseKey
      * @return $this
      */
-    public function assertInvalid($errors,
+    public function assertInvalid($errors = null,
                                   $errorBag = 'default',
                                   $responseKey = 'errors')
     {
@@ -1109,7 +1109,7 @@ EOF;
                         PHP_EOL.PHP_EOL.json_encode($sessionErrors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).PHP_EOL
                 : 'Response does not have validation errors in the session.';
 
-        foreach ($errors as $key => $value) {
+        foreach (Arr::wrap($errors) as $key => $value) {
             PHPUnit::assertArrayHasKey(
                 (is_int($key)) ? $value : $key,
                 $sessionErrors,

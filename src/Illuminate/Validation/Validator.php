@@ -15,6 +15,7 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ValidatedInput;
+use InvalidArgumentException;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -276,6 +277,13 @@ class Validator implements ValidatorContract
     protected $dotPlaceholder;
 
     /**
+     * The exception to throw upon failure.
+     *
+     * @var string
+     */
+    protected $exception = ValidationException::class;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -475,9 +483,7 @@ class Validator implements ValidatorContract
      */
     public function validate()
     {
-        if ($this->fails()) {
-            throw new ValidationException($this);
-        }
+        throw_if($this->fails(), $this->exception, $this);
 
         return $this->validated();
     }
@@ -520,9 +526,7 @@ class Validator implements ValidatorContract
      */
     public function validated()
     {
-        if ($this->invalid()) {
-            throw new ValidationException($this);
-        }
+        throw_if($this->invalid(), $this->exception, $this);
 
         $results = [];
 
@@ -1373,6 +1377,27 @@ class Validator implements ValidatorContract
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
     {
         $this->presenceVerifier = $presenceVerifier;
+    }
+
+    /**
+     * Set the exception to throw upon failed validation.
+     *
+     * @param  string  $exception
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setException($exception)
+    {
+        if (! is_a($exception, ValidationException::class, true)) {
+            throw new InvalidArgumentException(
+                sprintf('Exception [%s] is invalid. It must extend [%s].', $exception, ValidationException::class)
+            );
+        }
+
+        $this->exception = $exception;
+
+        return $this;
     }
 
     /**

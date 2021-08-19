@@ -196,6 +196,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('stub.column', $builder->qualifyColumn('column'));
     }
 
+    public function testQualifyColumns()
+    {
+        $builder = new Builder(m::mock(BaseBuilder::class));
+        $builder->shouldReceive('from')->with('stub');
+
+        $builder->setModel(new EloquentModelStub);
+
+        $this->assertEquals(['stub.column', 'stub.name'], $builder->qualifyColumns(['column', 'name']));
+    }
+
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
         $builder = m::mock(Builder::class.'[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);

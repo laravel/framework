@@ -2883,6 +2883,29 @@ class DatabaseQueryBuilderTest extends TestCase
         ]);
     }
 
+    public function testMySqlUpdateWrappingJsonPathArrayIndex()
+    {
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+                    ->method('update')
+                    ->with(
+                        'update `users` set `options` = json_set(`options`, \'$[1]."2fa"\', false), `meta` = json_set(`meta`, \'$."tags"[0][2]\', ?) where `active` = ?',
+                        [
+                            'large',
+                            1,
+                        ]
+                    );
+
+        $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('active', 1)->update([
+            'options->[1]->2fa' => false,
+            'meta->tags[0][2]' => 'large',
+        ]);
+    }
+
     public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()
     {
         $grammar = new MySqlGrammar;

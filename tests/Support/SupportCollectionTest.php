@@ -7,13 +7,13 @@ use ArrayIterator;
 use ArrayObject;
 use CachingIterator;
 use Exception;
-use Illuminate\Collections\ItemNotFoundException;
-use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\MultipleItemsFoundException;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -86,7 +86,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleThrowsExceptionIfNoItemsExists($collection)
+    public function testSoleThrowsExceptionIfNoItemsExist($collection)
     {
         $this->expectException(ItemNotFoundException::class);
 
@@ -129,7 +129,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testSoleThrowsExceptionIfNoItemsExistsWithCallback($collection)
+    public function testSoleThrowsExceptionIfNoItemsExistWithCallback($collection)
     {
         $this->expectException(ItemNotFoundException::class);
 
@@ -152,6 +152,91 @@ class SupportCollectionTest extends TestCase
         $data->sole(function ($value) {
             return $value === 'bar';
         });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailReturnsFirstItemInCollection($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->firstOrFail());
+        $this->assertSame(['name' => 'foo'], $collection->firstOrFail('name', '=', 'foo'));
+        $this->assertSame(['name' => 'foo'], $collection->firstOrFail('name', 'foo'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailThrowsExceptionIfNoItemsExist($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $collection->where('name', 'INVALID')->firstOrFail();
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailDoesntThrowExceptionIfMoreThanOneItemExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->where('name', 'foo')->firstOrFail());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailReturnsFirstItemInCollectionIfOnlyOneExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->firstOrFail(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailThrowsExceptionIfNoItemsExistWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->firstOrFail(function ($value) {
+            return $value === 'invalid';
+        });
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailDoesntThrowExceptionIfMoreThanOneItemExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'bar']);
+
+        $this->assertSame(
+            'bar',
+            $data->firstOrFail(function ($value) {
+                return $value === 'bar';
+            })
+        );
     }
 
     /**
