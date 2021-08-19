@@ -1106,14 +1106,11 @@ class Validator implements ValidatorContract
         $payload = new Fluent($this->data);
 
         foreach ((array) $attribute as $key) {
-
             if (Str::contains($key, ['*'])) {
+                $dataGetTarget = str_replace(strrchr($key, '.'), '', $key);
 
-                $dataGetTarget = str_replace(strrchr($key, "."), '', $key);
-
-                foreach ((array)data_get($this->data, $dataGetTarget) as $index => $item) {
+                foreach ((array) data_get($this->data, $dataGetTarget) as $index => $item) {
                     if ($callback($payload, new Fluent($item))) {
-
                         $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
                         // If the $attribute given to the sometimes() method ends with a wildcard,
