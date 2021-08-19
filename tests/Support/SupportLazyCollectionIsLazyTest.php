@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Collections\ItemNotFoundException;
 use Illuminate\Collections\MultipleItemsFoundException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
 use stdClass;
