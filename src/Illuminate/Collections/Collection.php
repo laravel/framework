@@ -4,8 +4,6 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
-use Illuminate\Collections\ItemNotFoundException;
-use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -1110,8 +1108,8 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws \Illuminate\Collections\ItemNotFoundException
-     * @throws \Illuminate\Collections\MultipleItemsFoundException
+     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\MultipleItemsFoundException
      */
     public function sole($key = null, $operator = null, $value = null)
     {

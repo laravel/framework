@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Testing\TestComponent;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
 
@@ -51,7 +52,7 @@ trait InteractsWithViews
      *
      * @param  string  $componentClass
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @return \Illuminate\Testing\TestView
+     * @return \Illuminate\Testing\TestComponent
      */
     protected function component(string $componentClass, array $data = [])
     {
@@ -59,9 +60,11 @@ trait InteractsWithViews
 
         $view = value($component->resolveView(), $data);
 
-        return $view instanceof View
-                ? new TestView($view->with($component->data()))
-                : new TestView(view($view, $component->data()));
+        $view = $view instanceof View
+            ? $view->with($component->data())
+            : view($view, $component->data());
+
+        return new TestComponent($component, $view);
     }
 
     /**
