@@ -1217,9 +1217,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelStub::class, $relation->getMorphClass());
     }
 
-    public function testMorphOneCreatesProperRelationWhenUsingBasenames()
+    public function testMorphOneCreatesProperRelationWhenUsingTableNames()
     {
-        Relation::useTableNamesForMorphMap();
+        Relation::morphUsingTableNames();
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->morphOne(EloquentModelSaveStub::class, 'morph');
