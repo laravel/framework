@@ -50,8 +50,7 @@ class ImplicitRouteBinding
                 if ($route->allowsWithTrashedBindings()) {
                     $childRouteBindingMethod = 'resolveWithTrashedChildRouteBinding';
                 }
-                if ($route->allowsOnlyTrashedBindings())
-                {
+                if ($route->allowsOnlyTrashedBindings()) {
                     $childRouteBindingMethod = 'resolveOnlyTrashedChildRouteBinding';
                 }
 
