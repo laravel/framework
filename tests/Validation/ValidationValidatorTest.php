@@ -4197,6 +4197,13 @@ class ValidationValidatorTest extends TestCase
             return $item->type === 'email';
         });
         $this->assertEquals(['first.second.third.0.value' => ['Required', 'email:rfc,dns'], 'first.second.third.0.email' => ['Required', 'email:rfc,dns'],'first.second.third.1.value' => ['Required']], $v->getRules());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['first' => ['second' => ['third' => [['type' => 'email'], ['type' => 'string']]]]], ['first.second.third' => ['Required'], 'first.second.third.0.value' => ['Required'], 'first.second.third.0.email' => ['Required'], 'first.second.third.1.value' => ['Required']]);
+        $v->sometimes(['first.second.*'], 'Array', function ($i) {
+            return true;
+        });
+        $this->assertEquals(['first.second.third' => ['Required', 'Array'], 'first.second.third.0.value' => ['Required'], 'first.second.third.0.email' => ['Required'], 'first.second.third.1.value' => ['Required']], $v->getRules());
     }
 
     public function testCustomValidators()

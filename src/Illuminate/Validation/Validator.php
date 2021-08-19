@@ -1106,27 +1106,21 @@ class Validator implements ValidatorContract
     {
         $payload = new Fluent($this->data);
 
-        foreach ((array) $attribute as $attributeEntry) {
+        foreach ((array) $attribute as $key) {
 
-            if (Str::contains($attributeEntry, ['*'])) {
+            if (Str::contains($key, ['*']) && !Str::endsWith($key, '*')) {
 
-                if (Str::endsWith($attributeEntry, '*')) {
-                    throw new InvalidArgumentException("The attribute [{$attributeEntry}] can not end with '*'.");
-                }
-
-                $dataGetTarget = str_replace(strrchr($attributeEntry, "."), '', $attributeEntry);
+                $dataGetTarget = str_replace(strrchr($key, "."), '', $key);
 
                 foreach ((array)data_get($this->data, $dataGetTarget) as $index => $item) {
                     if ($callback($payload, new Fluent($item))) {
-                        $response = (new ValidationRuleParser($this->data))->explode([$attributeEntry => $rules]);
-                        $this->addRules([$response->implicitAttributes[$attributeEntry][$index] => $rules]);
+                        $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
+                        $this->addRules([$response->implicitAttributes[$key][$index] => $rules]);
                     }
                 }
 
             } elseif ($callback($payload)) {
-                foreach ((array)$attributeEntry as $key) {
-                    $this->addRules([$key => $rules]);
-                }
+                $this->addRules([$key => $rules]);
             }
         }
 
