@@ -9,7 +9,7 @@ class RouteUri
      *
      * @var array
      */
-    public static $typeExpressions = [
+    protected static $typeExpressions = [
         'int' => '[0-9]+',
         'alpha' => '[a-zA-Z]+',
         'alnum' => '[a-zA-Z0-9]+',
@@ -60,8 +60,6 @@ class RouteUri
     public static function parse($uri)
     {
         $pattern = '/{(?:'.static::typesPattern().'\s+)?(\w+)(?::(\w+))?(\??)}/';
-
-        preg_match_all($pattern, $uri, $matches);
 
         $bindingFields = [];
         $wheres = [];
