@@ -79,6 +79,19 @@ class RateLimiter
             $this->hit($key, $decaySeconds);
         });
     }
+    
+    /**
+     * Attempt once to execute a callback if it's not limited.
+     *
+     * @param  string  $key
+     * @param  \Closure  $callback
+     * @param  int  $decaySeconds
+     * @return mixed
+     */
+    public function attemptOnce($key, Closure $callback, $decaySeconds = 60)
+    {
+        return $this->attempt($key, 1, $callback, $decaySeconds);
+    }
 
     /**
      * Determine if the given key has been "accessed" too many times.
