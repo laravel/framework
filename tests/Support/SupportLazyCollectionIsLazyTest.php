@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Collections\ItemNotFoundException;
 use Illuminate\Collections\MultipleItemsFoundException;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
