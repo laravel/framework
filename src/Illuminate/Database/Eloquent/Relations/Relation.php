@@ -51,11 +51,11 @@ abstract class Relation
     protected static $constraints = true;
 
     /**
-     * Indicates that class basenames should be used when determining morph classes.
+     * Indicates that model table names should be used when determining morph classes.
      *
      * @var bool
      */
-    public static $useClassBasenamesForMorphMap = false;
+    public static $useTableNamesForMorphMap = false;
 
     /**
      * An array to map class names to their morph names in the database.
@@ -388,9 +388,9 @@ abstract class Relation
      *
      * @return void
      */
-    public static function useClassBasenamesForMorphMap()
+    public static function useTableNamesForMorphMap()
     {
-        static::$useClassBasenamesForMorphMap = true;
+        static::$useTableNamesForMorphMap = true;
     }
 
     /**
