@@ -569,11 +569,12 @@ class Route
     /**
      * Allow "trashed" models to be retrieved when resolving implicit model bindings for this route.
      *
+     * @param  bool  $withTrashed
      * @return $this
      */
-    public function withTrashed()
+    public function withTrashed($withTrashed = true)
     {
-        $this->withTrashedBindings = true;
+        $this->withTrashedBindings = $withTrashed;
 
         return $this;
     }

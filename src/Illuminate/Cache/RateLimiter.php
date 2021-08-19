@@ -153,11 +153,23 @@ class RateLimiter
      * @param  int  $maxAttempts
      * @return int
      */
-    public function retriesLeft($key, $maxAttempts)
+    public function remaining($key, $maxAttempts)
     {
         $attempts = $this->attempts($key);
 
         return $maxAttempts - $attempts;
+    }
+
+    /**
+     * Get the number of retries left for the given key.
+     *
+     * @param  string  $key
+     * @param  int  $maxAttempts
+     * @return int
+     */
+    public function retriesLeft($key, $maxAttempts)
+    {
+        return $this->remaining($key, $maxAttempts);
     }
 
     /**

@@ -627,6 +627,34 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('english is required!', $v->messages()->first('lang.en'));
     }
 
+    public function testCustomException()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['name' => ''], ['name' => 'required']);
+
+        $exception = new class($v) extends ValidationException {};
+        $v->setException($exception);
+
+        try {
+            $v->validate();
+        } catch (ValidationException $e) {
+            $this->assertSame($exception, $e);
+        }
+    }
+
+    public function testCustomExceptionMustExtendValidationException()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [], []);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
+
+        $v->setException(\RuntimeException::class);
+    }
+
     public function testValidationDotCustomDotAnythingCanBeTranslated()
     {
         $trans = $this->getIlluminateArrayTranslator();

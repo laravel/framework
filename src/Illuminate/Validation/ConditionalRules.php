@@ -16,7 +16,7 @@ class ConditionalRules
     /**
      * The rules to be added to the attribute.
      *
-     * @var array
+     * @var array|string
      */
     protected $rules;
 

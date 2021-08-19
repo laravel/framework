@@ -182,7 +182,13 @@ class Dispatcher implements DispatcherContract
 
         if (is_array($events)) {
             foreach ($events as $event => $listeners) {
-                foreach ($listeners as $listener) {
+                foreach (Arr::wrap($listeners) as $listener) {
+                    if (is_string($listener) && method_exists($subscriber, $listener)) {
+                        $this->listen($event, [get_class($subscriber), $listener]);
+
+                        continue;
+                    }
+
                     $this->listen($event, $listener);
                 }
             }
