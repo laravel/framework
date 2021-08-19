@@ -5,6 +5,18 @@ namespace Illuminate\Routing;
 class RouteUri
 {
     /**
+     * Registered field types and their associated regular expressions.
+     *
+     * @var array
+     */
+    public static $typeExpressions = [
+        'int' => '[0-9]+',
+        'alpha' => '[a-zA-Z]+',
+        'alnum' => '[a-zA-Z0-9]+',
+        'uuid' => '[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}',
+    ];
+
+    /**
      * The route URI.
      *
      * @var string
@@ -19,16 +31,24 @@ class RouteUri
     public $bindingFields = [];
 
     /**
+     * The regular expression requirements.
+     *
+     * @var array
+     */
+    public $wheres = [];
+
+    /**
      * Create a new route URI instance.
      *
      * @param  string  $uri
      * @param  array  $bindingFields
      * @return void
      */
-    public function __construct(string $uri, array $bindingFields = [])
+    public function __construct(string $uri, array $bindingFields = [], array $wheres = [])
     {
         $this->uri = $uri;
         $this->bindingFields = $bindingFields;
+        $this->wheres = $wheres;
     }
 
     /**
@@ -39,24 +59,72 @@ class RouteUri
      */
     public static function parse($uri)
     {
-        preg_match_all('/\{([\w\:]+?)\??\}/', $uri, $matches);
+        $pattern = '/{(?:'.static::typesPattern().'\s+)?(\w+)(?::(\w+))?(\??)}/';
+
+        preg_match_all($pattern, $uri, $matches);
 
         $bindingFields = [];
+        $wheres = [];
 
-        foreach ($matches[0] as $match) {
-            if (strpos($match, ':') === false) {
-                continue;
+        $uri = preg_replace_callback($pattern, function($match) use (&$bindingFields, &$wheres) {
+            [$_, $type, $parameter, $field, $optional] = $match;
+
+            if ('' !== $type) {
+                $wheres[$parameter] = static::$typeExpressions[$type];
             }
 
-            $segments = explode(':', trim($match, '{}?'));
+            if ('' !== $field) {
+                $bindingFields[$parameter] = $field;
+            }
 
-            $bindingFields[$segments[0]] = $segments[1];
+            return '{'.$parameter.$optional.'}';
+        }, $uri);
 
-            $uri = strpos($match, '?') !== false
-                    ? str_replace($match, '{'.$segments[0].'?}', $uri)
-                    : str_replace($match, '{'.$segments[0].'}', $uri);
+        return new static($uri, $bindingFields, $wheres);
+    }
+
+    /**
+     * Add a named type and its associated regular expression.
+     *
+     * @param  string  $name
+     * @param  string  $expression
+     * @return void
+     */
+    public static function addType($name, $expression)
+    {
+        static::$typeExpressions[$name] = $expression;
+    }
+
+    /**
+     * Get the regular expression for a named type.
+     *
+     * @param  string  $name
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function getExpressionForType($name)
+    {
+        if (isset(static::$typeExpressions[$name])) {
+            return static::$typeExpressions[$name];
         }
 
-        return new static($uri, $bindingFields);
+        throw new \InvalidArgumentException("No expression for type '$name' has been registered.");
+    }
+
+    /**
+     * Compile all the named types into a regular expression pattern.
+     *
+     * @param  string  $delimiter
+     * @return string
+     */
+    protected static function typesPattern($delimiter = '/')
+    {
+        $quote = function ($type) use ($delimiter) {
+            return preg_quote($type, $delimiter);
+        };
+
+        $types = array_map($quote, array_keys(static::$typeExpressions));
+
+        return '('.implode('|', $types).')';
     }
 }

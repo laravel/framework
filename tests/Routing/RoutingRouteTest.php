@@ -839,6 +839,32 @@ class RoutingRouteTest extends TestCase
         $this->assertFalse($route->matches($request));
     }
 
+    public function testTypedParametersProperlyFilter()
+    {
+        $route = new Route('GET', 'foo/{int bar}', null);
+        $this->assertTrue($route->matches(Request::create('foo/123')));
+        $this->assertFalse($route->matches(Request::create('foo/abc')));
+        $this->assertFalse($route->matches(Request::create('foo/123abc')));
+
+        $route = new Route('GET', 'foo/{alpha bar}', null);
+        $this->assertTrue($route->matches(Request::create('foo/abc')));
+        $this->assertFalse($route->matches(Request::create('foo/123')));
+        $this->assertFalse($route->matches(Request::create('foo/123abc')));
+
+        $route = new Route('GET', 'foo/{alnum bar}', null);
+        $this->assertTrue($route->matches(Request::create('foo/abc')));
+        $this->assertTrue($route->matches(Request::create('foo/123')));
+        $this->assertTrue($route->matches(Request::create('foo/123abc')));
+        $this->assertFalse($route->matches(Request::create('foo/+++')));
+
+        $route = new Route('GET', 'foo/{uuid bar}', null);
+        $this->assertTrue($route->matches(Request::create('foo/'.Str::uuid())));
+        $this->assertFalse($route->matches(Request::create('foo/abc')));
+        $this->assertFalse($route->matches(Request::create('foo/123')));
+        $this->assertFalse($route->matches(Request::create('foo/123abc')));
+        $this->assertFalse($route->matches(Request::create('foo/+++')));
+    }
+
     public function testRoutePrefixParameterParsing()
     {
         $route = new Route('GET', '/foo', ['prefix' => 'profiles/{user:username}/portfolios', 'uses' => function () {

@@ -833,6 +833,7 @@ class Route
 
         return tap(RouteUri::parse($uri), function ($uri) {
             $this->bindingFields = $uri->bindingFields;
+            $this->wheres = array_merge($this->wheres, $uri->wheres);
         })->uri;
     }
 

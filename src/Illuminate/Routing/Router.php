@@ -1221,6 +1221,20 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Add a named type and its associated regular expression.
+     *
+     * @param  string  $name
+     * @param  string  $expression
+     * @return $this
+     */
+    public function addParameterType($name, $expression)
+    {
+        RouteUri::addType($name, $expression);
+
+        return $this;
+    }
+
+    /**
      * Get or set the verbs used in the resource URIs.
      *
      * @param  array  $verbs

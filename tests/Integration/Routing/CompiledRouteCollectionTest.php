@@ -347,6 +347,21 @@ class CompiledRouteCollectionTest extends TestCase
         $this->assertSame('foo', $routes->match(Request::create('/foo', 'GET'))->getName());
     }
 
+    public function testTypesAreCompiled()
+    {
+        $this->routeCollection->add(
+            $this->newRoute('GET', '/foo/{int foo}', ['uses' => 'FooController@index', 'as' => 'foo'])
+        );
+
+        $routes = $this->collection();
+
+        $this->assertSame('foo', $routes->match(Request::create('/foo/1', 'GET'))->getName());
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $routes->match(Request::create('/foo/bar', 'GET'));
+    }
+
     public function testMatchingDynamicallyAddedRoutesTakePrecedenceOverFallbackRoutes()
     {
         $this->routeCollection->add($this->fallbackRoute(['uses' => 'FooController@index']));
