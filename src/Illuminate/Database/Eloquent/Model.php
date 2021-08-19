@@ -1817,9 +1817,21 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveSoftDeletableRouteBinding($value, $field = null)
+    public function resolveWithTrashedRouteBinding($value, $field = null)
     {
         return $this->where($field ?? $this->getRouteKeyName(), $value)->withTrashed()->first();
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveOnlyTrashedRouteBinding($value, $field = null)
+    {
+        return $this->where($field ?? $this->getRouteKeyName(), $value)->onlyTrashed()->first();
     }
 
     /**
@@ -1843,9 +1855,22 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveSoftDeletableChildRouteBinding($childType, $value, $field)
+    public function resolveWithTrashedChildRouteBinding($childType, $value, $field)
     {
         return $this->resolveChildRouteBindingQuery($childType, $value, $field)->withTrashed()->first();
+    }
+
+    /**
+     * Retrieve the child model for a bound value.
+     *
+     * @param  string  $childType
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveOnlyTrashedChildRouteBinding($childType, $value, $field)
+    {
+        return $this->resolveChildRouteBindingQuery($childType, $value, $field)->onlyTrashed()->first();
     }
 
     /**

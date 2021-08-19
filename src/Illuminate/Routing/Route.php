@@ -101,6 +101,13 @@ class Route
     protected $withTrashedBindings = false;
 
     /**
+     * Indicates "only trashed" models can be retrieved when resolving implicit model bindings for this route.
+     *
+     * @var bool
+     */
+    protected $onlyTrashedBindings = false;
+
+    /**
      * Indicates the maximum number of seconds the route should acquire a session lock for.
      *
      * @var int|null
@@ -584,9 +591,32 @@ class Route
      *
      * @return bool
      */
-    public function allowsTrashedBindings()
+    public function allowsWithTrashedBindings()
     {
         return $this->withTrashedBindings;
+    }
+
+    /**
+     * Allow "only trashed" models to be retrieved when resolving implicit model bindings for this route.
+     *
+     * @param  bool  $onlyTrashed
+     * @return $this
+     */
+    public function onlyTrashed($onlyTrashed = true)
+    {
+        $this->onlyTrashedBindings = $onlyTrashed;
+
+        return $this;
+    }
+
+    /**
+     * Determines if the route allows "only trashed" models to be retrieved when resolving implicit model bindings.
+     *
+     * @return bool
+     */
+    public function allowsOnlyTrashedBindings()
+    {
+        return $this->onlyTrashedBindings;
     }
 
     /**
