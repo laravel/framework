@@ -14,7 +14,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -1108,17 +1107,23 @@ class Validator implements ValidatorContract
 
         foreach ((array) $attribute as $key) {
 
-            if (Str::contains($key, ['*']) && !Str::endsWith($key, '*')) {
+            if (Str::contains($key, ['*'])) {
 
                 $dataGetTarget = str_replace(strrchr($key, "."), '', $key);
 
                 foreach ((array)data_get($this->data, $dataGetTarget) as $index => $item) {
                     if ($callback($payload, new Fluent($item))) {
+
                         $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
-                        $this->addRules([$response->implicitAttributes[$key][$index] => $rules]);
+
+                        // If the $attribute given to the sometimes() method ends with a wildcard,
+                        // we must set the index to retrieve the explicit attribute from the implicit
+                        // attributes list to '0'. Otherwise,we are good to go with the foreach index.
+                        $implicitIndex = Str::endsWith($key, '*') ? 0 : $index;
+
+                        $this->addRules([$response->implicitAttributes[$key][$implicitIndex] => $rules]);
                     }
                 }
-
             } elseif ($callback($payload)) {
                 $this->addRules([$key => $rules]);
             }
