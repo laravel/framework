@@ -1,6 +1,95 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.52.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.55.0...8.x)
+
+
+## [v8.55.0 (2021-08-17)](https://github.com/laravel/framework/compare/v8.54.0...v8.55.0)
+
+### Added
+- Added stringable support for isUuid ([#38330](https://github.com/laravel/framework/pull/38330))
+- Allow for closure reflection on all MailFake assertions ([#38328](https://github.com/laravel/framework/pull/38328))
+- Added `Illuminate/Support/Testing/Fakes/MailFake::assertNothingOutgoing()` ([363af47](https://github.com/laravel/framework/commit/363af4793bfac97f2d846f5fa6bb985ce6a5642e))
+- Added `Illuminate/Support/Testing/Fakes/MailFake::assertNotOutgoing()` ([a3658c9](https://github.com/laravel/framework/commit/a3658c93695b79b3f9a8fc72c04c6d928dcc51a9))
+- Added Support withTrashed on routes ([#38348](https://github.com/laravel/framework/pull/38348))
+- Added Failover Swift Transport driver ([#38344](https://github.com/laravel/framework/pull/38344))
+- Added Conditional rules ([#38361](https://github.com/laravel/framework/pull/38361))
+- Added assertRedirectToSignedRoute() method for testing responses ([#38349](https://github.com/laravel/framework/pull/38349))
+- Added Validated subsets ([#38366](https://github.com/laravel/framework/pull/38366))
+- Share handler instead of client between requests in pool to ensure ResponseReceived events are dispatched in async HTTP Request ([#38380](https://github.com/laravel/framework/pull/38380))
+- Support union types on event discovery ([#38383](https://github.com/laravel/framework/pull/38383))
+- Added Assert invalid in testResponse ([#38384](https://github.com/laravel/framework/pull/38384))
+- Add qualifyColumns method to Model class ([#38403](https://github.com/laravel/framework/pull/38403))
+- Added ability to throw a custom validation exception ([#38406](https://github.com/laravel/framework/pull/38406))
+- Support shorter subscription syntax ([#38408](https://github.com/laravel/framework/pull/38408))
+
+### Fixed
+- Handle exceptions in batch callbacks ([#38327](https://github.com/laravel/framework/pull/38327))
+- Bump AWS PHP SDK ([#38297](https://github.com/laravel/framework/pull/38297))
+- Fixed firstOrCreate and firstOrNew should merge attributes correctly ([#38346](https://github.com/laravel/framework/pull/38346))
+- Check for incomplete class to prevent unexpected error when class cannot be loaded in retry command ([#38379](https://github.com/laravel/framework/pull/38379))
+
+### Changed
+- Update the ParallelRunner to allow for a custom Runner to be resolved ([#38374](https://github.com/laravel/framework/pull/38374))
+- Use Fluent instead of array on Rule::when() ([#38397](https://github.com/laravel/framework/pull/38397))
+
+
+## [v8.54.0 (2021-08-10)](https://github.com/laravel/framework/compare/v8.53.1...v8.54.0)
+
+### Added
+- Added support for GCM encryption ([#38190](https://github.com/laravel/framework/pull/38190), [827bc1d](https://github.com/laravel/framework/commit/827bc1de8b400fd7cc3edd3391124dc9003f1ddc))
+- Added exception as parameter to the missing() callbacks in `Illuminate/Routing/Middleware/SubstituteBindings.php` ([#38289](https://github.com/laravel/framework/pull/38289))
+- Implement TrustProxies middleware ([#38295](https://github.com/laravel/framework/pull/38295))
+- Added bitwise not operator to `Illuminate/Database/Query/Builder.php` ([#38316](https://github.com/laravel/framework/pull/38316))
+- Adds attempt method to RateLimiter ([#38313](https://github.com/laravel/framework/pull/38313))
+- Added withoutTrashed on Exists rule ([#38314](https://github.com/laravel/framework/pull/38314))
+
+### Changed
+- Wraps column name inside subQuery of hasOneOfMany-relationship ([#38263](https://github.com/laravel/framework/pull/38263))
+- Change Visibility of the Markdown property in Mailable ([#38320](https://github.com/laravel/framework/pull/38320))
+- Swap multiple logical OR for in_array when checking date casting ([#38307](https://github.com/laravel/framework/pull/38307))
+
+### Fixed
+- Fixed out of bounds shift and pop behavior in Collection ([bd89575](https://github.com/laravel/framework/commit/bd89575218afd14cbc12fde4be56607e40aeded9))
+- Fixed schedule timezone when using CarbonImmutable ([#38297](https://github.com/laravel/framework/pull/38297))
+- Fixed isDateCastable for the new immutable_date and immutable_datetime casts ([#38294](https://github.com/laravel/framework/pull/38294))
+- Fixed Factory hasMany method ([#38319](https://github.com/laravel/framework/pull/38319))
+
+
+## [v8.53.1 (2021-08-05)](https://github.com/laravel/framework/compare/v8.53.0...v8.53.1)
+
+### Added
+- Added placeholders replace for accepted_if validation message ([#38240](https://github.com/laravel/framework/pull/38240))
+
+### Fixed
+- Use type hints in cast.stub to match interface ([#38234](https://github.com/laravel/framework/pull/38234))
+- Some PHP 8.1 fixes ([#38245](https://github.com/laravel/framework/pull/38245))
+- Fixed aliasing with cursor pagination ([#38251](https://github.com/laravel/framework/pull/38251))
+- Fixed signed routes ([#38249](https://github.com/laravel/framework/pull/38249))
+
+
+## [v8.53.0 (2021-08-03)](https://github.com/laravel/framework/compare/v8.52.0...v8.53.0)
+
+### Added
+- Added cache_locks table to cache stub ([#38152](https://github.com/laravel/framework/pull/38152))
+- Added queue:monitor command ([#38168](https://github.com/laravel/framework/pull/38168))
+- Added twiceDailyAt schedule frequency ([#38174](https://github.com/laravel/framework/pull/38174))
+- Added immutable date and datetime casting ([#38199](https://github.com/laravel/framework/pull/38199))
+- Allow the php web server to run multiple workers ([#38208](https://github.com/laravel/framework/pull/38208))
+- Added accepted_if validation rule ([#38210](https://github.com/laravel/framework/pull/38210))
+
+### Fixed
+- Fixed signed routes with expires parameter ([#38111](https://github.com/laravel/framework/pull/38111), [732c0e0](https://github.com/laravel/framework/commit/732c0e0f64b222e7fc7daef6553f8e99007bb32c))
+- Remove call to deleted method in `Illuminate/Testing/TestResponse::statusMessageWithException()` ([cde3662](https://github.com/laravel/framework/commit/cde36626376e014390713ab03a01eb4dfe6488ce))
+- Fixed previous column for cursor pagination ([#38203](https://github.com/laravel/framework/pull/38203))
+
+### Changed
+- Prevent assertStatus() invalid JSON exception for valid JSON response content ([#38192](https://github.com/laravel/framework/pull/38192))
+- Bump AWS SDK to `^3.186.4` ([#38216](https://github.com/laravel/framework/pull/38216))
+- Implement `ReturnTypeWillChange` for some place ([#38221](https://github.com/laravel/framework/pull/38221), [#38212](https://github.com/laravel/framework/pull/38212), [#38226](https://github.com/laravel/framework/pull/38226))
+- Use actual countable interface on MessageBag ([#38227](https://github.com/laravel/framework/pull/38227))
+
+### Refactoring
+- Remove hardcoded Carbon reference from scheduler event ([#38063](https://github.com/laravel/framework/pull/38063))
 
 
 ## [v8.52.0 (2021-07-27)](https://github.com/laravel/framework/compare/v8.51.0...v8.52.0)
