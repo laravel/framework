@@ -8,6 +8,14 @@ use stdClass;
 
 class InteractsWithContainerTest extends TestCase
 {
+    public function testSingletonResolvesAnInstance()
+    {
+        $this->singleton('foo', 'bar');
+
+        $this->assertEquals('bar', $this->app->make('foo'));
+        $this->assertEquals('bar', $this->app->make('foo', ['with' => 'params']));
+    }
+
     public function testWithoutMixBindsEmptyHandlerAndReturnsInstance()
     {
         $instance = $this->withoutMix();

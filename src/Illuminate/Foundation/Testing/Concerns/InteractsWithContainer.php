@@ -78,6 +78,22 @@ trait InteractsWithContainer
     }
 
     /**
+     * Register a singleton in the container.
+     *
+     * @param  string  $abstract
+     * @param  object  $instance
+     * @return object
+     */
+    protected function singleton($abstract, $instance)
+    {
+        $this->app->singleton($abstract, function () use ($instance) {
+            return $instance;
+        });
+
+        return $instance;
+    }
+
+    /**
      * Register an empty handler for Laravel Mix in the container.
      *
      * @return $this
