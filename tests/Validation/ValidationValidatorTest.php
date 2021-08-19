@@ -3609,6 +3609,59 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateName()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '        '], ['x' => 'Required|Name']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '       x '], ['x' => 'Required|Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '       ユ '], ['x' => 'Required|Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'abc'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://google.com'], ['x' => 'Name']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコードを基盤技術と'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ユニコード を基盤技術と'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'आपका स्वागत है'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'Continuación'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'ofreció su dimisión'], ['x' => 'Name']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '❤'], ['x' => 'Name']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '123'], ['x' => 'Name']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 123], ['x' => 'Name']);
+        $this->assertFalse($v->passes());
+        
+
+        $v = new Validator($trans, ['x' => 'abc123'], ['x' => 'Name']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateTimezone()
     {
         $trans = $this->getIlluminateArrayTranslator();
