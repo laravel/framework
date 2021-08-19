@@ -990,11 +990,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     public function testFindFirstOrFailIsLazy()
     {
         $this->assertEnumerates(1, function ($collection) {
-            try {
-                $collection->firstOrFail();
-            } catch (ItemNotFoundException $e) {
-                //
-            }
+            $collection->firstOrFail();
         });
 
         $this->assertEnumerates(1, function ($collection) {
@@ -1004,13 +1000,9 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
 
         $this->assertEnumerates(2, function ($collection) {
-            try {
-                $collection->firstOrFail(function ($item) {
-                    return $item % 2 === 0;
-                });
-            } catch (ItemNotFoundException $e) {
-                //
-            }
+            $collection->firstOrFail(function ($item) {
+                return $item % 2 === 0;
+            });
         });
     }
 
