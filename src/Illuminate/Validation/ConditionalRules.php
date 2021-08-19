@@ -25,21 +25,21 @@ class ConditionalRules
      *
      * @var array|string
      */
-    protected $default;
+    protected $defaultRules;
 
     /**
      * Create a new conditional rules instance.
      *
      * @param  callable|bool  $condition
      * @param  array|string  $rules
-     * @param  array|string  $default
+     * @param  array|string  $defaultRules
      * @return void
      */
-    public function __construct($condition, $rules, $default = [])
+    public function __construct($condition, $rules, $defaultRules = [])
     {
         $this->condition = $condition;
         $this->rules = $rules;
-        $this->default = $default;
+        $this->defaultRules = $defaultRules;
     }
 
     /**
@@ -70,8 +70,8 @@ class ConditionalRules
      *
      * @return array
      */
-    public function default()
+    public function defaultRules()
     {
-        return is_string($this->default) ? explode('|', $this->default) : $this->default;
+        return is_string($this->defaultRules) ? explode('|', $this->defaultRules) : $this->defaultRules;
     }
 }
