@@ -1131,6 +1131,31 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the first item in the collection but throw an exception if no matching items exist.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return mixed
+     *
+     * @throws \Illuminate\Collections\ItemNotFoundException
+     */
+    public function firstOrFail($key = null, $operator = null, $value = null)
+    {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        $items = $this->when($filter)->filter($filter);
+
+        if ($items->isEmpty()) {
+            throw new ItemNotFoundException;
+        }
+
+        return $items->first();
+    }
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
