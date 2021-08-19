@@ -1,6 +1,6 @@
 {
-    "name": "illuminate/collections",
-    "description": "The Illuminate Collections package.",
+    "name": "illuminate/conditionable",
+    "description": "The Illuminate Conditionable package.",
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
@@ -14,26 +14,17 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
-        "illuminate/conditionable": "^9.0",
-        "illuminate/contracts": "^9.0",
-        "illuminate/macroable": "^9.0"
+        "php": "^7.4|^8.0"
     },
     "autoload": {
         "psr-4": {
             "Illuminate\\Support\\": ""
-        },
-        "files": [
-            "helpers.php"
-        ]
+        }
     },
     "extra": {
         "branch-alias": {
             "dev-master": "9.x-dev"
         }
-    },
-    "suggest": {
-        "symfony/var-dumper": "Required to use the dump method (^5.3)."
     },
     "config": {
         "sort-packages": true
