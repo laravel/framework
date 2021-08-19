@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Collections\ItemNotFoundException;
 use Illuminate\Collections\MultipleItemsFoundException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -996,6 +998,16 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->firstOrFail(function ($item) {
                 return $item === 1;
             });
+        });
+
+        $this->assertEnumerates(100, function ($collection) {
+            try {
+                $collection->firstOrFail(function ($item) {
+                    return $item === 101;
+                });
+            } catch (ItemNotFoundException $e) {
+                //
+            }
         });
 
         $this->assertEnumerates(2, function ($collection) {
