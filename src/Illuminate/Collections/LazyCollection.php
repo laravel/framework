@@ -1075,7 +1075,7 @@ class LazyCollection implements Enumerable
     }
 
     /**
-     * Get the first item in the collection, but if no items exist throw an exception.
+     * Get the first item in the collection but throw an exception if no matching items exist.
      *
      * @param  mixed  $key
      * @param  mixed  $operator
