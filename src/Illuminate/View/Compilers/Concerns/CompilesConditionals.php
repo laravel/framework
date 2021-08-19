@@ -233,6 +233,48 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the if-in statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIn($expression)
+    {
+        return "<?php if(in_array{$expression}): ?>";
+    }
+
+    /**
+     * Compile the end-in statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndIn()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the if-notin statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileNotin($expression)
+    {
+        return "<?php if(! in_array{$expression}): ?>";
+    }
+
+    /**
+     * Compile the end-notin statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndNotin()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the switch statements into valid PHP.
      *
      * @param  string  $expression
