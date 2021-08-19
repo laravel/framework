@@ -64,7 +64,7 @@ class RouteUri
         $bindingFields = [];
         $wheres = [];
 
-        $uri = preg_replace_callback($pattern, function($match) use (&$bindingFields, &$wheres) {
+        $uri = preg_replace_callback($pattern, function ($match) use (&$bindingFields, &$wheres) {
             [$_, $type, $parameter, $field, $optional] = $match;
 
             if ('' !== $type) {
