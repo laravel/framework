@@ -1146,7 +1146,7 @@ class Collection implements ArrayAccess, Enumerable
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
-        $items = $this->when($filter)->filter($filter);
+        $items = $this->when($filter !== null)->filter($filter);
 
         if ($items->isEmpty()) {
             throw new ItemNotFoundException;
