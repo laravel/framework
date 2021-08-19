@@ -51,13 +51,6 @@ abstract class Relation
     protected static $constraints = true;
 
     /**
-     * Indicates that table names should be used when determining morph classes.
-     *
-     * @var bool
-     */
-    public static $useTableNamesForMorphMap = false;
-
-    /**
      * An array to map class names to their morph names in the database.
      *
      * @var array
@@ -381,16 +374,6 @@ abstract class Relation
                     && in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
-    }
-
-    /**
-     * Indicate that the table names should be used when determining morphed class names.
-     *
-     * @return void
-     */
-    public static function morphUsingTableNames()
-    {
-        static::$useTableNamesForMorphMap = true;
     }
 
     /**
