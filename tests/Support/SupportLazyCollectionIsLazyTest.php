@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
 use PHPUnit\Framework\TestCase;
@@ -983,6 +984,35 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->slice(-2, 2)->all();
+        });
+    }
+
+    public function testFindFirstOrFailIsLazy()
+    {
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->firstOrFail();
+        });
+
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->firstOrFail(function ($item) {
+                return $item === 1;
+            });
+        });
+
+        $this->assertEnumerates(100, function ($collection) {
+            try {
+                $collection->firstOrFail(function ($item) {
+                    return $item === 101;
+                });
+            } catch (ItemNotFoundException $e) {
+                //
+            }
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->firstOrFail(function ($item) {
+                return $item % 2 === 0;
+            });
         });
     }
 
