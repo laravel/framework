@@ -28,6 +28,24 @@ class RuleMakeCommand extends GeneratorCommand
     protected $type = 'Rule';
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function buildClass($name)
+    {
+        return str_replace(
+            '{{ ruleType }}',
+            $this->option('implicit') ? 'ImplicitRule': 'Rule',
+            parent::buildClass($name)
+        );
+    }
+
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
