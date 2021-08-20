@@ -181,14 +181,21 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @return $this
      */
-    public function whereKey($id)
+    public function whereKey($id, $negation = false)
     {
         if ($id instanceof Model) {
             $id = $id->getKey();
         }
 
         if (is_array($id) || $id instanceof Arrayable) {
-            $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
+            $this->query->{
+                ! $negation
+                ? 'whereIn'
+                : 'whereNotIn'
+            }(
+                $this->model->getQualifiedKeyName(),
+                $id
+            );
 
             return $this;
         }
@@ -197,7 +204,11 @@ class Builder implements BuilderContract
             $id = (string) $id;
         }
 
-        return $this->where($this->model->getQualifiedKeyName(), '=', $id);
+        return $this->where(
+            $this->model->getQualifiedKeyName(),
+            ! $negation ? '=' : '!=',
+            $id
+        );
     }
 
     /**
@@ -208,21 +219,7 @@ class Builder implements BuilderContract
      */
     public function whereKeyNot($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
-
-        if (is_array($id) || $id instanceof Arrayable) {
-            $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
-
-            return $this;
-        }
-
-        if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
-        }
-
-        return $this->where($this->model->getQualifiedKeyName(), '!=', $id);
+        return $this->whereKey($id, true);
     }
 
     /**
