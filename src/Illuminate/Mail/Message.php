@@ -181,7 +181,7 @@ class Message
         if (is_array($address)) {
             $type = lcfirst($type);
 
-            $addresses = collect($address)->map(function (string|array $address) {
+            $addresses = collect($address)->map(function (string | array $address) {
                 if (is_array($address)) {
                     return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
                 }
