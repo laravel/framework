@@ -70,7 +70,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public static function generateKey($cipher)
     {
-        return random_bytes($cipher === 'AES-128-CBC' ? 16 : 32);
+        return random_bytes(in_array($cipher, ['AES-128-CBC', 'AES-128-GCM']) ? 16 : 32);
     }
 
     /**
