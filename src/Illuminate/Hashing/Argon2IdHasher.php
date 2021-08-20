@@ -6,7 +6,6 @@ use RuntimeException;
 
 class Argon2IdHasher extends ArgonHasher
 {
-
     /**
      * Check the given plain value against a hash.
      *
