@@ -158,6 +158,39 @@ class SupportStrTest extends TestCase
         $this->assertSame('bar', Str::between('foobarbar', 'foo', 'bar'));
     }
 
+    public function providesForStrBetweenAll()
+    {
+        return [
+            ['abc]', '', ']', []],
+            ['[abc', '[', '', []],
+            ['abc', '[', ']', []],
+            ['[abc', '[', ']', []],
+            ['abc]', '[', ']', []],
+            ['a]b[c', '[', ']', []],
+            ['abc[def]', '[', ']', ['def']],
+            ['a[b]c[d]e', '[', ']', ['b', 'd']],
+            ['a[]c[]e[f]', '[', ']', ['', '', 'f']],
+            ['foobarbuzz foobaxbuzz', 'foo', 'buzz', ['bar', 'bax']],
+            ['[[[]][[[]]]', '[', ']', ['[[', '[[']],
+            ['[[[]][[[]]]', '[[', ']', ['[', '[']],
+            ['「你好」「美女」', '「', '」', ['你好', '美女']],
+            [<<<STR
+            Hello:
+
+            Follow your order with <a href="http://example.com/t&t">Track & Trace</a>
+
+            Or <a href="http://example.com/unsub">unsubscribe</a> forever.
+
+            STR, 'href="', '"', ['http://example.com/t&t', 'http://example.com/unsub']],
+        ];
+    }
+
+    /** @dataProvider providesForStrBetweenAll */
+    public function testStrBetweenAll($subject, $from, $to, $expected)
+    {
+        $this->assertSame($expected, Str::betweenAll($subject, $from, $to));
+    }
+
     public function testStrAfter()
     {
         $this->assertSame('nah', Str::after('hannah', 'han'));

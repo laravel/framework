@@ -157,6 +157,25 @@ class Str
     }
 
     /**
+     * Get an array containing all substrings that occur between two given values.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return array<string>
+     */
+    public static function betweenAll($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return [];
+        }
+
+        preg_match_all('/'.preg_quote($from).'(.*?)'.preg_quote($to).'/', $subject, $matches);
+
+        return $matches[1];
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
