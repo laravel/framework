@@ -326,6 +326,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('bar', (string) $this->stringable('foobarbar')->between('foo', 'bar'));
     }
 
+    public function testBetweenAll()
+    {
+        $this->assertSame(['a', 'b'], $this->stringable('[a] [b]')->betweenAll('[', ']'));
+    }
+
     public function testAfter()
     {
         $this->assertSame('nah', (string) $this->stringable('hannah')->after('han'));

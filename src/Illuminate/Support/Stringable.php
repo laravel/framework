@@ -131,6 +131,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get an array containing all substrings that occur between two given values.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return array<string>
+     */
+    public function betweenAll($from, $to)
+    {
+        return Str::betweenAll($this->value, $from, $to);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
