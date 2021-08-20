@@ -68,6 +68,19 @@ class HashManager extends Manager implements Hasher
      * @param  array  $options
      * @return bool
      */
+    public function checkPlainAgainstHash($value, $hashedValue, array $options = [])
+    {
+        return $this->check($value, $hashedValue, $options);
+    }
+
+    /**
+     * Check the given plain value against a hash.
+     *
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
+     * @return bool
+     */
     public function check($value, $hashedValue, array $options = [])
     {
         return $this->driver()->check($value, $hashedValue, $options);

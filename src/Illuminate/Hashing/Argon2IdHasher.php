@@ -6,6 +6,22 @@ use RuntimeException;
 
 class Argon2IdHasher extends ArgonHasher
 {
+
+    /**
+     * Check the given plain value against a hash.
+     *
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
+    public function checkPlainAgainstHash($value, $hashedValue, array $options = [])
+    {
+        return $this->check($value, $hashedValue, $options);
+    }
+
     /**
      * Check the given plain value against a hash.
      *

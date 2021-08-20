@@ -65,6 +65,21 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      *
      * @throws \RuntimeException
      */
+    public function checkPlainAgainstHash($value, $hashedValue, array $options = [])
+    {
+        return $this->check($value, $hashedValue, $options);
+    }
+
+    /**
+     * Check the given plain value against a hash.
+     *
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
+     * @return bool
+     *
+     * @throws \RuntimeException
+     */
     public function check($value, $hashedValue, array $options = [])
     {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'bcrypt') {

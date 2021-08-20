@@ -32,6 +32,16 @@ interface Hasher
     public function check($value, $hashedValue, array $options = []);
 
     /**
+     * Check the given plain value against a hash.
+     *
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
+     * @return bool
+     */
+    public function checkPlainAgainstHash($value, $hashedValue, array $options = []);
+
+    /**
      * Check if the given hash has been hashed using the given options.
      *
      * @param  string  $hashedValue
