@@ -681,7 +681,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueueMonitorCommand()
     {
-        $this->app->singleton('command.queue.monitor', function ($app) {
+        $this->app->singleton(QueueMonitorCommand::class, function ($app) {
             return new QueueMonitorCommand($app['queue'], $app['events']);
         });
     }
@@ -705,7 +705,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     protected function registerQueuePruneFailedJobsCommand()
     {
-        $this->app->singleton('command.queue.prune-failed-jobs', function () {
+        $this->app->singleton(QueuePruneFailedJobsCommand::class, function () {
             return new QueuePruneFailedJobsCommand;
         });
     }
