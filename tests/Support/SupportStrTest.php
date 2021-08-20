@@ -174,7 +174,7 @@ class SupportStrTest extends TestCase
             ['[[[]][[[]]]', '[', ']', ['[[', '[[']],
             ['[[[]][[[]]]', '[[', ']', ['[', '[']],
             ['「你好」「美女」', '「', '」', ['你好', '美女']],
-            [<<<STR
+            [<<<'STR'
             Hello:
 
             Follow your order with <a href="http://example.com/t&t">Track & Trace</a>
