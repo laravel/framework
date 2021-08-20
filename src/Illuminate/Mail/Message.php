@@ -3,22 +3,22 @@
 namespace Illuminate\Mail;
 
 use Illuminate\Support\Traits\ForwardsCalls;
-use Swift_Attachment;
-use Swift_Image;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 /**
- * @mixin \Swift_Message
+ * @mixin \Symfony\Component\Mime\Email
  */
 class Message
 {
     use ForwardsCalls;
 
     /**
-     * The Swift Message instance.
+     * The Symfony Email instance.
      *
-     * @var \Swift_Message
+     * @var \Symfony\Component\Mime\Email
      */
-    protected $swift;
+    protected $email;
 
     /**
      * CIDs of files embedded in the message.
@@ -30,12 +30,12 @@ class Message
     /**
      * Create a new message instance.
      *
-     * @param  \Swift_Message  $swift
+     * @param  \Symfony\Component\Mime\Email  $email
      * @return void
      */
-    public function __construct($swift)
+    public function __construct(Email $email)
     {
-        $this->swift = $swift;
+        $this->email = $email;
     }
 
     /**
@@ -47,7 +47,11 @@ class Message
      */
     public function from($address, $name = null)
     {
-        $this->swift->setFrom($address, $name);
+        if (is_array($address)) {
+            $this->email->from(...$address);
+        } else {
+            $this->email->from(new Address($address, (string) $name));
+        }
 
         return $this;
     }
@@ -61,7 +65,11 @@ class Message
      */
     public function sender($address, $name = null)
     {
-        $this->swift->setSender($address, $name);
+        if (is_array($address)) {
+            $this->email->sender(...$address);
+        } else {
+            $this->email->sender(new Address($address, (string) $name));
+        }
 
         return $this;
     }
@@ -74,7 +82,7 @@ class Message
      */
     public function returnPath($address)
     {
-        $this->swift->setReturnPath($address);
+        $this->email->returnPath($address);
 
         return $this;
     }
@@ -90,7 +98,11 @@ class Message
     public function to($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setTo($address, $name);
+            if (is_array($address)) {
+                $this->email->to(...$address);
+            } else {
+                $this->email->to(new Address($address, (string) $name));
+            }
 
             return $this;
         }
@@ -109,7 +121,11 @@ class Message
     public function cc($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setCc($address, $name);
+            if (is_array($address)) {
+                $this->email->cc(...$address);
+            } else {
+                $this->email->cc(new Address($address, (string) $name));
+            }
 
             return $this;
         }
@@ -128,7 +144,11 @@ class Message
     public function bcc($address, $name = null, $override = false)
     {
         if ($override) {
-            $this->swift->setBcc($address, $name);
+            if (is_array($address)) {
+                $this->email->bcc(...$address);
+            } else {
+                $this->email->bcc(new Address($address, (string) $name));
+            }
 
             return $this;
         }
@@ -159,9 +179,19 @@ class Message
     protected function addAddresses($address, $name, $type)
     {
         if (is_array($address)) {
-            $this->swift->{"set{$type}"}($address, $name);
+            $type = lcfirst($type);
+
+            $addresses = collect($address)->map(function (string|array $address) {
+                if (is_array($address)) {
+                    return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
+                }
+
+                return $address;
+            })->all();
+
+            $this->email->{"{$type}"}(...$addresses);
         } else {
-            $this->swift->{"add{$type}"}($address, $name);
+            $this->email->{"add{$type}"}(new Address($address, (string) $name));
         }
 
         return $this;
@@ -175,7 +205,7 @@ class Message
      */
     public function subject($subject)
     {
-        $this->swift->setSubject($subject);
+        $this->email->subject($subject);
 
         return $this;
     }
@@ -188,7 +218,7 @@ class Message
      */
     public function priority($level)
     {
-        $this->swift->setPriority($level);
+        $this->email->priority($level);
 
         return $this;
     }
@@ -202,20 +232,9 @@ class Message
      */
     public function attach($file, array $options = [])
     {
-        $attachment = $this->createAttachmentFromPath($file);
+        $this->email->attachFromPath($file, $options['as'] ?? null, $options['mime'] ?? null);
 
-        return $this->prepAttachment($attachment, $options);
-    }
-
-    /**
-     * Create a Swift Attachment instance.
-     *
-     * @param  string  $file
-     * @return \Swift_Mime_Attachment
-     */
-    protected function createAttachmentFromPath($file)
-    {
-        return Swift_Attachment::fromPath($file);
+        return $this;
     }
 
     /**
@@ -228,42 +247,26 @@ class Message
      */
     public function attachData($data, $name, array $options = [])
     {
-        $attachment = $this->createAttachmentFromData($data, $name);
+        $this->email->attach($data, $name, $options['mime'] ?? null);
 
-        return $this->prepAttachment($attachment, $options);
+        return $this;
     }
 
     /**
-     * Create a Swift Attachment instance from data.
-     *
-     * @param  string  $data
-     * @param  string  $name
-     * @return \Swift_Attachment
-     */
-    protected function createAttachmentFromData($data, $name)
-    {
-        return new Swift_Attachment($data, $name);
-    }
-
-    /**
-     * Embed a file in the message and get the CID.
+     * Embed a file in the message.
      *
      * @param  string  $file
-     * @return string
+     * @return $this
      */
     public function embed($file)
     {
-        if (isset($this->embeddedFiles[$file])) {
-            return $this->embeddedFiles[$file];
-        }
+        $this->email->embedFromPath($file);
 
-        return $this->embeddedFiles[$file] = $this->swift->embed(
-            Swift_Image::fromPath($file)
-        );
+        return $this;
     }
 
     /**
-     * Embed in-memory data in the message and get the CID.
+     * Embed in-memory data in the message.
      *
      * @param  string  $data
      * @param  string  $name
@@ -272,51 +275,23 @@ class Message
      */
     public function embedData($data, $name, $contentType = null)
     {
-        $image = new Swift_Image($data, $name, $contentType);
-
-        return $this->swift->embed($image);
-    }
-
-    /**
-     * Prepare and attach the given attachment.
-     *
-     * @param  \Swift_Attachment  $attachment
-     * @param  array  $options
-     * @return $this
-     */
-    protected function prepAttachment($attachment, $options = [])
-    {
-        // First we will check for a MIME type on the message, which instructs the
-        // mail client on what type of attachment the file is so that it may be
-        // downloaded correctly by the user. The MIME option is not required.
-        if (isset($options['mime'])) {
-            $attachment->setContentType($options['mime']);
-        }
-
-        // If an alternative name was given as an option, we will set that on this
-        // attachment so that it will be downloaded with the desired names from
-        // the developer, otherwise the default file names will get assigned.
-        if (isset($options['as'])) {
-            $attachment->setFilename($options['as']);
-        }
-
-        $this->swift->attach($attachment);
+        $this->email->embed($data, $name, $contentType);
 
         return $this;
     }
 
     /**
-     * Get the underlying Swift Message instance.
+     * Get the underlying Symfony Email instance.
      *
-     * @return \Swift_Message
+     * @return \Symfony\Component\Mime\Email
      */
-    public function getSwiftMessage()
+    public function getSymfonyMessage()
     {
-        return $this->swift;
+        return $this->email;
     }
 
     /**
-     * Dynamically pass missing methods to the Swift instance.
+     * Dynamically pass missing methods to the Symfony instance.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -324,6 +299,6 @@ class Message
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->swift, $method, $parameters);
+        return $this->forwardCallTo($this->email, $method, $parameters);
     }
 }
