@@ -15,7 +15,8 @@ use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
-use Swift_Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 class Mailer implements MailerContract, MailQueueContract
 {
@@ -36,11 +37,11 @@ class Mailer implements MailerContract, MailQueueContract
     protected $views;
 
     /**
-     * The Swift Mailer instance.
+     * The Symfony Mailer instance.
      *
-     * @var \Swift_Mailer
+     * @var \Symfony\Component\Mailer\MailerInterface
      */
-    protected $swift;
+    protected $mailer;
 
     /**
      * The event dispatcher instance.
@@ -96,15 +97,15 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $name
      * @param  \Illuminate\Contracts\View\Factory  $views
-     * @param  \Swift_Mailer  $swift
+     * @param  \Symfony\Component\Mailer\MailerInterface  $mailer
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(string $name, Factory $views, Swift_Mailer $swift, Dispatcher $events = null)
+    public function __construct(string $name, Factory $views, MailerInterface $mailer, Dispatcher $events = null)
     {
         $this->name = $name;
         $this->views = $views;
-        $this->swift = $swift;
+        $this->mailer = $mailer;
         $this->events = $events;
     }
 
@@ -484,7 +485,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function createMessage()
     {
-        $message = new Message($this->swift->createMessage('message'));
+        $message = new Message(new Email());
 
         // If a global from address has been specified we will set it on every message
         // instance so the developer does not have to repeat themselves every time
@@ -581,13 +582,13 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Get the Swift Mailer instance.
+     * Get the Symfony Mailer instance.
      *
-     * @return \Swift_Mailer
+     * @return \Symfony\Component\Mailer\MailerInterface
      */
-    public function getSwiftMailer()
+    public function getSymfonyMailer()
     {
-        return $this->swift;
+        return $this->mailer;
     }
 
     /**
@@ -601,14 +602,14 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Set the Swift Mailer instance.
+     * Set the Symfony Mailer instance.
      *
-     * @param  \Swift_Mailer  $swift
+     * @param  \Symfony\Component\Mailer\MailerInterface  $mailer
      * @return void
      */
-    public function setSwiftMailer($swift)
+    public function setSymfonyMailer($mailer)
     {
-        $this->swift = $swift;
+        $this->mailer = $mailer;
     }
 
     /**
