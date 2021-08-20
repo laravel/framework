@@ -179,6 +179,7 @@ class Builder implements BuilderContract
      * Add a where clause on the primary key to the query.
      *
      * @param  mixed  $id
+     * @param  bool   $negation
      * @return $this
      */
     public function whereKey($id, $negation = false)
