@@ -5,17 +5,25 @@ namespace Illuminate\Tests\Hashing;
 use Illuminate\Hashing\Argon2IdHasher;
 use Illuminate\Hashing\ArgonHasher;
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class HasherTest extends TestCase
 {
+    private string $randomValueToHash;
+
+    private function __construct()
+    {
+        $this->randomValueToHash = Str::random(rand(6, 12));
+    }
+
     public function testBasicBcryptHashing()
     {
         $hasher = new BcryptHasher;
-        $value = $hasher->make('password');
-        $this->assertNotSame('password', $value);
-        $this->assertTrue($hasher->check('password', $value));
+        $value = $hasher->make($this->randomValueToHash);
+        $this->assertNotSame($this->randomValueToHash, $value);
+        $this->assertTrue($hasher->check($this->randomValueToHash, $value));
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['rounds' => 1]));
         $this->assertSame('bcrypt', password_get_info($value)['algoName']);
@@ -28,9 +36,9 @@ class HasherTest extends TestCase
         }
 
         $hasher = new ArgonHasher;
-        $value = $hasher->make('password');
-        $this->assertNotSame('password', $value);
-        $this->assertTrue($hasher->check('password', $value));
+        $value = $hasher->make($this->randomValueToHash);
+        $this->assertNotSame($this->randomValueToHash, $value);
+        $this->assertTrue($hasher->check($this->randomValueToHash, $value));
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
         $this->assertSame('argon2i', password_get_info($value)['algoName']);
@@ -43,9 +51,9 @@ class HasherTest extends TestCase
         }
 
         $hasher = new Argon2IdHasher;
-        $value = $hasher->make('password');
-        $this->assertNotSame('password', $value);
-        $this->assertTrue($hasher->check('password', $value));
+        $value = $hasher->make($this->randomValueToHash);
+        $this->assertNotSame($this->randomValueToHash, $value);
+        $this->assertTrue($hasher->check($this->randomValueToHash, $value));
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
         $this->assertSame('argon2id', password_get_info($value)['algoName']);
@@ -63,8 +71,8 @@ class HasherTest extends TestCase
         }
 
         $argonHasher = new ArgonHasher(['verify' => true]);
-        $argonHashed = $argonHasher->make('password');
-        (new BcryptHasher(['verify' => true]))->check('password', $argonHashed);
+        $argonHashed = $argonHasher->make($this->randomValueToHash);
+        (new BcryptHasher(['verify' => true]))->check($this->randomValueToHash, $argonHashed);
     }
 
     /**
@@ -75,8 +83,8 @@ class HasherTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $bcryptHasher = new BcryptHasher(['verify' => true]);
-        $bcryptHashed = $bcryptHasher->make('password');
-        (new ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
+        $bcryptHashed = $bcryptHasher->make($this->randomValueToHash);
+        (new ArgonHasher(['verify' => true]))->check($this->randomValueToHash, $bcryptHashed);
     }
 
     /**
@@ -87,7 +95,7 @@ class HasherTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $bcryptHasher = new BcryptHasher(['verify' => true]);
-        $bcryptHashed = $bcryptHasher->make('password');
-        (new Argon2IdHasher(['verify' => true]))->check('password', $bcryptHashed);
+        $bcryptHashed = $bcryptHasher->make($this->randomValueToHash);
+        (new Argon2IdHasher(['verify' => true]))->check($this->randomValueToHash, $bcryptHashed);
     }
 }
