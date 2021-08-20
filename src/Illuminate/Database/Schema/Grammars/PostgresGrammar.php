@@ -813,6 +813,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a uuid type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeUlid(Fluent $column)
+    {
+        return 'char(26)';
+    }
+
+    /**
      * Create the column definition for an IP address type.
      *
      * @param  \Illuminate\Support\Fluent  $column
