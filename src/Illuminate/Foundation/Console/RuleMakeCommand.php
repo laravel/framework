@@ -44,7 +44,6 @@ class RuleMakeCommand extends GeneratorCommand
         );
     }
 
-
     /**
      * Get the stub file for the generator.
      *
@@ -68,5 +67,17 @@ class RuleMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Rules';
+    }
+    
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule instead.'],
+        ];
     }
 }
