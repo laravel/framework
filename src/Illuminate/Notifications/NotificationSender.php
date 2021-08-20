@@ -98,7 +98,10 @@ class NotificationSender
                 continue;
             }
 
-            $this->withLocale($this->preferredLocale($notifiable, $notification), function () use ($viaChannels, $notifiable, $original) {
+            $locale = $this->preferredLocale($notifiable, $notification);
+            $original->locale($locale);
+
+            $this->withLocale($locale, function () use ($viaChannels, $notifiable, $original) {
                 $notificationId = Str::uuid()->toString();
 
                 foreach ((array) $viaChannels as $channel) {
