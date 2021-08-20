@@ -132,7 +132,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
             : $this->fullUrl().$question.Arr::query($query);
     }
-    
+
     /**
      * Get the full URL for the request without the given query string parameters.
      *
