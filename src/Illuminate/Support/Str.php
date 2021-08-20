@@ -8,6 +8,7 @@ use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Ulid\Ulid;
 use voku\helper\ASCII;
 
 class Str
@@ -885,5 +886,19 @@ class Str
     public static function createUuidsNormally()
     {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Generate a ULID.
+     *
+     * @param  bool  $lowercase
+     * @param  string|null  $dateTime
+     * @return \Ulid\Ulid
+     */
+    public static function ulid(bool $lowercase = false, string $dateTime = null)
+    {
+        return $dateTime
+            ? Ulid::fromTimestamp(Carbon::parse($dateTime)->getTimestampMs(), $lowercase)
+            : Ulid::generate($lowercase);
     }
 }
