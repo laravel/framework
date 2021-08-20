@@ -1349,9 +1349,10 @@ EOF;
     /**
      * Dump the content from the response.
      *
+     * @param  string|null  $key
      * @return $this
      */
-    public function dump()
+    public function dump($key = null)
     {
         $content = $this->getContent();
 
@@ -1361,7 +1362,11 @@ EOF;
             $content = $json;
         }
 
-        dump($content);
+        if (! is_null($key)) {
+            dump(data_get($content, $key));
+        } else {
+            dump($content);
+        }
 
         return $this;
     }
