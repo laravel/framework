@@ -891,14 +891,14 @@ class Str
     /**
      * Generate a ULID.
      *
-     * @param  bool  $lowercase
-     * @param  string|null  $dateTime
+     * @param bool $lowercase
+     * @param \DateTimeInterface|null $dateTime
      * @return \Ulid\Ulid
      */
-    public static function ulid(bool $lowercase = false, string $dateTime = null)
+    public static function ulid(bool $lowercase = false, \DateTimeInterface $dateTime = null)
     {
         return $dateTime
-            ? Ulid::fromTimestamp(Carbon::parse($dateTime)->getTimestampMs(), $lowercase)
+            ? Ulid::fromTimestamp(strtotime($dateTime) * 1000, $lowercase)
             : Ulid::generate($lowercase);
     }
 }

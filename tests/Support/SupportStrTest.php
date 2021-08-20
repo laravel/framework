@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
+use Ulid\Ulid;
 
 class SupportStrTest extends TestCase
 {
@@ -495,6 +497,13 @@ class SupportStrTest extends TestCase
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
+    }
+
+    public function testUlid()
+    {
+        $this->assertInstanceOf(Ulid::class, Str::ulid());
+        $datetime = Carbon::now()->subHour();
+        $this->assertSame($datetime->getTimestamp() * 1000, Str::ulid(false, $datetime)->toTimestamp());
     }
 
     public function testAsciiNull()

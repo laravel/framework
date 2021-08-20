@@ -719,7 +719,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeUlid(Fluent $column)
     {
-        return 'nvarchar(26)';
+        return 'nchar(26)';
     }
 
     /**
