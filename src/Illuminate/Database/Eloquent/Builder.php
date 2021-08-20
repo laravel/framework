@@ -206,10 +206,10 @@ class Builder
      * Add a where clause on the primary key to the query.
      *
      * @param  mixed  $id
-     * @param  bool   $negation
+     * @param  bool   $reverse
      * @return $this
      */
-    public function whereKey($id, $negation = false)
+    public function whereKey($id, $reverse = false)
     {
         if ($id instanceof Model) {
             $id = $id->getKey();
@@ -217,7 +217,7 @@ class Builder
 
         if (is_array($id) || $id instanceof Arrayable) {
             $this->query->{
-                ! $negation
+                ! $reverse
                 ? 'whereIn'
                 : 'whereNotIn'
             }(
@@ -234,7 +234,7 @@ class Builder
 
         return $this->where(
             $this->model->getQualifiedKeyName(),
-            ! $negation ? '=' : '!=',
+            ! $reverse ? '=' : '!=',
             $id
         );
     }
