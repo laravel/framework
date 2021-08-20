@@ -2,9 +2,9 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\{{ $baseRule }};
 
-class {{ class }} implements Rule
+class {{ class }} implements {{ $baseRule }}
 {
     /**
      * Create a new rule instance.
