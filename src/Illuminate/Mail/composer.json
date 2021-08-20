@@ -23,7 +23,7 @@
         "illuminate/support": "^9.0",
         "league/commonmark": "^2.0",
         "psr/log": "^1.0",
-        "swiftmailer/swiftmailer": "^6.2.7",
+        "symfony/mailer": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2"
     },
     "autoload": {
