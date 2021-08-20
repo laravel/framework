@@ -11,18 +11,6 @@ use RuntimeException;
 class Encrypter implements EncrypterContract, StringEncrypter
 {
     /**
-     * The supported cipher algorithms and their properties.
-     *
-     * @var array
-     */
-    private static $supportedCiphers = [
-        'AES-128-CBC' => ['size' => 16, 'aead' => false],
-        'AES-256-CBC' => ['size' => 32, 'aead' => false],
-        'AES-128-GCM' => ['size' => 16, 'aead' => true],
-        'AES-256-GCM' => ['size' => 32, 'aead' => true],
-    ];
-
-    /**
      * The encryption key.
      *
      * @var string
@@ -35,6 +23,18 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * @var string
      */
     protected $cipher;
+
+    /**
+     * The supported cipher algorithms and their properties.
+     *
+     * @var array
+     */
+    private static $supportedCiphers = [
+        'AES-128-CBC' => ['size' => 16, 'aead' => false],
+        'AES-256-CBC' => ['size' => 32, 'aead' => false],
+        'AES-128-GCM' => ['size' => 16, 'aead' => true],
+        'AES-256-GCM' => ['size' => 32, 'aead' => true],
+    ];
 
     /**
      * Create a new encrypter instance.
@@ -51,7 +51,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
 
         if (! static::supported($key, $cipher)) {
             $ciphers = implode(', ', array_keys(self::$supportedCiphers));
-            throw new RuntimeException("Unsupported cipher or incorrect key length. Supported ciphers are: $ciphers.");
+
+            throw new RuntimeException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
         }
 
         $this->key = $key;
@@ -98,9 +99,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
     {
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
 
-        // A tag (mac) is returned by openssl_encrypt for AEAD ciphers.
-        // Including $tag in the call for non-AEAD ciphers results in a warning before PHP 8.1.
         $tag = '';
+
         $value = self::$supportedCiphers[$this->cipher]['aead']
             ? \openssl_encrypt(
                 $serialize ? serialize($value) : $value,
@@ -119,10 +119,9 @@ class Encrypter implements EncrypterContract, StringEncrypter
         $tag = base64_encode($tag);
 
         $mac = self::$supportedCiphers[$this->cipher]['aead']
-            ? '' // For AEAD-algoritms, the tag/mac is returned by openssl_encrypt
+            ? '' // For AEAD-algoritms, the tag / MAC is returned by openssl_encrypt...
             : $this->hash($iv, $value);
 
-        // Both tag and mac are included for compatibility reasons. A breaking update could use the same name for these.
         $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -220,7 +219,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
             throw new DecryptException('The payload is invalid.');
         }
 
-        // We only need to check for the valid MAC if a non-AEAD algorithm is used
         if (! self::$supportedCiphers[$this->cipher]['aead'] && ! $this->validMac($payload)) {
             throw new DecryptException('The MAC is invalid.');
         }
