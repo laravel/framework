@@ -40,7 +40,7 @@ class RuleMakeCommand extends GeneratorCommand
     {
         return str_replace(
             '{{ ruleType }}',
-            $this->option('implicit') ? 'ImplicitRule': 'Rule',
+            $this->option('implicit') ? 'ImplicitRule' : 'Rule',
             parent::buildClass($name)
         );
     }
@@ -69,7 +69,7 @@ class RuleMakeCommand extends GeneratorCommand
     {
         return $rootNamespace.'\Rules';
     }
-    
+
     /**
      * Get the console command options.
      *
