@@ -117,11 +117,9 @@ class Message
     public function cc($address, $name = null, $override = false)
     {
         if ($override) {
-            if (is_array($address)) {
-                $this->email->cc(...$address);
-            } else {
-                $this->email->cc(new Address($address, (string) $name));
-            }
+            is_array($address)
+                ? $this->email->cc(...$address)
+                : $this->email->cc(new Address($address, (string) $name));
 
             return $this;
         }
