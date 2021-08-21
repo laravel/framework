@@ -123,7 +123,6 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class)->validateResolved();
     }
 
-
     public function testPrepareForValidationRunsBeforeValidation()
     {
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
