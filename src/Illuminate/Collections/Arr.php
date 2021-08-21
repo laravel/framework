@@ -703,8 +703,8 @@ class Arr
     }
 
     /**
-     * Turn the given array into associative array, combined by the array keys.
-     * If the array keys is empty then combine the given array by the first element
+     * Turn the given array elements into associative arrays, combined by the given array keys.
+     * If the array keys is empty then combine the given array elements by the first element
      *
      * @param array $array
      * @param array $keys
