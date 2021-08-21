@@ -63,11 +63,9 @@ class Message
      */
     public function sender($address, $name = null)
     {
-        if (is_array($address)) {
-            $this->email->sender(...$address);
-        } else {
-            $this->email->sender(new Address($address, (string) $name));
-        }
+        is_array($address)
+            ? $this->email->sender(...$address)
+            : $this->email->sender(new Address($address, (string) $name));
 
         return $this;
     }
