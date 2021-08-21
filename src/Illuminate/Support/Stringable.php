@@ -479,7 +479,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Remove BOM mark in the string
+     * Remove BOM mark in the string.
      *
      * @return static
      */

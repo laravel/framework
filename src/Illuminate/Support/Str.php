@@ -640,7 +640,7 @@ class Str
     }
 
     /**
-     * Remove BOM mark in the string
+     * Remove BOM mark in the string.
      *
      * @param  string  $value
      * @return string
