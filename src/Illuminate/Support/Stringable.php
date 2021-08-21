@@ -479,6 +479,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Remove BOM mark in the string
+     *
+     * @return static
+     */
+    public function removeBom()
+    {
+        return new static(Str::removeBom($this->value));
+    }
+
+    /**
      * Repeat the string.
      *
      * @param  int  $times

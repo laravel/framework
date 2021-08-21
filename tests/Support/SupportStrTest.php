@@ -395,6 +395,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
     }
 
+    public function testRemoveBom()
+    {
+        $this->assertSame('foobar', Str::removeBom("\xef\xbb\xbffoobar"));
+        $this->assertSame('foobar', Str::removeBom("\xEF\xBB\xBFfoobar"));
+        $this->assertSame('foobar', Str::removeBom('foobar'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));

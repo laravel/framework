@@ -640,6 +640,23 @@ class Str
     }
 
     /**
+     * Remove BOM mark in the string
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function removeBom($value)
+    {
+        $bomMark = "\xEF\xBB\xBF";
+
+        if (static::startsWith($value, $bomMark)) {
+            return static::replace($bomMark, '', $value);
+        }
+
+        return $value;
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $value
