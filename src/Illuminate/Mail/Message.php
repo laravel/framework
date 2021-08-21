@@ -138,11 +138,9 @@ class Message
     public function bcc($address, $name = null, $override = false)
     {
         if ($override) {
-            if (is_array($address)) {
-                $this->email->bcc(...$address);
-            } else {
-                $this->email->bcc(new Address($address, (string) $name));
-            }
+            is_array($address)
+                ? $this->email->bcc(...$address)
+                : $this->email->bcc(new Address($address, (string) $name));
 
             return $this;
         }
