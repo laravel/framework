@@ -701,4 +701,31 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Turn the given array into associative array, combined by the array keys.
+     * If the array keys is empty then combine the given array by the first element
+     *
+     * @param array $array
+     * @param array $keys
+     * @return array|array[]|false[]
+     */
+    public static function combine(array $array, array $keys = [])
+    {
+        if (empty($array)) {
+            return [];
+        }
+
+        if (!is_array(current($array))) {
+            $array = [$array];
+        }
+
+        $headers = !empty($keys) ? $keys : array_shift($array);
+        return array_map(static function (array $row) use ($headers) {
+            if (count($row) !== count($headers)) {
+                throw new InvalidArgumentException('Array rows count don\'t match the headers count.');
+            }
+            return array_combine($headers, $row);
+        }, $array);
+    }
 }
