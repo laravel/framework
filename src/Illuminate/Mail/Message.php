@@ -47,11 +47,9 @@ class Message
      */
     public function from($address, $name = null)
     {
-        if (is_array($address)) {
-            $this->email->from(...$address);
-        } else {
-            $this->email->from(new Address($address, (string) $name));
-        }
+        is_array($address)
+            ? $this->email->from(...$address)
+            : $this->email->from(new Address($address, (string) $name));
 
         return $this;
     }
