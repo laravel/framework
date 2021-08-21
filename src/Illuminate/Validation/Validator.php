@@ -1106,7 +1106,6 @@ class Validator implements ValidatorContract
         $payload = new Fluent($this->data);
 
         foreach ((array) $attribute as $key) {
-
             $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
             foreach ($response->rules as $ruleKey => $ruleValue) {

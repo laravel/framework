@@ -4143,7 +4143,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['users' => null], ['users.*.name'=> 'required|string']);
         $v->sometimes(['users'], 'array', function ($i, $item) {
-            return !!$item;
+            return (bool) $item;
         });
         $this->assertEquals([], $v->getRules());
 
@@ -4159,7 +4159,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
         $v->sometimes(['company.users'], 'array', function ($i, $item) {
-            return !!$item->users;
+            return (bool) $item->users;
         });
         $this->assertEquals(['company' => ['required']], $v->getRules());
 
@@ -4282,7 +4282,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes('value', 'email', function ($i) {
             return $i->type === 'email';
         });
-        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email'],], $v->getRules());
+        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
 
         // ['value'] -> standard true case with array, the INPUT based condition does match and the optional validation is added
         $trans = $this->getIlluminateArrayTranslator();
@@ -4290,7 +4290,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['value'], 'email', function ($i, $item) {
             return $i->type === 'email';
         });
-        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email'],], $v->getRules());
+        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
 
         // ['email'] -> if value is set, it will be validated as string
         $trans = $this->getIlluminateArrayTranslator();
@@ -4298,7 +4298,7 @@ class ValidationValidatorTest extends TestCase
         $v->sometimes(['email'], 'email', function ($i, $item) {
             return $item;
         });
-        $this->assertEquals(['email' => ['required', 'email'],], $v->getRules());
+        $this->assertEquals(['email' => ['required', 'email']], $v->getRules());
     }
 
     public function testCustomValidators()
