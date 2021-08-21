@@ -94,11 +94,9 @@ class Message
     public function to($address, $name = null, $override = false)
     {
         if ($override) {
-            if (is_array($address)) {
-                $this->email->to(...$address);
-            } else {
-                $this->email->to(new Address($address, (string) $name));
-            }
+            is_array($address)
+                ? $this->email->to(...$address)
+                : $this->email->to(new Address($address, (string) $name));
 
             return $this;
         }
