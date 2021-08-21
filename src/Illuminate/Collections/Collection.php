@@ -400,7 +400,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  string|array  $keys
      * @return $this
      */
-    public function forget($keys)
+    public function forget($keys) // TODO
     {
         foreach ((array) $keys as $key) {
             $this->offsetUnset($key);
@@ -817,7 +817,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $count
      * @return mixed
      */
-    public function pop($count = 1)
+    public function pop($count = 1) // TODO
     {
         if ($count === 1) {
             return array_pop($this->items);
@@ -845,7 +845,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $key
      * @return $this
      */
-    public function prepend($value, $key = null)
+    public function prepend($value, $key = null) // TODO
     {
         $this->items = Arr::prepend($this->items, ...func_get_args());
 
@@ -858,7 +858,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  ...TValue  $values
      * @return $this
      */
-    public function push(...$values)
+    public function push(...$values) // TODO
     {
         foreach ($values as $value) {
             $this->items[] = $value;
@@ -891,7 +891,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $default
      * @return mixed
      */
-    public function pull($key, $default = null)
+    public function pull($key, $default = null) // TODO
     {
         return Arr::pull($this->items, $key, $default);
     }
@@ -903,7 +903,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $value
      * @return $this
      */
-    public function put($key, $value)
+    public function put($key, $value) // TODO
     {
         $this->offsetSet($key, $value);
 
@@ -987,7 +987,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $count
      * @return mixed
      */
-    public function shift($count = 1)
+    public function shift($count = 1) // TODO
     {
         if ($count === 1) {
             return array_shift($this->items);
@@ -1026,7 +1026,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $step
      * @return static
      */
-    public function sliding($size = 2, $step = 1)
+    public function sliding($size = 2, $step = 1) // TODO
     {
         $chunks = floor(($this->count() - $size) / $step) + 1;
 
@@ -1123,7 +1123,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  int  $numberOfGroups
      * @return static
      */
-    public function splitIn($numberOfGroups)
+    public function splitIn($numberOfGroups) // TODO
     {
         return $this->chunk(ceil($this->count() / $numberOfGroups));
     }
@@ -1378,7 +1378,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $replacement
      * @return static
      */
-    public function splice($offset, $length = null, $replacement = [])
+    public function splice($offset, $length = null, $replacement = []) // TODO
     {
         if (func_num_args() === 1) {
             return new static(array_splice($this->items, $offset));
@@ -1430,7 +1430,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  callable  $callback
      * @return $this
      */
-    public function transform(callable $callback)
+    public function transform(callable $callback) // TODO
     {
         $this->items = $this->map($callback)->all();
 
@@ -1491,7 +1491,7 @@ class Collection implements ArrayAccess, Enumerable
      * @return \ArrayIterator
      */
     #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator() // TODO
     {
         return new ArrayIterator($this->items);
     }
@@ -1524,7 +1524,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $item
      * @return $this
      */
-    public function add($item)
+    public function add($item) // TODO
     {
         $this->items[] = $item;
 
@@ -1536,7 +1536,7 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @return \Illuminate\Support\Collection
      */
-    public function toBase()
+    public function toBase() // TODO
     {
         return new self($this);
     }
@@ -1548,7 +1548,7 @@ class Collection implements ArrayAccess, Enumerable
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function offsetExists($key)
+    public function offsetExists($key) // TODO
     {
         return isset($this->items[$key]);
     }
@@ -1560,7 +1560,7 @@ class Collection implements ArrayAccess, Enumerable
      * @return mixed
      */
     #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet($key) // TODO
     {
         return $this->items[$key];
     }
@@ -1573,7 +1573,7 @@ class Collection implements ArrayAccess, Enumerable
      * @return void
      */
     #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value) // TODO
     {
         if (is_null($key)) {
             $this->items[] = $value;
@@ -1589,7 +1589,7 @@ class Collection implements ArrayAccess, Enumerable
      * @return void
      */
     #[\ReturnTypeWillChange]
-    public function offsetUnset($key)
+    public function offsetUnset($key) // TODO
     {
         unset($this->items[$key]);
     }
