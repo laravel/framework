@@ -1106,27 +1106,42 @@ class Validator implements ValidatorContract
         $payload = new Fluent($this->data);
 
         foreach ((array) $attribute as $key) {
-            if (Str::contains($key, ['*'])) {
-                $dataGetTarget = str_replace(strrchr($key, '.'), '', $key);
 
-                foreach ((array) data_get($this->data, $dataGetTarget) as $index => $item) {
-                    if ($callback($payload, new Fluent($item))) {
-                        $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
+            $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
-                        // If the $attribute given to the sometimes() method ends with a wildcard,
-                        // we must set the index to retrieve the explicit attribute from the implicit
-                        // attributes list to '0'. Otherwise,we are good to go with the foreach index.
-                        $implicitIndex = Str::endsWith($key, '*') ? 0 : $index;
-
-                        $this->addRules([$response->implicitAttributes[$key][$implicitIndex] => $rules]);
-                    }
+            foreach ($response->rules as $ruleKey => $ruleValue) {
+                if ($callback($payload, $this->makeSometimesItemData($ruleKey))) {
+                    $this->addRules([$ruleKey => $ruleValue]);
                 }
-            } elseif ($callback($payload)) {
-                $this->addRules([$key => $rules]);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @param  string  $attribute
+     * @return array|Fluent|mixed
+     */
+    private function makeSometimesItemData(string $attribute)
+    {
+        // We need the last part of the attribute to access the parent data
+        // later on. This enables us to validate 'user.*.contact' based on
+        // another value in the parent (e.g. user.*.type). If the attribute
+        // looks like 'user.*.contact' it returns '.value', otherwise false.
+        // In case of false, we don't substr() in the following if() and use
+        // the full attribute.
+        $attributeEnd = strrchr($attribute, '.');
+
+        if ($attributeEnd) {
+            $attribute = substr($attribute, 0, -strlen($attributeEnd));
+        }
+
+        $itemData = data_get($this->data, $attribute);
+
+        return is_array($itemData)
+            ? new Fluent($itemData)
+            : $itemData;
     }
 
     /**
