@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Auth\Access\Response;
+
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
