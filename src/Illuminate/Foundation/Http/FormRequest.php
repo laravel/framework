@@ -91,9 +91,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $validator = $this->createDefaultValidator($factory);
         }
 
-        if (method_exists($this, 'withValidator')) {
-            $this->withValidator($validator);
-        }
+        $this->withValidator($validator);
 
         $this->setValidator($validator);
 
@@ -166,11 +164,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function passesAuthorization()
     {
-        if (method_exists($this, 'authorize')) {
-            return $this->container->call([$this, 'authorize']);
-        }
-
-        return true;
+        return $this->container->call([$this, 'authorize']);
     }
 
     /**
@@ -213,6 +207,36 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [];
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     */
+    public function withValidator(Validator $validator)
+    {
+    }
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
     }
 
     /**
