@@ -722,8 +722,9 @@ class Arr
         }
 
         $headers = !empty($keys) ? $keys : array_shift($array);
-        return array_map(static function (array $row) use ($headers) {
-            if (count($row) !== count($headers)) {
+        $headersCount = count($headers);
+        return array_map(static function (array $row) use ($headers, $headersCount) {
+            if (count($row) !== $headersCount) {
                 throw new InvalidArgumentException('Array rows count don\'t match the headers count.');
             }
             return array_combine($headers, $row);
