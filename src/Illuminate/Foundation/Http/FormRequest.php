@@ -170,17 +170,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected function passesAuthorization()
     {
         if (method_exists($this, 'authorize')) {
-            if (! $result = $this->container->call([$this, 'authorize'])) {
-                return $result;
-            }
-
-            if (is_string($result)) {
-                $result = Response::deny($result);
-            }
+            $result = $this->container->call([$this, 'authorize']));
 
             if ($result instanceof Response) {
                 $result->authorize();
             }
+            
+            return $result;
         }
 
         return true;
