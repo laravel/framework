@@ -101,6 +101,13 @@ class Route
     protected $withTrashedBindings = false;
 
     /**
+     * The relationships to load when resolving implicit model bindings for this route.
+     *
+     * @var array
+     */
+    protected $withRelationships = [];
+
+    /**
      * Indicates the maximum number of seconds the route should acquire a session lock for.
      *
      * @var int|null
@@ -575,6 +582,27 @@ class Route
     public function withTrashed($withTrashed = true)
     {
         $this->withTrashedBindings = $withTrashed;
+
+        return $this;
+    }
+
+    /**
+     * Get or set the realtionships to load when resolving implicit model bindings for this route.
+     *
+     * @param string|array|null $relationship
+     * @return $this|array
+     */
+    public function with($relationship = null)
+    {
+        if(is_null($relationship)) {
+            return $this->withRelationships;
+        }
+
+        if(is_array($relationship)) {
+            $this->withRelationships = $relationship;
+        } else {
+            $this->withRelationships[] = $relationship;
+        }
 
         return $this;
     }
