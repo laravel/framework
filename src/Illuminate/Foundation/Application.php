@@ -686,6 +686,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
             }
         }
 
+        if (property_exists($provider, 'scoped')) {
+            foreach ($provider->scoped as $key => $value) {
+                $this->scoped($key, $value);
+            }
+        }
+
         $this->markAsRegistered($provider);
 
         // If the application has already booted, we will call this boot method on
