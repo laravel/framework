@@ -78,6 +78,24 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
+    public function testScopedAreCreatedWhenServiceProviderIsRegistered()
+    {
+        $app = new Application;
+        $app->register($provider = new class($app) extends ServiceProvider
+        {
+            public $scoped = [
+                AbstractClass::class => ConcreteClass::class,
+            ];
+        });
+
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
+
+        $instance = $app->make(AbstractClass::class);
+
+        $this->assertInstanceOf(ConcreteClass::class, $instance);
+        $this->assertSame($instance, $app->make(AbstractClass::class));
+    }
+
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
     {
         $provider = m::mock(ServiceProvider::class);
