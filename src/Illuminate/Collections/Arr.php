@@ -709,6 +709,7 @@ class Arr
      * @param array $array
      * @param array $keys
      * @return array|array[]|false[]
+     * @throws InvalidArgumentException
      */
     public static function combine(array $array, array $keys = [])
     {
