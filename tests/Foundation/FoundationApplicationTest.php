@@ -78,7 +78,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
-    public function testScopedAreCreatedWhenServiceProviderIsRegistered()
+    public function testScopedInstancesAreCreatedWhenServiceProviderIsRegistered()
     {
         $app = new Application;
         $app->register($provider = new class($app) extends ServiceProvider
