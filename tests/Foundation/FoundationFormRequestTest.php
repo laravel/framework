@@ -110,14 +110,6 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestForbiddenWithResponseStub::class)->validateResolved();
     }
 
-    public function testValidateThrowsExceptionFromString()
-    {
-        $this->expectException(AuthorizationException::class);
-        $this->expectExceptionMessage('bar');
-
-        $this->createRequest([], FoundationTestFormRequestForbiddenWithMessageStub::class)->validateResolved();
-    }
-
     public function testValidateDoesntThrowExceptionFromResponseAllowed()
     {
         $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class)->validateResolved();
@@ -350,14 +342,6 @@ class FoundationTestFormRequestForbiddenWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::deny('foo');
-    }
-}
-
-class FoundationTestFormRequestForbiddenWithMessageStub extends FormRequest
-{
-    public function authorize()
-    {
-        return 'bar';
     }
 }
 
