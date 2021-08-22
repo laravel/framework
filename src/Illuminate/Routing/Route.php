@@ -594,11 +594,11 @@ class Route
      */
     public function with($relationship = null)
     {
-        if(is_null($relationship)) {
+        if (is_null($relationship)) {
             return $this->withRelationships;
         }
 
-        if(is_array($relationship)) {
+        if (is_array($relationship)) {
             $this->withRelationships = $relationship;
         } else {
             $this->withRelationships[] = $relationship;
