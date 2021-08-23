@@ -289,6 +289,6 @@ class Message
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->email, $method, $parameters);
+        return $this->forwardCallTo($this->message, $method, $parameters);
     }
 }
