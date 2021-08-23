@@ -15,7 +15,7 @@ use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
-use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 
 class Mailer implements MailerContract, MailQueueContract
@@ -37,11 +37,11 @@ class Mailer implements MailerContract, MailQueueContract
     protected $views;
 
     /**
-     * The Symfony Mailer instance.
+     * The Symfony Transport instance.
      *
-     * @var \Symfony\Component\Mailer\MailerInterface
+     * @var \Symfony\Component\Mailer\Transport\TransportInterface
      */
-    protected $mailer;
+    protected $transport;
 
     /**
      * The event dispatcher instance.
@@ -86,27 +86,20 @@ class Mailer implements MailerContract, MailQueueContract
     protected $queue;
 
     /**
-     * Array of failed recipients.
-     *
-     * @var array
-     */
-    protected $failedRecipients = [];
-
-    /**
      * Create a new Mailer instance.
      *
      * @param  string  $name
      * @param  \Illuminate\Contracts\View\Factory  $views
-     * @param  \Symfony\Component\Mailer\MailerInterface  $mailer
+     * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      * @return void
      */
-    public function __construct(string $name, Factory $views, MailerInterface $mailer, Dispatcher $events = null)
+    public function __construct(string $name, Factory $views, TransportInterface $transport, Dispatcher $events = null)
     {
         $this->name = $name;
         $this->views = $views;
-        $this->mailer = $mailer;
         $this->events = $events;
+        $this->transport = $transport;
     }
 
     /**
@@ -283,10 +276,10 @@ class Mailer implements MailerContract, MailQueueContract
         // Next we will determine if the message should be sent. We give the developer
         // one final chance to stop this message and then we will send it to all of
         // its recipients. We will then fire the sent event for the sent message.
-        $swiftMessage = $message->getSwiftMessage();
+        $symfonyMessage = $message->getSymfonyMessage();
 
-        if ($this->shouldSendMessage($swiftMessage, $data)) {
-            $this->sendSwiftMessage($swiftMessage);
+        if ($this->shouldSendMessage($symfonyMessage, $data)) {
+            $this->sendSymfonyMessage($symfonyMessage);
 
             $this->dispatchSentEvent($message, $data);
         }
@@ -353,19 +346,15 @@ class Mailer implements MailerContract, MailQueueContract
     protected function addContent($message, $view, $plain, $raw, $data)
     {
         if (isset($view)) {
-            $message->setBody($this->renderView($view, $data) ?: ' ', 'text/html');
+            $message->html($this->renderView($view, $data) ?: ' ');
         }
 
         if (isset($plain)) {
-            $method = isset($view) ? 'addPart' : 'setBody';
-
-            $message->$method($this->renderView($plain, $data) ?: ' ', 'text/plain');
+            $message->text($this->renderView($plain, $data) ?: ' ');
         }
 
         if (isset($raw)) {
-            $method = (isset($view) || isset($plain)) ? 'addPart' : 'setBody';
-
-            $message->$method($raw, 'text/plain');
+            $message->text($raw);
         }
     }
 
@@ -509,26 +498,24 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a Swift Message instance.
+     * Send a Symfony Email instance.
      *
-     * @param  \Swift_Message  $message
+     * @param  \Symfony\Component\Mime\Email  $message
      * @return int|null
      */
-    protected function sendSwiftMessage($message)
+    protected function sendSymfonyMessage(Email $message)
     {
-        $this->failedRecipients = [];
-
         try {
-            return $this->swift->send($message, $this->failedRecipients);
+            return $this->transport->send($message);
         } finally {
             $this->forceReconnection();
         }
     }
 
     /**
-     * Determines if the message can be sent.
+     * Determines if the email can be sent.
      *
-     * @param  \Swift_Message  $message
+     * @param  \Symfony\Component\Mime\Email  $message
      * @param  array  $data
      * @return bool
      */
@@ -568,27 +555,17 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function forceReconnection()
     {
-        $this->getSwiftMailer()->getTransport()->stop();
+        $this->getSymfonyMailer()->getTransport()->stop();
     }
 
     /**
-     * Get the array of failed recipients.
+     * Get the Symfony Transport instance.
      *
-     * @return array
+     * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
-    public function failures()
+    public function getSymfonyTransport()
     {
-        return $this->failedRecipients;
-    }
-
-    /**
-     * Get the Symfony Mailer instance.
-     *
-     * @return \Symfony\Component\Mailer\MailerInterface
-     */
-    public function getSymfonyMailer()
-    {
-        return $this->mailer;
+        return $this->transport;
     }
 
     /**
@@ -602,14 +579,14 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Set the Symfony Mailer instance.
+     * Set the Symfony Transport instance.
      *
-     * @param  \Symfony\Component\Mailer\MailerInterface  $mailer
+     * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
      * @return void
      */
-    public function setSymfonyMailer($mailer)
+    public function setSymfonyTransport($transport)
     {
-        $this->mailer = $mailer;
+        $this->transport = $transport;
     }
 
     /**
