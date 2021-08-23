@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
@@ -432,6 +433,20 @@ abstract class Relation implements BuilderContract
     public static function getMorphedModel($alias)
     {
         return static::$morphMap[$alias] ?? null;
+    }
+
+    /**
+     * Determines if the passed attributes are validated data.
+     *
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
+     * @return bool
+     */
+    protected function shouldForceAttributes($attributes, $values = [])
+    {
+        return $attributes instanceof ValidatedData && $values instanceof ValidatedData ||
+            ($attributes instanceof ValidatedData && empty($values)) ||
+            ($values instanceof ValidatedData && empty($attributes));
     }
 
     /**

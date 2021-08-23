@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -229,32 +230,35 @@ class HasManyThrough extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew($attributes)
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance($attributes);
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+
+        if (! is_null($instance = $this->where($rawAttributes)->first())) {
+            return $instance;
         }
 
-        return $instance;
+        return $this->related->newModelInstance(
+            $rawAttributes,
+            $this->shouldForceAttributes($attributes)
+        );
     }
 
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate($attributes, $values = [])
     {
-        $instance = $this->firstOrNew($attributes);
-
-        $instance->fill($values)->save();
-
-        return $instance;
+        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
+            $instance->fill($values)->save();
+        });
     }
 
     /**

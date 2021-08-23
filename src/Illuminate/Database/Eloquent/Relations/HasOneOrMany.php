@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -45,10 +46,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create and return an un-saved instance of the related model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function make(array $attributes = [])
+    public function make($attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
@@ -207,17 +208,25 @@ abstract class HasOneOrMany extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew($attributes = [], $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance(array_merge($attributes, $values));
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
 
-            $this->setForeignAttributesForCreate($instance);
+        if (! is_null($instance = $this->where($rawAttributes)->first())) {
+            return $instance;
         }
+
+        $instance = $this->related->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );
+
+        $this->setForeignAttributesForCreate($instance);
 
         return $instance;
     }
@@ -225,15 +234,27 @@ abstract class HasOneOrMany extends Relation
     /**
      * Get the first related record matching the attributes or create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes = [], array $values = [])
+    public function firstOrCreate($attributes = [], $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create(array_merge($attributes, $values));
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
+
+        if (! is_null($instance = $this->where($rawAttributes)->first())) {
+            return $instance;
         }
+
+        $instance = $this->related->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );
+
+        $this->setForeignAttributesForCreate($instance);
+
+        $instance->save();
 
         return $instance;
     }
@@ -241,16 +262,14 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate($attributes, $values = [])
     {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values);
-
-            $instance->save();
+            $instance->fill($values)->save();
         });
     }
 
@@ -285,10 +304,10 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -593,33 +594,52 @@ class BelongsToMany extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew($attributes = [], $values = [])
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
-            $instance = $this->related->newInstance(array_merge($attributes, $values));
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
+
+        if (! is_null($instance = $this->related->where($rawAttributes)->first())) {
+            return $instance;
         }
 
-        return $instance;
+        return $this->related->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );;
     }
 
     /**
      * Get the first related record matching the attributes or create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $joining
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
+    public function firstOrCreate($attributes = [], $values = [], $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
-            $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
+        $rawJoining = $joining instanceof ValidatedData ? $joining->toArray() : $joining;
+
+        if (! is_null($instance = $this->related->where($attributes)->first())) {
+            return $instance;
         }
+
+        $instance = $this->related->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );
+
+        $instance->save(['touch' => false]);
+
+        $this->attach($instance, $rawJoining, $touch);
 
         return $instance;
     }
@@ -627,21 +647,34 @@ class BelongsToMany extends Relation
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $values
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $joining
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
+    public function updateOrCreate($attributes, $values = [], $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
-            return $this->create(array_merge($attributes, $values), $joining, $touch);
+        $rawAttributes = $attributes instanceof ValidatedData ? $attributes->toArray() : $attributes;
+        $rawValues = $values instanceof ValidatedData ? $values->toArray() : $values;
+        $rawJoining = $joining instanceof ValidatedData ? $joining->toArray() : $joining;
+
+        if (! is_null($instance = $this->related->where($rawAttributes)->first())) {
+            $instance->fill($values);
+
+            $instance->save(['touch' => false]);
+
+            return $instance;
         }
 
-        $instance->fill($values);
+        $instance = $this->related->newModelInstance(
+            array_merge($rawAttributes, $rawValues),
+            $this->shouldForceAttributes($attributes, $values)
+        );
 
         $instance->save(['touch' => false]);
+
+        $this->attach($instance, $rawJoining, $touch);
 
         return $instance;
     }
@@ -1153,12 +1186,12 @@ class BelongsToMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
-     * @param  array  $joining
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $attributes
+     * @param  array|\Illuminate\Contracts\Support\ValidatedData  $joining
      * @param  bool  $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [], array $joining = [], $touch = true)
+    public function create($attributes = [], $joining = [], $touch = true)
     {
         $instance = $this->related->newInstance($attributes);
 
@@ -1167,7 +1200,11 @@ class BelongsToMany extends Relation
         // accomplish this which will insert the record and any more attributes.
         $instance->save(['touch' => false]);
 
-        $this->attach($instance, $joining, $touch);
+        $this->attach(
+            $instance,
+            $joining instanceof ValidatedData ? $joining->toArray() : $joining,
+            $touch
+        );
 
         return $instance;
     }
