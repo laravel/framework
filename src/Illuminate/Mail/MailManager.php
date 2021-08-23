@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Postmark\Transport as PostmarkTransport;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
