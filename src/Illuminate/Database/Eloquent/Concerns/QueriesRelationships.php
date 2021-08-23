@@ -359,8 +359,8 @@ trait QueriesRelationships
      */
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->whereHas($relation, function ($builder) use ($column, $operator, $value) {
-            $builder->where($column, $operator, $value);
+        return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
         });
     }
 
@@ -375,8 +375,42 @@ trait QueriesRelationships
      */
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->orWhereHas($relation, function ($builder) use ($column, $operator, $value) {
-            $builder->where($column, $operator, $value);
+        return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a where clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  string|array $types
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with an "or where" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  string|array $types
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
         });
     }
 

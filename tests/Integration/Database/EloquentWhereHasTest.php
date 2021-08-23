@@ -55,6 +55,22 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
+    public function testWhereMorphRelation()
+    {
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+    }
+
+    public function testOrWhereMorphRelation()
+    {
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)
+            ->orWhereMorphRelation('commentable', '*', 'public', false)
+            ->get();
+
+        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+    }
+
     public function testWithCount()
     {
         $users = User::whereHas('posts', function ($query) {
