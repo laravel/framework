@@ -115,7 +115,7 @@ class MailManager implements FactoryContract
         $mailer = new Mailer(
             $name,
             $this->app['view'],
-            $this->createTransport($config),
+            $this->createSymfonyTransport($config),
             $this->app['events']
         );
 
@@ -141,7 +141,7 @@ class MailManager implements FactoryContract
      *
      * @throws \InvalidArgumentException
      */
-    public function createTransport(array $config)
+    public function createSymfonyTransport(array $config)
     {
         // Here we will check if the "transport" key exists and if it doesn't we will
         // assume an application is still using the legacy mail configuration file
@@ -335,8 +335,8 @@ class MailManager implements FactoryContract
             // the transport configuration parameter in order to offer compatibility
             // with any Laravel <= 6.x application style mail configuration files.
             $transports[] = $this->app['config']['mail.driver']
-                ? $this->createTransport(array_merge($config, ['transport' => $name]))
-                : $this->createTransport($config);
+                ? $this->createSymfonyTransport(array_merge($config, ['transport' => $name]))
+                : $this->createSymfonyTransport($config);
         }
 
         return new FailoverTransport($transports);
