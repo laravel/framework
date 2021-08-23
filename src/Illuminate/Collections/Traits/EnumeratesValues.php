@@ -16,6 +16,9 @@ use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 
 /**
+ * @template TKey of array-key
+ * @template TValue
+ *
  * @property-read HigherOrderCollectionProxy $average
  * @property-read HigherOrderCollectionProxy $avg
  * @property-read HigherOrderCollectionProxy $contains
@@ -43,8 +46,6 @@ use Traversable;
  * @property-read HigherOrderCollectionProxy $unless
  * @property-read HigherOrderCollectionProxy $until
  * @property-read HigherOrderCollectionProxy $when
- * @template TKey of array-key
- * @template TValue
  */
 trait EnumeratesValues
 {

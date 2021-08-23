@@ -11,6 +11,7 @@ use JsonSerializable;
 /**
  * @template TKey of array-key
  * @template TValue
+ *
  * @extends \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @extends \IteratorAggregate<TKey, TValue>
  */

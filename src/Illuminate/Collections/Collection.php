@@ -11,6 +11,7 @@ use stdClass;
 /**
  * @template TKey of array-key
  * @template TValue
+ *
  * @implements \ArrayAccess<TKey, TValue>
  * @implements \Illuminate\Support\Enumerable<TKey, TValue>
  */
