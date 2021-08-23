@@ -8,7 +8,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class LogTransport extends TransportInterface
+class LogTransport implements TransportInterface
 {
     /**
      * The Logger instance.
