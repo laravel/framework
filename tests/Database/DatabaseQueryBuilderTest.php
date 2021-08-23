@@ -4105,6 +4105,21 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testWhereWithQueryableValue()
+    {
+        $builder = $this->getBuilder();
+
+        $sub = $this->getBuilder();
+
+        $builder->select('*')
+            ->from('users')
+            ->where('role', '=', 'member')
+            ->where('email_verified_at', '>', $sub->select('created_at')->from('votes')->latest()->where('value', 1)->limit(1));
+
+        $this->assertSame('select * from "users" where "role" = ? and "email_verified_at" > (select "created_at" from "votes" where "value" = ? order by "created_at" desc limit 1)', $builder->toSql());
+        $this->assertEquals(['member', 1], $builder->getBindings());
+    }
+
     public function testFromSub()
     {
         $builder = $this->getBuilder();

@@ -752,6 +752,17 @@ class Builder
             }
         }
 
+        // If the value is queryable instance, we will assume the developer wants
+        // to run a subquery and then compare the result of that subquery with
+        // the given value that was provided to the method.
+        if ($this->isQueryable($value)) {
+            [$sub, $bindings] = $this->createSub($value);
+
+            $value = new Expression('('.$sub.')');
+
+            $this->addBinding($bindings, 'where');
+        }
+
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
