@@ -269,7 +269,9 @@ abstract class HasOneOrMany extends Relation
     public function updateOrCreate($attributes, $values = [])
     {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
+            $instance->fill($values);
+
+            $instance->save();
         });
     }
 
