@@ -18,7 +18,7 @@ class Message
      *
      * @var \Symfony\Component\Mime\Email
      */
-    protected $email;
+    protected $message;
 
     /**
      * CIDs of files embedded in the message.
@@ -30,12 +30,12 @@ class Message
     /**
      * Create a new message instance.
      *
-     * @param  \Symfony\Component\Mime\Email  $email
+     * @param  \Symfony\Component\Mime\Email  $message
      * @return void
      */
-    public function __construct(Email $email)
+    public function __construct(Email $message)
     {
-        $this->email = $email;
+        $this->message = $message;
     }
 
     /**
@@ -48,8 +48,8 @@ class Message
     public function from($address, $name = null)
     {
         is_array($address)
-            ? $this->email->from(...$address)
-            : $this->email->from(new Address($address, (string) $name));
+            ? $this->message->from(...$address)
+            : $this->message->from(new Address($address, (string) $name));
 
         return $this;
     }
@@ -64,8 +64,8 @@ class Message
     public function sender($address, $name = null)
     {
         is_array($address)
-            ? $this->email->sender(...$address)
-            : $this->email->sender(new Address($address, (string) $name));
+            ? $this->message->sender(...$address)
+            : $this->message->sender(new Address($address, (string) $name));
 
         return $this;
     }
@@ -78,7 +78,7 @@ class Message
      */
     public function returnPath($address)
     {
-        $this->email->returnPath($address);
+        $this->message->returnPath($address);
 
         return $this;
     }
@@ -95,8 +95,8 @@ class Message
     {
         if ($override) {
             is_array($address)
-                ? $this->email->to(...$address)
-                : $this->email->to(new Address($address, (string) $name));
+                ? $this->message->to(...$address)
+                : $this->message->to(new Address($address, (string) $name));
 
             return $this;
         }
@@ -116,8 +116,8 @@ class Message
     {
         if ($override) {
             is_array($address)
-                ? $this->email->cc(...$address)
-                : $this->email->cc(new Address($address, (string) $name));
+                ? $this->message->cc(...$address)
+                : $this->message->cc(new Address($address, (string) $name));
 
             return $this;
         }
@@ -137,8 +137,8 @@ class Message
     {
         if ($override) {
             is_array($address)
-                ? $this->email->bcc(...$address)
-                : $this->email->bcc(new Address($address, (string) $name));
+                ? $this->message->bcc(...$address)
+                : $this->message->bcc(new Address($address, (string) $name));
 
             return $this;
         }
@@ -179,9 +179,9 @@ class Message
                 return $address;
             })->all();
 
-            $this->email->{"{$type}"}(...$addresses);
+            $this->message->{"{$type}"}(...$addresses);
         } else {
-            $this->email->{"add{$type}"}(new Address($address, (string) $name));
+            $this->message->{"add{$type}"}(new Address($address, (string) $name));
         }
 
         return $this;
@@ -195,7 +195,7 @@ class Message
      */
     public function subject($subject)
     {
-        $this->email->subject($subject);
+        $this->message->subject($subject);
 
         return $this;
     }
@@ -208,7 +208,7 @@ class Message
      */
     public function priority($level)
     {
-        $this->email->priority($level);
+        $this->message->priority($level);
 
         return $this;
     }
@@ -222,7 +222,7 @@ class Message
      */
     public function attach($file, array $options = [])
     {
-        $this->email->attachFromPath($file, $options['as'] ?? null, $options['mime'] ?? null);
+        $this->message->attachFromPath($file, $options['as'] ?? null, $options['mime'] ?? null);
 
         return $this;
     }
@@ -237,7 +237,7 @@ class Message
      */
     public function attachData($data, $name, array $options = [])
     {
-        $this->email->attach($data, $name, $options['mime'] ?? null);
+        $this->message->attach($data, $name, $options['mime'] ?? null);
 
         return $this;
     }
@@ -250,7 +250,7 @@ class Message
      */
     public function embed($file)
     {
-        $this->email->embedFromPath($file);
+        $this->message->embedFromPath($file);
 
         return $this;
     }
@@ -265,7 +265,7 @@ class Message
      */
     public function embedData($data, $name, $contentType = null)
     {
-        $this->email->embed($data, $name, $contentType);
+        $this->message->embed($data, $name, $contentType);
 
         return $this;
     }
@@ -277,7 +277,7 @@ class Message
      */
     public function getSymfonyMessage()
     {
-        return $this->email;
+        return $this->message;
     }
 
     /**

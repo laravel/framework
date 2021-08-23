@@ -116,7 +116,7 @@ class MailManager implements FactoryContract
         $mailer = new Mailer(
             $name,
             $this->app['view'],
-            $this->createSymfonyMailer($config),
+            $this->createTransport($config),
             $this->app['events']
         );
 
@@ -132,17 +132,6 @@ class MailManager implements FactoryContract
         }
 
         return $mailer;
-    }
-
-    /**
-     * Create the Symfony Mailer instance for the given configuration.
-     *
-     * @param  array  $config
-     * @return \Symfony\Component\Mailer\MailerInterface
-     */
-    protected function createSymfonyMailer(array $config)
-    {
-        return new SymfonyMailer($this->createTransport($config));
     }
 
     /**
