@@ -2,10 +2,8 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Mail\Transport\ArrayTransport;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
-use Symfony\Component\Mailer\Transport\SendmailTransport;
 
 class MailFailoverTransportTest extends TestCase
 {

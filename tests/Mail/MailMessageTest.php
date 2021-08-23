@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Mail;
 use Illuminate\Mail\Message;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
