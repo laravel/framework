@@ -78,7 +78,7 @@ class RuleMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule instead.'],
+            ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule.'],
         ];
     }
 }
