@@ -349,6 +349,38 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a basic where clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereHas($relation, function (Builder $builder) use ($column, $operator, $value) {
+            $builder->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add an "or where" clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereHas($relation, function (Builder $builder) use ($value, $operator, $column) {
+            $builder->where($column, $operator, $value);
+        });
+    }
+
+    /**
      * Add subselect queries to include an aggregate value for a relationship.
      *
      * @param  mixed  $relations

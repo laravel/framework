@@ -41,6 +41,20 @@ class EloquentWhereHasTest extends DatabaseTestCase
         (new Comment)->commentable()->associate($post)->save();
     }
 
+    public function testWhereRelation()
+    {
+        $users = User::whereRelation('posts', 'public', true)->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelation()
+    {
+        $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
     public function testWithCount()
     {
         $users = User::whereHas('posts', function ($query) {
