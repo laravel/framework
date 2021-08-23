@@ -1127,7 +1127,7 @@ class Validator implements ValidatorContract
         // We need the last part of the attribute to access the parent data
         // later on. This enables us to validate 'user.*.contact' based on
         // another value in the parent (e.g. user.*.type). If the attribute
-        // looks like 'user.*.contact' it returns '.value', otherwise false.
+        // looks like 'user.*.contact' it returns '.contact', otherwise false.
         // In case of false, we don't substr() in the following if() and use
         // the full attribute.
         $attributeEnd = strrchr($attribute, '.');
