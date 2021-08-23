@@ -388,7 +388,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      */
     public function fill($attributes)
     {
-        if ($attributes instanceof ValidatedData){
+        if ($attributes instanceof ValidatedData) {
             return $this->forceFill($attributes->toArray());
         }
 

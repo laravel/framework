@@ -869,7 +869,7 @@ class Builder implements BuilderContract
      */
     public function create($attributes = [])
     {
-        if ($attributes instanceof ValidatedData){
+        if ($attributes instanceof ValidatedData) {
             return $this->forceCreate($attributes->toArray());
         }
 
