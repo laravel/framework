@@ -8,7 +8,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class ArrayTransport extends TransportInterface
+class ArrayTransport implements TransportInterface
 {
     /**
      * The collection of Swift Messages.
