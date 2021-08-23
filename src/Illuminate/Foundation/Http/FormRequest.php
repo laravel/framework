@@ -188,11 +188,14 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get a validated input container for the validated input.
      *
-     * @return \Illuminate\Support\ValidatedInput
+     * @param  array|null  $keys
+     * @return \Illuminate\Support\ValidatedInput|array
      */
-    public function safe()
+    public function safe(array $keys = null)
     {
-        return $this->validator->safe();
+        return is_array($keys)
+                    ? $this->validator->safe()->only($keys)
+                    : $this->validator->safe();
     }
 
     /**
