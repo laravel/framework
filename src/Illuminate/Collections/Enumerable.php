@@ -816,8 +816,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws \Illuminate\Collections\ItemNotFoundException
-     * @throws \Illuminate\Collections\MultipleItemsFoundException
+     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\MultipleItemsFoundException
      */
     public function sole($key = null, $operator = null, $value = null);
 

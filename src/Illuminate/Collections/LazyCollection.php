@@ -1082,7 +1082,7 @@ class LazyCollection implements Enumerable
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Support\ItemNotFoundException
      */
     public function firstOrFail($key = null, $operator = null, $value = null)
     {
@@ -1091,7 +1091,7 @@ class LazyCollection implements Enumerable
             : $key;
 
         return $this
-            ->when($filter !== null)
+            ->unless($filter == null)
             ->filter($filter)
             ->take(1)
             ->collect()

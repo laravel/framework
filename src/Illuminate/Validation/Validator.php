@@ -510,11 +510,14 @@ class Validator implements ValidatorContract
     /**
      * Get a validated input container for the validated input.
      *
-     * @return \Illuminate\Support\ValidatedInput
+     * @param  array|null  $keys
+     * @return \Illuminate\Support\ValidatedInput|array
      */
-    public function safe()
+    public function safe(array $keys = null)
     {
-        return new ValidatedInput($this->validated());
+        return is_array($keys)
+                ? (new ValidatedInput($this->validated()))->only($keys)
+                : new ValidatedInput($this->validated());
     }
 
     /**

@@ -1138,7 +1138,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  mixed  $value
      * @return mixed
      *
-     * @throws \Illuminate\Collections\ItemNotFoundException
+     * @throws \Illuminate\Support\ItemNotFoundException
      */
     public function firstOrFail($key = null, $operator = null, $value = null)
     {
@@ -1146,7 +1146,7 @@ class Collection implements ArrayAccess, Enumerable
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
-        $items = $this->when($filter !== null)->filter($filter);
+        $items = $this->unless($filter == null)->filter($filter);
 
         if ($items->isEmpty()) {
             throw new ItemNotFoundException;
