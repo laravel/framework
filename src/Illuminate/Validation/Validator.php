@@ -1109,7 +1109,7 @@ class Validator implements ValidatorContract
             $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
-                if ($callback($payload, $this->makeSometimesItemData($ruleKey))) {
+                if ($callback($payload, $this->dataForSometimesIteration($ruleKey))) {
                     $this->addRules([$ruleKey => $ruleValue]);
                 }
             }
@@ -1119,28 +1119,22 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the data that should be injected into the iteration of a wildcard "sometimes" callback.
+     *
      * @param  string  $attribute
-     * @return array|Fluent|mixed
+     * @return \Illuminate\Support\Fluent|array|mixed
      */
-    private function makeSometimesItemData(string $attribute)
+    private function dataForSometimesIteration(string $attribute)
     {
-        // We need the last part of the attribute to access the parent data
-        // later on. This enables us to validate 'user.*.contact' based on
-        // another value in the parent (e.g. user.*.type). If the attribute
-        // looks like 'user.*.contact' it returns '.contact', otherwise false.
-        // In case of false, we don't substr() in the following if() and use
-        // the full attribute.
-        $attributeEnd = strrchr($attribute, '.');
+        $lastSegmentOfAttribute = strrchr($attribute, '.');
 
-        if ($attributeEnd) {
-            $attribute = substr($attribute, 0, -strlen($attributeEnd));
-        }
+        $attribute = $lastSegmentOfAttribute
+                    ? Str::replaceLast($lastSegmentOfAttribute, '', $attribute)
+                    : $attribute;
 
-        $itemData = data_get($this->data, $attribute);
-
-        return is_array($itemData)
-            ? new Fluent($itemData)
-            : $itemData;
+        return is_array($data = data_get($this->data, $attribute))
+                    ? new Fluent($data)
+                    : $data;
     }
 
     /**
