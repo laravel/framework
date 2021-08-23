@@ -397,10 +397,10 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Remove an item from the collection by key.
      *
-     * @param  string|array  $keys
+     * @param  TKey|array<array-key, TKey>  $keys
      * @return $this
      */
-    public function forget($keys) // TODO
+    public function forget($keys)
     {
         foreach ((array) $keys as $key) {
             $this->offsetUnset($key);
@@ -815,9 +815,9 @@ class Collection implements ArrayAccess, Enumerable
      * Get and remove the last N items from the collection.
      *
      * @param  int  $count
-     * @return mixed
+     * @return static<int, TValue>|TValue|null
      */
-    public function pop($count = 1) // TODO
+    public function pop($count = 1)
     {
         if ($count === 1) {
             return array_pop($this->items);
@@ -841,11 +841,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Push an item onto the beginning of the collection.
      *
-     * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  TValue  $value
+     * @param  TKey  $key
      * @return $this
      */
-    public function prepend($value, $key = null) // TODO
+    public function prepend($value, $key = null)
     {
         $this->items = Arr::prepend($this->items, ...func_get_args());
 
@@ -858,7 +858,7 @@ class Collection implements ArrayAccess, Enumerable
      * @param  ...TValue  $values
      * @return $this
      */
-    public function push(...$values) // TODO
+    public function push(...$values)
     {
         foreach ($values as $value) {
             $this->items[] = $value;
@@ -887,11 +887,13 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get and remove an item from the collection.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @template TPullDefault
+     *
+     * @param  TKey  $key
+     * @param  TPullDefault  $default
+     * @return TValue|TPullDefault
      */
-    public function pull($key, $default = null) // TODO
+    public function pull($key, $default = null)
     {
         return Arr::pull($this->items, $key, $default);
     }
@@ -899,11 +901,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Put an item in the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  TKey  $key
+     * @param  TValue  $value
      * @return $this
      */
-    public function put($key, $value) // TODO
+    public function put($key, $value)
     {
         $this->offsetSet($key, $value);
 
@@ -962,7 +964,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Search the collection for a given value and return the corresponding key if successful.
      *
-     * @param  TValue|callable(TValue,TKey): bool  $value
+     * @param  TValue|(callable(TValue,TKey): bool)  $value
      * @param  bool  $strict
      * @return TKey|bool
      */
@@ -985,9 +987,9 @@ class Collection implements ArrayAccess, Enumerable
      * Get and remove the first N items from the collection.
      *
      * @param  int  $count
-     * @return mixed
+     * @return static<int, TValue>|TValue|null
      */
-    public function shift($count = 1) // TODO
+    public function shift($count = 1)
     {
         if ($count === 1) {
             return array_shift($this->items);
@@ -1024,9 +1026,9 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  int  $size
      * @param  int  $step
-     * @return static
+     * @return static<int, static<TKey, TValue>>
      */
-    public function sliding($size = 2, $step = 1) // TODO
+    public function sliding($size = 2, $step = 1)
     {
         $chunks = floor(($this->count() - $size) / $step) + 1;
 
@@ -1084,7 +1086,7 @@ class Collection implements ArrayAccess, Enumerable
      * Split a collection into a certain number of groups.
      *
      * @param  int  $numberOfGroups
-     * @return static<int, static<int, TValue>>
+     * @return static<int, static<TKey, TValue>>
      */
     public function split($numberOfGroups)
     {
@@ -1121,9 +1123,9 @@ class Collection implements ArrayAccess, Enumerable
      * Split a collection into a certain number of groups, and fill the first groups completely.
      *
      * @param  int  $numberOfGroups
-     * @return static
+     * @return static<int, static<TKey, TValue>>
      */
-    public function splitIn($numberOfGroups) // TODO
+    public function splitIn($numberOfGroups)
     {
         return $this->chunk(ceil($this->count() / $numberOfGroups));
     }
@@ -1375,10 +1377,10 @@ class Collection implements ArrayAccess, Enumerable
      *
      * @param  int  $offset
      * @param  int|null  $length
-     * @param  mixed  $replacement
-     * @return static
+     * @param  array<array-key, TValue>  $replacement
+     * @return static<TKey, TValue>
      */
-    public function splice($offset, $length = null, $replacement = []) // TODO
+    public function splice($offset, $length = null, $replacement = [])
     {
         if (func_num_args() === 1) {
             return new static(array_splice($this->items, $offset));
@@ -1427,10 +1429,10 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Transform each item in the collection using a callback.
      *
-     * @param  callable  $callback
+     * @param  callable(TValue, TKey): TValue  $callback
      * @return $this
      */
-    public function transform(callable $callback) // TODO
+    public function transform(callable $callback)
     {
         $this->items = $this->map($callback)->all();
 
@@ -1488,10 +1490,10 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get an iterator for the items.
      *
-     * @return \ArrayIterator
+     * @return \ArrayIterator<TKey, TValue>
      */
     #[\ReturnTypeWillChange]
-    public function getIterator() // TODO
+    public function getIterator()
     {
         return new ArrayIterator($this->items);
     }
@@ -1521,10 +1523,10 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Add an item to the collection.
      *
-     * @param  mixed  $item
+     * @param  TValue  $item
      * @return $this
      */
-    public function add($item) // TODO
+    public function add($item)
     {
         $this->items[] = $item;
 
@@ -1534,9 +1536,9 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get a base Support collection instance from this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    public function toBase() // TODO
+    public function toBase()
     {
         return new self($this);
     }
@@ -1544,11 +1546,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Determine if an item exists at an offset.
      *
-     * @param  mixed  $key
+     * @param  TKey  $key
      * @return bool
      */
     #[\ReturnTypeWillChange]
-    public function offsetExists($key) // TODO
+    public function offsetExists($key)
     {
         return isset($this->items[$key]);
     }
@@ -1556,11 +1558,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get an item at a given offset.
      *
-     * @param  mixed  $key
-     * @return mixed
+     * @param  TKey  $key
+     * @return TValue
      */
     #[\ReturnTypeWillChange]
-    public function offsetGet($key) // TODO
+    public function offsetGet($key)
     {
         return $this->items[$key];
     }
@@ -1568,12 +1570,12 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Set the item at a given offset.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param  TKey|null  $key
+     * @param  TValue  $value
      * @return void
      */
     #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value) // TODO
+    public function offsetSet($key, $value)
     {
         if (is_null($key)) {
             $this->items[] = $value;
@@ -1585,11 +1587,11 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Unset the item at a given offset.
      *
-     * @param  string  $key
+     * @param  TKey  $key
      * @return void
      */
     #[\ReturnTypeWillChange]
-    public function offsetUnset($key) // TODO
+    public function offsetUnset($key)
     {
         unset($this->items[$key]);
     }

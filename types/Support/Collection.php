@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Collection;
 use function PHPStan\Testing\assertType;
 
 class User extends Authenticatable
@@ -17,11 +18,6 @@ $iterable = [];
 $traversable = [];
 
 assertType('Illuminate\Support\Collection<int, User>', $collection);
-
-foreach ($collection as $int => $user) {
-    assertType('int', $int);
-    assertType('User', $user);
-}
 
 assertType('Illuminate\Support\Collection<int, string>', collect(['string']));
 assertType('Illuminate\Support\Collection<string, User>', collect(['string' => new User]));
@@ -553,14 +549,14 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->replaceRecur
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->reverse());
 
-assertType('int|bool', $collection->make([1])->search(2));
-assertType('string|bool', $collection->make(['string' => 'string'])->search('string'));
-assertType('int|bool', $collection->search(function ($user, $int) {
-    assertType('User', $user);
-    assertType('int', $int);
-
-    return true;
-}));
+// assertType('int|bool', $collection->make([1])->search(2));
+// assertType('string|bool', $collection->make(['string' => 'string'])->search('string'));
+// assertType('int|bool', $collection->search(function ($user, $int) {
+//     assertType('User', $user);
+//    assertType('int', $int);
+//
+//    return true;
+// }));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->shuffle());
 assertType('Illuminate\Support\Collection<int, User>', $collection->shuffle());
@@ -751,6 +747,94 @@ assertType('array<int, User>', $collection->all());
 assertType('User|null', $collection->get(0));
 assertType('string|User', $collection->get(0, 'string'));
 
+assertType('Illuminate\Support\Collection<int, User>', $collection->forget(1));
+assertType('Illuminate\Support\Collection<int, User>', $collection->forget([1, 2]));
+
+assertType('Illuminate\Support\Collection<int, User>|User|null', $collection->pop(1));
+assertType('Illuminate\Support\Collection<int, string>|string|null', $collection::make([
+    'string-key-1' => 'string-value-1',
+    'string-key-2' => 'string-value-2',
+])->pop(2));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->prepend(2));
+assertType('Illuminate\Support\Collection<int, User>', $collection->prepend(new User, 2));
+
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->push(2));
+assertType('Illuminate\Support\Collection<int, User>', $collection->push(new User, new User));
+
+assertType('User|null', $collection->pull(1));
+assertType('string|User', $collection->pull(1, 'string'));
+
+assertType('Illuminate\Support\Collection<int, User>', $collection->put(1, new User));
+assertType('Illuminate\Support\Collection<string, string>', $collection::make([
+    'string-key-1' => 'string-value-1'
+])->put('string-key-2', 'string-value-2'));
+
+assertType('Illuminate\Support\Collection<int, User>|User|null', $collection->shift(1));
+assertType('Illuminate\Support\Collection<int, string>|string|null', $collection::make([
+    'string-key-1' => 'string-value-1',
+    'string-key-2' => 'string-value-2',
+])->shift(2));
+
+assertType(
+    'Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>',
+    $collection->sliding(2)
+);
+
+assertType(
+    'Illuminate\Support\Collection<int, Illuminate\Support\Collection<string, string>>',
+    $collection::make(['string' => 'string'])->sliding(2, 1)
+);
+
+assertType(
+    'Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>',
+    $collection->splitIn(2)
+);
+
+assertType(
+    'Illuminate\Support\Collection<int, Illuminate\Support\Collection<string, string>>',
+    $collection::make(['string' => 'string'])->splitIn(1)
+);
+
+assertType('Illuminate\Support\Collection<int, User>', $collection->splice(1));
+assertType('Illuminate\Support\Collection<int, User>', $collection->splice(1, 1, [new User]));
+
+assertType('Illuminate\Support\Collection<int, User>', $collection->transform(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return new User;
+}));
+
+assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User));
+
+/**
+ * @template TKey of array-key
+ * @template TValue
+ *
+ * @extends \Illuminate\Support\Collection<TKey, TValue>
+ */
+class CustomCollection extends Collection {}
+
+// assertType('CustomCollection<int, User>', CustomCollection::make([new User]));
+assertType('Illuminate\Support\Collection<int, User>', CustomCollection::make([new User])->toBase());
+
+assertType('bool', $collection->offsetExists(0));
+assertType('bool', isset($collection[0]));
+
+$collection->offsetSet(0, new User);
+$collection->offsetSet(null, new User);
+assertType('User', $collection[0] = new User);
+
+$collection->offsetUnset(0);
+unset($collection[0]);
+
 assertType('array<int, User>', $collection->toArray());
 assertType('array<string, string>', collect(['string' => 'string'])->toArray());
 assertType('array<int, int>', collect([1, 2])->toArray());
+
+assertType('ArrayIterator<int, User>', $collection->getIterator());
+foreach ($collection as $int => $user) {
+    assertType('int', $int);
+    assertType('User', $user);
+}
