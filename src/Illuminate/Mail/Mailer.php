@@ -547,18 +547,6 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Force the transport to re-connect.
-     *
-     * This will prevent errors in daemon queue situations.
-     *
-     * @return void
-     */
-    protected function forceReconnection()
-    {
-        $this->getSymfonyMailer()->getTransport()->stop();
-    }
-
-    /**
      * Get the Symfony Transport instance.
      *
      * @return \Symfony\Component\Mailer\Transport\TransportInterface
