@@ -767,7 +767,7 @@ assertType('string|User', $collection->pull(1, 'string'));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->put(1, new User));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make([
-    'string-key-1' => 'string-value-1'
+    'string-key-1' => 'string-value-1',
 ])->put('string-key-2', 'string-value-2'));
 
 assertType('Illuminate\Support\Collection<int, User>|User|null', $collection->shift(1));
@@ -814,7 +814,9 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User
  *
  * @extends \Illuminate\Support\Collection<TKey, TValue>
  */
-class CustomCollection extends Collection {}
+class CustomCollection extends Collection
+{
+}
 
 // assertType('CustomCollection<int, User>', CustomCollection::make([new User]));
 assertType('Illuminate\Support\Collection<int, User>', CustomCollection::make([new User])->toBase());
