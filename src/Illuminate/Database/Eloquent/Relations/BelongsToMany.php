@@ -610,7 +610,7 @@ class BelongsToMany extends Relation
         return $this->related->newModelInstance(
             array_merge($rawAttributes, $rawValues),
             $this->shouldForceAttributes($attributes, $values)
-        );;
+        );
     }
 
     /**
