@@ -321,12 +321,10 @@ class MailManager implements FactoryContract
             'X-PM-Message-Stream' => $config['message_stream_id'],
         ] : [];
 
-        return tap(new PostmarkTransport(
+        return new PostmarkTransport(
             $config['token'] ?? $this->app['config']->get('services.postmark.token'),
             $headers
-        ), function ($transport) {
-            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin);
-        });
+        );
     }
 
     /**

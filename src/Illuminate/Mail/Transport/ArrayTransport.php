@@ -3,9 +3,12 @@
 namespace Illuminate\Mail\Transport;
 
 use Illuminate\Support\Collection;
-use Swift_Mime_SimpleMessage;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\RawMessage;
 
-class ArrayTransport extends Transport
+class ArrayTransport extends TransportInterface
 {
     /**
      * The collection of Swift Messages.
@@ -27,13 +30,11 @@ class ArrayTransport extends Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $this->beforeSendPerformed($message);
-
         $this->messages[] = $message;
 
-        return $this->numberOfRecipients($message);
+        return new SentMessage($message, $envelope);
     }
 
     /**
@@ -54,5 +55,15 @@ class ArrayTransport extends Transport
     public function flush()
     {
         return $this->messages = new Collection;
+    }
+
+    /**
+     * Get the string representation of the message.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return 'array';
     }
 }
