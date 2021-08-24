@@ -4,7 +4,7 @@
 
 ## Supported Versions
 
-Please see [our support policy](https://laravel.com/docs/releases#support-policy) on supported versions for security releases.
+Please see [our support policy](https://laravel.com/docs/releases#support-policy) for information on supported versions for security releases.
 
 ## Reporting a Vulnerability
 
