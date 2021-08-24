@@ -6,7 +6,7 @@
 
 Version | Security Fixes Until
 --- | ---
-8 | September 8th, 2021
+8 | July 3rd, 2022
 7 | March 3rd, 2021
 6 (LTS) | September 3rd, 2022
 5.8	| February 26th, 2020
