@@ -840,10 +840,13 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      *
      * @param  array  $attributes
      * @param  array  $options
+     * @return array  ...$namedAttributes
      * @return bool
      */
-    public function update(array $attributes = [], array $options = [])
+    public function update(array $attributes = [], array $options = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (! $this->exists) {
             return false;
         }
@@ -856,10 +859,13 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      *
      * @param  array  $attributes
      * @param  array  $options
+     * @return array  ...$namedAttributes
      * @return bool
      */
-    public function updateQuietly(array $attributes = [], array $options = [])
+    public function updateQuietly(array $attributes = [], array $options = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (! $this->exists) {
             return false;
         }
