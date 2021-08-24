@@ -99,7 +99,7 @@ class PendingRequest
     protected $retryDelay = 100;
 
     /**
-     * A callback to determine if the request should be retried
+     * A callback to determine if the request should be retried.
      *
      * @var callable|null
      */
