@@ -162,11 +162,11 @@ class ServeCommand extends Command
     }
 
     /**
-     * Get host and port from host option string.
+     * Get the host and port from the host option string.
      *
      * @return array
      */
-    protected function getHostAndPort(): array
+    protected function getHostAndPort()
     {
         $hostParts = explode(':', $this->input->getOption('host'));
 
