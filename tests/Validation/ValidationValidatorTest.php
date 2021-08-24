@@ -4299,6 +4299,14 @@ class ValidationValidatorTest extends TestCase
             return $item;
         });
         $this->assertEquals(['email' => ['required', 'email']], $v->getRules());
+
+        // ['attendee.*'] -> if attendee name is set, all other fields will be required as well
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*'=> 'string']);
+        $v->sometimes(['attendee.*'], 'required', function ($i, $item) {
+            return (bool) $item->name;
+        });
+        $this->assertEquals(['attendee.name' => ['string', 'required'], 'attendee.title' => ['string', 'required'], 'attendee.type' => ['string', 'required']], $v->getRules());
     }
 
     public function testCustomValidators()
