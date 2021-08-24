@@ -26,6 +26,15 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
     }
 
+    public function testMakeMethodWithNamedArgumentsDoesNotSaveNewModel()
+    {
+        $relation = $this->getRelation();
+        $instance = $this->expectNewModel($relation, ['name' => 'taylor']);
+        $instance->expects($this->never())->method('save');
+
+        $this->assertEquals($instance, $relation->make(name: 'taylor'));
+    }
+
     public function testMakeManyCreatesARelatedModelForEachRecord()
     {
         $records = [
@@ -53,6 +62,14 @@ class DatabaseEloquentHasManyTest extends TestCase
         $created = $this->expectCreatedModel($relation, ['name' => 'taylor']);
 
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
+    }
+
+    public function testCreateMethodWithNamedArgumentsProperlyCreatesNewModel()
+    {
+        $relation = $this->getRelation();
+        $created = $this->expectCreatedModel($relation, ['name' => 'taylor']);
+
+        $this->assertEquals($created, $relation->create(name: 'taylor'));
     }
 
     public function testFindOrNewMethodFindsModel()
@@ -93,6 +110,17 @@ class DatabaseEloquentHasManyTest extends TestCase
         $model->shouldReceive('setAttribute')->never();
 
         $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    public function testFirstOrNewMethodWithNamedArgumentsAndWithValuesFindsFirstModel()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(stdClass::class));
+        $relation->getRelated()->shouldReceive('newInstance')->never();
+        $model->shouldReceive('setAttribute')->never();
+
+        $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(foo: 'bar', values: ['baz' => 'qux']));
     }
 
     public function testFirstOrNewMethodReturnsNewModelWithForeignKeySet()

@@ -188,6 +188,18 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
+    public function testFirstOrCreateMethodWithNamedArgumentsAndWithValuesFindsFirstModel()
+    {
+        $relation = $this->getOneRelation();
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
+        $relation->getRelated()->shouldReceive('newInstance')->never();
+        $model->shouldReceive('setAttribute')->never();
+        $model->shouldReceive('save')->never();
+
+        $this->assertInstanceOf(Model::class, $relation->firstOrCreate(foo: 'bar', values: ['baz' => 'qux']));
+    }
+
     public function testFirstOrCreateMethodCreatesNewMorphModel()
     {
         $relation = $this->getOneRelation();

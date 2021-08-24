@@ -1560,6 +1560,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         Carbon::setTestNow(null);
     }
 
+    public function testUpdateWithNamedArguments()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', $now])->andReturn(1);
+
+        $result = $builder->update(foo: 'bar');
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     public function testUpdateWithTimestampValue()
     {
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));

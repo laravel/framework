@@ -107,6 +107,17 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
     }
 
+    public function testMakeMethodDoesNotSaveNewModelWithNamedAttributes()
+    {
+        $relation = $this->getRelation();
+        $instance = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'newInstance', 'setAttribute'])->getMock();
+        $relation->getRelated()->shouldReceive('newInstance')->with(['name' => 'taylor'])->andReturn($instance);
+        $instance->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
+        $instance->expects($this->never())->method('save');
+
+        $this->assertEquals($instance, $relation->make(name: 'taylor'));
+    }
+
     public function testSaveMethodSetsForeignKeyOnModel()
     {
         $relation = $this->getRelation();
@@ -127,6 +138,17 @@ class DatabaseEloquentHasOneTest extends TestCase
         $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
 
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
+    }
+
+    public function testCreateMethodProperlyCreatesNewModelWithNamedAttributes()
+    {
+        $relation = $this->getRelation();
+        $created = $this->getMockBuilder(Model::class)->onlyMethods(['save', 'getKey', 'setAttribute'])->getMock();
+        $created->expects($this->once())->method('save')->willReturn(true);
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['name' => 'taylor'])->andReturn($created);
+        $created->expects($this->once())->method('setAttribute')->with('foreign_key', 1);
+
+        $this->assertEquals($created, $relation->create(name: 'taylor'));
     }
 
     public function testRelationIsProperlyInitialized()
