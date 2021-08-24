@@ -864,10 +864,13 @@ class Builder implements BuilderContract
      * Save a new model and return the instance. Allow mass-assignment.
      *
      * @param  array  $attributes
+     * @param  array ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function forceCreate(array $attributes)
+    public function forceCreate(array $attributes, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return $this->model->unguarded(function () use ($attributes) {
             return $this->newModelInstance()->create($attributes);
         });
@@ -877,10 +880,13 @@ class Builder implements BuilderContract
      * Update records in the database.
      *
      * @param  array  $values
+     * @param  array  ...$namedValues
      * @return int
      */
-    public function update(array $values)
+    public function update(array $values = [], ...$namedValues)
     {
+        $values  = array_merge($values, $namedValues);
+
         return $this->toBase()->update($this->addUpdatedAtColumn($values));
     }
 
