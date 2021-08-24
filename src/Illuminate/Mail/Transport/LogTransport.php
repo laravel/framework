@@ -35,7 +35,7 @@ class LogTransport implements TransportInterface
     {
         $this->logger->debug($message->toString());
 
-        return new SentMessage($message, $envelope);
+        return new SentMessage($message, $envelope ?? Envelope::create($message));
     }
 
     /**

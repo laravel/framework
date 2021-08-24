@@ -15,6 +15,7 @@ use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
 
@@ -187,11 +188,11 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $html
      * @param  mixed  $callback
-     * @return void
+     * @return \Symfony\Component\Mailer\SentMessage|null
      */
     public function html($html, $callback)
     {
-        $this->send(['html' => new HtmlString($html)], [], $callback);
+        return $this->send(['html' => new HtmlString($html)], [], $callback);
     }
 
     /**
@@ -199,11 +200,11 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return void
+     * @return \Symfony\Component\Mailer\SentMessage|null
      */
     public function raw($text, $callback)
     {
-        $this->send(['raw' => $text], [], $callback);
+        return $this->send(['raw' => $text], [], $callback);
     }
 
     /**
@@ -212,11 +213,11 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  array  $data
      * @param  mixed  $callback
-     * @return void
+     * @return \Symfony\Component\Mailer\SentMessage|null
      */
     public function plain($view, array $data, $callback)
     {
-        $this->send(['text' => $view], $data, $callback);
+        return $this->send(['text' => $view], $data, $callback);
     }
 
     /**
@@ -244,7 +245,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
-     * @return void
+     * @return \Symfony\Component\Mailer\SentMessage|null
      */
     public function send($view, array $data = [], $callback = null)
     {
@@ -262,7 +263,9 @@ class Mailer implements MailerContract, MailQueueContract
         // Once we have retrieved the view content for the e-mail we will set the body
         // of this message using the HTML type, which will provide a simple wrapper
         // to creating view based emails that are able to receive arrays of data.
-        $callback($message);
+        if (! is_null($callback)) {
+            $callback($message);
+        }
 
         $this->addContent($message, $view, $plain, $raw, $data);
 
@@ -279,9 +282,11 @@ class Mailer implements MailerContract, MailQueueContract
         $symfonyMessage = $message->getSymfonyMessage();
 
         if ($this->shouldSendMessage($symfonyMessage, $data)) {
-            $this->sendSymfonyMessage($symfonyMessage);
+            $sentMessage = $this->sendSymfonyMessage($symfonyMessage);
 
             $this->dispatchSentEvent($message, $data);
+
+            return $sentMessage;
         }
     }
 
@@ -501,14 +506,14 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Symfony Email instance.
      *
      * @param  \Symfony\Component\Mime\Email  $message
-     * @return int|null
+     * @return \Symfony\Component\Mailer\SentMessage|null
      */
     protected function sendSymfonyMessage(Email $message)
     {
         try {
-            return $this->transport->send($message);
+            return $this->transport->send($message, Envelope::create($message));
         } finally {
-            $this->forceReconnection();
+            //
         }
     }
 

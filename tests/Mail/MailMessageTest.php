@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Message;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -20,11 +19,6 @@ class MailMessageTest extends TestCase
         parent::setUp();
 
         $this->message = new Message(new Email());
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 
     public function testFromMethod()
