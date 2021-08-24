@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^8.0.2",
         "ext-json": "*",
         "illuminate/collections": "^9.0",
         "illuminate/container": "^9.0",
@@ -24,9 +24,9 @@
         "illuminate/pipeline": "^9.0",
         "illuminate/session": "^9.0",
         "illuminate/support": "^9.0",
-        "symfony/http-foundation": "^5.3",
-        "symfony/http-kernel": "^5.3",
-        "symfony/routing": "^5.3"
+        "symfony/http-foundation": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "symfony/routing": "^6.0"
     },
     "autoload": {
         "psr-4": {
