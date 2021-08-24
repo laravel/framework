@@ -49,6 +49,7 @@
         "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/collections": "self.version",
+        "illuminate/conditionable": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
         "illuminate/container": "self.version",
@@ -106,7 +107,11 @@
         ],
         "psr-4": {
             "Illuminate\\": "src/Illuminate/",
-            "Illuminate\\Support\\": ["src/Illuminate/Macroable/", "src/Illuminate/Collections/"]
+            "Illuminate\\Support\\": [
+                "src/Illuminate/Macroable/",
+                "src/Illuminate/Collections/",
+                "src/Illuminate/Conditionable/"
+            ]
         }
     },
     "autoload-dev": {

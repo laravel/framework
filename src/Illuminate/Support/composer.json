@@ -19,6 +19,7 @@
         "ext-mbstring": "*",
         "doctrine/inflector": "^2.0",
         "illuminate/collections": "^9.0",
+        "illuminate/conditionable": "^9.0",
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
         "nesbot/carbon": "^2.31",
