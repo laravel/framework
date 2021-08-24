@@ -411,6 +411,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Nuno Maduro', $user1->name);
     }
 
+    public function testFirstOrNewWithNamedArguments()
+    {
+        $user1 = EloquentTestUser::firstOrNew(
+            name: 'Dries Vints',
+            values: ['name' => 'Nuno Maduro']
+        );
+
+        $this->assertSame('Nuno Maduro', $user1->name);
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
@@ -444,6 +454,64 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Nuno Maduro', $user4->name);
     }
 
+    public function testFirstOrCreateWithNamedArguments()
+    {
+        $user1 = EloquentTestUser::firstOrCreate(email: 'taylorotwell@gmail.com');
+
+        $this->assertSame('taylorotwell@gmail.com', $user1->email);
+        $this->assertNull($user1->name);
+
+        $user2 = EloquentTestUser::firstOrCreate(
+            email: 'taylorotwell@gmail.com',
+            values: ['name' => 'Taylor Otwell']
+        );
+
+        $this->assertEquals($user1->id, $user2->id);
+        $this->assertSame('taylorotwell@gmail.com', $user2->email);
+        $this->assertNull($user2->name);
+
+        $user3 = EloquentTestUser::firstOrCreate(
+            email: 'abigailotwell@gmail.com',
+            values: ['name' => 'Abigail Otwell']
+        );
+
+        $this->assertNotEquals($user3->id, $user1->id);
+        $this->assertSame('abigailotwell@gmail.com', $user3->email);
+        $this->assertSame('Abigail Otwell', $user3->name);
+
+        $user4 = EloquentTestUser::firstOrCreate(
+            name: 'Dries Vints',
+            values: ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
+        );
+
+        $this->assertSame('Nuno Maduro', $user4->name);
+    }
+
+    public function testFirstOrCreateWithPositionalAndNamedArguments()
+    {
+        $now = Carbon::now()->startOfSecond();
+        $nowWithFractionsSerialized = $now->toJSON();
+        Carbon::setTestNow($now);
+
+        $user1 = EloquentTestUser::firstOrCreate(
+            ['name' => 'Taylor Otwell'],
+            email: 'taylorotwell@gmail.com',
+        );
+
+        $this->assertSame('Taylor Otwell', $user1->name);
+        $this->assertSame('taylorotwell@gmail.com', $user1->email);
+
+        $user2 = EloquentTestUser::firstOrCreate(
+            ['name' => 'Abigail Otwell'],
+            ['birthday' => $now],
+            email: 'abigailotwell@gmail.com',
+        );
+
+        $this->assertSame('Abigail Otwell', $user2->name);
+        $this->assertSame('abigailotwell@gmail.com', $user2->email);
+        $this->assertSame($nowWithFractionsSerialized, $user2->birthday->toJSON());
+    }
+
     public function testUpdateOrCreate()
     {
         $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -464,6 +532,53 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertSame('Mohamed Said', $user3->name);
         $this->assertEquals(2, EloquentTestUser::count());
+    }
+
+    public function testUpdateOrCreateWithNamedArguments()
+    {
+        $user1 = EloquentTestUser::create(email: 'taylorotwell@gmail.com');
+
+        $user2 = EloquentTestUser::updateOrCreate(
+            email: 'taylorotwell@gmail.com',
+            values: ['name' => 'Taylor Otwell']
+        );
+
+        $this->assertEquals($user1->id, $user2->id);
+        $this->assertSame('taylorotwell@gmail.com', $user2->email);
+        $this->assertSame('Taylor Otwell', $user2->name);
+
+        $user3 = EloquentTestUser::updateOrCreate(
+            email: 'themsaid@gmail.com',
+            values: ['name' => 'Mohamed Said']
+        );
+
+        $this->assertSame('Mohamed Said', $user3->name);
+        $this->assertEquals(2, EloquentTestUser::count());
+    }
+
+    public function testUpdateOrCreateWithPositonalAndNamedArguments()
+    {
+        $now = Carbon::now()->startOfSecond();
+        $nowWithFractionsSerialized = $now->toJSON();
+        Carbon::setTestNow($now);
+
+        $user1 = EloquentTestUser::firstOrCreate(
+            ['name' => 'Taylor Otwell'],
+            email: 'taylorotwell@gmail.com',
+        );
+
+        $this->assertSame('Taylor Otwell', $user1->name);
+        $this->assertSame('taylorotwell@gmail.com', $user1->email);
+
+        $user2 = EloquentTestUser::updateOrCreate(
+            ['name' => 'Abigail Otwell'],
+            ['birthday' => $now],
+            email: 'abigailotwell@gmail.com',
+        );
+
+        $this->assertSame('Abigail Otwell', $user2->name);
+        $this->assertSame('abigailotwell@gmail.com', $user2->email);
+        $this->assertSame($nowWithFractionsSerialized, $user2->birthday->toJSON());
     }
 
     public function testUpdateOrCreateOnDifferentConnection()
@@ -710,6 +825,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame($post->id, $post2->id);
     }
 
+    public function testFirstOrNewOnHasOneRelationShipWithNamedArguments()
+    {
+        $user1 = EloquentTestUser::create(email: 'taylorotwell@gmail.com');
+        $post1 = $user1->post()->firstOrNew(name: 'First Post', values: ['name' => 'New Post']);
+
+        $this->assertSame('New Post', $post1->name);
+
+        $user2 = EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        $post = $user2->post()->create(name: 'First Post');
+        $post2 = $user2->post()->firstOrNew(name: 'First Post', values: ['name' => 'New Post']);
+
+        $this->assertSame('First Post', $post2->name);
+        $this->assertSame($post->id, $post2->id);
+    }
+
     public function testFirstOrCreateOnHasOneRelationShip()
     {
         $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -723,6 +853,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertSame('First Post', $post2->name);
         $this->assertSame($post->id, $post2->id);
+    }
+
+    public function testFirstOrCreateOnHasOneRelationShipWithnamedArguments()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post1 = $user1->post()->firstOrCreate(name: 'First Post', values: ['name' => 'New Post']);
+
+        $this->assertSame('New Post', $post1->name);
+    }
+
+    public function testHasOnSelfReferencingBelongsToManyRelationshipWithNamedArguments()
+    {
+        $user = EloquentTestUser::create(email: 'taylorotwell@gmail.com');
+        $user->friends()->create(email: 'abigailotwell@gmail.com');
+
+        $this->assertTrue(isset($user->friends[0]->id));
+
+        $results = EloquentTestUser::has('friends')->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationship()
@@ -1403,6 +1554,28 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $john->friends()->attach($jane, ['friend_level_id' => 1]);
         $john->friends()->attach($jack, ['friend_level_id' => 2]);
         $john->friends()->attach($jule, ['friend_level_id' => 3]);
+
+        $johnWithFriends = EloquentTestUserWithCustomFriendPivot::with('friends')->find(1);
+
+        $this->assertCount(3, $johnWithFriends->friends);
+        $this->assertSame('friend', $johnWithFriends->friends->find(3)->pivot->level->level);
+        $this->assertSame('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
+    }
+
+    public function testBelongsToManyCustomPivotWithNamedArguments()
+    {
+        $john = EloquentTestUserWithCustomFriendPivot::create(id: 1, name: 'John Doe', email: 'johndoe@example.com');
+        $jane = EloquentTestUserWithCustomFriendPivot::create(id: 2, name: 'Jane Doe', email: 'janedoe@example.com');
+        $jack = EloquentTestUserWithCustomFriendPivot::create(id: 3, name: 'Jack Doe', email: 'jackdoe@example.com');
+        $jule = EloquentTestUserWithCustomFriendPivot::create(id: 4, name: 'Jule Doe', email: 'juledoe@example.com');
+
+        EloquentTestFriendLevel::create(id: 1, level: 'acquaintance');
+        EloquentTestFriendLevel::create(id: 2, level: 'friend');
+        EloquentTestFriendLevel::create(id: 3, level: 'bff');
+
+        $john->friends()->attach($jane, friend_level_id:  1);
+        $john->friends()->attach($jack, friend_level_id:  2);
+        $john->friends()->attach($jule, friend_level_id:  3);
 
         $johnWithFriends = EloquentTestUserWithCustomFriendPivot::with('friends')->find(1);
 
