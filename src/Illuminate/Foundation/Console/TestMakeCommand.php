@@ -101,7 +101,7 @@ class TestMakeCommand extends GeneratorCommand
     {
         return [
             ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test.'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the test even if the test already exists']
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the test even if the test already exists.']
         ];
     }
 }
