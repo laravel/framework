@@ -166,8 +166,8 @@ class Collection implements ArrayAccess, Enumerable
      * Determine if an item exists in the collection.
      *
      * @param  (callable(TValue): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)
@@ -378,7 +378,7 @@ class Collection implements ArrayAccess, Enumerable
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
-     * @return static<TKey, TValue>
+     * @return static<int, mixed>
      */
     public function flatten($depth = INF)
     {
@@ -637,7 +637,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the values of a given key.
      *
-     * @param  string|array<int, string>  $value
+     * @param  string|array<array-key, string>  $value
      * @param  string|null  $key
      * @return static<int, mixed>
      */
@@ -1135,8 +1135,8 @@ class Collection implements ArrayAccess, Enumerable
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
      * @param  (callable(TValue, TKey): bool)|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return TValue
      *
      * @throws \Illuminate\Support\ItemNotFoundException

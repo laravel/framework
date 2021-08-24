@@ -174,9 +174,9 @@ trait EnumeratesValues
     /**
      * Alias for the "contains" method.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return bool
      */
     public function some($key, $operator = null, $value = null)
@@ -277,8 +277,8 @@ trait EnumeratesValues
      * Determine if all items pass the given truth test.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return bool
      */
     public function every($key, $operator = null, $value = null)

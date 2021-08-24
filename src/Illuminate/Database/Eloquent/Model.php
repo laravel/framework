@@ -526,7 +526,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * Get all of the models from the database.
      *
      * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection<int, static>
      */
     public static function all($columns = ['*'])
     {

@@ -116,9 +116,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Alias for the "contains" method.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return bool
      */
     public function some($key, $operator = null, $value = null);
@@ -143,9 +143,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Determine if an item exists in the enumerable.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null);
@@ -264,8 +264,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Determine if all items pass the given truth test.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return bool
      */
     public function every($key, $operator = null, $value = null);
@@ -746,8 +746,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return array<int, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null);
@@ -867,8 +867,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
      * @param  (callable(TValue, TKey): bool)|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return TValue
      *
      * @throws \Illuminate\Support\ItemNotFoundException
@@ -997,7 +997,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the values of a given key.
      *
-     * @param  string|array<int, string>  $value
+     * @param  string|array<array-key, string>  $value
      * @param  string|null  $key
      * @return static<int, mixed>
      */

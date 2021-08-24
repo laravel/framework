@@ -368,6 +368,9 @@ assertType('string|User', $collection->first(function ($user) {
     return false;
 }, 'string'));
 
+assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten());
+assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));
+
 assertType('User|null', $collection->firstWhere('string', 'string'));
 assertType('User|null', $collection->firstWhere('string', 'string', 'string'));
 
