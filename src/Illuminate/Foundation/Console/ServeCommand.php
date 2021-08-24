@@ -138,7 +138,7 @@ class ServeCommand extends Command
      */
     protected function host()
     {
-        list($host,) = $this->getHostAndPort();
+        [$host, ] = $this->getHostAndPort();
 
         return $host;
     }
@@ -153,7 +153,7 @@ class ServeCommand extends Command
         $port = $this->input->getOption('port');
 
         if (is_null($port)) {
-            list(, $port) = $this->getHostAndPort();
+            [, $port] = $this->getHostAndPort();
         }
 
         $port = $port ?: 8000;
@@ -172,7 +172,7 @@ class ServeCommand extends Command
 
         return [
             $hostParts[0],
-            $hostParts[1] ?? null
+            $hostParts[1] ?? null,
         ];
     }
 
