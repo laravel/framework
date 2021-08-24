@@ -102,7 +102,7 @@ class Builder implements BuilderContract
      * Create and return an un-saved model instance.
      *
      * @param  array  $attributes
-     * @param  array $namedAttributes
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function make(array $attributes = [], ...$namedAttributes)
@@ -473,7 +473,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @param  array  $namedAttributes
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function updateOrCreate(array $attributes = [], array $values = [], ...$namedAttributes)
