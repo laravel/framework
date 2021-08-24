@@ -943,13 +943,30 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
-    public function testVisible()
-    {
+    public function testCheckAttributeIsHidden() {
+        $model = new EloquentModelStub;
+
+        $model->setHidden(['name']);
+
+        $this->assertTrue($model->isHidden('name'));
+        $this->assertFalse($model->isHidden('age'));
+    }
+
+    public function testVisible()    {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
         $model->setVisible(['name', 'id']);
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+    }
+
+    public function testCheckAttributeIsVisible() {
+        $model = new EloquentModelStub;
+
+        $model->setVisible(['name']);
+
+        $this->assertTrue($model->isVisible('name'));
+        $this->assertFalse($model->isVisible('age'));
     }
 
     public function testDynamicHidden()

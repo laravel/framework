@@ -44,6 +44,17 @@ trait HidesAttributes
     }
 
     /**
+     * Check if the attribute is hidden.
+     *
+     * @param $attribute
+     * @return bool
+     */
+    public function isHidden($attribute)
+    {
+        return in_array($attribute, $this->hidden);
+    }
+
+    /**
      * Get the visible attributes for the model.
      *
      * @return array
@@ -64,6 +75,17 @@ trait HidesAttributes
         $this->visible = $visible;
 
         return $this;
+    }
+
+    /**
+     * Check if the attribute is visible.
+     *
+     * @param $attribute
+     * @return bool
+     */
+    public function isVisible($attribute)
+    {
+        return in_array($attribute, $this->visible);
     }
 
     /**
