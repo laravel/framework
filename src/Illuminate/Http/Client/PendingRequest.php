@@ -451,7 +451,7 @@ class PendingRequest
      * @param  callable|null  $when
      * @return $this
      */
-    public function retry(int $times, int $sleep = 0, $when = null)
+    public function retry(int $times, int $sleep = 0, ?callable $when = null)
     {
         $this->tries = $times;
         $this->retryDelay = $sleep;
