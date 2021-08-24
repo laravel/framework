@@ -577,7 +577,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
      * @return void
      */
-    public function setSymfonyTransport($transport)
+    public function setSymfonyTransport(TransportInterface $transport)
     {
         $this->transport = $transport;
     }
