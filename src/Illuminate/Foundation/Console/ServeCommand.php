@@ -138,7 +138,9 @@ class ServeCommand extends Command
      */
     protected function host()
     {
-        return $this->input->getOption('host');
+        [$host, ] = $this->getHostAndPort();
+
+        return $host;
     }
 
     /**
@@ -148,9 +150,30 @@ class ServeCommand extends Command
      */
     protected function port()
     {
-        $port = $this->input->getOption('port') ?: 8000;
+        $port = $this->input->getOption('port');
+
+        if (is_null($port)) {
+            [, $port] = $this->getHostAndPort();
+        }
+
+        $port = $port ?: 8000;
 
         return $port + $this->portOffset;
+    }
+
+    /**
+     * Get the host and port from the host option string.
+     *
+     * @return array
+     */
+    protected function getHostAndPort()
+    {
+        $hostParts = explode(':', $this->input->getOption('host'));
+
+        return [
+            $hostParts[0],
+            $hostParts[1] ?? null,
+        ];
     }
 
     /**
