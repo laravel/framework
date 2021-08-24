@@ -34,7 +34,7 @@ class ArrayTransport implements TransportInterface
     {
         $this->messages[] = $message;
 
-        return new SentMessage($message, $envelope);
+        return new SentMessage($message, $envelope ?? Envelope::create($message));
     }
 
     /**
