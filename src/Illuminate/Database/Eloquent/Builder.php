@@ -885,7 +885,7 @@ class Builder implements BuilderContract
      */
     public function update(array $values = [], ...$namedValues)
     {
-        $values  = array_merge($values, $namedValues);
+        $values = array_merge($values, $namedValues);
 
         return $this->toBase()->update($this->addUpdatedAtColumn($values));
     }
