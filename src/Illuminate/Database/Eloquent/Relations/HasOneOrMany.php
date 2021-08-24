@@ -2,9 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 abstract class HasOneOrMany extends Relation
@@ -46,10 +47,13 @@ abstract class HasOneOrMany extends Relation
      * Create and return an un-saved instance of the related model.
      *
      * @param  array  $attributes
+     * @param  array  $namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function make(array $attributes = [])
+    public function make(array $attributes = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
         });
@@ -227,10 +231,13 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes = [], array $values = [])
+    public function firstOrCreate(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->create(array_merge($attributes, $values));
         }
@@ -243,10 +250,13 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values);
 
@@ -286,10 +296,13 @@ abstract class HasOneOrMany extends Relation
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [])
+    public function create(array $attributes = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
 

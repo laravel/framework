@@ -196,10 +196,13 @@ trait InteractsWithPivotTable
      * @param  mixed  $id
      * @param  array  $attributes
      * @param  bool  $touch
+     * @param  array $namedAttributes
      * @return int
      */
-    public function updateExistingPivot($id, array $attributes, $touch = true)
+    public function updateExistingPivot($id, array $attributes, $touch = true, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if ($this->using &&
             empty($this->pivotWheres) &&
             empty($this->pivotWhereIns) &&
@@ -256,10 +259,13 @@ trait InteractsWithPivotTable
      * @param  mixed  $id
      * @param  array  $attributes
      * @param  bool  $touch
+     * @param  array  ...$namedAttributes
      * @return void
      */
-    public function attach($id, array $attributes = [], $touch = true)
+    public function attach($id, array $attributes = [], $touch = true, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if ($this->using) {
             $this->attachUsingCustomClass($id, $attributes);
         } else {
@@ -504,10 +510,13 @@ trait InteractsWithPivotTable
      *
      * @param  array  $attributes
      * @param  bool  $exists
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(array $attributes = [], $exists = false)
+    public function newPivot(array $attributes = [], $exists = false, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         $pivot = $this->related->newPivot(
             $this->parent, $attributes, $this->table, $exists, $this->using
         );
@@ -519,10 +528,13 @@ trait InteractsWithPivotTable
      * Create a new existing pivot model instance.
      *
      * @param  array  $attributes
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newExistingPivot(array $attributes = [])
+    public function newExistingPivot(array $attributes = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return $this->newPivot($attributes, true);
     }
 

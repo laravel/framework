@@ -102,10 +102,13 @@ class Builder implements BuilderContract
      * Create and return an un-saved model instance.
      *
      * @param  array  $attributes
+     * @param  array $namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function make(array $attributes = [])
+    public function make(array $attributes = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return $this->newModelInstance($attributes);
     }
 
@@ -430,10 +433,13 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
@@ -446,10 +452,13 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function firstOrCreate(array $attributes = [], array $values = [])
+    public function firstOrCreate(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (! is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
@@ -464,10 +473,13 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  $namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
-    public function updateOrCreate(array $attributes, array $values = [])
+    public function updateOrCreate(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
             $instance->fill($values)->save();
         });
@@ -836,10 +848,13 @@ class Builder implements BuilderContract
      * Save a new model and return the instance.
      *
      * @param  array  $attributes
+     * @param  array ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create(array $attributes = [])
+    public function create(array $attributes = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
         });

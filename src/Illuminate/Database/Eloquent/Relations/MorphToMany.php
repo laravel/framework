@@ -145,9 +145,10 @@ class MorphToMany extends BelongsToMany
      *
      * @param  array  $attributes
      * @param  bool  $exists
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(array $attributes = [], $exists = false)
+    public function newPivot(array $attributes = [], $exists = false, ...$namedAttributes)
     {
         $using = $this->using;
 

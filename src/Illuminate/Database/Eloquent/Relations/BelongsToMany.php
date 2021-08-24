@@ -595,10 +595,13 @@ class BelongsToMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (is_null($instance = $this->related->where($attributes)->first())) {
             $instance = $this->related->newInstance(array_merge($attributes, $values));
         }
@@ -613,10 +616,13 @@ class BelongsToMany extends Relation
      * @param  array  $values
      * @param  array  $joining
      * @param  bool  $touch
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
+    public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (is_null($instance = $this->related->where($attributes)->first())) {
             $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
         }
@@ -631,10 +637,13 @@ class BelongsToMany extends Relation
      * @param  array  $values
      * @param  array  $joining
      * @param  bool  $touch
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
+    public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (is_null($instance = $this->related->where($attributes)->first())) {
             return $this->create(array_merge($attributes, $values), $joining, $touch);
         }
@@ -1156,10 +1165,13 @@ class BelongsToMany extends Relation
      * @param  array  $attributes
      * @param  array  $joining
      * @param  bool  $touch
+     * @param  array ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes = [], array $joining = [], $touch = true)
+    public function create(array $attributes = [], array $joining = [], $touch = true, ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         $instance = $this->related->newInstance($attributes);
 
         // Once we save the related model, we need to attach it to the base model via
