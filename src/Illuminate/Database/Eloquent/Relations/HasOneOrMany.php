@@ -213,10 +213,13 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  array  $attributes
      * @param  array  $values
+     * @param  array  ...$namedAttributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes = [], array $values = [])
+    public function firstOrNew(array $attributes = [], array $values = [], ...$namedAttributes)
     {
+        $attributes = array_merge($attributes, $namedAttributes);
+
         if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance(array_merge($attributes, $values));
 
