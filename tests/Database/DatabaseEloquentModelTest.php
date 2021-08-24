@@ -943,7 +943,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
-    public function testCheckAttributeIsHidden() {
+    public function testCheckAttributeIsHidden()
+    {
         $model = new EloquentModelStub;
 
         $model->setHidden(['name']);
@@ -952,7 +953,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isHidden('age'));
     }
 
-    public function testVisible()    {
+    public function testVisible()
+    {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
         $model->setVisible(['name', 'id']);
         $array = $model->toArray();
@@ -960,7 +962,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
-    public function testCheckAttributeIsVisible() {
+    public function testCheckAttributeIsVisible()
+    {
         $model = new EloquentModelStub;
 
         $model->setVisible(['name']);
