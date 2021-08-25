@@ -518,6 +518,24 @@ class Builder
     }
 
     /**
+     * Execute the query and get the first result or throw an 403 forbidden exception.
+     *
+     * @param  array  $columns
+     * @param  string  $message
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelForbiddenException
+     */
+    public function firstOrForbidden($columns = ['*'], $message = null)
+    {
+        if (! is_null($model = $this->first($columns))) {
+            return $model;
+        }
+
+        throw new ModelForbiddenException($message);
+    }
+
+    /**
      * Execute the query and get the first result or call a callback.
      *
      * @param  \Closure|array  $columns

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Database\Eloquent\ModelForbiddenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
@@ -90,6 +91,7 @@ class Handler implements ExceptionHandlerContract
         HttpException::class,
         HttpResponseException::class,
         ModelNotFoundException::class,
+        ModelForbiddenException::class,
         MultipleRecordsFoundException::class,
         RecordsNotFoundException::class,
         SuspiciousOperationException::class,
@@ -383,6 +385,8 @@ class Handler implements ExceptionHandlerContract
     {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
+        } elseif ($e instanceof ModelForbiddenException) {
+            $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof TokenMismatchException) {
