@@ -48,6 +48,23 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         });
     }
 
+    public function testDeleteBroadcasting()
+    {
+        Event::fake([BroadcastableModelEventOccurred::class]);
+
+        $model = new TestEloquentBroadcastUser;
+        $model->name = 'Taylor';
+        $model->save();
+        $model = $model->fresh();
+        $model->delete();
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) use ($model) {
+            return $event->model === $model->id
+                    && count($event->broadcastOn()) === 1
+                    && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model}";
+        });
+    }
+
     public function testChannelRouteFormatting()
     {
         $model = new TestEloquentBroadcastUser;

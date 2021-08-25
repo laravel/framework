@@ -124,18 +124,24 @@ trait BroadcastsEvents
      */
     public function newBroadcastableModelEvent($event)
     {
-        return tap($this->newBroadcastableEvent($event), function ($event) {
-            $event->connection = property_exists($this, 'broadcastConnection')
+        return tap($this->newBroadcastableEvent($event), function ($instance) use ($event) {
+            $instance->connection = property_exists($this, 'broadcastConnection')
                             ? $this->broadcastConnection
                             : $this->broadcastConnection();
 
-            $event->queue = property_exists($this, 'broadcastQueue')
+            $instance->queue = property_exists($this, 'broadcastQueue')
                             ? $this->broadcastQueue
                             : $this->broadcastQueue();
 
-            $event->afterCommit = property_exists($this, 'broadcastAfterCommit')
+            $instance->afterCommit = property_exists($this, 'broadcastAfterCommit')
                             ? $this->broadcastAfterCommit
                             : $this->broadcastAfterCommit();
+
+            if (method_exists($this, 'broadcastAs')) {
+                $instance->broadcastableAs($this->broadcastAs($event) ?: null);
+            }
+
+            $instance->onDefaultChannels($this->broadcastOn($event) ?: []);
         });
     }
 

@@ -19,6 +19,13 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public $model;
 
     /**
+     * The model's class name.
+     *
+     * @var string
+     */
+    protected $modelClass;
+
+    /**
      * The event name (created, updated, etc.).
      *
      * @var string
@@ -26,11 +33,25 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     protected $event;
 
     /**
+     * The custom name that should be used when broadcasting the event.
+     *
+     * @var string|null
+     */
+    protected $broadcastableAs;
+
+    /**
      * The channels that the event should be broadcast on.
      *
      * @var array
      */
     protected $channels = [];
+
+    /**
+     * The default channels that the event should be broadcast on if no other channels are provided.
+     *
+     * @var array
+     */
+    protected $defaultChannels = [];
 
     /**
      * The queue connection that should be used to queue the broadcast job.
@@ -56,7 +77,13 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public function __construct($model, $event)
     {
         $this->model = $model;
+        $this->modelClass = get_class($model);
         $this->event = $event;
+
+        if ($this->event === 'deleted' &&
+            ! method_exists($model, 'bootSoftDeletes')) {
+            $this->model = $this->model->getKey();
+        }
     }
 
     /**
@@ -67,7 +94,7 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public function broadcastOn()
     {
         $channels = empty($this->channels)
-                ? ($this->model->broadcastOn($this->event) ?: [])
+                ? $this->defaultChannels
                 : $this->channels;
 
         return collect($channels)->map(function ($channel) {
@@ -82,11 +109,20 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
      */
     public function broadcastAs()
     {
-        $default = class_basename($this->model).ucfirst($this->event);
+        return $this->broadcastableAs ?: class_basename($this->modelClass).ucfirst($this->event);
+    }
 
-        return method_exists($this->model, 'broadcastAs')
-                ? ($this->model->broadcastAs($this->event) ?: $default)
-                : $default;
+    /**
+     * Specify the name the model event is broadcastable as.
+     *
+     * @param  string|null  $name
+     * @return $this
+     */
+    public function broadcastableAs(?string $name)
+    {
+        $this->broadcastableAs = $name;
+
+        return $this;
     }
 
     /**
@@ -96,7 +132,7 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
      */
     public function broadcastWith()
     {
-        return method_exists($this->model, 'broadcastWith')
+        return is_object($this->model) && method_exists($this->model, 'broadcastWith')
             ? $this->model->broadcastWith($this->event)
             : null;
     }
@@ -110,6 +146,19 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
     public function onChannels(array $channels)
     {
         $this->channels = $channels;
+
+        return $this;
+    }
+
+    /**
+     * Specify the default channels the event should broadcast on if no others are specified.
+     *
+     * @param  array  $channels
+     * @return $this
+     */
+    public function onDefaultChannels(array $channels)
+    {
+        $this->defaultChannels = $channels;
 
         return $this;
     }
