@@ -119,8 +119,8 @@ trait ManagesComponents
      * Start the slot rendering process.
      *
      * @param  string  $name
-     * @param  array  $attributes
      * @param  string|null  $content
+     * @param  array  $attributes
      * @return void
      */
     public function slot($name, $content = null, $attributes = [])
@@ -147,9 +147,11 @@ trait ManagesComponents
             $this->slotStack[$this->currentComponent()]
         );
 
-        [$currentSlotName, $currentSlotAttributes] = $currentSlot;
+        [$currentName, $currentAttributes] = $currentSlot;
 
-        $this->slots[$this->currentComponent()][$currentSlotName] = new ComponentSlot(trim(ob_get_clean()), $currentSlotAttributes);
+        $this->slots[$this->currentComponent()][$currentName] = new ComponentSlot(
+            trim(ob_get_clean()), $currentAttributes
+        );
     }
 
     /**
