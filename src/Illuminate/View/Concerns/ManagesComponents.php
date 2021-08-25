@@ -125,7 +125,7 @@ trait ManagesComponents
      */
     public function slot($name, $content = null, $attributes = [])
     {
-        if ($content) {
+        if (func_num_args() === 2 || $content !== null) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
