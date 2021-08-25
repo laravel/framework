@@ -9,6 +9,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelForbiddenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -151,6 +152,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
         $builder->firstOrFail(['column']);
+    }
+
+    public function testFirstOrForbiddenMethodThrowsModelForbiddenException()
+    {
+        $this->expectException(ModelForbiddenException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->firstOrForbidden(['column']);
     }
 
     public function testFindWithMany()
