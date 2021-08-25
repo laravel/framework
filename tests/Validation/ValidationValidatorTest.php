@@ -6242,6 +6242,49 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
     }
 
+    public function providesPassingExcludeData()
+    {
+        return [
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude'],
+                ], [
+                    'has_appointment' => false,
+                    'appointment_date' => 'should be excluded',
+                ], [
+                    'has_appointment' => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providesPassingExcludeData
+     */
+    public function testExclude($rules, $data, $expectedValidatedData)
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            $rules
+        );
+
+        $passes = $validator->passes();
+
+        if (! $passes) {
+            $message = sprintf("Validation unexpectedly failed:\nRules: %s\nData: %s\nValidation error: %s",
+                json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($validator->messages()->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        $this->assertTrue($passes, $message ?? '');
+
+        $this->assertSame($expectedValidatedData, $validator->validated());
+    }
+
     public function testExcludingArrays()
     {
         $validator = new Validator(

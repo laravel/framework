@@ -253,7 +253,7 @@ class Validator implements ValidatorContract
      *
      * @var string[]
      */
-    protected $excludeRules = ['ExcludeIf', 'ExcludeUnless', 'ExcludeWithout'];
+    protected $excludeRules = ['Exclude', 'ExcludeIf', 'ExcludeUnless', 'ExcludeWithout'];
 
     /**
      * The size related validation rules.
