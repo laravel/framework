@@ -20,7 +20,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest dd()
  * @method static \Illuminate\Http\Client\PendingRequest dump()
- * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0)
+ * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null)
  * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
  * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
