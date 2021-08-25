@@ -118,7 +118,6 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
-
     public function testMailableIsSentWithSelectedLocale()
     {
         $user = NotifiableLocalizedUser::forceCreate([
