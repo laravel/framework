@@ -242,6 +242,28 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testFirstOrFailStopsIteratingAtFirstMatch($collection)
+    {
+        $data = new $collection([
+            function () {
+                return false;
+            },
+            function () {
+                return true;
+            },
+            function () {
+                throw new Exception();
+            },
+        ]);
+
+        $this->assertNotNull($data->firstOrFail(function ($callback) {
+            return $callback();
+        }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testFirstWhere($collection)
     {
         $data = new $collection([
