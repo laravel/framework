@@ -14,7 +14,7 @@ jobs:
       fail-fast: true
       matrix:
         php: ['8.0']
-        stability: [prefer-lowest, prefer-stable]
+        stability: [prefer-stable]
         include:
           - php: '8.1'
             flags: "--ignore-platform-req=php"
