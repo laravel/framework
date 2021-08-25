@@ -14,13 +14,11 @@ jobs:
       fail-fast: true
       matrix:
         php: ['8.0']
-        stability: [prefer-stable]
         include:
           - php: '8.1'
             flags: "--ignore-platform-req=php"
-            stability: prefer-stable
 
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }}
 
     steps:
       - name: Checkout code
@@ -38,7 +36,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
 
       - name: Execute type checking
         continue-on-error: ${{ matrix.php > 8 }}
