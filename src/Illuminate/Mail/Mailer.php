@@ -546,7 +546,7 @@ class Mailer implements MailerContract, MailQueueContract
     {
         if ($this->events) {
             $this->events->dispatch(
-                new MessageSent($message->getSwiftMessage(), $data)
+                new MessageSent($message->getSymfonyMessage(), $data)
             );
         }
     }
