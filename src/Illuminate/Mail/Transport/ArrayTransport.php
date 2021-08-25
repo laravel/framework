@@ -11,7 +11,7 @@ use Symfony\Component\Mime\RawMessage;
 class ArrayTransport implements TransportInterface
 {
     /**
-     * The collection of Swift Messages.
+     * The collection of Symfony Messages.
      *
      * @var \Illuminate\Support\Collection
      */

@@ -167,7 +167,7 @@ class MailManager implements FactoryContract
      */
     protected function createSmtpTransport(array $config)
     {
-        // The Swift SMTP transport instance will allow us to use any SMTP backend
+        // The Symfony ESMTP transport instance will allow use of any SMTP backend
         // for delivering mail such as Sendgrid, Amazon SES, or a custom server
         // a developer has available. We will just pass this configured host.
         $transport = new EsmtpTransport(
@@ -177,7 +177,7 @@ class MailManager implements FactoryContract
         );
 
         // Once we have the transport we will check for the presence of a username
-        // and password. If we have it we will set the credentials on the Swift
+        // and password. If we have it we'll set the credentials on the Symfony
         // transporter instance so that we'll properly authenticate delivery.
         if (isset($config['username'])) {
             $transport->setUsername($config['username']);

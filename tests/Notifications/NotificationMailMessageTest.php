@@ -128,7 +128,7 @@ class NotificationMailMessageTest extends TestCase
         };
 
         $message = new MailMessage;
-        $message->withSwiftMessage($callback);
+        $message->withSymfonyMessage($callback);
 
         $this->assertSame([$callback], $message->callbacks);
     }
