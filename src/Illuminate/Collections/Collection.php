@@ -954,7 +954,7 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-     * Updates items values using "dot" notation
+     * Updates items values using "dot" notation.
      *
      * @param  string  $key
      * @param  mixed  $value
