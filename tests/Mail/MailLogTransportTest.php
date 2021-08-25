@@ -30,12 +30,13 @@ class MailLogTransportTest extends TestCase
 
         $this->assertInstanceOf(Logger::class, $monolog = $logger->getLogger());
         $this->assertCount(1, $handlers = $monolog->getHandlers());
-        $this->assertInstanceOf(StreamHandler::class, $handler = $handlers[0]);
+        $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
     }
 
     public function testGetLogTransportWithPsrLogger()
     {
         $this->app['config']->set('mail.driver', 'log');
+
         $logger = $this->app->instance('log', new NullLogger);
 
         $transportLogger = app('mailer')->getSymfonyTransport()->logger();

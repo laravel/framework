@@ -32,9 +32,7 @@ class ArrayTransport implements TransportInterface
      */
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $this->messages[] = $message;
-
-        return new SentMessage($message, $envelope ?? Envelope::create($message));
+        return $this->messages[] = new SentMessage($message, $envelope ?? Envelope::create($message));
     }
 
     /**
