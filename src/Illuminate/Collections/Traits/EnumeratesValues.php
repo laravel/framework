@@ -704,7 +704,7 @@ trait EnumeratesValues
     /**
      * Pass the collection into a new class.
      *
-     * @param  string  $class
+     * @param  string-class  $class
      * @return mixed
      */
     public function pipeInto($class)
@@ -736,9 +736,12 @@ trait EnumeratesValues
     /**
      * Reduce an associative collection to a single value.
      *
-     * @param  callable  $callback
-     * @param  mixed  $initial
-     * @return mixed
+     * @template TReduceWithKeysInitial
+     * @template TReduceWithKeysReturnType
+     *
+     * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue): TReduceWithKeysReturnType $callback
+     * @param  TReduceWithKeysInitial $initial
+     * @return TReduceWithKeysReturnType
      */
     public function reduceWithKeys(callable $callback, $initial = null)
     {
@@ -821,7 +824,7 @@ trait EnumeratesValues
     /**
      * Get the collection of items as a plain array.
      *
-     * @return array<TKey, TValue>
+     * @return array<TKey, mixed>
      */
     public function toArray()
     {
@@ -833,7 +836,7 @@ trait EnumeratesValues
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return array<TKey, mixed>
      */
     #[\ReturnTypeWillChange]
     public function jsonSerialize()

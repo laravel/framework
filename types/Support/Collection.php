@@ -535,9 +535,23 @@ assertType('int', $collection
 
         return 1;
     }));
-
 assertType('int', $collection
     ->reduce(function ($int, $user) {
+        assertType('User', $user);
+        assertType('int', $int);
+
+        return 1;
+    }, 0));
+
+assertType('int', $collection
+    ->reduceWithKeys(function ($null, $user) {
+        assertType('User', $user);
+        assertType('int|null', $null);
+
+        return 1;
+    }));
+assertType('int', $collection
+    ->reduceWithKeys(function ($int, $user) {
         assertType('User', $user);
         assertType('int', $int);
 
@@ -687,6 +701,8 @@ assertType('int', $collection->make([1])->pipe(function ($collection) {
     return 1;
 }));
 
+assertType('mixed', $collection->pipeInto(User::class));
+
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string'));
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->make(['string' => 'string'])->pluck('string', 'string'));
 
@@ -834,9 +850,9 @@ assertType('User', $collection[0] = new User);
 $collection->offsetUnset(0);
 unset($collection[0]);
 
-assertType('array<int, User>', $collection->toArray());
-assertType('array<string, string>', collect(['string' => 'string'])->toArray());
-assertType('array<int, int>', collect([1, 2])->toArray());
+assertType('array<int, mixed>', $collection->toArray());
+assertType('array<string, mixed>', collect(['string' => 'string'])->toArray());
+assertType('array<int, mixed>', collect([1, 2])->toArray());
 
 assertType('ArrayIterator<int, User>', $collection->getIterator());
 foreach ($collection as $int => $user) {
