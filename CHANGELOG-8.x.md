@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.55.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.56.0...8.x)
+
+
+## [v8.56.0 (2021-08-24)](https://github.com/laravel/framework/compare/v8.55.0...v8.56.0)
+
+### Added
+- Added firstOrFail to Illuminate\Support\Collections and Illuminate\Support\LazyCollections ([#38420](https://github.com/laravel/framework/pull/38420))
+- Support route caching with trashed bindings ([c3ec2f2](https://github.com/laravel/framework/commit/c3ec2f2d2ad15f2e35cebaa6fcf242ce22af2f8a))
+- Allow only keys directly on safe in FormRequest ([5e4ded8](https://github.com/laravel/framework/commit/5e4ded83bacc64e5604b6f71496734071c53b221))
+- Added default rules in conditional rules ([#38450](https://github.com/laravel/framework/pull/38450))
+- Added fullUrlWithoutQuery method to Request ([#38482](https://github.com/laravel/framework/pull/38482))
+- Added --implicit (and -i) option to make:rule ([#38480](https://github.com/laravel/framework/pull/38480))
+- Added colon port support in serve command host option ([#38522](https://github.com/laravel/framework/pull/38522))
+
+### Changed
+- Testing: Access component properties from the return value of $this->component() ([#38396](https://github.com/laravel/framework/pull/38396), [42a71fd](https://github.com/laravel/framework/commit/42a71fded8b552321f1a1b962cb17e273c7cdf24))
+- Update InteractsWithInput::bearerToken() ([#38426](https://github.com/laravel/framework/pull/38426))
+- Minor improvements to validation assertions API ([#38422](https://github.com/laravel/framework/pull/38422))
+- Blade component slot attributes ([#38372](https://github.com/laravel/framework/pull/38372))
+- Convenient methods for rate limiting ([2f93c49](https://github.com/laravel/framework/commit/2f93c4949b60e9b13a3a2d9e5ebb096bd1ae98a9))
+- Run event:clear on optimize:clear ([a61b24c2](https://github.com/laravel/framework/commit/a61b24c2d266aee6000f9e768df8c1a7be8fd9d1))
+- Remove unnecessary double MAC for AEAD ciphers ([#38475](https://github.com/laravel/framework/pull/38475))
+- Adds Response authorization to Form Requests ([#38489](https://github.com/laravel/framework/pull/38489))
+- Make TestResponse::getCookie public so it can be directly used in tests ([#38524](https://github.com/laravel/framework/pull/38524))
 
 
 ## [v8.55.0 (2021-08-17)](https://github.com/laravel/framework/compare/v8.54.0...v8.55.0)
