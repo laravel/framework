@@ -374,10 +374,14 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([5, 5, 5], $data->set('foo', 5)->pluck('foo')->all());
 
         // Callback with one argument
-        $this->assertSame([2, 4, 6], $data->set('foo', fn ($foo) => $foo * 2)->pluck('foo')->all());
+        $this->assertSame([2, 4, 6], $data->set('foo', function ($foo) {
+            return $foo * 2;
+        })->pluck('foo')->all());
 
         // Callback with two arguments
-        $this->assertSame([10, 40, 90], $data->set('foo', fn ($foo, $item) => $foo * $item['bar'])->pluck('foo')->all());
+        $this->assertSame([10, 40, 90], $data->set('foo', function ($foo, $item) {
+            return $foo * $item['bar'];
+        })->pluck('foo')->all());
 
         // Using "dot" notation
         $this->assertSame([['b' => 5], ['b' => 5], ['b' => 5]], $data->set('a.b', 5)->pluck('a')->all());
