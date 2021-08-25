@@ -954,6 +954,23 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+    * Updates items values using "dot" notation
+    *
+    * @param  string  $key
+    * @param  mixed  $value
+    * @return static
+    */
+    public function set($key, $value)
+    {
+        return $this->map(function ($item) use ($key, $value) {
+            $actualValue = data_get($item, $key);
+            $newValue = is_callable($value) ? $value($actualValue, $item) : $value;
+
+            return data_set($item, $key, $newValue);
+        });
+    }
+
+    /**
      * Get and remove the first N items from the collection.
      *
      * @param  int  $count

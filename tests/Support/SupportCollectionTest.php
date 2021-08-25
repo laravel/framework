@@ -362,6 +362,27 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(new Collection(['foo', 'bar', 'baz']), (new Collection(['foo', 'bar', 'baz']))->shift(6));
     }
 
+    public function testSet()
+    {
+        $data = new Collection([
+            ['foo' => 1, 'bar' => 10, 'a' => ['b' => 100]],
+            ['foo' => 2, 'bar' => 20, 'a' => ['b' => 200]],
+            ['foo' => 3, 'bar' => 30, 'a' => ['b' => 300]],
+        ]);
+
+        // Fixed value
+        $this->assertSame([5, 5, 5], $data->set('foo', 5)->pluck('foo')->all());
+
+        // Callback with one argument
+        $this->assertSame([2, 4, 6], $data->set('foo', fn ($foo) => $foo * 2)->pluck('foo')->all());
+
+        // Callback with two arguments
+        $this->assertSame([10, 40, 90], $data->set('foo', fn ($foo, $item) => $foo * $item['bar'])->pluck('foo')->all());
+
+        // Using "dot" notation
+        $this->assertSame([['b' => 5], ['b' => 5], ['b' => 5]], $data->set('a.b', 5)->pluck('a')->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
