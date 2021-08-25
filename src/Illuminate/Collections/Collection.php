@@ -954,12 +954,12 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
-    * Updates items values using "dot" notation
-    *
-    * @param  string  $key
-    * @param  mixed  $value
-    * @return static
-    */
+     * Updates items values using "dot" notation
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
     public function set($key, $value)
     {
         return $this->map(function ($item) use ($key, $value) {
