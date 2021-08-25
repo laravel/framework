@@ -1535,6 +1535,16 @@ trait ValidatesAttributes
     }
 
     /**
+     * Indicate that an attribute is excluded.
+     *
+     * @return bool
+     */
+    public function validateExclude()
+    {
+        return false;
+    }
+
+    /**
      * Indicate that an attribute should be excluded when another attribute has a given value.
      *
      * @param  string  $attribute
