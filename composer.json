@@ -90,7 +90,7 @@
         "pda/pheanstalk": "^4.0",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1.2",
-        "symfony/cache": "^5.3"
+        "symfony/cache": "^6.0"
     },
     "provide": {
         "psr/container-implementation": "1.0"
