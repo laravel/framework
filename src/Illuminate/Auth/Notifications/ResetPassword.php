@@ -69,7 +69,7 @@ class ResetPassword extends Notification
     }
     
     /**
-     * Get the reset URL for the given notifiable.
+     * Get the password reset URL for the given notifiable.
      *
      * @param  mixed  $notifiable
      * @return string
