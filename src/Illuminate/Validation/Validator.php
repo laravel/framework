@@ -1109,7 +1109,7 @@ class Validator implements ValidatorContract
             $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
-                if ($callback($payload, $this->dataForSometimesIteration($ruleKey))) {
+                if ($callback($payload, $this->dataForSometimesIteration($ruleKey, !Str::endsWith($key, '.*')))) {
                     $this->addRules([$ruleKey => $ruleValue]);
                 }
             }
@@ -1124,17 +1124,17 @@ class Validator implements ValidatorContract
      * @param  string  $attribute
      * @return \Illuminate\Support\Fluent|array|mixed
      */
-    private function dataForSometimesIteration(string $attribute)
+    private function dataForSometimesIteration(string $attribute, $removeLastSegmentOfAttribute)
     {
         $lastSegmentOfAttribute = strrchr($attribute, '.');
 
-        $attribute = $lastSegmentOfAttribute
+        $attribute = $lastSegmentOfAttribute && $removeLastSegmentOfAttribute
                     ? Str::replaceLast($lastSegmentOfAttribute, '', $attribute)
                     : $attribute;
 
         return is_array($data = data_get($this->data, $attribute))
-                    ? new Fluent($data)
-                    : $data;
+            ? new Fluent($data)
+            : $data;
     }
 
     /**

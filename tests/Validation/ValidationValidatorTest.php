@@ -4167,7 +4167,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
-            return $item->users !== null;
+            return $item !== null;
         });
         $this->assertEquals(['company.users' => ['array'], 'company.users.0.name' => ['required', 'string'], 'company.users.1.name' => ['required', 'string']], $v->getRules());
 
@@ -4175,15 +4175,15 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
         $v->sometimes(['company.*'], 'array', function ($i, $item) {
-            return $item->users;
+            return (bool) $item;
         });
         $this->assertEquals(['company' => ['required']], $v->getRules());
 
         // ['users.*'] -> all nested array items in users must be validated as array
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
-        $v->sometimes(['users.*'], 'array', function ($item) {
-            return true;
+        $v->sometimes(['users.*'], 'array', function ($i, $item) {
+            return (bool) $item;
         });
         $this->assertEquals(['users.0' => ['array'], 'users.1' => ['array'], 'users.0.name' => ['required', 'string'], 'users.1.name' => ['required', 'string']], $v->getRules());
 
@@ -4304,7 +4304,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*'=> 'string']);
         $v->sometimes(['attendee.*'], 'required', function ($i, $item) {
-            return (bool) $item->name;
+            return (bool) $item;
         });
         $this->assertEquals(['attendee.name' => ['string', 'required'], 'attendee.title' => ['string', 'required'], 'attendee.type' => ['string', 'required']], $v->getRules());
     }
