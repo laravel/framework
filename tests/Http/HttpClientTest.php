@@ -714,6 +714,28 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentInOrder($exampleUrls);
     }
 
+    public function testUrlIsAbsolute()
+    {
+        $this->factory->fake();
+
+        $this->factory->baseUrl('http://example.com/1')->get('http://example.com/2');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://example.com/2';
+        });
+    }
+
+    public function testUrlIsRelative()
+    {
+        $this->factory->fake();
+
+        $this->factory->baseUrl('http://example.com')->get('1');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://example.com/1';
+        });
+    }
+
     public function testWrongNumberOfRequestsThrowAssertionFailed()
     {
         $this->factory->fake();
