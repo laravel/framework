@@ -292,8 +292,8 @@ class ValidationRuleParser
 
             if ($attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules->passes($data)
-                                ? $attributeRules->rules()
-                                : $attributeRules->defaultRules(), ];
+                                ? array_filter($attributeRules->rules())
+                                : array_filter($attributeRules->defaultRules()), ];
             }
 
             return [$attribute => collect($attributeRules)->map(function ($rule) use ($data) {
@@ -303,6 +303,6 @@ class ValidationRuleParser
 
                 return $rule->passes($data) ? $rule->rules() : $rule->defaultRules();
             })->filter()->flatten(1)->values()->all()];
-        })->filter()->all();
+        })->all();
     }
 }
