@@ -83,7 +83,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public static function generateKey($cipher)
     {
-        return random_bytes(self::$supportedCiphers[$cipher]['size']);
+        return random_bytes(self::$supportedCiphers[$cipher]['size'] ?? 32);
     }
 
     /**
