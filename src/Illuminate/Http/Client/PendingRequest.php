@@ -648,7 +648,9 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+        if (!$this->isAbsoluteUrl($url)) {
+            $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+        }
 
         if (isset($options[$this->bodyFormat])) {
             if ($this->bodyFormat === 'multipart') {
@@ -689,6 +691,20 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100, $this->retryWhenCallback);
+    }
+
+    /**
+     * Determines whether the specified URL is absolute
+     *
+     * @param  string  $url
+     * @return bool
+     */
+    protected function isAbsoluteUrl(string $url)
+    {
+        // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+        // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+        // by any combination of letters, digits, plus, period, or hyphen.
+        return preg_match('/^([a-z][a-z\d\+\-\.]*:)?\/\//i', $url);
     }
 
     /**
@@ -892,10 +908,10 @@ class PendingRequest
         return function ($handler) {
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? collect())
-                     ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
+                    ->map
+                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->filter()
+                    ->first();
 
                 if (is_null($response)) {
                     return $handler($request, $options);
