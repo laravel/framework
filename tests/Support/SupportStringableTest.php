@@ -538,6 +538,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
     }
 
+    public function testSentence()
+    {
+        $this->assertSame('it converts to sentence case', (string) $this->stringable('ItConvertsToSentenceCase')->sentence());
+        $this->assertSame('it preserves hyphenated-words', (string) $this->stringable('it preserves hyphenated-words')->sentence());
+        $this->assertSame('it converts to sentence case', (string) $this->stringable('it_converts_to_sentence_case')->sentence());
+        $this->assertSame('it converts to sentence case', (string) $this->stringable('itConvertsToSentenceCase')->sentence());
+        $this->assertSame('it converts to sentence case', (string) $this->stringable('itConverts toSentenceCase')->sentence());
+        $this->assertSame('laravel php framework', (string) $this->stringable('Laravel    Php      Framework   ')->sentence());
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', (string) $this->stringable('LaravelPHPFramework')->snake());

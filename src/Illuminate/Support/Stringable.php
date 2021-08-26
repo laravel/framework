@@ -555,6 +555,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert the given string to a sentence.
+     *
+     * @return static
+     */
+    public function sentence()
+    {
+        return new static(Str::sentence($this->value));
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $prefix
