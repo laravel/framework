@@ -1109,7 +1109,7 @@ class Validator implements ValidatorContract
             $response = (new ValidationRuleParser($this->data))->explode([$key => $rules]);
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
-                if ($callback($payload, $this->dataForSometimesIteration($ruleKey, !Str::endsWith($key, '.*')))) {
+                if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! Str::endsWith($key, '.*')))) {
                     $this->addRules([$ruleKey => $ruleValue]);
                 }
             }
