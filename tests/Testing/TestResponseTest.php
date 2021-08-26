@@ -472,6 +472,22 @@ class TestResponseTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function testAssertUnprocessable()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Expected response status code');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertUnprocessable();
+    }
+
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
         $statusCode = 500;
