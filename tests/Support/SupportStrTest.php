@@ -395,6 +395,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
     }
 
+    public function testSentence()
+    {
+        $this->assertSame('it converts to sentence case', Str::sentence('ItConvertsToSentenceCase'));
+        $this->assertSame('it preserves hyphenated-words', Str::sentence('it preserves hyphenated-words'));
+        $this->assertSame('it converts to sentence case', Str::sentence('it_converts_to_sentence_case'));
+        $this->assertSame('it converts to sentence case', Str::sentence('itConvertsToSentenceCase'));
+        $this->assertSame('it converts to sentence case', Str::sentence('itConverts toSentenceCase'));
+        $this->assertSame('laravel php framework', Str::sentence('Laravel    Php      Framework   '));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
