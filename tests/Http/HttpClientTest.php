@@ -725,7 +725,7 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testUrlIsRelative()
+    public function testBaseUrl()
     {
         $this->factory->fake();
 
