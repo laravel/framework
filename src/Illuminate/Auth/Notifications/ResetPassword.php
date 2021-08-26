@@ -67,7 +67,7 @@ class ResetPassword extends Notification
 
         return $this->buildMailMessage($url);
     }
-    
+
     /**
      * Get the password reset URL for the given notifiable.
      *
