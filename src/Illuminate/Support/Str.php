@@ -676,6 +676,17 @@ class Str
     }
 
     /**
+     * Convert the given string to a sentence.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function sentence($value)
+    {
+        return str_replace('_', ' ', static::snake($value));
+    }
+
+    /**
      * Get the singular form of an English word.
      *
      * @param  string  $value
