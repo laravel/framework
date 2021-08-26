@@ -648,7 +648,7 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        if (!$this->isAbsoluteUrl($url)) {
+        if (! $this->isAbsoluteUrl($url)) {
             $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
         }
 
@@ -694,7 +694,7 @@ class PendingRequest
     }
 
     /**
-     * Determines whether the specified URL is absolute
+     * Determines whether the specified URL is absolute.
      *
      * @param  string  $url
      * @return bool
