@@ -196,8 +196,8 @@ class Event
         }
 
         $this->runInBackground
-                    ? $this->runCommandInBackground($container)
-                    : $this->runCommandInForeground($container);
+            ? $this->runCommandInBackground($container)
+            : $this->runCommandInForeground($container);
     }
 
     /**
@@ -300,8 +300,8 @@ class Event
             return false;
         }
 
-        return $this->expressionPasses() &&
-               $this->runsInEnvironment($app->environment());
+        return $this->expressionPasses($app) &&
+            $this->runsInEnvironment($app->environment());
     }
 
     /**
@@ -317,9 +317,10 @@ class Event
     /**
      * Determine if the Cron expression passes.
      *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return bool
      */
-    protected function expressionPasses()
+    protected function expressionPasses($app)
     {
         $date = Date::now();
 
@@ -327,7 +328,8 @@ class Event
             $date = $date->setTimezone($this->timezone);
         }
 
-        return (new CronExpression($this->expression))->isDue($date->toDateTimeString());
+        return $app->make(CronExpression::class, ['expression' => $this->expression])
+            ->isDue($date->toDateTimeString());
     }
 
     /**
@@ -836,8 +838,8 @@ class Event
             $output = $this->output && is_file($this->output) ? file_get_contents($this->output) : '';
 
             return $onlyIfOutputExists && empty($output)
-                            ? null
-                            : $container->call($callback, ['output' => new Stringable($output)]);
+                ? null
+                : $container->call($callback, ['output' => new Stringable($output)]);
         };
     }
 
