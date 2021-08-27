@@ -10,10 +10,12 @@ trait Conditionable
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
+     * @template TWhenReturnType
+     *
+     * @param  bool  $value
+     * @param  (callable($this): TWhenReturnType)|null  $callback
+     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @return $this|TWhenReturnType
      */
     public function when($value, callable $callback = null, callable $default = null)
     {
@@ -35,10 +37,12 @@ trait Conditionable
     /**
      * Apply the callback if the given "value" is (or resolves to) falsy.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @param  callable|null  $default
-     * @return $this|mixed
+     * @template TUnlessReturnType
+     *
+     * @param  bool  $value
+     * @param  (callable($this): TUnlessReturnType)  $callback
+     * @param  (callable($this): TUnlessReturnType)|null  $default
+     * @return $this|TUnlessReturnType
      */
     public function unless($value, callable $callback = null, callable $default = null)
     {

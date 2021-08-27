@@ -88,6 +88,7 @@
         "mockery/mockery": "^1.4.3",
         "orchestra/testbench-core": "^7.0",
         "pda/pheanstalk": "^4.0",
+        "phpstan/phpstan": "^0.12.94",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1.2",
         "symfony/cache": "^6.0"
