@@ -525,7 +525,7 @@ trait MakesHttpRequests
             $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
 
-        foreach($this->blacklistedHeaders as $header) {
+        foreach ($this->blacklistedHeaders as $header) {
             $symfonyRequest->headers->remove($header);
             $symfonyRequest->server->remove($this->formatServerHeaderKey(strtoupper($header)));
         }
