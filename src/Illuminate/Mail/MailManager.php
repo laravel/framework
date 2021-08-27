@@ -4,18 +4,18 @@ namespace Illuminate\Mail;
 
 use Aws\SesV2\SesV2Client;
 use Closure;
-use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
-use Illuminate\Mail\Transport\MailgunTransport;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Postmark\Transport as PostmarkTransport;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
@@ -280,20 +280,28 @@ class MailManager implements FactoryContract
      * Create an instance of the Mailgun Swift Transport driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Mail\Transport\MailgunTransport
+     * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
     protected function createMailgunTransport(array $config)
     {
+        $factory = new MailgunTransportFactory();
+
+        if (isset($config['dsn'])) {
+            return $factory->create(
+                Dsn::fromString($config['dsn'])
+            );
+        }
+
         if (! isset($config['secret'])) {
             $config = $this->app['config']->get('services.mailgun', []);
         }
 
-        return new MailgunTransport(
-            $this->guzzle($config),
+        return $factory->create(new Dsn(
+            'mailgun+api',
+            $config['endpoint'] ?? 'default',
             $config['secret'],
-            $config['domain'],
-            $config['endpoint'] ?? null
-        );
+            $config['domain']
+        ));
     }
 
     /**
@@ -369,21 +377,6 @@ class MailManager implements FactoryContract
     protected function createArrayTransport()
     {
         return new ArrayTransport;
-    }
-
-    /**
-     * Get a fresh Guzzle HTTP client instance.
-     *
-     * @param  array  $config
-     * @return \GuzzleHttp\Client
-     */
-    protected function guzzle(array $config)
-    {
-        return new HttpClient(Arr::add(
-            $config['guzzle'] ?? [],
-            'connect_timeout',
-            60
-        ));
     }
 
     /**
