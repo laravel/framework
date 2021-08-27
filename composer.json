@@ -91,7 +91,8 @@
         "phpstan/phpstan": "^0.12.94",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1.2",
-        "symfony/cache": "^6.0"
+        "symfony/cache": "^6.0",
+        "symfony/mailgun-mailer": "^6.0"
     },
     "provide": {
         "psr/container-implementation": "1.0"
@@ -154,6 +155,8 @@
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
+        "symfony/http-client": "Required to enable support for the Mailgun mail driver when using the https or api scheme (^6.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail driver (^6.0).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
         "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
     },
