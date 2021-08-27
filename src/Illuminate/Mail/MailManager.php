@@ -12,9 +12,9 @@ use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Postmark\Transport as PostmarkTransport;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
@@ -286,12 +286,6 @@ class MailManager implements FactoryContract
     {
         $factory = new MailgunTransportFactory();
 
-        if (isset($config['dsn'])) {
-            return $factory->create(
-                Dsn::fromString($config['dsn'])
-            );
-        }
-
         if (! isset($config['secret'])) {
             $config = $this->app['config']->get('services.mailgun', []);
         }
@@ -312,14 +306,13 @@ class MailManager implements FactoryContract
      */
     protected function createPostmarkTransport(array $config)
     {
-        $headers = isset($config['message_stream_id']) ? [
-            'X-PM-Message-Stream' => $config['message_stream_id'],
-        ] : [];
+        $factory = new PostmarkTransportFactory();
 
-        return new PostmarkTransport(
-            $config['token'] ?? $this->app['config']->get('services.postmark.token'),
-            $headers
-        );
+        return $factory->create(new Dsn(
+            'postmark+api',
+            'default',
+            $config['token']
+        ));
     }
 
     /**
