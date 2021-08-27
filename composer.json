@@ -92,7 +92,8 @@
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1.2",
         "symfony/cache": "^6.0",
-        "symfony/mailgun-mailer": "^6.0"
+        "symfony/mailgun-mailer": "^6.0",
+        "symfony/postmark-mailer": "^6.0"
     },
     "provide": {
         "psr/container-implementation": "1.0"
@@ -141,7 +142,7 @@
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.12|^3.0).",
         "filp/whoops": "Required for friendly error pages in development (^2.8).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",
-        "guzzlehttp/guzzle": "Required to use the HTTP Client, Mailgun mail driver and the ping methods on schedules (^7.2).",
+        "guzzlehttp/guzzle": "Required to use the HTTP Client and the ping methods on schedules (^7.2).",
         "laravel/tinker": "Required to use the tinker console command (^2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^2.0).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^2.0).",
@@ -155,10 +156,10 @@
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
-        "symfony/http-client": "Required to enable support for the Mailgun mail driver when using the https or api scheme (^6.0).",
-        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail driver (^6.0).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
-        "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
+        "symfony/http-client": "Required to enable support for the Mailgun mail transport (^6.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0).",
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
     },
     "config": {
         "sort-packages": true
