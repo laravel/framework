@@ -21,6 +21,13 @@ trait MakesHttpRequests
     protected $defaultHeaders = [];
 
     /**
+     * Headers to remove for the request.
+     *
+     * @var array
+     */
+    protected $blacklistedHeaders = [];
+
+    /**
      * Additional cookies for the request.
      *
      * @var array
@@ -73,6 +80,18 @@ trait MakesHttpRequests
     public function withHeaders(array $headers)
     {
         $this->defaultHeaders = array_merge($this->defaultHeaders, $headers);
+
+        return $this;
+    }
+
+    /**
+     * Remove all the blacklisted headers.
+     *
+     * @return $this
+     */
+    public function blacklistHeaders($blacklistedHeaders)
+    {
+        $this->blacklistedHeaders = $blacklistedHeaders;
 
         return $this;
     }
@@ -505,6 +524,11 @@ trait MakesHttpRequests
             $this->prepareUrlForRequest($uri), $method, $parameters,
             $cookies, $files, array_replace($this->serverVariables, $server), $content
         );
+
+        foreach($this->blacklistedHeaders as $header) {
+            $symfonyRequest->headers->remove($header);
+            $symfonyRequest->server->remove($this->formatServerHeaderKey(strtoupper($header)));
+        }
 
         $response = $kernel->handle(
             $request = Request::createFromBase($symfonyRequest)
