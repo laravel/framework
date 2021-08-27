@@ -9,7 +9,7 @@ trait ExplainsQueries
     /**
      * Explains the query.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, object>
      */
     public function explain()
     {

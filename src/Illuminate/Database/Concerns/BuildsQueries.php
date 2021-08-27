@@ -16,6 +16,9 @@ use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ */
 trait BuildsQueries
 {
     use Conditionable;
@@ -63,9 +66,11 @@ trait BuildsQueries
     /**
      * Run a map over each item while chunking.
      *
-     * @param  callable  $callback
+     * @template TChunkMapValue
+     *
+     * @param  callable(TModel): TChunkMapValue  $callback
      * @param  int  $count
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, TChunkMapValue>
      */
     public function chunkMap(callable $callback, $count = 1000)
     {
