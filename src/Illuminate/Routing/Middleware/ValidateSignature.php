@@ -68,6 +68,6 @@ class ValidateSignature
      */
     protected function generateKey($request)
     {
-        return static::$prefix.':'. $request->query('signature');
+        return value(static::$prefix, $request).':'. $request->query('signature');
     }
 }

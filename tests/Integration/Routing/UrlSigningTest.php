@@ -269,6 +269,40 @@ class UrlSigningTest extends TestCase
         $this->get($url)->assertStatus(403);
     }
 
+    public function testTemporarySignedOnceWithPrefixAsClosure()
+    {
+        ValidateSignature::$prefix = function ($request) {
+            return 'signed.once|' . $request->ip();
+        };
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+
+        $cacheKey = 'signed.once|127.0.0.1:cc69b6ae281eb37edc5aa63b772e94e0192767998827cb64df79c72b0d460921';
+
+        $cache = $this->mock(Repository::class);
+        $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnFalse();
+        $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnTrue();
+        $cache->shouldReceive('put')->once()
+            ->withArgs(function ($key, $value, $ttl) use ($cacheKey) {
+                return $key === $cacheKey
+                    && $value === true
+                    && $ttl->getTimestamp() === now()->addMinutes(5)->getTimestamp();
+            })
+            ->andReturnTrue();
+
+        $this->mock('cache')->shouldReceive('store')->with(null)->times(2)->andReturn($cache);
+
+        Route::get('/foo/{id}', function ($id) {
+            return $id;
+        })->name('foo')->middleware('signed:absolute,once');
+
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+
+        $this->get(URL::signedRoute('foo', ['id' => 1]))->assertStatus(403);
+        $this->assertSame('1', $this->get($url)->assertOk()->original);
+        $this->get($url)->assertStatus(403);
+    }
+
     protected function tearDown(): void
     {
         ValidateSignature::$prefix = 'signed.once';
