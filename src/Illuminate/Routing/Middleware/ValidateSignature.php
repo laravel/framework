@@ -4,7 +4,6 @@ namespace Illuminate\Routing\Middleware;
 
 use Closure;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
-
 use function cache;
 use function config;
 use function date_create_from_format;
