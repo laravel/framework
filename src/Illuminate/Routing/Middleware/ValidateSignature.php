@@ -70,5 +70,4 @@ class ValidateSignature
     {
         return static::$prefix.':'. $request->query('signature');
     }
-
 }
