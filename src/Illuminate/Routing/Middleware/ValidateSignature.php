@@ -2,11 +2,11 @@
 
 namespace Illuminate\Routing\Middleware;
 
-use Closure;
-use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use function cache;
+use Closure;
 use function config;
 use function date_create_from_format;
+use Illuminate\Routing\Exceptions\InvalidSignatureException;
 
 class ValidateSignature
 {
@@ -68,6 +68,6 @@ class ValidateSignature
      */
     protected function generateKey($request)
     {
-        return value(static::$prefix, $request).':'. $request->query('signature');
+        return value(static::$prefix, $request).':'.$request->query('signature');
     }
 }

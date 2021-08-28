@@ -272,7 +272,7 @@ class UrlSigningTest extends TestCase
     public function testTemporarySignedOnceWithPrefixAsClosure()
     {
         ValidateSignature::$prefix = function ($request) {
-            return 'signed.once|' . $request->ip();
+            return 'signed.once|'.$request->ip();
         };
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
