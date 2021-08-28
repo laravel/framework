@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Routing\Middleware\ValidateSignatureOnce;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
@@ -243,6 +244,8 @@ class UrlSigningTest extends TestCase
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
 
+        Config::set('cache.signed', 'foo');
+
         $cache = $this->mock(Repository::class);
         $cache->shouldReceive('has')->once()->with('bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0')->andReturnFalse();
         $cache->shouldReceive('has')->once()->with('bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0')->andReturnTrue();
@@ -254,12 +257,11 @@ class UrlSigningTest extends TestCase
             })
             ->andReturnTrue();
 
-        $factory = $this->mock(Factory::class);
-        $factory->shouldReceive('store')->with('foo')->times(3)->andReturn($cache);
+        $this->mock('cache')->shouldReceive('store')->with('foo')->times(2)->andReturn($cache);
 
         Route::get('/foo/{id}', function ($id) {
             return $id;
-        })->name('foo')->middleware(ValidateSignatureOnce::class . ':,foo,bar');
+        })->name('foo')->middleware(ValidateSignatureOnce::class . ':,bar');
 
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
 
