@@ -2,13 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
+use DateTime;
+use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ValidateSignature;
+use Illuminate\Routing\Middleware\ValidateSignatureOnce;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -194,6 +199,73 @@ class UrlSigningTest extends TestCase
 
         $response = $this->get('/foo/relative');
         $response->assertStatus(403);
+    }
+
+    public function testTemporarySignedOnceUrls()
+    {
+        Route::get('/foo/{id}', function ($id) {
+            return $id;
+        })->name('foo')->middleware(ValidateSignatureOnce::class);
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+
+        $this->get(URL::signedRoute('foo', ['id' => 1]))->assertStatus(403);
+        $this->assertSame('1', $this->get($url)->assertOk()->original);
+        $this->get($url)->assertStatus(403);
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
+        $this->get($url)->assertStatus(403);
+    }
+
+    public function testTemporarySignedOnceRelativeUrls()
+    {
+        Route::get('/foo/relative/{id}', function ($id) {
+            return $id;
+        })->name('foo')->middleware(ValidateSignatureOnce::class . ':relative');
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+        $this->assertIsString(
+            $url = 'https://fake.test'.URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1], false)
+        );
+
+        $this->get('https://fake.test'.URL::signedRoute('foo', ['id' => 1], null, false))->assertStatus(403);
+        $this->assertSame('1', $this->get($url)->assertOk()->original);
+        $this->get($url)->assertStatus(403);
+
+        Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
+        $this->get($url)->assertStatus(403);
+
+        $this->get('foo/relative/1')->assertStatus(403);
+    }
+
+    public function testTemporarySignedOnceWithPrefixAndStore()
+    {
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+
+        $cache = $this->mock(Repository::class);
+        $cache->shouldReceive('has')->once()->with('bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0')->andReturnFalse();
+        $cache->shouldReceive('has')->once()->with('bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0')->andReturnTrue();
+        $cache->shouldReceive('put')->once()
+            ->withArgs(function ($key, $value, $ttl) {
+                return $key === 'bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0'
+                    && $value === true
+                    && $ttl->getTimestamp() === now()->addMinutes(5)->getTimestamp();
+            })
+            ->andReturnTrue();
+
+        $factory = $this->mock(Factory::class);
+        $factory->shouldReceive('store')->with('foo')->times(3)->andReturn($cache);
+
+        Route::get('/foo/{id}', function ($id) {
+            return $id;
+        })->name('foo')->middleware(ValidateSignatureOnce::class . ':,foo,bar');
+
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+
+        $this->get(URL::signedRoute('foo', ['id' => 1]))->assertStatus(403);
+        $this->assertSame('1', $this->get($url)->assertOk()->original);
+        $this->get($url)->assertStatus(403);
     }
 }
 
