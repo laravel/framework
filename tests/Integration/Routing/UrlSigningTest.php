@@ -250,7 +250,7 @@ class UrlSigningTest extends TestCase
 
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
 
-        $cacheKey = 'bar:' . Str::of($url)->after('signature=')->before('&');
+        $cacheKey = 'bar:'.Str::of($url)->after('signature=')->before('&');
 
         $cache = $this->mock(Repository::class);
         $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnFalse();
@@ -284,7 +284,7 @@ class UrlSigningTest extends TestCase
 
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
 
-        $cacheKey = 'signed.once|127.0.0.1:' . Str::of($url)->after('signature=')->before('&');
+        $cacheKey = 'signed.once|127.0.0.1:'.Str::of($url)->after('signature=')->before('&');
 
         $cache = $this->mock(Repository::class);
         $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnFalse();
