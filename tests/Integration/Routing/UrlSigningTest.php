@@ -2,19 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use DateTime;
-use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ValidateSignature;
-use Illuminate\Routing\Middleware\ValidateSignatureOnce;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -206,7 +202,7 @@ class UrlSigningTest extends TestCase
     {
         Route::get('/foo/{id}', function ($id) {
             return $id;
-        })->name('foo')->middleware(ValidateSignatureOnce::class);
+        })->name('foo')->middleware('signed:absolute,once');
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
@@ -223,7 +219,7 @@ class UrlSigningTest extends TestCase
     {
         Route::get('/foo/relative/{id}', function ($id) {
             return $id;
-        })->name('foo')->middleware(ValidateSignatureOnce::class . ':relative');
+        })->name('foo')->middleware('signed:relative,once');
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
         $this->assertIsString(
@@ -242,16 +238,19 @@ class UrlSigningTest extends TestCase
 
     public function testTemporarySignedOnceWithPrefixAndStore()
     {
-        Carbon::setTestNow(Carbon::create(2018, 1, 1));
+        ValidateSignature::$prefix = 'bar';
 
+        Carbon::setTestNow(Carbon::create(2018, 1, 1));
         Config::set('cache.signed', 'foo');
 
+        $cacheKey = 'bar:cc69b6ae281eb37edc5aa63b772e94e0192767998827cb64df79c72b0d460921';
+
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('has')->once()->with('bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0')->andReturnFalse();
-        $cache->shouldReceive('has')->once()->with('bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0')->andReturnTrue();
+        $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnFalse();
+        $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnTrue();
         $cache->shouldReceive('put')->once()
-            ->withArgs(function ($key, $value, $ttl) {
-                return $key === 'bar:08fc6cf251550ec087372cb9a2b869ac9d8ab5a0'
+            ->withArgs(function ($key, $value, $ttl) use ($cacheKey) {
+                return $key === $cacheKey
                     && $value === true
                     && $ttl->getTimestamp() === now()->addMinutes(5)->getTimestamp();
             })
@@ -261,13 +260,20 @@ class UrlSigningTest extends TestCase
 
         Route::get('/foo/{id}', function ($id) {
             return $id;
-        })->name('foo')->middleware(ValidateSignatureOnce::class . ':,bar');
+        })->name('foo')->middleware('signed:absolute,once');
 
         $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
 
         $this->get(URL::signedRoute('foo', ['id' => 1]))->assertStatus(403);
         $this->assertSame('1', $this->get($url)->assertOk()->original);
         $this->get($url)->assertStatus(403);
+    }
+
+    protected function tearDown(): void
+    {
+        ValidateSignature::$prefix = 'signed.once';
+
+        parent::tearDown();
     }
 }
 
