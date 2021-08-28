@@ -39,13 +39,24 @@ class ValidateSignatureOnce
      */
     public function handle($request, Closure $next, $relative = null, $store = null, $prefix = 'signed_once')
     {
-        if ($request->query('expires') &&
-            $request->hasValidSignature($relative !== 'relative') &&
+        if ($this->hasValidSignature($request, $relative !== 'relative') &&
             $this->notHandledPreviously($request, $store, $prefix)) {
             return $next($request);
         }
 
         throw new InvalidSignatureException;
+    }
+
+    /**
+     * Check if the request has an expiring valid signature.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  bool  $relative
+     * @return bool
+     */
+    protected function hasValidSignature($request, $relative)
+    {
+        return $request->query('expires') && $request->hasValidSignature($relative);
     }
 
     /**
