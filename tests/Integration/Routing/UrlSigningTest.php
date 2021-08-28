@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
@@ -243,7 +244,13 @@ class UrlSigningTest extends TestCase
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
         Config::set('cache.signed', 'foo');
 
-        $cacheKey = 'bar:cc69b6ae281eb37edc5aa63b772e94e0192767998827cb64df79c72b0d460921';
+        Route::get('/foo/{id}', function ($id) {
+            return $id;
+        })->name('foo')->middleware('signed:absolute,once');
+
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+
+        $cacheKey = 'bar:' . Str::of($url)->after('signature=')->before('&');
 
         $cache = $this->mock(Repository::class);
         $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnFalse();
@@ -258,12 +265,6 @@ class UrlSigningTest extends TestCase
 
         $this->mock('cache')->shouldReceive('store')->with('foo')->times(2)->andReturn($cache);
 
-        Route::get('/foo/{id}', function ($id) {
-            return $id;
-        })->name('foo')->middleware('signed:absolute,once');
-
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
-
         $this->get(URL::signedRoute('foo', ['id' => 1]))->assertStatus(403);
         $this->assertSame('1', $this->get($url)->assertOk()->original);
         $this->get($url)->assertStatus(403);
@@ -277,7 +278,13 @@ class UrlSigningTest extends TestCase
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
 
-        $cacheKey = 'signed.once|127.0.0.1:cc69b6ae281eb37edc5aa63b772e94e0192767998827cb64df79c72b0d460921';
+        Route::get('/foo/{id}', function ($id) {
+            return $id;
+        })->name('foo')->middleware('signed:absolute,once');
+
+        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
+
+        $cacheKey = 'signed.once|127.0.0.1:' . Str::of($url)->after('signature=')->before('&');
 
         $cache = $this->mock(Repository::class);
         $cache->shouldReceive('has')->once()->with($cacheKey)->andReturnFalse();
@@ -291,12 +298,6 @@ class UrlSigningTest extends TestCase
             ->andReturnTrue();
 
         $this->mock('cache')->shouldReceive('store')->with(null)->times(2)->andReturn($cache);
-
-        Route::get('/foo/{id}', function ($id) {
-            return $id;
-        })->name('foo')->middleware('signed:absolute,once');
-
-        $this->assertIsString($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
 
         $this->get(URL::signedRoute('foo', ['id' => 1]))->assertStatus(403);
         $this->assertSame('1', $this->get($url)->assertOk()->original);
