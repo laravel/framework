@@ -666,13 +666,28 @@ class SupportStringableTest extends TestCase
         };
 
         $this->assertInstanceOf(Stringable::class, $this->stringable('foo')->pipe($callback));
-        $this->assertSame('bar', (string) $this->stringable('foo')->pipe($callback));
+        $this->assertSame('bar', (string)  $this->stringable('foo')->pipe($callback));
     }
 
     public function testMarkdown()
     {
         $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
         $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+    }
+
+    public function testMask()
+    {
+        $subject = 'My name is a secret';
+
+        $this->assertSame('My name is ********', (string) $this->stringable($subject)->mask('a secret'));
+        $this->assertSame('My name is !!!!!!!!', (string) $this->stringable($subject)->mask('a secret', '!X'));
+        $this->assertSame('My name is ********', (string) $this->stringable($subject)->mask('a secret', ''));
+        $this->assertSame('My name is a secret', (string) $this->stringable($subject)->mask('not found'));
+        $this->assertSame('I did ****** and secret', (string) $this->stringable('I did secret and secret')->mask('secret'));
+
+        $this->assertSame('My name is ********', (string) $this->stringable($subject)->mask([11]));
+        $this->assertSame('My **** is a secret', (string) $this->stringable($subject)->mask([3, 4]));
+        $this->assertSame('******* is a secret', (string) $this->stringable($subject)->mask([0, -12]));
     }
 
     public function testRepeat()

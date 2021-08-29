@@ -574,9 +574,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('My name is !!!!!!!!', Str::mask($subject, 'a secret', '!X'));
         $this->assertSame('My name is ********', Str::mask($subject, 'a secret', ''));
         $this->assertSame('My name is a secret', Str::mask($subject, 'not found'));
+        $this->assertSame('I did ****** and secret', Str::mask('I did secret and secret', 'secret'));
 
         $this->assertSame('My name is ********', Str::mask($subject, [11]));
         $this->assertSame('My **** is a secret', Str::mask($subject, [3, 4]));
+        $this->assertSame('******* is a secret', Str::mask($subject, [0, -12]));
     }
 
     public function testRepeat()

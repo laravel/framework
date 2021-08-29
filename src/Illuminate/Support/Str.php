@@ -405,10 +405,10 @@ class Str
     public static function mask($haystack, $needle, $mask = '*')
     {
         if (is_array($needle)) {
-            $needle = self::substr($haystack, $needle[0], $needle[1] ?? null);
+            $needle = self::substr($haystack, ...$needle);
         }
 
-        return static::replace(
+        return static::replaceFirst(
             $needle, static::repeat($mask[0] ?? '*', static::length($needle)), $haystack
         );
     }
