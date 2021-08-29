@@ -395,6 +395,25 @@ class Str
     }
 
     /**
+     * Masks a matching string with a repeated character.
+     *
+     * @param  string  $haystack
+     * @param  string|array  $needle
+     * @param  string  $mask
+     * @return string
+     */
+    public static function mask($haystack, $needle, $mask = '*')
+    {
+        if (is_array($needle)) {
+            $needle = self::substr($haystack, $needle[0], $needle[1] ?? null);
+        }
+
+        return static::replace(
+            $needle, static::repeat($mask[0] ?? '*', static::length($needle)), $haystack
+        );
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern

@@ -566,6 +566,19 @@ class SupportStrTest extends TestCase
         $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
 
+    public function testMask()
+    {
+        $subject = 'My name is a secret';
+
+        $this->assertSame('My name is ********', Str::mask($subject, 'a secret'));
+        $this->assertSame('My name is !!!!!!!!', Str::mask($subject, 'a secret', '!X'));
+        $this->assertSame('My name is ********', Str::mask($subject, 'a secret', ''));
+        $this->assertSame('My name is a secret', Str::mask($subject, 'not found'));
+
+        $this->assertSame('My name is ********', Str::mask($subject, [11]));
+        $this->assertSame('My **** is a secret', Str::mask($subject, [3, 4]));
+    }
+
     public function testRepeat()
     {
         $this->assertSame('aaaaa', Str::repeat('a', 5));
