@@ -63,14 +63,15 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testHasColumnWithTablePrefix()
     {
+//        dd('s');
         $this->db->connection()->setTablePrefix('test_');
-
+//        dd($this->db->connection()->getSchemaBuilder());
         $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
         });
 
-        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumn('table1', 'name'));
+        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasIndex('table1', 'name','asd'));
     }
 
     public function testHasColumnAndIndexWithPrefixIndexDisabled()
@@ -128,6 +129,24 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->schemaBuilder()->dropColumns('pandemic_table', ['covid19', 'wear_mask']);
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
+    }
+
+    public function testTableHasIndexTablePrefix()
+    {
+        $this->db->connection()->setTablePrefix('test_');
+
+        $this->schemaBuilder()->create('pandemic_table', function (Blueprint $table) {
+            $table->id();
+            $table->string('stay_home')->index();
+            $table->string('covid19');
+            $table->string('wear_mask');
+            $table->unique(['wear_mask','covid19']);
+        });
+        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table','id','primary'));
+        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table','stay_home'));
+        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table',['wear_mask','covid19'],'pandemic_table_wear_mask_covid19_unique'));
+        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table',['wear_mask']));
+        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table',['wear_mask'],'primary'));
     }
 
     private function schemaBuilder()
