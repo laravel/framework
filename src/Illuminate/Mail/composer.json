@@ -37,9 +37,9 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.189.0).",
-        "symfony/http-client": "Required to use the Mailgun mail driver (^6.0).",
-        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail driver (^6.0).",
+        "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
+        "symfony/http-client": "Required to use the Symfony mail transports (^6.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0)."
     },
     "config": {
