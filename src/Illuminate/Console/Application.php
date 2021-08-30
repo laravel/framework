@@ -54,11 +54,11 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected static $bootstrappers = [];
 
     /**
-     * A map of command names to classes.
+     * The lazy command loader.
      *
-     * @var array
+     * @var \Illuminate\Console\ContainerCommandLoader
      */
-    protected $commandMap = [];
+    protected $commandLoader;
 
     /**
      * Create a new Artisan console application.
@@ -265,8 +265,8 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolve($command)
     {
-        if (class_exists($command) && ($commandName = $command::getDefaultName())) {
-            $this->commandMap[$commandName] = $command;
+        if (class_exists($command) && $this->commandLoader) {
+            $this->commandLoader->add($command);
 
             return null;
         }
@@ -298,7 +298,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function setContainerCommandLoader()
     {
-        $this->setCommandLoader(new ContainerCommandLoader($this->laravel, $this->commandMap));
+        $this->setCommandLoader($this->commandLoader = new ContainerCommandLoader($this->laravel));
 
         return $this;
     }

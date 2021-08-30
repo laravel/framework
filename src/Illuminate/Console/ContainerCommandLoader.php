@@ -17,23 +17,32 @@ class ContainerCommandLoader implements CommandLoaderInterface
     protected $container;
 
     /**
-     * A map of command names to classes.
+     * A list of class names.
      *
      * @var array
      */
-    protected $commandMap;
+    protected $classes = [];
 
     /**
      * Create a new command loader instance.
      *
      * @param  \Psr\Container\ContainerInterface  $container
-     * @param  array  $commandMap
      * @return void
      */
-    public function __construct(ContainerInterface $container, array $commandMap)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->commandMap = $commandMap;
+    }
+
+    /**
+     * Add class to the loader.
+     *
+     * @param string $name
+     * @return void
+     */
+    public function add(string $name)
+    {
+        $this->classes[] = $name;
     }
 
     /**
@@ -50,7 +59,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
             throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
         }
 
-        return $this->container->get($this->commandMap[$name]);
+        return $this->container->get($name);
     }
 
     /**
@@ -61,7 +70,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
      */
     public function has(string $name): bool
     {
-        return $name && isset($this->commandMap[$name]);
+        return in_array($name, $this->classes);
     }
 
     /**
@@ -71,6 +80,12 @@ class ContainerCommandLoader implements CommandLoaderInterface
      */
     public function getNames(): array
     {
-        return array_keys($this->commandMap);
+        $names = [];
+
+        foreach ($this->classes as $class) {
+            $names[] = $class::getDefaultName();
+        }
+
+        return $names;
     }
 }
