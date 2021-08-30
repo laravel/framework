@@ -79,6 +79,34 @@ class EncrypterTest extends TestCase
         $this->assertNotEmpty($data->tag);
     }
 
+    public function testThatAnAeadTagMustBeProvidedInFullLength()
+    {
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $encrypted = $e->encrypt('foo');
+        $data = json_decode(base64_decode($encrypted));
+
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('Could not decrypt the data.');
+
+        $data->tag = substr($data->tag, 0, 4);
+        $encrypted = base64_encode(json_encode($data));
+        $e->decrypt($encrypted);
+    }
+
+    public function testThatAnAeadTagCantBeModified()
+    {
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $encrypted = $e->encrypt('foo');
+        $data = json_decode(base64_decode($encrypted));
+
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('Could not decrypt the data.');
+
+        $data->tag = 'A'.substr($data->tag, 1, 23);
+        $encrypted = base64_encode(json_encode($data));
+        $e->decrypt($encrypted);
+    }
+
     public function testThatANonAeadCipherIncludesMac()
     {
         $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
