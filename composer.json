@@ -91,10 +91,7 @@
         "phpstan/phpstan": "^0.12.94",
         "phpunit/phpunit": "^9.4",
         "predis/predis": "^1.1.2",
-        "symfony/amazon-mailer": "^6.0",
-        "symfony/cache": "^6.0",
-        "symfony/mailgun-mailer": "^6.0",
-        "symfony/postmark-mailer": "^6.0"
+        "symfony/cache": "^6.0"
     },
     "provide": {
         "psr/container-implementation": "1.0"
