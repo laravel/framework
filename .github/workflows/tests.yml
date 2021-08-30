@@ -40,7 +40,7 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--ignore-platform-req=php --with symfony/process:^5.4 --with symfony/routing:^5.4"
+            flags: "--with symfony/process:^5.4 --with symfony/routing:^5.4"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -56,6 +56,10 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
           tools: composer:v2
           coverage: none
+
+      - name: Mimic PHP 8.0
+        run: composer config platform.php 8.0.999
+        if: matrix.php > 8
 
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
@@ -93,7 +97,7 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--ignore-platform-req=php"
+            flags: "--with symfony/process:^5.4 --with symfony/routing:^5.4"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -114,6 +118,10 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, pdo_mysql, fileinfo, ftp, redis, memcached
           tools: composer:v2
           coverage: none
+
+      - name: Mimic PHP 8.0
+        run: composer config platform.php 8.0.999
+        if: matrix.php > 8
 
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
