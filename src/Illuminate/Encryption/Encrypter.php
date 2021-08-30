@@ -161,7 +161,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
 
         $tag = empty($payload['tag']) ? null : base64_decode($payload['tag']);
 
-        if (self::$supportedCiphers[$this->cipher]['aead'] && strlen($tag) !== 16) {
+        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && strlen($tag) !== 16) {
             throw new DecryptException('Could not decrypt the data.');
         }
 
