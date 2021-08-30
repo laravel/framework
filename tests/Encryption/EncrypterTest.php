@@ -56,6 +56,19 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $e->decrypt($encrypted));
     }
 
+    public function testCipherNamesCanBeMixedCase()
+    {
+        $upper = new Encrypter(str_repeat('b', 16), 'AES-128-GCM');
+        $encrypted = $upper->encrypt('bar');
+        $this->assertNotSame('bar', $encrypted);
+
+        $lower = new Encrypter(str_repeat('b', 16), 'aes-128-gcm');
+        $this->assertSame('bar', $lower->decrypt($encrypted));
+
+        $mixed = new Encrypter(str_repeat('b', 16), 'aEs-128-GcM');
+        $this->assertSame('bar', $mixed->decrypt($encrypted));
+    }
+
     public function testThatAnAeadCipherIncludesTag()
     {
         $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
@@ -79,7 +92,7 @@ class EncrypterTest extends TestCase
     public function testDoNoAllowLongerKey()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: AES-128-CBC, AES-256-CBC, AES-128-GCM, AES-256-GCM.');
+        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('z', 32));
     }
@@ -87,7 +100,7 @@ class EncrypterTest extends TestCase
     public function testWithBadKeyLength()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: AES-128-CBC, AES-256-CBC, AES-128-GCM, AES-256-GCM.');
+        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('a', 5));
     }
@@ -95,15 +108,15 @@ class EncrypterTest extends TestCase
     public function testWithBadKeyLengthAlternativeCipher()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: AES-128-CBC, AES-256-CBC, AES-128-GCM, AES-256-GCM.');
+        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
-        new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
+        new Encrypter(str_repeat('a', 16), 'AES-256-GCM');
     }
 
     public function testWithUnsupportedCipher()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: AES-128-CBC, AES-256-CBC, AES-128-GCM, AES-256-GCM.');
+        $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
     }
