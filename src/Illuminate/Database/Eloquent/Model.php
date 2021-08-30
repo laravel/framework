@@ -878,7 +878,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     }
 
     /**
-     * Update the model to the database using transaction.
+     * Update the model in the database within a transaction.
      *
      * @param  array  $attributes
      * @param  array  $options
