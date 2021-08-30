@@ -151,7 +151,7 @@ class Builder
            $tablesCount += $this->hasTable($table);
         }
 
-        return count($tables) == $tablesCount ?? false;
+        return count($tables) == $tablesCount;
     }
 
     /**
