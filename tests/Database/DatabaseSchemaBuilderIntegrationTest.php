@@ -63,15 +63,13 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testHasColumnWithTablePrefix()
     {
-//        dd('s');
         $this->db->connection()->setTablePrefix('test_');
-//        dd($this->db->connection()->getSchemaBuilder());
         $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
         });
 
-        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasIndex('table1', 'name','asd'));
+        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumn('table1', 'name'));
     }
 
     public function testHasColumnAndIndexWithPrefixIndexDisabled()
