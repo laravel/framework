@@ -40,7 +40,6 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--with symfony/process:^5.4 --with symfony/routing:^5.4"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -74,7 +73,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         continue-on-error: ${{ matrix.php > 8 }}
@@ -97,7 +96,6 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--with symfony/process:^5.4 --with symfony/routing:^5.4"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -136,7 +134,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         continue-on-error: ${{ matrix.php > 8 }}
