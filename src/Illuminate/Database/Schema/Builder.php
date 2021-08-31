@@ -228,6 +228,33 @@ class Builder
         return false;
     }
 
+    /*
+     * Determine if the given table has a given Foreign Key
+     * @param string $localTable
+     * @param string $localColumn
+     * @param string $foreignTable
+     * @param string $foreignColumn
+     * */
+    public function hasForeignKey(string $localTable, string $localColumn, string $foreignTable, string $foreignColumn) : bool
+    {
+        $localTable = $this->connection->getTablePrefix().$localTable;
+        $foreignTable = $this->connection->getTablePrefix().$foreignTable;
+
+        $foreignKeysTable = $this->connection->getDoctrineSchemaManager()->listTableForeignKeys($localTable);
+
+        foreach ($foreignKeysTable as $foreignKeyTable){
+            if (
+                in_array($localColumn,$foreignKeyTable->getLocalColumns())
+                && in_array($foreignColumn,$foreignKeyTable->getForeignColumns())
+                && $foreignKeyTable->getForeignTableName() === $foreignTable
+            ){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Modify a table on the schema.
      *
