@@ -136,6 +136,23 @@ class Builder
             $this->grammar->compileTableExists(), [$table]
         )) > 0;
     }
+    
+    /**
+     * Determine if the given tables are exists.
+     *
+     * @param  array  $tables
+     * @return bool
+     */
+    public function hasTables($tables)
+    {
+        foreach ($tables as $table) {
+            if(! $this->hasTable($table)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Determine if the given table has a given column.
