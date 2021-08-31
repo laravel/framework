@@ -93,7 +93,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
                 'pandemic_table_wear_mask_covid19_unique'
             )
         );
-        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table', ['wear_mask']));
+        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table', 'wear_mask'));
         $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table', ['wear_mask'], 'primary'));
     }
 
