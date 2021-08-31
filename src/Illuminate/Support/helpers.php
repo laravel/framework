@@ -256,20 +256,7 @@ if (! function_exists('shadow')) {
      */
     function shadow($object)
     {
-        return new HigherOrderShadowProxy($object, false);
-    }
-}
-
-if (! function_exists('shadow_tap')) {
-    /**
-     * Executes a method or macro call result if it exists, and returns the object.
-     *
-     * @param  object  $object
-     * @return mixed
-     */
-    function shadow_tap($object)
-    {
-        return new HigherOrderShadowProxy($object, true);
+        return new HigherOrderShadowProxy($object);
     }
 }
 

@@ -375,27 +375,6 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(shadow($macroable)->invalid('foo'));
     }
 
-    public function testShadowTap()
-    {
-        $object = new Fluent(['foo' => 'bar']);
-
-        $this->assertSame($object, shadow_tap($object)->offsetSet('foo', 'baz'));
-        $this->assertSame('baz', $object->foo);
-
-        $macroable = new class extends Fluent
-        {
-            use Macroable;
-            protected $attributes = ['foo' => 'bar'];
-        };
-
-        $macroable::macro('testMacro', function () {
-            return $this->attributes['baz'] = 'qux';
-        });
-
-        $this->assertSame($macroable, shadow_tap($macroable)->testMacro());
-        $this->assertSame('qux', $macroable->baz);
-    }
-
     public function testTap()
     {
         $object = (object) ['id' => 1];
