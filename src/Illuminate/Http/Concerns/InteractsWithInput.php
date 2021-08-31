@@ -474,7 +474,7 @@ trait InteractsWithInput
             return $this->$source->all();
         }
 
-        return $this->$source->get($key, $default);
+        return data_get($this->$source->all(), $key, $default);
     }
 
     /**
