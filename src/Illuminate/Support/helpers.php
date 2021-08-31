@@ -4,6 +4,7 @@ use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\HigherOrderShadowProxy;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
 
@@ -243,6 +244,32 @@ if (! function_exists('retry')) {
 
             goto beginning;
         }
+    }
+}
+
+if (! function_exists('shadow')) {
+    /**
+     * Return the method or macro call result if it exists in the object.
+     *
+     * @param  object  $object
+     * @return mixed
+     */
+    function shadow($object)
+    {
+        return new HigherOrderShadowProxy($object, false);
+    }
+}
+
+if (!function_exists('shadow_tap')) {
+    /**
+     * Executes a method or macro call result if it exists, and returns the object.
+     *
+     * @param  object  $object
+     * @return mixed
+     */
+    function shadow_tap($object)
+    {
+        return new HigherOrderShadowProxy($object, true);
     }
 }
 
