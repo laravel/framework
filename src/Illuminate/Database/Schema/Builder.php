@@ -212,10 +212,10 @@ class Builder
         if (is_null($indexName)) {
             $indexName = $table.'_'.$column.'_index';
         }
-        if ( ! is_array($column)) {
+        if (! is_array($column)) {
             $column = [$column];
         }
-        $table = $this->connection->getTablePrefix() . $table;
+        $table = $this->connection->getTablePrefix().$table;
 
         $tableIndexes = $this->connection->getDoctrineSchemaManager()->listTableIndexes($table);
 
