@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Support;
 use ArrayAccess;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Traits\Macroable;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -351,6 +353,47 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
         class_uses_recursive(SupportTestClassThree::class));
+    }
+
+    public function testShadow()
+    {
+        $object = new Fluent(['foo' => 'bar']);
+
+        $this->assertSame('bar', shadow($object)->offsetGet('foo'));
+        $this->assertFalse(shadow($object)->invalid('foo'));
+
+        $macroable = new class extends Fluent
+        {
+            use Macroable;
+        };
+
+        $macroable::macro('testMacro', function () {
+            return 'macro';
+        });
+
+        $this->assertSame('macro', shadow($macroable)->testMacro());
+        $this->assertFalse(shadow($macroable)->invalid('foo'));
+    }
+
+    public function testShadowTap()
+    {
+        $object = new Fluent(['foo' => 'bar']);
+
+        $this->assertSame($object, shadow_tap($object)->offsetSet('foo', 'baz'));
+        $this->assertSame('baz', $object->foo);
+
+        $macroable = new class extends Fluent
+        {
+            use Macroable;
+            protected $attributes = ['foo' => 'bar'];
+        };
+
+        $macroable::macro('testMacro', function () {
+            return $this->attributes['baz'] = 'qux';
+        });
+
+        $this->assertSame($macroable, shadow_tap($macroable)->testMacro());
+        $this->assertSame('qux', $macroable->baz);
     }
 
     public function testTap()
