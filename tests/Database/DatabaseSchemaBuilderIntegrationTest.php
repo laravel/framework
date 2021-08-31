@@ -82,13 +82,19 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             $table->string('stay_home')->index();
             $table->string('covid19');
             $table->string('wear_mask');
-            $table->unique(['wear_mask','covid19']);
+            $table->unique(['wear_mask', 'covid19']);
         });
-        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table','id','primary'));
-        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table','stay_home'));
-        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table',['wear_mask','covid19'],'pandemic_table_wear_mask_covid19_unique'));
-        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table',['wear_mask']));
-        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table',['wear_mask'],'primary'));
+        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table', 'id', 'primary'));
+        $this->assertTrue($this->schemaBuilder()->hasIndex('pandemic_table', 'stay_home'));
+        $this->assertTrue(
+            $this->schemaBuilder()->hasIndex(
+                'pandemic_table',
+                ['wear_mask', 'covid19'],
+                'pandemic_table_wear_mask_covid19_unique'
+            )
+        );
+        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table', ['wear_mask']));
+        $this->assertFalse($this->schemaBuilder()->hasIndex('pandemic_table', ['wear_mask'], 'primary'));
     }
 
     public function testHasColumnAndIndexWithPrefixIndexDisabled()

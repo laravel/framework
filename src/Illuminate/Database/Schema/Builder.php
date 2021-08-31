@@ -209,10 +209,10 @@ class Builder
      * */
     public function hasIndex($table, $column, $indexName = null): bool
     {
-        if (is_null($indexName) && !is_array($column)) {
-            $indexName = $table . '_' . $column . '_index';
+        if (is_null($indexName)) {
+            $indexName = $table.'_'.$column.'_index';
         }
-        if (!is_array($column)) {
+        if ( ! is_array($column)) {
             $column = [$column];
         }
         $table = $this->connection->getTablePrefix() . $table;
@@ -220,7 +220,7 @@ class Builder
         $tableIndexes = $this->connection->getDoctrineSchemaManager()->listTableIndexes($table);
 
         foreach ($tableIndexes as $tableIndex) {
-            if ($tableIndex->getName() === $indexName && !count(array_diff($column, $tableIndex->getColumns()))) {
+            if ($tableIndex->getName() === $indexName && ! count(array_diff($column, $tableIndex->getColumns()))) {
                 return true;
             }
         }
