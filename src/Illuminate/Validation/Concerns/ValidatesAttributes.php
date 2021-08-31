@@ -1544,7 +1544,7 @@ trait ValidatesAttributes
      */
     public function validateProhibits($attribute, $value, $parameters)
     {
-        return !Arr::hasAny($this->data, $parameters);
+        return ! Arr::hasAny($this->data, $parameters);
     }
 
     /**
