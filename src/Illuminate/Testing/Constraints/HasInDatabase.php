@@ -78,7 +78,8 @@ class HasInDatabase extends Constraint
     {
         $query = $this->database->table($table);
 
-        $similarResults = $query->where(array_slice($this->data, 0, 1, true))->limit($this->show)->get();
+        $firstCondition = array_slice($this->data, 0, 1, true);
+        $similarResults = $query->where($firstCondition)->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
             $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT);
