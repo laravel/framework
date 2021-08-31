@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Pagination;
 
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use PHPUnit\Framework\TestCase;
 
 class LengthAwarePaginatorTest extends TestCase
@@ -105,6 +107,25 @@ class LengthAwarePaginatorTest extends TestCase
 
         $this->assertSame('http://website.com?key=value%20with%20spaces&foo=2',
                             $this->p->url($this->p->currentPage()));
+    }
+
+    public function testLengthAwarePaginatorCustomizeUrls()
+    {
+        $paginator = new LengthAwarePaginator(
+            ['item1', 'item2', 'item3', 'item4', 'item5', 'item6'],
+            6, 2, 2,
+            $this->options
+        );
+
+        $paginator->setPath('http://website.com/test');
+        $paginator->setPageName('/page');
+
+        Paginator::urlGeneratorResolver(function ($path, $parameters, $page, AbstractPaginator $paginator) {
+            return $path . $paginator->getPageName() . $page;
+        });
+
+        $this->assertSame('http://website.com/test/page1', $paginator->previousPageUrl());
+        $this->assertSame('http://website.com/test/page3', $paginator->nextPageUrl());
     }
 
     public function testItRetrievesThePaginatorOptions()

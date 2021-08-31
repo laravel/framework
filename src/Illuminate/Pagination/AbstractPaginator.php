@@ -102,6 +102,13 @@ abstract class AbstractPaginator implements Htmlable
     protected static $queryStringResolver;
 
     /**
+     * The url generator resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $urlGeneratorResolver;
+
+    /**
      * The view factory resolver callback.
      *
      * @var \Closure
@@ -178,6 +185,10 @@ abstract class AbstractPaginator implements Htmlable
 
         if (count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
+        }
+
+        if (isset(static::$urlGeneratorResolver)) {
+            return call_user_func(static::$urlGeneratorResolver, $this->path(), $parameters, $page, $this);
         }
 
         return $this->path()
@@ -536,6 +547,17 @@ abstract class AbstractPaginator implements Htmlable
     public static function queryStringResolver(Closure $resolver)
     {
         static::$queryStringResolver = $resolver;
+    }
+
+    /**
+     * Set the url generator resolver callback.
+     *
+     * @param Closure $resolver
+     * @return void
+     */
+    public static function urlGeneratorResolver(Closure $resolver)
+    {
+        static::$urlGeneratorResolver = $resolver;
     }
 
     /**
