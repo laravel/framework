@@ -1,6 +1,27 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.56.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.57.0...8.x)
+
+
+## [v8.57.0 (2021-08-27)](https://github.com/laravel/framework/compare/v8.56.0...v8.57.0)
+
+### Added
+- Added exclude validation rule ([#38537](https://github.com/laravel/framework/pull/38537))
+- Allow passing when callback to Http client retry method ([#38531](https://github.com/laravel/framework/pull/38531))
+- Added `Illuminate/Testing/TestResponse::assertUnprocessable()` ([#38553](https://github.com/laravel/framework/pull/38553))
+- Added the password reset URL to the toMailCallback ([#38552](https://github.com/laravel/framework/pull/38552))
+- Added a simple where helper for querying relations ([#38499](https://github.com/laravel/framework/pull/38499))
+- Allow sync broadcast via method ([#38557](https://github.com/laravel/framework/pull/38557))
+- Make $validator->sometimes() item aware to be able to work with nested arrays ([#38443](https://github.com/laravel/framework/pull/38443))
+
+### Fixed
+- Fixed Blade component falsy slots ([#38546](https://github.com/laravel/framework/pull/38546))
+- Keep backward compatibility with custom ciphers in `Illuminate/Encryption/Encrypter::generateKey()` ([#38556](https://github.com/laravel/framework/pull/38556))
+- Fixed bug discarding input fields with empty validation rules ([#38563](https://github.com/laravel/framework/pull/38563))
+
+### Changed
+- Don't iterate over all collection in Collection::firstOrFail ([#38536](https://github.com/laravel/framework/pull/38536))
+- Error out when detecting incompatible DBAL version ([#38543](https://github.com/laravel/framework/pull/38543))
 
 
 ## [v8.56.0 (2021-08-24)](https://github.com/laravel/framework/compare/v8.55.0...v8.56.0)
