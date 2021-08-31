@@ -250,10 +250,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     {
         $builder = m::mock(Builder::class);
 
-        $key = array_key_first($this->data);
-        $value = $this->data[$key];
+        $firstCondition = array_slice($this->data, 0, 1, true);
 
-        $builder->shouldReceive('where')->with($key, $value)->andReturnSelf();
+        $builder->shouldReceive('where')->with($firstCondition)->andReturnSelf();
 
         $builder->shouldReceive('limit')->andReturnSelf();
 
