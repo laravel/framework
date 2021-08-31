@@ -209,7 +209,7 @@ class Builder
      * */
     public function hasIndex($table, $column, $indexName = null): bool
     {
-        if (is_null($indexName) && is_array($column)){
+        if (is_null($indexName) && is_array($column)) {
             throw new LogicException("For array of columns index name can't be null");
         }
         if (is_null($indexName)) {
