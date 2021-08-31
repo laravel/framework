@@ -106,6 +106,26 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
             'nested key exists and null' => [true, 'nested->value', ['nested' => ['value' => null]]],
             'nested key exists and "null"' => [false, 'nested->value', ['nested' => ['value' => 'null']]],
             'nested key exists and not null' => [false, 'nested->value', ['nested' => ['value' => false]]],
+            'array index not exists' => [false, '[0]', [1 => 'invalid']],
+            'array index exists and null' => [true, '[0]', [null]],
+            'array index exists and "null"' => [false, '[0]', ['null']],
+            'array index exists and not null' => [false, '[0]', [false]],
+            'nested array index not exists' => [false, 'nested[0]', ['nested' => [1 => 'nested->invalid']]],
+            'nested array index exists and null' => [true, 'nested->value[1]', ['nested' => ['value' => [0, null]]]],
+            'nested array index exists and "null"' => [false, 'nested->value[1]', ['nested' => ['value' => [0, 'null']]]],
+            'nested array index exists and not null' => [false, 'nested->value[1]', ['nested' => ['value' => [0, false]]]],
         ];
+    }
+
+    public function testJsonPathUpdate()
+    {
+        DB::table(self::TABLE)->insert([
+            [self::JSON_COL => '{"foo":["bar"]}'],
+            [self::JSON_COL => '{"foo":["baz"]}'],
+        ]);
+        $updatedCount = DB::table(self::TABLE)->where(self::JSON_COL.'->foo[0]', 'baz')->update([
+            self::JSON_COL.'->foo[0]' => 'updated',
+        ]);
+        $this->assertSame(1, $updatedCount);
     }
 }

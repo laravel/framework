@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use DateTimeInterface;
 use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
 
@@ -22,11 +21,11 @@ trait InteractsWithTime
     /**
      * Travel to another time.
      *
-     * @param  \DateTimeInterface  $date
+     * @param  \DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null  $date
      * @param  callable|null  $callback
      * @return mixed
      */
-    public function travelTo(DateTimeInterface $date, $callback = null)
+    public function travelTo($date, $callback = null)
     {
         Carbon::setTestNow($date);
 

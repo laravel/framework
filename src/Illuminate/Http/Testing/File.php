@@ -131,7 +131,7 @@ class File extends UploadedFile
      *
      * @return string
      */
-    public function getMimeType()
+    public function getMimeType(): string
     {
         return $this->mimeTypeToReport ?: MimeType::from($this->name);
     }

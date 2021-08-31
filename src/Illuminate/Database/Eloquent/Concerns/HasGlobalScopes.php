@@ -13,14 +13,14 @@ trait HasGlobalScopes
      * Register a new global scope on the model.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|\Closure|string  $scope
-     * @param  \Closure|null  $implementation
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure|null  $implementation
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public static function addGlobalScope($scope, Closure $implementation = null)
+    public static function addGlobalScope($scope, $implementation = null)
     {
-        if (is_string($scope) && ! is_null($implementation)) {
+        if (is_string($scope) && ($implementation instanceof Closure || $implementation instanceof Scope)) {
             return static::$globalScopes[static::class][$scope] = $implementation;
         } elseif ($scope instanceof Closure) {
             return static::$globalScopes[static::class][spl_object_hash($scope)] = $scope;

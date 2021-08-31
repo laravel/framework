@@ -18,6 +18,15 @@ class ConfigCacheCommand extends Command
     protected $name = 'config:cache';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'config:cache';
+
+    /**
      * The console command description.
      *
      * @var string

@@ -670,6 +670,10 @@ class Grammar extends BaseGrammar
             return $having['boolean'].' '.$having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
+        } elseif ($having['type'] === 'Null') {
+            return $this->compileHavingNull($having);
+        } elseif ($having['type'] === 'NotNull') {
+            return $this->compileHavingNotNull($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -707,6 +711,32 @@ class Grammar extends BaseGrammar
         $max = $this->parameter(last($having['values']));
 
         return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
+     * Compile a having null clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingNull($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        return $having['boolean'].' '.$column.' is null';
+    }
+
+    /**
+     * Compile a having not null clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingNotNull($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        return $having['boolean'].' '.$column.' is not null';
     }
 
     /**
@@ -1145,49 +1175,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Wrap a value in keyword identifiers.
-     *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
-     * @param  bool  $prefixAlias
-     * @return string
-     */
-    public function wrap($value, $prefixAlias = false)
-    {
-        if ($this->isExpression($value)) {
-            return $this->getValue($value);
-        }
-
-        // If the value being wrapped has a column alias we will need to separate out
-        // the pieces so we can wrap each of the segments of the expression on its
-        // own, and then join these both back together using the "as" connector.
-        if (stripos($value, ' as ') !== false) {
-            return $this->wrapAliasedValue($value, $prefixAlias);
-        }
-
-        // If the given value is a JSON selector we will wrap it differently than a
-        // traditional value. We will need to split this path and wrap each part
-        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
-        if ($this->isJsonSelector($value)) {
-            return $this->wrapJsonSelector($value);
-        }
-
-        return $this->wrapSegments(explode('.', $value));
-    }
-
-    /**
-     * Wrap the given JSON selector.
-     *
-     * @param  string  $value
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    protected function wrapJsonSelector($value)
-    {
-        throw new RuntimeException('This database engine does not support JSON operations.');
-    }
-
-    /**
      * Wrap the given JSON selector for boolean values.
      *
      * @param  string  $value
@@ -1237,18 +1224,34 @@ class Grammar extends BaseGrammar
     {
         $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
 
-        return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
+        $jsonPath = collect(explode($delimiter, $value))
+            ->map(function ($segment) {
+                return $this->wrapJsonPathSegment($segment);
+            })
+            ->join('.');
+
+        return "'$".(str_starts_with($jsonPath, '[') ? '' : '.').$jsonPath."'";
     }
 
     /**
-     * Determine if the given string is a JSON selector.
+     * Wrap the given JSON path segment.
      *
-     * @param  string  $value
-     * @return bool
+     * @param  string  $segment
+     * @return string
      */
-    protected function isJsonSelector($value)
+    protected function wrapJsonPathSegment($segment)
     {
-        return Str::contains($value, '->');
+        if (preg_match('/(\[[^\]]+\])+$/', $segment, $parts)) {
+            $key = Str::beforeLast($segment, $parts[0]);
+
+            if (! empty($key)) {
+                return '"'.$key.'"'.$parts[0];
+            }
+
+            return $parts[0];
+        }
+
+        return '"'.$segment.'"';
     }
 
     /**

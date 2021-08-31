@@ -1001,7 +1001,7 @@ class Container implements ArrayAccess, ContainerContract
     protected function resolvePrimitive(ReflectionParameter $parameter)
     {
         if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->getName()))) {
-            return $concrete instanceof Closure ? $concrete($this) : $concrete;
+            return Util::unwrapIfClosure($concrete, $this);
         }
 
         if ($parameter->isDefaultValueAvailable()) {

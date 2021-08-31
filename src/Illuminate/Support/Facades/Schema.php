@@ -26,6 +26,13 @@ namespace Illuminate\Support\Facades;
 class Schema extends Facade
 {
     /**
+     * Indicates if the resolved facade should be cached.
+     *
+     * @var bool
+     */
+    protected static $cached = false;
+
+    /**
      * Get a schema builder instance for a connection.
      *
      * @param  string|null  $name
@@ -37,12 +44,12 @@ class Schema extends Facade
     }
 
     /**
-     * Get a schema builder instance for the default connection.
+     * Get the registered name of the component.
      *
-     * @return \Illuminate\Database\Schema\Builder
+     * @return string
      */
     protected static function getFacadeAccessor()
     {
-        return static::$app['db']->connection()->getSchemaBuilder();
+        return 'db.schema';
     }
 }
