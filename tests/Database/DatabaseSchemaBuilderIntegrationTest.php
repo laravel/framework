@@ -118,10 +118,10 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             $table->foreignId('country_id')->references('id')->on('countries_table')->cascadeOnDelete();
             $table->foreignId('image_id')->references('image_id')->on('countries_table')->cascadeOnDelete();
         });
-        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table','country_id','countries_table','id'));
-        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table','image_id','countries_table','image_id'));
-        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table','id','countries_table','image_id'));
-        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table','image_id','images_table','id'));
+        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table', 'country_id', 'countries_table', 'id'));
+        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table', 'image_id', 'countries_table', 'image_id'));
+        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table', 'id', 'countries_table', 'image_id'));
+        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table', 'image_id', 'images_table', 'id'));
     }
 
     public function testTableHasForeignKeyWithoutTablePrefix()
@@ -144,10 +144,10 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             $table->foreignId('country_id')->references('id')->on('countries_table')->cascadeOnDelete();
             $table->foreignId('image_id')->references('image_id')->on('countries_table')->cascadeOnDelete();
         });
-        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table','country_id','countries_table','id'));
-        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table','image_id','countries_table','image_id'));
-        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table','id','countries_table','image_id'));
-        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table','image_id','images_table','id'));
+        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table', 'country_id', 'countries_table', 'id'));
+        $this->assertTrue($this->schemaBuilder()->hasForeignKey('users_table', 'image_id', 'countries_table', 'image_id'));
+        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table', 'id', 'countries_table', 'image_id'));
+        $this->assertFalse($this->schemaBuilder()->hasForeignKey('users_table', 'image_id', 'images_table', 'id'));
     }
 
     public function testHasColumnAndIndexWithPrefixIndexDisabled()

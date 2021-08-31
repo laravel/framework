@@ -235,19 +235,19 @@ class Builder
      * @param string $foreignTable
      * @param string $foreignColumn
      * */
-    public function hasForeignKey(string $localTable, string $localColumn, string $foreignTable, string $foreignColumn) : bool
+    public function hasForeignKey(string $localTable, string $localColumn, string $foreignTable, string $foreignColumn): bool
     {
         $localTable = $this->connection->getTablePrefix().$localTable;
         $foreignTable = $this->connection->getTablePrefix().$foreignTable;
 
         $foreignKeysTable = $this->connection->getDoctrineSchemaManager()->listTableForeignKeys($localTable);
 
-        foreach ($foreignKeysTable as $foreignKeyTable){
+        foreach ($foreignKeysTable as $foreignKeyTable) {
             if (
-                in_array($localColumn,$foreignKeyTable->getLocalColumns())
-                && in_array($foreignColumn,$foreignKeyTable->getForeignColumns())
+                in_array($localColumn, $foreignKeyTable->getLocalColumns())
+                && in_array($foreignColumn, $foreignKeyTable->getForeignColumns())
                 && $foreignKeyTable->getForeignTableName() === $foreignTable
-            ){
+            ) {
                 return true;
             }
         }
