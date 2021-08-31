@@ -321,12 +321,12 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $complexCondition = [
             ['title', '=', 'Spark'],
-            ['count', '>', 5]
+            ['count', '>', 5],
         ];
 
         return [
             'simple' => [$simpleCondition],
-            'complex' => [$complexCondition]
+            'complex' => [$complexCondition],
         ];
     }
 
