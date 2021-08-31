@@ -1,6 +1,17 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.57.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.58.0...8.x)
+
+
+## [v8.58.0 (2021-08-31)](https://github.com/laravel/framework/compare/v8.57.0...v8.58.0)
+
+### Added
+- Added updateOrFail method to Model ([#38592](https://github.com/laravel/framework/pull/38592))
+- Make mail stubs more configurable ([#38596](https://github.com/laravel/framework/pull/38596))
+- Added prohibits validation ([#38612](https://github.com/laravel/framework/pull/38612))
+
+### Changed
+- Use lowercase OpenSSL cipher names ([#38594](https://github.com/laravel/framework/pull/38594), [#38600](https://github.com/laravel/framework/pull/38600))
 
 
 ## [v8.57.0 (2021-08-27)](https://github.com/laravel/framework/compare/v8.56.0...v8.57.0)
