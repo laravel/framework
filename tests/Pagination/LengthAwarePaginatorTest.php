@@ -121,7 +121,7 @@ class LengthAwarePaginatorTest extends TestCase
         $paginator->setPageName('/page');
 
         Paginator::urlGeneratorResolver(function ($path, $parameters, $page, AbstractPaginator $paginator) {
-            return $path . $paginator->getPageName() . $page;
+            return $path.$paginator->getPageName().$page;
         });
 
         $this->assertSame('http://website.com/test/page1', $paginator->previousPageUrl());
