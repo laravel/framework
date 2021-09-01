@@ -488,6 +488,36 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertBadRequestWhenNotBadRequest()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Expected response status code');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertBadRequest();
+    }
+
+    public function testAssertBadRequestWhenIsBadRequest()
+    {
+        $statusCode = 400;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $chainedResponse = $response->assertBadRequest();
+        // Ensure that we can chain the response and implicitly that we do _not_ throw an assertion error
+        $this->assertEquals($response, $chainedResponse);
+    }
+
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
         $statusCode = 500;

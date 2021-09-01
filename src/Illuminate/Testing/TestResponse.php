@@ -165,6 +165,16 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has a 400 Bad Request status code.
+     *
+     * @return $this
+     */
+    public function assertBadRequest()
+    {
+        return $this->assertStatus(400);
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
