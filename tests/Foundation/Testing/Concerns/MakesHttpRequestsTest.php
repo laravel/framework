@@ -26,6 +26,12 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('Basic foobar', $this->defaultHeaders['Authorization']);
     }
 
+    public function testAsAjaxSetsXRequestedWithHeader()
+    {
+        $this->asAjax();
+        $this->assertSame('XMLHttpRequest', $this->defaultHeaders['X-Requested-With']);
+    }
+
     public function testWithoutAndWithMiddleware()
     {
         $this->assertFalse($this->app->has('middleware.disable'));

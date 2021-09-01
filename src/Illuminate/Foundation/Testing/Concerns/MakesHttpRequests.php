@@ -92,6 +92,18 @@ trait MakesHttpRequests
     }
 
     /**
+     * Sets a header to simulate an ajax request
+     *
+     * @return $this
+     */
+    public function asAjax()
+    {
+        $this->withHeader('X-Requested-With', 'XMLHttpRequest');
+
+        return $this;
+    }
+
+    /**
      * Add an authorization token for the request.
      *
      * @param  string  $token
