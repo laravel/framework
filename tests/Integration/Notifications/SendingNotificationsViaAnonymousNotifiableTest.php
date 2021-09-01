@@ -92,7 +92,6 @@ class AnotherTestCustomChannel
     }
 }
 
-
 class AnonymousTestNotificationWithProperties extends Notification
 {
     public function __construct($test)
