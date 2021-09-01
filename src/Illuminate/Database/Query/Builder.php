@@ -371,8 +371,8 @@ class Builder
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
-                $query->from($databaseName.'.'.$query->from);
+            if (strpos($query->getQuery()->from, $databaseName) !== 0 && strpos($query->getQuery()->from, '.') === false) {
+                $query->getQuery()->from($databaseName.'.'.$query->getQuery()->from);
             }
         }
 
