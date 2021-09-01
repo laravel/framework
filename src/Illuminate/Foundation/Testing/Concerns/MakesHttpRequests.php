@@ -92,7 +92,7 @@ trait MakesHttpRequests
     }
 
     /**
-     * Sets a header to simulate an ajax request
+     * Sets a header to simulate an ajax request.
      *
      * @return $this
      */
