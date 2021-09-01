@@ -36,6 +36,13 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         ], $_SERVER['__notifiable.route']);
     }
 
+    public function testAnonymousNotifiableWithProperties()
+    {
+        NotificationFacade::route('testchannel', 'enzo')
+            ->with(['foo' => 'bar'])
+            ->notify(new AnonymousTestNotificationWithProperties($this));
+    }
+
     public function testFaking()
     {
         $fake = NotificationFacade::fake();
@@ -82,5 +89,21 @@ class AnotherTestCustomChannel
     public function send($notifiable, $notification)
     {
         $_SERVER['__notifiable.route'][] = $notifiable->routeNotificationFor('anothertestchannel');
+    }
+}
+
+
+class AnonymousTestNotificationWithProperties extends Notification
+{
+    public function __construct($test)
+    {
+        $this->test = $test;
+    }
+
+    public function via($notifiable)
+    {
+        $this->test->assertSame('bar', $notifiable->foo);
+
+        return [TestCustomChannel::class];
     }
 }

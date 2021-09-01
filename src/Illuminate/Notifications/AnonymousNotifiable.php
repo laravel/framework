@@ -3,9 +3,11 @@
 namespace Illuminate\Notifications;
 
 use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Fluent;
 use InvalidArgumentException;
 
-class AnonymousNotifiable
+class AnonymousNotifiable extends Fluent
 {
     /**
      * All of the notification routing information.
@@ -13,6 +15,24 @@ class AnonymousNotifiable
      * @var array
      */
     public $routes = [];
+
+    /**
+     * Adds dynamic properties to the instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $attributes
+     *
+     * @return $this
+     */
+    public function with($attributes)
+    {
+        if ($attributes instanceof Arrayable) {
+            $attributes = $attributes->toArray();
+        }
+
+        $this->attributes = array_merge($this->attributes, $attributes);
+
+        return $this;
+    }
 
     /**
      * Add routing information to the target.
