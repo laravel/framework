@@ -69,6 +69,19 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
+     * Merge the input with the given items.
+     *
+     * @param array $items
+     * @return $this
+     */
+    public function merge(array $items)
+    {
+        array_merge($this->input, $items);
+
+        return $this;
+    }
+
+    /**
      * Get the input as a collection.
      *
      * @return \Illuminate\Support\Collection
