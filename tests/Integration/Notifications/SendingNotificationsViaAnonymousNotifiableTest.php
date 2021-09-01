@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
+use BadMethodCallException;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
@@ -41,6 +42,15 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         NotificationFacade::route('testchannel', 'enzo')
             ->with(['foo' => 'bar'])
             ->notify(new AnonymousTestNotificationWithProperties($this));
+    }
+
+    public function testAnonymouseNotifiableDoesntAllowSetCalls()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Call to undefined method Illuminate\Notifications\AnonymousNotifiable::foo()');
+
+        NotificationFacade::route('testchannel', 'enzo')
+            ->foo('bar');
     }
 
     public function testFaking()
