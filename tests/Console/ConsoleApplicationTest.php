@@ -4,11 +4,13 @@ namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
+use Illuminate\Console\ContainerCommandLoader;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use TypeError;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -50,6 +52,38 @@ class ConsoleApplicationTest extends TestCase
         $this->assertEquals($command, $result);
     }
 
+    public function testAddingToCommandLoaderAndDoesNotResolve()
+    {
+        $app = $this->getMockConsole([]);
+        $commandName = FoobarCommand::class;
+
+        $loader = new ContainerCommandLoader($app->getLaravel());
+        $app->setContainerCommandLoader($loader);
+
+        $app->getLaravel()->shouldNotReceive('make');
+
+        $resolvedResult = $app->resolve($commandName);
+        $namesResult = $loader->getNames();
+
+        $this->assertNull($resolvedResult);
+        $this->assertEquals(['foobar'], $namesResult);
+    }
+
+    public function testCommanderLoaderDoesntAddForClassThatDoesntExist()
+    {
+        $app = $this->getMockConsole([]);
+        $commandName = 'Some\Command\That\Doesnt\Exist';
+
+        $loader = new ContainerCommandLoader($app->getLaravel());
+        $app->setContainerCommandLoader($loader);
+
+        $app->getLaravel()->shouldReceive('make');
+
+        $this->expectException(TypeError::class);
+
+        $resolvedResult = $app->resolve($commandName);
+    }
+
     public function testCallFullyStringCommandLine()
     {
         $app = new Application(
@@ -85,5 +119,13 @@ class ConsoleApplicationTest extends TestCase
         return $this->getMockBuilder(Application::class)->onlyMethods($methods)->setConstructorArgs([
             $app, $events, 'test-version',
         ])->getMock();
+    }
+}
+
+class FoobarCommand extends Command
+{
+    public static function getDefaultName(): string
+    {
+        return 'foobar';
     }
 }

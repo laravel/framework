@@ -12,6 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -265,7 +266,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolve($command)
     {
-        if (class_exists($command) && $this->commandLoader) {
+        if ($this->commandLoader && $this->commandLoader->accepts($command)) {
             $this->commandLoader->add($command);
 
             return null;
@@ -294,11 +295,16 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Set the container command loader for lazy resolution.
      *
+     * @param \Symfony\Component\Console\CommandLoader\CommandLoaderInterface|null
      * @return $this
      */
-    public function setContainerCommandLoader()
+    public function setContainerCommandLoader(CommandLoaderInterface $loader = null)
     {
-        $this->setCommandLoader($this->commandLoader = new ContainerCommandLoader($this->laravel));
+        if (is_null($loader)) {
+            $loader = new ContainerCommandLoader($this->laravel);
+        }
+
+        $this->setCommandLoader($this->commandLoader = $loader);
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
@@ -35,13 +36,30 @@ class ContainerCommandLoader implements CommandLoaderInterface
     }
 
     /**
+     * Determine if the class is accepted by the command loader.
+     *
+     * @param string $class
+     * @return bool
+     */
+    public function accepts(string $class): bool
+    {
+        return class_exists($class);
+    }
+
+    /**
      * Add class to the loader.
      *
      * @param string $name
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function add(string $name)
     {
+        if (! $this->accepts($name)) {
+            throw new InvalidArgumentException(sprintf('Command "%s" was not accepted by the command loader.', $name));
+        }
+
         $this->classes[] = $name;
     }
 
