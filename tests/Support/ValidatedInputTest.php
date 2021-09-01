@@ -21,7 +21,7 @@ class ValidatedInputTest extends TestCase
     public function test_can_merge_items()
     {
         $input = new ValidatedInput(['name' => 'Taylor']);
-        
+
         $input->merge(['votes' => 100]);
 
         $this->assertEquals('Taylor', $input->name);

@@ -76,7 +76,7 @@ class ValidatedInput implements ValidatedData
      */
     public function merge(array $items)
     {
-        array_merge($this->input, $items);
+        $this->input = array_merge($this->input, $items);
 
         return $this;
     }
