@@ -2,13 +2,10 @@
 
 namespace Illuminate\Notifications;
 
-use BadMethodCallException;
 use Illuminate\Contracts\Notifications\Dispatcher;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Fluent;
 use InvalidArgumentException;
 
-class AnonymousNotifiable extends Fluent
+class AnonymousNotifiable
 {
     /**
      * All of the notification routing information.
@@ -33,23 +30,6 @@ class AnonymousNotifiable extends Fluent
         }
 
         $this->routes[$channel] = $route;
-
-        return $this;
-    }
-
-    /**
-     * Add dynamic properties to the instance.
-     *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $attributes
-     * @return $this
-     */
-    public function with($attributes)
-    {
-        if ($attributes instanceof Arrayable) {
-            $attributes = $attributes->toArray();
-        }
-
-        $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
     }
@@ -95,19 +75,5 @@ class AnonymousNotifiable extends Fluent
     public function getKey()
     {
         //
-    }
-
-    /**
-     * Disable dynamic calls to set a parameter value.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return void
-     */
-    public function __call($method, $parameters)
-    {
-        throw new BadMethodCallException(sprintf(
-            'Call to undefined method %s::%s()', static::class, $method
-        ));
     }
 }
