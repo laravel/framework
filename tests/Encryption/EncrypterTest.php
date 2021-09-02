@@ -102,7 +102,7 @@ class EncrypterTest extends TestCase
         $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('Could not decrypt the data.');
 
-        $data->tag = 'A'.substr($data->tag, 1, 23);
+        $data->tag[0] = $data->tag[0] === 'A' ? 'B' : 'A';
         $encrypted = base64_encode(json_encode($data));
         $e->decrypt($encrypted);
     }
