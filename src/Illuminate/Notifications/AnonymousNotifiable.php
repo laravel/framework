@@ -18,23 +18,6 @@ class AnonymousNotifiable extends Fluent
     public $routes = [];
 
     /**
-     * Adds dynamic properties to the instance.
-     *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $attributes
-     * @return $this
-     */
-    public function with($attributes)
-    {
-        if ($attributes instanceof Arrayable) {
-            $attributes = $attributes->toArray();
-        }
-
-        $this->attributes = array_merge($this->attributes, $attributes);
-
-        return $this;
-    }
-
-    /**
      * Add routing information to the target.
      *
      * @param  string  $channel
@@ -53,6 +36,23 @@ class AnonymousNotifiable extends Fluent
 
         return $this;
     }
+
+    /**
+     * Add dynamic properties to the instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $attributes
+     * @return $this
+     */
+    public function with($attributes)
+    {
+        if ($attributes instanceof Arrayable) {
+            $attributes = $attributes->toArray();
+        }
+
+        $this->attributes = array_merge($this->attributes, $attributes);
+
+        return $this;
+    }    
 
     /**
      * Send the given notification.
