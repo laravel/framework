@@ -5,6 +5,13 @@ namespace {{ factoryNamespace }};
 use Illuminate\Database\Eloquent\Factories\Factory;
 use {{ namespacedModel }};
 
+/**
+ * @method {{ model }}|\Illuminate\Support\Collection<{{ model }}> create($attributes = [], ?Model $parent = null)
+ * @method \Illuminate\Support\Collection<{{ model }}> createMany(iterable $records)
+ * @method {{ model }} createOne($attributes = [])
+ * @method {{ model }}|\Illuminate\Support\Collection<{{ model }}> make($attributes = [], ?Model $parent = null)
+ * @method {{ model }} makeOne($attributes = [])
+ */
 class {{ factory }}Factory extends Factory
 {
     /**
