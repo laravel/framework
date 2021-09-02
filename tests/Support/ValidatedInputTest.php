@@ -22,7 +22,7 @@ class ValidatedInputTest extends TestCase
     {
         $input = new ValidatedInput(['name' => 'Taylor']);
 
-        $input->merge(['votes' => 100]);
+        $input = $input->merge(['votes' => 100]);
 
         $this->assertEquals('Taylor', $input->name);
         $this->assertEquals('Taylor', $input['name']);
