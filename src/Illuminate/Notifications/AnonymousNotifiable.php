@@ -52,7 +52,7 @@ class AnonymousNotifiable extends Fluent
         $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
-    }    
+    }
 
     /**
      * Send the given notification.
