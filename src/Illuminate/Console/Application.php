@@ -57,7 +57,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * The lazy command loader.
      *
-     * @var \Illuminate\Console\ContainerCommandLoader
+     * @var \Symfony\Component\Console\CommandLoader\CommandLoaderInterface
      */
     protected $commandLoader;
 
