@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use BadMethodCallException;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
@@ -35,22 +34,6 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         $this->assertEquals([
             'enzo', 'enzo@deepblue.com',
         ], $_SERVER['__notifiable.route']);
-    }
-
-    public function testAnonymousNotifiableWithProperties()
-    {
-        NotificationFacade::route('testchannel', 'enzo')
-            ->with(['foo' => 'bar'])
-            ->notify(new AnonymousTestNotificationWithProperties($this));
-    }
-
-    public function testAnonymouseNotifiableDoesntAllowSetCalls()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('Call to undefined method Illuminate\Notifications\AnonymousNotifiable::foo()');
-
-        NotificationFacade::route('testchannel', 'enzo')
-            ->foo('bar');
     }
 
     public function testFaking()
@@ -99,20 +82,5 @@ class AnotherTestCustomChannel
     public function send($notifiable, $notification)
     {
         $_SERVER['__notifiable.route'][] = $notifiable->routeNotificationFor('anothertestchannel');
-    }
-}
-
-class AnonymousTestNotificationWithProperties extends Notification
-{
-    public function __construct($test)
-    {
-        $this->test = $test;
-    }
-
-    public function via($notifiable)
-    {
-        $this->test->assertSame('bar', $notifiable->foo);
-
-        return [TestCustomChannel::class];
     }
 }
