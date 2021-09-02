@@ -661,7 +661,7 @@ class LazyCollection implements Enumerable
             }
 
             if ($item instanceof ArrayAccess) {
-                return (object) collect($keys)->mapWithKeys(function ($key) use ($item) {
+                return collect($keys)->mapWithKeys(function ($key) use ($item) {
                     return [$key => $item[$key]];
                 })->toArray();
             }

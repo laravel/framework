@@ -2107,8 +2107,8 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertEquals([
-                (object) ['name' => 'marco', 'hobby' => 'drinking'],
-                (object) ['name' => 'belle', 'hobby' => 'cross-stitch'],
+                ['name' => 'marco', 'hobby' => 'drinking'],
+                ['name' => 'belle', 'hobby' => 'cross-stitch'],
             ],
             $data->pluckMany(['name', 'hobby'])->all()
         );
