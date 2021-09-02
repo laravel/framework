@@ -9,6 +9,7 @@ use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -2063,6 +2064,55 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(['taylor' => 'foo', 'dayle' => 'bar'], $data->pluck('email', 'name')->all());
         $this->assertEquals(['foo', 'bar'], $data->pluck('email')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPluckManyWithCollections($collection)
+    {
+        $data = new $collection([
+            collect(['id' => 1, 'name' => 'matt', 'hobby' => 'coding']),
+            collect(['id' => 2, 'name' => 'tomo', 'hobby' => 'cooking']),
+        ]);
+
+        $this->assertEquals($data->map->only(['name', 'hobby']), $data->pluckMany(['name', 'hobby']));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPluckManyWithArrayAndObjectValues($collection)
+    {
+        $data = new $collection([
+            (object) ['id' => 1, 'name' => 'matt', 'hobby' => 'coding'],
+            ['id' => 2, 'name' => 'tomo', 'hobby' => 'cooking'],
+        ]);
+
+        $this->assertEquals([
+                (object) ['name' => 'matt', 'hobby' => 'coding'],
+                ['name' => 'tomo', 'hobby' => 'cooking'],
+            ],
+            $data->pluckMany(['name', 'hobby'])->all()
+        );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPluckManyWithArrayAccessValues($collection)
+    {
+        $data = new $collection([
+            new TestArrayAccessImplementation(['id' => 1, 'name' => 'marco', 'hobby' => 'drinking']),
+            new TestArrayAccessImplementation(['id' => 2, 'name' => 'belle', 'hobby' => 'cross-stitch']),
+        ]);
+
+        $this->assertEquals([
+                (object) ['name' => 'marco', 'hobby' => 'drinking'],
+                (object) ['name' => 'belle', 'hobby' => 'cross-stitch'],
+            ],
+            $data->pluckMany(['name', 'hobby'])->all()
+        );
     }
 
     /**

@@ -628,6 +628,33 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the values of several given keys.
+     *
+     * @param  array   $keys
+     * @return static
+     */
+    public function pluckMany($keys)
+    {
+        return $this->map(function ($item) use ($keys) {
+            if ($item instanceof self) {
+                return $item->only($keys);
+            }
+
+            if (is_array($item)) {
+                return Arr::only($item, $keys);
+            }
+
+            if ($item instanceof ArrayAccess) {
+                return (object) collect($keys)->mapWithKeys(function ($key) use ($item) {
+                    return [$key => $item[$key]];
+                })->toArray();
+            }
+
+            return (object) Arr::only(get_object_vars($item), $keys);
+        });
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @param  callable  $callback
