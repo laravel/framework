@@ -809,7 +809,7 @@ class PendingRequest
      *
      * @return bool
      */
-    public function requestsReusableClient()
+    protected function requestsReusableClient()
     {
         return ! is_null($this->client) || $this->async;
     }
@@ -819,7 +819,7 @@ class PendingRequest
      *
      * @return \GuzzleHttp\Client
      */
-    public function getReusableClient()
+    protected function getReusableClient()
     {
         return $this->client = $this->client ?: $this->createClient($this->buildHandlerStack());
     }
