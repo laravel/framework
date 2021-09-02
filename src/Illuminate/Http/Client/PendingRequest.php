@@ -805,13 +805,13 @@ class PendingRequest
     }
 
     /**
-     * Determine if a reusable client is required
+     * Determine if a reusable client is required.
      *
      * @return bool
      */
     public function requestsReusableClient()
     {
-        return !is_null($this->client) || $this->async;
+        return ! is_null($this->client) || $this->async;
     }
 
     /**
