@@ -24,10 +24,26 @@ class ValidationRuleParserTest extends TestCase
 
         $this->assertEquals([
             'name' => ['required', 'min:2'],
+            'email' => [],
             'password' => ['required', 'min:2'],
             'username' => ['required', 'min:2'],
             'address' => ['required'],
             'city' => ['required', 'min:2'],
+        ], $rules);
+    }
+
+    public function test_empty_rules_are_preserved()
+    {
+        $rules = ValidationRuleParser::filterConditionalRules([
+            'name' => [],
+            'email' => '',
+            'password' => Rule::when(true, 'required|min:2'),
+        ]);
+
+        $this->assertEquals([
+            'name' => [],
+            'email' => '',
+            'password' => ['required', 'min:2'],
         ], $rules);
     }
 
@@ -47,6 +63,21 @@ class ValidationRuleParserTest extends TestCase
             'password' => ['string', 'max:10'],
             'username' => ['required', 'min:2'],
             'address' => ['required', 'string', 'max:10'],
+        ], $rules);
+    }
+
+    public function test_empty_conditional_rules_are_preserved()
+    {
+        $rules = ValidationRuleParser::filterConditionalRules([
+            'name' => Rule::when(true, '', ['string', 'max:10']),
+            'email' => Rule::when(false, ['required', 'min:2'], []),
+            'password' => Rule::when(false, 'required|min:2', 'string|max:10'),
+        ]);
+
+        $this->assertEquals([
+            'name' => [],
+            'email' => [],
+            'password' => ['string', 'max:10'],
         ], $rules);
     }
 }

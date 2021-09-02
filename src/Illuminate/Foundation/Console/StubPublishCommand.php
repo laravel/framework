@@ -46,6 +46,8 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/event.stub' => $stubsPath.'/event.stub',
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
             __DIR__.'/stubs/job.stub' => $stubsPath.'/job.stub',
+            __DIR__.'/stubs/mail.stub' => $stubsPath.'/mail.stub',
+            __DIR__.'/stubs/markdown-mail.stub' => $stubsPath.'/markdown-mail.stub',
             __DIR__.'/stubs/markdown-notification.stub' => $stubsPath.'/markdown-notification.stub',
             __DIR__.'/stubs/model.pivot.stub' => $stubsPath.'/model.pivot.stub',
             __DIR__.'/stubs/model.stub' => $stubsPath.'/model.stub',

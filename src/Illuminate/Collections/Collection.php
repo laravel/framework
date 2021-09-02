@@ -1177,13 +1177,15 @@ class Collection implements ArrayAccess, Enumerable
             ? $this->operatorForWhere(...func_get_args())
             : $key;
 
-        $items = $this->unless($filter == null)->filter($filter);
+        $placeholder = new stdClass();
 
-        if ($items->isEmpty()) {
+        $item = $this->first($filter, $placeholder);
+
+        if ($item === $placeholder) {
             throw new ItemNotFoundException;
         }
 
-        return $items->first();
+        return $item;
     }
 
     /**
