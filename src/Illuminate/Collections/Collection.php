@@ -636,7 +636,7 @@ class Collection implements ArrayAccess, Enumerable
     public function pluckMany($keys)
     {
         return $this->map(function ($item) use ($keys) {
-            if ($item instanceof self) {
+            if ($item instanceof self || $item instanceof LazyCollection) {
                 return $item->only($keys);
             }
 

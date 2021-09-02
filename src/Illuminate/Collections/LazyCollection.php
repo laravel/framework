@@ -652,7 +652,7 @@ class LazyCollection implements Enumerable
     public function pluckMany($keys)
     {
         return $this->map(function ($item) use ($keys) {
-            if ($item instanceof self) {
+            if ($item instanceof self || $item instanceof Collection) {
                 return $item->only($keys);
             }
 
