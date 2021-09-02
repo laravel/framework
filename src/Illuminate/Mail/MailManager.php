@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 /**
@@ -166,23 +167,16 @@ class MailManager implements FactoryContract
      */
     protected function createSmtpTransport(array $config)
     {
-        // The Symfony ESMTP transport instance will allow use of any SMTP backend
-        // for delivering mail such as Sendgrid, Amazon SES, or a custom server
-        // a developer has available. We will just pass this configured host.
-        $transport = new EsmtpTransport(
+        $factory = new EsmtpTransportFactory;
+
+        $transport = $factory->create(new Dsn(
+            ! empty($config['encryption']) && $config['encryption'] === 'tls' ? 'smtps' : '',
             $config['host'],
-            $config['port'],
-            ! empty($config['encryption']) && $config['encryption'] === 'tls' ? true : null
-        );
-
-        // Once we have the transport we will check for the presence of a username
-        // and password. If we have it we'll set the credentials on the Symfony
-        // transporter instance so that we'll properly authenticate delivery.
-        if (isset($config['username'])) {
-            $transport->setUsername($config['username']);
-
-            $transport->setPassword($config['password']);
-        }
+            $config['username'] ?? null,
+            $config['password'] ?? null,
+            $config['port'] ?? null,
+            $config
+        ));
 
         return $this->configureSmtpTransport($transport, $config);
     }
@@ -206,10 +200,6 @@ class MailManager implements FactoryContract
             if (isset($config['timeout'])) {
                 $stream->setTimeout($config['timeout']);
             }
-        }
-
-        if (isset($config['local_domain'])) {
-            $transport->setLocalDomain($config['local_domain']);
         }
 
         return $transport;
