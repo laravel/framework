@@ -22,7 +22,7 @@ class ClassMorphViolationException extends RuntimeException
     {
         $class = get_class($model);
 
-        parent::__construct("No morph map found for model [{$class}] while class morphs is disabled.");
+        parent::__construct("No morph map defined for model [{$class}].");
 
         $this->model = $class;
     }

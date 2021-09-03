@@ -54,13 +54,6 @@ trait HasRelationships
     protected static $relationResolvers = [];
 
     /**
-     * Prevents morph relationships without a morph map.
-     *
-     * @var bool
-     */
-    protected static $preventClassMorphs = false;
-
-    /**
      * Define a dynamic relation resolver.
      *
      * @param  string  $name
@@ -73,17 +66,6 @@ trait HasRelationships
             static::$relationResolvers,
             [static::class => [$name => $callback]]
         );
-    }
-
-    /**
-     * Prevent morphs to be used without a mapping.
-     *
-     * @param  bool  $prevent
-     * @return void
-     */
-    public static function preventClassMorphs($prevent = true)
-    {
-        self::$preventClassMorphs = $prevent;
     }
 
     /**
@@ -750,7 +732,7 @@ trait HasRelationships
             return array_search(static::class, $morphMap, true);
         }
 
-        if (self::$preventClassMorphs) {
+        if (Relation::requiresMorphMap()) {
             throw new ClassMorphViolationException($this);
         }
 

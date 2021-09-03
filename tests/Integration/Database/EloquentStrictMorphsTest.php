@@ -13,7 +13,7 @@ class EloquentStrictMorphsTest extends TestCase
     {
         parent::setUp();
 
-        Model::preventClassMorphs();
+        Relation::requireMorphMap();
     }
 
     public function testStrictModeThrowsAnExceptionOnClassMap()
@@ -42,7 +42,7 @@ class EloquentStrictMorphsTest extends TestCase
         parent::tearDown();
 
         Relation::morphMap([], false);
-        Model::preventClassMorphs(false);
+        Relation::requireMorphMap(false);
     }
 }
 

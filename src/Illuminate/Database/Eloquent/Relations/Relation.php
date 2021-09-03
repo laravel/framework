@@ -58,6 +58,13 @@ abstract class Relation
     public static $morphMap = [];
 
     /**
+     * Prevents morph relationships without a morph map.
+     *
+     * @var bool
+     */
+    protected static $requireMorphMap = false;
+
+    /**
      * The count of self joins.
      *
      * @var int
@@ -374,6 +381,27 @@ abstract class Relation
                     && in_array($model->getKeyType(), ['int', 'integer'])
                         ? 'whereIntegerInRaw'
                         : 'whereIn';
+    }
+
+    /**
+     * Prevent polymorphic relationships from being used without model mappings.
+     *
+     * @param  bool  $requireMorphMap
+     * @return void
+     */
+    public static function requireMorphMap($requireMorphMap = true)
+    {
+        static::$requireMorphMap = $requireMorphMap;
+    }
+
+    /**
+     * Determine if polymorphic relationships require explicit model mapping.
+     *
+     * @return bool
+     */
+    public static function requiresMorphMap()
+    {
+        return static::$requireMorphMap;
     }
 
     /**
