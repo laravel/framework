@@ -17,6 +17,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     use ConditionallyLoadsAttributes, DelegatesToResource;
 
     /**
+     * The resource index.
+     *
+     * @var int
+     */
+    protected static $index = 1;
+
+    /**
      * The resource instance.
      *
      * @var mixed
@@ -72,15 +79,33 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      * Create a new anonymous resource collection.
      *
      * @param  mixed  $resource
+     * @param  int  $startIndex
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public static function collection($resource)
+    public static function collection($resource, $startIndex = 1)
     {
+        static::$index = $startIndex ?? 1;
+
         return tap(new AnonymousResourceCollection($resource, static::class), function ($collection) {
             if (property_exists(static::class, 'preserveKeys')) {
                 $collection->preserveKeys = (new static([]))->preserveKeys === true;
             }
         });
+    }
+
+    /**
+     * Return the current resource index and increment it by specified amount.
+     *
+     * @param  int  $increment
+     * @return int
+     */
+    protected static function index($increment = 1)
+    {
+        $index = static::$index;
+
+        static::$index += $increment;
+
+        return $index;
     }
 
     /**
