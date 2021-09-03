@@ -283,7 +283,7 @@ class MailManager implements FactoryContract
         return $factory->create(new Dsn(
             'postmark+api',
             'default',
-            $config['token']
+            $config['token'] ?? $this->app['config']->get('services.postmark.token')
         ));
     }
 
