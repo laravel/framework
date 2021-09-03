@@ -155,7 +155,7 @@
         "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
-        "symfony/http-client": "Required to enable support for the Symfony mail transports (^6.0).",
+        "symfony/http-client": "Required to enable support for the Symfony API mail transports (^6.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
