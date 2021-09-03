@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -243,20 +244,22 @@ class Message
     }
 
     /**
-     * Embed a file in the message.
+     * Embed a file in the message and get the CID.
      *
      * @param  string  $file
-     * @return $this
+     * @return string
      */
     public function embed($file)
     {
-        $this->message->embedFromPath($file);
+        $cid = Str::random(10);
 
-        return $this;
+        $this->message->embedFromPath($file, $cid);
+
+        return "cid:$cid";
     }
 
     /**
-     * Embed in-memory data in the message.
+     * Embed in-memory data in the message and get the CID.
      *
      * @param  string  $data
      * @param  string  $name
@@ -267,7 +270,7 @@ class Message
     {
         $this->message->embed($data, $name, $contentType);
 
-        return $this;
+        return "cid:$name";
     }
 
     /**
