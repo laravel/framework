@@ -129,6 +129,20 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
+    public function testCustomValueTranslation()
+    {
+        $this->createMockTranslator('The :attribute field is required when :other is :value.');
+
+        $exception = $this->catchException(ValidationException::class, function() {
+            $this->createRequest(
+                ['type' => '1'],
+                FoundationTestFormRequestValueTranslationStub::class,
+            )->validateResolved();
+        });
+
+        $this->assertEquals('The foo field is required when type is bar.', $exception->errors()['foo'][0]);
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -183,10 +197,24 @@ class FoundationFormRequestTest extends TestCase
      */
     protected function createValidationFactory($container)
     {
-        $translator = m::mock(Translator::class)->shouldReceive('get')
-                       ->zeroOrMoreTimes()->andReturn('error')->getMock();
+        $translator = $this->mocks['translator'] ?? $this->createMockTranslator();
 
         return new ValidationFactory($translator, $container);
+    }
+
+    /**
+     * Create a mock translator.
+     *
+     * @param  string  $message
+     * @return \Illuminate\Contracts\Translation\Translator
+     */
+    protected function createMockTranslator($message = 'error')
+    {
+        return $this->mocks['translator'] = m::mock(Translator::class)
+            ->shouldReceive('get')
+            ->zeroOrMoreTimes()
+            ->andReturn($message)
+            ->getMock();
     }
 
     /**
@@ -355,5 +383,23 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
     public function authorize()
     {
         return Response::allow('baz');
+    }
+}
+
+class FoundationTestFormRequestValueTranslationStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['foo' => 'required_if:type,1'];
+    }
+
+    public function values()
+    {
+        return array('type' => ['1' => 'bar']);
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 }
