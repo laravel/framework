@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
+use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -53,6 +54,13 @@ trait HasRelationships
     protected static $relationResolvers = [];
 
     /**
+     * Prevents morph relationships without a morph map.
+     *
+     * @var bool
+     */
+    protected static $preventClassMorphs = false;
+
+    /**
      * Define a dynamic relation resolver.
      *
      * @param  string  $name
@@ -65,6 +73,17 @@ trait HasRelationships
             static::$relationResolvers,
             [static::class => [$name => $callback]]
         );
+    }
+
+    /**
+     * Prevent morphs to be used without a mapping.
+     *
+     * @param  bool  $prevent
+     * @return void
+     */
+    public static function preventClassMorphs($prevent = true)
+    {
+        self::$preventClassMorphs = $prevent;
     }
 
     /**
@@ -729,6 +748,10 @@ trait HasRelationships
 
         if (! empty($morphMap) && in_array(static::class, $morphMap)) {
             return array_search(static::class, $morphMap, true);
+        }
+
+        if (self::$preventClassMorphs) {
+            throw new ClassMorphViolationException($this);
         }
 
         return static::class;

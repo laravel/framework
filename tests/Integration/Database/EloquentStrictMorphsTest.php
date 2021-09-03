@@ -1,0 +1,51 @@
+<?php
+
+namespace Illuminate\Tests\Integration\Database;
+
+use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Orchestra\Testbench\TestCase;
+
+class EloquentStrictMorphsTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Model::preventClassMorphs();
+    }
+
+    public function testStrictModeThrowsAnExceptionOnClassMap()
+    {
+        $this->expectException(ClassMorphViolationException::class);
+
+        $model = TestModel::make();
+
+        $model->getMorphClass();
+    }
+
+    public function testStrictModeDoesNotThrowExceptionWhenMorphMap()
+    {
+        $model = TestModel::make();
+
+        Relation::morphMap([
+            'test' => TestModel::class,
+        ]);
+
+        $morphName = $model->getMorphClass();
+        $this->assertEquals('test', $morphName);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Relation::morphMap([], false);
+        Model::preventClassMorphs(false);
+    }
+}
+
+class TestModel extends Model
+{
+}
