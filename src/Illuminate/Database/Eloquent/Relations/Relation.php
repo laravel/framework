@@ -405,6 +405,20 @@ abstract class Relation
     }
 
     /**
+     * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
+     *
+     * @param  array|null  $map
+     * @param  bool  $merge
+     * @return array
+     */
+    public static function enforceMorphMap(array $map, $merge = true)
+    {
+        static::requireMorphMap();
+
+        return static::morphMap($map, $merge);
+    }
+
+    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map

@@ -37,6 +37,20 @@ class EloquentStrictMorphsTest extends TestCase
         $this->assertEquals('test', $morphName);
     }
 
+    public function testMapsCanBeEnforcedInOneMethod()
+    {
+        $model = TestModel::make();
+
+        Relation::requireMorphMap(false);
+
+        Relation::enforceMorphMap([
+            'test' => TestModel::class,
+        ]);
+
+        $morphName = $model->getMorphClass();
+        $this->assertEquals('test', $morphName);
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
