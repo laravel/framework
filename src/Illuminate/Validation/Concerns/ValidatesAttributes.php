@@ -1101,14 +1101,12 @@ trait ValidatesAttributes
     {
         if (is_array($value) && $this->hasRule($attribute, 'Array')) {
             foreach ($value as $element) {
-                if (is_array($element)) {
+                if (!in_array($element, $parameters, true) || is_array($element)) {
                     return false;
                 }
             }
-
-            return count(array_diff($value, $parameters)) === 0;
+            return true;
         }
-
         return ! is_array($value) && in_array((string) $value, $parameters);
     }
 
