@@ -9,6 +9,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\NullableIf;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -90,6 +91,17 @@ class Rule
     public static function requiredIf($callback)
     {
         return new RequiredIf($callback);
+    }
+
+    /**
+     * Get a nullable_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\NullableIf
+     */
+    public static function nullableIf($callback)
+    {
+        return new NullableIf($callback);
     }
 
     /**
