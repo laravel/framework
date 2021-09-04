@@ -1101,7 +1101,7 @@ trait ValidatesAttributes
     {
         if (is_array($value) && $this->hasRule($attribute, 'Array')) {
             foreach ($value as $element) {
-                if (!in_array($element, $parameters, true) || is_array($element)) {
+                if (! in_array($element, $parameters, true) || is_array($element)) {
                     return false;
                 }
             }
