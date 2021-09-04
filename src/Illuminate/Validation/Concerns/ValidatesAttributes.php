@@ -1109,7 +1109,7 @@ trait ValidatesAttributes
             return true;
         }
 
-        return !is_array($value) && in_array((string) $value, $parameters);
+        return ! is_array($value) && in_array((string) $value, $parameters);
     }
 
     /**
