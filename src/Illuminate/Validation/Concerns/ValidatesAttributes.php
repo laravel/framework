@@ -1105,6 +1105,7 @@ trait ValidatesAttributes
                     return false;
                 }
             }
+
         } elseif(! in_array($value, $parameters, true)) {
             return false;
         }
