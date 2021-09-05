@@ -29,6 +29,16 @@ trait Macroable
     }
 
     /**
+     * Return the macros registered for the class.
+     *
+     * @return array
+     */
+    public static function macros()
+    {
+        return static::$macros;
+    }
+
+    /**
      * Mix another object into the class.
      *
      * @param  object  $mixin

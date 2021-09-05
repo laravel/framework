@@ -40,7 +40,13 @@ class Mail extends Facade
      */
     public static function fake()
     {
+        $macros = static::mailer()->macros();
+
         static::swap($fake = new MailFake);
+
+        foreach ($macros as $name => $macro) {
+            static::macro($name, $macro);
+        }
 
         return $fake;
     }
