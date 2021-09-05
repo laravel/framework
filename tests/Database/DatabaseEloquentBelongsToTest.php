@@ -38,6 +38,8 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(function ($newModel) {
             $newModel->username = 'taylor';
+
+            return $newModel;
         });
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
@@ -49,6 +51,21 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame($newModel, $relation->getResults());
 
         $this->assertSame('taylor', $newModel->username);
+    }
+
+    public function testBelongsToWithDynamicDefaultThatReturnsNull()
+    {
+        $relation = $this->getRelation()->withDefault(function ($newModel) {
+            return null;
+        });
+
+        $this->builder->shouldReceive('first')->once()->andReturnNull();
+
+        $newModel = new EloquentBelongsToModelStub();
+
+        $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
+
+        $this->assertNull($relation->getResults());
     }
 
     public function testBelongsToWithArrayDefault()

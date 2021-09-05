@@ -70,6 +70,8 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(function ($newModel) {
             $newModel->username = 'taylor';
+
+            return $newModel;
         });
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();

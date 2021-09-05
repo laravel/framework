@@ -43,6 +43,8 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(function ($newModel) {
             $newModel->username = 'taylor';
+
+            return $newModel;
         });
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
@@ -62,6 +64,8 @@ class DatabaseEloquentHasOneTest extends TestCase
     {
         $relation = $this->getRelation()->withDefault(function ($newModel, $parentModel) {
             $newModel->username = $parentModel->username;
+
+            return $newModel;
         });
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
