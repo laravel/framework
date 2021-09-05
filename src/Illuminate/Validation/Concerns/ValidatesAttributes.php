@@ -1105,11 +1105,11 @@ trait ValidatesAttributes
                     return false;
                 }
             }
-
-            return true;
+        } elseif(! in_array($value, $parameters, true)) {
+            return false;
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return true;
     }
 
     /**
