@@ -1173,6 +1173,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->orders = [];
         $this->assertSame('select * from "users"', $builder->toSql());
 
+        $builder->orderBy('email', 'asc', 'my_test_collation');
+        $this->assertSame('select * from "users" order by "email" asc collate my_test_collation', $builder->toSql());
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderBy('email')->orderByRaw('"age" ? desc', ['foo']);
         $this->assertSame('select * from "users" order by "email" asc, "age" ? desc', $builder->toSql());
