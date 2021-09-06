@@ -50,7 +50,7 @@ class Event extends Facade
      *
      * @param  callable  $callable
      * @param  array  $eventsToFake
-     * @return callable
+     * @return mixed
      */
     public static function fakeFor(callable $callable, array $eventsToFake = [])
     {
