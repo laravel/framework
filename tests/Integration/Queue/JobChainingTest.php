@@ -218,6 +218,36 @@ class JobChainingTest extends TestCase
         $this->assertNull(JobChainingTestThirdJob::$usedQueue);
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
+
+    public function testChainPrepend()
+    {
+        $job = new JobChainingTestFirstJob();
+        $job->chain([
+            new JobChainingTestThirdJob()
+        ]);
+        $job->prependChain([
+            new JobChainingTestSecondJob()
+        ]);
+
+        $this->assertCount(2, $job->chained);
+        $this->assertInstanceOf(JobChainingTestSecondJob::class, unserialize($job->chained[0]));
+        $this->assertInstanceOf(JobChainingTestThirdJob::class, unserialize($job->chained[1]));
+    }
+
+    public function testChainAppend()
+    {
+        $job = new JobChainingTestFirstJob();
+        $job->chain([
+            new JobChainingTestSecondJob()
+        ]);
+        $job->appendChain([
+            new JobChainingTestThirdJob()
+        ]);
+
+        $this->assertCount(2, $job->chained);
+        $this->assertInstanceOf(JobChainingTestSecondJob::class, unserialize($job->chained[0]));
+        $this->assertInstanceOf(JobChainingTestThirdJob::class, unserialize($job->chained[1]));
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
