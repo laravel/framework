@@ -49,7 +49,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     {
         $key = (string) $key;
 
-        if (! static::supported($key, strtolower($cipher))) {
+        if (! static::supported($key, $cipher)) {
             $ciphers = implode(', ', array_keys(self::$supportedCiphers));
 
             throw new RuntimeException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
@@ -68,11 +68,11 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public static function supported($key, $cipher)
     {
-        if (! isset(self::$supportedCiphers[$cipher])) {
+        if (! isset(self::$supportedCiphers[strtolower($cipher)])) {
             return false;
         }
 
-        return mb_strlen($key, '8bit') === self::$supportedCiphers[$cipher]['size'];
+        return mb_strlen($key, '8bit') === self::$supportedCiphers[strtolower($cipher)]['size'];
     }
 
     /**
