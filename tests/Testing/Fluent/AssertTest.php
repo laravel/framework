@@ -699,6 +699,64 @@ class AssertTest extends TestCase
         });
     }
 
+    public function testEachScope()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'key' => 'first',
+            ],
+            'bar' => [
+                'key' => 'second',
+            ],
+        ]);
+
+        $assert->each(function (AssertableJson $item) {
+            $item->whereType('key', 'string');
+        });
+    }
+
+    public function testEachScopeFailsWhenNoProps()
+    {
+        $assert = AssertableJson::fromArray([]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Cannot scope directly onto each element of the root level because it is empty.');
+
+        $assert->each(function (AssertableJson $item) {
+            //
+        });
+    }
+
+    public function testEachNestedScopeFailsWhenNoProps()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Cannot scope directly onto each element of property [foo] because it is empty.');
+
+        $assert->has('foo', function (AssertableJson $assert) {
+            $assert->each(function (AssertableJson $item) {
+                //
+            });
+        });
+    }
+
+    public function testEachScopeFailsWhenPropSingleValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 'bar',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] is not scopeable.');
+
+        $assert->each(function (AssertableJson $item) {
+            //
+        });
+    }
+
     public function testFailsWhenNotInteractingWithAllPropsInScope()
     {
         $assert = AssertableJson::fromArray([

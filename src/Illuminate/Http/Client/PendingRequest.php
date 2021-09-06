@@ -799,6 +799,28 @@ class PendingRequest
      */
     public function buildClient()
     {
+        return $this->requestsReusableClient()
+               ? $this->getReusableClient()
+               : $this->createClient($this->buildHandlerStack());
+    }
+
+    /**
+     * Determine if a reusable client is required.
+     *
+     * @return bool
+     */
+    protected function requestsReusableClient()
+    {
+        return ! is_null($this->client) || $this->async;
+    }
+
+    /**
+     * Retrieve a reusable Guzzle client.
+     *
+     * @return \GuzzleHttp\Client
+     */
+    protected function getReusableClient()
+    {
         return $this->client = $this->client ?: $this->createClient($this->buildHandlerStack());
     }
 
