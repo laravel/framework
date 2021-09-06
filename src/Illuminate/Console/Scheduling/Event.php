@@ -577,7 +577,7 @@ class Event
         return function (Container $container, HttpClient $http) use ($url) {
             try {
                 $http->get($url);
-            } catch (ClientExceptionInterface | TransferException $e) {
+            } catch (ClientExceptionInterface|TransferException $e) {
                 $container->make(ExceptionHandler::class)->report($e);
             }
         };
