@@ -1986,7 +1986,7 @@ class Builder
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
             'direction' => $direction,
-            'collation' => $collation
+            'collation' => $collation,
         ];
 
         return $this;

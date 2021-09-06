@@ -736,6 +736,7 @@ class Grammar extends BaseGrammar
     {
         return array_map(function ($order) {
             $collation = isset($order['collation']) ? ' collate '.$order['collation'] : '';
+
             return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'].$collation;
         }, $orders);
     }
