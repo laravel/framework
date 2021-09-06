@@ -150,10 +150,20 @@ abstract class TestCase extends BaseTestCase
      * @return void
      *
      * @throws \Mockery\Exception\InvalidCountException
+     * @throws \DomainException
      */
     protected function tearDown(): void
     {
         if ($this->app) {
+            
+            $database = $this->app->make('db');
+            foreach ($database->getConnections() as $connection) {
+                $transaction_level = $connection->transactionLevel();
+                if ($transaction_level !== 0) {
+                    throw new \DomainException("Invalid transaction level: ". $transaction_level);
+                }
+            }
+
             $this->callBeforeApplicationDestroyedCallbacks();
 
             ParallelTesting::callTearDownTestCaseCallbacks($this);
