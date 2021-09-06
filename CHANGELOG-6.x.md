@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.32...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.33...6.x)
+
+
+## [v6.20.33 (2021-08-31)](https://github.com/laravel/framework/compare/v6.20.32...v6.20.33)
+
+### Changed
+- Error out when detecting incompatible DBAL version ([#38543](https://github.com/laravel/framework/pull/38543))
 
 
 ## [v6.20.32 (2021-08-10)](https://github.com/laravel/framework/compare/v6.20.31...v6.20.32)
