@@ -248,7 +248,7 @@ trait ValidatesAttributes
     {
         try {
             if ($this->isTestingRelativeDateTime($value)) {
-                return Date::parse($value);
+                return @Date::parse($value) ?: null;
             }
 
             return date_create($value) ?: null;
