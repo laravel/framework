@@ -183,4 +183,13 @@ class EncrypterTest extends TestCase
         $modified_payload = base64_encode(json_encode($data));
         $e->decrypt($modified_payload);
     }
+
+    public function testSupportedMethodAcceptsAnyCasing()
+    {
+        $key = str_repeat('a', 16);
+
+        $this->assertTrue(Encrypter::supported($key, 'AES-128-GCM'));
+        $this->assertTrue(Encrypter::supported($key, 'aes-128-CBC'));
+        $this->assertTrue(Encrypter::supported($key, 'aes-128-cbc'));
+    }
 }
