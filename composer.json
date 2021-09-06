@@ -26,7 +26,7 @@
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.31",
         "opis/closure": "^3.6",
-        "psr/container": "^1.0",
+        "psr/container": "^1.1.1|^2.0.1",
         "psr/simple-cache": "^1.0",
         "ramsey/uuid": "^4.0",
         "swiftmailer/swiftmailer": "^6.2.7",
