@@ -192,6 +192,38 @@ trait Queueable
         return $this;
     }
 
+
+    /**
+     * Prepend jobs to the chain to be run if this job is successful.
+     *
+     * @param array $chain
+     * @return $this
+     */
+    public function prependChain($chain)
+    {
+        $this->chained = collect($chain)->map(function ($job) {
+            return $this->serializeJob($job);
+        })->merge(collect($this->chained))->all();
+
+        return $this;
+    }
+
+    /**
+     * Append jobs to the chain to be run if this job is successful.
+     *
+     * @param array $chain
+     * @return $this
+     */
+    public function appendChain($chain)
+    {
+        $this->chained = collect($this->chained)
+            ->merge(collect($chain)->map(function ($job) {
+                return $this->serializeJob($job);
+            }))->all();
+
+        return $this;
+    }
+    
     /**
      * Serialize a job for queuing.
      *
