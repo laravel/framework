@@ -159,7 +159,7 @@ abstract class TestCase extends BaseTestCase
             foreach ($database->getConnections() as $connection) {
                 $transaction_level = $connection->transactionLevel();
                 if ($transaction_level !== 0) {
-                    throw new \DomainException("Invalid transaction level: ".$transaction_level);
+                    throw new \DomainException('Invalid transaction level: '.$transaction_level);
                 }
             }
 
