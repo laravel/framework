@@ -222,7 +222,7 @@ trait Queueable
 
         return $this;
     }
-    
+
     /**
      * Serialize a job for queuing.
      *
