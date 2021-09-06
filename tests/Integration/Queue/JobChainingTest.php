@@ -223,10 +223,10 @@ class JobChainingTest extends TestCase
     {
         $job = new JobChainingTestFirstJob();
         $job->chain([
-            new JobChainingTestThirdJob()
+            new JobChainingTestThirdJob(),
         ]);
         $job->prependChain([
-            new JobChainingTestSecondJob()
+            new JobChainingTestSecondJob(),
         ]);
 
         $this->assertCount(2, $job->chained);
@@ -238,10 +238,10 @@ class JobChainingTest extends TestCase
     {
         $job = new JobChainingTestFirstJob();
         $job->chain([
-            new JobChainingTestSecondJob()
+            new JobChainingTestSecondJob(),
         ]);
         $job->appendChain([
-            new JobChainingTestThirdJob()
+            new JobChainingTestThirdJob(),
         ]);
 
         $this->assertCount(2, $job->chained);

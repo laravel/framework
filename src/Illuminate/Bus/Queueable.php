@@ -192,7 +192,6 @@ trait Queueable
         return $this;
     }
 
-
     /**
      * Prepend jobs to the chain to be run if this job is successful.
      *
