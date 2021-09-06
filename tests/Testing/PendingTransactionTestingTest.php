@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Testing;
 
-use Illuminate\Tests\Testing\PendingTransactionTesting;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
 
@@ -15,6 +14,6 @@ class PendingTransactionTestingTest extends TestCase
         $result = $test->run();
 
         $this->assertCount(1, $result->errors());
-        $this->assertSame("DomainException: Invalid transaction level: 1", trim($result->errors()[0]->getExceptionAsString()));
+        $this->assertSame('DomainException: Invalid transaction level: 1', trim($result->errors()[0]->getExceptionAsString()));
     }
 }

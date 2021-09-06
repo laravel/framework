@@ -155,12 +155,11 @@ abstract class TestCase extends BaseTestCase
     protected function tearDown(): void
     {
         if ($this->app) {
-            
             $database = $this->app->make('db');
             foreach ($database->getConnections() as $connection) {
                 $transaction_level = $connection->transactionLevel();
                 if ($transaction_level !== 0) {
-                    throw new \DomainException("Invalid transaction level: ". $transaction_level);
+                    throw new \DomainException("Invalid transaction level: ".$transaction_level);
                 }
             }
 
