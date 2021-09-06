@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "psr/container": "^1.0",
+        "psr/container": "^1.1.1|^2.0.1",
         "psr/simple-cache": "^1.0"
     },
     "autoload": {
