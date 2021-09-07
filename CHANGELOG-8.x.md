@@ -1,6 +1,25 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.58.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.59.0...8.x)
+
+
+## [v8.59.0 (2021-09-07)](https://github.com/laravel/framework/compare/v8.58.0...v8.59.0)
+
+### Added
+- Allow quiet creation ([e9cd94c](https://github.com/laravel/framework/commit/e9cd94c89f59c833c13d04f32f1e31db419a4c0c))
+- Added merge() function to ValidatedInput ([#38640](https://github.com/laravel/framework/pull/38640))
+- Added support for disallowing class morphs ([#38656](https://github.com/laravel/framework/pull/38656))
+- Added AssertableJson::each() method ([#38684](https://github.com/laravel/framework/pull/38684))
+- Added Eloquent builder whereMorphedTo method to streamline finding models morphed to another model ([#38668](https://github.com/laravel/framework/pull/38668))
+
+### Fixed
+- Silence Validator Date Parse Warnings ([#38652](https://github.com/laravel/framework/pull/38652))
+
+### Changed
+- Remove mapWithKeys from HTTP Client headers() methods ([#38643](https://github.com/laravel/framework/pull/38643))
+- Return a new or existing guzzle client based on context in `Illuminate/Http/Client/PendingRequest::buildClient()` ([#38642](https://github.com/laravel/framework/pull/38642))
+- Show a pretty diff for assertExactJson() ([#38655](https://github.com/laravel/framework/pull/38655))
+- Lowercase cipher name in the Encrypter supported method ([#38693](https://github.com/laravel/framework/pull/38693))
 
 
 ## [v8.58.0 (2021-08-31)](https://github.com/laravel/framework/compare/v8.57.0...v8.58.0)
