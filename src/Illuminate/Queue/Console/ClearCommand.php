@@ -6,8 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use ReflectionClass;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 class ClearCommand extends Command
 {
@@ -18,7 +16,8 @@ class ClearCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:clear';
+    protected $signature = 'queue:clear
+                       {queues? : The names of the queues to clear} {--force : Force the operation to run when in production}';
 
     /**
      * The name of the console command.
@@ -34,7 +33,7 @@ class ClearCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Delete all of the jobs from the specified queue';
+    protected $description = 'Delete all of the jobs from the specified queues';
 
     /**
      * Execute the console command.
@@ -47,63 +46,54 @@ class ClearCommand extends Command
             return 1;
         }
 
-        $connection = $this->argument('connection')
-                        ?: $this->laravel['config']['queue.default'];
+        $this->parseQueues($this->argument('queues'))
+            ->each(function ($item) {
+                $queue = ($this->laravel['queue'])->connection($item['connection']);
 
-        // We need to get the right queue for the connection which is set in the queue
-        // configuration file for the application. We will pull it based on the set
-        // connection being run for the queue operation currently being executed.
-        $queueName = $this->getQueue($connection);
+                if ($queue instanceof ClearableQueue) {
+                    $count = $queue->clear($item['queue']);
 
-        $queue = ($this->laravel['queue'])->connection($connection);
-
-        if ($queue instanceof ClearableQueue) {
-            $count = $queue->clear($queueName);
-
-            $this->line('<info>Cleared '.$count.' jobs from the ['.$queueName.'] queue</info> ');
-        } else {
-            $this->line('<error>Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']</error> ');
-        }
+                    $this->line('<info>Cleared '.$count.' jobs from the ['.$item['queue'].'] queue</info> ');
+                } else {
+                    $this->line('<error>Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']</error> ');
+                }
+            });
 
         return 0;
+    }
+
+    /**
+     * Parse the queues into an array of the connections and queues.
+     *
+     * @param  string  $queues
+     * @return \Illuminate\Support\Collection
+     */
+    protected function parseQueues($queues)
+    {
+        return collect(explode(',', $queues))->map(function ($queue) {
+            [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
+
+            if (! isset($queue)) {
+                $queue = $connection ?: $this->getQueue($connection);
+                $connection = $this->laravel['config']['queue.default'];
+            }
+
+            return [
+                'connection' => $connection,
+                'queue' => $queue,
+            ];
+        });
     }
 
     /**
      * Get the queue name to clear.
      *
      * @param  string  $connection
+     *
      * @return string
      */
     protected function getQueue($connection)
     {
-        return $this->option('queue') ?: $this->laravel['config']->get(
-            "queue.connections.{$connection}.queue", 'default'
-        );
-    }
-
-    /**
-     *  Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['connection', InputArgument::OPTIONAL, 'The name of the queue connection to clear'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['queue', null, InputOption::VALUE_OPTIONAL, 'The name of the queue to clear'],
-
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
-        ];
+        return $this->laravel['config']->get("queue.connections.{$connection}.queue", 'default');
     }
 }
