@@ -415,6 +415,47 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a morph-to relationship condition to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereMorphedTo($relation, $model, $boolean = 'and')
+    {
+        if (is_string($relation)) {
+            $relation = $this->getRelationWithoutConstraints($relation);
+        }
+
+        if (is_string($model)) {
+            $morphMap = Relation::morphMap();
+
+            if (! empty($morphMap) && in_array($model, $morphMap)) {
+                $model = array_search($model, $morphMap, true);
+            }
+
+            return $this->where($relation->getMorphType(), $model, null, $boolean);
+        }
+
+        return $this->where(function ($query) use ($relation, $model) {
+            $query->where($relation->getMorphType(), $model->getMorphClass())
+                ->where($relation->getForeignKeyName(), $model->getKey());
+        }, null, null, $boolean);
+    }
+
+    /**
+     * Add a morph-to relationship condition to the query with an "or where" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereMorphedTo($relation, $model)
+    {
+        return $this->whereMorphedTo($relation, $model, 'or');
+    }
+
+    /**
      * Add subselect queries to include an aggregate value for a relationship.
      *
      * @param  mixed  $relations

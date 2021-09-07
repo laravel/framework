@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
@@ -1305,6 +1306,62 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'quux'], $builder->getBindings());
     }
 
+    public function testWhereMorphedTo()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+
+        $builder = $model->whereMorphedTo('morph', $relatedModel);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
+        $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testOrWhereMorphedTo()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+
+        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', $relatedModel);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
+        $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testWhereMorphedToClass()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builder = $model->whereMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "morph_type" = ?', $builder->toSql());
+        $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
+    }
+
+    public function testWhereMorphedToAlias()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        Relation::morphMap([
+            'alias' => EloquentBuilderTestModelCloseRelatedStub::class,
+        ]);
+
+        $builder = $model->whereMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "morph_type" = ?', $builder->toSql());
+        $this->assertEquals(['alias'], $builder->getBindings());
+
+        Relation::morphMap([], false);
+    }
+
     public function testWhereKeyMethodWithInt()
     {
         $model = $this->getMockModel();
@@ -1792,6 +1849,11 @@ class EloquentBuilderTestModelParentStub extends Model
             'self_id',
             'related_id'
         );
+    }
+
+    public function morph()
+    {
+        return $this->morphTo();
     }
 }
 
