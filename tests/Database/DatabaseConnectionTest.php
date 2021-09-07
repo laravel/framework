@@ -155,7 +155,7 @@ class DatabaseConnectionTest extends TestCase
     {
         $pdo = $this->createMock(DatabaseConnectionTestMockPDO::class);
         $pdo->method('beginTransaction')
-            ->willReturnOnConsecutiveCalls($this->throwException(new ErrorException('server has gone away')));
+            ->willReturnOnConsecutiveCalls($this->throwException(new ErrorException('server has gone away')), true);
         $connection = $this->getMockConnection(['reconnect'], $pdo);
         $connection->expects($this->once())->method('reconnect');
         $connection->beginTransaction();
@@ -324,7 +324,7 @@ class DatabaseConnectionTest extends TestCase
 
         $statement = m::mock(PDOStatement::class);
         $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
-        $statement->shouldReceive('execute')->once()->andReturn('result');
+        $statement->shouldReceive('execute')->once()->andReturn(true);
 
         $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
 
@@ -336,7 +336,7 @@ class DatabaseConnectionTest extends TestCase
             $called = true;
         });
 
-        $this->assertSame('result', $connection->statement('foo'));
+        $this->assertTrue($connection->statement('foo'));
 
         $this->assertTrue($called);
     }
