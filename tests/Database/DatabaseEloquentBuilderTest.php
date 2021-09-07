@@ -248,7 +248,29 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->shouldReceive('first')->with(['name'])->andReturn(null);
 
-        $this->assertNull($builder->value('name'));
+        $this->assertNull($builder->valueOrFail('name'));
+    }
+
+    public function testValueOrFailMethodWithModelNotFound()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $mockModel = new stdClass;
+        $mockModel->name = 'foo';
+        $builder->shouldReceive('first')->with(['name'])->andReturn($mockModel);
+
+        $this->assertSame('foo', $builder->valueOrFail('name'));
+    }
+
+    public function testValueOrFailMethodWithModelFound()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $mockModel = new stdClass;
+        $mockModel->name = 'foo';
+        $builder->shouldReceive('first')->with(['name'])->andReturn($mockModel);
+
+        $this->assertSame('foo', $builder->value('name'));
     }
 
     public function testChunkWithLastChunkComplete()
