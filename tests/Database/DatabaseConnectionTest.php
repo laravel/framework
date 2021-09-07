@@ -99,9 +99,9 @@ class DatabaseConnectionTest extends TestCase
     public function testDeleteCallsTheAffectingStatementMethod()
     {
         $connection = $this->getMockConnection(['affectingStatement']);
-        $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn('baz');
+        $connection->expects($this->once())->method('affectingStatement')->with($this->equalTo('foo'), $this->equalTo(['bar']))->willReturn(true);
         $results = $connection->delete('foo', ['bar']);
-        $this->assertSame('baz', $results);
+        $this->assertTrue($results);
     }
 
     public function testStatementProperlyCallsPDO()
@@ -109,12 +109,12 @@ class DatabaseConnectionTest extends TestCase
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
         $statement = $this->getMockBuilder('PDOStatement')->onlyMethods(['execute', 'bindValue'])->getMock();
         $statement->expects($this->once())->method('bindValue')->with(1, 'bar', 2);
-        $statement->expects($this->once())->method('execute')->willReturn('foo');
+        $statement->expects($this->once())->method('execute')->willReturn(true);
         $pdo->expects($this->once())->method('prepare')->with($this->equalTo('foo'))->willReturn($statement);
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
         $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['bar']))->willReturn(['bar']);
         $results = $mock->statement('foo', ['bar']);
-        $this->assertSame('foo', $results);
+        $this->assertTrue($results);
         $log = $mock->getQueryLog();
         $this->assertSame('foo', $log[0]['query']);
         $this->assertEquals(['bar'], $log[0]['bindings']);
@@ -127,12 +127,12 @@ class DatabaseConnectionTest extends TestCase
         $statement = $this->getMockBuilder('PDOStatement')->onlyMethods(['execute', 'rowCount', 'bindValue'])->getMock();
         $statement->expects($this->once())->method('bindValue')->with('foo', 'bar', 2);
         $statement->expects($this->once())->method('execute');
-        $statement->expects($this->once())->method('rowCount')->willReturn(['boom']);
+        $statement->expects($this->once())->method('rowCount')->willReturn(42);
         $pdo->expects($this->once())->method('prepare')->with('foo')->willReturn($statement);
         $mock = $this->getMockConnection(['prepareBindings'], $pdo);
         $mock->expects($this->once())->method('prepareBindings')->with($this->equalTo(['foo' => 'bar']))->willReturn(['foo' => 'bar']);
         $results = $mock->update('foo', ['foo' => 'bar']);
-        $this->assertEquals(['boom'], $results);
+        $this->assertSame(42, $results);
         $log = $mock->getQueryLog();
         $this->assertSame('foo', $log[0]['query']);
         $this->assertEquals(['foo' => 'bar'], $log[0]['bindings']);
