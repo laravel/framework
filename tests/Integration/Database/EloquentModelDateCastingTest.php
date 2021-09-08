@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelDateCastingTest;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
@@ -21,6 +22,8 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->date('date_field')->nullable();
             $table->datetime('datetime_field')->nullable();
+            $table->date('immutable_date_field')->nullable();
+            $table->datetime('immutable_datetime_field')->nullable();
         });
     }
 
@@ -36,6 +39,27 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(Carbon::class, $user->date_field);
         $this->assertInstanceOf(Carbon::class, $user->datetime_field);
     }
+
+    public function testCustomDateCastsAreComparedAsDates()
+    {
+        /** @var TestModel1 */
+        $user = TestModel1::create([
+            'date_field' => '2019-10-01',
+            'datetime_field' => '2019-10-01 10:15:20',
+            'immutable_date_field' => '2019-10-01',
+            'immutable_datetime_field' => '2019-10-01 10:15:20',
+        ]);
+
+        $user->date_field = new Carbon('2019-10-01');
+        $user->datetime_field = new Carbon('2019-10-01 10:15:20');
+        $user->immutable_date_field = new CarbonImmutable('2019-10-01');
+        $user->immutable_datetime_field = new CarbonImmutable('2019-10-01 10:15:20');
+
+        $this->assertArrayNotHasKey('date_field', $user->getDirty());
+        $this->assertArrayNotHasKey('datetime_field', $user->getDirty());
+        $this->assertArrayNotHasKey('immutable_date_field', $user->getDirty());
+        $this->assertArrayNotHasKey('immutable_datetime_field', $user->getDirty());
+    }
 }
 
 class TestModel1 extends Model
@@ -47,5 +71,7 @@ class TestModel1 extends Model
     public $casts = [
         'date_field' => 'date:Y-m',
         'datetime_field' => 'datetime:Y-m H:i',
+        'immutable_date_field' => 'date:Y-m',
+        'immutable_datetime_field' => 'datetime:Y-m H:i',
     ];
 }
