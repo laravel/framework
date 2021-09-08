@@ -67,7 +67,7 @@ class ProviderRepository
         foreach ($manifest['when'] as $provider => $events) {
             $this->registerLoadEvents($provider, $events);
         }
-        
+
         // We will add the deferred services to the application so that they are able
         // to be resolved if necessary during the registration process of the eagerly
         // loaded providers.
