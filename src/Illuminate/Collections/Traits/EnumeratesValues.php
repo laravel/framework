@@ -719,7 +719,7 @@ trait EnumeratesValues
      * @template TReduceReturnType
      *
      * @param  callable(TReduceInitial|TReduceReturnType, TValue): TReduceReturnType  $callback
-     * @param  TReduceInitial $initial
+     * @param  TReduceInitial  $initial
      * @return TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null)
