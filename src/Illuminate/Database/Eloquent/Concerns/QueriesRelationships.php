@@ -384,7 +384,7 @@ trait QueriesRelationships
      * Add a polymorphic relationship condition to the query with a where clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
-     * @param  string|array $types
+     * @param  string|array  $types
      * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
@@ -401,7 +401,7 @@ trait QueriesRelationships
      * Add a polymorphic relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
-     * @param  string|array $types
+     * @param  string|array  $types
      * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
