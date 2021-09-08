@@ -128,7 +128,7 @@ class ModelMakeCommand extends GeneratorCommand
         $policy = Str::studly(class_basename($this->argument('name')));
 
         $this->call('make:policy', [
-            'name' => "{$policy}Policy"
+            'name' => "{$policy}Policy",
         ]);
     }
 
