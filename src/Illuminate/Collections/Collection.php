@@ -794,7 +794,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Get the items with the specified keys.
      *
-     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey> $keys
+     * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>  $keys
      * @return static<TKey, TValue>
      */
     public function only($keys)

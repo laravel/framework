@@ -122,7 +122,7 @@ trait EnumeratesValues
      * @template TUnwrapKey of array-key
      * @template TUnwrapValue
      *
-     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>   $value
+     * @param  array<TUnwrapKey, TUnwrapValue>|static<TUnwrapKey, TUnwrapValue>  $value
      * @return array<TUnwrapKey, TUnwrapValue>
      */
     public static function unwrap($value)
@@ -346,7 +346,7 @@ trait EnumeratesValues
      * @template TMapToGroupsKey of array-key
      * @template TMapToGroupsValue
      *
-     * @param  callable(TValue, TKey): array<TMapToGroupsKey, TMapToGroupsValue>   $callback
+     * @param  callable(TValue, TKey): array<TMapToGroupsKey, TMapToGroupsValue>  $callback
      * @return static<TMapToGroupsKey, static<int, TMapToGroupsValue>>
      */
     public function mapToGroups(callable $callback)
@@ -359,7 +359,7 @@ trait EnumeratesValues
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param callable(TValue, TKey): mixed $callback
+     * @param  callable(TValue, TKey): mixed  $callback
      * @return static<int, mixed>
      */
     public function flatMap(callable $callback)
@@ -370,7 +370,7 @@ trait EnumeratesValues
     /**
      * Map the values into a new class.
      *
-     * @param  class-string $class
+     * @param  class-string  $class
      * @return static<TKey, mixed>
      */
     public function mapInto($class)
@@ -436,8 +436,8 @@ trait EnumeratesValues
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  TValue|string|null $operator
-     * @param  TValue|null $value
+     * @param  TValue|string|null  $operator
+     * @param  TValue|null  $value
      * @return array<int, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null)
@@ -718,7 +718,7 @@ trait EnumeratesValues
      * @template TReduceInitial
      * @template TReduceReturnType
      *
-     * @param  callable(TReduceInitial|TReduceReturnType, TValue): TReduceReturnType $callback
+     * @param  callable(TReduceInitial|TReduceReturnType, TValue): TReduceReturnType  $callback
      * @param  TReduceInitial $initial
      * @return TReduceReturnType
      */
@@ -739,8 +739,8 @@ trait EnumeratesValues
      * @template TReduceWithKeysInitial
      * @template TReduceWithKeysReturnType
      *
-     * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue): TReduceWithKeysReturnType $callback
-     * @param  TReduceWithKeysInitial $initial
+     * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue): TReduceWithKeysReturnType  $callback
+     * @param  TReduceWithKeysInitial  $initial
      * @return TReduceWithKeysReturnType
      */
     public function reduceWithKeys(callable $callback, $initial = null)

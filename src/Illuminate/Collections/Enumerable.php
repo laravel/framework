@@ -661,7 +661,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Map the values into a new class.
      *
-     * @param  class-string $class
+     * @param  class-string  $class
      * @return static<TKey, mixed>
      */
     public function mapInto($class);
