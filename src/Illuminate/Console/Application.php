@@ -80,6 +80,8 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->events->dispatch(new ArtisanStarting($this));
 
+        $this->setContainerCommandLoader();
+
         $this->bootstrap();
     }
 

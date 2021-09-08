@@ -18,11 +18,11 @@ class ContainerCommandLoader implements CommandLoaderInterface
     protected $container;
 
     /**
-     * A list of class names.
+     * A map of command names to classes.
      *
      * @var array
      */
-    protected $classes = [];
+    protected $commandMap = [];
 
     /**
      * Create a new command loader instance.
@@ -36,14 +36,14 @@ class ContainerCommandLoader implements CommandLoaderInterface
     }
 
     /**
-     * Determine if the class is accepted by the command loader.
+     * Determine if the command is accepted by the command loader.
      *
-     * @param string $class
+     * @param string $name
      * @return bool
      */
-    public function accepts(string $class): bool
+    public function accepts(string $name): bool
     {
-        return class_exists($class);
+        return class_exists($name) && ! is_null($name::getDefaultName());
     }
 
     /**
@@ -60,7 +60,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
             throw new InvalidArgumentException(sprintf('Command "%s" was not accepted by the command loader.', $name));
         }
 
-        $this->classes[] = $name;
+        $this->commandMap[$name::getDefaultName()] = $name;
     }
 
     /**
@@ -77,7 +77,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
             throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
         }
 
-        return $this->container->get($name);
+        return $this->container->get($this->commandMap[$name]);
     }
 
     /**
@@ -88,7 +88,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
      */
     public function has(string $name): bool
     {
-        return in_array($name, $this->classes);
+        return isset($this->commandMap[$name]);
     }
 
     /**
@@ -98,12 +98,6 @@ class ContainerCommandLoader implements CommandLoaderInterface
      */
     public function getNames(): array
     {
-        $names = [];
-
-        foreach ($this->classes as $class) {
-            $names[] = $class::getDefaultName();
-        }
-
-        return $names;
+        return array_keys($this->commandMap);
     }
 }
