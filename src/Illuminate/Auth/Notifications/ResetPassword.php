@@ -59,31 +59,20 @@ class ResetPassword extends Notification
      */
     public function toMail($notifiable)
     {
-        $url = $this->resetUrl($notifiable);
-
         if (static::$toMailCallback) {
-            return call_user_func(static::$toMailCallback, $notifiable, $this->token, $url);
+            return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        return $this->buildMailMessage($url);
-    }
-
-    /**
-     * Get the password reset URL for the given notifiable.
-     *
-     * @param  mixed  $notifiable
-     * @return string
-     */
-    protected function resetUrl($notifiable)
-    {
         if (static::$createUrlCallback) {
-            return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
+            $url = call_user_func(static::$createUrlCallback, $notifiable, $this->token);
         } else {
-            return url(route('password.reset', [
+            $url = url(route('password.reset', [
                 'token' => $this->token,
                 'email' => $notifiable->getEmailForPasswordReset(),
             ], false));
         }
+
+        return $this->buildMailMessage($url);
     }
 
     /**
