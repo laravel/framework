@@ -990,7 +990,7 @@ EOF;
     {
         $this->ensureResponseHasView();
 
-        return $this->original->gatherData()[$key];
+        return Arr::get($this->original->gatherData(), $key);
     }
 
     /**
