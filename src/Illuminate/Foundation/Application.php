@@ -363,7 +363,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the bootstrap directory.
      *
-     * @param  string  $path Optionally, a path to append to the bootstrap path
+     * @param  string  $path
      * @return string
      */
     public function bootstrapPath($path = '')
@@ -374,7 +374,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the application configuration files.
      *
-     * @param  string  $path Optionally, a path to append to the config path
+     * @param  string  $path
      * @return string
      */
     public function configPath($path = '')
@@ -385,7 +385,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the database directory.
      *
-     * @param  string  $path Optionally, a path to append to the database path
+     * @param  string  $path
      * @return string
      */
     public function databasePath($path = '')
