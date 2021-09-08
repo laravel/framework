@@ -754,7 +754,9 @@ class SupportHelpersTest extends TestCase
         ];
     }
 
-    /** @dataProvider providesPregReplaceArrayData */
+    /**
+     * @dataProvider providesPregReplaceArrayData
+     */
     public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
     {
         $this->assertSame(
