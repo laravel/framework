@@ -214,7 +214,7 @@ interface Builder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  \Closure|Builder|string|array  $column
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Builder|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -235,7 +235,7 @@ interface Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|Builder|string|array  $column
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Builder|string|array  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return static
@@ -819,7 +819,7 @@ interface Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @param  string  $direction
      * @return static
      */
@@ -828,7 +828,7 @@ interface Builder
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @return static
      */
     public function orderByDesc($column);
@@ -836,7 +836,7 @@ interface Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @return static
      */
     public function latest($column = 'created_at');
@@ -844,7 +844,7 @@ interface Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|Builder|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @return static
      */
     public function oldest($column = 'created_at');
@@ -963,18 +963,21 @@ interface Builder
 
     /**
      * Lock the selected rows in the table for updating.
+     *
      * @return static
      */
     public function lockForUpdate();
 
     /**
      * Share lock the selected rows in the table.
+     *
      * @return static
      */
     public function sharedLock();
 
     /**
      * Get a new instance of the query builder.
+     *
      * @return static
      */
     public function newQuery();
@@ -989,12 +992,14 @@ interface Builder
 
     /**
      * Get the current query value bindings in a flattened array.
+     *
      * @return array
      */
     public function getBindings();
 
     /**
      * Get the raw array of bindings.
+     *
      * @return array
      */
     public function getRawBindings();
@@ -1020,7 +1025,7 @@ interface Builder
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param  Builder  $query
+     * @param  \Illuminate\Contracts\Database\Query\Builder  $query
      * @return static
      */
     public function mergeBindings(Builder $query);
