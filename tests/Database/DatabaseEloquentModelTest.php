@@ -13,6 +13,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -153,6 +154,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
         $this->assertFalse($model->isDirty('objectAttribute'));
         $this->assertFalse($model->isDirty('collectionAttribute'));
+    }
+
+    public function testDirtyOnCastedArrayObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'arrayobjectAttribute' => '{"foo": "bar"}',
+        ]);
+        $model->syncOriginal();
+
+        $model->arrayobjectAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty());
+
+        $model->arrayobjectAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty());
     }
 
     public function testCleanAttributes()
@@ -2570,6 +2586,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'arrayobjectAttribute' => AsArrayObject::class,
     ];
 
     public function jsonAttributeValue()
