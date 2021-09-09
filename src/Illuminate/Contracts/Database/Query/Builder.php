@@ -1040,30 +1040,35 @@ interface Builder
 
     /**
      * Get the database connection instance.
+     *
      * @return \Illuminate\Database\ConnectionInterface
      */
     public function getConnection();
 
     /**
      * Get the database query processor instance.
+     *
      * @return \Illuminate\Database\Query\Processors\Processor
      */
     public function getProcessor();
 
     /**
      * Get the query grammar instance.
+     *
      * @return \Illuminate\Database\Query\Grammars\Grammar
      */
     public function getGrammar();
 
     /**
      * Use the write pdo for query.
+     *
      * @return static
      */
     public function useWritePdo();
 
     /**
      * Clone the query.
+     *
      * @return static
      */
     public function clone();
