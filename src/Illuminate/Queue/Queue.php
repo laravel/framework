@@ -185,7 +185,10 @@ abstract class Queue
      */
     public function getJobBackoff($job)
     {
-        if (! method_exists($job, 'backoff') && ! isset($job->backoff)) {
+        if (
+            (! method_exists($job, 'backoff') && ! isset($job->backoff))
+            || ($job->backoff ?? $job->backoff() === null)
+        ) {
             return;
         }
 
