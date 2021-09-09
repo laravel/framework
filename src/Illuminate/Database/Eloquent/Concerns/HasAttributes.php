@@ -1658,6 +1658,16 @@ trait HasAttributes
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
+        } elseif ($this->isClassCastable($key)) {
+            $caster = $this->resolveCasterClass($key);
+            $original = $this->normalizeCastClassResponse($key, $caster->set(
+                $this,
+                $key,
+                $this->castAttribute($key, $original),
+                $this->attributes
+            ));
+
+            return $attribute === $original[$key];
         }
 
         return is_numeric($attribute) && is_numeric($original)

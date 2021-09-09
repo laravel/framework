@@ -20,7 +20,7 @@ class AsEncryptedArrayObject implements Castable
         {
             public function get($model, $key, $value, $attributes)
             {
-                return new ArrayObject(json_decode(Crypt::decryptString($attributes[$key]), true));
+                return new ArrayObject(json_decode(Crypt::decryptString($value), true));
             }
 
             public function set($model, $key, $value, $attributes)
