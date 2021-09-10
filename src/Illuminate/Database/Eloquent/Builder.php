@@ -920,7 +920,7 @@ class Builder
         if (reset($values) instanceof Model) {
             $values = array_map(function (Model $value) {
                 $value = $value->toArray();
-                $this->addTimestampsToUpsertValues($value);
+                $this->addTimestampsToUpsertValues([$value]);
 
                 return $value;
             }, $values);
