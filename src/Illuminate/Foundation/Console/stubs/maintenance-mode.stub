@@ -6,7 +6,11 @@ if (! file_exists($down = __DIR__.'/down')) {
 }
 
 // Decode the "down" file's JSON...
-$data = json_decode(file_get_contents($down), true);
+try {
+    $data = json_decode(file_get_contents($down), true);
+} catch (\Exception $e) {
+    return;
+}
 
 // Allow framework to handle request if no prerendered template...
 if (! isset($data['template'])) {
