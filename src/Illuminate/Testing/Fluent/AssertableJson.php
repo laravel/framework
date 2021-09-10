@@ -144,6 +144,29 @@ class AssertableJson implements Arrayable
     }
 
     /**
+     * Ensure that the given prop exists and has expected size.
+     *
+     * Optionally instantiate a new "scope" on each child element via callback.
+     *
+     * @param  string|int  $key
+     * @param  int|\Closure|null  $length
+     * @param  \Closure|null  $callback
+     * @return $this
+     */
+    public function hasEach($key, $length = null, Closure $callback = null): self
+    {
+        if (is_int($length) && ! is_null($callback)) {
+            return $this->has($key, function (self $scope) use ($length, $callback) {
+                return $scope->count($length)
+                    ->each($callback)
+                    ->etc();
+            });
+        }
+
+        return $this->has($key, $length, $callback);
+    }
+
+    /**
      * Create a new instance from an array.
      *
      * @param  array  $data
