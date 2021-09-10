@@ -1780,6 +1780,11 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
         return $this->getKey();
     }
 
+    public function getQueueableClass()
+    {
+        return $this->getMorphClass();
+    }
+
     /**
      * Get the queueable relationships for the entity.
      *

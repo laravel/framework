@@ -95,6 +95,11 @@ class SyncQueueTestEntity implements QueueableEntity
     {
         //
     }
+
+    public function getQueueableClass()
+    {
+        //
+    }
 }
 
 class SyncQueueTestHandler

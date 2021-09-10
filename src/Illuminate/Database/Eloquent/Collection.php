@@ -647,13 +647,18 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $class = get_class($this->first());
+        $first = $this->first();
+        $class = get_class($first);
 
         $this->each(function ($model) use ($class) {
             if (get_class($model) !== $class) {
                 throw new LogicException('Queueing collections with multiple model types is not supported.');
             }
         });
+
+        if ($first instanceof QueueableEntity) {
+            return $first->getQueueableClass();
+        }
 
         return $class;
     }

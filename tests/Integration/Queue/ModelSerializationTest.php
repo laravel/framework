@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
@@ -333,6 +334,45 @@ class ModelSerializationTest extends TestCase
         $this->assertSame(
             'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized
         );
+    }
+
+    public function test_model_serialization_structure_with_morphs()
+    {
+        Relation::morphMap([
+            'testUser' => ModelSerializationTestUser::class,
+        ]);
+
+        $user = ModelSerializationTestUser::create([
+            'email' => 'nuno@laravel.com',
+        ]);
+
+        $serialized = serialize(new CollectionSerializationTestClass($user));
+
+        $this->assertSame(
+            'O:67:"Illuminate\Tests\Integration\Queue\CollectionSerializationTestClass":1:{s:5:"users";O:45:"Illuminate\Contracts\Database\ModelIdentifier":4:{s:5:"class";s:8:"testUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}',
+            $serialized
+        );
+
+        Relation::morphMap([], false);
+    }
+
+    public function testItCanUnserializeWithMorphs()
+    {
+        Relation::morphMap([
+            'testUser' => ModelSerializationTestUser::class,
+        ]);
+
+        $user = ModelSerializationTestUser::create([
+            'email' => 'nuno@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationTestClass($user));
+
+        $unSerialized = unserialize($serialized);
+
+        $this->assertSame('nuno@laravel.com', $unSerialized->user->email);
+
+        Relation::morphMap([], false);
     }
 }
 
