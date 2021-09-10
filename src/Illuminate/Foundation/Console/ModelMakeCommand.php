@@ -61,12 +61,12 @@ class ModelMakeCommand extends GeneratorCommand
             $this->createSeeder();
         }
 
-        if ($this->option('policy')) {
-            $this->createPolicy();
-        }
-
         if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
             $this->createController();
+        }
+
+        if ($this->option('policy')) {
+            $this->createPolicy();
         }
     }
 
@@ -119,21 +119,6 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Create a policy file for the model.
-     *
-     * @return void
-     */
-    protected function createPolicy()
-    {
-        $policy = Str::studly(class_basename($this->argument('name')));
-
-        $this->call('make:policy', [
-            'name' => "{$policy}Policy",
-            '--model' => $this->qualifyClass($this->getNameInput()),
-        ]);
-    }
-
-    /**
      * Create a controller for the model.
      *
      * @return void
@@ -149,6 +134,21 @@ class ModelMakeCommand extends GeneratorCommand
             '--model' => $this->option('resource') || $this->option('api') ? $modelName : null,
             '--api' => $this->option('api'),
         ]));
+    }
+
+    /**
+     * Create a policy file for the model.
+     *
+     * @return void
+     */
+    protected function createPolicy()
+    {
+        $policy = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:policy', [
+            'name' => "{$policy}Policy",
+            '--model' => $this->qualifyClass($this->getNameInput()),
+        ]);
     }
 
     /**
@@ -200,8 +200,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
-            ['policy', null, InputOption::VALUE_NONE, 'Create a new policy file for the model'],
-            ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder file for the model'],
+            ['policy', null, InputOption::VALUE_NONE, 'Create a new policy for the model'],
+            ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder for the model'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
