@@ -129,6 +129,7 @@ class ModelMakeCommand extends GeneratorCommand
 
         $this->call('make:policy', [
             'name' => "{$policy}Policy",
+            '--model' => $this->qualifyClass($this->getNameInput()),
         ]);
     }
 
