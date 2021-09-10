@@ -963,18 +963,21 @@ interface Builder
 
     /**
      * Lock the selected rows in the table for updating.
+     *
      * @return static
      */
     public function lockForUpdate();
 
     /**
      * Share lock the selected rows in the table.
+     *
      * @return static
      */
     public function sharedLock();
 
     /**
      * Get a new instance of the query builder.
+     *
      * @return static
      */
     public function newQuery();
@@ -989,12 +992,14 @@ interface Builder
 
     /**
      * Get the current query value bindings in a flattened array.
+     *
      * @return array
      */
     public function getBindings();
 
     /**
      * Get the raw array of bindings.
+     *
      * @return array
      */
     public function getRawBindings();
@@ -1035,30 +1040,35 @@ interface Builder
 
     /**
      * Get the database connection instance.
+     *
      * @return \Illuminate\Database\ConnectionInterface
      */
     public function getConnection();
 
     /**
      * Get the database query processor instance.
+     *
      * @return \Illuminate\Database\Query\Processors\Processor
      */
     public function getProcessor();
 
     /**
      * Get the query grammar instance.
+     *
      * @return \Illuminate\Database\Query\Grammars\Grammar
      */
     public function getGrammar();
 
     /**
      * Use the write pdo for query.
+     *
      * @return static
      */
     public function useWritePdo();
 
     /**
      * Clone the query.
+     *
      * @return static
      */
     public function clone();
