@@ -757,6 +757,40 @@ class AssertTest extends TestCase
         });
     }
 
+    public function testHasEachScope()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'bar' => [
+                    'key' => 'first',
+                ],
+                'baz' => [
+                    'key' => 'second',
+                ],
+            ],
+        ]);
+
+        $assert->hasEach('foo', 2, function (AssertableJson $item) {
+            $item->whereType('key', 'string');
+        });
+    }
+
+    public function testHasEachWithoutScope()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [
+                'bar' => [
+                    'key' => 'first',
+                ],
+                'baz' => [
+                    'key' => 'second',
+                ],
+            ],
+        ]);
+
+        $assert->hasEach('foo', 2);
+    }
+
     public function testFailsWhenNotInteractingWithAllPropsInScope()
     {
         $assert = AssertableJson::fromArray([
