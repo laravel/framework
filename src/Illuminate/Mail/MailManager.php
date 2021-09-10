@@ -288,10 +288,17 @@ class MailManager implements FactoryContract
     {
         $factory = new PostmarkTransportFactory();
 
+        $options = isset($config['message_stream_id'])
+                    ? ['message_stream' => $config['message_stream_id']]
+                    : [];
+
         return $factory->create(new Dsn(
             'postmark+api',
             'default',
-            $config['token'] ?? $this->app['config']->get('services.postmark.token')
+            $config['token'] ?? $this->app['config']->get('services.postmark.token'),
+            null,
+            null,
+            $options
         ));
     }
 
