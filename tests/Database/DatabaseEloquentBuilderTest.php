@@ -8,7 +8,6 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
@@ -1708,7 +1707,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->insert(
             [
                 new EloquentBuilderTestStubStringPrimaryKey(['email' => 'foo', 'name' => 'bar']),
-                new EloquentBuilderTestStubStringPrimaryKey(['name' => 'bar2', 'email' => 'foo2'])
+                new EloquentBuilderTestStubStringPrimaryKey(['name' => 'bar2', 'email' => 'foo2']),
             ]
         );
 
@@ -1738,7 +1737,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->insert(
             [
                 ['email' => 'foo', 'name' => 'bar'],
-                ['name' => 'bar2', 'email' => 'foo2']
+                ['name' => 'bar2', 'email' => 'foo2'],
             ]
         );
 
@@ -2011,6 +2010,6 @@ class EloquentBuilderTestStubStringPrimaryKey extends Model
 
     protected $fillable = [
         'email',
-        'name'
+        'name',
     ];
 }

@@ -910,15 +910,15 @@ class Builder
     }
 
     /**
-     * Insert many models at once
+     * Insert many models at once.
      *
-     * @param Model[]|array $values
+     * @param  Model[]|array $values
      * @return bool
      */
     public function insert(array $values = []): bool
     {
         if (reset($values) instanceof Model) {
-            $values = array_map(function(Model $value) {
+            $values = array_map(function (Model $value) {
                 $value = $value->toArray();
                 $this->addTimestampsToUpsertValues($value);
 
