@@ -910,6 +910,23 @@ class Builder
     }
 
     /**
+     * Insert many models at once
+     *
+     * @param Model[]|array $values
+     * @return bool
+     */
+    public function insert(array $values = []): bool
+    {
+        if (reset($values) instanceof Model) {
+            $values = array_map(static function(Model $value) {
+                return $value->toArray();
+            }, $values);
+        }
+
+        return $this->query->insert($values);
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
