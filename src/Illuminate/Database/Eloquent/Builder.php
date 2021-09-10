@@ -918,12 +918,15 @@ class Builder
     public function insert(array $values = []): bool
     {
         if (reset($values) instanceof Model) {
-            $values = array_map(static function(Model $value) {
-                return $value->toArray();
+            $values = array_map(function(Model $value) {
+                $value = $value->toArray();
+                $this->addTimestampsToUpsertValues($value);
+
+                return $value;
             }, $values);
         }
 
-        return $this->query->insert($values);
+        return $this->toBase()->insert($values);
     }
 
     /**
