@@ -109,6 +109,25 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert the given record exists in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  array  $data
+     * @param  string|null  $connection
+     * @return $this
+     */
+    protected function assertExists($table, array $data = [], $connection = null)
+    {
+        if ($table instanceof Model) {
+            return $this->assertDatabaseHas($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
+        }
+
+        $this->assertDatabaseHas($this->getTable($table), $data, $connection);
+
+        return $this;
+    }
+
+    /**
      * Determine if the argument is a soft deletable model.
      *
      * @param  mixed  $model
