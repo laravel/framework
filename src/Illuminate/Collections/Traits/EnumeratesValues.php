@@ -282,7 +282,7 @@ trait EnumeratesValues
     /**
      * Get the first item by the given key value pair.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return mixed
