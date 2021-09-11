@@ -1041,7 +1041,7 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([
             ['v' => 1, 'x' => 1],
             ['v' => 2, 'x' => 1],
-            ['v' => 2, 'x' => 2]
+            ['v' => 2, 'x' => 2],
         ]);
         $this->assertEquals(
             [['v' => 1, 'x' => 1]],

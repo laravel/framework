@@ -1058,7 +1058,7 @@ trait EnumeratesValues
     }
 
     /**
-     * @param array $key
+     * @param  array  $key
      * @return static
      */
     protected function whereArray(array $key)
@@ -1070,7 +1070,7 @@ trait EnumeratesValues
     }
 
     /**
-     * @param array $key
+     * @param  array  $key
      * @return mixed
      */
     protected function firstWhereArray(array $key)
