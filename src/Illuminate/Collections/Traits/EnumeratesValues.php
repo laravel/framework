@@ -290,11 +290,7 @@ trait EnumeratesValues
     public function firstWhere($key, $operator = null, $value = null)
     {
         if (is_array($key)) {
-            $k = array_key_first($key);
-            $v = Arr::pull($key, $k);
-            return count($key)
-                ? $this->where($k, '=', $v)->firstWhere($key)
-                : $this->firstWhere($k, '=', $v);
+            return $this->firstWhereArray($key);
         }
 
         return $this->first($this->operatorForWhere(...func_get_args()));
@@ -1030,5 +1026,18 @@ trait EnumeratesValues
         return $this->where($k, '=', Arr::pull($key, $k))
             ->when(! empty($key))
             ->where($key);
+    }
+
+    /**
+     * @param array $key
+     * @return mixed
+     */
+    protected function firstWhereArray(array $key)
+    {
+        $k = array_key_first($key);
+        $v = Arr::pull($key, $k);
+        return count($key)
+            ? $this->where($k, '=', $v)->firstWhere($key)
+            : $this->firstWhere($k, '=', $v);
     }
 }
