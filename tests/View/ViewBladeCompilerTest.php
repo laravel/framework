@@ -107,10 +107,10 @@ class ViewBladeCompilerTest extends TestCase
     }
 
     /**
+     * @dataProvider appendViewPathDataProvider
+     *
      * @param  string  $content
      * @param  string  $compiled
-     *
-     * @dataProvider appendViewPathDataProvider
      */
     public function testIncludePathToTemplate($content, $compiled)
     {
