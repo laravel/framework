@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheArrayStoreTest extends TestCase
 {
@@ -21,16 +22,16 @@ class CacheArrayStoreTest extends TestCase
         $store = new ArrayStore;
         $result = $store->put('foo', 'bar', 10);
         $resultMany = $store->putMany([
-            'fizz'  => 'buz',
-            'quz'   => 'baz',
+            'fizz' => 'buz',
+            'quz' => 'baz',
         ], 10);
         $this->assertTrue($result);
         $this->assertTrue($resultMany);
         $this->assertEquals([
-            'foo'   => 'bar',
-            'fizz'  => 'buz',
-            'quz'   => 'baz',
-            'norf'  => null,
+            'foo' => 'bar',
+            'fizz' => 'buz',
+            'quz' => 'baz',
+            'norf' => null,
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
     }
 
@@ -198,7 +199,7 @@ class CacheArrayStoreTest extends TestCase
     public function testValuesAreNotStoredByReference()
     {
         $store = new ArrayStore($serialize = true);
-        $object = new \stdClass;
+        $object = new stdClass;
         $object->foo = true;
 
         $store->put('object', $object, 10);
@@ -210,7 +211,7 @@ class CacheArrayStoreTest extends TestCase
     public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
     {
         $store = new ArrayStore;
-        $object = new \stdClass;
+        $object = new stdClass;
         $object->foo = true;
 
         $store->put('object', $object, 10);

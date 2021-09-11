@@ -91,6 +91,20 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Build an on-demand disk.
+     *
+     * @param  string|array  $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function build($config)
+    {
+        return $this->resolve('ondemand', is_array($config) ? $config : [
+            'driver' => 'local',
+            'root' => $config,
+        ]);
+    }
+
+    /**
      * Attempt to get the disk from the local cache.
      *
      * @param  string  $name
@@ -105,13 +119,14 @@ class FilesystemManager implements FactoryContract
      * Resolve the given disk.
      *
      * @param  string  $name
+     * @param  array|null  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve($name)
+    protected function resolve($name, $config = null)
     {
-        $config = $this->getConfig($name);
+        $config = $config ?? $this->getConfig($name);
 
         if (empty($config['driver'])) {
             throw new InvalidArgumentException("Disk [{$name}] does not have a configured driver.");
@@ -125,11 +140,11 @@ class FilesystemManager implements FactoryContract
 
         $driverMethod = 'create'.ucfirst($name).'Driver';
 
-        if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($config);
-        } else {
+        if (! method_exists($this, $driverMethod)) {
             throw new InvalidArgumentException("Driver [{$name}] is not supported.");
         }
+
+        return $this->{$driverMethod}($config);
     }
 
     /**
@@ -243,7 +258,7 @@ class FilesystemManager implements FactoryContract
     {
         $cache = Arr::pull($config, 'cache');
 
-        $config = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
+        $config = Arr::only($config, ['visibility', 'disable_asserts', 'url', 'temporary_url']);
 
         if ($cache) {
             $adapter = new CachedAdapter($adapter, $this->createCacheStore($cache));

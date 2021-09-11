@@ -71,7 +71,9 @@ class MySqlSchemaState extends SchemaState
     {
         $command = 'mysql '.$this->connectionString().' --database="${:LARAVEL_LOAD_DATABASE}" < "${:LARAVEL_LOAD_PATH}"';
 
-        $this->makeProcess($command)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        $process = $this->makeProcess($command)->setTimeout(null);
+
+        $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
     }
@@ -123,7 +125,7 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_HOST' => is_array($config['host']) ? $config['host'][0] : $config['host'],
             'LARAVEL_LOAD_PORT' => $config['port'] ?? '',
             'LARAVEL_LOAD_USER' => $config['username'],
-            'LARAVEL_LOAD_PASSWORD' => $config['password'],
+            'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
         ];
     }
@@ -144,6 +146,12 @@ class MySqlSchemaState extends SchemaState
             if (Str::contains($e->getMessage(), ['column-statistics', 'column_statistics'])) {
                 return $this->executeDumpProcess(Process::fromShellCommandLine(
                     str_replace(' --column-statistics=0', '', $process->getCommandLine())
+                ), $output, $variables);
+            }
+
+            if (Str::contains($e->getMessage(), ['set-gtid-purged'])) {
+                return $this->executeDumpProcess(Process::fromShellCommandLine(
+                    str_replace(' --set-gtid-purged=OFF', '', $process->getCommandLine())
                 ), $output, $variables);
             }
 

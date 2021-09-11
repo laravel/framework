@@ -1,6 +1,186 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.9...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.34...6.x)
+
+
+## [v6.20.34 (2021-09-07)](https://github.com/laravel/framework/compare/v6.20.33...v6.20.34)
+
+### Fixed
+- Silence validator date parse warnings ([#38670](https://github.com/laravel/framework/pull/38670))
+
+
+## [v6.20.33 (2021-08-31)](https://github.com/laravel/framework/compare/v6.20.32...v6.20.33)
+
+### Changed
+- Error out when detecting incompatible DBAL version ([#38543](https://github.com/laravel/framework/pull/38543))
+
+
+## [v6.20.32 (2021-08-10)](https://github.com/laravel/framework/compare/v6.20.31...v6.20.32)
+
+### Fixed
+- Bump AWS PHP SDK ([#38297](https://github.com/laravel/framework/pull/38297))
+
+
+## [v6.20.31 (2021-08-03)](https://github.com/laravel/framework/compare/v6.20.30...v6.20.31)
+ 
+### Fixed
+- Fixed signed routes with expires parameter ([#38111](https://github.com/laravel/framework/pull/38111), [732c0e0](https://github.com/laravel/framework/commit/732c0e0f64b222e7fc7daef6553f8e99007bb32c))
+
+### Refactoring
+- Remove hardcoded Carbon reference from scheduler event ([#38063](https://github.com/laravel/framework/pull/38063))
+
+
+## [v6.20.30 (2021-07-07)](https://github.com/laravel/framework/compare/v6.20.29...v6.20.30)
+
+### Fixed
+- Fix edge case causing a BadMethodCallExceptions to be thrown when using loadMissing() ([#37871](https://github.com/laravel/framework/pull/37871))
+
+
+## [v6.20.29 (2021-06-22)](https://github.com/laravel/framework/compare/v6.20.28...v6.20.29)
+
+### Changed
+- Removed unnecessary checks in RequiredIf validation, fixed tests ([#37700](https://github.com/laravel/framework/pull/37700))
+
+
+## [v6.20.28 (2021-06-15)](https://github.com/laravel/framework/compare/v6.20.27...v6.20.28)
+
+### Fixed
+- Fixed dns_get_record loose check of A records for active_url rule ([#37675](https://github.com/laravel/framework/pull/37675))
+- Type hinted arguments for Illuminate\Validation\Rules\RequiredIf ([#37688](https://github.com/laravel/framework/pull/37688))
+- Fixed when passed object as parameters to scopes method ([#37692](https://github.com/laravel/framework/pull/37692))
+
+
+## [v6.20.27 (2021-05-11)](https://github.com/laravel/framework/compare/v6.20.26...v6.20.27)
+
+### Added
+- Support mass assignment to SQL Server views ([#37307](https://github.com/laravel/framework/pull/37307))
+
+### Fixed
+- Fixed `Illuminate\Database\Query\Builder::offset()` with non numbers $value ([#37164](https://github.com/laravel/framework/pull/37164))
+- Fixed unless rules ([#37291](https://github.com/laravel/framework/pull/37291))
+
+### Changed
+- Allow reporting reportable exceptions with the default logger ([#37235](https://github.com/laravel/framework/pull/37235))
+
+
+## [v6.20.26 (2021-04-28)](https://github.com/laravel/framework/compare/v6.20.25...v6.20.26)
+
+### Fixed
+- Fixed Cache store with a name other than 'dynamodb' ([#37145](https://github.com/laravel/framework/pull/37145))
+
+### Changed
+- Some cast to int in `Illuminate\Database\Query\Grammars\SqlServerGrammar` ([09bf145](https://github.com/laravel/framework/commit/09bf1457e9df53e172e6fd5929cbafb539677c7c))
+
+
+## [v6.20.25 (2021-04-27)](https://github.com/laravel/framework/compare/v6.20.24...v6.20.25)
+
+### Fixed
+- Fixed nullable values for required_if ([#37128](https://github.com/laravel/framework/pull/37128), [86fd558](https://github.com/laravel/framework/commit/86fd558b4e5d8d7d45cf457cd1a72d54334297a1))
+
+
+## [v6.20.24 (2021-04-20)](https://github.com/laravel/framework/compare/v6.20.23...v6.20.24)
+
+### Fixed
+- Fixed required_if boolean validation ([#36969](https://github.com/laravel/framework/pull/36969))
+
+
+## [v6.20.23 (2021-04-13)](https://github.com/laravel/framework/compare/v6.20.22...v6.20.23)
+
+### Added 
+- Added strings to the `DetectsLostConnections.php` ([4210258](https://github.com/laravel/framework/commit/42102589bc7f7b8533ee1b815ef0cc18017d4e45))
+
+
+## [v6.20.22 (2021-03-31)](https://github.com/laravel/framework/compare/v6.20.21...v6.20.22)
+
+### Fixed
+- Fixed setting DynamoDB credentials ([#36822](https://github.com/laravel/framework/pull/36822))
+
+
+## [v6.20.21 (2021-03-30)](https://github.com/laravel/framework/compare/v6.20.20...v6.20.21)
+
+### Added
+- Added support of DynamoDB in CI suite ([#36749](https://github.com/laravel/framework/pull/36749))
+- Support username parameter for predis ([#36762](https://github.com/laravel/framework/pull/36762))
+
+### Changed
+- Use qualified column names in pivot query ([#36720](https://github.com/laravel/framework/pull/36720))
+
+
+## [v6.20.20 (2021-03-23)](https://github.com/laravel/framework/compare/v6.20.19...v6.20.20)
+
+### Added
+- Added WSREP communication link failure for lost connection detection ([#36668](https://github.com/laravel/framework/pull/36668))
+
+### Fixed
+- Fixes the issue using cache:clear with PhpRedis and a clustered Redis instance. ([#36665](https://github.com/laravel/framework/pull/36665))
+
+
+## [v6.20.19 (2021-03-16)](https://github.com/laravel/framework/compare/v6.20.18...v6.20.19)
+
+### Added
+- Added broken pipe exception as lost connection error ([#36601](https://github.com/laravel/framework/pull/36601))
+
+
+## [v6.20.18 (2021-03-09)](https://github.com/laravel/framework/compare/v6.20.17...v6.20.18)
+
+### Fixed
+- Fix validator treating null as true for (required|exclude)_(if|unless) due to loose `in_array()` check ([#36504](https://github.com/laravel/framework/pull/36504))
+
+### Changed
+- Delete existing links that are broken in `Illuminate\Foundation\Console\StorageLinkCommand` ([#36470](https://github.com/laravel/framework/pull/36470))
+
+
+## [v6.20.17 (2021-03-02)](https://github.com/laravel/framework/compare/v6.20.16...v6.20.17)
+
+### Added
+- Added new line to `DetectsLostConnections` ([#36373](https://github.com/laravel/framework/pull/36373))
+
+
+## [v6.20.16 (2021-02-02)](https://github.com/laravel/framework/compare/v6.20.15...v6.20.16)
+
+### Fixed
+- Fixed `Illuminate\View\ViewException::report()` ([#36110](https://github.com/laravel/framework/pull/36110))
+- Fixed `Illuminate\Redis\Connections\PhpRedisConnection::spop()` ([#36106](https://github.com/laravel/framework/pull/36106))
+
+### Changed
+- Typecast page number as integer in `Illuminate\Pagination\AbstractPaginator::resolveCurrentPage()` ([#36055](https://github.com/laravel/framework/pull/36055))
+
+
+## [v6.20.15 (2021-01-26)](https://github.com/laravel/framework/compare/v6.20.14...v6.20.15)
+
+### Changed
+- Pipe new through render and report exception methods ([#36037](https://github.com/laravel/framework/pull/36037))
+
+
+## [v6.20.14 (2021-01-21)](https://github.com/laravel/framework/compare/v6.20.13...v6.20.14)
+
+### Fixed
+- Fixed type error in `Illuminate\Http\Concerns\InteractsWithContentTypes::isJson()` ([#35956](https://github.com/laravel/framework/pull/35956))
+- Limit expected bindings ([#35972](https://github.com/laravel/framework/pull/35972), [006873d](https://github.com/laravel/framework/commit/006873df411d28bfd03fea5e7f91a2afe3918498))
+
+
+## [v6.20.13 (2021-01-19)](https://github.com/laravel/framework/compare/v6.20.12...v6.20.13)
+
+### Fixed
+- Fixed empty html mail ([#35941](https://github.com/laravel/framework/pull/35941))
+
+
+## [v6.20.12 (2021-01-13)](https://github.com/laravel/framework/compare/v6.20.11...v6.20.12)
+
+
+## [v6.20.11 (2021-01-13)](https://github.com/laravel/framework/compare/v6.20.10...v6.20.11)
+
+### Fixed
+- Limit expected bindings ([#35865](https://github.com/laravel/framework/pull/35865))
+
+
+## [v6.20.10 (2021-01-12)](https://github.com/laravel/framework/compare/v6.20.9...v6.20.10)
+
+### Added
+- Added new line to `DetectsLostConnections` ([#35790](https://github.com/laravel/framework/pull/35790))
+
+### Fixed
+- Fixed error from missing null check on PHP 8 in `Illuminate\Validation\Concerns\ValidatesAttributes::validateJson()` ([#35797](https://github.com/laravel/framework/pull/35797))
 
 
 ## [v6.20.9 (2021-01-05)](https://github.com/laravel/framework/compare/v6.20.8...v6.20.9)
@@ -205,6 +385,8 @@
 
 ### Changed
 - Improve cookie encryption ([#33662](https://github.com/laravel/framework/pull/33662))
+
+This change will invalidate all existing cookies. Please see [this security bulletin](https://blog.laravel.com/laravel-cookie-security-releases) for more information.
 
 
 ## [v6.18.26 (2020-07-21)](https://github.com/laravel/framework/compare/v6.18.25...v6.18.26)

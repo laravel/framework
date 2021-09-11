@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -11,7 +12,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -46,8 +46,6 @@ class UniqueJobTest extends TestCase
         $this->app['db']->connection()->getSchemaBuilder()->drop('jobs');
 
         parent::tearDown();
-
-        m::close();
     }
 
     public function testUniqueJobsAreNotDispatched()
@@ -83,7 +81,7 @@ class UniqueJobTest extends TestCase
     {
         UniqueTestFailJob::$handled = false;
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         try {
             dispatch($job = new UniqueTestFailJob);
@@ -191,7 +189,7 @@ class UniqueTestFailJob implements ShouldQueue, ShouldBeUnique
     {
         static::$handled = true;
 
-        throw new \Exception;
+        throw new Exception;
     }
 }
 

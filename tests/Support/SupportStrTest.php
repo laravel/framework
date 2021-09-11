@@ -15,6 +15,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('Taylor Otwell', Str::words('Taylor Otwell', 3));
     }
 
+    public function testStringCanBeLimitedByWordsNonAscii()
+    {
+        $this->assertSame('这是...', Str::words('这是 段中文', 1));
+        $this->assertSame('这是___', Str::words('这是 段中文', 1, '___'));
+        $this->assertSame('这是-段中文', Str::words('这是-段中文', 3, '___'));
+        $this->assertSame('这是___', Str::words('这是     段中文', 1, '___'));
+    }
+
     public function testStringTrimmedOnlyWhereNecessary()
     {
         $this->assertSame(' Taylor Otwell ', Str::words(' Taylor Otwell ', 3));
@@ -328,6 +336,14 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testReplace()
+    {
+        $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
+        $this->assertSame('foo bar baz 8.x', Str::replace('?', '8.x', 'foo bar baz ?'));
+        $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
+        $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));
@@ -365,6 +381,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
     }
 
+    public function testRemove()
+    {
+        $this->assertSame('Fbar', Str::remove('o', 'Foobar'));
+        $this->assertSame('Foo', Str::remove('bar', 'Foobar'));
+        $this->assertSame('oobar', Str::remove('F', 'Foobar'));
+        $this->assertSame('Foobar', Str::remove('f', 'Foobar'));
+        $this->assertSame('oobar', Str::remove('f', 'Foobar', false));
+
+        $this->assertSame('Fbr', Str::remove(['o', 'a'], 'Foobar'));
+        $this->assertSame('Fooar', Str::remove(['f', 'b'], 'Foobar'));
+        $this->assertSame('ooar', Str::remove(['f', 'b'], 'Foobar', false));
+        $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
@@ -396,6 +426,18 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBar', Str::studly('foo_bar')); // test cache
         $this->assertSame('FooBarBaz', Str::studly('foo-barBaz'));
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
+    }
+
+    public function testMatch()
+    {
+        $this->assertSame('bar', Str::match('/bar/', 'foo bar'));
+        $this->assertSame('bar', Str::match('/foo (.*)/', 'foo bar'));
+        $this->assertEmpty(Str::match('/nothing/', 'foo bar'));
+
+        $this->assertEquals(['bar', 'bar'], Str::matchAll('/bar/', 'bar foo bar')->all());
+
+        $this->assertEquals(['un', 'ly'], Str::matchAll('/f(\w*)/', 'bar fun bar fly')->all());
+        $this->assertEmpty(Str::matchAll('/nothing/', 'bar fun bar fly'));
     }
 
     public function testCamel()
@@ -480,6 +522,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('Alien     ', Str::padRight('Alien', 10));
     }
 
+    public function testWordCount()
+    {
+        $this->assertEquals(2, Str::wordCount('Hello, world!'));
+        $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
+    }
+
     public function validUuidList()
     {
         return [
@@ -510,6 +558,18 @@ class SupportStrTest extends TestCase
             ['af6f8cb0c57d11e19b210800200c9a66'],
             ['ff6f8cb0-c57da-51e1-9b21-0800200c9a66'],
         ];
+    }
+
+    public function testMarkdown()
+    {
+        $this->assertSame("<p><em>hello world</em></p>\n", Str::markdown('*hello world*'));
+        $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
+    }
+
+    public function testRepeat()
+    {
+        $this->assertSame('aaaaa', Str::repeat('a', 5));
+        $this->assertSame('', Str::repeat('', 5));
     }
 }
 

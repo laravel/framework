@@ -18,6 +18,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
@@ -645,6 +646,8 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $this->current = $route = $this->routes->match($request);
 
+        $route->setContainer($this->container);
+
         $this->container->instance(Route::class, $route);
 
         return $route;
@@ -702,16 +705,24 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function gatherRouteMiddleware(Route $route)
     {
+        $computedMiddleware = $route->gatherMiddleware();
+
         $excluded = collect($route->excludedMiddleware())->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
-        $middleware = collect($route->gatherMiddleware())->map(function ($name) {
+        $middleware = collect($computedMiddleware)->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
             if (empty($excluded)) {
                 return false;
-            } elseif (in_array($name, $excluded, true)) {
+            }
+
+            if ($name instanceof Closure) {
+                return false;
+            }
+
+            if (in_array($name, $excluded, true)) {
                 return true;
             }
 
@@ -769,11 +780,14 @@ class Router implements BindingRegistrar, RegistrarContract
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
             $response = new JsonResponse($response, 201);
+        } elseif ($response instanceof Stringable) {
+            $response = new Response($response->__toString(), 200, ['Content-Type' => 'text/html']);
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
                     $response instanceof Jsonable ||
                     $response instanceof ArrayObject ||
                     $response instanceof JsonSerializable ||
+                    $response instanceof \stdClass ||
                     is_array($response))) {
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
@@ -940,6 +954,18 @@ class Router implements BindingRegistrar, RegistrarContract
         if (! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
         }
+
+        return $this;
+    }
+
+    /**
+     * Flush the router's middleware groups.
+     *
+     * @return $this
+     */
+    public function flushMiddlewareGroups()
+    {
+        $this->middlewareGroups = [];
 
         return $this;
     }
@@ -1268,6 +1294,19 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         return $result;
+    }
+
+    /**
+     * Set the container instance used by the router.
+     *
+     * @param  \Illuminate\Container\Container  $container
+     * @return $this
+     */
+    public function setContainer(Container $container)
+    {
+        $this->container = $container;
+
+        return $this;
     }
 
     /**

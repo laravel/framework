@@ -105,7 +105,7 @@ abstract class Lock implements LockContract
      *
      * @param  int  $seconds
      * @param  callable|null  $callback
-     * @return bool
+     * @return mixed
      *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
      */
@@ -153,7 +153,7 @@ abstract class Lock implements LockContract
     }
 
     /**
-     * Specify the number of milliseconds to sleep in between blocked lock aquisition attempts.
+     * Specify the number of milliseconds to sleep in between blocked lock acquisition attempts.
      *
      * @param  int  $milliseconds
      * @return $this

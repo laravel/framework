@@ -106,7 +106,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model = new TestEloquentModelWithCustomCast;
         $model->birthday_at = now();
-        $this->assertTrue(is_string($model->toArray()['birthday_at']));
+        $this->assertIsString($model->toArray()['birthday_at']);
     }
 
     public function testGetOriginalWithCastValueObjects()
@@ -418,7 +418,8 @@ class ValueObject implements Castable
 
     public static function castUsing(array $arguments)
     {
-        return new class(...$arguments) implements CastsAttributes {
+        return new class(...$arguments) implements CastsAttributes
+        {
             private $argument;
 
             public function __construct($argument = null)
@@ -447,7 +448,7 @@ class ValueObjectWithCasterInstance extends ValueObject
 {
     public static function castUsing(array $arguments)
     {
-        return new ValueObjectCaster();
+        return new ValueObjectCaster;
     }
 }
 

@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithPivotTable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class BelongsToMany extends Relation
 {
-    use Concerns\InteractsWithPivotTable;
+    use InteractsWithDictionary, InteractsWithPivotTable;
 
     /**
      * The intermediate table for the relation.
@@ -277,7 +279,9 @@ class BelongsToMany extends Relation
         // children back to their parent using the dictionary and the keys on the
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->{$this->parentKey}])) {
+            $key = $this->getDictionaryKey($model->{$this->parentKey});
+
+            if (isset($dictionary[$key])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );
@@ -301,7 +305,9 @@ class BelongsToMany extends Relation
         $dictionary = [];
 
         foreach ($results as $result) {
-            $dictionary[$result->{$this->accessor}->{$this->foreignPivotKey}][] = $result;
+            $value = $this->getDictionaryKey($result->{$this->accessor}->{$this->foreignPivotKey});
+
+            $dictionary[$value][] = $result;
         }
 
         return $dictionary;
@@ -569,7 +575,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Find a related model by its primary key or return new instance of the related model.
+     * Find a related model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
      * @param  array  $columns
@@ -767,7 +773,7 @@ class BelongsToMany extends Relation
     public function get($columns = ['*'])
     {
         // First we'll add the proper select columns onto the query so it is run with
-        // the proper columns. Then, we will get the results and hydrate out pivot
+        // the proper columns. Then, we will get the results and hydrate our pivot
         // models with the result of those columns as a separate model relation.
         $builder = $this->query->applyScopes();
 
@@ -857,6 +863,24 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Paginate the given query into a cursor paginator.
+     *
+     * @param  int|null  $perPage
+     * @param  array  $columns
+     * @param  string  $cursorName
+     * @param  string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     */
+    public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    {
+        $this->query->addSelect($this->shouldSelect($columns));
+
+        return tap($this->query->cursorPaginate($perPage, $columns, $cursorName, $cursor), function ($paginator) {
+            $this->hydratePivotRelation($paginator->items());
+        });
+    }
+
+    /**
      * Chunk the results of the query.
      *
      * @param  int  $count
@@ -865,9 +889,7 @@ class BelongsToMany extends Relation
      */
     public function chunk($count, callable $callback)
     {
-        $this->query->addSelect($this->shouldSelect());
-
-        return $this->query->chunk($count, function ($results, $page) use ($callback) {
+        return $this->prepareQueryBuilder()->chunk($count, function ($results, $page) use ($callback) {
             $this->hydratePivotRelation($results->all());
 
             return $callback($results, $page);
@@ -885,7 +907,7 @@ class BelongsToMany extends Relation
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
-        $this->query->addSelect($this->shouldSelect());
+        $this->prepareQueryBuilder();
 
         $column = $column ?? $this->getRelated()->qualifyColumn(
             $this->getRelatedKeyName()
@@ -919,19 +941,65 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazy($chunkSize = 1000)
+    {
+        return $this->prepareQueryBuilder()->lazy($chunkSize)->map(function ($model) {
+            $this->hydratePivotRelation([$model]);
+
+            return $model;
+        });
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs.
+     *
+     * @param  int  $count
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyById($chunkSize = 1000, $column = null, $alias = null)
+    {
+        $column = $column ?? $this->getRelated()->qualifyColumn(
+            $this->getRelatedKeyName()
+        );
+
+        $alias = $alias ?? $this->getRelatedKeyName();
+
+        return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias)->map(function ($model) {
+            $this->hydratePivotRelation([$model]);
+
+            return $model;
+        });
+    }
+
+    /**
      * Get a lazy collection for the given query.
      *
      * @return \Illuminate\Support\LazyCollection
      */
     public function cursor()
     {
-        $this->query->addSelect($this->shouldSelect());
-
-        return $this->query->cursor()->map(function ($model) {
+        return $this->prepareQueryBuilder()->cursor()->map(function ($model) {
             $this->hydratePivotRelation([$model]);
 
             return $model;
         });
+    }
+
+    /**
+     * Prepare the query builder for query execution.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function prepareQueryBuilder()
+    {
+        return $this->query->addSelect($this->shouldSelect());
     }
 
     /**

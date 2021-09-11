@@ -2,10 +2,13 @@
 
 namespace Illuminate\Http\Client;
 
+use Illuminate\Support\Traits\Macroable;
 use OutOfBoundsException;
 
 class ResponseSequence
 {
+    use Macroable;
+
     /**
      * The responses in the sequence.
      *
@@ -137,6 +140,8 @@ class ResponseSequence
      * Get the next response in the sequence.
      *
      * @return mixed
+     *
+     * @throws \OutOfBoundsException
      */
     public function __invoke()
     {

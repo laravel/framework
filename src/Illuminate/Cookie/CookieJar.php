@@ -154,6 +154,19 @@ class CookieJar implements JarContract
     }
 
     /**
+     * Queue a cookie to expire with the next response.
+     *
+     * @param  string  $name
+     * @param  string|null  $path
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function expire($name, $path = null, $domain = null)
+    {
+        $this->queue($this->forget($name, $path, $domain));
+    }
+
+    /**
      * Remove a cookie from the queue.
      *
      * @param  string  $name
@@ -213,5 +226,17 @@ class CookieJar implements JarContract
     public function getQueuedCookies()
     {
         return Arr::flatten($this->queued);
+    }
+
+    /**
+     * Flush the cookies which have been queued for the next request.
+     *
+     * @return $this
+     */
+    public function flushQueuedCookies()
+    {
+        $this->queued = [];
+
+        return $this;
     }
 }

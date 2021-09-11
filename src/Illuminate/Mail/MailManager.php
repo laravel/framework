@@ -18,6 +18,7 @@ use Postmark\ThrowExceptionOnFailurePlugin;
 use Postmark\Transport as PostmarkTransport;
 use Psr\Log\LoggerInterface;
 use Swift_DependencyContainer;
+use Swift_FailoverTransport as FailoverTransport;
 use Swift_Mailer;
 use Swift_SendmailTransport as SendmailTransport;
 use Swift_SmtpTransport as SmtpTransport;
@@ -63,7 +64,7 @@ class MailManager implements FactoryContract
      * Get a mailer instance by name.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Mail\Mailer
+     * @return \Illuminate\Contracts\Mail\Mailer
      */
     public function mailer($name = null)
     {
@@ -156,6 +157,8 @@ class MailManager implements FactoryContract
      *
      * @param  array  $config
      * @return \Swift_Transport
+     *
+     * @throws \InvalidArgumentException
      */
     public function createTransport(array $config)
     {
@@ -168,7 +171,7 @@ class MailManager implements FactoryContract
             return call_user_func($this->customCreators[$transport], $config);
         }
 
-        if (trim($transport) === '' || ! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
+        if (trim($transport ?? '') === '' || ! method_exists($this, $method = 'create'.ucfirst($transport).'Transport')) {
             throw new InvalidArgumentException("Unsupported mail transport [{$transport}].");
         }
 
@@ -260,11 +263,11 @@ class MailManager implements FactoryContract
      */
     protected function createSesTransport(array $config)
     {
-        if (! isset($config['secret'])) {
-            $config = array_merge($this->app['config']->get('services.ses', []), [
-                'version' => 'latest', 'service' => 'email',
-            ]);
-        }
+        $config = array_merge(
+            $this->app['config']->get('services.ses', []),
+            ['version' => 'latest', 'service' => 'email'],
+            $config
+        );
 
         $config = Arr::except($config, ['transport']);
 
@@ -335,8 +338,36 @@ class MailManager implements FactoryContract
             $config['token'] ?? $this->app['config']->get('services.postmark.token'),
             $headers
         ), function ($transport) {
-            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin());
+            $transport->registerPlugin(new ThrowExceptionOnFailurePlugin);
         });
+    }
+
+    /**
+     * Create an instance of the Failover Swift Transport driver.
+     *
+     * @param  array  $config
+     * @return \Swift_FailoverTransport
+     */
+    protected function createFailoverTransport(array $config)
+    {
+        $transports = [];
+
+        foreach ($config['mailers'] as $name) {
+            $config = $this->getConfig($name);
+
+            if (is_null($config)) {
+                throw new InvalidArgumentException("Mailer [{$name}] is not defined.");
+            }
+
+            // Now, we will check if the "driver" key exists and if it does we will set
+            // the transport configuration parameter in order to offer compatibility
+            // with any Laravel <= 6.x application style mail configuration files.
+            $transports[] = $this->app['config']['mail.driver']
+                ? $this->createTransport(array_merge($config, ['transport' => $name]))
+                : $this->createTransport($config);
+        }
+
+        return new FailoverTransport($transports);
     }
 
     /**
@@ -468,6 +499,41 @@ class MailManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the application instance used by the manager.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function getApplication()
+    {
+        return $this->app;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
+     * Forget all of the resolved mailer instances.
+     *
+     * @return $this
+     */
+    public function forgetMailers()
+    {
+        $this->mailers = [];
 
         return $this;
     }

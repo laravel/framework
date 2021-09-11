@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Feature request
-    url: https://github.com/laravel/ideas/issues
-    about: 'For ideas or feature requests, open up an issue on the Laravel ideas repository'
+    url: https://github.com/laravel/framework/discussions
+    about: 'For ideas or feature requests, start a new discussion'
   - name: Support Questions & Other
     url: https://laravel.com/docs/contributions#support-questions
     about: 'This repository is only for reporting bugs. If you have a question or need help using the library, click:'

@@ -15,8 +15,8 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ]);
 
         $db->bootEloquent();
@@ -222,6 +222,25 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $position = HasOneThroughTestPosition::find(1);
 
         $position->contract()->each(function ($contract) {
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'laravel_through_key', ], array_keys($contract->getAttributes()));
+        });
+    }
+
+    public function testLazyReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $position = HasOneThroughTestPosition::find(1);
+
+        $position->contract()->lazy()->each(function ($contract) {
             $this->assertEquals([
                 'id',
                 'user_id',

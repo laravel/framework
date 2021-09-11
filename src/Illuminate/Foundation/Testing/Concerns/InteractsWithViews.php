@@ -4,8 +4,8 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Testing\TestComponent;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
 
@@ -38,11 +38,13 @@ trait InteractsWithViews
             ViewFacade::addLocation(sys_get_temp_dir());
         }
 
-        $tempFile = tempnam($tempDirectory, 'laravel-blade').'.blade.php';
+        $tempFileInfo = pathinfo(tempnam($tempDirectory, 'laravel-blade'));
+
+        $tempFile = $tempFileInfo['dirname'].'/'.$tempFileInfo['filename'].'.blade.php';
 
         file_put_contents($tempFile, $template);
 
-        return new TestView(view(Str::before(basename($tempFile), '.blade.php'), $data));
+        return new TestView(view($tempFileInfo['filename'], $data));
     }
 
     /**
@@ -50,17 +52,19 @@ trait InteractsWithViews
      *
      * @param  string  $componentClass
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @return \Illuminate\Testing\TestView
+     * @return \Illuminate\Testing\TestComponent
      */
     protected function component(string $componentClass, array $data = [])
     {
         $component = $this->app->make($componentClass, $data);
 
-        $view = $component->resolveView();
+        $view = value($component->resolveView(), $data);
 
-        return $view instanceof View
-                ? new TestView($view->with($component->data()))
-                : new TestView(view($view, $component->data()));
+        $view = $view instanceof View
+            ? $view->with($component->data())
+            : view($view, $component->data());
+
+        return new TestComponent($component, $view);
     }
 
     /**

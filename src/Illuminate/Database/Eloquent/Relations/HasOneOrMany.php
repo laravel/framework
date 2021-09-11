@@ -5,9 +5,12 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 abstract class HasOneOrMany extends Relation
 {
+    use InteractsWithDictionary;
+
     /**
      * The foreign key of the parent model.
      *
@@ -53,7 +56,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create and return an un-saved instances of the related models.
+     * Create and return an un-saved instance of the related models.
      *
      * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection
@@ -77,9 +80,11 @@ abstract class HasOneOrMany extends Relation
     public function addConstraints()
     {
         if (static::$constraints) {
-            $this->query->where($this->foreignKey, '=', $this->getParentKey());
+            $query = $this->getRelationQuery();
 
-            $this->query->whereNotNull($this->foreignKey);
+            $query->where($this->foreignKey, '=', $this->getParentKey());
+
+            $query->whereNotNull($this->foreignKey);
         }
     }
 
@@ -93,7 +98,7 @@ abstract class HasOneOrMany extends Relation
     {
         $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-        $this->query->{$whereIn}(
+        $this->getRelationQuery()->{$whereIn}(
             $this->foreignKey, $this->getKeys($models, $this->localKey)
         );
     }
@@ -141,7 +146,7 @@ abstract class HasOneOrMany extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
+            if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
                 $model->setRelation(
                     $relation, $this->getRelationValue($dictionary, $key, $type)
                 );
@@ -177,12 +182,12 @@ abstract class HasOneOrMany extends Relation
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$result->{$foreign} => $result];
+            return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
     }
 
     /**
-     * Find a model by its primary key or return new instance of the related model.
+     * Find a model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
      * @param  array  $columns
@@ -209,7 +214,7 @@ abstract class HasOneOrMany extends Relation
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance($attributes + $values);
+            $instance = $this->related->newInstance(array_merge($attributes, $values));
 
             $this->setForeignAttributesForCreate($instance);
         }
@@ -227,7 +232,7 @@ abstract class HasOneOrMany extends Relation
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create($attributes + $values);
+            $instance = $this->create(array_merge($attributes, $values));
         }
 
         return $instance;

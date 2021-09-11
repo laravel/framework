@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use BadMethodCallException;
 use Carbon\Carbon as BaseCarbon;
+use Carbon\CarbonImmutable as BaseCarbonImmutable;
 use DateTime;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
@@ -107,5 +108,14 @@ class SupportCarbonTest extends TestCase
         $deserialized = eval($serialized);
 
         $this->assertInstanceOf(Carbon::class, $deserialized);
+    }
+
+    public function testSetTestNowWillPersistBetweenImmutableAndMutableInstance()
+    {
+        Carbon::setTestNow(new Carbon('2017-06-27 13:14:15.000000'));
+
+        $this->assertSame('2017-06-27 13:14:15', Carbon::now()->toDateTimeString());
+        $this->assertSame('2017-06-27 13:14:15', BaseCarbon::now()->toDateTimeString());
+        $this->assertSame('2017-06-27 13:14:15', BaseCarbonImmutable::now()->toDateTimeString());
     }
 }

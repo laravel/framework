@@ -42,10 +42,16 @@ class BladeTest extends TestCase
         $this->assertSame('<span class="text-medium">
     Hello Taylor
 </span>
-  
- <span >
+<span >
     Hello Samuel
 </span>', trim($view));
+    }
+
+    public function test_inline_link_type_attributes_dont_add_extra_spacing_at_end()
+    {
+        $view = View::make('uses-link')->render();
+
+        $this->assertSame('This is a sentence with a <a href="https://laravel.com">link</a>.', trim($view));
     }
 
     public function test_appendable_attributes()
@@ -61,6 +67,13 @@ class BladeTest extends TestCase
         $this->assertSame('<div class="mt-4 bg-gray-100" data-controller="inside-controller" foo="bar">
     Hello Taylor
 </div>', trim($view));
+    }
+
+    public function tested_nested_anonymous_attribute_proxying_works_correctly()
+    {
+        $view = View::make('uses-child-input')->render();
+
+        $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
     protected function getEnvironmentSetUp($app)

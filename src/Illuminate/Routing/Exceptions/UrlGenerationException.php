@@ -12,7 +12,7 @@ class UrlGenerationException extends Exception
      * Create a new exception for missing route parameters.
      *
      * @param  \Illuminate\Routing\Route  $route
-     * @param  array $parameters
+     * @param  array  $parameters
      * @return static
      */
     public static function forMissingParameters(Route $route, array $parameters = [])

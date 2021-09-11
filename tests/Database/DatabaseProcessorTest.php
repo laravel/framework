@@ -38,6 +38,7 @@ class ProcessorTestPDOStub extends PDO
         //
     }
 
+    #[\ReturnTypeWillChange]
     public function lastInsertId($sequence = null)
     {
         //

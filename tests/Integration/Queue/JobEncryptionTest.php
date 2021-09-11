@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Mockery as m;
 
 /**
  * @group integration
@@ -49,7 +48,7 @@ class JobEncryptionTest extends DatabaseTestCase
         JobEncryptionTestEncryptedJob::$ran = false;
         JobEncryptionTestNonEncryptedJob::$ran = false;
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testEncryptedJobPayloadIsStoredEncrypted()

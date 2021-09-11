@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
@@ -101,6 +102,19 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 
+    public function testValidateThrowsExceptionFromAuthorizationResponse()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+
+        $this->createRequest([], FoundationTestFormRequestForbiddenWithResponseStub::class)->validateResolved();
+    }
+
+    public function testValidateDoesntThrowExceptionFromResponseAllowed()
+    {
+        $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class)->validateResolved();
+    }
+
     public function testPrepareForValidationRunsBeforeValidation()
     {
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
@@ -119,15 +133,15 @@ class FoundationFormRequestTest extends TestCase
      * Catch the given exception thrown from the executor, and return it.
      *
      * @param  string  $class
-     * @param  \Closure  $excecutor
+     * @param  \Closure  $executor
      * @return \Exception
      *
      * @throws \Exception
      */
-    protected function catchException($class, $excecutor)
+    protected function catchException($class, $executor)
     {
         try {
-            $excecutor();
+            $executor();
         } catch (Exception $e) {
             if (is_a($e, $class)) {
                 return $e;
@@ -320,5 +334,26 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function passedValidation()
     {
         $this->replace(['name' => 'Adam']);
+    }
+}
+
+class FoundationTestFormRequestForbiddenWithResponseStub extends FormRequest
+{
+    public function authorize()
+    {
+        return Response::deny('foo');
+    }
+}
+
+class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
+{
+    public function rules()
+    {
+        return [];
+    }
+
+    public function authorize()
+    {
+        return Response::allow('baz');
     }
 }

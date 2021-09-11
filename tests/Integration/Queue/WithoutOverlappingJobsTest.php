@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -57,7 +58,7 @@ class WithoutOverlappingJobsTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         try {
             $instance->call($job, [
@@ -147,6 +148,6 @@ class FailedOverlappingTestJob extends OverlappingTestJob
     {
         static::$handled = true;
 
-        throw new \Exception;
+        throw new Exception;
     }
 }

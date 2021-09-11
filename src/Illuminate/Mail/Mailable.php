@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -20,7 +21,7 @@ use ReflectionProperty;
 
 class Mailable implements MailableContract, Renderable
 {
-    use ForwardsCalls, Localizable;
+    use Conditionable, ForwardsCalls, Localizable;
 
     /**
      * The locale of the message.
@@ -76,7 +77,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @var string
      */
-    protected $markdown;
+    public $markdown;
 
     /**
      * The HTML to use for the message.
@@ -170,7 +171,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function send($mailer)
     {
-        return $this->withLocale($this->locale, function () use ($mailer) {
+        $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer = $mailer instanceof MailFactory
@@ -233,7 +234,11 @@ class Mailable implements MailableContract, Renderable
      */
     protected function newQueuedJob()
     {
-        return new SendQueuedMailable($this);
+        return (new SendQueuedMailable($this))
+                    ->through(array_merge(
+                        method_exists($this, 'middleware') ? $this->middleware() : [],
+                        $this->middleware ?? []
+                    ));
     }
 
     /**
@@ -988,25 +993,6 @@ class Mailable implements MailableContract, Renderable
     public static function buildViewDataUsing(callable $callback)
     {
         static::$viewDataCallback = $callback;
-    }
-
-    /**
-     * Apply the callback's message changes if the given "value" is true.
-     *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed|$this
-     */
-    public function when($value, $callback, $default = null)
-    {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
     }
 
     /**

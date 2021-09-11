@@ -82,14 +82,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'users\') drop table "users"', $statements[0]);
+        $this->assertSame('if exists (select * from sys.sysobjects where id = object_id(\'users\', \'U\')) drop table "users"', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropIfExists();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar()->setTablePrefix('prefix_'));
 
         $this->assertCount(1, $statements);
-        $this->assertSame('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'prefix_users\') drop table "prefix_users"', $statements[0]);
+        $this->assertSame('if exists (select * from sys.sysobjects where id = object_id(\'prefix_users\', \'U\')) drop table "prefix_users"', $statements[0]);
     }
 
     public function testDropColumn()
@@ -892,6 +892,42 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     public function testQuoteStringOnArray()
     {
         $this->assertSame("N'中文', N'測試'", $this->getGrammar()->quoteString(['中文', '測試']));
+    }
+
+    public function testCreateDatabase()
+    {
+        $connection = $this->getConnection();
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+
+        $this->assertSame(
+            'create database "my_database_a"',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+
+        $this->assertSame(
+            'create database "my_database_b"',
+            $statement
+        );
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
+
+        $this->assertSame(
+            'drop database if exists "my_database_a"',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
+
+        $this->assertSame(
+            'drop database if exists "my_database_b"',
+            $statement
+        );
     }
 
     protected function getConnection()

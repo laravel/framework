@@ -390,6 +390,22 @@ if (! function_exists('dispatch')) {
     }
 }
 
+if (! function_exists('dispatch_sync')) {
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * Queueable jobs will be dispatched to the "sync" queue.
+     *
+     * @param  mixed  $job
+     * @param  mixed  $handler
+     * @return mixed
+     */
+    function dispatch_sync($job, $handler = null)
+    {
+        return app(Dispatcher::class)->dispatchSync($job, $handler);
+    }
+}
+
 if (! function_exists('dispatch_now')) {
     /**
      * Dispatch a command to its appropriate handler in the current process.
@@ -397,6 +413,8 @@ if (! function_exists('dispatch_now')) {
      * @param  mixed  $job
      * @param  mixed  $handler
      * @return mixed
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     function dispatch_now($job, $handler = null)
     {
@@ -641,7 +659,7 @@ if (! function_exists('rescue')) {
                 report($e);
             }
 
-            return $rescue instanceof Closure ? $rescue($e) : $rescue;
+            return value($rescue, $e);
         }
     }
 }
