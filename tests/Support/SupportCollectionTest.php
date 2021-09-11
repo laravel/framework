@@ -752,10 +752,18 @@ class SupportCollectionTest extends TestCase
             $c->where('v')->values()->all()
         );
 
-        $c = new $collection([['v' => 1, 'x' => 1], ['v' => 2, 'x' => 1], ['v' => 2, 'x' => 2]]);
+        $c = new $collection([
+            ['v' => 1, 'x' => 1],
+            ['v' => 2, 'x' => 1],
+            ['v' => 2, 'x' => 2]
+        ]);
         $this->assertEquals(
             [['v' => 1, 'x' => 1]],
             $c->where(['v' => 1])->values()->all()
+        );
+        $this->assertEquals(
+            [['v' => 2, 'x' => 1], ['v' => 2, 'x' => 2]],
+            $c->where(['v' => 2])->values()->all()
         );
         $this->assertEquals(
             [['v' => 2, 'x' => 1]],
