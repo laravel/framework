@@ -540,7 +540,7 @@ trait EnumeratesValues
     /**
      * Filter items by the given key value pair.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return static
