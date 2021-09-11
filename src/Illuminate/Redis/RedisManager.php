@@ -108,7 +108,7 @@ class RedisManager implements Factory
         if (isset($this->config[$name])) {
             return $this->connector()->connect(
                 $this->parseConnectionConfiguration($this->config[$name]),
-                $options
+                array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.'.$name, Arr::get($options, 'parameters', []))])
             );
         }
 
