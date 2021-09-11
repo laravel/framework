@@ -77,6 +77,8 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertSame('book', $data->firstWhere('material', 'paper')['type']);
+        $this->assertSame('book', $data->firstWhere(['material' => 'paper'])['type']);
+        $this->assertSame('book', $data->firstWhere(['material' => 'paper', 'type' => 'book'])['type']);
         $this->assertSame('gasket', $data->firstWhere('material', 'rubber')['type']);
         $this->assertNull($data->firstWhere('material', 'nonexistant'));
         $this->assertNull($data->firstWhere('nonexistant', 'key'));

@@ -289,6 +289,14 @@ trait EnumeratesValues
      */
     public function firstWhere($key, $operator = null, $value = null)
     {
+        if (is_array($key)) {
+            $k = array_key_first($key);
+            $v = Arr::pull($key, $k);
+            return count($key) > 1
+                ? $this->where($k, '=', $v)->firstWhere($key)
+                : $this->firstWhere($k, '=', $v);
+        }
+
         return $this->first($this->operatorForWhere(...func_get_args()));
     }
 
