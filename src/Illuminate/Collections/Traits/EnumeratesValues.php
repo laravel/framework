@@ -292,7 +292,7 @@ trait EnumeratesValues
         if (is_array($key)) {
             $k = array_key_first($key);
             $v = Arr::pull($key, $k);
-            return count($key) > 1
+            return count($key)
                 ? $this->where($k, '=', $v)->firstWhere($key)
                 : $this->firstWhere($k, '=', $v);
         }
