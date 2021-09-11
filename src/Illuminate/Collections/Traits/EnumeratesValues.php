@@ -692,6 +692,28 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the item where the key/callback has the minimum value.
+     *
+     * @param  callable|string  $callback
+     * @return mixed
+     */
+    public function whereMin($callback)
+    {
+        return $this->sortBy($callback)->first();
+    }
+
+    /**
+     * Get the item where the key/callback has the maximum value.
+     *
+     * @param  callable|string  $callback
+     * @return mixed
+     */
+    public function whereMax($callback)
+    {
+        return $this->sortByDesc($callback)->first();
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable  $callback
