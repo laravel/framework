@@ -47,6 +47,11 @@ class PreventRequestsDuringMaintenance
     {
         if ($this->app->isDownForMaintenance()) {
             $data = json_decode(file_get_contents($this->app->storagePath().'/framework/down'), true);
+            
+            if (isset($data['time']) && now()->diffInSeconds(filectime($this->app->storagePath().'/framework/down')) >= $data['time']) {
+                unlink($this->app->storagePath().'/framework/down');
+                return $next($request);
+            }
 
             if (isset($data['secret']) && $request->path() === $data['secret']) {
                 return $this->bypassResponse($data['secret']);
