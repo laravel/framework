@@ -548,10 +548,7 @@ trait EnumeratesValues
     public function where($key, $operator = null, $value = null)
     {
         if (is_array($key)) {
-            $k = array_key_first($key);
-            return $this->where($k, '=', Arr::pull($key, $k))
-                ->when(! empty($key))
-                ->where($key);
+            return $this->whereArray($key);
         }
 
         return $this->filter($this->operatorForWhere(...func_get_args()));
@@ -1013,5 +1010,17 @@ trait EnumeratesValues
         return function ($value) {
             return $value;
         };
+    }
+
+    /**
+     * @param array $key
+     * @return static
+     */
+    protected function whereArray(array $key)
+    {
+        $k = array_key_first($key);
+        return $this->where($k, '=', Arr::pull($key, $k))
+            ->when(! empty($key))
+            ->where($key);
     }
 }
