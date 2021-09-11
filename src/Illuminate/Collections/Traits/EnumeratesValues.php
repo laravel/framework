@@ -1064,6 +1064,7 @@ trait EnumeratesValues
     protected function whereArray(array $key)
     {
         $k = array_key_first($key);
+
         return $this->where($k, '=', Arr::pull($key, $k))
             ->when(! empty($key))
             ->where($key);
@@ -1077,6 +1078,7 @@ trait EnumeratesValues
     {
         $k = array_key_first($key);
         $v = Arr::pull($key, $k);
+
         return count($key)
             ? $this->where($k, '=', $v)->firstWhere($key)
             : $this->firstWhere($k, '=', $v);
