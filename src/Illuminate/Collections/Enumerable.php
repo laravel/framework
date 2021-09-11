@@ -423,20 +423,20 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whereInstanceOf($type);
 
     /**
-     * Get the item where the key/callback has the minimum value.
+     * Get the item where the given key has the minimum value.
      *
-     * @param  callable|string  $callback
-     * @return mixed
+     * @param  string  $key
+     * @return static
      */
-    public function whereMin($callback);
+    public function whereMin($key);
 
     /**
-     * Get the item where the key/callback has the maximum value.
+     * Get the item where the given key has the maximum value.
      *
-     * @param  callable|string  $callback
-     * @return mixed
+     * @param  string  $key
+     * @return static
      */
-    public function whereMax($callback);
+    public function whereMax($key);
 
     /**
      * Get the first item from the enumerable passing the given truth test.

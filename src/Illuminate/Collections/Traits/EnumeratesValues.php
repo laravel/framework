@@ -692,25 +692,25 @@ trait EnumeratesValues
     }
 
     /**
-     * Get the item where the key/callback has the minimum value.
+     * Get the item where the given key has the minimum value.
      *
-     * @param  callable|string  $callback
-     * @return mixed
+     * @param  string  $key
+     * @return static
      */
-    public function whereMin($callback)
+    public function whereMin($key)
     {
-        return $this->sortBy($callback)->first();
+        return $this->where($key, $this->min($key));
     }
 
     /**
-     * Get the item where the key/callback has the maximum value.
+     * Get the item where the given key has the maximum value.
      *
-     * @param  callable|string  $callback
-     * @return mixed
+     * @param  string  $key
+     * @return static
      */
-    public function whereMax($callback)
+    public function whereMax($key)
     {
-        return $this->sortByDesc($callback)->first();
+        return $this->where($key, $this->max($key));
     }
 
     /**
