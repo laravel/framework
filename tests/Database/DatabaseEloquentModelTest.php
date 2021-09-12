@@ -166,13 +166,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model->syncOriginal();
 
         $this->assertInstanceOf(ArrayObject::class, $model->arrayobjectAttribute);
-        $this->assertFalse($model->isDirty());
+        $this->assertFalse($model->isDirty('arrayobjectAttribute'));
 
         $model->arrayobjectAttribute = ['foo' => 'bar'];
-        $this->assertFalse($model->isDirty());
+        $this->assertFalse($model->isDirty('arrayobjectAttribute'));
 
         $model->arrayobjectAttribute = ['foo' => 'baz'];
-        $this->assertTrue($model->isDirty());
+        $this->assertTrue($model->isDirty('arrayobjectAttribute'));
     }
 
     public function testCleanAttributes()
