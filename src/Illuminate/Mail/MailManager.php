@@ -219,10 +219,10 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * Create an instance of the Amazon SES Swift Transport driver.
+     * Create an instance of the Symfony Amazon SES Transport driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Mail\Transport\SesTransport
+     * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
     protected function createSesTransport(array $config)
     {
@@ -257,7 +257,7 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * Create an instance of the Mailgun Swift Transport driver.
+     * Create an instance of the Symfony Mailgun Transport driver.
      *
      * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\TransportInterface
@@ -279,10 +279,10 @@ class MailManager implements FactoryContract
     }
 
     /**
-     * Create an instance of the Postmark Swift Transport driver.
+     * Create an instance of the Symfony Postmark Transport driver.
      *
      * @param  array  $config
-     * @return \Swift_Transport
+     * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
     protected function createPostmarkTransport(array $config)
     {
