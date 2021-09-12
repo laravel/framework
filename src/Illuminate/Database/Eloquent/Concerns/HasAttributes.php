@@ -1659,8 +1659,7 @@ trait HasAttributes
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key)) {
-            $caster = $this->resolveCasterClass($key);
-            $original = $this->normalizeCastClassResponse($key, $caster->set(
+            $original = $this->normalizeCastClassResponse($key, $this->resolveCasterClass($key)->set(
                 $this,
                 $key,
                 $this->castAttribute($key, $original),

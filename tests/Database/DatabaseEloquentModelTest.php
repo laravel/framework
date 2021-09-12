@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use ArrayObject;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -163,6 +164,9 @@ class DatabaseEloquentModelTest extends TestCase
             'arrayobjectAttribute' => '{"foo": "bar"}',
         ]);
         $model->syncOriginal();
+
+        $this->assertInstanceOf(ArrayObject::class, $model->arrayobjectAttribute);
+        $this->assertFalse($model->isDirty());
 
         $model->arrayobjectAttribute = ['foo' => 'bar'];
         $this->assertFalse($model->isDirty());
