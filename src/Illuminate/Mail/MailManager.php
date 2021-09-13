@@ -236,6 +236,10 @@ class MailManager implements FactoryContract
 
         $factory = new SesTransportFactory();
 
+        if (! isset($config['session_token']) && isset($config['token'])) {
+            $config['session_token'] = $config['token'];
+        }
+
         return $factory->create(new Dsn(
             'ses+api',
             'default',
