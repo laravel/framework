@@ -56,7 +56,7 @@ class ArrayTransport implements TransportInterface
     }
 
     /**
-     * Get the string representation of the message.
+     * Get the string representation of the transport driver.
      *
      * @return string
      */
