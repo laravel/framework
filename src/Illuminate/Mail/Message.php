@@ -324,6 +324,6 @@ class Message
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->swift, $method, $parameters);
+        return $this->forwardDecoratedCallTo($this->swift, $method, $parameters);
     }
 }

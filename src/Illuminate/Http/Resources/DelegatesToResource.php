@@ -149,6 +149,6 @@ trait DelegatesToResource
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallTo($this->resource, $method, $parameters);
+        return $this->forwardDecoratedCallTo($this->resource, $method, $parameters);
     }
 }
