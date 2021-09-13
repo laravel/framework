@@ -113,7 +113,6 @@ class EloquentWhereTest extends DatabaseTestCase
 
         $this->assertTrue($secondUser->is(UserWhereTest::lastWhere('name', '=', $secondUser->name)));
         $this->assertTrue($secondUser->is(UserWhereTest::lastWhere('name', $secondUser->name)));
-        $this->assertTrue($secondUser->is(UserWhereTest::lastWhere('address', 'test-address')));
         $this->assertTrue($secondUser->is(UserWhereTest::where('name', $secondUser->name)->lastWhere('email', $secondUser->email)));
         $this->assertNull(UserWhereTest::where('name', $secondUser->name)->lastWhere('email', $firstUser->email));
         $this->assertTrue($secondUser->is(UserWhereTest::lastWhere(['name' => $secondUser->name, 'email' => $secondUser->email])));
