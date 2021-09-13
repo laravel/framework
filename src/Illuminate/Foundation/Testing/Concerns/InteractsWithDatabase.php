@@ -109,22 +109,33 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Assert the given record exists in the database.
+     * Assert the given model exists in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $table
-     * @param  array  $data
-     * @param  string|null  $connection
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return $this
      */
-    protected function assertExists($table, array $data = [], $connection = null)
+    protected function assertModelExists($model)
     {
-        if ($table instanceof Model) {
-            return $this->assertDatabaseHas($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
-        }
+        return $this->assertDatabaseHas(
+            $model->getTable(),
+            [$model->getKeyName() => $model->getKey()],
+            $model->getConnectionName()
+        );
+    }
 
-        $this->assertDatabaseHas($this->getTable($table), $data, $connection);
-
-        return $this;
+    /**
+     * Assert the given model does not exist in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
+     */
+    protected function assertModelMissing($model)
+    {
+        return $this->assertDatabaseMissing(
+            $model->getTable(),
+            [$model->getKeyName() => $model->getKey()],
+            $model->getConnectionName()
+        );
     }
 
     /**

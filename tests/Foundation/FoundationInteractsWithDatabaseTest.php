@@ -172,6 +172,17 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDeleted(new ProductStub($this->data));
     }
 
+    public function testAssertModelMissingPassesWhenDoesNotFindModelResults()
+    {
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertModelMissing(new ProductStub($this->data));
+    }
+
     public function testAssertDeletedFailsWhenFindsModelResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -247,30 +258,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder->shouldReceive('get')->andReturn(collect($this->data));
 
-        $this->assertExists(new ProductStub($this->data));
-    }
-
-    public function testAssertExistsSupportsModelStrings()
-    {
-        $this->data = ['id' => 1];
-
-        $builder = $this->mockCountBuilder(1);
-
-        $builder->shouldReceive('get')->andReturn(collect($this->data));
-
-        $this->assertExists(ProductStub::class, $this->data);
-    }
-
-    public function testAssertExistsFailsDoesNotFindResults()
-    {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('The table is empty.');
-
-        $builder = $this->mockCountBuilder(0);
-
-        $builder->shouldReceive('get')->andReturn(collect());
-
-        $this->assertExists($this->table, $this->data);
+        $this->assertModelExists(new ProductStub($this->data));
     }
 
     public function testGetTableNameFromModel()
