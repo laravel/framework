@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Encryption\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Testing\LoggedExceptionCollection;
@@ -603,7 +604,7 @@ trait MakesHttpRequests
         }
 
         return collect($this->defaultCookies)->map(function ($value, $key) {
-            return encrypt(CookieValuePrefix::create($key, app('encrypter')->getKey()).$value, false);
+            return encrypt(CookieValuePrefix::create($key, app(Key::class)->getValue()).$value, false);
         })->merge($this->unencryptedCookies)->all();
     }
 

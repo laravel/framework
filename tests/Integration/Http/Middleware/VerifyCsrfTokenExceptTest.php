@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\Key;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 
@@ -15,7 +16,7 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         parent::setUp();
 
-        $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(Encrypter::generateKey('AES-128-CBC')));
+        $this->stub = new VerifyCsrfTokenExceptStub(app(), new Encrypter(new Key(Encrypter::generateKey('AES-128-CBC'))));
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
 
@@ -57,6 +58,6 @@ class VerifyCsrfTokenExceptTest extends TestCase
 
     private function assertNonMatchingExcept(array $except)
     {
-        return $this->assertMatchingExcept($except, false);
+        $this->assertMatchingExcept($except, false);
     }
 }

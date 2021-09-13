@@ -9,6 +9,7 @@ use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\Key;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -37,8 +38,11 @@ class EncryptCookiesTest extends TestCase
         parent::setUp();
 
         $this->container = new Container;
-        $this->container->singleton(EncrypterContract::class, function () {
-            return new Encrypter(str_repeat('a', 16));
+        $this->container->singleton(Key::class, static function (): Key {
+            return new Key(str_repeat('a', 16));
+        });
+        $this->container->singleton(EncrypterContract::class, function (Container $container) {
+            return new Encrypter($container->make(Key::class));
         });
 
         $this->router = new Router(new Dispatcher, $this->container);
@@ -90,7 +94,7 @@ class EncryptCookiesTest extends TestCase
         $encrypter = $this->container->make(EncrypterContract::class);
 
         return $encrypter->encrypt(
-            CookieValuePrefix::create($key, $encrypter->getKey()).$value,
+            CookieValuePrefix::create($key, $this->container->make(Key::class)->getValue()).$value,
             false
         );
     }

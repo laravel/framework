@@ -39,15 +39,15 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Create a new encrypter instance.
      *
-     * @param  string  $key
+     * @param  \Illuminate\Encryption\Key  $key
      * @param  string  $cipher
      * @return void
      *
      * @throws \RuntimeException
      */
-    public function __construct($key, $cipher = 'aes-128-cbc')
+    public function __construct(Key $key, string $cipher = 'aes-128-cbc')
     {
-        $key = (string) $key;
+        $key = $key->getValue();
 
         if (! static::supported($key, $cipher)) {
             $ciphers = implode(', ', array_keys(self::$supportedCiphers));
@@ -253,15 +253,5 @@ class Encrypter implements EncrypterContract, StringEncrypter
         return hash_equals(
             $this->hash($payload['iv'], $payload['value']), $payload['mac']
         );
-    }
-
-    /**
-     * Get the encryption key.
-     *
-     * @return string
-     */
-    public function getKey()
-    {
-        return $this->key;
     }
 }

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Encryption\Key;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,13 @@ class EncryptCookies
      * @var \Illuminate\Contracts\Encryption\Encrypter
      */
     protected $encrypter;
+
+    /**
+     * The key instance.
+     *
+     * @var \Illuminate\Encryption\Key
+     */
+    protected Key $key;
 
     /**
      * The names of the cookies that should not be encrypted.
@@ -37,11 +45,13 @@ class EncryptCookies
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
+     * @param  \Illuminate\Encryption\Key  $key
      * @return void
      */
-    public function __construct(EncrypterContract $encrypter)
+    public function __construct(EncrypterContract $encrypter, Key $key)
     {
         $this->encrypter = $encrypter;
+        $this->key = $key;
     }
 
     /**
@@ -103,7 +113,7 @@ class EncryptCookies
     {
         return is_array($value)
                     ? $this->validateArray($key, $value)
-                    : CookieValuePrefix::validate($key, $value, $this->encrypter->getKey());
+                    : CookieValuePrefix::validate($key, $value, $this->key->getValue());
     }
 
     /**
@@ -177,7 +187,7 @@ class EncryptCookies
             $response->headers->setCookie($this->duplicate(
                 $cookie,
                 $this->encrypter->encrypt(
-                    CookieValuePrefix::create($cookie->getName(), $this->encrypter->getKey()).$cookie->getValue(),
+                    CookieValuePrefix::create($cookie->getName(), $this->key->getValue()).$cookie->getValue(),
                     static::serialized($cookie->getName())
                 )
             ));

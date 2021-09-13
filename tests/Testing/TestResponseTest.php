@@ -8,6 +8,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\Key;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -1467,14 +1468,15 @@ class TestResponseTest extends TestCase
     public function testAssertCookie()
     {
         $container = Container::getInstance();
-        $encrypter = new Encrypter(str_repeat('a', 16));
+        $key = new Key(str_repeat('a', 16));
+        $encrypter = new Encrypter($key);
         $container->singleton('encrypter', function () use ($encrypter) {
             return $encrypter;
         });
 
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
-        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false);
+        $encryptedValue = $encrypter->encrypt(CookieValuePrefix::create($cookieName, $key->getValue()).$cookieValue, false);
 
         $response = TestResponse::fromBaseResponse(
             (new Response)->withCookie(new Cookie($cookieName, $encryptedValue))
@@ -1544,7 +1546,8 @@ class TestResponseTest extends TestCase
     public function testGetEncryptedCookie()
     {
         $container = Container::getInstance();
-        $encrypter = new Encrypter(str_repeat('a', 16));
+        $key = new Key(str_repeat('a', 16));
+        $encrypter = new Encrypter($key);
         $container->singleton('encrypter', function () use ($encrypter) {
             return $encrypter;
         });
@@ -1552,7 +1555,7 @@ class TestResponseTest extends TestCase
         $cookieName = 'cookie-name';
         $cookieValue = 'cookie-value';
         $encryptedValue = $encrypter->encrypt(
-            CookieValuePrefix::create($cookieName, $encrypter->getKey()).$cookieValue, false
+            CookieValuePrefix::create($cookieName, $key->getValue()).$cookieValue, false
         );
 
         $response = TestResponse::fromBaseResponse(

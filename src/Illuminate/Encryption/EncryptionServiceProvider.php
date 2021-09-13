@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Opis\Closure\SerializableClosure;
@@ -15,8 +16,23 @@ class EncryptionServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerKey();
         $this->registerEncrypter();
         $this->registerOpisSecurityKey();
+    }
+
+    /**
+     * Register the key.
+     *
+     * @return void
+     */
+    protected function registerKey(): void
+    {
+        $this->app->singleton(Key::class, function (Container $container): Key {
+            $config = $container->make('config')->get('app');
+
+            return new Key($this->parseKey($config));
+        });
     }
 
     /**
@@ -26,10 +42,10 @@ class EncryptionServiceProvider extends ServiceProvider
      */
     protected function registerEncrypter()
     {
-        $this->app->singleton('encrypter', function ($app) {
+        $this->app->singleton('encrypter', function (Container $app) {
             $config = $app->make('config')->get('app');
 
-            return new Encrypter($this->parseKey($config), $config['cipher']);
+            return new Encrypter($app->make(Key::class), $config['cipher']);
         });
     }
 

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Encryption;
 
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Encryption\Key;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -11,7 +12,7 @@ class EncrypterTest extends TestCase
 {
     public function testEncryption()
     {
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new Encrypter(new Key(str_repeat('a', 16)));
         $encrypted = $e->encrypt('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
@@ -19,7 +20,7 @@ class EncrypterTest extends TestCase
 
     public function testRawStringEncryption()
     {
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new Encrypter(new Key(str_repeat('a', 16)));
         $encrypted = $e->encryptString('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decryptString($encrypted));
@@ -27,7 +28,7 @@ class EncrypterTest extends TestCase
 
     public function testEncryptionUsingBase64EncodedKey()
     {
-        $e = new Encrypter(random_bytes(16));
+        $e = new Encrypter(new Key(random_bytes(16)));
         $encrypted = $e->encrypt('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
@@ -35,7 +36,7 @@ class EncrypterTest extends TestCase
 
     public function testEncryptedLengthIsFixed()
     {
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new Encrypter(new Key(str_repeat('a', 16)));
         $lengths = [];
         for ($i = 0; $i < 100; $i++) {
             $lengths[] = strlen($e->encrypt('foo'));
@@ -45,12 +46,12 @@ class EncrypterTest extends TestCase
 
     public function testWithCustomCipher()
     {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $e = new Encrypter(new Key(str_repeat('b', 32)), 'AES-256-GCM');
         $encrypted = $e->encrypt('bar');
         $this->assertNotSame('bar', $encrypted);
         $this->assertSame('bar', $e->decrypt($encrypted));
 
-        $e = new Encrypter(random_bytes(32), 'AES-256-GCM');
+        $e = new Encrypter(new Key(random_bytes(32)), 'AES-256-GCM');
         $encrypted = $e->encrypt('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
@@ -58,20 +59,20 @@ class EncrypterTest extends TestCase
 
     public function testCipherNamesCanBeMixedCase()
     {
-        $upper = new Encrypter(str_repeat('b', 16), 'AES-128-GCM');
+        $upper = new Encrypter(new Key(str_repeat('b', 16)), 'AES-128-GCM');
         $encrypted = $upper->encrypt('bar');
         $this->assertNotSame('bar', $encrypted);
 
-        $lower = new Encrypter(str_repeat('b', 16), 'aes-128-gcm');
+        $lower = new Encrypter(new Key(str_repeat('b', 16)), 'aes-128-gcm');
         $this->assertSame('bar', $lower->decrypt($encrypted));
 
-        $mixed = new Encrypter(str_repeat('b', 16), 'aEs-128-GcM');
+        $mixed = new Encrypter(new Key(str_repeat('b', 16)), 'aEs-128-GcM');
         $this->assertSame('bar', $mixed->decrypt($encrypted));
     }
 
     public function testThatAnAeadCipherIncludesTag()
     {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $e = new Encrypter(new Key(str_repeat('b', 32)), 'AES-256-GCM');
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
@@ -81,7 +82,7 @@ class EncrypterTest extends TestCase
 
     public function testThatAnAeadTagMustBeProvidedInFullLength()
     {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $e = new Encrypter(new Key(str_repeat('b', 32)), 'AES-256-GCM');
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
@@ -95,7 +96,7 @@ class EncrypterTest extends TestCase
 
     public function testThatAnAeadTagCantBeModified()
     {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $e = new Encrypter(new Key(str_repeat('b', 32)), 'AES-256-GCM');
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
@@ -109,7 +110,7 @@ class EncrypterTest extends TestCase
 
     public function testThatANonAeadCipherIncludesMac()
     {
-        $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
+        $e = new Encrypter(new Key(str_repeat('b', 32)), 'AES-256-CBC');
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
@@ -122,7 +123,7 @@ class EncrypterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
-        new Encrypter(str_repeat('z', 32));
+        new Encrypter(new Key(str_repeat('z', 32)));
     }
 
     public function testWithBadKeyLength()
@@ -130,7 +131,7 @@ class EncrypterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
-        new Encrypter(str_repeat('a', 5));
+        new Encrypter(new Key(str_repeat('a', 5)));
     }
 
     public function testWithBadKeyLengthAlternativeCipher()
@@ -138,7 +139,7 @@ class EncrypterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
-        new Encrypter(str_repeat('a', 16), 'AES-256-GCM');
+        new Encrypter(new Key(str_repeat('a', 16)), 'AES-256-GCM');
     }
 
     public function testWithUnsupportedCipher()
@@ -146,7 +147,7 @@ class EncrypterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
-        new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
+        new Encrypter(new Key(str_repeat('c', 16)), 'AES-256-CFB8');
     }
 
     public function testExceptionThrownWhenPayloadIsInvalid()
@@ -154,7 +155,7 @@ class EncrypterTest extends TestCase
         $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('The payload is invalid.');
 
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new Encrypter(new Key(str_repeat('a', 16)));
         $payload = $e->encrypt('foo');
         $payload = str_shuffle($payload);
         $e->decrypt($payload);
@@ -165,8 +166,8 @@ class EncrypterTest extends TestCase
         $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('The MAC is invalid.');
 
-        $a = new Encrypter(str_repeat('a', 16));
-        $b = new Encrypter(str_repeat('b', 16));
+        $a = new Encrypter(new Key(str_repeat('a', 16)));
+        $b = new Encrypter(new Key(str_repeat('b', 16)));
         $b->decrypt($a->encrypt('baz'));
     }
 
@@ -175,7 +176,7 @@ class EncrypterTest extends TestCase
         $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('The payload is invalid.');
 
-        $e = new Encrypter(str_repeat('a', 16));
+        $e = new Encrypter(new Key(str_repeat('a', 16)));
         $payload = $e->encrypt('foo');
         $data = json_decode(base64_decode($payload), true);
         $data['iv'] .= $data['value'][0];

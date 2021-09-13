@@ -9,7 +9,6 @@ namespace Illuminate\Support\Facades;
  * @method static string encrypt(mixed $value, bool $serialize = true)
  * @method static string encryptString(string $value)
  * @method static string generateKey(string $cipher)
- * @method static string getKey()
  *
  * @see \Illuminate\Encryption\Encrypter
  */
