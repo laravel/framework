@@ -969,6 +969,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if ($this->isBothAsString($value, $comparedToValue)) {
+            return $value > $comparedToValue;
+        }
+
         return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
     }
 
@@ -1002,6 +1006,10 @@ trait ValidatesAttributes
 
         if (! $this->isSameType($value, $comparedToValue)) {
             return false;
+        }
+
+        if ($this->isBothAsString($value, $comparedToValue)) {
+            return $value < $comparedToValue;
         }
 
         return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
@@ -1039,6 +1047,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if ($this->isBothAsString($value, $comparedToValue)) {
+            return $value >= $comparedToValue;
+        }
+
         return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue);
     }
 
@@ -1072,6 +1084,10 @@ trait ValidatesAttributes
 
         if (! $this->isSameType($value, $comparedToValue)) {
             return false;
+        }
+
+        if ($this->isBothAsString($value, $comparedToValue)) {
+            return $value <= $comparedToValue;
         }
 
         return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue);
@@ -2049,6 +2065,18 @@ trait ValidatesAttributes
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
         }
+    }
+
+    /**
+     * Check if the parameters are of the strings
+     *
+     * @param $first
+     * @param $second
+     * @return bool
+     */
+    protected function isBothAsString($first, $second): bool
+    {
+        return is_string($first) === is_string($second);
     }
 
     /**
