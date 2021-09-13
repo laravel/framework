@@ -234,6 +234,10 @@ class MailManager implements FactoryContract
 
         $config = Arr::except($config, ['transport']);
 
+        if (! isset($config['session_token']) && isset($config['token'])) {
+            $config['session_token'] = $config['token'];
+        }
+
         $factory = new SesTransportFactory();
 
         return $factory->create(new Dsn(
