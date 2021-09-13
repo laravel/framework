@@ -38,8 +38,7 @@ trait ForwardsCalls
     }
 
     /**
-     * Forward a method call to the given object, returning $this if
-     * the forwarded call returned itself (was fluent).
+     * Forward a method call to the given object, returning $this if the forwarded call returned itself.
      *
      * @param  mixed  $object
      * @param  string  $method
