@@ -250,7 +250,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function send($view, array $data = [], $callback = null)
     {
         if ($view instanceof MailableContract) {
-            return $this->sendMailable($view);
+            return new SentMessage($this->sendMailable($view));
         }
 
         // First we need to parse the view, which could either be a string or an array
