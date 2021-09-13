@@ -167,7 +167,7 @@ class Mailable implements MailableContract, Renderable
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
-     * @return \Symfony\Component\Mailer\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send($mailer)
     {

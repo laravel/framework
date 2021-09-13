@@ -188,7 +188,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $html
      * @param  mixed  $callback
-     * @return \Symfony\Component\Mailer\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function html($html, $callback)
     {
@@ -200,7 +200,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return \Symfony\Component\Mailer\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function raw($text, $callback)
     {
@@ -213,7 +213,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string  $view
      * @param  array  $data
      * @param  mixed  $callback
-     * @return \Symfony\Component\Mailer\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function plain($view, array $data, $callback)
     {
@@ -245,12 +245,14 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
-     * @return \Symfony\Component\Mailer\SentMessage|null
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send($view, array $data = [], $callback = null)
     {
         if ($view instanceof MailableContract) {
-            return new SentMessage($this->sendMailable($view));
+            $sentMessage = $this->sendMailable($view);
+
+            return $sentMessage === null ? null : new SentMessage($sentMessage);
         }
 
         // First we need to parse the view, which could either be a string or an array
@@ -286,7 +288,7 @@ class Mailer implements MailerContract, MailQueueContract
 
             $this->dispatchSentEvent($message, $data);
 
-            return $sentMessage;
+            return $sentMessage === null ? null : new SentMessage($sentMessage);
         }
     }
 
