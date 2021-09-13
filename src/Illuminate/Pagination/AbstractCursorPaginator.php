@@ -653,7 +653,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardDecoratedCallTo($this->getCollection(), $method, $parameters);
+        return $this->forwardCallTo($this->getCollection(), $method, $parameters);
     }
 
     /**
