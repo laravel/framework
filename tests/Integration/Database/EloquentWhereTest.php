@@ -95,6 +95,34 @@ class EloquentWhereTest extends DatabaseTestCase
         );
     }
 
+    public function testLastWhere()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
+        $firstUser = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $secondUser */
+        $secondUser = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address',
+        ]);
+
+        $this->assertTrue($secondUser->is(UserWhereTest::lastWhere('name', '=', $secondUser->name)));
+        $this->assertTrue($secondUser->is(UserWhereTest::lastWhere('name', $secondUser->name)));
+        $this->assertTrue($secondUser->is(UserWhereTest::lastWhere('address', 'test-address')));
+        $this->assertTrue($secondUser->is(UserWhereTest::where('name', $secondUser->name)->lastWhere('email', $secondUser->email)));
+        $this->assertNull(UserWhereTest::where('name', $secondUser->name)->lastWhere('email', $firstUser->email));
+        $this->assertTrue($secondUser->is(UserWhereTest::lastWhere(['name' => $secondUser->name, 'email' => $secondUser->email])));
+        $this->assertNull(UserWhereTest::lastWhere(['name' => $firstUser->name, 'email' => $secondUser->email]));
+        $this->assertTrue($firstUser->is(
+            UserWhereTest::lastWhere(['name' => 'wrong-name', 'email' => $firstUser->email], null, null, 'or'))
+        );
+    }
+
     public function testSole()
     {
         $expected = UserWhereTest::create([

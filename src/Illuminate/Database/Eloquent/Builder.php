@@ -289,6 +289,20 @@ class Builder
     }
 
     /**
+     * Add a basic where clause to the query, and return the last result.
+     *
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Eloquent\Model|static|null
+     */
+    public function lastWhere($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return $this->where($column, $operator, $value, $boolean)->latest()->first();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
