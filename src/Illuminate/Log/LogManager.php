@@ -95,7 +95,7 @@ class LogManager implements LoggerInterface
      */
     public function driver($driver = null)
     {
-        return $this->get($driver ?? $this->getDefaultDriver());
+        return $this->get($this->parseDriver($driver));
     }
 
     /**
@@ -450,7 +450,7 @@ class LogManager implements LoggerInterface
     /**
      * Get the default log driver name.
      *
-     * @return string
+     * @return string|null
      */
     public function getDefaultDriver()
     {
@@ -490,11 +490,28 @@ class LogManager implements LoggerInterface
      */
     public function forgetChannel($driver = null)
     {
-        $driver = $driver ?? $this->getDefaultDriver();
+        $driver = $this->parseDriver($driver);
 
         if (isset($this->channels[$driver])) {
             unset($this->channels[$driver]);
         }
+    }
+
+    /**
+     * Parse the driver name.
+     *
+     * @param  string|null  $driver
+     * @return string|null
+     */
+    protected function parseDriver($driver)
+    {
+        $driver = $driver ?? $this->getDefaultDriver();
+
+        if ($this->app->runningUnitTests()) {
+            $driver = $driver ?? 'null';
+        }
+
+        return $driver;
     }
 
     /**

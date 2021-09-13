@@ -172,6 +172,17 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDeleted(new ProductStub($this->data));
     }
 
+    public function testAssertModelMissingPassesWhenDoesNotFindModelResults()
+    {
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect());
+
+        $this->assertModelMissing(new ProductStub($this->data));
+    }
+
     public function testAssertDeletedFailsWhenFindsModelResults()
     {
         $this->expectException(ExpectationFailedException::class);
@@ -237,6 +248,17 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect());
 
         $this->assertSoftDeleted(new CustomProductStub($this->data));
+    }
+
+    public function testAssertExistsPassesWhenFindsResults()
+    {
+        $this->data = ['id' => 1];
+
+        $builder = $this->mockCountBuilder(1);
+
+        $builder->shouldReceive('get')->andReturn(collect($this->data));
+
+        $this->assertModelExists(new ProductStub($this->data));
     }
 
     public function testGetTableNameFromModel()

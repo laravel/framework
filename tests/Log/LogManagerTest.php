@@ -15,6 +15,7 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Logger as Monolog;
 use Orchestra\Testbench\TestCase;
 use ReflectionProperty;
+use RuntimeException;
 
 class LogManagerTest extends TestCase
 {
@@ -200,6 +201,41 @@ class LogManagerTest extends TestCase
             $this->assertInstanceOf(LineFormatter::class, $handler->getFormatter());
         } else {
             $this->assertInstanceOf(NullHandler::class, $handler);
+        }
+    }
+
+    public function testItUtilisesTheNullDriverDuringTestsWhenNullDriverUsed()
+    {
+        $config = $this->app->make('config');
+        $config->set('logging.default', null);
+        $config->set('logging.channels.null', [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ]);
+        $manager = new class($this->app) extends LogManager
+        {
+            protected function createEmergencyLogger()
+            {
+                throw new RuntimeException('Emergency logger was created.');
+            }
+        };
+
+        // In tests, this should not need to create the emergency logger...
+        $manager->info('message');
+
+        // we should also be able to forget the null channel...
+        $this->assertCount(1, $manager->getChannels());
+        $manager->forgetChannel();
+        $this->assertCount(0, $manager->getChannels());
+
+        // However in production we want it to fallback to the emergency logger...
+        $this->app['env'] = 'production';
+        try {
+            $manager->info('message');
+
+            $this->fail('Emergency logger was not created as expected.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Emergency logger was created.', $exception->getMessage());
         }
     }
 

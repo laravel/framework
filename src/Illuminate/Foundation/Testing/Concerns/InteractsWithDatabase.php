@@ -109,6 +109,36 @@ trait InteractsWithDatabase
     }
 
     /**
+     * Assert the given model exists in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
+     */
+    protected function assertModelExists($model)
+    {
+        return $this->assertDatabaseHas(
+            $model->getTable(),
+            [$model->getKeyName() => $model->getKey()],
+            $model->getConnectionName()
+        );
+    }
+
+    /**
+     * Assert the given model does not exist in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
+     */
+    protected function assertModelMissing($model)
+    {
+        return $this->assertDatabaseMissing(
+            $model->getTable(),
+            [$model->getKeyName() => $model->getKey()],
+            $model->getConnectionName()
+        );
+    }
+
+    /**
      * Determine if the argument is a soft deletable model.
      *
      * @param  mixed  $model
