@@ -2078,12 +2078,19 @@ trait ValidatesAttributes
      * @param $second
      * @return bool
      */
-    protected function isBothAsString($first, $second): bool
+    protected function isBothAsString($first, $second)
     {
         return is_string($first) && is_string($second);
     }
 
-    protected function isSameSize($first, $second) : bool
+    /**
+     * Check that two string have the same size
+     *
+     * @param $first
+     * @param $second
+     * @return bool
+     */
+    protected function isSameSize($first, $second)
     {
         return mb_strlen($first) === mb_strlen($second);
     }
