@@ -969,10 +969,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ($this->isBothAsString($value, $comparedToValue)) {
-            return $value > $comparedToValue;
-        }
-
         return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
     }
 
@@ -1006,10 +1002,6 @@ trait ValidatesAttributes
 
         if (! $this->isSameType($value, $comparedToValue)) {
             return false;
-        }
-
-        if ($this->isBothAsString($value, $comparedToValue)) {
-            return $value < $comparedToValue;
         }
 
         return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
@@ -1047,7 +1039,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ($this->isBothAsString($value, $comparedToValue)) {
+        if ($this->isBothAsString($value, $comparedToValue) && $this->isSameSize($value, $comparedToValue)) {
             return $value >= $comparedToValue;
         }
 
@@ -1086,7 +1078,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ($this->isBothAsString($value, $comparedToValue)) {
+        if ($this->isBothAsString($value, $comparedToValue) && $this->isSameSize($value, $comparedToValue)) {
             return $value <= $comparedToValue;
         }
 
@@ -2088,7 +2080,12 @@ trait ValidatesAttributes
      */
     protected function isBothAsString($first, $second): bool
     {
-        return is_string($first) === is_string($second);
+        return is_string($first) && is_string($second);
+    }
+
+    protected function isSameSize($first, $second) : bool
+    {
+        return mb_strlen($first) === mb_strlen($second);
     }
 
     /**

@@ -1745,6 +1745,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['lhs' => '1.1.2', 'rhs' => '1.1.1'], ['lhs' => 'gte:rhs']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->fails());
 
@@ -1784,6 +1787,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lte:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => '1.2.1', 'rhs' => '1.1.1'], ['lhs' => 'lte:rhs']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'lte:rhs']);
