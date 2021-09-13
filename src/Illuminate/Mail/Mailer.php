@@ -250,9 +250,7 @@ class Mailer implements MailerContract, MailQueueContract
     public function send($view, array $data = [], $callback = null)
     {
         if ($view instanceof MailableContract) {
-            $sentMessage = $this->sendMailable($view);
-
-            return $sentMessage === null ? null : new SentMessage($sentMessage);
+            return $this->sendMailable($view);
         }
 
         // First we need to parse the view, which could either be a string or an array
@@ -296,7 +294,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send the given mailable.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return mixed
+     * @return \Illuminate\Mail\SentMessage|null
      */
     protected function sendMailable(MailableContract $mailable)
     {
