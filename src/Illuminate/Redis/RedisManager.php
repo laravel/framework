@@ -7,8 +7,8 @@ use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\Connectors\PhpRedisConnector;
 use Illuminate\Redis\Connectors\PredisConnector;
-use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Arr;
+use Illuminate\Support\ConfigurationUrlParser;
 use InvalidArgumentException;
 
 /**
