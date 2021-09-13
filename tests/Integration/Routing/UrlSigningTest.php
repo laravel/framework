@@ -145,6 +145,58 @@ class UrlSigningTest extends TestCase
         $this->assertSame('valid', $this->get($url)->original);
     }
 
+    public function testExceptedParametersCanBeAddedInAnyOrder()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWhileIgnoring(['one', 'two', 'three']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'bar' => 'baz',
+        ]));
+
+        $this->assertSame('valid', $this->get($url.'&one=value&two=another-value')->original);
+        $this->assertSame('valid', $this->get($url.'&two=value&one=&three')->original);
+    }
+
+    public function testUnusualExceptedParametersWorksAsExpexted()
+    {
+        $this->withoutExceptionHandling();
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWhileIgnoring(['']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'bar' => 'baz',
+        ]));
+
+        $this->assertSame('valid', $this->get($url)->original);
+
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWhileIgnoring(['*', '[a-z]+']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'bar' => 'baz',
+        ]));
+
+        $this->assertSame('valid', $this->get($url.'&*=value&[a-z]+=value')->original);
+    }
+
+    public function testExceptedParameterCanBeAPrefixOrSuffixOfAnotherParameter()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignatureWhileIgnoring(['pre', 'fix']) ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertIsString($url = URL::signedRoute('foo', ['id' => 1,
+            'prefix' => 'value',
+            'suffix' => 'value',
+        ]));
+
+        $this->assertSame('valid', $this->get($url.'&pre=fix&fix=suff')->original);
+    }
+
     public function testSignedMiddleware()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {

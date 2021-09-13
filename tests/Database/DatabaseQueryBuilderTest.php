@@ -676,6 +676,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereBetween('id', [new Raw(1), new Raw(2)]);
         $this->assertSame('select * from "users" where "id" between 1 and 2', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $period = now()->toPeriod(now()->addDay());
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $this->assertEquals($period->toArray(), $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
+        $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
     public function testWhereBetweenColumns()
@@ -1325,6 +1336,76 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->havingBetween('id', [[1, 2], [3, 4]]);
         $this->assertSame('select * from "users" having "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+    }
+
+    public function testHavingNull()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingNull('email');
+        $this->assertSame('select * from "users" having "email" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->havingNull('email')
+            ->havingNull('phone');
+        $this->assertSame('select * from "users" having "email" is null and "phone" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->orHavingNull('email')
+            ->orHavingNull('phone');
+        $this->assertSame('select * from "users" having "email" is null or "phone" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email')->havingNull('email');
+        $this->assertSame('select * from "users" group by "email" having "email" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('email as foo_email')->from('users')->havingNull('foo_email');
+        $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is null', $builder->toSql());
+    }
+
+    public function testHavingNotNull()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->havingNotNull('email');
+        $this->assertSame('select * from "users" having "email" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->havingNotNull('email')
+            ->havingNotNull('phone');
+        $this->assertSame('select * from "users" having "email" is not null and "phone" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->orHavingNotNull('email')
+            ->orHavingNotNull('phone');
+        $this->assertSame('select * from "users" having "email" is not null or "phone" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->groupBy('email')->havingNotNull('email');
+        $this->assertSame('select * from "users" group by "email" having "email" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('email as foo_email')->from('users')->havingNotNull('foo_email');
+        $this->assertSame('select "email" as "foo_email" from "users" having "foo_email" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(['category', new Raw('count(*) as "total"')])->from('item')->where('department', '=', 'popular')->groupBy('category')->havingNotNull('total');
+        $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" is not null', $builder->toSql());
     }
 
     public function testHavingShortcut()
@@ -2799,6 +2880,29 @@ class DatabaseQueryBuilderTest extends TestCase
             'meta->tags' => ['white', 'large'],
             'group_id' => new Raw('45'),
             'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
+    public function testMySqlUpdateWrappingJsonPathArrayIndex()
+    {
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+                    ->method('update')
+                    ->with(
+                        'update `users` set `options` = json_set(`options`, \'$[1]."2fa"\', false), `meta` = json_set(`meta`, \'$."tags"[0][2]\', ?) where `active` = ?',
+                        [
+                            'large',
+                            1,
+                        ]
+                    );
+
+        $builder = new Builder($connection, $grammar, $processor);
+        $builder->from('users')->where('active', 1)->update([
+            'options->[1]->2fa' => false,
+            'meta->tags[0][2]' => 'large',
         ]);
     }
 
