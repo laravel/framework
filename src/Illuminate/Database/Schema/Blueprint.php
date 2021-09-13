@@ -188,6 +188,7 @@ class Blueprint
     protected function addImpliedCommands(Grammar $grammar)
     {
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
+            $this->reorderAddedColumns();
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
@@ -198,6 +199,40 @@ class Blueprint
         $this->addFluentIndexes();
 
         $this->addFluentCommands($grammar);
+    }
+
+    /**
+     * Move new columns that are added after other new columns.
+     *
+     * @return void
+     */
+    protected function reorderAddedColumns()
+    {
+        $columns = [];
+        $columns_by_name = [];
+
+        foreach ($this->columns as $column) {
+            $index = null;
+
+            if ($column->after) {
+                $after_column = $columns_by_name[$column->after] ?? null;
+
+                if ($after_column && ! $after_column->change) {
+                    $index = array_search($after_column, $columns, true);
+                    unset($column->after);
+                }
+            }
+
+            if ($index === null) {
+                $columns[] = $column;
+            } else {
+                array_splice($columns, $index + 1, 0, [$column]);
+            }
+
+            $columns_by_name[$column->name] = $column;
+        }
+
+        $this->columns = $columns;
     }
 
     /**
