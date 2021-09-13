@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\RouteAction;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\TestCase;
 
 class RouteActionTest extends TestCase

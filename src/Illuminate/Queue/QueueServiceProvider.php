@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Laravel\SerializableClosure\SerializableClosure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -20,6 +21,8 @@ use Illuminate\Support\ServiceProvider;
 
 class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+    use SerializesAndRestoresModelIdentifiers;
+
     /**
      * Register the service provider.
      *
@@ -27,11 +30,37 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register()
     {
+        $this->configuresSerializableClosureUses();
+
         $this->registerManager();
         $this->registerConnection();
         $this->registerWorker();
         $this->registerListener();
         $this->registerFailedJobServices();
+    }
+
+    /**
+     * Configures serializable closures uses
+     *
+     * @return void
+     */
+    protected function configuresSerializableClosureUses()
+    {
+        SerializableClosure::transformUseVariablesUsing(function ($data) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->getSerializedPropertyValue($value);
+            }
+
+            return $data;
+        });
+
+        SerializableClosure::transformUseVariablesUsing(function ($data) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->getRestoredPropertyValue($value);
+            }
+
+            return $data;
+        });
     }
 
     /**
