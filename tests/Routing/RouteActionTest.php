@@ -5,15 +5,22 @@ namespace Illuminate\Tests\Routing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\RouteAction;
 use Laravel\SerializableClosure\SerializableClosure;
+use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 use PHPUnit\Framework\TestCase;
 
 class RouteActionTest extends TestCase
 {
     public function test_it_can_detect_a_serialized_closure()
     {
-        $action = ['uses' => serialize(new SerializableClosure(function (RouteActionUser $user) {
+        $callable = function (RouteActionUser $user) {
             return $user;
-        }))];
+        };
+
+        if (\PHP_VERSION_ID < 70400) {
+            $action = ['uses' => serialize(new OpisSerializableClosure($callable))];
+        } else {
+            $action = ['uses' => serialize(new SerializableClosure($callable))];
+        }
 
         $this->assertTrue(RouteAction::containsSerializedClosure($action));
 
