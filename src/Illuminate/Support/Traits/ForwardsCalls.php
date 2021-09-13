@@ -44,7 +44,6 @@ trait ForwardsCalls
      * @param  mixed  $object
      * @param  string  $method
      * @param  array  $parameters
-     *
      * @return mixed
      *
      * @throws \BadMethodCallException
