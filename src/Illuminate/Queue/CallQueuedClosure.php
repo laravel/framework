@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Laravel\SerializableClosure\SerializableClosure;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Container\Container;

@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Aws\DynamoDb\DynamoDbClient;
-use Laravel\SerializableClosure\SerializableClosure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -18,6 +17,7 @@ use Illuminate\Queue\Failed\DynamoDbFailedJobProvider;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -40,7 +40,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Configures serializable closures uses
+     * Configures serializable closures uses.
      *
      * @return void
      */

@@ -3,8 +3,8 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 use Laravel\SerializableClosure\SerializableClosure;
+use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 
 class SerializableClosureFactory
 {
