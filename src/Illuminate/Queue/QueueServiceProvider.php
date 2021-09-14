@@ -30,7 +30,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register()
     {
-        $this->configuresSerializableClosureUses();
+        $this->configureSerializableClosureUses();
 
         $this->registerManager();
         $this->registerConnection();
@@ -40,11 +40,11 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Configures serializable closures uses.
+     * Configure serializable closures uses.
      *
      * @return void
      */
-    protected function configuresSerializableClosureUses()
+    protected function configureSerializableClosureUses()
     {
         SerializableClosure::transformUseVariablesUsing(function ($data) {
             foreach ($data as $key => $value) {
