@@ -70,9 +70,9 @@ class BoundMethod
     /**
      * Call a method that has been bound to the container.
      *
-     * @param \Illuminate\Container\Container  $container
-     * @param callable  $callback
-     * @param mixed  $default
+     * @param  \Illuminate\Container\Container  $container
+     * @param  callable  $callback
+     * @param  mixed  $default
      *
      * @return mixed
      * @throws \ReflectionException
