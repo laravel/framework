@@ -40,7 +40,7 @@ class EncryptionServiceProvider extends ServiceProvider
      *
      * @return void
      *
-     * @deprecated It will be removed in Laravel 9.
+     * @deprecated Will be removed in a future Laravel version.
      */
     protected function registerOpisSecurityKey()
     {
