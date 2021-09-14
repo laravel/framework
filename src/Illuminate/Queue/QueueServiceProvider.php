@@ -54,7 +54,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
             return $data;
         });
 
-        SerializableClosure::transformUseVariablesUsing(function ($data) {
+        SerializableClosure::resolveUseVariablesUsing(function ($data) {
             foreach ($data as $key => $value) {
                 $data[$key] = $this->getRestoredPropertyValue($value);
             }
