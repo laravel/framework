@@ -29,7 +29,7 @@ class MemcachedConnector
             foreach ($servers as $server) {
                 if (! is_int($server['port'])) {
                     throw new InvalidArgumentException('Port must be a integer.');
-                 }
+                }
                 $memcached->addServer(
                     $server['host'], $server['port'], $server['weight']
                 );
