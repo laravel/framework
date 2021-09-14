@@ -109,6 +109,23 @@ class ContainerCallTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
+    public function testBindMethodWithCallParameters()
+    {
+        $container = new Container;
+        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub, $app, $params) {
+            return $params;
+        });
+        $result = $container->call([new ContainerTestCallStub, 'unresolvable'], ['param' => 'works']);
+        $this->assertEquals(['param' => 'works'], $result);
+
+        $container = new Container;
+        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub, $app, $params) {
+            return $params;
+        });
+        $result = $container->call(ContainerTestCallStub::class.'@unresolvable', ['param' => 'works']);
+        $this->assertEquals(['param' => 'works'], $result);
+    }
+
     public function testClosureCallWithInjectedDependency()
     {
         $container = new Container;
