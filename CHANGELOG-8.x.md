@@ -3,6 +3,15 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.59.0...8.x)
 
 
+## [v8.60.0 (2021-09-08)](https://github.com/laravel/framework/compare/v8.59.0...v8.60.0)
+
+### Added
+- Added the `valueOfFail()` Eloquent builder method ([#38707](https://github.com/laravel/framework/pull/38707))
+
+### Reverted
+- Reverted ["Added the password reset URL to the toMailCallback"](https://github.com/laravel/framework/pull/38552)) ([#38711](https://github.com/laravel/framework/pull/38711))
+
+
 ## [v8.59.0 (2021-09-07)](https://github.com/laravel/framework/compare/v8.58.0...v8.59.0)
 
 ### Added
