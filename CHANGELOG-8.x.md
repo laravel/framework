@@ -1,6 +1,23 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.59.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.61.0...8.x)
+
+
+## [v8.61.0 (2021-09-13)](https://github.com/laravel/framework/compare/v8.60.0...v8.61.0)
+
+### Added
+- Added posibility compare custom date/immutable_date using date comparison ([#38720](https://github.com/laravel/framework/pull/38720))
+- Added policy option to make:model ([#38725](https://github.com/laravel/framework/pull/38725)
+- Allow tests to utilise the null logger ([#38785](https://github.com/laravel/framework/pull/38785))
+- Added deleteOrFail to Model ([#38784](https://github.com/laravel/framework/pull/38784))
+- Added assertExists testing method ([#38766](https://github.com/laravel/framework/pull/38766))
+- Added forwardDecoratedCallTo to Illuminate/Database/Eloquent/Relations/Relation ([#38800](https://github.com/laravel/framework/pull/38800))
+- Adding support for using a different Redis DB in a Sentinel setup ([#38764](https://github.com/laravel/framework/pull/38764))
+
+### Changed
+- Return on null in `Illuminate/Queue/Queue::getJobBackoff()` ([27bcf13](https://github.com/laravel/framework/commit/27bcf13ce0fb64d7677e1376bf6fde0fc08810a2))
+- Provide psr/simple-cache-implementation ([#38767](https://github.com/laravel/framework/pull/38767))
+- Use lowercase for hmac hash algorithm ([#38787](https://github.com/laravel/framework/pull/38787))
 
 
 ## [v8.60.0 (2021-09-08)](https://github.com/laravel/framework/compare/v8.59.0...v8.60.0)
