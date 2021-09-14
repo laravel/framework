@@ -17,11 +17,10 @@ class RouteSignatureParametersTest extends TestCase
             return $user;
         };
 
-        if (\PHP_VERSION_ID < 70400) {
-            $action = ['uses' => serialize(new OpisSerializableClosure($callable))];
-        } else {
-            $action = ['uses' => serialize(new SerializableClosure($callable))];
-        }
+        $action = ['uses' => serialize(\PHP_VERSION_ID < 70400
+            ? new OpisSerializableClosure($callable)
+            : new SerializableClosure($callable)
+        )];
 
         $parameters = RouteSignatureParameters::fromAction($action);
 

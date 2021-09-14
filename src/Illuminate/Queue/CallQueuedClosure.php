@@ -92,7 +92,7 @@ class CallQueuedClosure implements ShouldQueue
     public function failed($e)
     {
         foreach ($this->failureCallbacks as $callback) {
-            call_user_func($callback, $e);
+            $callback($e);
         }
     }
 

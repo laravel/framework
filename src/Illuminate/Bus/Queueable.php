@@ -244,7 +244,7 @@ trait Queueable
     public function invokeChainCatchCallbacks($e)
     {
         collect($this->chainCatchCallbacks)->each(function ($callback) use ($e) {
-            call_user_func($callback, $e);
+            $callback($e);
         });
     }
 }
