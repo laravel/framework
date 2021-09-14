@@ -339,11 +339,12 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $method
      * @param  mixed  $instance
+     * @param  array  $parameters
      * @return mixed
      */
-    public function callMethodBinding($method, $instance)
+    public function callMethodBinding($method, $instance, $parameters)
     {
-        return call_user_func($this->methodBindings[$method], $instance, $this);
+        return call_user_func($this->methodBindings[$method], $instance, $this, $parameters);
     }
 
     /**
