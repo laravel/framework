@@ -74,6 +74,7 @@ class BoundMethod
      * @param  callable  $callback
      * @param  mixed  $default
      * @return mixed
+     *
      * @throws \ReflectionException
      */
     protected static function callBoundMethod($container, $callback, $default)
