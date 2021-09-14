@@ -70,10 +70,12 @@ class BoundMethod
     /**
      * Call a method that has been bound to the container.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  callable  $callback
-     * @param  mixed  $default
+     * @param \Illuminate\Container\Container $container
+     * @param callable                        $callback
+     * @param mixed                           $default
+     *
      * @return mixed
+     * @throws \ReflectionException
      */
     protected static function callBoundMethod($container, $callback, $default)
     {
@@ -87,7 +89,13 @@ class BoundMethod
         $method = static::normalizeMethod($callback);
 
         if ($container->hasMethodBinding($method)) {
-            return $container->callMethodBinding($method, $callback[0]);
+            $reflectDefault = new ReflectionFunction($default);
+
+            return $container->callMethodBinding(
+                $method,
+                $callback[0],
+                $reflectDefault->getStaticVariables()['parameters']
+            );
         }
 
         return Util::unwrapIfClosure($default);
