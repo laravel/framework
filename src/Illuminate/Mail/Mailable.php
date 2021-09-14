@@ -167,11 +167,11 @@ class Mailable implements MailableContract, Renderable
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
-     * @return void
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send($mailer)
     {
-        $this->withLocale($this->locale, function () use ($mailer) {
+        return $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer = $mailer instanceof MailFactory
@@ -450,7 +450,7 @@ class Mailable implements MailableContract, Renderable
     protected function runCallbacks($message)
     {
         foreach ($this->callbacks as $callback) {
-            $callback($message->getSwiftMessage());
+            $callback($message->getSymfonyMessage());
         }
 
         return $this;
@@ -972,12 +972,12 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Register a callback to be called with the Swift message instance.
+     * Register a callback to be called with the Symfony message instance.
      *
      * @param  callable  $callback
      * @return $this
      */
-    public function withSwiftMessage($callback)
+    public function withSymfonyMessage($callback)
     {
         $this->callbacks[] = $callback;
 

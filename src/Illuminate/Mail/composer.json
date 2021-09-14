@@ -23,7 +23,7 @@
         "illuminate/support": "^9.0",
         "league/commonmark": "^2.0",
         "psr/log": "^1.0",
-        "swiftmailer/swiftmailer": "^6.2.7",
+        "symfony/mailer": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2"
     },
     "autoload": {
@@ -37,9 +37,10 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.189.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun mail driver (^7.2).",
-        "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
+        "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
+        "symfony/http-client": "Required to use the Symfony API mail transports (^6.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0)."
     },
     "config": {
         "sort-packages": true

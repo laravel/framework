@@ -244,7 +244,7 @@ class MailChannel
     protected function runCallbacks($mailMessage, $message)
     {
         foreach ($message->callbacks as $callback) {
-            $callback($mailMessage->getSwiftMessage());
+            $callback($mailMessage->getSymfonyMessage());
         }
 
         return $this;
