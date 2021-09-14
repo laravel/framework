@@ -73,7 +73,6 @@ class BoundMethod
      * @param  \Illuminate\Container\Container  $container
      * @param  callable  $callback
      * @param  mixed  $default
-     *
      * @return mixed
      * @throws \ReflectionException
      */
