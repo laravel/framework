@@ -19,6 +19,12 @@ class SentMessage
      */
     protected $sentMessage;
 
+    /**
+     * Create a new SentMessage instance.
+     *
+     * @param  \Symfony\Component\Mailer\SentMessage  $sentMessage
+     * @return void
+     */
     public function __construct(SymfonySentMessage $sentMessage)
     {
         $this->sentMessage = $sentMessage;
