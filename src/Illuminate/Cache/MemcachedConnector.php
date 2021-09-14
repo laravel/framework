@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Memcached;
+use InvalidArgumentException;
 
 class MemcachedConnector
 {
