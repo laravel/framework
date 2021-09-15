@@ -407,7 +407,7 @@ abstract class Relation
     /**
      * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
      *
-     * @param  array|null  $map
+     * @param  array  $map
      * @param  bool  $merge
      * @return array
      */
