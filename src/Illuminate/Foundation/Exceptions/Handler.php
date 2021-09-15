@@ -386,7 +386,7 @@ class Handler implements ExceptionHandlerContract
         } elseif ($e instanceof AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof TokenMismatchException) {
-            $e = new HttpException(419, $e->getMessage(), $e);
+            $e = new HttpException(Response::HTTP_PAGE_EXPIRED, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
             $e = new NotFoundHttpException('Bad hostname provided.', $e);
         } elseif ($e instanceof RecordsNotFoundException) {
