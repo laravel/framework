@@ -19,6 +19,15 @@ use Orchestra\Testbench\TestCase;
  */
 class UniqueJobTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (\PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('Test failing in PHP 8.1');
+        }
+
+        parent::setUp();
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testbench');

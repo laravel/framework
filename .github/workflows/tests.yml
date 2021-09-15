@@ -40,7 +40,6 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--ignore-platform-req=php"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -57,6 +56,10 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Mimic PHP 8.0
+        run: composer config platform.php 8.0.999
+        if: matrix.php > 8
+
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
         with:
@@ -70,7 +73,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
         continue-on-error: ${{ matrix.php > 8 }}
@@ -93,7 +96,6 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: '8.1'
-            flags: "--ignore-platform-req=php"
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -115,6 +117,10 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Mimic PHP 8.0
+        run: composer config platform.php 8.0.999
+        if: matrix.php > 8
+
       - name: Set Minimum Guzzle Version
         uses: nick-invision/retry@v1
         with:
@@ -128,8 +134,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+          command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        continue-on-error: ${{ matrix.php > 8 }}
         run: vendor/bin/phpunit --verbose

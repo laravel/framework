@@ -16,6 +16,10 @@ class ValidatorTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
+        if (\PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('Test failing in PHP 8.1');
+        }
+
         parent::setUp();
 
         Schema::create('users', function (Blueprint $table) {

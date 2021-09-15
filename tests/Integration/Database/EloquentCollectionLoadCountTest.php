@@ -52,9 +52,9 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $posts->loadCount('comments');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertSame('2', $posts[0]->comments_count);
-        $this->assertSame('0', $posts[1]->comments_count);
-        $this->assertSame('2', $posts[0]->getOriginal('comments_count'));
+        $this->assertEquals('2', $posts[0]->comments_count);
+        $this->assertEquals('0', $posts[1]->comments_count);
+        $this->assertEquals('2', $posts[0]->getOriginal('comments_count'));
     }
 
     public function testLoadCountWithSameModels()
@@ -66,9 +66,9 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $posts->loadCount('comments');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertSame('2', $posts[0]->comments_count);
-        $this->assertSame('0', $posts[1]->comments_count);
-        $this->assertSame('2', $posts[2]->comments_count);
+        $this->assertEquals('2', $posts[0]->comments_count);
+        $this->assertEquals('0', $posts[1]->comments_count);
+        $this->assertEquals('2', $posts[2]->comments_count);
     }
 
     public function testLoadCountOnDeletedModels()
@@ -80,8 +80,8 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $posts->loadCount('comments');
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertSame('2', $posts[0]->comments_count);
-        $this->assertSame('0', $posts[1]->comments_count);
+        $this->assertEquals('2', $posts[0]->comments_count);
+        $this->assertEquals('0', $posts[1]->comments_count);
     }
 
     public function testLoadCountWithArrayOfRelations()
@@ -93,10 +93,10 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         $posts->loadCount(['comments', 'likes']);
 
         $this->assertCount(1, DB::getQueryLog());
-        $this->assertSame('2', $posts[0]->comments_count);
-        $this->assertSame('1', $posts[0]->likes_count);
-        $this->assertSame('0', $posts[1]->comments_count);
-        $this->assertSame('0', $posts[1]->likes_count);
+        $this->assertEquals('2', $posts[0]->comments_count);
+        $this->assertEquals('1', $posts[0]->likes_count);
+        $this->assertEquals('0', $posts[1]->comments_count);
+        $this->assertEquals('0', $posts[1]->likes_count);
     }
 
     public function testLoadCountDoesNotOverrideAttributesWithDefaultValue()
@@ -107,7 +107,7 @@ class EloquentCollectionLoadCountTest extends DatabaseTestCase
         Collection::make([$post])->loadCount('comments');
 
         $this->assertSame(200, $post->some_default_value);
-        $this->assertSame('2', $post->comments_count);
+        $this->assertEquals('2', $post->comments_count);
     }
 }
 

@@ -4,6 +4,9 @@ namespace Illuminate\Queue;
 
 use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 
+/**
+ * @deprecated This class will be removed in Laravel 9.
+ */
 class SerializableClosure extends OpisSerializableClosure
 {
     use SerializesAndRestoresModelIdentifiers;
