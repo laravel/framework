@@ -20,15 +20,15 @@ class DynamoDbStoreTest extends TestCase
             $this->markTestSkipped('DynamoDB not configured.');
         }
 
+        if (\PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('Test failing in PHP 8.1');
+        }
+
         parent::setUp();
     }
 
     public function testItemsCanBeStoredAndRetrieved()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         Cache::driver('dynamodb')->put('name', 'Taylor', 10);
         $this->assertSame('Taylor', Cache::driver('dynamodb')->get('name'));
 
@@ -48,10 +48,6 @@ class DynamoDbStoreTest extends TestCase
 
     public function testItemsCanBeAtomicallyAdded()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $key = Str::random(6);
 
         $this->assertTrue(Cache::driver('dynamodb')->add($key, 'Taylor', 10));
@@ -60,10 +56,6 @@ class DynamoDbStoreTest extends TestCase
 
     public function testItemsCanBeIncrementedAndDecremented()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         Cache::driver('dynamodb')->put('counter', 0, 10);
         Cache::driver('dynamodb')->increment('counter');
         Cache::driver('dynamodb')->increment('counter', 4);
@@ -76,10 +68,6 @@ class DynamoDbStoreTest extends TestCase
 
     public function testLocksCanBeAcquired()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         Cache::driver('dynamodb')->lock('lock', 10)->get(function () {
             $this->assertFalse(Cache::driver('dynamodb')->lock('lock', 10)->get());
         });
