@@ -411,7 +411,7 @@ abstract class Relation
      * @param  bool  $merge
      * @return array
      */
-    public static function enforceMorphMap(array $map, $merge = true)
+    public static function enforceMorphMap(array $map = null, $merge = true)
     {
         static::requireMorphMap();
 
