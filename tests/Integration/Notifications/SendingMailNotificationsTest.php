@@ -68,6 +68,10 @@ class SendingMailNotificationsTest extends TestCase
 
     protected function setUp(): void
     {
+        if (\PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('Test failing in PHP 8.1');
+        }
+
         parent::setUp();
 
         Schema::create('users', function (Blueprint $table) {
@@ -79,10 +83,6 @@ class SendingMailNotificationsTest extends TestCase
 
     public function testMailIsSent()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $notification = new TestMailNotification;
         $notification->id = Str::uuid()->toString();
 
@@ -128,10 +128,6 @@ class SendingMailNotificationsTest extends TestCase
 
     public function testMailIsSentToNamedAddress()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $notification = new TestMailNotification;
         $notification->id = Str::uuid()->toString();
 
@@ -178,10 +174,6 @@ class SendingMailNotificationsTest extends TestCase
 
     public function testMailIsSentWithSubject()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $notification = new TestMailNotificationWithSubject;
         $notification->id = Str::uuid()->toString();
 
