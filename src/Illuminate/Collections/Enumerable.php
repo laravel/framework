@@ -255,7 +255,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Execute a callback over each nested chunk of items.
      *
-     * @param  callable(mixed ...$args): mixed  $callback
+     * @param  callable  $callback
      * @return static<TKey, TValue>
      */
     public function eachSpread(callable $callback);
@@ -604,10 +604,8 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Run a map over each nested chunk of items.
      *
-     * @template TMapSpreadValue
-     *
-     * @param  callable(mixed ...$args): TMapSpreadValue  $callback
-     * @return static<TKey, TMapSpreadValue>
+     * @param  callable  $callback
+     * @return static<TKey, TValue>
      */
     public function mapSpread(callable $callback);
 
