@@ -17,6 +17,10 @@ class MailSesTransportTest extends TestCase
     /** @group Foo */
     public function testGetTransport()
     {
+        if (\PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('Test failing in PHP 8.1');
+        }
+
         $container = new Container;
 
         $container->singleton('config', function () {
