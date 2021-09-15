@@ -18,6 +18,8 @@ class Response extends SymfonyResponse
         Macroable::__call as macroCall;
     }
 
+    public const HTTP_PAGE_EXPIRED = 419;
+
     /**
      * Create a new HTTP response.
      *
