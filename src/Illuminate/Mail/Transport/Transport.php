@@ -18,6 +18,8 @@ abstract class Transport implements Swift_Transport
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function isStarted()
     {
@@ -42,6 +44,8 @@ abstract class Transport implements Swift_Transport
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function ping()
     {
