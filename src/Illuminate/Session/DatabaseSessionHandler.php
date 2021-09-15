@@ -69,6 +69,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName)
@@ -78,6 +80,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function close()
@@ -87,6 +91,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return string|false
      */
     #[\ReturnTypeWillChange]
     public function read($sessionId)
@@ -122,6 +128,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function write($sessionId, $data)
@@ -257,6 +265,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function destroy($sessionId)
@@ -268,6 +278,8 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
     /**
      * {@inheritdoc}
+     *
+     * @return int|false
      */
     #[\ReturnTypeWillChange]
     public function gc($lifetime)

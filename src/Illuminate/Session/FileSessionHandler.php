@@ -47,6 +47,8 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName)
@@ -56,6 +58,8 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function close()
@@ -65,6 +69,8 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return string|false
      */
     #[\ReturnTypeWillChange]
     public function read($sessionId)
@@ -80,6 +86,8 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function write($sessionId, $data)
@@ -91,6 +99,8 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function destroy($sessionId)
@@ -102,6 +112,8 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return int|false
      */
     #[\ReturnTypeWillChange]
     public function gc($lifetime)
