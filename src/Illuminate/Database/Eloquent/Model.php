@@ -1219,6 +1219,48 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
 
         return $count;
     }
+    
+    /**
+     * Destroy the models for the given IDs within a transaction.
+     *
+     * @param  \Illuminate\Support\Collection|array|int|string  $ids
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    public static function destroyOrFail($ids)
+    {
+        if ($ids instanceof EloquentCollection) {
+            $ids = $ids->modelKeys();
+        }
+
+        if ($ids instanceof BaseCollection) {
+            $ids = $ids->all();
+        }
+
+        $ids = is_array($ids) ? $ids : func_get_args();
+
+        if (count($ids) === 0) {
+            return false;
+        }
+
+        // We will actually pull the models from the database table and call delete on
+        // each of them individually so that their events get fired properly with a
+        // correct set of attributes in case the developers wants to check these.
+        $key = ($instance = new static)->getKeyName();
+
+        if ($instance->whereIn($key, $ids)->get()->count() < 1) {
+            throw new LogicException('Call to a member function destroy() on null.');
+        }
+
+        $instance->where($key, $ids)->get()->each(function ($model) {
+            $model->getConnection()->transaction(function () use ($model) {
+                return $model->delete();
+            });
+        });
+
+        return true;
+    }
 
     /**
      * Delete the model from the database.
