@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class EventMakeCommand extends GeneratorCommand
 {
@@ -71,5 +72,34 @@ class EventMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Events';
+    }
+    
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['listener', 'l', InputOption::VALUE_NONE, 'Create the accompanying listener'],
+        ];
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        parent::handle();
+
+        if ($this->option('listener')) {
+            $event = $this->getNameInput();
+            $this->callSilent('make:listener', array_filter(
+                ['name' => $event . 'Listener', '--event' => $event]
+            ));
+        }
     }
 }
