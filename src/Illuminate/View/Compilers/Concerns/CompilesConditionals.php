@@ -147,6 +147,27 @@ trait CompilesConditionals
     {
         return "<?php if (empty(trim(\$__env->yieldContent{$expression}))): ?>";
     }
+    
+    /**
+     * Compile the has-session statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHasSession($name)
+    {
+        return "<?php if (session()->has{$name}): ?>";
+    }
+
+    /**
+     * Compile the end-session statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndHasSession()
+    {
+        return '<?php endif; ?>';
+    }
 
     /**
      * Compile the if statements into valid PHP.
