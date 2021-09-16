@@ -18,10 +18,15 @@ class MemcachedConnector
     public function connect(array $servers, $connectionId = null, array $options = [], array $credentials = [])
     {
         $memcached = $this->getMemcached(
-            $connectionId, $credentials, $options
+            $connectionId, $credentials
         );
 
         if (! $memcached->getServerList()) {
+            // Don't call setOptions before calling getServerList.
+            // setOptions may quit persisitent-connection.
+            if (count($options)) {
+                $memcached->setOptions($options);
+            }
             // For each server in the array, we'll just extract the configuration and add
             // the server to the Memcached connection. Once we have added all of these
             // servers we'll verify the connection is successful and return it back.
@@ -40,19 +45,14 @@ class MemcachedConnector
      *
      * @param  string|null  $connectionId
      * @param  array  $credentials
-     * @param  array  $options
      * @return \Memcached
      */
-    protected function getMemcached($connectionId, array $credentials, array $options)
+    protected function getMemcached($connectionId, array $credentials)
     {
         $memcached = $this->createMemcachedInstance($connectionId);
 
         if (count($credentials) === 2) {
             $this->setCredentials($memcached, $credentials);
-        }
-
-        if (count($options)) {
-            $memcached->setOptions($options);
         }
 
         return $memcached;
