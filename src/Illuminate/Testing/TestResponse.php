@@ -579,6 +579,28 @@ EOF;
     }
 
     /**
+     * Assert that the given HTML string or array of HTML strings are contained within the response text.
+     *
+     * @param  string|array  $value
+     * @return $this
+     */
+    public function assertSeeHtml($value)
+    {
+        return $this->assertSee($value, false);
+    }
+
+    /**
+     * Assert that the given HTML strings are contained within the response text.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeHtmlInOrder(array $values)
+    {
+        return $this->assertSeeInOrder($values, false);
+    }
+
+    /**
      * Assert that the given string or array of strings are contained within the response text.
      *
      * @param  string|array  $value
@@ -634,6 +656,17 @@ EOF;
         }
 
         return $this;
+    }
+
+    /**
+     * Assert that the given HTML string or array of HTML strings are not contained within the response text.
+     *
+     * @param  string|array  $value
+     * @return $this
+     */
+    public function assertDontSeeHtml($value)
+    {
+        return $this->assertDontSee($value, false);
     }
 
     /**
