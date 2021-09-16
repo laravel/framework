@@ -195,6 +195,17 @@ trait ManagesLayouts
     {
         return ! $this->hasSection($name);
     }
+    
+    /**
+     * Check if the session exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function hasSession($name)
+    {
+        return array_key_exists($name, request()->session()->all());
+    }
 
     /**
      * Get the contents of a section.
