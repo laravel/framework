@@ -98,7 +98,7 @@ class EventMakeCommand extends GeneratorCommand
         if ($this->option('listener')) {
             $event = $this->getNameInput();
             $this->callSilent('make:listener', array_filter(
-                ['name' => $event . 'Listener', '--event' => $event]
+                ['name' => $event.'Listener', '--event' => $event]
             ));
         }
     }
