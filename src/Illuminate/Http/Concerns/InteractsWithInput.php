@@ -304,7 +304,7 @@ trait InteractsWithInput
      */
     public function collect($key = null)
     {
-        return collect($this->input($key, []));
+        return collect($this->input($key));
     }
 
     /**
