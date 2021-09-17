@@ -241,7 +241,6 @@ class TestResponseTest extends TestCase
         $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
     }
 
-
     public function testAssertSeeHtmlInOrder()
     {
         $response = $this->makeMockResponse([
