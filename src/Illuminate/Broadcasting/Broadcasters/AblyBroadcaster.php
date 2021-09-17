@@ -3,6 +3,7 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Ably\AblyRest;
+use Ably\Exceptions\AblyException;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -117,11 +118,19 @@ class AblyBroadcaster extends Broadcaster
      * @param  string  $event
      * @param  array  $payload
      * @return void
+     *
+     * @throws \Illuminate\Broadcasting\BroadcastException
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-        foreach ($this->formatChannels($channels) as $channel) {
-            $this->ably->channels->get($channel)->publish($event, $payload);
+        try {
+            foreach ($this->formatChannels($channels) as $channel) {
+                $this->ably->channels->get($channel)->publish($event, $payload);
+            }
+        } catch (AblyException $e) {
+            throw new BrodcastException(
+                sprintf('Ably error: %s', $e->getMessage())
+            )
         }
     }
 

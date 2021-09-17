@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
@@ -72,10 +73,18 @@ class BroadcastEvent implements ShouldQueue
 
         $payload = $this->getPayloadFromEvent($this->event);
 
-        foreach ($connections as $connection) {
-            $manager->connection($connection)->broadcast(
-                $channels, $name, $payload
-            );
+        try {
+            foreach ($connections as $connection) {
+                $manager->connection($connection)->broadcast(
+                    $channels, $name, $payload
+                );
+            }
+        } catch (BroadcastException $e) {
+            if ($manager->getApplication()['config']['broadcasting.ignore_exceptions'] ?? false) {
+                return;
+            }
+
+            throw $e;
         }
     }
 
