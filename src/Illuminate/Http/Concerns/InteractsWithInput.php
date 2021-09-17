@@ -297,6 +297,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a collection.
+     *
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return collect($this->input($key));
+    }
+
+    /**
      * Get a subset containing the provided keys with values from the input data.
      *
      * @param  array|mixed  $keys
