@@ -234,6 +234,16 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
+    public function testGettingAliasFromModelClassName()
+    {
+        Relation::morphMap(['user' => 'App\User']);
+
+        $this->assertEquals(
+            'user',
+            Relation::getMorphedAlias('App\User')
+        );
+    }
+
     public function testWithoutRelations()
     {
         $original = new EloquentNoTouchingModelStub;

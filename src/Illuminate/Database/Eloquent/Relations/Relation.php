@@ -466,6 +466,17 @@ abstract class Relation
     }
 
     /**
+     * Get the alias associated with a given Model class name.
+     *
+     * @param  string  $model
+     * @return false|int|string
+     */
+    public static function getMorphedAlias($model)
+    {
+        return array_search($model, static::$morphMap);
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
