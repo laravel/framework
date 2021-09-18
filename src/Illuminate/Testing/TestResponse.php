@@ -687,13 +687,13 @@ EOF;
     /**
      * Assert that the expected value and type exists at the given path in the response.
      *
-     * @param  string  $path
      * @param  mixed  $expect
+     * @param  string  $path
      * @return $this
      */
-    public function assertJsonPath($path, $expect)
+    public function assertJsonPath($expect, $path)
     {
-        $this->decodeResponseJson()->assertPath($path, $expect);
+        $this->decodeResponseJson()->assertPath($expect, $path);
 
         return $this;
     }

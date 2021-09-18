@@ -213,11 +213,11 @@ class AssertableJsonString implements ArrayAccess, Countable
     /**
      * Assert that the expected value and type exists at the given path in the response.
      *
-     * @param  string  $path
      * @param  mixed  $expect
+     * @param  string  $path
      * @return $this
      */
-    public function assertPath($path, $expect)
+    public function assertPath($expect, $path)
     {
         PHPUnit::assertSame($expect, $this->json($path));
 
