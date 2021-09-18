@@ -97,6 +97,13 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     protected $perPage = 15;
 
     /**
+     * Set custom foreign Key basename.
+     *
+     * @var string
+     */
+    protected $foreignKeyBaseName;
+
+    /**
      * Indicates if the model exists.
      *
      * @var bool
@@ -1939,6 +1946,9 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      */
     public function getForeignKey()
     {
+        if (isset($this->foreignKeyBaseName) && !empty($this->foreignKeyBaseName)){
+            return $this->foreignKeyBaseName.'_'.$this->getKeyName();
+        }
         return Str::snake(class_basename($this)).'_'.$this->getKeyName();
     }
 
