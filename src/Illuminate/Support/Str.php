@@ -819,6 +819,28 @@ class Str
     }
 
     /**
+     * Encodes the string to a URL-query-safe string.
+     *
+     * @param  $string
+     * @return string
+     */
+    public static function urlQuery($string)
+    {
+        return urlencode(static::lower($string));
+    }
+
+    /**
+     * Encodes the string to a URL-path-safe string.
+     *
+     * @param  $string
+     * @return string
+     */
+    public static function urlPath($string)
+    {
+        return rawurlencode(static::lower($string));
+    }
+
+    /**
      * Get the number of words a string contains.
      *
      * @param  string  $string

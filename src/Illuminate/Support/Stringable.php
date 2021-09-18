@@ -708,6 +708,26 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Encodes the string to a URL-path-safe string.
+     *
+     * @return static
+     */
+    public function urlPath()
+    {
+        return new static(Str::urlPath($this->value));
+    }
+
+    /**
+     * Encodes the string to a URL-query-safe string.
+     *
+     * @return static
+     */
+    public function urlQuery()
+    {
+        return new static(Str::urlQuery($this->value));
+    }
+
+    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback

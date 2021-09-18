@@ -91,6 +91,22 @@ class SupportStringableTest extends TestCase
         $this->assertSame(' foo', (string) $this->stringable(' foo ')->rtrim());
     }
 
+    public function testUrlPath()
+    {
+        $this->assertSame('laravel', (string) $this->stringable('Laravel')->urlPath());
+        $this->assertSame('this%20sign%20%22%3D%22%20is%20%2F%20cool%21', (string) $this->stringable('This sign "=" is / cool!')->urlPath());
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0', (string) $this->stringable('мама')->urlPath());
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0%20%D0%BC%D1%8B%D0%BB%D0%B0%20%D1%80%D0%B0%D0%BC%D1%83', (string) $this->stringable('мама мыла раму')->urlPath());
+    }
+
+    public function testUrlQuery()
+    {
+        $this->assertSame('laravel', (string) $this->stringable('Laravel')->urlQuery());
+        $this->assertSame('this+sign+%22%3D%22+is+%2F+cool%21', (string) $this->stringable('This sign "=" is / cool!')->urlQuery());
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0', (string) $this->stringable('мама')->urlQuery());
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0+%D0%BC%D1%8B%D0%BB%D0%B0+%D1%80%D0%B0%D0%BC%D1%83', (string) $this->stringable('мама мыла раму')->urlQuery());
+    }
+
     public function testCanBeLimitedByWords()
     {
         $this->assertSame('Taylor...', (string) $this->stringable('Taylor Otwell')->words(1));

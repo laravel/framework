@@ -491,6 +491,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
     }
 
+    public function testUrlPath()
+    {
+        $this->assertSame('laravel', Str::urlPath('Laravel'));
+        $this->assertSame('this%20sign%20%22%3D%22%20is%20%2F%20cool%21', Str::urlPath('This sign "=" is / cool!'));
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0', Str::urlPath('мама'));
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0%20%D0%BC%D1%8B%D0%BB%D0%B0%20%D1%80%D0%B0%D0%BC%D1%83', Str::urlPath('мама мыла раму'));
+    }
+
+    public function testUrlQuery()
+    {
+        $this->assertSame('laravel', Str::urlQuery('Laravel'));
+        $this->assertSame('this+sign+%22%3D%22+is+%2F+cool%21', Str::urlQuery('This sign "=" is / cool!'));
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0', Str::urlQuery('мама'));
+        $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0+%D0%BC%D1%8B%D0%BB%D0%B0+%D1%80%D0%B0%D0%BC%D1%83', Str::urlQuery('мама мыла раму'));
+    }
+
     public function testUuid()
     {
         if (\PHP_VERSION_ID >= 80100) {
