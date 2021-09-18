@@ -830,17 +830,6 @@ class Str
     }
 
     /**
-     * Encodes the string to a URL-path-safe string.
-     *
-     * @param  $string
-     * @return string
-     */
-    public static function urlPath($string)
-    {
-        return rawurlencode(static::lower($string));
-    }
-
-    /**
      * Get the number of words a string contains.
      *
      * @param  string  $string
