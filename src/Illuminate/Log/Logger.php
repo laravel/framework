@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Log\Events\MessageLogged;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Stringable;
 
 class Logger implements LoggerInterface
 {
@@ -53,7 +54,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function emergency($message, array $context = [])
+    public function emergency(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -65,7 +66,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function alert($message, array $context = [])
+    public function alert(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -77,7 +78,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function critical($message, array $context = [])
+    public function critical(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -89,7 +90,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function error($message, array $context = [])
+    public function error(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -101,7 +102,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function warning($message, array $context = [])
+    public function warning(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -113,7 +114,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function notice($message, array $context = [])
+    public function notice(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -125,7 +126,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function info($message, array $context = [])
+    public function info(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -137,7 +138,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function debug($message, array $context = [])
+    public function debug(string|Stringable $message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -150,7 +151,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         $this->writeLog($level, $message, $context);
     }
@@ -163,7 +164,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function write($level, $message, array $context = [])
+    public function write($level, string|Stringable $message, array $context = []): void
     {
         $this->writeLog($level, $message, $context);
     }
