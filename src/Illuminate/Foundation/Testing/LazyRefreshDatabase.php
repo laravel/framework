@@ -26,9 +26,7 @@ trait LazyRefreshDatabase
 
             RefreshDatabaseState::$lazilyRefreshed = true;
 
-            $this->usingInMemoryDatabase()
-                ? $this->refreshInMemoryDatabase()
-                : $this->refreshTestDatabase();
+            $this->standardRefreshDatabase();
         });
 
         $this->beforeApplicationDestroyed(function () {
