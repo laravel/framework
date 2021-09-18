@@ -1946,7 +1946,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      */
     public function getForeignKey()
     {
-        if (isset($this->foreignKeyBaseName) && !empty($this->foreignKeyBaseName)){
+        if (isset($this->foreignKeyBaseName) && ! empty($this->foreignKeyBaseName)) {
             return $this->foreignKeyBaseName.'_'.$this->getKeyName();
         }
         return Str::snake(class_basename($this)).'_'.$this->getKeyName();
