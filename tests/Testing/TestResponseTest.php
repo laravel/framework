@@ -778,14 +778,14 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('foo', 'foobar.foobar_foo');
         $response->assertJsonPath('bar', 'foobar.foobar_bar');
 
-        $response->assertJsonPath( 'foo', 'foobar.foobar_foo')->assertJsonPath( 'bar','foobar.foobar_bar');
+        $response->assertJsonPath('foo', 'foobar.foobar_foo')->assertJsonPath('bar','foobar.foobar_bar');
 
         $response->assertJsonPath([
             ['bar' => 'foo 0', 'foo' => 'bar 0'],
             ['bar' => 'foo 1', 'foo' => 'bar 1'],
             ['bar' => 'foo 2', 'foo' => 'bar 2'],
         ], 'bars');
-        $response->assertJsonPath(['bar' => 'foo 0', 'foo' => 'bar 0'],  'bars.0');
+        $response->assertJsonPath(['bar' => 'foo 0', 'foo' => 'bar 0'], 'bars.0');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
