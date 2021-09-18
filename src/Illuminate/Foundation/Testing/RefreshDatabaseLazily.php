@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Database\Events\QueryExecuting;
 
-trait LazyRefreshDatabase
+trait RefreshDatabaseLazily
 {
     use RefreshDatabase {
         refreshDatabase as standardRefreshDatabase;

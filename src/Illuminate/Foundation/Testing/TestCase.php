@@ -117,7 +117,7 @@ abstract class TestCase extends BaseTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
-        if (isset($uses[RefreshDatabase::class]) || isset($uses[LazyRefreshDatabase::class])) {
+        if (isset($uses[RefreshDatabase::class]) || isset($uses[RefreshDatabaseLazily::class])) {
             $this->refreshDatabase();
         }
 
