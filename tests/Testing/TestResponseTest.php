@@ -765,33 +765,33 @@ class TestResponseTest extends TestCase
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
-        $response->assertJsonPath('0.foo', 'foo 0');
+        $response->assertJsonPath('foo 0', '0.foo');
 
-        $response->assertJsonPath('0.foo', 'foo 0');
-        $response->assertJsonPath('0.bar', 'bar 0');
-        $response->assertJsonPath('0.foobar', 'foobar 0');
+        $response->assertJsonPath('foo 0', '0.foo');
+        $response->assertJsonPath('bar 0', '0.bar');
+        $response->assertJsonPath('foobar 0', '0.foobar');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
-        $response->assertJsonPath('foo', 'bar');
+        $response->assertJsonPath('bar', 'foo');
 
-        $response->assertJsonPath('foobar.foobar_foo', 'foo');
-        $response->assertJsonPath('foobar.foobar_bar', 'bar');
+        $response->assertJsonPath('foo', 'foobar.foobar_foo');
+        $response->assertJsonPath('bar', 'foobar.foobar_bar');
 
-        $response->assertJsonPath('foobar.foobar_foo', 'foo')->assertJsonPath('foobar.foobar_bar', 'bar');
+        $response->assertJsonPath( 'foo', 'foobar.foobar_foo')->assertJsonPath( 'bar','foobar.foobar_bar');
 
-        $response->assertJsonPath('bars', [
+        $response->assertJsonPath([
             ['bar' => 'foo 0', 'foo' => 'bar 0'],
             ['bar' => 'foo 1', 'foo' => 'bar 1'],
             ['bar' => 'foo 2', 'foo' => 'bar 2'],
-        ]);
-        $response->assertJsonPath('bars.0', ['bar' => 'foo 0', 'foo' => 'bar 0']);
+        ], 'bars');
+        $response->assertJsonPath(['bar' => 'foo 0', 'foo' => 'bar 0'],  'bars.0');
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
-        $response->assertJsonPath('0.id', 10);
-        $response->assertJsonPath('1.id', 20);
-        $response->assertJsonPath('2.id', 30);
+        $response->assertJsonPath(10, '0.id');
+        $response->assertJsonPath(20, '1.id');
+        $response->assertJsonPath(30, '2.id');
     }
 
     public function testAssertJsonPathCanFail()
@@ -801,7 +801,7 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
-        $response->assertJsonPath('0.id', '10');
+        $response->assertJsonPath('10', '0.id');
     }
 
     public function testAssertJsonFragment()
