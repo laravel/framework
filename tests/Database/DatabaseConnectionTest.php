@@ -407,6 +407,18 @@ class DatabaseConnectionTest extends TestCase
         $connection->logQuery('foo', [], null);
     }
 
+    public function testAnEventIsFiredBeforeAndAfterQuerying()
+    {
+        $connection = $this->getMockConnection();
+        $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuting::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(QueryExecuted::class));
+
+        $connection->pretend(function ($connection) {
+            $connection->select('foo bar', ['baz']);
+        });
+    }
+
     public function testPretendOnlyLogsQueries()
     {
         $connection = $this->getMockConnection();
