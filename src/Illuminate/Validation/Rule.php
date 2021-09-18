@@ -9,6 +9,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -90,6 +91,17 @@ class Rule
     public static function requiredIf($callback)
     {
         return new RequiredIf($callback);
+    }
+
+    /**
+     * Get a prohibited_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\ProhibitedIf
+     */
+    public static function prohibitedIf($callback)
+    {
+        return new ProhibitedIf($callback);
     }
 
     /**
