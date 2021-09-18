@@ -121,6 +121,10 @@ abstract class TestCase extends BaseTestCase
             $this->refreshDatabase();
         }
 
+        if (isset($uses[LazyRefreshDatabase::class])) {
+            $this->refreshDatabaseLazily();
+        }
+
         if (isset($uses[DatabaseMigrations::class])) {
             $this->runDatabaseMigrations();
         }
