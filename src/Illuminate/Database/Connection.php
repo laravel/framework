@@ -8,7 +8,6 @@ use Doctrine\DBAL\Connection as DoctrineConnection;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\Events\QueryExecuting;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
