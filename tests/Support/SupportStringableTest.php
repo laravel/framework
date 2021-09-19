@@ -93,8 +93,9 @@ class SupportStringableTest extends TestCase
 
     public function testUrlQuery()
     {
-        $this->assertSame('laravel', (string) $this->stringable('Laravel')->urlQuery());
-        $this->assertSame('this+sign+%22%3D%22+is+%2F+cool%21', (string) $this->stringable('This sign "=" is / cool!')->urlQuery());
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->urlQuery());
+        $this->assertSame('Laravel', (string) $this->stringable(" Laravel \n")->urlQuery());
+        $this->assertSame('This+sign+%22%3D%22+is+%2F+cool%21', (string) $this->stringable('This sign "=" is / cool!')->urlQuery());
         $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0', (string) $this->stringable('мама')->urlQuery());
         $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0+%D0%BC%D1%8B%D0%BB%D0%B0+%D1%80%D0%B0%D0%BC%D1%83', (string) $this->stringable('мама мыла раму')->urlQuery());
     }

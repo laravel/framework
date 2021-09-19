@@ -493,8 +493,9 @@ class SupportStrTest extends TestCase
 
     public function testUrlQuery()
     {
-        $this->assertSame('laravel', Str::urlQuery('Laravel'));
-        $this->assertSame('this+sign+%22%3D%22+is+%2F+cool%21', Str::urlQuery('This sign "=" is / cool!'));
+        $this->assertSame('Laravel', Str::urlQuery('Laravel'));
+        $this->assertSame('Laravel', Str::urlQuery(" Laravel \n"));
+        $this->assertSame('This+sign+%22%3D%22+is+%2F+cool%21', Str::urlQuery('This sign "=" is / cool!'));
         $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0', Str::urlQuery('мама'));
         $this->assertSame('%D0%BC%D0%B0%D0%BC%D0%B0+%D0%BC%D1%8B%D0%BB%D0%B0+%D1%80%D0%B0%D0%BC%D1%83', Str::urlQuery('мама мыла раму'));
     }

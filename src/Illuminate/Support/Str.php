@@ -826,7 +826,7 @@ class Str
      */
     public static function urlQuery($string)
     {
-        return urlencode(static::lower($string));
+        return urlencode(trim($string));
     }
 
     /**
