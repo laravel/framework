@@ -633,6 +633,12 @@ class Builder
             }
         }
 
+        foreach ($models as $model) {
+            if ($model instanceof Model) {
+                $model->fireModelEvent('relationsRetrieved');
+            }
+        }
+
         return $models;
     }
 

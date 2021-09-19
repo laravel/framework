@@ -96,7 +96,7 @@ trait HasEvents
     {
         return array_merge(
             [
-                'retrieved', 'creating', 'created', 'updating', 'updated',
+                'relationsRetrieved', 'retrieved', 'creating', 'created', 'updating', 'updated',
                 'saving', 'saved', 'restoring', 'restored', 'replicating',
                 'deleting', 'deleted', 'forceDeleted',
             ],
@@ -225,6 +225,17 @@ trait HasEvents
         }
 
         return $result;
+    }
+
+    /**
+     * Register a relationsRetrieved model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function relationsRetrieved($callback)
+    {
+        static::registerModelEvent('relationsRetrieved', $callback);
     }
 
     /**
