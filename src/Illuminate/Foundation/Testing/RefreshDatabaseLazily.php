@@ -2,8 +2,6 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Database\Events\QueryExecuting;
-
 trait RefreshDatabaseLazily
 {
     use RefreshDatabase {

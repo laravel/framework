@@ -411,7 +411,7 @@ class DatabaseConnectionTest extends TestCase
         $this->expectExceptionMessage('The callback was fired');
 
         $connection = $this->getMockConnection();
-        $connection->beforeExecuting(function() {
+        $connection->beforeExecuting(function () {
             throw new Exception('The callback was fired');
         });
         $connection->select('foo bar', ['baz']);
