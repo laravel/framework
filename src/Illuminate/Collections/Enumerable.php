@@ -535,6 +535,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function implode($value, $glue = null);
 
     /**
+     * Explode collection's values base on the separators.
+     *
+     * @param  string|array<string>  $separators
+     * @return static<int, string>
+     */
+    public function explode($separators);
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items

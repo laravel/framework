@@ -525,6 +525,29 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Explode collection's values base on the separators.
+     *
+     * @param  string|array<string>  $separators
+     * @return static<int, string>
+     */
+    public function explode($separators)
+    {
+        return new static(function () use ($separators) {
+            $separators = array_values(array_filter(is_array($separators) ? $separators : [$separators]));
+
+            foreach ($this as $item) {
+                if (isset($separators[0])) {
+                    foreach (explode($separators[0], str_replace($separators, $separators[0], $item)) as $subItem) {
+                        yield $subItem;
+                    }
+                } else {
+                    yield $item;
+                }
+            }
+        });
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  mixed  $items

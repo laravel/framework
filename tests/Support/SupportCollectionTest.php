@@ -2105,6 +2105,28 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testExplode($collection)
+    {
+        $data = new $collection('taylor,foo');
+        $this->assertSame(['taylor,foo'], $data->explode('')->all());
+        $this->assertSame(['taylor', 'foo'], $data->explode(',')->all());
+        $this->assertSame(['taylor', 'foo'], $data->explode(['', ','])->all());
+
+        $data = new $collection('taylor,foo;dayle,bar');
+        $this->assertSame(['taylor', 'foo', 'dayle', 'bar'], $data->explode([',', ';'])->all());
+        $this->assertSame(['taylor', 'foo', 'dayle', 'bar'], $data->explode(',')->explode(';')->all());
+
+        $data = new $collection(['taylor:foo', 'dayle|bar']);
+        $this->assertSame(['taylor', 'foo', 'dayle', 'bar'], $data->explode([':', '|'])->all());
+        $this->assertSame(['taylor', 'foo', 'dayle', 'bar'], $data->explode(':')->explode('|')->all());
+
+        $data = new $collection('taylor[a]foo[b][c]dayle[d]bar');
+        $this->assertSame(['taylor', 'foo', '', 'dayle', 'bar'], $data->explode(['[a]', '[b]', '[c]', '[d]'])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testTake($collection)
     {
         $data = new $collection(['taylor', 'dayle', 'shawn']);
