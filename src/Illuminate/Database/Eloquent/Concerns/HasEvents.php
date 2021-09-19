@@ -166,7 +166,7 @@ trait HasEvents
      * @param  bool  $halt
      * @return mixed
      */
-    protected function fireModelEvent($event, $halt = true)
+    public function fireModelEvent($event, $halt = true)
     {
         if (! isset(static::$dispatcher)) {
             return true;
