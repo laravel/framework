@@ -303,7 +303,7 @@ class Handler implements ExceptionHandlerContract
         try {
             return array_filter([
                 'userId' => Auth::id(),
-                // 'email' => optional(Auth::user())->email,
+                // 'email' => Auth::user()?->email,
             ]);
         } catch (Throwable $e) {
             return [];
