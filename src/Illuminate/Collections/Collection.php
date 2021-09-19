@@ -520,6 +520,25 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Explode collection's values base on the separators.
+     *
+     * @param  string|array<string>  $separators
+     * @return static
+     */
+    public function explode($separators)
+    {
+        $separators = array_values(array_filter(is_array($separators) ? $separators : [$separators]));
+
+        if (isset($separators[0])) {
+            return $this->reduce(function ($result, $item) use ($separators) {
+                return $result->push(...explode($separators[0], str_replace($separators, $separators[0], $item)));
+            }, new static());
+        }
+
+        return new static($this->all());
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  mixed  $items

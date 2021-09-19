@@ -500,6 +500,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function implode($value, $glue = null);
 
     /**
+     * Explode collection's values base on the separators.
+     *
+     * @param  string|array<string>  $separators
+     * @return static
+     */
+    public function explode($separators);
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param  mixed  $items
