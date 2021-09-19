@@ -17,9 +17,9 @@ trait RefreshDatabaseLazily
      */
     public function refreshDatabase()
     {
-        $events = $this->app->make('events');
+        $database = $this->app->make('db');
 
-        $events->listen(QueryExecuting::class, function () {
+        $database->beforeExecuting(function () {
             if (RefreshDatabaseState::$lazilyRefreshed) {
                 return;
             }
