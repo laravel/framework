@@ -72,7 +72,7 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => $stubsPath.'/middleware.stub',
         ];
 
-        if ($stubs = $this->argument('stubs')) {
+        if ($this->hasArgument('stubs')) {
             $stubs = explode(',', $this->argument('stubs'));
 
             $files = array_filter($files, function ($file) use ($stubs) {
