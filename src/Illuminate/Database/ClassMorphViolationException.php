@@ -7,7 +7,7 @@ use RuntimeException;
 class ClassMorphViolationException extends RuntimeException
 {
     /**
-     * The name of the affected Eloquent model.
+     * The class name of the affected Eloquent model.
      *
      * @var string
      */
@@ -16,12 +16,10 @@ class ClassMorphViolationException extends RuntimeException
     /**
      * Create a new exception instance.
      *
-     * @param  object  $model
+     * @param  string  $class
      */
-    public function __construct($model)
+    public function __construct($class)
     {
-        $class = get_class($model);
-
         parent::__construct("No morph map defined for model [{$class}].");
 
         $this->model = $class;

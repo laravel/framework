@@ -724,7 +724,7 @@ trait HasRelationships
      *
      * @return string
      */
-    public function getMorphClass()
+    public static function getMorphClass()
     {
         $morphMap = Relation::morphMap();
 
@@ -733,7 +733,7 @@ trait HasRelationships
         }
 
         if (Relation::requiresMorphMap()) {
-            throw new ClassMorphViolationException($this);
+            throw new ClassMorphViolationException(static::class);
         }
 
         return static::class;
@@ -873,3 +873,4 @@ trait HasRelationships
         return $this;
     }
 }
+v
