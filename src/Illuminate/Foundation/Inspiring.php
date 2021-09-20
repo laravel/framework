@@ -25,7 +25,7 @@ class Inspiring
             'Be present above all else. - Naval Ravikant',
             'Happiness is not something readymade. It comes from your own actions. - Dalai Lama',
             'He who is contented is rich. - Laozi',
-            'I begin to speak only when I am certain what I will say is not better left unsaid - Cato the Younger',
+            'I begin to speak only when I am certain what I will say is not better left unsaid. - Cato the Younger',
             'If you do not have a consistent goal in life, you can not live it in a consistent way. - Marcus Aurelius',
             'It is not the man who has too little, but the man who craves more, that is poor. - Seneca',
             'It is quality rather than quantity that matters. - Lucius Annaeus Seneca',
