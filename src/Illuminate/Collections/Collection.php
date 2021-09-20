@@ -539,16 +539,19 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Explode collection's values base on the separators.
      *
-     * @param  string|array<string>  $separators
+     * @param  string|array<string>  $value
+     * @param  string|array<string>  $glue
      * @return static<int, string>
      */
-    public function explode($separators)
+    public function explode($value, $glue = null)
     {
-        $separators = array_values(array_filter(is_array($separators) ? $separators : [$separators]));
+        $separators = array_values(array_filter(is_array($separators = $glue ?? $value) ? $separators : [$separators]));
 
         if (isset($separators[0])) {
-            return $this->reduce(function ($result, $item) use ($separators) {
-                return $result->push(...explode($separators[0], str_replace($separators, $separators[0], $item)));
+            return $this->reduce(function ($result, $item) use ($value, $glue, $separators) {
+                $target = is_null($glue) ? $item : Arr::get($item, $value);
+
+                return $result->push(...explode($separators[0], str_replace($separators, $separators[0], $target)));
             }, new static());
         }
 

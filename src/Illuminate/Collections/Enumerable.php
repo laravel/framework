@@ -537,10 +537,11 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Explode collection's values base on the separators.
      *
-     * @param  string|array<string>  $separators
+     * @param  string|array<string>  $value
+     * @param  string|array<string>  $glue
      * @return static<int, string>
      */
-    public function explode($separators);
+    public function explode($value, $glue = null);
 
     /**
      * Intersect the collection with the given items.

@@ -527,18 +527,20 @@ class LazyCollection implements Enumerable
     /**
      * Explode collection's values base on the separators.
      *
-     * @param  string|array<string>  $separators
+     * @param  string|array<string>  $value
+     * @param  string|array<string>  $glue
      * @return static<int, string>
      */
-    public function explode($separators)
+    public function explode($value, $glue = null)
     {
-        return new static(function () use ($separators) {
-            $separators = array_values(array_filter(is_array($separators) ? $separators : [$separators]));
+        return new static(function () use ($value, $glue) {
+            $separators = array_values(array_filter(is_array($separators = $glue ?? $value) ? $separators : [$separators]));
 
             foreach ($this as $item) {
                 if (isset($separators[0])) {
-                    foreach (explode($separators[0], str_replace($separators, $separators[0], $item)) as $subItem) {
-                        yield $subItem;
+                    $target = is_null($glue) ? $item : Arr::get($item, $value);
+                    foreach (explode($separators[0], str_replace($separators, $separators[0], $target)) as $subString) {
+                        yield $subString;
                     }
                 } else {
                     yield $item;

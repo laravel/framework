@@ -2122,6 +2122,12 @@ class SupportCollectionTest extends TestCase
 
         $data = new $collection('taylor[a]foo[b][c]dayle[d]bar');
         $this->assertSame(['taylor', 'foo', '', 'dayle', 'bar'], $data->explode(['[a]', '[b]', '[c]', '[d]'])->all());
+
+        $data = new $collection([['names' => 'taylor,foo'], ['names' => 'dayle,bar']]);
+        $this->assertSame(['taylor', 'foo', 'dayle', 'bar'], $data->explode('names', ',')->all());
+
+        $data = new $collection([['person' => ['names' => 'taylor,foo']], ['person' => ['names' => 'dayle;bar']]]);
+        $this->assertSame(['taylor', 'foo', 'dayle', 'bar'], $data->explode('person.names', [',', ';'])->all());
     }
 
     /**
