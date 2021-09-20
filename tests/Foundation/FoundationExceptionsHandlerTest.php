@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\RedirectResponse;
@@ -284,6 +285,68 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('error');
 
         $this->handler->report(new RecordsNotFoundException);
+    }
+
+    public function testItReturnsSpecificErrorViewIfExists()
+    {
+        $viewFactory = m::mock(stdClass::class);
+        $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
+
+        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
+            return $viewFactory;
+        });
+
+        $handler = new class($this->container) extends Handler
+        {
+            public function getErrorView($e)
+            {
+                return $this->getHttpExceptionView($e);
+            }
+        };
+
+        $this->assertSame('errors::502', $handler->getErrorView(new HttpException(502)));
+    }
+
+    public function testItReturnsFallbackErrorViewIfExists()
+    {
+        $viewFactory = m::mock(stdClass::class);
+        $viewFactory->shouldReceive('exists')->once()->with('errors::502')->andReturn(false);
+        $viewFactory->shouldReceive('exists')->once()->with('errors::5xx')->andReturn(true);
+
+        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
+            return $viewFactory;
+        });
+
+        $handler = new class($this->container) extends Handler
+        {
+            public function getErrorView($e)
+            {
+                return $this->getHttpExceptionView($e);
+            }
+        };
+
+        $this->assertSame('errors::5xx', $handler->getErrorView(new HttpException(502)));
+    }
+
+    public function testItReturnsNullIfNoErrorViewExists()
+    {
+        $viewFactory = m::mock(stdClass::class);
+        $viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(false);
+        $viewFactory->shouldReceive('exists')->once()->with('errors::4xx')->andReturn(false);
+
+        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
+            return $viewFactory;
+        });
+
+        $handler = new class($this->container) extends Handler
+        {
+            public function getErrorView($e)
+            {
+                return $this->getHttpExceptionView($e);
+            }
+        };
+
+        $this->assertNull($handler->getErrorView(new HttpException(404)));
     }
 }
 
