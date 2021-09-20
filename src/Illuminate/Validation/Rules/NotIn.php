@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-class NotIn implements RulesInterface
+class NotIn implements RuleToStringInterface
 {
     /**
      * The name of the rule.

@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use InvalidArgumentException;
 
-class RequiredIf implements RulesInterface
+class RequiredIf implements RuleToStringInterface
 {
     /**
      * The condition that validates the attribute.

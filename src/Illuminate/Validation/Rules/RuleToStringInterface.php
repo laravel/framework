@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-interface RulesInterface
+interface RuleToStringInterface
 {
     /**
      * Convert the rule to a validation string.
