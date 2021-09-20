@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 
 class StubPublishCommand extends Command
 {
@@ -12,14 +13,15 @@ class StubPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'stub:publish {--force : Overwrite any existing files}';
+    protected $signature = 'stub:publish {stubs? : The stubs to publish}
+                            {--force : Overwrite any existing files}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Publish all stubs that are available for customization';
+    protected $description = 'Publish stubs that are available for customization';
 
     /**
      * Execute the console command.
@@ -69,6 +71,14 @@ class StubPublishCommand extends Command
             realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $stubsPath.'/controller.stub',
             realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => $stubsPath.'/middleware.stub',
         ];
+
+        if ($stubs = $this->argument('stubs')) {
+            $stubs = explode(',', $this->argument('stubs'));
+
+            $files = array_filter($files, function ($file) use ($stubs) {
+                return Str::contains(Str::afterLast($file, '/'), $stubs);
+            });
+        }
 
         foreach ($files as $from => $to) {
             if (! file_exists($to) || $this->option('force')) {
