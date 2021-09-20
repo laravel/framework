@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Support\Traits\Conditionable;
 
-class Dimensions
+class Dimensions implements RulesInterface
 {
     use Conditionable;
 

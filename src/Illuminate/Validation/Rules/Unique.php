@@ -5,7 +5,7 @@ namespace Illuminate\Validation\Rules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Conditionable;
 
-class Unique
+class Unique implements RulesInterface
 {
     use Conditionable, DatabaseRule;
 

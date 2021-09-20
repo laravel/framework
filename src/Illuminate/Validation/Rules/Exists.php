@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Support\Traits\Conditionable;
 
-class Exists
+class Exists implements RulesInterface
 {
     use Conditionable, DatabaseRule;
 

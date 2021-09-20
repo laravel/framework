@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-class In
+class In implements RulesInterface
 {
     /**
      * The name of the rule.
