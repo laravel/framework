@@ -296,7 +296,8 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $viewFactory;
         });
 
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             public function getErrorView($e)
             {
                 return $this->getHttpExceptionView($e);
@@ -316,7 +317,8 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $viewFactory;
         });
 
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             public function getErrorView($e)
             {
                 return $this->getHttpExceptionView($e);
@@ -336,7 +338,8 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $viewFactory;
         });
 
-        $handler = new class($this->container) extends Handler {
+        $handler = new class($this->container) extends Handler
+        {
             public function getErrorView($e)
             {
                 return $this->getHttpExceptionView($e);
