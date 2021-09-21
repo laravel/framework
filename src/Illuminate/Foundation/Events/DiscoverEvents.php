@@ -91,10 +91,10 @@ class DiscoverEvents
         $composer = json_decode(file_get_contents(app()->basePath() . \DIRECTORY_SEPARATOR . 'composer.json'), true);
         $psr4 = data_get($composer, 'autoload.psr-4');
 
-        return str_replace(
+        return ucfirst(str_replace(
             array_merge([DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'], str_replace('/', \DIRECTORY_SEPARATOR, array_values($psr4))),
             array_merge(['\\', app()->getNamespace()], array_keys($psr4)),
-            ucfirst(Str::replaceLast('.php', '', $class))
-        );
+            Str::replaceLast('.php', '', $class)
+        ));
     }
 }
