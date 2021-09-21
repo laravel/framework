@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing;
 
-trait RefreshDatabaseLazily
+trait LazilyRefreshDatabase
 {
     use RefreshDatabase {
-        refreshDatabase as standardRefreshDatabase;
+        refreshDatabase as baseRefreshDatabase;
     }
 
     /**
@@ -24,7 +24,7 @@ trait RefreshDatabaseLazily
 
             RefreshDatabaseState::$lazilyRefreshed = true;
 
-            $this->standardRefreshDatabase();
+            $this->baseRefreshDatabase();
         });
 
         $this->beforeApplicationDestroyed(function () {

@@ -12,7 +12,7 @@ class RefreshDatabaseState
     public static $migrated = false;
 
     /**
-     * Indicates if a lazy hook has been fired.
+     * Indicates if a lazy refresh hook has been invoked.
      *
      * @var bool
      */
