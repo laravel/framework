@@ -55,6 +55,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected static $bootstrappers = [];
 
     /**
+     * Indicates whether the console application has booted.
+     *
+     * @var bool
+     */
+    protected $booted = false;
+
+    /**
      * The lazy command loader.
      *
      * @var \Symfony\Component\Console\CommandLoader\CommandLoaderInterface
@@ -81,8 +88,6 @@ class Application extends SymfonyApplication implements ApplicationContract
         $this->events->dispatch(new ArtisanStarting($this));
 
         $this->setContainerCommandLoader();
-
-        $this->bootstrap();
     }
 
     /**
@@ -154,13 +159,21 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Bootstrap the console application.
      *
-     * @return void
+     * @return $this
      */
-    protected function bootstrap()
+    public function bootstrap()
     {
+        if ($this->booted) {
+            return $this;
+        }
+
         foreach (static::$bootstrappers as $bootstrapper) {
             $bootstrapper($this);
         }
+
+        $this->booted = true;
+
+        return $this;
     }
 
     /**
@@ -297,7 +310,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add deferred commands list.
      *
-     * @param array $commands
+     * @param array $commands   Must be keyed by command name e.g. ['migrate' => MigrateCommand::class]
      * @return $this
      */
     public function addDeferredCommands(array $commands)

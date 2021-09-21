@@ -48,6 +48,13 @@ class Kernel implements KernelContract
     protected $commands = [];
 
     /**
+     * The deferred command list.
+     *
+     * @var array|null
+     */
+    protected $deferredCommands;
+
+    /**
      * Indicates if the Closure commands have been loaded.
      *
      * @var bool
@@ -232,6 +239,16 @@ class Kernel implements KernelContract
     {
         return base_path('bootstrap/cache/commands.php');
     }
+    
+    /**
+     * Load the cached commands, used for deferring/lazy resolving of commands.
+     *
+     * @return void
+     */
+    protected function loadCachedCommands()
+    {
+        $this->deferredCommands = $this->getCachedCommands();
+    }
 
     /**
      * Register all of the commands in the given directory.
@@ -347,7 +364,9 @@ class Kernel implements KernelContract
         $this->app->loadDeferredProviders();
 
         if (! $this->commandsLoaded) {
-            $this->commands();
+            if (! $this->loadCachedCommands()) {
+                $this->commands();
+            }
 
             $this->commandsLoaded = true;
         }
@@ -362,8 +381,9 @@ class Kernel implements KernelContract
     {
         if (is_null($this->artisan)) {
             $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
-                                    ->addDeferredCommands($this->getCachedCommands())
-                                    ->resolveCommands($this->commands);
+                                    ->addDeferredCommands($this->deferredCommands ?? [])
+                                    ->resolveCommands($this->commands)
+                                    ->bootstrap();
         }
 
         return $this->artisan;
