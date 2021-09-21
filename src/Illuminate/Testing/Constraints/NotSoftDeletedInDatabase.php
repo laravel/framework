@@ -45,10 +45,8 @@ class NotSoftDeletedInDatabase extends Constraint
      */
     public function __construct(Connection $database, array $data, string $deletedAtColumn)
     {
-        $this->data = $data;
-
         $this->database = $database;
-
+        $this->data = $data;
         $this->deletedAtColumn = $deletedAtColumn;
     }
 
@@ -75,7 +73,7 @@ class NotSoftDeletedInDatabase extends Constraint
     public function failureDescription($table): string
     {
         return sprintf(
-            "any not soft deleted row in the table [%s] matches the attributes %s.\n\n%s",
+            "any existing row in the table [%s] matches the attributes %s.\n\n%s",
             $table, $this->toString(), $this->getAdditionalInfo($table)
         );
     }

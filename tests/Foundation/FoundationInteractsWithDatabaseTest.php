@@ -264,6 +264,18 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertNotSoftDeleted(ProductStub::class, $this->data);
     }
 
+    public function testAssertNotSoftDeletedOnlyFindsMatchingModels()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that any existing row');
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('get')->andReturn(collect(), collect(1));
+
+        $this->assertNotSoftDeleted(ProductStub::class, $this->data);
+    }
+
     public function testAssertNotSoftDeletedInDatabaseDoesNotFindResults()
     {
         $this->expectException(ExpectationFailedException::class);
