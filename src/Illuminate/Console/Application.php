@@ -295,6 +295,19 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
+     * Add deferred commands list.
+     *
+     * @param array $commands
+     * @return $this
+     */
+    public function addDeferredCommands(array $commands)
+    {
+        $this->commandLoader->merge($commands);
+
+        return $this;
+    }
+
+    /**
      * Set the container command loader for lazy resolution.
      *
      * @param \Symfony\Component\Console\CommandLoader\CommandLoaderInterface|null
@@ -309,6 +322,16 @@ class Application extends SymfonyApplication implements ApplicationContract
         $this->setCommandLoader($this->commandLoader = $loader);
 
         return $this;
+    }
+
+    /**
+     * Get the deferred console commander loader.
+     *
+     * @return \Symfony\Component\Console\CommandLoader\CommandLoaderInterface
+     */
+    public function getCommandLoader()
+    {
+        return $this->commandLoader;
     }
 
     /**

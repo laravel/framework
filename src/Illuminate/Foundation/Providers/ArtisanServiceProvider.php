@@ -22,6 +22,7 @@ use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
+use Illuminate\Foundation\Console\CommandCacheCommand;
 use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
@@ -95,6 +96,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ClearCompiled' => ClearCompiledCommand::class,
         'ClearResets' => ClearResetsCommand::class,
         'ConfigCache' => ConfigCacheCommand::class,
+        'CommandCache' => CommandCacheCommand::class,
         'ConfigClear' => ConfigClearCommand::class,
         'Db' => DbCommand::class,
         'DbPrune' => PruneCommand::class,
@@ -317,6 +319,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ConfigClearCommand::class, function ($app) {
             return new ConfigClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCommandCacheCommand()
+    {
+        $this->app->singleton(CommandCacheCommand::class, function ($app) {
+            return new CommandCacheCommand;
         });
     }
 

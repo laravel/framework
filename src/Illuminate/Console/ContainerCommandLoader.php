@@ -36,13 +36,28 @@ class ContainerCommandLoader implements CommandLoaderInterface
     }
 
     /**
-     * Determine if the command is accepted by the command loader.
+     * Merge the command map list
+     * 
+     * @param array $commandMap
+     * @return void
+     */
+    public function merge(array $commandMap)
+    {
+        $this->commandMap = array_merge($this->commandMap, $commandMap);
+    }
+
+    /**
+     * Determine if the command is accepted by the cmand loader.
      *
      * @param string $name
      * @return bool
      */
     public function accepts(string $name): bool
     {
+        if (in_array($name, $this->commandMap)) {
+            return true;
+        }
+
         return class_exists($name) && ! is_null($name::getDefaultName());
     }
 
@@ -56,6 +71,10 @@ class ContainerCommandLoader implements CommandLoaderInterface
      */
     public function add(string $name)
     {
+        if (in_array($name, $this->commandMap)) {
+            return;
+        }
+
         if (! $this->accepts($name)) {
             throw new InvalidArgumentException(sprintf('Command "%s" was not accepted by the command loader.', $name));
         }
@@ -99,5 +118,15 @@ class ContainerCommandLoader implements CommandLoaderInterface
     public function getNames(): array
     {
         return array_keys($this->commandMap);
+    }
+
+    /**
+     * Get the full list of commands.
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->commandMap;
     }
 }

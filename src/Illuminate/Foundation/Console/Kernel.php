@@ -200,6 +200,40 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Cache the list of registered deferred/lazily loaded commands.
+     *
+     * @return void
+     */
+    public function cacheCommands()
+    {
+        $commands = $this->getArtisan()->getCommandLoader()->all();
+
+        file_put_contents($this->getCommandCachePath(), '<?php return ' . var_export($commands, true) . ';');
+    }
+
+    /**
+     * Get the list of deferred/lazily loaded commands.
+     *
+     * @return array
+     */
+    protected function getCachedCommands(): array
+    {
+        $path = $this->getCommandCachePath();
+        
+        return file_exists($path) ? require $this->getCommandCachePath() : [];
+    }
+
+    /**
+     * Get full path to the command cache file.
+     *
+     * @return string
+     */
+    protected function getCommandCachePath(): string
+    {
+        return base_path('bootstrap/cache/commands.php');
+    }
+
+    /**
      * Register all of the commands in the given directory.
      *
      * @param  array|string  $paths
@@ -328,6 +362,7 @@ class Kernel implements KernelContract
     {
         if (is_null($this->artisan)) {
             $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
+                                    ->addDeferredCommands($this->getCachedCommands())
                                     ->resolveCommands($this->commands);
         }
 
