@@ -92,8 +92,8 @@ class DiscoverEvents
         $psr4 = data_get($composer, 'autoload.psr-4');
 
         return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\', ...str_replace('/', \DIRECTORY_SEPARATOR, array_values($psr4))],
-            ['\\', app()->getNamespace(), ...array_keys($psr4)],
+            array_merge([DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'], str_replace('/', \DIRECTORY_SEPARATOR, array_values($psr4))),
+            array_merge(['\\', app()->getNamespace()], array_keys($psr4)),
             ucfirst(Str::replaceLast('.php', '', $class))
         );
     }
