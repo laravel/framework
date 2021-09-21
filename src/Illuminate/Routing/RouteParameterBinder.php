@@ -89,8 +89,18 @@ class RouteParameterBinder
 
         $parameters = array_intersect_key($matches, array_flip($parameterNames));
 
+        // Explode if there's multiple parameters
+        $parameters = array_map(function ($parameter) {
+            if (strpos($parameter, '/')) {
+                return explode('/', $parameter);
+            }
+
+            return $parameter;
+        }, $parameters);
+
         return array_filter($parameters, function ($value) {
-            return is_string($value) && strlen($value) > 0;
+            return (is_string($value) && strlen($value) > 0)
+                || is_array($value);
         });
     }
 
