@@ -1127,7 +1127,11 @@ class Validator implements ValidatorContract
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
                 if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! Str::endsWith($key, '.*')))) {
-                    $this->addRules([$ruleKey => $ruleValue]);
+                    if(is_array($rules)) {
+                        $this->addRules([$key => $ruleValue]);
+                    } else {
+                        $this->addRules([$ruleKey => $ruleValue]);
+                    }
                 }
             }
         }
