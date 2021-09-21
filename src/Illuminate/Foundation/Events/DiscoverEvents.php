@@ -88,11 +88,11 @@ class DiscoverEvents
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
         $class = trim(Str::replaceFirst($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
-        $composer = json_decode(file_get_contents(app()->basePath() . \DIRECTORY_SEPARATOR . 'composer.json'), true);
+        $composer = json_decode(file_get_contents(app()->basePath().DIRECTORY_SEPARATOR.'composer.json'), true);
         $psr4 = data_get($composer, 'autoload.psr-4');
 
         return ucfirst(str_replace(
-            array_merge([DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'], str_replace('/', \DIRECTORY_SEPARATOR, array_values($psr4))),
+            array_merge([DIRECTORY_SEPARATOR, ucfirst(basename(app()->path())).'\\'], str_replace('/', DIRECTORY_SEPARATOR, array_values($psr4))),
             array_merge(['\\', app()->getNamespace()], array_keys($psr4)),
             Str::replaceLast('.php', '', $class)
         ));
