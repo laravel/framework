@@ -1156,6 +1156,21 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Save a new model without raising any events and attach it to the parent model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array  $pivotAttributes
+     * @param  bool  $touch
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function saveQuietly(Model $model, array $pivotAttributes = [], $touch = true)
+    {
+        return Model::withoutEvents(function () use ($model, $pivotAttributes, $touch) {
+            return $this->save($model, $pivotAttributes, $touch);
+        });
+    }
+
+    /**
      * Save an array of new models and attach them to the parent model.
      *
      * @param  \Illuminate\Support\Collection|array  $models
