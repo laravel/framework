@@ -406,6 +406,17 @@ class DatabaseConnectionTest extends TestCase
         $connection->logQuery('foo', [], null);
     }
 
+    public function testBeforeExecutingHooksCanBeRegistered()
+    {
+        $this->expectExceptionMessage('The callback was fired');
+
+        $connection = $this->getMockConnection();
+        $connection->beforeExecuting(function () {
+            throw new Exception('The callback was fired');
+        });
+        $connection->select('foo bar', ['baz']);
+    }
+
     public function testPretendOnlyLogsQueries()
     {
         $connection = $this->getMockConnection();
