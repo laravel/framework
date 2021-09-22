@@ -394,6 +394,21 @@ class Arr
     }
 
     /**
+     * Determines if an array is multidimensional.
+     *
+     * @param array $array
+     * @return bool
+     */
+    public static function isMultidimensional(array $array)
+    {
+        foreach ($array as $value) {
+            return is_array($value);
+        }
+
+        return false;
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array

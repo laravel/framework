@@ -424,6 +424,12 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
+    public function testIsMultidimensional()
+    {
+        $this->assertTrue(Arr::isMultidimensional(['a' => [1 => 'b']]));
+        $this->assertFalse(Arr::isMultidimensional(['a' => 'b']));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
