@@ -396,7 +396,7 @@ class Arr
     /**
      * Determines if an array is multidimensional.
      *
-     * @param array $array
+     * @param  array  $array
      * @return bool
      */
     public static function isMultidimensional(array $array)
