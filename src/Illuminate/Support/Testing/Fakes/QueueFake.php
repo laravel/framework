@@ -242,7 +242,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function hasPushed($job)
     {
-        return isset($this->jobs[$job]) && ! empty($this->jobs[$job]);
+        return ! empty($this->jobs[$job]);
     }
 
     /**
