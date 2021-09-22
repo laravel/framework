@@ -158,9 +158,16 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('pivot')
-                    ? $this->resolveStubPath('/stubs/model.pivot.stub')
-                    : $this->resolveStubPath('/stubs/model.stub');
+
+        if ($this->option('pivot')) {
+            return $this->resolveStubPath('/stubs/model.pivot.stub');
+        }
+
+        if ($this->option('unguarded')) {
+            return $this->resolveStubPath('/stubs/model.unguarded.stub');
+        }
+
+        return $this->resolveStubPath('/stubs/model.stub');
     }
 
     /**
@@ -202,6 +209,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
             ['policy', null, InputOption::VALUE_NONE, 'Create a new policy for the model'],
             ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder for the model'],
+            ['unguarded', 'u', InputOption::VALUE_NONE, 'Indicates if the all attributes of the generated model are mass assignable'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
