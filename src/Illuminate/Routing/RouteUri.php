@@ -39,23 +39,17 @@ class RouteUri
      */
     public static function parse($uri)
     {
-        preg_match_all('/\{([\w\:]+?)\??\}/', $uri, $matches);
-
         $bindingFields = [];
 
-        foreach ($matches[0] as $match) {
-            if (strpos($match, ':') === false) {
-                continue;
+        $uri = preg_replace_callback('/{(\w+)(?::(\w+))?(\??)}/', function ($match) use (&$bindingFields) {
+            [$_, $parameter, $field, $optional] = $match;
+
+            if ('' !== $field) {
+                $bindingFields[$parameter] = $field;
             }
 
-            $segments = explode(':', trim($match, '{}?'));
-
-            $bindingFields[$segments[0]] = $segments[1];
-
-            $uri = strpos($match, '?') !== false
-                    ? str_replace($match, '{'.$segments[0].'?}', $uri)
-                    : str_replace($match, '{'.$segments[0].'}', $uri);
-        }
+            return '{'.$parameter.$optional.'}';
+        }, $uri);
 
         return new static($uri, $bindingFields);
     }
