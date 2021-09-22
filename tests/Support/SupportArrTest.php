@@ -427,6 +427,7 @@ class SupportArrTest extends TestCase
     public function testIsMultidimensional()
     {
         $this->assertTrue(Arr::isMultidimensional(['a' => [1 => 'b']]));
+        $this->assertTrue(Arr::isMultidimensional(['a', 'b' => [1 => 'b']]));
         $this->assertFalse(Arr::isMultidimensional(['a' => 'b']));
     }
 

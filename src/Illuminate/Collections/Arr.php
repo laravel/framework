@@ -402,7 +402,9 @@ class Arr
     public static function isMultidimensional(array $array)
     {
         foreach ($array as $value) {
-            return is_array($value);
+            if (is_array($value)) {
+                return true;
+            }
         }
 
         return false;
