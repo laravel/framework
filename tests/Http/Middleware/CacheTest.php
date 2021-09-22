@@ -104,4 +104,15 @@ class CacheTest extends TestCase
 
         $this->assertSame(Carbon::parse($birthdate)->timestamp, $response->getLastModified()->getTimestamp());
     }
+
+    public function testTrailingDelimiterIgnored()
+    {
+        $time = time();
+
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, "last_modified=$time;");
+
+        $this->assertSame($time, $response->getLastModified()->getTimestamp());
+    }
 }
