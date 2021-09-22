@@ -1661,10 +1661,7 @@ trait HasAttributes
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
-            $caster = $this->resolveCasterClass($key);
-
-            return optional($caster->get($this, $key, $original, $this->attributes))->toArray() ===
-                optional($caster->get($this, $key, $attribute, $this->attributes))->toArray();
+            return $this->fromJson($attribute) === $this->fromJson($original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
