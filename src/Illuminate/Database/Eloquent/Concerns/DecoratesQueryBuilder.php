@@ -32,7 +32,7 @@ trait DecoratesQueryBuilder
      */
     public function select($columns = ['*'])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -40,7 +40,7 @@ trait DecoratesQueryBuilder
      */
     public function selectSub($query, $as)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -48,7 +48,7 @@ trait DecoratesQueryBuilder
      */
     public function selectRaw($expression, array $bindings = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -56,7 +56,7 @@ trait DecoratesQueryBuilder
      */
     public function fromSub($query, $as)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -64,7 +64,7 @@ trait DecoratesQueryBuilder
      */
     public function fromRaw($expression, $bindings = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -72,7 +72,7 @@ trait DecoratesQueryBuilder
      */
     public function addSelect($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -80,7 +80,7 @@ trait DecoratesQueryBuilder
      */
     public function distinct()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -88,7 +88,7 @@ trait DecoratesQueryBuilder
      */
     public function from($table, $as = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -96,7 +96,7 @@ trait DecoratesQueryBuilder
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -104,7 +104,7 @@ trait DecoratesQueryBuilder
      */
     public function joinWhere($table, $first, $operator, $second, $type = 'inner')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -112,7 +112,7 @@ trait DecoratesQueryBuilder
      */
     public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -120,7 +120,7 @@ trait DecoratesQueryBuilder
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -128,7 +128,7 @@ trait DecoratesQueryBuilder
      */
     public function leftJoinWhere($table, $first, $operator, $second)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -136,7 +136,7 @@ trait DecoratesQueryBuilder
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -144,7 +144,7 @@ trait DecoratesQueryBuilder
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -152,7 +152,7 @@ trait DecoratesQueryBuilder
      */
     public function rightJoinWhere($table, $first, $operator, $second)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -160,7 +160,7 @@ trait DecoratesQueryBuilder
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -168,7 +168,7 @@ trait DecoratesQueryBuilder
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -176,7 +176,7 @@ trait DecoratesQueryBuilder
      */
     public function crossJoinSub($query, $as)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -184,7 +184,7 @@ trait DecoratesQueryBuilder
      */
     public function mergeWheres($wheres, $bindings)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -192,7 +192,7 @@ trait DecoratesQueryBuilder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -200,7 +200,7 @@ trait DecoratesQueryBuilder
      */
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -208,7 +208,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhere($column, $operator = null, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -216,7 +216,7 @@ trait DecoratesQueryBuilder
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -224,7 +224,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereColumn($first, $operator = null, $second = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -232,7 +232,7 @@ trait DecoratesQueryBuilder
      */
     public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -240,7 +240,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereRaw($sql, $bindings = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -248,7 +248,7 @@ trait DecoratesQueryBuilder
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -256,7 +256,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereIn($column, $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -264,7 +264,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNotIn($column, $values, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -272,7 +272,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereNotIn($column, $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -280,7 +280,7 @@ trait DecoratesQueryBuilder
      */
     public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -288,7 +288,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereIntegerInRaw($column, $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -296,7 +296,7 @@ trait DecoratesQueryBuilder
      */
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -304,7 +304,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereIntegerNotInRaw($column, $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -312,7 +312,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNull($columns, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -320,7 +320,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereNull($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -328,7 +328,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNotNull($columns, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -336,7 +336,7 @@ trait DecoratesQueryBuilder
      */
     public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -344,7 +344,7 @@ trait DecoratesQueryBuilder
      */
     public function whereBetweenColumns($column, array $values, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -352,7 +352,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereBetween($column, iterable $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -360,7 +360,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereBetweenColumns($column, array $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -368,7 +368,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNotBetween($column, iterable $values, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -376,7 +376,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNotBetweenColumns($column, array $values, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -384,7 +384,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereNotBetween($column, iterable $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -392,7 +392,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereNotBetweenColumns($column, array $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -400,7 +400,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereNotNull($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -408,7 +408,7 @@ trait DecoratesQueryBuilder
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -416,7 +416,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereDate($column, $operator, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -424,7 +424,7 @@ trait DecoratesQueryBuilder
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -432,7 +432,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereTime($column, $operator, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -440,7 +440,7 @@ trait DecoratesQueryBuilder
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -448,7 +448,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereDay($column, $operator, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -456,7 +456,7 @@ trait DecoratesQueryBuilder
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -464,7 +464,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereMonth($column, $operator, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -472,7 +472,7 @@ trait DecoratesQueryBuilder
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -480,7 +480,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereYear($column, $operator, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -488,7 +488,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -496,7 +496,7 @@ trait DecoratesQueryBuilder
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -504,7 +504,7 @@ trait DecoratesQueryBuilder
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -512,7 +512,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereExists(Closure $callback, $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -520,7 +520,7 @@ trait DecoratesQueryBuilder
      */
     public function whereNotExists(Closure $callback, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -528,7 +528,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereNotExists(Closure $callback)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -536,7 +536,7 @@ trait DecoratesQueryBuilder
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -544,7 +544,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereRowValues($columns, $operator, $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -552,7 +552,7 @@ trait DecoratesQueryBuilder
      */
     public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -560,7 +560,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereJsonContains($column, $value)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -568,7 +568,7 @@ trait DecoratesQueryBuilder
      */
     public function whereJsonDoesntContain($column, $value, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -576,7 +576,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereJsonDoesntContain($column, $value)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -584,7 +584,7 @@ trait DecoratesQueryBuilder
      */
     public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -592,7 +592,7 @@ trait DecoratesQueryBuilder
      */
     public function orWhereJsonLength($column, $operator, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -600,7 +600,7 @@ trait DecoratesQueryBuilder
      */
     public function groupBy(...$groups)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -608,7 +608,7 @@ trait DecoratesQueryBuilder
      */
     public function groupByRaw($sql, array $bindings = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -616,7 +616,7 @@ trait DecoratesQueryBuilder
      */
     public function having($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -624,7 +624,7 @@ trait DecoratesQueryBuilder
      */
     public function orHaving($column, $operator = null, $value = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -632,7 +632,7 @@ trait DecoratesQueryBuilder
      */
     public function havingNull($columns, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -640,7 +640,7 @@ trait DecoratesQueryBuilder
      */
     public function orHavingNull($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -648,7 +648,7 @@ trait DecoratesQueryBuilder
      */
     public function havingNotNull($columns, $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -656,7 +656,7 @@ trait DecoratesQueryBuilder
      */
     public function orHavingNotNull($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -664,7 +664,7 @@ trait DecoratesQueryBuilder
      */
     public function havingBetween($column, array $values, $boolean = 'and', $not = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -672,7 +672,7 @@ trait DecoratesQueryBuilder
      */
     public function havingRaw($sql, array $bindings = [], $boolean = 'and')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -680,7 +680,7 @@ trait DecoratesQueryBuilder
      */
     public function orHavingRaw($sql, array $bindings = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -688,7 +688,7 @@ trait DecoratesQueryBuilder
      */
     public function orderBy($column, $direction = 'asc')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -696,7 +696,7 @@ trait DecoratesQueryBuilder
      */
     public function orderByDesc($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -704,7 +704,7 @@ trait DecoratesQueryBuilder
      */
     public function latest($column = 'created_at')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -712,7 +712,7 @@ trait DecoratesQueryBuilder
      */
     public function oldest($column = 'created_at')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -720,7 +720,7 @@ trait DecoratesQueryBuilder
      */
     public function inRandomOrder($seed = '')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -728,7 +728,7 @@ trait DecoratesQueryBuilder
      */
     public function orderByRaw($sql, $bindings = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -736,7 +736,7 @@ trait DecoratesQueryBuilder
      */
     public function skip($value)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -744,7 +744,7 @@ trait DecoratesQueryBuilder
      */
     public function offset($value)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -752,7 +752,7 @@ trait DecoratesQueryBuilder
      */
     public function take($value)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -760,7 +760,7 @@ trait DecoratesQueryBuilder
      */
     public function limit($value)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -768,7 +768,7 @@ trait DecoratesQueryBuilder
      */
     public function forPage($page, $perPage = 15)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -776,7 +776,7 @@ trait DecoratesQueryBuilder
      */
     public function forPageBeforeId($perPage = 15, $lastId = 0, $column = 'id')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -784,7 +784,7 @@ trait DecoratesQueryBuilder
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -792,7 +792,7 @@ trait DecoratesQueryBuilder
      */
     public function reorder($column = null, $direction = 'asc')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -800,7 +800,7 @@ trait DecoratesQueryBuilder
      */
     public function union($query, $all = false)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -808,7 +808,7 @@ trait DecoratesQueryBuilder
      */
     public function unionAll($query)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -816,7 +816,7 @@ trait DecoratesQueryBuilder
      */
     public function lock($value = true)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -824,7 +824,7 @@ trait DecoratesQueryBuilder
      */
     public function lockForUpdate()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -832,7 +832,7 @@ trait DecoratesQueryBuilder
      */
     public function sharedLock()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -848,7 +848,7 @@ trait DecoratesQueryBuilder
      */
     public function find($id, $columns = ['*'])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -856,7 +856,7 @@ trait DecoratesQueryBuilder
      */
     public function value($column)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -864,7 +864,7 @@ trait DecoratesQueryBuilder
      */
     public function get($columns = ['*'])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -872,7 +872,7 @@ trait DecoratesQueryBuilder
      */
     public function cursor()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -880,7 +880,7 @@ trait DecoratesQueryBuilder
      */
     public function pluck($column, $key = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -888,7 +888,7 @@ trait DecoratesQueryBuilder
      */
     public function implode($column, $glue = '')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -976,7 +976,7 @@ trait DecoratesQueryBuilder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1024,7 +1024,7 @@ trait DecoratesQueryBuilder
      */
     public function update(array $values)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1032,7 +1032,7 @@ trait DecoratesQueryBuilder
      */
     public function updateOrInsert(array $attributes, array $values = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1040,7 +1040,7 @@ trait DecoratesQueryBuilder
      */
     public function upsert(array $values, $uniqueBy, $update = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1048,7 +1048,7 @@ trait DecoratesQueryBuilder
      */
     public function increment($column, $amount = 1, array $extra = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1056,7 +1056,7 @@ trait DecoratesQueryBuilder
      */
     public function decrement($column, $amount = 1, array $extra = [])
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1064,7 +1064,7 @@ trait DecoratesQueryBuilder
      */
     public function delete($id = null)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1072,7 +1072,7 @@ trait DecoratesQueryBuilder
      */
     public function truncate()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1104,7 +1104,7 @@ trait DecoratesQueryBuilder
      */
     public function getRawBindings()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1112,7 +1112,7 @@ trait DecoratesQueryBuilder
      */
     public function setBindings(array $bindings, $type = 'where')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1120,7 +1120,7 @@ trait DecoratesQueryBuilder
      */
     public function addBinding($value, $type = 'where')
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1128,7 +1128,7 @@ trait DecoratesQueryBuilder
      */
     public function mergeBindings(Builder $query)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1136,7 +1136,7 @@ trait DecoratesQueryBuilder
      */
     public function cleanBindings(array $bindings)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1152,7 +1152,7 @@ trait DecoratesQueryBuilder
      */
     public function getProcessor()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1168,7 +1168,7 @@ trait DecoratesQueryBuilder
      */
     public function useWritePdo()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1176,7 +1176,7 @@ trait DecoratesQueryBuilder
      */
     public function clone()
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1184,7 +1184,7 @@ trait DecoratesQueryBuilder
      */
     public function cloneWithout(array $properties)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1192,7 +1192,7 @@ trait DecoratesQueryBuilder
      */
     public function cloneWithoutBindings(array $except)
     {
-        return $this->forwardCallToQueryBuilder(__FUNCTION__, func_get_args());
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
 
     /**
@@ -1204,24 +1204,6 @@ trait DecoratesQueryBuilder
      */
     public function __call($method, $parameters)
     {
-        return $this->forwardCallToQueryBuilder($method, $parameters);
-    }
-
-    /**
-     * Forward the given method to the query builder.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return static|mixed
-     */
-    protected function forwardCallToQueryBuilder($method, $parameters)
-    {
-        $result = $this->forwardCallTo($this->query, $method, $parameters);
-
-        if ($result === $this->query) {
-            return $this;
-        }
-
-        return $result;
+        return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
     }
 }
