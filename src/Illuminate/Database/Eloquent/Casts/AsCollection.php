@@ -20,7 +20,7 @@ class AsCollection implements Castable
         {
             public function get($model, $key, $value, $attributes)
             {
-                return $value ? new Collection(json_decode($value, true)) : null;
+                return isset($attributes[$key]) ? new Collection(json_decode($attributes[$key], true)) : null;
             }
 
             public function set($model, $key, $value, $attributes)
