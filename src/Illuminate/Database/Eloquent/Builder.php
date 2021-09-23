@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -303,6 +304,40 @@ class Builder
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "BelongsTo" relationship where clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string  $relationship
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
+    {
+        if ($relationshipName === null) {
+            $relationshipName = Str::camel(class_basename(get_class($related)));
+        }
+
+        if (! $this->model->isRelation($relationshipName)) {
+            return $this;
+        }
+
+        $relationship = $this->model->{$relationshipName}();
+
+        if (! $relationship instanceof BelongsTo) {
+            return $this;
+        }
+
+        $this->where(
+            $relationship->getForeignKeyName(),
+            '=',
+            $related->getAttributeValue($relationship->getOwnerKeyName()),
+            $boolean,
+        );
+
+        return $this;
     }
 
     /**
