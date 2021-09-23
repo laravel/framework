@@ -923,8 +923,6 @@ EOF;
      */
     public function assertResource(\Illuminate\Http\Resources\Json\JsonResource $resource)
     {
-        /** @var \Illuminate\Testing\TestResponse $this */
-
         $resourceContent = [
             'data' => json_decode($resource->toJson(), 1),
         ];
