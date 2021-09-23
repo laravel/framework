@@ -918,6 +918,21 @@ EOF;
         return $this->decodeResponseJson()->json($key);
     }
 
+    public function assertResource(\Illuminate\Http\Resources\Json\JsonResource $resource)
+    {
+        /** @var \Illuminate\Testing\TestResponse $this */
+
+        if ($resource->resource instanceof \Illuminate\Pagination\AbstractPaginator) {
+            return $this->decodeResponseJson()
+                ->assertSubset([
+                    'data' => json_decode($resource->toJson(), 1)
+                ]);
+        }
+
+        $resource = ['data' => json_decode($resource->toJson(), 1)];
+        return $this->assertExactJson($resource);
+    }
+
     /**
      * Assert that the response view equals the given value.
      *
