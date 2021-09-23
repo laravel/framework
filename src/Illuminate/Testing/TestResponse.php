@@ -918,6 +918,9 @@ EOF;
         return $this->decodeResponseJson()->json($key);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function assertResource(\Illuminate\Http\Resources\Json\JsonResource $resource)
     {
         /** @var \Illuminate\Testing\TestResponse $this */
