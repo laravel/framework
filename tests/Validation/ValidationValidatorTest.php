@@ -4392,8 +4392,6 @@ class ValidationValidatorTest extends TestCase
         });
         $this->assertTrue($v->passes());
 
-        return;
-
         $v = new Validator($trans, [
             'foo' => [
                 ['start' => '2016-04-19', 'end' => '2017-04-19'],
