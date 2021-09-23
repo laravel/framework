@@ -923,6 +923,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($related);
         $builder->getQuery()->shouldReceive('where')->once()->with('parent_id', '=', 2, 'and');
 
+        $result = $builder->whereBelongsTo($parent);
+        $this->assertEquals($result, $builder);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('where')->once()->with('parent_id', '=', 2, 'and');
+
         $result = $builder->whereBelongsTo($parent, 'parent');
         $this->assertEquals($result, $builder);
     }
