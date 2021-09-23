@@ -37,18 +37,27 @@ class RedisStore extends TaggableStore implements LockProvider
     protected $lockConnection;
 
     /**
+     * Whether to preserve type of numbers.
+     *
+     * @var bool
+     */
+    protected $strict;
+
+    /**
      * Create a new Redis store.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $prefix
      * @param  string  $connection
+     * @param  bool  $strict
      * @return void
      */
-    public function __construct(Redis $redis, $prefix = '', $connection = 'default')
+    public function __construct(Redis $redis, $prefix = '', $connection = 'default', $strict = true)
     {
         $this->redis = $redis;
         $this->setPrefix($prefix);
         $this->setConnection($connection);
+        $this->strict = $strict;
     }
 
     /**
@@ -331,6 +340,10 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function serialize($value)
     {
+        if ($this->strict) {
+            return is_int($value) ? $value : serialize($value);
+        }
+
         return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value) ? $value : serialize($value);
     }
 
@@ -342,6 +355,10 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function unserialize($value)
     {
+        if ($this->strict && filter_var($value, FILTER_VALIDATE_INT)) {
+            return (int) $value;
+        }
+
         return is_numeric($value) ? $value : unserialize($value);
     }
 }
