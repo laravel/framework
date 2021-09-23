@@ -922,15 +922,16 @@ EOF;
     {
         /** @var \Illuminate\Testing\TestResponse $this */
 
+        $resourceContent = [
+            'data' => json_decode($resource->toJson(), 1),
+        ];
+
         if ($resource->resource instanceof \Illuminate\Pagination\AbstractPaginator) {
             return $this->decodeResponseJson()
-                ->assertSubset([
-                    'data' => json_decode($resource->toJson(), 1)
-                ]);
+                ->assertSubset($resourceContent);
         }
 
-        $resource = ['data' => json_decode($resource->toJson(), 1)];
-        return $this->assertExactJson($resource);
+        return $this->assertExactJson($resourceContent);
     }
 
     /**
