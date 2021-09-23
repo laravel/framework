@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
+use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -904,6 +905,45 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('where')->once()->with('foo', '@>', 'bar');
         $result = $builder->where('foo', '@>', 'bar');
         $this->assertEquals($result, $builder);
+    }
+
+    public function testWhereBelongsTo()
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        $schema = Model::getConnectionResolver()
+            ->connection()
+            ->getSchemaBuilder();
+
+        $schema->create('where_belongs_to_stubs', function ($table) {
+            $table->increments('id');
+            $table->integer('parent_id');
+        });
+
+        EloquentBuilderTestWhereBelongsToStub::query()->insert([
+            ['id' => 1, 'parent_id' => 2],
+            ['id' => 2, 'parent_id' => 1],
+        ]);
+
+        $related = EloquentBuilderTestWhereBelongsToStub::query()->find(1);
+
+        $model = new EloquentBuilderTestWhereBelongsToStub;
+
+        $query = $model->query()->whereBelongsTo($related);
+        $this->assertSame($query->toSql(), 'select * from "where_belongs_to_stubs" where "parent_id" = ?');
+
+        $query = $model->query()->whereBelongsTo($related, 'parent');
+        $this->assertSame($query->toSql(), 'select * from "where_belongs_to_stubs" where "parent_id" = ?');
+
+        $schema->drop('where_belongs_to_stubs');
     }
 
     public function testDeleteOverride()
@@ -1947,4 +1987,19 @@ class EloquentBuilderTestStubStringPrimaryKey extends Model
     protected $table = 'foo_table';
 
     protected $keyType = 'string';
+}
+
+class EloquentBuilderTestWhereBelongsToStub extends Model
+{
+    protected $table = 'where_belongs_to_stubs';
+
+    public function eloquentBuilderTestWhereBelongsToStub()
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
 }
