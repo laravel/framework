@@ -310,8 +310,8 @@ class Builder
      * Add a "BelongsTo" relationship where clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $related
-     * @param  string $relationship
-     * @param  string $boolean
+     * @param  string  $relationship
+     * @param  string  $boolean
      * @return $this
      *
      * @throws \Exception
