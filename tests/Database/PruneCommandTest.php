@@ -60,6 +60,20 @@ No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
 EOF, str_replace("\r", '', $output->fetch()));
     }
 
+    public function testPretendPrunableModelWithPrunableRecords()
+    {
+        $output = $this->artisan([
+            '--model' => PrunableTestModelWithPrunableRecords::class,
+            '--pretend' => true
+        ]);
+
+        $this->assertEquals(<<<'EOF'
+10 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records will be pruned.
+20 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records will be pruned.
+
+EOF, str_replace("\r", '', $output->fetch()));
+    }
+
     protected function artisan($arguments)
     {
         $input = new ArrayInput($arguments);
