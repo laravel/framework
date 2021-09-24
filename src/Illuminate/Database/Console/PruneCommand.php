@@ -20,7 +20,7 @@ class PruneCommand extends Command
     protected $signature = 'model:prune
                                 {--model=* : Class names of the models to be pruned}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
-                                {--pretend : Print the number of prunable records found instead of deleting them}';
+                                {--pretend : Display the number of prunable records found instead of deleting them}';
 
     /**
      * The console command description.
@@ -115,7 +115,7 @@ class PruneCommand extends Command
     }
 
     /**
-     * Report how many models will be pruned, instead of actually pruning them.
+     * Display how many models will be pruned.
      *
      * @param  string  $model
      * @return void
@@ -123,12 +123,13 @@ class PruneCommand extends Command
     protected function pretendToPrune($model)
     {
         $instance = new $model;
+
         $count = $instance->prunable()
             ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($instance))), function ($query) {
                 $query->withTrashed();
             })->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             $this->info("No prunable [$model] records found.");
         } else {
             $this->info("{$count} [{$model}] records will be pruned.");
