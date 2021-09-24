@@ -309,10 +309,12 @@ class Builder
     /**
      * Add a "BelongsTo" relationship where clause to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $related
-     * @param  string  $relationship
-     * @param  string  $boolean
+     * @param \Illuminate\Database\Eloquent\Model $related
+     * @param string $relationship
+     * @param string $boolean
      * @return $this
+     *
+     * @throws \Exception
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
@@ -321,12 +323,16 @@ class Builder
         }
 
         if (! $this->model->isRelation($relationshipName)) {
+            throw new Exception("Relationship [{$relationshipName}] does not exist on the Eloquent builder model.");
+
             return $this;
         }
 
         $relationship = $this->model->{$relationshipName}();
 
         if (! $relationship instanceof BelongsTo) {
+            throw new Exception("Relationship [{$relationshipName}] is not of type BelongsTo.");
+
             return $this;
         }
 
