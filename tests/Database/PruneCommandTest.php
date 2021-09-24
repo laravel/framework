@@ -87,7 +87,7 @@ EOF, str_replace("\r", '', $output->fetch()));
 
         $output = $this->artisan([
             '--model' => PrunableTestModelWithPrunableRecords::class,
-            '--pretend' => true
+            '--pretend' => true,
         ]);
 
         $this->assertEquals(<<<'EOF'

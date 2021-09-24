@@ -44,12 +44,12 @@ class PruneCommand extends Command
 
             return;
         }
-        
+
         if ($this->option('pretend')) {
             $models->each(function ($model) {
                 $this->pretendToPrune($model);
             });
-            
+
             return;
         }
 
