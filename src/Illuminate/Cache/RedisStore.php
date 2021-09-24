@@ -355,7 +355,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function unserialize($value)
     {
-        if ($this->strict && filter_var($value, FILTER_VALIDATE_INT)) {
+        if ($this->strict && filter_var($value, FILTER_VALIDATE_INT) !== false) {
             return (int) $value;
         }
 
