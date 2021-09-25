@@ -156,7 +156,7 @@ class RouteListCommand extends Command
     protected function displayRoutes(array $routes)
     {
         if ($this->option('json')) {
-            $this->line(json_encode(array_values($routes)));
+            $this->line($this->asJson($routes));
 
             return;
         }
@@ -251,6 +251,23 @@ class RouteListCommand extends Command
         }
 
         return array_map('strtolower', $results);
+    }
+
+    /**
+     * Output the routes as JSON.
+     *
+     * @return string
+     */
+    protected function asJson(array $routes)
+    {
+        return collect($routes)
+            ->map(function ($route) {
+                $route['middleware'] = empty($route['middleware']) ? [] : explode("\n", $route['middleware']);
+
+                return $route;
+            })
+            ->values()
+            ->toJson();
     }
 
     /**
