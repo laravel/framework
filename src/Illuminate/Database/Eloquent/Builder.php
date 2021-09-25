@@ -323,13 +323,17 @@ class Builder
         }
 
         if (! $this->model->isRelation($relationshipName)) {
-            throw new Exception("Relationship [{$relationshipName}] does not exist on the Eloquent builder model.");
+            $modelClass = get_class($this->model);
+
+            throw RelationNotFoundException::make($modelClass, $relationshipName);
         }
 
         $relationship = $this->model->{$relationshipName}();
 
         if (! $relationship instanceof BelongsTo) {
-            throw new Exception("Relationship [{$relationshipName}] is not of type BelongsTo.");
+            $modelClass = get_class($this->model);
+
+            throw RelationNotFoundException::make($modelClass, $relationshipName, BelongsTo::class);
         }
 
         $this->where(
