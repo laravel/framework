@@ -432,7 +432,7 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        return $this->getRawAttributeFromArray($key) ?? $this->getDefaultAttribueValue($key);
+        return $this->getRawAttributeFromArray($key) ?? $this->getDefaultAttributeValue($key);
     }
 
     /**
@@ -441,7 +441,7 @@ trait HasAttributes
      * @param  string  $key
      * @return mixed
      */
-    protected function getDefaultAttribueValue($key)
+    protected function getDefaultAttributeValue($key)
     {
         return $this->defaultValues()[$key] ?? null;
     }
