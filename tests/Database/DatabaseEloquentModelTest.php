@@ -2239,6 +2239,13 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNull($user->name);
     }
+
+    public function testGetDefaultValues()
+    {
+        $model = new EloquentModelDefaultValues;
+        $model->setAttribute('name', null);
+        $this->assertSame('taylor', $model->name);
+    }
 }
 
 class EloquentTestObserverStub
@@ -2685,6 +2692,15 @@ class EloquentModelWithUpdatedAtNull extends Model
 {
     protected $table = 'stub';
     const UPDATED_AT = null;
+}
+
+class EloquentModelDefaultValues extends Model
+{
+    public function defaultValues(){
+        return [
+            "name" => "taylor",
+        ];
+    }
 }
 
 class UnsavedModel extends Model

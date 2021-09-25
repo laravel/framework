@@ -415,12 +415,43 @@ trait HasAttributes
     }
 
     /**
-     * Get an attribute from the $attributes array.
+     * Default values to be used if an attribute value is null.
+     *
+     * @return array
+     */
+    public function defaultValues()
+    {
+        return [];
+    }
+
+    /**
+     * Get an attribute from the $attributes array or from the default values.
      *
      * @param  string  $key
      * @return mixed
      */
     protected function getAttributeFromArray($key)
+    {
+        return getRawAttributeFromArray($key) ?? getDefaultAttribueValue($key);
+    }
+
+    /**
+     * Get an attribute from the default values.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function getDefaultAttribueValue($key){
+        return $this->defaultValues()[$key] ?? null;
+    }
+
+    /**
+     * Get an attribute from the $attributes array.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    protected function getRawAttributeFromArray($key)
     {
         return $this->getAttributes()[$key] ?? null;
     }
