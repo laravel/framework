@@ -2696,7 +2696,8 @@ class EloquentModelWithUpdatedAtNull extends Model
 
 class EloquentModelDefaultValues extends Model
 {
-    public function defaultValues(){
+    public function defaultValues()
+    {
         return [
             "name" => "taylor",
         ];
