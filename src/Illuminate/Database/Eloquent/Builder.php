@@ -322,18 +322,14 @@ class Builder
             $relationshipName = Str::camel(class_basename(get_class($related)));
         }
 
-        if (! $this->model->isRelation($relationshipName)) {
-            $modelClass = get_class($this->model);
-
-            throw RelationNotFoundException::make($modelClass, $relationshipName);
+        try {
+            $relationship = $this->model->{$relationshipName}();
+        } catch (BadMethodCallException $exception) {
+            throw RelationNotFoundException::make($this->model, $relationshipName);
         }
 
-        $relationship = $this->model->{$relationshipName}();
-
         if (! $relationship instanceof BelongsTo) {
-            $modelClass = get_class($this->model);
-
-            throw RelationNotFoundException::make($modelClass, $relationshipName, BelongsTo::class);
+            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
         }
 
         $this->where(
