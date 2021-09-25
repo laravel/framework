@@ -2699,7 +2699,7 @@ class EloquentModelDefaultValues extends Model
     public function defaultValues()
     {
         return [
-            "name" => "taylor",
+            'name' => 'taylor',
         ];
     }
 }
