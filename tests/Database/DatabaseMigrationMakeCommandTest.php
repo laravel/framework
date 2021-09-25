@@ -114,6 +114,22 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
     }
 
+    public function testCanSpecifyConnectionToCreateMigrationsIn()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()
+            ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true, 'test_connection')
+            ->andReturn(__DIR__.'/migrations/2021_04_23_110457_create_foo.php');
+
+        $this->runCommand($command, ['name' => 'create_foo', '--connection' => 'test_connection']);
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);
