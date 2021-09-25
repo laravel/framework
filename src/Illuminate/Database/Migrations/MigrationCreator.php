@@ -50,25 +50,26 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  string|null  $connection
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $connection = null)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        $stub = $this->getStub($table, $create, $connection);
 
         $path = $this->getPath($name, $path);
 
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put(
-            $path, $this->populateStub($name, $stub, $table)
+            $path, $this->populateStub($name, $stub, $table, $connection)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
@@ -108,22 +109,26 @@ class MigrationCreator
      *
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  string|null  $connection
      * @return string
      */
-    protected function getStub($table, $create)
+    protected function getStub($table, $create, $connection)
     {
         if (is_null($table)) {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
+            $stubName = is_null($connection) ? 'migration.stub' : 'migration.connection.stub';
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/'.$stubName)
                             ? $customPath
-                            : $this->stubPath().'/migration.stub';
+                            : $this->stubPath().'/'.$stubName;
         } elseif ($create) {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
+            $stubName = is_null($connection) ? 'migration.create.stub' : 'migration.connection.create.stub';
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/'.$stubName)
                             ? $customPath
-                            : $this->stubPath().'/migration.create.stub';
+                            : $this->stubPath().'/'.$stubName;
         } else {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
+            $stubName = is_null($connection) ? 'migration.update.stub' : 'migration.connection.update.stub';
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/'.$stubName)
                             ? $customPath
-                            : $this->stubPath().'/migration.update.stub';
+                            : $this->stubPath().'/'.$stubName;
         }
 
         return $this->files->get($stub);
@@ -135,9 +140,10 @@ class MigrationCreator
      * @param  string  $name
      * @param  string  $stub
      * @param  string|null  $table
+     * @param  string|null  $connection
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($name, $stub, $table, $connection)
     {
         $stub = str_replace(
             ['DummyClass', '{{ class }}', '{{class}}'],
@@ -151,6 +157,13 @@ class MigrationCreator
             $stub = str_replace(
                 ['DummyTable', '{{ table }}', '{{table}}'],
                 $table, $stub
+            );
+        }
+
+        if (! is_null($connection)) {
+            $stub = str_replace(
+                ['DummyConnection', '{{ connection }}', '{{connection}}'],
+                $connection, $stub
             );
         }
 
