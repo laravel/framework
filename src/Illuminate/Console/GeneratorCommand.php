@@ -127,16 +127,17 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
+        $name = $this->qualifyClass($this->getNameInput());
+        $className = str_replace($this->getNamespace($name).'\\', '', $name);
+
         // First we need to ensure that the given name is not a reserved word within the PHP
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
-        if ($this->isReservedName($this->getNameInput())) {
-            $this->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
+        if ($this->isReservedName($className)) {
+            $this->error('The name "'.$className.'" is reserved by PHP.');
 
             return false;
         }
-
-        $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
 
