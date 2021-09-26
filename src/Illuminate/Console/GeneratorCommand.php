@@ -133,7 +133,7 @@ abstract class GeneratorCommand extends Command
         // First we need to ensure that the given name is not a reserved word within the PHP
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
-        if ($this->isReservedName($className)) {
+        if (! $this->isValidClassName($className)) {
             $this->error('The name "'.$className.'" is reserved by PHP.');
 
             return false;
@@ -388,6 +388,25 @@ abstract class GeneratorCommand extends Command
         $name = strtolower($name);
 
         return in_array($name, $this->reservedNames);
+    }
+
+    /**
+     * Checks whether the given class name is valid.
+     *
+     * @param string $className
+     * @return bool
+     */
+    protected function isValidClassName(string $className): bool
+    {
+        if ($this->isReservedName($className)) {
+            return false;
+        }
+
+        if (! preg_match('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$/', $className)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
