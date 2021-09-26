@@ -24,10 +24,6 @@ class JobDispatchingTest extends TestCase
 
     public function testJobCanUseCustomMethodsAfterDispatch()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         Job::dispatch('test')->replaceValue('new-test');
 
         $this->assertTrue(Job::$ran);

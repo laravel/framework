@@ -493,10 +493,6 @@ class SupportStrTest extends TestCase
 
     public function testUuid()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
         $this->assertInstanceOf(UuidInterface::class, Str::orderedUuid());
     }
