@@ -6,8 +6,10 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
+use Illuminate\Support\EnvProcessorFactory;
 use Illuminate\Support\Optional;
 use IteratorAggregate;
+use JsonException;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -662,6 +664,249 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('bar', Env::get('foo'));
     }
 
+    public function testEnvArrayProcessor()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertSame(['bar'], Env::array('foo'));
+
+        $_SERVER['foo'] = 'bar,baz';
+        $this->assertSame(['bar', 'baz'], Env::array('foo'));
+
+        $_SERVER['foo'] = 'bar;baz';
+        $this->assertSame(['bar;baz'], Env::array('foo'));
+
+        $_SERVER['foo'] = 'bar;baz';
+        $this->assertSame(['bar', 'baz'], Env::getWithProcessor(EnvProcessorFactory::arrayProcessor()->delimiter(';'), 'foo'));
+
+        $_SERVER['foo'] = '1,2';
+        $this->assertSame(['1', '2'], Env::array('foo'));
+        $this->assertSame([1, 2], Env::getWithProcessor(EnvProcessorFactory::arrayProcessor()->integerElements(), 'foo'));
+        $this->assertSame([1.0, 2.0], Env::getWithProcessor(EnvProcessorFactory::arrayProcessor()->floatElements(), 'foo'));
+
+        $_SERVER['foo'] = '1.2,2.6';
+        $this->assertSame(['1.2', '2.6'], Env::array('foo'));
+        $this->assertSame([1, 2], Env::getWithProcessor(EnvProcessorFactory::arrayProcessor()->integerElements(), 'foo'));
+        $this->assertSame([1.2, 2.6], Env::getWithProcessor(EnvProcessorFactory::arrayProcessor()->floatElements(), 'foo'));
+
+        $_SERVER['foo'] = '';
+        $this->assertSame([''], Env::array('foo'));
+
+        $_SERVER['foo'] = 'null';
+        $this->assertSame([], Env::array('foo'));
+
+        $_SERVER['foo'] = null;
+        $this->assertSame([], Env::array('foo'));
+        $this->assertSame(['xyz'], Env::array('foo', ['xyz']));
+    }
+
+    public function testEnvStringProcessor()
+    {
+        $_SERVER['foo'] = '5';
+        $this->assertSame('5', Env::string('foo'));
+
+        $_SERVER['foo'] = null;
+        $this->assertSame('', Env::string('foo'));
+
+        $_SERVER['foo'] = 'null';
+        $this->assertSame('', Env::string('foo'));
+    }
+
+    /**
+     * @dataProvider providesValidIntegers
+     */
+    public function testEnvIntegerProcessor(?string $envValue, int $expectedIntValue)
+    {
+        $_SERVER['foo'] = $envValue;
+        $this->assertSame($expectedIntValue, Env::integer('foo'));
+    }
+
+    public function testEnvIntegerProcessorThrowsExceptionIfNonNumericValueIsProvided()
+    {
+        $_SERVER['foo'] = 'random string';
+        $this->expectExceptionObject(new RuntimeException('Non-numeric env var cannot be cast to int.'));
+        Env::integer('foo');
+    }
+
+    /**
+     * @dataProvider providesValidFloats
+     */
+    public function testEnvFloatProcessor(?string $envValue, float $expectedIntValue)
+    {
+        $_SERVER['foo'] = $envValue;
+        $this->assertSame($expectedIntValue, Env::float('foo'));
+    }
+
+    public function testEnvFloatProcessorThrowsExceptionIfNonNumericValueIsProvided()
+    {
+        $_SERVER['foo'] = 'random string';
+        $this->expectExceptionObject(new RuntimeException('Non-numeric env var cannot be cast to float.'));
+        Env::float('foo');
+    }
+
+    /**
+     * @dataProvider providesValidBools
+     */
+    public function testEnvBooleanProcessor(?string $envValue, bool $expectedBoolValue)
+    {
+        $_SERVER['foo'] = $envValue;
+        $this->assertSame(null === $envValue ? true : $expectedBoolValue, Env::boolean('foo'));
+        $this->assertSame(null === $envValue ? true : ! $expectedBoolValue, Env::getWithProcessor(EnvProcessorFactory::booleanProcessor()->not(), 'foo', true));
+    }
+
+    public function testEnvTrimProcessor()
+    {
+        $_SERVER['foo'] = "\nfoo\n";
+        $this->assertSame('foo', Env::trim('foo'));
+
+        $_SERVER['foo'] = " foo\n";
+        $this->assertSame('foo', Env::trim('foo'));
+
+        $_SERVER['foo'] = '1 foo 1';
+        $this->assertSame(' foo ', Env::trim('foo', '1'));
+
+        $_SERVER['foo'] = '1 foo 1';
+        $this->assertSame(' foo ', Env::getWithProcessor(EnvProcessorFactory::trimProcessor()->charactersToTrim('1'), 'foo'));
+
+        $_SERVER['foo'] = '1 foo 1';
+        $this->assertSame('foo', Env::trim('foo', ' 1'));
+
+        $_SERVER['foo'] = null;
+        $this->assertSame('foobar', Env::trim('foo', null, 'foobar'));
+    }
+
+    public function testEnvFileProcessor()
+    {
+        $_SERVER['foo'] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'file_foo.txt';
+        $this->assertSame('foo bar', Env::file('foo'));
+    }
+
+    public function testEnvFileProcessorThrowsExceptionIfEmptyStringIsProvided()
+    {
+        $_SERVER['foo'] = '';
+
+        $this->expectExceptionObject(new LogicException('File path must be a non empty string'));
+        Env::file('foo');
+    }
+
+    public function testEnvFileProcessorThrowsExceptionIfTheValueProvidedIsNotAValidFilePath()
+    {
+        $_SERVER['foo'] = __DIR__.DIRECTORY_SEPARATOR.'file_which_does_not_exist.txt';
+
+        $this->expectExceptionObject(new LogicException(sprintf('File at path "%s" does not exist', $_SERVER['foo'])));
+        Env::file('foo');
+    }
+
+    /**
+     * @dataProvider providesValidJsonPayloads
+     */
+    public function testEnvJsonProcessor(?string $envValue, mixed $expectedValue)
+    {
+        $_SERVER['foo'] = $envValue;
+        $this->assertSame($expectedValue, Env::json('foo'));
+    }
+
+    public function testEnvJsonProcessorThrowsRuntimeExceptionIfTheDecodedValueIsString()
+    {
+        $value = '1';
+
+        $_SERVER['foo'] = json_encode($value);
+        $this->expectExceptionObject(new RuntimeException('Invalid JSON env var: array or null expected, "string" given.'));
+        Env::json('foo');
+    }
+
+    public function testEnvJsonProcessorThrowsRuntimeExceptionIfTheDecodedValueIsInteger()
+    {
+        $value = 1;
+
+        $_SERVER['foo'] = json_encode($value);
+
+        $this->expectExceptionObject(new RuntimeException('Invalid JSON env var: array or null expected, "int" given.'));
+
+        Env::json('foo');
+    }
+
+    public function testEnvJsonProcessorThrowsRuntimeExceptionIfTheDecodedValueIsBool()
+    {
+        $value = true;
+
+        $_SERVER['foo'] = json_encode($value);
+
+        $this->expectExceptionObject(new RuntimeException('Invalid JSON env var: array or null expected, "bool" given.'));
+
+        Env::json('foo');
+    }
+
+    public function testEnvJsonProcessorThrowsJsonExceptionIfTheGivenStringIsNotJsonDecodable()
+    {
+        $_SERVER['foo'] = 'not json, hence not json decodable';
+        $this->expectException(JsonException::class);
+        Env::json('foo');
+    }
+
+    public function testEnvJsonProcessorReturnsDefaultValueIfProvided()
+    {
+        $_SERVER['foo'] = null;
+
+        $defaultValue = 5;
+        $this->assertSame([$defaultValue], Env::json('foo', [$defaultValue]));
+
+        $defaultValue = null;
+        $this->assertSame($defaultValue, Env::json('foo', $defaultValue));
+
+        $defaultValue = '5';
+        $this->assertSame([$defaultValue], Env::json('foo', [$defaultValue]));
+    }
+
+    /**
+     * @dataProvider providesValidBase64Payloads
+     */
+    public function testEnvBase64Processor(string $envValue, string $expectedValue)
+    {
+        $_SERVER['foo'] = $envValue;
+        $this->assertSame($expectedValue, Env::base64('foo'));
+    }
+
+    public function testEnvChainProcessorWithFileAndJsonProcessorsWithValidJsonFilePath()
+    {
+        $_SERVER['foo'] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'file_foo.json';
+
+        $this->assertSame(
+            ['bar' => 'baz 123'],
+            Env::chain('foo', null, EnvProcessorFactory::fileProcessor(), EnvProcessorFactory::jsonProcessor())
+        );
+    }
+
+    public function testEnvChainProcessorWithFileAndJsonProcessorsWhenTheGivenFilePathIsNull()
+    {
+        $_SERVER['foo'] = null;
+
+        $this->assertNull(
+            Env::chain('foo', null, EnvProcessorFactory::fileProcessor(), EnvProcessorFactory::jsonProcessor())
+        );
+    }
+
+    public function testEnvChainProcessorWithFileAndTrimProcessorsWithValidFilePathWhichHasNewlineAtTheEnd()
+    {
+        $_SERVER['foo'] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'file_with_newline.txt';
+
+        $this->assertSame(
+            'test 123',
+            Env::chain('foo', null, EnvProcessorFactory::fileProcessor(), EnvProcessorFactory::trimProcessor())
+        );
+    }
+
+    public function testEnvChainProcessorThrowsExceptionWhenNoProcessorsAreProvided()
+    {
+        $this->expectExceptionObject(new LogicException('The chain processor expects at least two processors, 0 given'));
+        Env::chain('foo');
+    }
+
+    public function testEnvChainProcessorThrowsExceptionWhenOnlyOneProcessorIsProvided()
+    {
+        $this->expectExceptionObject(new LogicException('The chain processor expects at least two processors, 1 given'));
+        Env::chain('foo', null, EnvProcessorFactory::fileProcessor());
+    }
+
     public function testEnvTrue()
     {
         $_SERVER['foo'] = 'true';
@@ -733,6 +978,71 @@ class SupportHelpersTest extends TestCase
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
         $this->assertSame('From $_SERVER', env('foo'));
+    }
+
+    public function providesValidBools(): iterable
+    {
+        return [
+            ['true', true],
+            ['false', false],
+            ['1', true],
+            ['0', false],
+            ['on', true],
+            ['off', false],
+            ['yes', true],
+            ['no', false],
+            ['null', false],
+            [null, false],
+            ['5', true],
+            ['1.1', true],
+            ['1e1', true],
+            ['random string', false],
+        ];
+    }
+
+    public function providesValidJsonPayloads(): iterable
+    {
+        $value = new stdClass();
+        $value->bar = 'baz';
+
+        return [
+            [json_encode(['baz']), ['baz']],
+            [json_encode(['foo' => 'bar']), ['foo' => 'bar']],
+            [json_encode([]), []],
+            [json_encode(null), null],
+            [json_encode($value), (array) $value],
+        ];
+    }
+
+    public function providesValidBase64Payloads(): iterable
+    {
+        return [
+            [base64_encode('Hello World'), 'Hello World'],
+            ['/+0=', "\xFF\xED"],
+            ['_-0=', "\xFF\xED"],
+        ];
+    }
+
+    public function providesValidIntegers(): iterable
+    {
+        return [
+            ['1', 1],
+            ['1.1', 1],
+            ['1e1', 10],
+            ['1.9', 1],
+            [null, 0],
+        ];
+    }
+
+    public function providesValidFloats(): iterable
+    {
+        return [
+            ['1', 1.0],
+            ['1.1', 1.1],
+            ['1e1', 10.0],
+            ['1.9', 1.9],
+            [null, 0.0],
+        ];
     }
 
     public function providesPregReplaceArrayData()
