@@ -147,7 +147,7 @@ abstract class GeneratorCommand extends Command
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
         if (! $this->isValidClassName($className)) {
-            $this->error('The name "'.$className.'" is reserved by PHP.');
+            $this->error('The name "'.$className.'" cannot be used to name a class, interface or trait.');
 
             return false;
         }
