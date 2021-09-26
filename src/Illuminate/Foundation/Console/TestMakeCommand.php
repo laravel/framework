@@ -39,8 +39,8 @@ class TestMakeCommand extends GeneratorCommand
         $suffix = $this->option('unit') ? '.unit.stub' : '.stub';
 
         return $this->option('pest')
-            ? $this->resolveStubPath('/stubs/pest' . $suffix)
-            : $this->resolveStubPath('/stubs/test' . $suffix);
+            ? $this->resolveStubPath('/stubs/pest'.$suffix)
+            : $this->resolveStubPath('/stubs/test'.$suffix);
     }
 
     /**
