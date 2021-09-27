@@ -55,7 +55,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             'immutable_datetime_field' => '2019-10-01 10:15',
         ]);
 
-        $this->assertSame(['2019-10', '2019-10-01 10:15:20', '2019-10-01 00:00:00', '2019-10-01 10:15'], $bindings);
+        $this->assertSame(['2019-10-01 00:00:00', '2019-10-01 10:15:20', '2019-10-01 00:00:00', '2019-10-01 10:15:00'], $bindings);
     }
 
 
