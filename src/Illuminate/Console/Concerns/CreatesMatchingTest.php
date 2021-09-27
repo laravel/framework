@@ -51,5 +51,4 @@ trait CreatesMatchingTest
 
         $this->call('make:test', $arguments);
     }
-
 }
