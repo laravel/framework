@@ -105,8 +105,8 @@ class ConsoleMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned.', 'command:name'],
-            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller.'],
+            ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned', 'command:name'],
+            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller'],
         ];
     }
 }
