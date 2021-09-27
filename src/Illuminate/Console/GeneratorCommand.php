@@ -128,7 +128,7 @@ abstract class GeneratorCommand extends Command
             'test',
             null,
             InputOption::VALUE_NONE,
-            'Generate an accompanying test for the controller'
+            'Generate an accompanying test for the '.$this->type
         ));
     }
 
