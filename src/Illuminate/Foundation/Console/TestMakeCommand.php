@@ -95,15 +95,6 @@ class TestMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Add options that should be added by default for every generator command.
-     *
-     * @return void
-     */
-    protected function addDefaults()
-    {
-    }
-
-    /**
      * Get the console command options.
      *
      * @return array
