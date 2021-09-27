@@ -93,7 +93,7 @@ class TestMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Add an option for specifying that an accompanying test should be generated.
+     * Add options that should be added by default for every generator command.
      *
      * @return void
      */
