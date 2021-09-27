@@ -319,7 +319,7 @@ class Builder
         }
 
         if (!is_null($limit)) {
-            $this->query->limit($limit);   
+            $this->query->limit($limit);
         }
 
         $this->query->latest($column);
@@ -341,7 +341,7 @@ class Builder
         }
 
         if (!is_null($limit)) {
-            $this->query->limit($limit);   
+            $this->query->limit($limit);
         }
 
         $this->query->oldest($column);
