@@ -254,8 +254,9 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Output the routes as JSON.
+     * Convert the given routes to JSON.
      *
+     * @param  array  $routes
      * @return string
      */
     protected function asJson(array $routes)
