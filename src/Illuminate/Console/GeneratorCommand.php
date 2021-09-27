@@ -160,7 +160,7 @@ abstract class GeneratorCommand extends Command
 
         $this->info($this->type.' created successfully.');
 
-        $this->afterCreating($path, );
+        $this->afterCreating($path);
     }
 
     /**
