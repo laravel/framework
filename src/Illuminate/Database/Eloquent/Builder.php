@@ -319,7 +319,7 @@ class Builder
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
         if ($relationshipName === null) {
-            $relationshipName = Str::camel(class_basename(get_class($related)));
+            $relationshipName = Str::camel(class_basename($related));
         }
 
         try {
