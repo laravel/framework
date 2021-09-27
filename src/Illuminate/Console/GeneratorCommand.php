@@ -5,6 +5,7 @@ namespace Illuminate\Console;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 abstract class GeneratorCommand extends Command
 {
@@ -107,8 +108,28 @@ abstract class GeneratorCommand extends Command
     public function __construct(Filesystem $files)
     {
         parent::__construct();
+        $this->addDefaultOptions();
 
         $this->files = $files;
+    }
+
+    /**
+     * Add options that should be added by default for every generator command.
+     *
+     * @return void
+     */
+    protected function addDefaultOptions()
+    {
+        if ($this->getDefinition()->hasOption('test')) {
+            return;
+        }
+
+        $this->getDefinition()->addOption(new InputOption(
+            'test',
+            null,
+            InputOption::VALUE_NONE,
+            'Generate an accompanying test for the controller'
+        ));
     }
 
     /**
@@ -160,17 +181,10 @@ abstract class GeneratorCommand extends Command
 
         $this->info($this->type.' created successfully.');
 
-        $this->afterCreating($path);
-    }
-
-    /**
-     * Perform any further actions after the file has been generated.
-     *
-     * @param string $path The path to the newly created file.
-     * @return void
-     */
-    protected function afterCreating($path)
-    {
+        if ($this->hasOption('test') && $this->option('test')) {
+            $testName = Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test');
+            $this->call('make:test', ['name' => $testName]);
+        }
     }
 
     /**

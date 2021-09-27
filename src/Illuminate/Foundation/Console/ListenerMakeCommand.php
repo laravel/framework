@@ -2,15 +2,12 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ListenerMakeCommand extends GeneratorCommand
 {
-    use CreatesSupportingTests;
-
     /**
      * The console command name.
      *
@@ -78,19 +75,6 @@ class ListenerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Perform any further actions after the file has been generated.
-     *
-     * @param string $path The path to the newly created file.
-     * @return void
-     */
-    protected function afterCreating($path)
-    {
-        if ($this->option('test')) {
-            $this->createTest($path);
-        }
-    }
-
-    /**
      * Determine if the class already exists.
      *
      * @param  string  $rawName
@@ -122,7 +106,6 @@ class ListenerMakeCommand extends GeneratorCommand
         return [
             ['event', 'e', InputOption::VALUE_OPTIONAL, 'The event class being listened for'],
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued'],
-            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller'],
         ];
     }
 }

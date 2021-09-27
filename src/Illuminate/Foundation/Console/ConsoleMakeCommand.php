@@ -2,16 +2,12 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class ConsoleMakeCommand extends GeneratorCommand
 {
-    use CreatesSupportingTests;
-
     /**
      * The console command name.
      *
@@ -62,19 +58,6 @@ class ConsoleMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Perform any further actions after the file has been generated.
-     *
-     * @param string $path The path to the newly created file.
-     * @return void
-     */
-    protected function afterCreating($path)
-    {
-        if ($this->option('test')) {
-            $this->createTest($path);
-        }
-    }
-
-    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
@@ -106,7 +89,6 @@ class ConsoleMakeCommand extends GeneratorCommand
     {
         return [
             ['command', null, InputOption::VALUE_OPTIONAL, 'The terminal command that should be assigned', 'command:name'],
-            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller'],
         ];
     }
 }

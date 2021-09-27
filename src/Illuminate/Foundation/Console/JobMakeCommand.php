@@ -2,14 +2,11 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class JobMakeCommand extends GeneratorCommand
 {
-    use CreatesSupportingTests;
-
     /**
      * The console command name.
      *
@@ -41,19 +38,6 @@ class JobMakeCommand extends GeneratorCommand
         return $this->option('sync')
                         ? $this->resolveStubPath('/stubs/job.stub')
                         : $this->resolveStubPath('/stubs/job.queued.stub');
-    }
-
-    /**
-     * Perform any further actions after the file has been generated.
-     *
-     * @param string $path The path to the newly created file.
-     * @return void
-     */
-    protected function afterCreating($path)
-    {
-        if ($this->option('test')) {
-            $this->createTest($path);
-        }
     }
 
     /**
@@ -89,7 +73,6 @@ class JobMakeCommand extends GeneratorCommand
     {
         return [
             ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous'],
-            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller'],
         ];
     }
 }

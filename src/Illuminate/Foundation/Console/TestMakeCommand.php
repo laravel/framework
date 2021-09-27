@@ -93,6 +93,15 @@ class TestMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Add an option for specifying that an accompanying test should be generated.
+     *
+     * @return void
+     */
+    protected function addDefaultOptions()
+    {
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array

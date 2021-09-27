@@ -2,14 +2,11 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class NotificationMakeCommand extends GeneratorCommand
 {
-    use CreatesSupportingTests;
-
     /**
      * The console command name.
      *
@@ -95,19 +92,6 @@ class NotificationMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Perform any further actions after the file has been generated.
-     *
-     * @param string $path The path to the newly created file.
-     * @return void
-     */
-    protected function afterCreating($path)
-    {
-        if ($this->option('test')) {
-            $this->createTest($path);
-        }
-    }
-
-    /**
      * Resolve the fully-qualified path to the stub.
      *
      * @param  string  $stub
@@ -141,7 +125,6 @@ class NotificationMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
             ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
-            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller'],
         ];
     }
 }

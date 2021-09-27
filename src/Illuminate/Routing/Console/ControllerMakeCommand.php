@@ -2,16 +2,12 @@
 
 namespace Illuminate\Routing\Console;
 
-use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 class ControllerMakeCommand extends GeneratorCommand
 {
-    use CreatesSupportingTests;
-
     /**
      * The console command name.
      *
@@ -63,19 +59,6 @@ class ControllerMakeCommand extends GeneratorCommand
         $stub = $stub ?? '/stubs/controller.plain.stub';
 
         return $this->resolveStubPath($stub);
-    }
-
-    /**
-     * Perform any further actions after the file has been generated.
-     *
-     * @param string $path The path to the newly created file.
-     * @return void
-     */
-    protected function afterCreating($path)
-    {
-        if ($this->option('test')) {
-            $this->createTest($path);
-        }
     }
 
     /**
@@ -220,7 +203,6 @@ class ControllerMakeCommand extends GeneratorCommand
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller.'],
         ];
     }
 }
