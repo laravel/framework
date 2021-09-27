@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Illuminate\Console\Concerns;
 
 use Illuminate\Support\Str;
