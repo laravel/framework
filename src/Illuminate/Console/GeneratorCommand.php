@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -115,30 +116,12 @@ abstract class GeneratorCommand extends Command
     public function __construct(Filesystem $files)
     {
         parent::__construct();
-        $this->addDefaults();
 
-        $this->files = $files;
-    }
-
-    /**
-     * Add arguments and options that should be available by default for every generator command.
-     *
-     * @return void
-     */
-    protected function addDefaults()
-    {
-        if ($this->getDefinition()->hasOption('test')) {
-            return;
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+            $this->addTestOptions();
         }
 
-        $this->createAccompanyingTest = true;
-
-        $this->getDefinition()->addOption(new InputOption(
-            'test',
-            null,
-            InputOption::VALUE_NONE,
-            'Generate an accompanying test for the '.$this->type
-        ));
+        $this->files = $files;
     }
 
     /**
@@ -190,9 +173,8 @@ abstract class GeneratorCommand extends Command
 
         $this->info($this->type.' created successfully.');
 
-        if ($this->createAccompanyingTest && $this->option('test')) {
-            $testName = Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test');
-            $this->call('make:test', ['name' => $testName]);
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+            $this->handleTestCreation($path);
         }
     }
 
