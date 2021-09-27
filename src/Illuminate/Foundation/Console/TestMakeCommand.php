@@ -99,7 +99,7 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    protected function addDefaultOptions()
+    protected function addDefaults()
     {
     }
 

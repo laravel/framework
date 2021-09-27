@@ -115,7 +115,7 @@ abstract class GeneratorCommand extends Command
     public function __construct(Filesystem $files)
     {
         parent::__construct();
-        $this->addDefaultOptions();
+        $this->addDefaults();
 
         $this->files = $files;
     }
@@ -125,7 +125,7 @@ abstract class GeneratorCommand extends Command
      *
      * @return void
      */
-    protected function addDefaultOptions()
+    protected function addDefaults()
     {
         if ($this->getDefinition()->hasOption('test')) {
             return;
