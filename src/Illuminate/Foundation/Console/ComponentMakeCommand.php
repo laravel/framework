@@ -145,6 +145,7 @@ class ComponentMakeCommand extends GeneratorCommand
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
             ['inline', null, InputOption::VALUE_NONE, 'Create a component that renders an inline view'],
+            ['anonymous', null, InputOption::VALUE_NONE, 'Create an anonymous component'],
         ];
     }
 }

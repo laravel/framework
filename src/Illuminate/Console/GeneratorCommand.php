@@ -136,6 +136,11 @@ abstract class GeneratorCommand extends Command
             return false;
         }
 
+        // Don't create a class when generating an anonymous blade component
+        if ($this->type === 'Component' && $this->hasOption('anonymous') && $this->option('anonymous') === true) {
+            return false;
+        }
+
         $name = $this->qualifyClass($this->getNameInput());
 
         $path = $this->getPath($name);
