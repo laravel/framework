@@ -121,7 +121,7 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Add options that should be added by default for every generator command.
+     * Add arguments and options that should be available by default for every generator command.
      *
      * @return void
      */
