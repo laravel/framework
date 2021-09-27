@@ -648,7 +648,7 @@ trait QueriesRelationships
         }
 
         $this->where(
-            $relationship->getForeignKeyName(),
+            $relationship->getQualifiedForeignKeyName(),
             '=',
             $related->getAttributeValue($relationship->getOwnerKeyName()),
             $boolean,
