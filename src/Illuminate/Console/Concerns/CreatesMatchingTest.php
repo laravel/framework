@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 trait CreatesMatchingTest
 {
-
     /**
      * Add the standard command options for generating matching tests.
      *
@@ -33,12 +32,12 @@ trait CreatesMatchingTest
     /**
      * Create the matching test case if requested.
      *
-     * @param string $path
+     * @param  string  $path
      * @return void
      */
     protected function handleTestCreation($path)
     {
-        if (!$this->option('test') && !$this->option('pest')) {
+        if (! $this->option('test') && ! $this->option('pest')) {
             return;
         }
 
