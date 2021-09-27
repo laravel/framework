@@ -242,7 +242,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
                     }
                 );
 
-                if (! count($notifiableChannels)) {
+                if (empty($notifiableChannels)) {
                     continue;
                 }
             }
