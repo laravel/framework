@@ -87,7 +87,7 @@ class PruneCommand extends Command
             return collect($models);
         }
 
-        return collect((new Finder)->in(app_path('Models'))->files())
+        return collect((new Finder)->in(app_path('Models'))->files()->name('*.php'))
             ->map(function ($model) {
                 $namespace = $this->laravel->getNamespace();
 
