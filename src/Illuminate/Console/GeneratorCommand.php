@@ -24,6 +24,13 @@ abstract class GeneratorCommand extends Command
     protected $type;
 
     /**
+     * Whether a test should be generated.
+     *
+     * @var bool
+     */
+    protected $createAccompanyingTest = false;
+
+    /**
      * Reserved names that cannot be used for generation.
      *
      * @var string[]
@@ -124,6 +131,8 @@ abstract class GeneratorCommand extends Command
             return;
         }
 
+        $this->createAccompanyingTest = true;
+
         $this->getDefinition()->addOption(new InputOption(
             'test',
             null,
@@ -181,7 +190,7 @@ abstract class GeneratorCommand extends Command
 
         $this->info($this->type.' created successfully.');
 
-        if ($this->hasOption('test') && $this->option('test')) {
+        if ($this->createAccompanyingTest && $this->option('test')) {
             $testName = Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test');
             $this->call('make:test', ['name' => $testName]);
         }
