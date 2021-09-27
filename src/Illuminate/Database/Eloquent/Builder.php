@@ -318,7 +318,7 @@ class Builder
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
-        if (!is_null($limit)) {
+        if (! is_null($limit)) {
             $this->query->limit($limit);
         }
 
@@ -340,7 +340,7 @@ class Builder
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
-        if (!is_null($limit)) {
+        if (! is_null($limit)) {
             $this->query->limit($limit);
         }
 
