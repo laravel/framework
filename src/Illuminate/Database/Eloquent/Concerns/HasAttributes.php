@@ -1219,7 +1219,7 @@ trait HasAttributes
      */
     protected function isDateCastable($key)
     {
-        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+        return $this->hasCast($key, ['date', 'custom_datetime', 'datetime', 'immutable_date', 'immutable_custom_datetime', 'immutable_datetime']);
     }
 
     /**
