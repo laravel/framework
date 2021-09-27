@@ -1219,7 +1219,18 @@ trait HasAttributes
      */
     protected function isDateCastable($key)
     {
-        return $this->hasCast($key, ['date', 'custom_datetime', 'datetime', 'immutable_date', 'immutable_custom_datetime', 'immutable_datetime']);
+        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+    }
+
+    /**
+     * Determine whether a value is Date / DateTime custom-castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isDateCastableWithCustomFormat($key)
+    {
+        return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime']);
     }
 
     /**
@@ -1645,7 +1656,7 @@ trait HasAttributes
             return true;
         } elseif (is_null($attribute)) {
             return false;
-        } elseif ($this->isDateAttribute($key)) {
+        } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
