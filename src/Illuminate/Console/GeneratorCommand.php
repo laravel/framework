@@ -6,7 +6,6 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 abstract class GeneratorCommand extends Command
 {
@@ -23,13 +22,6 @@ abstract class GeneratorCommand extends Command
      * @var string
      */
     protected $type;
-
-    /**
-     * Whether a test should be generated.
-     *
-     * @var bool
-     */
-    protected $createAccompanyingTest = false;
 
     /**
      * Reserved names that cannot be used for generation.
