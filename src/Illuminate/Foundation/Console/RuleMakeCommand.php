@@ -2,11 +2,14 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class RuleMakeCommand extends GeneratorCommand
 {
+    use CreatesSupportingTests;
+
     /**
      * The console command name.
      *
@@ -60,6 +63,19 @@ class RuleMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Perform any further actions after the file has been generated.
+     *
+     * @param string $path The path to the newly created file.
+     * @return void
+     */
+    protected function afterCreating($path)
+    {
+        if ($this->option('test')) {
+            $this->createTest($path);
+        }
+    }
+
+    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
@@ -79,6 +95,7 @@ class RuleMakeCommand extends GeneratorCommand
     {
         return [
             ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule.'],
+            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller.'],
         ];
     }
 }

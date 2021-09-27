@@ -2,12 +2,15 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Concerns\CreatesSupportingTests;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends GeneratorCommand
 {
+    use CreatesSupportingTests;
+
     /**
      * The console command name.
      *
@@ -164,6 +167,19 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Perform any further actions after the file has been generated.
+     *
+     * @param string $path The path to the newly created file.
+     * @return void
+     */
+    protected function afterCreating($path)
+    {
+        if ($this->option('test')) {
+            $this->createTest($path);
+        }
+    }
+
+    /**
      * Resolve the fully-qualified path to the stub.
      *
      * @param  string  $stub
@@ -205,6 +221,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
+            ['test', null, InputOption::VALUE_NONE, 'Generate an accompanying test for the controller'],
         ];
     }
 }

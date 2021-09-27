@@ -159,6 +159,18 @@ abstract class GeneratorCommand extends Command
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
         $this->info($this->type.' created successfully.');
+
+        $this->afterCreating($path, );
+    }
+
+    /**
+     * Perform any further actions after the file has been generated.
+     *
+     * @param string $path The path to the newly created file.
+     * @return void
+     */
+    protected function afterCreating($path)
+    {
     }
 
     /**
