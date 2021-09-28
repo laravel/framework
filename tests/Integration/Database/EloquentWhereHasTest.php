@@ -32,6 +32,12 @@ class EloquentWhereHasTest extends DatabaseTestCase
             $table->integer('commentable_id');
         });
 
+        Schema::create('images', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('imageable_type');
+            $table->integer('imageable_id');
+        });
+
         $user = User::create();
         $post = tap((new Post(['public' => true]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
@@ -40,7 +46,9 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
 
-        $post = tap((new Post(['public' => false])))->save();
+        $user = User::create();
+        $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
+        (new Image)->imageable()->associate($user)->save();
     }
 
     public function testWhereRelation()
@@ -84,7 +92,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
     public function testWhereDoesntHaveAny()
     {
-        $post = Post::whereDoesntHaveAny(['comments', 'user'])->get();
+        $post = Post::whereDoesntHaveAny(['comments', 'images'])->get();
 
         $this->assertEquals([3], $post->pluck('id')->all());
     }
@@ -117,6 +125,11 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
 }
 
 class User extends Model
@@ -126,5 +139,20 @@ class User extends Model
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+}
+
+class Image extends Model
+{
+    public $timestamps = false;
+
+    public function commentable()
+    {
+        return $this->morphTo();
     }
 }
