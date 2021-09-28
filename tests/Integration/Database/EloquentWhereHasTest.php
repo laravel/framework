@@ -151,7 +151,7 @@ class Image extends Model
 {
     public $timestamps = false;
 
-    public function commentable()
+    public function imageable()
     {
         return $this->morphTo();
     }
