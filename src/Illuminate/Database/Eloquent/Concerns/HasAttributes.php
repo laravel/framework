@@ -1308,7 +1308,7 @@ trait HasAttributes
     protected function isClassSerializable($key)
     {
         return $this->isClassCastable($key) &&
-            method_exists($this->parseCasterClass($this->getCasts()[$key]), 'serialize');
+            method_exists($this->resolveCasterClass($key), 'serialize');
     }
 
     /**
