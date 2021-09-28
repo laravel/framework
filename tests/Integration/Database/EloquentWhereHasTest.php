@@ -106,6 +106,11 @@ class Comment extends Model
     {
         return $this->morphTo();
     }
+
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
 }
 
 class Post extends Model
