@@ -62,7 +62,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
     {
         $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();
 
-        $this->assertEquals([1, 2], $users->pluck('id')->all());
+        $this->assertEquals([1, 2, 3], $users->pluck('id')->all());
     }
 
     public function testWhereMorphRelation()
