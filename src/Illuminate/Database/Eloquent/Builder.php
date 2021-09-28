@@ -282,12 +282,17 @@ class Builder implements BuilderContract
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  int  $limit
      * @return $this
      */
-    public function latest($column = null)
+    public function latest($column = null, $limit = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        if (! is_null($limit)) {
+            $this->query->limit($limit);
         }
 
         $this->query->latest($column);
@@ -299,12 +304,17 @@ class Builder implements BuilderContract
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  int  $limit
      * @return $this
      */
-    public function oldest($column = null)
+    public function oldest($column = null, $limit = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        if (! is_null($limit)) {
+            $this->query->limit($limit);
         }
 
         $this->query->oldest($column);
