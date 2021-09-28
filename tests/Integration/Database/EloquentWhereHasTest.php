@@ -39,6 +39,8 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $user = User::create();
         $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
+
+        $post = tap((new Post(['public' => false])))->save();
     }
 
     public function testWhereRelation()
@@ -78,6 +80,13 @@ class EloquentWhereHasTest extends DatabaseTestCase
         })->get();
 
         $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testWhereDoesntHaveAny()
+    {
+        $post = Post::whereDoesntHaveAny(['comments', 'user'])->get();
+
+        $this->assertEquals([3], $post->pluck('id')->all());
     }
 }
 

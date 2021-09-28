@@ -349,6 +349,18 @@ trait QueriesRelationships
     }
 
     /**
+     * @param array $relations
+     * @param Closure|null $callback
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereDoesntHaveAny($relations, Closure $callback = null)
+    {
+        foreach ($relations as $relation) {
+            return $this->doesntHave($relation);
+        }
+    }
+
+    /**
      * Add a basic where clause to a relationship query.
      *
      * @param  string  $relation
