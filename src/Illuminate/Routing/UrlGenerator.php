@@ -405,6 +405,10 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $url = $absolute ? $request->url() : '/'.$request->path();
 
+        if ($this->forceScheme && $absolute) {
+            $url = preg_replace('/^.*:\/\//U', $this->forceScheme, $url);
+        }
+
         $queryString = ltrim(preg_replace('/(^|&)signature=[^&]+/', '', $request->server->get('QUERY_STRING')), '&');
 
         $signature = hash_hmac('sha256', rtrim($url.'?'.$queryString, '?'), call_user_func($this->keyResolver));
