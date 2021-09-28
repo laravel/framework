@@ -170,6 +170,31 @@ class Str
 
         return static::$camelCache[$value] = lcfirst(static::studly($value));
     }
+    
+    
+     /**
+     * Determine if a given string contains one of multiple array values.
+     *
+     * @param  string  $haystack
+     * @param  string[]  $needles
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public static function containsOne($haystack, array $needles, $ignoreCase = false)
+    {
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
+            $needles = array_map('mb_strtolower', $needles);
+        }
+
+        foreach ($needles as $needle) {
+            if (static::contains($haystack, $needle)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Determine if a given string contains a given substring.
