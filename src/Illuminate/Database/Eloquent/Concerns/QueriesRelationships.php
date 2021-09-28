@@ -192,9 +192,9 @@ trait QueriesRelationships
     public function whereDoesntHaveAny($relations, $boolean = 'and', $callback = null)
     {
         $closure = function ($q) use (&$closure, &$relations, $callback) {
-            // In order to nest "has", we need to add count relation constraints on the
-            // callback Closure. We'll do this by simply passing the Closure its own
-            // reference to itself so it calls itself recursively on each segment.
+            // Made use of the closure method used in hasNested()
+            // to loop over the relations and recursively call itself to exclude
+            // all passed relations
             count($relations) > 1
                 ? $q->whereDoesntHave(array_shift($relations), $closure)
                 : $q->has(array_shift($relations), '<', 1, 'and', $callback);
