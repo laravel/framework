@@ -14,12 +14,7 @@ trait CreatesMatchingTest
      */
     protected function addTestOptions()
     {
-        $options = [
-            'test' => 'PhpUnit',
-            'pest' => 'Pest',
-        ];
-
-        foreach ($options as $option => $name) {
+        foreach (['test' => 'PhpUnit', 'pest' => 'Pest'] as $option => $name) {
             $this->getDefinition()->addOption(new InputOption(
                 $option,
                 null,
