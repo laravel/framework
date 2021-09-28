@@ -1,6 +1,38 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.61.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.62.0...8.x)
+
+
+## [v8.62.0 (2021-09-28)](https://github.com/laravel/framework/compare/v8.61.0...v8.62.0)
+
+### Added
+- Added singular syntactic sugar to wormhole ([#38815](https://github.com/laravel/framework/pull/38815))
+- Added a few PHP 8.1 related changes ([#38404](https://github.com/laravel/framework/pull/38404), [#38961](https://github.com/laravel/framework/pull/38961))
+- Dispatch events when maintenance mode is enabled and disabled ([#38826](https://github.com/laravel/framework/pull/38826))
+- Added assertNotSoftDeleted Method ([#38886](https://github.com/laravel/framework/pull/38886))
+- Adds new RefreshDatabaseLazily testing trait ([#38861](https://github.com/laravel/framework/pull/38861))
+- Added --pretend option for model:prune command ([#38945](https://github.com/laravel/framework/pull/38945))
+- Make PendingMail Conditionable ([#38942](https://github.com/laravel/framework/pull/38942))
+- Adds --pest option when using the make:test artisan command ([#38966](https://github.com/laravel/framework/pull/38966))
+
+### Reverted
+- Reverted ["Added posibility compare custom date/immutable_date using date comparison"](https://github.com/laravel/framework/pull/38720) ([#38993](https://github.com/laravel/framework/pull/38993))
+
+### Fixed
+- Fix getDirty method when using AsArrayObject / AsCollection ([#38869](https://github.com/laravel/framework/pull/38869))
+- Fix sometimes conditions that add rules for sibling values within an array of data ([#38899](https://github.com/laravel/framework/pull/38899))
+- Fixed Illuminate/Validation/Rules/Password::passes() ([#38962](https://github.com/laravel/framework/pull/38962))
+- Fixed for custom date castable and database value formatting ([#38994](https://github.com/laravel/framework/pull/38994))
+
+### Changed
+- Make mailable assertions fluent ([#38850](https://github.com/laravel/framework/pull/38850))
+- Allow request input to be retrieved as a collection ([#38832](https://github.com/laravel/framework/pull/38832))
+- Allow index.blade.php views for anonymous components ([#38847](https://github.com/laravel/framework/pull/38847))
+- Changed *ofMany to decide relationship name when it is null ([#38889](https://github.com/laravel/framework/pull/38889))
+- Ignore trailing delimiter in cache.headers options string ([#38910](https://github.com/laravel/framework/pull/38910))
+- Only look for files ending with .php in model:prune ([#38975](https://github.com/laravel/framework/pull/38975))
+- Notification assertions respect shouldSend method on notification ([#38979](https://github.com/laravel/framework/pull/38979))
+- Convert middleware to array when outputting as JSON in /RouteListCommand ([#38953](https://github.com/laravel/framework/pull/38953))
 
 
 ## [v8.61.0 (2021-09-13)](https://github.com/laravel/framework/compare/v8.60.0...v8.61.0)
