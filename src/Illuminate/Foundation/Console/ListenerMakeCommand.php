@@ -82,7 +82,7 @@ class ListenerMakeCommand extends GeneratorCommand
      */
     protected function alreadyExists($rawName)
     {
-        return class_exists($rawName);
+        return class_exists($rawName) || parent::alreadyExists($rawName);
     }
 
     /**
