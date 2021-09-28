@@ -41,14 +41,9 @@ trait CreatesMatchingTest
             return;
         }
 
-        $testName = Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test');
-
-        $arguments = ['name' => $testName];
-
-        if ($this->option('pest')) {
-            $arguments['--pest'] = true;
-        }
-
-        $this->call('make:test', $arguments);
+        $this->call('make:test', [
+            'name' => Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test'),
+            '--pest' => $this->option('pest'),
+        ]);
     }
 }
