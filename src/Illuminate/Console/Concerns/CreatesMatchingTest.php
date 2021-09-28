@@ -14,19 +14,19 @@ trait CreatesMatchingTest
      */
     protected function addTestOptions()
     {
-        $this->getDefinition()->addOption(new InputOption(
-            'test',
-            null,
-            InputOption::VALUE_NONE,
-            'Generate an accompanying test for the '.$this->type
-        ));
+        $options = [
+            'test' => 'PhpUnit',
+            'pest' => 'Pest',
+        ];
 
-        $this->getDefinition()->addOption(new InputOption(
-            'pest',
-            null,
-            InputOption::VALUE_NONE,
-            'Generate an accompanying Pest test for the '.$this->type
-        ));
+        foreach ($options as $option => $name) {
+            $this->getDefinition()->addOption(new InputOption(
+                $option,
+                null,
+                InputOption::VALUE_NONE,
+                "Generate an accompanying {$name} test for the {$this->type}"
+            ));
+        }
     }
 
     /**
