@@ -375,7 +375,6 @@ class Stringable implements JsonSerializable
         return $this->match($pattern)->isNotEmpty();
     }
 
-
     /**
      * @param  string  $placeholder
      * @return $this
