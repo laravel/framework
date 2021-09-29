@@ -52,6 +52,13 @@ class MailMailableTest extends TestCase
         ], $mailable->to);
         $this->assertTrue($mailable->hasTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
+
+        foreach (['', null, [], false] as $address) {
+            $mailable = new WelcomeMailableStub;
+            $mailable->to($address);
+            $this->assertFalse($mailable->hasTo(new MailableTestUserStub));
+            $this->assertFalse($mailable->hasTo($address));
+        }
     }
 
     public function testMailableSetsCcRecipientsCorrectly()
@@ -108,6 +115,13 @@ class MailMailableTest extends TestCase
         ], $mailable->cc);
         $this->assertTrue($mailable->hasCc('taylor@laravel.com'));
         $this->assertTrue($mailable->hasCc('not-taylor@laravel.com'));
+
+        foreach (['', null, [], false] as $address) {
+            $mailable = new WelcomeMailableStub;
+            $mailable->cc($address);
+            $this->assertFalse($mailable->hasCc(new MailableTestUserStub));
+            $this->assertFalse($mailable->hasCc($address));
+        }
     }
 
     public function testMailableSetsBccRecipientsCorrectly()
@@ -164,6 +178,13 @@ class MailMailableTest extends TestCase
         ], $mailable->bcc);
         $this->assertTrue($mailable->hasBcc('taylor@laravel.com'));
         $this->assertTrue($mailable->hasBcc('not-taylor@laravel.com'));
+
+        foreach (['', null, [], false] as $address) {
+            $mailable = new WelcomeMailableStub;
+            $mailable->bcc($address);
+            $this->assertFalse($mailable->hasBcc(new MailableTestUserStub));
+            $this->assertFalse($mailable->hasBcc($address));
+        }
     }
 
     public function testMailableSetsReplyToCorrectly()
@@ -211,6 +232,67 @@ class MailMailableTest extends TestCase
         ], $mailable->replyTo);
         $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+
+        foreach (['', null, [], false] as $address) {
+            $mailable = new WelcomeMailableStub;
+            $mailable->replyTo($address);
+            $this->assertFalse($mailable->hasReplyTo(new MailableTestUserStub));
+            $this->assertFalse($mailable->hasReplyTo($address));
+        }
+    }
+
+    public function testMailableSetsFromCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->from('taylor@laravel.com');
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->from);
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->from('taylor@laravel.com', 'Taylor Otwell');
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->from(['taylor@laravel.com']);
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->from);
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+        $this->assertFalse($mailable->hasFrom('taylor@laravel.com', 'Taylor Otwell'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->from([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->from(new MailableTestUserStub);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
+        $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->from(collect([new MailableTestUserStub]));
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->from);
+        $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->from(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $this->assertEquals([
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+        ], $mailable->from);
+        $this->assertTrue($mailable->hasFrom(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasFrom('taylor@laravel.com'));
+
+        foreach (['', null, [], false] as $address) {
+            $mailable = new WelcomeMailableStub;
+            $mailable->from($address);
+            $this->assertFalse($mailable->hasFrom(new MailableTestUserStub));
+            $this->assertFalse($mailable->hasFrom($address));
+        }
     }
 
     public function testItIgnoresDuplicatedRawAttachments()
