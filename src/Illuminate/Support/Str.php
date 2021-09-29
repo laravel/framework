@@ -431,6 +431,21 @@ class Str
     }
 
     /**
+     * Merge two strings
+     *
+     * @param string $placeholder
+     * @param string $value
+     * @return string
+     */
+    public static function merge($placeholder, $value)
+    {
+        if (strlen($value) > strlen($placeholder)) {
+            return $value;
+        }
+        return $value . self::substr($placeholder, strlen($value), strlen($placeholder) - strlen($value));
+    }
+
+    /**
      * Pad both sides of a string with another.
      *
      * @param  string  $value
