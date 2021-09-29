@@ -690,6 +690,33 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    public function testItSPopsForKeys()
+    {
+        foreach ($this->connections() as $redis) {
+            $members = ['test:spop:1', 'test:spop:2', 'test:spop:3', 'test:spop:4'];
+
+            foreach ($members as $member) {
+                $redis->sadd('set', $member);
+            }
+
+            $result = $redis->spop('set');
+            $this->assertIsNotArray($result);
+            $this->assertContains($result, $members);
+
+            $result = $redis->spop('set', 1);
+
+            $this->assertIsArray($result);
+            $this->assertCount(1, $result);
+
+            $result = $redis->spop('set', 2);
+
+            $this->assertIsArray($result);
+            $this->assertCount(2, $result);
+
+            $redis->flushAll();
+        }
+    }
+
     public function testPhpRedisScanOption()
     {
         foreach ($this->connections() as $redis) {

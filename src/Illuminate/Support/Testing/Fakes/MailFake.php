@@ -306,7 +306,7 @@ class MailFake implements Mailer, MailQueue
     /**
      * Queue a new e-mail message for sending.
      *
-     * @param  string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
      * @return mixed
      */

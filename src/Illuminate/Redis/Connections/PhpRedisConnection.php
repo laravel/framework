@@ -197,7 +197,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function spop($key, $count = 1)
     {
-        return $this->command('spop', [$key, $count]);
+        return $this->command('spop', func_get_args());
     }
 
     /**
@@ -306,8 +306,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Scans the all keys based on options.
      *
-     * @param mixed $cursor
-     * @param array $options
+     * @param  mixed  $cursor
+     * @param  array  $options
      * @return mixed
      */
     public function scan($cursor, $options = [])
@@ -323,9 +323,9 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Scans the given set for all values based on options.
      *
-     * @param string $key
-     * @param mixed $cursor
-     * @param array $options
+     * @param  string  $key
+     * @param  mixed  $cursor
+     * @param  array  $options
      * @return mixed
      */
     public function zscan($key, $cursor, $options = [])
@@ -341,9 +341,9 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Scans the given set for all values based on options.
      *
-     * @param string $key
-     * @param mixed $cursor
-     * @param array $options
+     * @param  string  $key
+     * @param  mixed  $cursor
+     * @param  array  $options
      * @return mixed
      */
     public function hscan($key, $cursor, $options = [])
@@ -359,9 +359,9 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Scans the given set for all values based on options.
      *
-     * @param string $key
-     * @param mixed $cursor
-     * @param array $options
+     * @param  string  $key
+     * @param  mixed  $cursor
+     * @param  array  $options
      * @return mixed
      */
     public function sscan($key, $cursor, $options = [])
@@ -484,14 +484,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             return $this->command('flushdb');
         }
 
-        foreach ($this->client->_masters() as [$host, $port]) {
-            $redis = tap(new Redis)->connect($host, $port);
-
-            if (isset($this->config['password']) && ! empty($this->config['password'])) {
-                $redis->auth($this->config['password']);
-            }
-
-            $redis->flushDb();
+        foreach ($this->client->_masters() as $master) {
+            $this->client->flushDb($master);
         }
     }
 

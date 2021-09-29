@@ -17,14 +17,6 @@
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">./src</directory>
-        </include>
-        <exclude>
-            <directory suffix=".blade.php">./src/</directory>
-        </exclude>
-    </coverage>
     <php>
         <ini name="memory_limit" value="2048M" />
         <!--

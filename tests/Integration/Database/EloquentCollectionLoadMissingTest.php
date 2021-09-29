@@ -37,6 +37,21 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
             $table->unsignedInteger('comment_id');
         });
 
+        Schema::create('post_relations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_id');
+        });
+
+        Schema::create('post_sub_relations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_relation_id');
+        });
+
+        Schema::create('post_sub_sub_relations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_sub_relation_id');
+        });
+
         User::create();
 
         Post::create(['user_id' => 1]);
@@ -46,6 +61,11 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         Comment::create(['parent_id' => 2, 'post_id' => 1]);
 
         Revision::create(['comment_id' => 1]);
+
+        Post::create(['user_id' => 1]);
+        PostRelation::create(['post_id' => 2]);
+        PostSubRelation::create(['post_relation_id' => 1]);
+        PostSubSubRelation::create(['post_sub_relation_id' => 1]);
     }
 
     public function testLoadMissing()
@@ -89,6 +109,20 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('parent'));
     }
+
+    public function testLoadMissingWithoutInitialLoad()
+    {
+        $user = User::first();
+        $user->loadMissing('posts.postRelation.postSubRelations.postSubSubRelations');
+
+        $this->assertEquals(2, $user->posts->count());
+        $this->assertNull($user->posts[0]->postRelation);
+        $this->assertInstanceOf(PostRelation::class, $user->posts[1]->postRelation);
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations->count());
+        $this->assertInstanceOf(PostSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]);
+        $this->assertEquals(1, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations->count());
+        $this->assertInstanceOf(PostSubSubRelation::class, $user->posts[1]->postRelation->postSubRelations[0]->postSubSubRelations[0]);
+    }
 }
 
 class Comment extends Model
@@ -123,6 +157,42 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function postRelation()
+    {
+        return $this->hasOne(PostRelation::class);
+    }
+}
+
+class PostRelation extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    public function postSubRelations()
+    {
+        return $this->hasMany(PostSubRelation::class);
+    }
+}
+
+class PostSubRelation extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    public function postSubSubRelations()
+    {
+        return $this->hasMany(PostSubSubRelation::class);
+    }
+}
+
+class PostSubSubRelation extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
 }
 
 class Revision extends Model
@@ -135,4 +205,9 @@ class Revision extends Model
 class User extends Model
 {
     public $timestamps = false;
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }

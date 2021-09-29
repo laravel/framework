@@ -27,8 +27,8 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
         /**
          * Create a new array subset constraint instance.
          *
-         * @param iterable  $subset
-         * @param bool  $strict
+         * @param  iterable  $subset
+         * @param  bool  $strict
          * @return void
          */
         public function __construct(iterable $subset, bool $strict = false)
@@ -91,9 +91,9 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
         /**
          * Returns a string representation of the constraint.
          *
-         * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-         *
          * @return string
+         *
+         * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
          */
         public function toString(): string
         {
@@ -162,8 +162,8 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
         /**
          * Create a new array subset constraint instance.
          *
-         * @param iterable  $subset
-         * @param bool  $strict
+         * @param  iterable  $subset
+         * @param  bool  $strict
          * @return void
          */
         public function __construct(iterable $subset, bool $strict = false)
@@ -224,9 +224,9 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
         /**
          * Returns a string representation of the constraint.
          *
-         * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-         *
          * @return string
+         *
+         * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
          */
         public function toString(): string
         {
