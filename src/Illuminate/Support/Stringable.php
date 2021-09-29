@@ -377,7 +377,7 @@ class Stringable implements JsonSerializable
 
 
     /**
-     * @param string $placeholder
+     * @param  string  $placeholder
      * @return $this
      */
     public function merge($placeholder)

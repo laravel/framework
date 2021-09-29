@@ -431,10 +431,10 @@ class Str
     }
 
     /**
-     * Merge two strings
+     * Merge two strings.
      *
-     * @param string $placeholder
-     * @param string $value
+     * @param  string  $placeholder
+     * @param  string  $value
      * @return string
      */
     public static function merge($placeholder, $value)
@@ -442,7 +442,8 @@ class Str
         if (strlen($value) > strlen($placeholder)) {
             return $value;
         }
-        return $value . self::substr($placeholder, strlen($value), strlen($placeholder) - strlen($value));
+
+        return $value.self::substr($placeholder, strlen($value), strlen($placeholder) - strlen($value));
     }
 
     /**
