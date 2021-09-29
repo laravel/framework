@@ -14,6 +14,11 @@ use Queue;
  */
 class WorkCommandTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('app.debug', 'true');

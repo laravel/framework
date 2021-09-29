@@ -30,6 +30,8 @@ class LogTransport implements TransportInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return int
      */
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {

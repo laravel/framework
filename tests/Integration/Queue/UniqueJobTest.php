@@ -19,6 +19,11 @@ use Orchestra\Testbench\TestCase;
  */
 class UniqueJobTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testbench');

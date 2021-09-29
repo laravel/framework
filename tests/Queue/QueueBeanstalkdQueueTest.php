@@ -23,6 +23,11 @@ class QueueBeanstalkdQueueTest extends TestCase
      */
     private $container;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         m::close();

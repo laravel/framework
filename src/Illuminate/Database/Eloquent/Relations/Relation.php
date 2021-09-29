@@ -418,7 +418,7 @@ abstract class Relation implements BuilderContract
     /**
      * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
      *
-     * @param  array|null  $map
+     * @param  array  $map
      * @param  bool  $merge
      * @return array
      */
@@ -489,13 +489,7 @@ abstract class Relation implements BuilderContract
             return $this->macroCall($method, $parameters);
         }
 
-        $result = $this->forwardCallTo($this->query, $method, $parameters);
-
-        if ($result === $this->query) {
-            return $this;
-        }
-
-        return $result;
+        return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
     }
 
     /**

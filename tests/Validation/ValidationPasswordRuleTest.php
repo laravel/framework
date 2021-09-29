@@ -232,6 +232,29 @@ class ValidationPasswordRuleTest extends TestCase
         Password::defaults('required|password');
     }
 
+    public function testItPassesWithValidDataIfTheSameValidationRulesAreReused()
+    {
+        $rules = [
+            'password' => Password::default(),
+        ];
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => '1234'],
+            $rules
+        );
+
+        $this->assertFalse($v->passes());
+
+        $v1 = new Validator(
+            resolve('translator'),
+            ['password' => '12341234'],
+            $rules
+        );
+
+        $this->assertTrue($v1->passes());
+    }
+
     protected function passes($rule, $values)
     {
         $this->assertValidationRules($rule, $values, true, []);

@@ -2,9 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
+use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\UpCommand;
+use Illuminate\Foundation\Events\MaintenanceModeDisabled;
+use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -145,5 +150,28 @@ class MaintenanceModeTest extends TestCase
         $this->assertFalse(MaintenanceModeBypassCookie::isValid($cookie->getValue(), 'test-key'));
 
         Carbon::setTestNow(null);
+    }
+
+    public function testDispatchEventWhenMaintenanceModeIsEnabled()
+    {
+        Event::fake();
+
+        Event::assertNotDispatched(MaintenanceModeEnabled::class);
+        $this->artisan(DownCommand::class);
+        Event::assertDispatched(MaintenanceModeEnabled::class);
+    }
+
+    public function testDispatchEventWhenMaintenanceModeIsDisabled()
+    {
+        file_put_contents(storage_path('framework/down'), json_encode([
+            'retry' => 60,
+            'refresh' => 60,
+        ]));
+
+        Event::fake();
+
+        Event::assertNotDispatched(MaintenanceModeDisabled::class);
+        $this->artisan(UpCommand::class);
+        Event::assertDispatched(MaintenanceModeDisabled::class);
     }
 }

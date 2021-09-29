@@ -124,6 +124,7 @@ class FluentArrayIteratorStub implements IteratorAggregate
         $this->items = $items;
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->items);

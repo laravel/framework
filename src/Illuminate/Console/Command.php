@@ -163,6 +163,8 @@ class Command extends SymfonyCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function isHidden(): bool
     {

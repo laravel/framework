@@ -2,8 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -453,6 +456,56 @@ trait QueriesRelationships
     public function orWhereMorphedTo($relation, $model)
     {
         return $this->whereMorphedTo($relation, $model, 'or');
+    }
+
+    /**
+     * Add a "belongs to" relationship where clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string  $relationship
+     * @param  string  $boolean
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
+    {
+        if ($relationshipName === null) {
+            $relationshipName = Str::camel(class_basename($related));
+        }
+
+        try {
+            $relationship = $this->model->{$relationshipName}();
+        } catch (BadMethodCallException $exception) {
+            throw RelationNotFoundException::make($this->model, $relationshipName);
+        }
+
+        if (! $relationship instanceof BelongsTo) {
+            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
+        }
+
+        $this->where(
+            $relationship->getQualifiedForeignKeyName(),
+            '=',
+            $related->getAttributeValue($relationship->getOwnerKeyName()),
+            $boolean,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add an "BelongsTo" relationship with an "or where" clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string  $relationship
+     * @return $this
+     *
+     * @throws \Exception
+     */
+    public function orWhereBelongsTo($related, $relationshipName = null)
+    {
+        return $this->whereBelongsTo($related, $relationshipName, 'or');
     }
 
     /**

@@ -906,6 +906,35 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testWhereBelongsTo()
+    {
+        $related = new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 1,
+            'parent_id' => 2,
+        ]);
+
+        $parent = new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 2,
+            'parent_id' => 1,
+        ]);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+
+        $result = $builder->whereBelongsTo($parent);
+        $this->assertEquals($result, $builder);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+
+        $result = $builder->whereBelongsTo($parent, 'parent');
+        $this->assertEquals($result, $builder);
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
@@ -1947,4 +1976,22 @@ class EloquentBuilderTestStubStringPrimaryKey extends Model
     protected $table = 'foo_table';
 
     protected $keyType = 'string';
+}
+
+class EloquentBuilderTestWhereBelongsToStub extends Model
+{
+    protected $fillable = [
+        'id',
+        'parent_id',
+    ];
+
+    public function eloquentBuilderTestWhereBelongsToStub()
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id', 'parent');
+    }
 }

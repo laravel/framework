@@ -862,7 +862,7 @@ class Mailable implements MailableContract, Renderable
      * Assert that the given text is present in the HTML email body.
      *
      * @param  string  $string
-     * @return void
+     * @return $this
      */
     public function assertSeeInHtml($string)
     {
@@ -872,13 +872,15 @@ class Mailable implements MailableContract, Renderable
             Str::contains($html, $string),
             "Did not see expected text [{$string}] within email body."
         );
+
+        return $this;
     }
 
     /**
      * Assert that the given text is not present in the HTML email body.
      *
      * @param  string  $string
-     * @return void
+     * @return $this
      */
     public function assertDontSeeInHtml($string)
     {
@@ -888,13 +890,15 @@ class Mailable implements MailableContract, Renderable
             Str::contains($html, $string),
             "Saw unexpected text [{$string}] within email body."
         );
+
+        return $this;
     }
 
     /**
      * Assert that the given text is present in the plain-text email body.
      *
      * @param  string  $string
-     * @return void
+     * @return $this
      */
     public function assertSeeInText($string)
     {
@@ -904,13 +908,15 @@ class Mailable implements MailableContract, Renderable
             Str::contains($text, $string),
             "Did not see expected text [{$string}] within text email body."
         );
+
+        return $this;
     }
 
     /**
      * Assert that the given text is not present in the plain-text email body.
      *
      * @param  string  $string
-     * @return void
+     * @return $this
      */
     public function assertDontSeeInText($string)
     {
@@ -920,6 +926,8 @@ class Mailable implements MailableContract, Renderable
             Str::contains($text, $string),
             "Saw unexpected text [{$string}] within text email body."
         );
+
+        return $this;
     }
 
     /**

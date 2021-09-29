@@ -91,7 +91,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         $project->collaborators()->updateExistingPivot($user->id, ['role' => 'Lead Developer']);
 
-        $this->assertSame(
+        $this->assertEquals(
             [
                 'user_id' => '1',
                 'project_id' => '1',

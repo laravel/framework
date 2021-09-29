@@ -8,6 +8,8 @@ use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -1207,7 +1209,18 @@ trait HasAttributes
      */
     protected function isDateCastable($key)
     {
-        return $this->hasCast($key, ['date', 'datetime', 'custom_datetime', 'immutable_date', 'immutable_datetime', 'immutable_custom_datetime']);
+        return $this->hasCast($key, ['date', 'datetime', 'immutable_date', 'immutable_datetime']);
+    }
+
+    /**
+     * Determine whether a value is Date / DateTime custom-castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isDateCastableWithCustomFormat($key)
+    {
+        return $this->hasCast($key, ['custom_datetime', 'immutable_custom_datetime']);
     }
 
     /**
@@ -1285,7 +1298,7 @@ trait HasAttributes
     protected function isClassSerializable($key)
     {
         return $this->isClassCastable($key) &&
-            method_exists($this->parseCasterClass($this->getCasts()[$key]), 'serialize');
+            method_exists($this->resolveCasterClass($key), 'serialize');
     }
 
     /**
@@ -1633,7 +1646,7 @@ trait HasAttributes
             return true;
         } elseif (is_null($attribute)) {
             return false;
-        } elseif ($this->isDateAttribute($key) || $this->isDateCastable($key)) {
+        } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
@@ -1648,6 +1661,8 @@ trait HasAttributes
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
+        } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
+            return $this->fromJson($attribute) === $this->fromJson($original);
         }
 
         return is_numeric($attribute) && is_numeric($original)

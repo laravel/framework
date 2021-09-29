@@ -9,6 +9,7 @@ use Illuminate\Database\Connectors\SQLiteConnector;
 use Illuminate\Database\Connectors\SqlServerConnector;
 use Mockery as m;
 use PDO;
+use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -35,8 +36,9 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);
-        $connection->shouldReceive('execute')->once();
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($statement);
+        $statement->shouldReceive('execute')->once();
         $connection->shouldReceive('exec')->zeroOrMoreTimes();
         $result = $connector->connect($config);
 
@@ -61,9 +63,10 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(PDO::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ')->andReturn($connection);
-        $connection->shouldReceive('execute')->zeroOrMoreTimes();
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\' collate \'utf8_unicode_ci\'')->andReturn($statement);
+        $connection->shouldReceive('prepare')->once()->with('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ')->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
         $connection->shouldReceive('exec')->zeroOrMoreTimes();
         $result = $connector->connect($config);
 
@@ -78,8 +81,9 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
-        $connection->shouldReceive('execute')->once();
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
+        $statement->shouldReceive('execute')->once();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -93,9 +97,10 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set search_path to "public"')->andReturn($connection);
-        $connection->shouldReceive('execute')->twice();
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "public"')->andReturn($statement);
+        $statement->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -109,9 +114,10 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($connection);
-        $connection->shouldReceive('execute')->twice();
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($statement);
+        $statement->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
@@ -157,9 +163,10 @@ class DatabaseConnectorTest extends TestCase
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set application_name to \'Laravel App\'')->andReturn($connection);
-        $connection->shouldReceive('execute')->twice();
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
+        $connection->shouldReceive('prepare')->once()->with('set application_name to \'Laravel App\'')->andReturn($statement);
+        $statement->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);

@@ -278,7 +278,7 @@ class BelongsToMany extends Relation
 
         // Once we have an array dictionary of child objects we can easily match the
         // children back to their parent using the dictionary and the keys on the
-        // the parent models. Then we will return the hydrated models back out.
+        // parent models. Then we should return these hydrated models back out.
         foreach ($models as $model) {
             $key = $this->getDictionaryKey($model->{$this->parentKey});
 

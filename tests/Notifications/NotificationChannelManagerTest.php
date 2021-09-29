@@ -18,6 +18,11 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationChannelManagerTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         m::close();

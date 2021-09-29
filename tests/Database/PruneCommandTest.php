@@ -4,12 +4,15 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Events\Dispatcher;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -60,6 +63,41 @@ No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
 EOF, str_replace("\r", '', $output->fetch()));
     }
 
+    public function testTheCommandMayBePretended()
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->setAsGlobal();
+        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
+            $table->string('name')->nullable();
+            $table->string('value')->nullable();
+        });
+        DB::connection('default')->table('prunables')->insert([
+            ['name' => 'zain', 'value' => 1],
+            ['name' => 'patrice', 'value' => 2],
+            ['name' => 'amelia', 'value' => 3],
+            ['name' => 'stuart', 'value' => 4],
+            ['name' => 'bello', 'value' => 5],
+        ]);
+        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $db->getConnection('default')]);
+        PrunableTestModelWithPrunableRecords::setConnectionResolver($resolver);
+
+        $output = $this->artisan([
+            '--model' => PrunableTestModelWithPrunableRecords::class,
+            '--pretend' => true,
+        ]);
+
+        $this->assertEquals(<<<'EOF'
+3 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records will be pruned.
+
+EOF, str_replace("\r", '', $output->fetch()));
+
+        $this->assertEquals(5, PrunableTestModelWithPrunableRecords::count());
+    }
+
     protected function artisan($arguments)
     {
         $input = new ArrayInput($arguments);
@@ -84,12 +122,20 @@ class PrunableTestModelWithPrunableRecords extends Model
 {
     use MassPrunable;
 
+    protected $table = 'prunables';
+    protected $connection = 'default';
+
     public function pruneAll()
     {
         event(new ModelsPruned(static::class, 10));
         event(new ModelsPruned(static::class, 20));
 
         return 20;
+    }
+
+    public function prunable()
+    {
+        return static::where('value', '>=', 3);
     }
 }
 

@@ -959,6 +959,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
     /**
      * {@inheritdoc}
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(SymfonyRequest $request, int $type = self::MAIN_REQUEST, bool $catch = true): SymfonyResponse
     {
