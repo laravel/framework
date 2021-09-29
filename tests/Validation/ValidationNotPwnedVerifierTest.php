@@ -49,7 +49,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('timeout')
             ->once()
-            ->with(20)
+            ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
@@ -86,7 +86,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
         $httpFactory
             ->shouldReceive('timeout')
             ->once()
-            ->with(20)
+            ->with(30)
             ->andReturn($httpFactory);
 
         $httpFactory->shouldReceive('get')
