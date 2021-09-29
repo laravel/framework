@@ -105,40 +105,42 @@ class ValidationNotPwnedVerifierTest extends TestCase
         ]));
     }
 
-    // public function testDnsDown()
-    // {
-    //     $container = Container::getInstance();
-    //     $exception = new ConnectionException();
+    public function testDnsDown()
+    {
+        $container = Container::getInstance();
+        $exception = new ConnectionException();
 
-    //     $exceptionHandler = m::mock(ExceptionHandler::class);
-    //     $exceptionHandler->shouldReceive('report')->once()->with($exception);
-    //     $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
-    //         return $exceptionHandler;
-    //     });
+        $exceptionHandler = m::mock(ExceptionHandler::class);
+        $exceptionHandler->shouldReceive('report')->once()->with($exception);
+        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
+            return $exceptionHandler;
+        });
 
-    //     $httpFactory = m::mock(HttpFactory::class);
+        $httpFactory = m::mock(HttpFactory::class);
 
-    //     $httpFactory
-    //         ->shouldReceive('withHeaders')
-    //         ->once()
-    //         ->with(['Add-Padding' => true])
-    //         ->andReturn($httpFactory);
+        $httpFactory
+            ->shouldReceive('withHeaders')
+            ->once()
+            ->with(['Add-Padding' => true])
+            ->andReturn($httpFactory);
 
-    //     $httpFactory
-    //         ->shouldReceive('timeout')
-    //         ->once()
-    //         ->with(20)
-    //         ->andReturn($httpFactory);
+        $httpFactory
+            ->shouldReceive('timeout')
+            ->once()
+            ->with(20)
+            ->andReturn($httpFactory);
 
-    //     $httpFactory
-    //         ->shouldReceive('get')
-    //         ->once()
-    //         ->andThrow($exception);
+        $httpFactory
+            ->shouldReceive('get')
+            ->once()
+            ->andThrow($exception);
 
-    //     $verifier = new NotPwnedVerifier($httpFactory);
-    //     $this->assertTrue($verifier->verify([
-    //         'value' => 123123123,
-    //         'threshold' => 0,
-    //     ]));
-    // }
+        $verifier = new NotPwnedVerifier($httpFactory);
+        $this->assertTrue($verifier->verify([
+            'value' => 123123123,
+            'threshold' => 0,
+        ]));
+
+        unset($container[ExceptionHandler::class]);
+    }
 }
