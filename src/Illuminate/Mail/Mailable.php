@@ -619,7 +619,7 @@ class Mailable implements MailableContract, Renderable
     protected function setAddress($address, $name = null, $property = 'to')
     {
         if (empty($address)) {
-            $address = [];
+            return $this;
         }
 
         foreach ($this->addressesToArray($address, $name) as $recipient) {
