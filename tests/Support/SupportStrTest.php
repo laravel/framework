@@ -272,6 +272,8 @@ class SupportStrTest extends TestCase
 
         // empty patterns
         $this->assertFalse(Str::is([], 'test'));
+        $this->assertFalse(Str::is([null], 0));
+        $this->assertTrue(Str::is([null], null));
     }
 
     /**
