@@ -90,7 +90,6 @@ class NotPwnedVerifier implements UncompromisedVerifier
                 'https://api.pwnedpasswords.com/range/'.$hashPrefix
             );
         } catch (Exception $e) {
-            dd($e);
             report($e);
         }
 
