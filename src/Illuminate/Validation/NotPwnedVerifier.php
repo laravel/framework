@@ -89,7 +89,8 @@ class NotPwnedVerifier implements UncompromisedVerifier
             ])->timeout($this->timeout)->get(
                 'https://api.pwnedpasswords.com/range/'.$hashPrefix
             );
-        } catch (Exception $e) {dd($e);
+        } catch (Exception $e) {
+            dd($e);
             report($e);
         }
 
