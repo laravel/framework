@@ -252,6 +252,7 @@ class Str
     public static function is($pattern, $value)
     {
         $patterns = Arr::wrap($pattern);
+
         $value = (string) $value;
 
         if (empty($patterns)) {
