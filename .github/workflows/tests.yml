@@ -145,7 +145,6 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
-          AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
         uses: actions/upload-artifact@v2
