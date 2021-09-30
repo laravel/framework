@@ -559,10 +559,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItScansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $initialKeys = ['test:scan:1', 'test:scan:2'];
 
@@ -591,10 +587,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItZscansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $members = [100 => 'test:zscan:1', 200 => 'test:zscan:2'];
 
@@ -636,10 +628,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItHscansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $fields = ['name' => 'mohamed', 'hobby' => 'diving'];
 
@@ -677,10 +665,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItSscansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $members = ['test:sscan:1', 'test:sscan:2'];
 
