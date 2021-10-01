@@ -106,7 +106,7 @@ trait SoftDeletes
      * @return bool
      */
     public function restore()
-    {        
+    {
         if (! $this->trashed()) {
             return true;
         }
