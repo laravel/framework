@@ -585,6 +585,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application is in the staging environment.
+     *
+     * @return bool
+     */
+    public function isStaging()
+    {
+        return $this['env'] === 'staging';
+    }
+
+    /**
      * Determine if the application is in the production environment.
      *
      * @return bool

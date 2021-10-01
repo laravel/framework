@@ -11,6 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool configurationIsCached()
  * @method static bool hasBeenBootstrapped()
  * @method static bool isDownForMaintenance()
+ * @method static bool isStaging()
  * @method static bool routesAreCached()
  * @method static bool runningInConsole()
  * @method static bool runningUnitTests()
