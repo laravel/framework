@@ -680,7 +680,7 @@ trait ValidatesAttributes
             ->values()
             ->all() ?: [new RFCValidation];
 
-        return (new EmailValidator)->isValid($value, new MultipleValidationWithAnd($validations));
+        return $this->container->make(EmailValidator::class)->isValid($value, new MultipleValidationWithAnd($validations));
     }
 
     /**
