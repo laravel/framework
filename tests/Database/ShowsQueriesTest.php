@@ -55,7 +55,7 @@ class ShowsQueriesTest extends TestCase
         $this->schema()->drop('products');
     }
 
-    public function testTheQuerieIshownByQueryBuilder()
+    public function testTheQueryIsShownByQueryBuilder()
     {
         ob_start();
         DB::table('products')->where('id', '=', 1)->show()->get();
@@ -65,7 +65,16 @@ class ShowsQueriesTest extends TestCase
         $this->assertEquals('select * from "products" where "id" = 1', $sql);
     }
 
-    public function testTheQuerieIshownByEloquentBuilder()
+    public function testTheQueryCallsItsCallback()
+    {
+        $callback = function(string $sql){
+            $this->assertEquals('select * from "products" where "id" = 1', $sql);
+        };
+
+        DB::table('products')->where('id', '=', 1)->show($callback)->get();
+    }
+
+    public function testTheQueryIsShownByEloquentBuilder()
     {
         ob_start();
         ProductTestContract::whereId(1)->show()->get();
