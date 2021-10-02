@@ -593,8 +593,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function mergeGroupAttributesIntoRoute($route)
     {
-        if(!empty($this->groupStack[0]['withTrashed']) && $this->groupStack[0]['withTrashed'])
-        {
+        if (! empty($this->groupStack[0]['withTrashed']) && $this->groupStack[0]['withTrashed']) {
             $route->withTrashed();
         }
 

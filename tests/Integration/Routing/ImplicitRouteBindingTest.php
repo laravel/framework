@@ -140,7 +140,7 @@ PHP);
 
         config(['app.key' => str_repeat('a', 32)]);
 
-        Route::group(['prefix' => 'user', 'middleware' => 'web', 'withTrashed' => true], function() {
+        Route::group(['prefix' => 'user', 'middleware' => 'web', 'withTrashed' => true], function () {
             Route::post('/{user}', function (ImplicitBindingModel $user) {
                 return $user;
             });
@@ -149,15 +149,15 @@ PHP);
                 return $user;
             });
 
-            Route::group(['prefix' => 'users'], function() {
+            Route::group(['prefix' => 'users'], function () {
                 Route::get('/{user}/edit', function (ImplicitBindingModel $user) {
                     return $user;
                 });
             });
         });
 
-        Route::group(['prefix' => 'not-trashed'], function() {
-            Route::group(['prefix' => 'users', 'withTrashed' => true], function() {
+        Route::group(['prefix' => 'not-trashed'], function () {
+            Route::group(['prefix' => 'users', 'withTrashed' => true], function () {
                 Route::get('/{user}/edit', function (ImplicitBindingModel $user) {
                     return $user;
                 });
