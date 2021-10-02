@@ -62,4 +62,9 @@ interface Validator extends MessageProvider
      * @return \Illuminate\Support\MessageBag
      */
     public function errors();
+    /**
+     * Stops validation after encountering first error
+     * @return void
+     */
+    public function stopOnFirstFailure();
 }
