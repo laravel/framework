@@ -148,6 +148,20 @@ PHP);
             Route::get('/{user}/edit', function (ImplicitBindingModel $user) {
                 return $user;
             });
+
+            Route::group(['prefix' => 'users'], function() {
+                Route::get('/{user}/edit', function (ImplicitBindingModel $user) {
+                    return $user;
+                });
+            });
+        });
+
+        Route::group(['prefix' => 'not-trashed'], function() {
+            Route::group(['prefix' => 'users', 'withTrashed' => true], function() {
+                Route::get('/{user}/edit', function (ImplicitBindingModel $user) {
+                    return $user;
+                });
+            });
         });
 
         $post_response = $this->postJson("/user/{$user->id}");
@@ -160,6 +174,20 @@ PHP);
         $edit_response = $this->getJson("/user/{$user->id}/edit");
 
         $edit_response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $nested_edit_response = $this->getJson("/user/users/{$user->id}/edit");
+
+        $nested_edit_response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $not_trashed_nested_edit_response = $this->getJson("/user/users/{$user->id}/edit");
+
+        $not_trashed_nested_edit_response->assertJson([
             'id' => $user->id,
             'name' => $user->name,
         ]);
