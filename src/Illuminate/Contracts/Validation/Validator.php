@@ -64,7 +64,7 @@ interface Validator extends MessageProvider
     public function errors();
     /**
      * Stops validation after encountering first error
-     * @return void
+     * 
      */
     public function stopOnFirstFailure();
 }
