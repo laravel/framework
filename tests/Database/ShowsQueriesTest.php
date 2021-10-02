@@ -43,7 +43,6 @@ class ShowsQueriesTest extends TestCase
             $table->increments('id');
             $table->string('name');
         });
-
     }
 
     /**
@@ -64,7 +63,6 @@ class ShowsQueriesTest extends TestCase
         ob_end_clean();
 
         $this->assertEquals('select * from "products" where "id" = 1', $sql);
-
     }
 
     public function testTheQuerieIshownByEloquentBuilder()
@@ -104,12 +102,6 @@ class ShowsQueriesTest extends TestCase
         return $this->connection()->getSchemaBuilder();
     }
 
-    private function doISeeTheSqlOnView(string $sql)
-    {
-
-        $view->assertSee($sql);
-    }
-
 }
 
 /**
@@ -117,7 +109,7 @@ class ShowsQueriesTest extends TestCase
  */
 class ProductTestContract extends Eloquent
 {
-    protected $table   = 'products';
+    protected $table = 'products';
     protected $guarded = [];
 
     public function category()
@@ -128,7 +120,7 @@ class ProductTestContract extends Eloquent
 
 class CategoryTestContract extends Eloquent
 {
-    protected $table   = 'categories';
+    protected $table = 'categories';
     protected $guarded = [];
 
     public function category()

@@ -5,7 +5,7 @@ namespace Illuminate\Database\Concerns;
 trait ShowsQueries
 {
     /**
-     * Shows the query
+     * Shows the query.
      *
      * @return $this
      */
