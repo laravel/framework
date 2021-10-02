@@ -39,7 +39,6 @@ trait ShowsQueries
         $bindings = $query->getConnection()->prepareBindings($query->getBindings());
 
         $sql = preg_replace_callback('/(?<!\?)\?(?!\?)/', function () use (&$bindings, $query) {
-
             $value = array_shift($bindings);
 
             switch ($value) {
@@ -59,7 +58,6 @@ trait ShowsQueries
             }
 
             return $value;
-
         }, $query->toSql());
 
         return $sql;
