@@ -101,7 +101,6 @@ class ShowsQueriesTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-
 }
 
 /**
