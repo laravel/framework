@@ -77,7 +77,7 @@ class ShowsQueriesTest extends TestCase
         $this->assertEquals('select * from "products" where "id" = 1', $sql);
 
         ob_start();
-        ProductTestContract::whereHas('category')->show();
+        ProductTestContract::whereHas('category')->show()->get();
         $sql = ob_get_contents();
         ob_end_clean();
 

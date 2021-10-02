@@ -9,7 +9,7 @@ trait ShowsQueries
      *
      * @return $this
      */
-    public function show($toScreen = false)
+    public function show()
     {
         $sql = $this->toSql();
 
