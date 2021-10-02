@@ -246,6 +246,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Get the values for all of the input and files.
+     *
+     * @param  array|mixed|null  $keys
+     * @return array
+     */
+    public function values($keys = null)
+    {
+        return array_values($this->all(is_array($keys) ? $keys : func_get_args()));
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @param  array|mixed|null  $keys
