@@ -53,10 +53,11 @@ trait ShowsQueries
                     break;
                 default:
                     $value = with($query->getConnection(), function ($connection) use ($value) {
-                        return $connection->getPdo()->quote((string)$value);
+                        return $connection->getPdo()->quote((string) $value);
                     });
                     break;
             }
+
             return $value;
 
         }, $query->toSql());
