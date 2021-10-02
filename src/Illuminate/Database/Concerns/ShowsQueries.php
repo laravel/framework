@@ -7,7 +7,7 @@ trait ShowsQueries
     /**
      * Shows the query.
      *
-     * @param \Closure $callback
+     * @param  \Closure|null  $callback
      * @return mixed
      */
     public function show(\Closure $callback = null)

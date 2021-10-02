@@ -67,7 +67,7 @@ class ShowsQueriesTest extends TestCase
 
     public function testTheQueryCallsItsCallback()
     {
-        $callback = function(string $sql){
+        $callback = function (string $sql){
             $this->assertEquals('select * from "products" where "id" = 1', $sql);
         };
 
