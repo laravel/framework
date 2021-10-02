@@ -290,7 +290,7 @@ trait InteractsWithIO
      * @param  int|string|null  $verbosity
      * @return void
      */
-    public function line($string, $style = null, $verbosity = null)
+    public function line($string = '', $style = null, $verbosity = null)
     {
         $styled = $style ? "<$style>$string</$style>" : $string;
 
