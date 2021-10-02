@@ -131,6 +131,39 @@ PHP);
             'name' => $user->name,
         ]);
     }
+
+    public function testSoftDeletedModelsCanBeRetrievedUsingWithTrashedMethodOnGroups()
+    {
+        $user = ImplicitBindingModel::create(['name' => 'Dries']);
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::group(['prefix' => 'user', 'middleware' => 'web', 'withTrashed' => true], function() {
+            Route::post('/{user}', function (ImplicitBindingModel $user) {
+                return $user;
+            });
+
+            Route::get('/{user}/edit', function (ImplicitBindingModel $user) {
+                return $user;
+            });
+        });
+
+        $post_response = $this->postJson("/user/{$user->id}");
+
+        $post_response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $edit_response = $this->getJson("/user/{$user->id}/edit");
+
+        $edit_response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+    }
 }
 
 class ImplicitBindingModel extends Model
