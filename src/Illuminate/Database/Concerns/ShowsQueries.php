@@ -42,7 +42,7 @@ trait ShowsQueries
 
             $value = array_shift($bindings);
 
-            switch($value){
+            switch ($value) {
                 case null:
                     $value = 'null';
                     break;
@@ -52,7 +52,9 @@ trait ShowsQueries
                 case is_numeric($value):
                     break;
                 default:
-                    $value = with($query->getConnection(), fn ($connection) => $connection->getPdo()->quote((string) $value));
+                    $value = with($query->getConnection(), function ($connection) use ($value) {
+                        return $connection->getPdo()->quote((string)$value);
+                    });
                     break;
             }
             return $value;
