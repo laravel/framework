@@ -625,11 +625,17 @@ class Builder
     public function eagerLoadRelations(array $models)
     {
         foreach ($this->eagerLoad as $name => $constraints) {
+            $segments = explode(' ', $name);
+
+            if (count($segments) === 3 && Str::lower($segments[1] === 'as')) {
+                [$name, $alias] = [$segments[0], $segments[2]];
+            }
+
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
             if (strpos($name, '.') === false) {
-                $models = $this->eagerLoadRelation($models, $name, $constraints);
+                $models = $this->eagerLoadRelation($models, $name, $constraints, $alias ?? null);
             }
         }
 
@@ -644,7 +650,7 @@ class Builder
      * @param  \Closure  $constraints
      * @return array
      */
-    protected function eagerLoadRelation(array $models, $name, Closure $constraints)
+    protected function eagerLoadRelation(array $models, $name, Closure $constraints, string $alias = null)
     {
         // First we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the
@@ -660,7 +666,8 @@ class Builder
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
             $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->getEager(),
+            $alias ?? $name
         );
     }
 
