@@ -1182,7 +1182,7 @@ class Collection implements ArrayAccess, Enumerable
             return $chunked;
         }
 
-        return $chunked->map(function(Collection $items, $key) use ($callback) {
+        return $chunked->map(function (Collection $items, $key) use ($callback) {
             return $callback($items, $key);
         });
     }

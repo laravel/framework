@@ -1914,7 +1914,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         $data = $data->chunk(3, function ($chunk) {
-            return $chunk->filter(function($item) {
+            return $chunk->filter(function ($item) {
                 return $item != 1;
             });
         });
@@ -1925,7 +1925,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 2, 2 => 3], $data->first()->toArray());
         $this->assertEquals([9 => 10], $data->get(3)->toArray());
     }
-
 
     /**
      * @dataProvider collectionClassProvider
