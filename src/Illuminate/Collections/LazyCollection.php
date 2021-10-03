@@ -1141,8 +1141,8 @@ class LazyCollection implements Enumerable
             return $chunked;
         }
 
-        return $chunked->map(function (LazyCollection $chunk) use ($callback) {
-            return $callback($chunk);
+        return $chunked->map(function (LazyCollection $chunk, $key) use ($callback) {
+            return $callback($chunk, $key);
         });
     }
 
