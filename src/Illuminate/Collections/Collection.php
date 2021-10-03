@@ -1182,8 +1182,8 @@ class Collection implements ArrayAccess, Enumerable
             return $chunked;
         }
 
-        return $chunked->each(function(Collection $items) use ($callback) {
-            return $callback($items);
+        return $chunked->map(function(Collection $items, $key) use ($callback) {
+            return $callback($items, $key);
         });
     }
 
