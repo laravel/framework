@@ -142,7 +142,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $tag = EloquentManyToManyPolymorphicTestTag::create();
         $post->tags()->attach($tag->id);
 
-        $post = EloquentManyToManyPolymorphicTestPost::with(['tags as tags_alias' => function($query) use ($tag) {
+        $post = EloquentManyToManyPolymorphicTestPost::with(['tags as tags_alias' => function ($query) use ($tag) {
             $query->where('id', $tag->id);
         }])->whereId(1)->first();
         $tag = EloquentManyToManyPolymorphicTestTag::with('posts')->whereId(1)->first();
