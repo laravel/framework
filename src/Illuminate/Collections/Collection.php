@@ -1161,9 +1161,10 @@ class Collection implements ArrayAccess, Enumerable
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
+     * @param callable|null $callback
      * @return static
      */
-    public function chunk($size)
+    public function chunk($size, callable $callback = null)
     {
         if ($size <= 0) {
             return new static;
@@ -1175,7 +1176,15 @@ class Collection implements ArrayAccess, Enumerable
             $chunks[] = new static($chunk);
         }
 
-        return new static($chunks);
+        $chunked = new static($chunks);
+
+        if (! $callback) {
+            return $chunked;
+        }
+
+        return $chunked->each(function(Collection $items) use ($callback) {
+            return $callback($items);
+        });
     }
 
     /**
