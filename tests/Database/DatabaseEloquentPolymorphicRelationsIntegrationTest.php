@@ -95,12 +95,44 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $tag = EloquentManyToManyPolymorphicTestTag::create();
         $post->tags()->attach($tag->id);
 
-        $post = EloquentManyToManyPolymorphicTestPost::with('tags')->whereId(1)->first();
+        $post = EloquentManyToManyPolymorphicTestPost::with('tags as tags_test')->whereId(1)->first();
         $tag = EloquentManyToManyPolymorphicTestTag::with('posts')->whereId(1)->first();
 
         $this->assertTrue($post->relationLoaded('tags'));
         $this->assertTrue($tag->relationLoaded('posts'));
         $this->assertEquals($tag->id, $post->tags->first()->id);
+        $this->assertEquals($post->id, $tag->posts->first()->id);
+    }
+
+    public function testEagerLoadingAliasingRelationName()
+    {
+        $post = EloquentManyToManyPolymorphicTestPost::create();
+        $tag = EloquentManyToManyPolymorphicTestTag::create();
+        $post->tags()->attach($tag->id);
+
+        $post = EloquentManyToManyPolymorphicTestPost::with('tags as tags_alias')->whereId(1)->first();
+        $tag = EloquentManyToManyPolymorphicTestTag::with('posts')->whereId(1)->first();
+
+        $this->assertTrue($post->relationLoaded('tags_alias'));
+        $this->assertTrue($tag->relationLoaded('posts'));
+        $this->assertEquals($tag->id, $post->tags_alias->first()->id);
+        $this->assertEquals($post->id, $tag->posts->first()->id);
+    }
+
+    public function testEagerLoadCanLoadSameRelationWithDifferentAliases()
+    {
+        $post = EloquentManyToManyPolymorphicTestPost::create();
+        $tag = EloquentManyToManyPolymorphicTestTag::create();
+        $post->tags()->attach($tag->id);
+
+        $post = EloquentManyToManyPolymorphicTestPost::with('tags as tags_alias', 'tags as second_tags')->whereId(1)->first();
+        $tag = EloquentManyToManyPolymorphicTestTag::with('posts')->whereId(1)->first();
+
+        $this->assertTrue($post->relationLoaded('tags_alias'));
+        $this->assertTrue($post->relationLoaded('second_tags'));
+        $this->assertTrue($tag->relationLoaded('posts'));
+        $this->assertEquals($tag->id, $post->tags_alias->first()->id);
+        $this->assertEquals($tag->id, $post->second_tags->first()->id);
         $this->assertEquals($post->id, $tag->posts->first()->id);
     }
 
