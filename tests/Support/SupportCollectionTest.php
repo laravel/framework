@@ -1910,6 +1910,26 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testChunkWithCallback($collection)
+    {
+        $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $data = $data->chunk(3, function ($chunk) {
+            return $chunk->filter(function($item) {
+                return $item != 1;
+            });
+        });
+
+        $this->assertInstanceOf($collection, $data);
+        $this->assertInstanceOf($collection, $data->first());
+        $this->assertCount(4, $data);
+        $this->assertEquals([1 => 2, 2 => 3], $data->first()->toArray());
+        $this->assertEquals([9 => 10], $data->get(3)->toArray());
+    }
+
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testChunkWhenGivenZeroAsSize($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
