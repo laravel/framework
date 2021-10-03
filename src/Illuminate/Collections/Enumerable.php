@@ -812,7 +812,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
-     * @param callable|null $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public function chunk($size, callable $callback = null);

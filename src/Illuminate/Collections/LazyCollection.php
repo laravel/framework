@@ -1102,7 +1102,7 @@ class LazyCollection implements Enumerable
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
-     * @param callable|null $callback
+     * @param  callable|null  $callback
      * @return static
      */
     public function chunk($size, callable $callback = null)
@@ -1111,7 +1111,7 @@ class LazyCollection implements Enumerable
             return static::empty();
         }
 
-        $chunked =  new static(function () use ($size) {
+        $chunked = new static(function () use ($size) {
             $iterator = $this->getIterator();
 
             while ($iterator->valid()) {
