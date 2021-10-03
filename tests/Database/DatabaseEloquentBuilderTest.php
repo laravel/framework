@@ -650,7 +650,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             //
         };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
-        $builder->shouldAllowMockingProtectedMethods()->shouldReceive('eagerLoadRelation')->with(['models'], 'foo', $nop1)->andReturn(['foo']);
+        $builder->shouldAllowMockingProtectedMethods()->shouldReceive('eagerLoadRelation')->with(['models'], 'foo', $nop1, null)->andReturn(['foo']);
 
         $results = $builder->eagerLoadRelations(['models']);
         $this->assertEquals(['foo'], $results);
