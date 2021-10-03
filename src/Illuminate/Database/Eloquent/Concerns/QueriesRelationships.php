@@ -367,7 +367,7 @@ trait QueriesRelationships
         return $this->when(
             $relations->count() == 1,
             function($query) use ($relations, $column, $operator, $value) {
-                $query->whereHas($relations->first(), function ($query) use ($column,  $operator, $value) {
+                $query->whereHas($relations->first(), function ($query) use ($column, $operator, $value) {
                     $query->where($column, $operator, $value);
                 });
             },
@@ -396,7 +396,7 @@ trait QueriesRelationships
         return $this->when(
             $relations->count() == 1,
             function($query) use ($relations, $column, $operator, $value) {
-                $query->orWhereHas($relations->first(), function ($query) use ($column,  $operator, $value) {
+                $query->orWhereHas($relations->first(), function ($query) use ($column, $operator, $value) {
                     $query->where($column, $operator, $value);
                 });
             },
