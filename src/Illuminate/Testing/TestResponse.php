@@ -779,13 +779,13 @@ EOF;
     }
 
     /**
-     * Assert that the response JSON has the expected count of items at the given key.
+     * Assert that the response JSON at the given key has the expected count of items.
      *
-     * @param  int  $count
      * @param  string|null  $key
+     * @param  int  $count
      * @return $this
      */
-    public function assertJsonCount(int $count, $key = null)
+    public function assertJsonCount($key = null, int $count)
     {
         $this->decodeResponseJson()->assertCount($count, $key);
 

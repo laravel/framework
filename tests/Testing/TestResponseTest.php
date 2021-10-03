@@ -869,14 +869,14 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         // With falsey key
-        $response->assertJsonCount(1, '0');
+        $response->assertJsonCount('0', 1);
 
         // With simple key
-        $response->assertJsonCount(3, 'bars');
+        $response->assertJsonCount('bars', 3);
 
         // With nested key
-        $response->assertJsonCount(1, 'barfoo.0.bar');
-        $response->assertJsonCount(3, 'barfoo.2.bar');
+        $response->assertJsonCount('barfoo.0.bar', 1);
+        $response->assertJsonCount('barfoo.2.bar', 3);
 
         // Without structure
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
