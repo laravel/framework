@@ -136,6 +136,23 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $this->assertEquals($post->id, $tag->posts->first()->id);
     }
 
+    public function testEagerLoadingAliasingRelationNameWithConstraints()
+    {
+        $post = EloquentManyToManyPolymorphicTestPost::create();
+        $tag = EloquentManyToManyPolymorphicTestTag::create();
+        $post->tags()->attach($tag->id);
+
+        $post = EloquentManyToManyPolymorphicTestPost::with(['tags as tags_alias' => function($query) use ($tag) {
+            $query->where('id', $tag->id);
+        }])->whereId(1)->first();
+        $tag = EloquentManyToManyPolymorphicTestTag::with('posts')->whereId(1)->first();
+
+        $this->assertTrue($post->relationLoaded('tags_alias'));
+        $this->assertTrue($tag->relationLoaded('posts'));
+        $this->assertEquals($tag->id, $post->tags_alias->first()->id);
+        $this->assertEquals($post->id, $tag->posts->first()->id);
+    }
+
     public function testChunkById()
     {
         $post = EloquentManyToManyPolymorphicTestPost::create();
