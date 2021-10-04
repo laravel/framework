@@ -3910,7 +3910,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
 
-        [$sum, $max, $min] = $data->reduceMany(function($sum, $max, $min, $value) {
+        [$sum, $max, $min] = $data->reduceMany(function ($sum, $max, $min, $value) {
             $sum += $value;
             $max = max($max, $value);
             $min = min($min, $value);
