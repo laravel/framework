@@ -812,6 +812,20 @@ class Str
     }
 
     /**
+     * Replaces the middle of a string with another string.
+     *
+     * @param  $string
+     * @param  string  $replace
+     * @param  int  $maxChars
+     *
+     * @return array|string|string[]
+     */
+    public static function truncateMiddle($string, $maxChars = 16, $replace = '...')
+    {
+        return substr_replace($string, $replace, $maxChars/2, strlen($string) - $maxChars);
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string

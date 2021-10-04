@@ -575,6 +575,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
     }
+
+    public function testTruncateMiddle()
+    {
+        $this->assertSame('ba4d9...8bb3e', Str::truncateMiddle('ba4d95a2-94d8-4ce5-a4a4-a0621aa8bb3e', 10));
+        $this->assertSame('ba4d9---8bb3e', Str::truncateMiddle('ba4d95a2-94d8-4ce5-a4a4-a0621aa8bb3e', 10, '---'));
+        $this->assertSame('the quic...lazy dog', Str::truncateMiddle('the quick brown fox jumps over the lazy dog'));
+    }
 }
 
 class StringableObjectStub
