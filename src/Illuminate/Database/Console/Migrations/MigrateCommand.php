@@ -24,7 +24,8 @@ class MigrateCommand extends BaseCommand
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
-                {--step : Force the migrations to be run so they can be rolled back individually}';
+                {--step : Force the migrations to be run so they can be rolled back individually}
+                {--timed : Output how long it took to run all migrations}';
 
     /**
      * The console command description.
@@ -73,6 +74,8 @@ class MigrateCommand extends BaseCommand
             return 1;
         }
 
+        $startTime = microtime(true);
+
         $this->migrator->usingConnection($this->option('database'), function () {
             $this->prepareDatabase();
 
@@ -92,6 +95,12 @@ class MigrateCommand extends BaseCommand
                 $this->call('db:seed', ['--force' => true]);
             }
         });
+
+        
+        if ($this->option('timed')) {
+            $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+            $this->line('<info>Time to migrate</info> ('.$runTime.'ms)');
+        }
 
         return 0;
     }
