@@ -122,7 +122,7 @@ trait ManagesComponents
      * @param  mixed  $default
      * @return mixed|null
      */
-    public function componentDataItem($key, $default = null)
+    public function getConsumableComponentData($key, $default = null)
     {
         $currentComponent = count($this->componentStack);
 
