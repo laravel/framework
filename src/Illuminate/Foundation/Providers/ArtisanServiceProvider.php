@@ -933,7 +933,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
             return new RouteClearCommand($app['files']);
         });
     }
-    
 
     /**
      * Register the command.
