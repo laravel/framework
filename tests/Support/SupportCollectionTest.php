@@ -3914,6 +3914,7 @@ class SupportCollectionTest extends TestCase
             $sum += $value;
             $max = max($max, $value);
             $min = min($min, $value);
+
             return [$sum, $max, $min];
         }, 0, PHP_INT_MIN, PHP_INT_MAX);
 
