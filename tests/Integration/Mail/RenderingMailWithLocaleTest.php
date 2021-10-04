@@ -11,6 +11,15 @@ use Orchestra\Testbench\TestCase;
  */
 class RenderingMailWithLocaleTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (\PHP_VERSION_ID >= 80100) {
+            $this->markTestSkipped('SwiftMailer is incompatible with PHP 8.1');
+        }
+
+        parent::setUp();
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('app.locale', 'en');
@@ -29,10 +38,6 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInDefaultLocale()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('SwiftMailer is incompatible with PHP 8.1');
-        }
-
         $mail = new RenderedTestMail;
 
         $this->assertStringContainsString('name', $mail->render());
@@ -40,10 +45,6 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInSelectedLocale()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('SwiftMailer is incompatible with PHP 8.1');
-        }
-
         $mail = (new RenderedTestMail)->locale('es');
 
         $this->assertStringContainsString('nombre', $mail->render());
@@ -51,10 +52,6 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInAppSelectedLocale()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('SwiftMailer is incompatible with PHP 8.1');
-        }
-
         $this->app->setLocale('es');
 
         $mail = new RenderedTestMail;
