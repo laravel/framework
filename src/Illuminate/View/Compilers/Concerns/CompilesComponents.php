@@ -162,6 +162,20 @@ trait CompilesComponents
     }
 
     /**
+     * Compile the consume statement into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileConsume($expression)
+    {
+        return "<?php foreach ({$expression} as \$__key => \$__value) {
+    \$__consumeVariable = is_string(\$__key) ? \$__key : \$__value;
+    \$\$__consumeVariable = is_string(\$__key) ? \$__env->componentDataItem(\$__key, \$__value) : \$__env->componentDataItem(\$__value);
+} ?>";
+    }
+
+    /**
      * Sanitize the given component attribute value.
      *
      * @param  mixed  $value

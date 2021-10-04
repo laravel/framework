@@ -116,6 +116,32 @@ trait ManagesComponents
     }
 
     /**
+     * Get an item from the component data that exists above the current component.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed|null
+     */
+    public function componentDataItem($key, $default = null)
+    {
+        $currentComponent = count($this->componentStack);
+
+        if ($currentComponent === 0) {
+            return value($default);
+        }
+
+        for ($i = $currentComponent - 1; $i >= 0; $i--) {
+            $data = $this->componentData[$i] ?? [];
+
+            if (array_key_exists($key, $data)) {
+                return $data[$key];
+            }
+        }
+
+        return value($default);
+    }
+
+    /**
      * Start the slot rendering process.
      *
      * @param  string  $name
