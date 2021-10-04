@@ -1102,15 +1102,16 @@ class LazyCollection implements Enumerable
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
+     * @param  callable|null  $callback
      * @return static
      */
-    public function chunk($size)
+    public function chunk($size, callable $callback = null)
     {
         if ($size <= 0) {
             return static::empty();
         }
 
-        return new static(function () use ($size) {
+        $chunked = new static(function () use ($size) {
             $iterator = $this->getIterator();
 
             while ($iterator->valid()) {
@@ -1134,6 +1135,14 @@ class LazyCollection implements Enumerable
 
                 $iterator->next();
             }
+        });
+
+        if (! $callback) {
+            return $chunked;
+        }
+
+        return $chunked->map(function (LazyCollection $chunk, $key) use ($callback) {
+            return $callback($chunk, $key);
         });
     }
 
