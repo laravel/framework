@@ -73,7 +73,7 @@ class RouteCountCommand extends Command
                 'method' => implode('|', $route->methods()),
                 'uri' => $route->uri(),
                 'name' => $route->getName(),
-                ]);
+            ]);
         })->count();
     }
 
