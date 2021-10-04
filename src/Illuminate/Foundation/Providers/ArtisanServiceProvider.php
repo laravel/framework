@@ -50,6 +50,7 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\RouteCountCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
@@ -121,6 +122,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueWork' => 'command.queue.work',
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
+        'RouteCount' => 'command.route.count',
         'RouteList' => 'command.route.list',
         'SchemaDump' => 'command.schema.dump',
         'Seed' => 'command.seed',
@@ -929,6 +931,19 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.route.clear', function ($app) {
             return new RouteClearCommand($app['files']);
+        });
+    }
+    
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerRouteCountCommand()
+    {
+        $this->app->singleton('command.route.count', function ($app) {
+            return new RouteCountCommand($app['files']);
         });
     }
 
