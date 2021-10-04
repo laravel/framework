@@ -943,7 +943,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerRouteCountCommand()
     {
         $this->app->singleton('command.route.count', function ($app) {
-            return new RouteCountCommand($app['files']);
+            return new RouteCountCommand($app['router']);
         });
     }
 
