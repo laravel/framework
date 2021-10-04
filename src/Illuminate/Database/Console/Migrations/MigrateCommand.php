@@ -95,7 +95,6 @@ class MigrateCommand extends BaseCommand
                 $this->call('db:seed', ['--force' => true]);
             }
         });
-
         
         if ($this->option('timed')) {
             $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
