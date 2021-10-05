@@ -76,6 +76,17 @@ class BladeTest extends TestCase
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
+    public function test_consumable_data()
+    {
+        $view = View::make('consume')->render();
+
+        $this->assertSame('<h1>Menu</h1>
+<div>Slot: 1, Color: blue</div>
+<div>Slot: 2, Color: blue</div>
+<div>Slot: 3, Color: blue</div>
+<div>Slot: 4, Color: orange</div>', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
