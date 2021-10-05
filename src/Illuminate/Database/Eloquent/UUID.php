@@ -11,7 +11,7 @@ trait UUID
      *
      * @return void
      */
-    protected static function boot ()
+    protected static function boot()
     {
         parent::boot();
         static::creating(function ($model) {
@@ -26,7 +26,7 @@ trait UUID
      *
      * @return false
      */
-    public function getIncrementing ()
+    public function getIncrementing()
     {
         return false;
     }
@@ -36,7 +36,7 @@ trait UUID
      *
      * @return string
      */
-    public function getKeyType ()
+    public function getKeyType()
     {
         return 'string';
     }
