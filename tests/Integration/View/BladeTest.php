@@ -81,9 +81,9 @@ class BladeTest extends TestCase
         $view = View::make('consume', ['mode' => 'defaults'])->render();
 
         $this->assertSame('<ul>
-<li>slot=Inline child 1, color=red</li>
+<li>slot=Inline child 1, color=orange</li>
 <li>slot=Inline child 2, color=red</li>
-<li>slot=Default item 1, color=red</li>
+<li>slot=Default item 1, color=blue</li>
 <li>slot=Default item 2, color=red</li>
 </ul>', trim($view));
     }
@@ -93,21 +93,9 @@ class BladeTest extends TestCase
         $view = View::make('consume', ['mode' => 'props'])->render();
 
         $this->assertSame('<ul>
-<li>slot=Inline child 1, color=pink</li>
+<li>slot=Inline child 1, color=orange</li>
 <li>slot=Inline child 2, color=pink</li>
-<li>slot=Default item 1, color=pink</li>
-<li>slot=Default item 2, color=pink</li>
-</ul>', trim($view));
-    }
-
-    public function test_consume_with_override()
-    {
-        $view = View::make('consume', ['mode' => 'override'])->render();
-
-        $this->assertSame('<ul>
-<li>slot=Inline child 1, color=pink</li>
-<li>slot=Inline child 2, color=pink</li>
-<li>slot=Default item 1, color=yellow</li>
+<li>slot=Default item 1, color=blue</li>
 <li>slot=Default item 2, color=pink</li>
 </ul>', trim($view));
     }
