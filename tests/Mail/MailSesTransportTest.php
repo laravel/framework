@@ -14,7 +14,6 @@ use Swift_Message;
 
 class MailSesTransportTest extends TestCase
 {
-    /** @group Foo */
     public function testGetTransport()
     {
         if (\PHP_VERSION_ID >= 80100) {

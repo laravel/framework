@@ -208,4 +208,15 @@ trait ManagesComponents
     {
         return count($this->componentStack) - 1;
     }
+
+    /**
+     * Flush all of the component state.
+     *
+     * @return void
+     */
+    protected function flushComponents()
+    {
+        $this->componentStack = [];
+        $this->componentData = [];
+    }
 }

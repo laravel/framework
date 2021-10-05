@@ -397,17 +397,13 @@ class LogManager implements LoggerInterface
      */
     protected function prepareHandler(HandlerInterface $handler, array $config = [])
     {
-        $isHandlerFormattable = false;
-
-        if (Monolog::API === 1) {
-            $isHandlerFormattable = true;
-        } elseif (Monolog::API === 2 && $handler instanceof FormattableHandlerInterface) {
-            $isHandlerFormattable = true;
+        if (Monolog::API !== 1 && (Monolog::API !== 2 || ! $handler instanceof FormattableHandlerInterface)) {
+            return $handler;
         }
 
-        if ($isHandlerFormattable && ! isset($config['formatter'])) {
+        if (! isset($config['formatter'])) {
             $handler->setFormatter($this->formatter());
-        } elseif ($isHandlerFormattable && $config['formatter'] !== 'default') {
+        } elseif ($config['formatter'] !== 'default') {
             $handler->setFormatter($this->app->make($config['formatter'], $config['formatter_with'] ?? []));
         }
 
