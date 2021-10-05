@@ -76,6 +76,36 @@ class BladeTest extends TestCase
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
+    public function test_defined_parent_props_are_available_to_child()
+    {
+        $view = View::make('uses-context')->render();
+
+        $this->assertSame('<div>
+    <span>I like the color purple!</span>
+    <span>I like the color purple!</div>
+</div>', trim($view));
+    }
+
+    public function test_child_props_override_parent_context()
+    {
+        $view = View::make('uses-context-with-override')->render();
+
+        $this->assertSame('<div>
+    <span>I like the color purple!</span>
+    <span>I like the color pink!</div>
+</div>', trim($view));
+    }
+
+    public function test_default_values_are_used_in_parent_and_child_when_not_set()
+    {
+        $view = View::make('uses-context-default')->render();
+
+        $this->assertSame('<div>
+    <span>I like the color red!</span>
+    <span>I like the color blue!</div>
+</div>', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);

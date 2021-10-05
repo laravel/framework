@@ -25,6 +25,13 @@ trait ManagesComponents
     protected $componentData = [];
 
     /**
+     * The current data for all the actively rendering components.
+     *
+     * @var array
+     */
+    protected $currentContext = [];
+
+    /**
      * The slot contents for the component.
      *
      * @var array
@@ -81,16 +88,21 @@ trait ManagesComponents
     {
         $view = array_pop($this->componentStack);
 
-        $data = $this->componentData();
+        $previousContext = $this->currentContext;
+        $this->currentContext = array_merge($this->currentContext, $this->componentData());
 
-        $view = value($view, $data);
+        try {
+            $view = value($view, $this->currentContext);
 
-        if ($view instanceof View) {
-            return $view->with($data)->render();
-        } elseif ($view instanceof Htmlable) {
-            return $view->toHtml();
-        } else {
-            return $this->make($view, $data)->render();
+            if ($view instanceof View) {
+                return $view->with($this->currentContext)->render();
+            } elseif ($view instanceof Htmlable) {
+                return $view->toHtml();
+            } else {
+                return $this->make($view, $this->currentContext)->render();
+            }
+        } finally {
+            $this->currentContext = $previousContext;
         }
     }
 
