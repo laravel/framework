@@ -1,6 +1,24 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.62.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.63.0...8.x)
+
+
+## [v8.62.0 (2021-10-05)](https://github.com/laravel/framework/compare/v8.62.0...v8.63.0)
+
+### Added
+- Added new lost connection message to DetectsLostConnections ([#39028](https://github.com/laravel/framework/pull/39028))
+- Added whereBelongsTo() Eloquent builder method ([#38927](https://github.com/laravel/framework/pull/38927))
+- Added Illuminate/Foundation/Testing/Wormhole::minute() ([#39050](https://github.com/laravel/framework/pull/39050))
+
+### Fixed
+- Fixed castable value object not serialized correctly ([#39020](https://github.com/laravel/framework/pull/39020))
+- Fixed casting to string on PHP 8.1 ([#39033](https://github.com/laravel/framework/pull/39033))
+- Mail empty address handling ([#39035](https://github.com/laravel/framework/pull/39035))
+- Fixed NotPwnedVerifier failures ([#39038](https://github.com/laravel/framework/pull/39038))
+- Fixed LazyCollection#unique() double enumeration ([#39041](https://github.com/laravel/framework/pull/39041))
+  
+### Changed
+- HTTP client: only allow a single User-Agent header ([#39085](https://github.com/laravel/framework/pull/39085))
 
 
 ## [v8.62.0 (2021-09-28)](https://github.com/laravel/framework/compare/v8.61.0...v8.62.0)
