@@ -91,6 +91,7 @@ trait ManagesComponents
         $data = $this->componentData();
 
         $previousRenderData = $this->activeRenderData;
+
         $this->activeRenderData = array_merge($previousRenderData, $data);
 
         try {
