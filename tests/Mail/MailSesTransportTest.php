@@ -54,7 +54,7 @@ class MailSesTransportTest extends TestCase
         // Generate a messageId for our mock to return to ensure that the post-sent message
         // has X-SES-Message-ID in its headers
         $messageId = Str::random(32);
-        $sendRawEmailMock = new sendRawEmailMock($messageId);
+        $sendRawEmailMock = new SendRawEmailMock($messageId);
         $client->expects($this->once())
             ->method('sendRawEmail')
             ->with($this->equalTo([
@@ -68,7 +68,7 @@ class MailSesTransportTest extends TestCase
     }
 }
 
-class sendRawEmailMock
+class SendRawEmailMock
 {
     protected $getResponse;
 
@@ -77,11 +77,6 @@ class sendRawEmailMock
         $this->getResponse = $responseValue;
     }
 
-    /**
-     * Mock the get() call for the sendRawEmail response.
-     * @param  [type] $key [description]
-     * @return [type]      [description]
-     */
     public function get($key)
     {
         return $this->getResponse;
