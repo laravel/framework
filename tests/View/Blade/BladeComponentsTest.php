@@ -13,10 +13,11 @@ class BladeComponentsTest extends AbstractBladeTestCase
     public function testClassComponentsAreCompiled()
     {
         $this->assertSame('<?php if (isset($component)) { $__componentOriginal35bda42cbf6f9717b161c4f893644ac7a48b0d98 = $component; } ?>
+<?php if (isset($__componentData)) { $__env->withComponentConsumableData($__componentData); } ?>
 <?php $component = $__env->getContainer()->make(Test::class, ["foo" => "bar"]); ?>
 <?php $component->withName(\'test\'); ?>
 <?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
+<?php $__env->startComponent($component->resolveView(), $__componentData = $component->data()); ?>', $this->compiler->compileString('@component(\'Test::class\', \'test\', ["foo" => "bar"])'));
     }
 
     public function testEndComponentsAreCompiled()
