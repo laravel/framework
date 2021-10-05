@@ -81,10 +81,10 @@ class BladeTest extends TestCase
         $view = View::make('consume')->render();
 
         $this->assertSame('<h1>Menu</h1>
-<div>Slot: 1, Color: blue</div>
-<div>Slot: 2, Color: blue</div>
-<div>Slot: 3, Color: blue</div>
-<div>Slot: 4, Color: orange</div>', trim($view));
+<div>Slot: 1, Color: blue, Default: foo</div>
+<div>Slot: 2, Color: blue, Default: foo</div>
+<div>Slot: 3, Color: blue, Default: foo</div>
+<div>Slot: 4, Color: orange, Default: foo</div>', trim($view));
     }
 
     protected function getEnvironmentSetUp($app)
