@@ -76,28 +76,30 @@ class BladeTest extends TestCase
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
-    public function test_consume_default()
+    public function test_consume_defaults()
     {
-        $view = View::make('consume', ['mode' => 'defaults'])->render();
+        $view = View::make('consume')->render();
 
-        $this->assertSame('<ul>
-<li>slot=Inline child 1, color=orange</li>
-<li>slot=Inline child 2, color=red</li>
-<li>slot=Default item 1, color=blue</li>
-<li>slot=Default item 2, color=red</li>
-</ul>', trim($view));
+        $this->assertSame('<h1>Menu</h1>
+<div>Slot: A, Color: orange, Default: foo</div>
+<div>Slot: B, Color: red, Default: foo</div>
+<div>Slot: C, Color: blue, Default: foo</div>
+<div>Slot: D, Color: red, Default: foo</div>
+<div>Slot: E, Color: red, Default: foo</div>
+<div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
-    public function test_consume_props()
+    public function test_consume_with_props()
     {
-        $view = View::make('consume', ['mode' => 'props'])->render();
+        $view = View::make('consume', ['color' => 'rebeccapurple'])->render();
 
-        $this->assertSame('<ul>
-<li>slot=Inline child 1, color=orange</li>
-<li>slot=Inline child 2, color=pink</li>
-<li>slot=Default item 1, color=blue</li>
-<li>slot=Default item 2, color=pink</li>
-</ul>', trim($view));
+        $this->assertSame('<h1>Menu</h1>
+<div>Slot: A, Color: orange, Default: foo</div>
+<div>Slot: B, Color: rebeccapurple, Default: foo</div>
+<div>Slot: C, Color: blue, Default: foo</div>
+<div>Slot: D, Color: rebeccapurple, Default: foo</div>
+<div>Slot: E, Color: rebeccapurple, Default: foo</div>
+<div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
     protected function getEnvironmentSetUp($app)

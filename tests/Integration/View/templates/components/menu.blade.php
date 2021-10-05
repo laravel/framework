@@ -1,6 +1,6 @@
-@props(['color'])
-<ul>
-<x-menu-item color="orange">Inline child 1</x-menu-item>
-<x-menu-item>Inline child 2</x-menu-item>
+<h1>Menu</h1>
+<x-menu-item color="orange">A</x-menu-item>
+<x-menu-item>B</x-menu-item>
 {{ $slot }}
-</ul>
+<x-menu-item>E</x-menu-item>
+<x-menu-item color="yellow">F</x-menu-item>

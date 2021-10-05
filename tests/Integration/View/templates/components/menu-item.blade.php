@@ -1,2 +1,2 @@
-@consume(['color' => 'red'])
-<li>slot={{ $slot }}, color={{ $color }}</li>
+@consume(['color' => 'red', 'default' => 'foo'])
+<div>Slot: {{ $slot }}, Color: {{ $color }}, Default: {{ $default }}</div>
