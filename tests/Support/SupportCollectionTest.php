@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
+use UnexpectedValueException;
 
 class SupportCollectionTest extends TestCase
 {
@@ -3900,6 +3901,40 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foobarbazqux', $data->reduceWithKeys(function ($carry, $element, $key) {
             return $carry .= $key.$element;
         }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testReduceMany($collection)
+    {
+        $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
+
+        [$sum, $max, $min] = $data->reduceMany(function ($sum, $max, $min, $value) {
+            $sum += $value;
+            $max = max($max, $value);
+            $min = min($min, $value);
+
+            return [$sum, $max, $min];
+        }, 0, PHP_INT_MIN, PHP_INT_MAX);
+
+        $this->assertEquals(14, $sum);
+        $this->assertEquals(5, $max);
+        $this->assertEquals(-1, $min);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testReduceManyThrowsAnExceptionIfReducerDoesNotReturnAnArray($collection)
+    {
+        $data = new $collection([1]);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $data->reduceMany(function () {
+            return false;
+        }, null);
     }
 
     /**
