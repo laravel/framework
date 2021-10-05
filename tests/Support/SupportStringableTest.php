@@ -355,10 +355,15 @@ class SupportStringableTest extends TestCase
     public function testContains()
     {
         $this->assertTrue($this->stringable('taylor')->contains('ylo'));
+        $this->assertTrue($this->stringable('taYlor')->contains('yLo', false));
         $this->assertTrue($this->stringable('taylor')->contains('taylor'));
+        $this->assertTrue($this->stringable('Taylor')->contains('TAYLOR', false));
         $this->assertTrue($this->stringable('taylor')->contains(['ylo']));
+        $this->assertTrue($this->stringable('taYlor')->contains(['yLo'], false));
         $this->assertTrue($this->stringable('taylor')->contains(['xxx', 'ylo']));
+        $this->assertTrue($this->stringable('Taylor')->contains(['xxx', 'yLo'], false));
         $this->assertFalse($this->stringable('taylor')->contains('xxx'));
+        $this->assertFalse($this->stringable('taylor')->contains('xxx', false));
         $this->assertFalse($this->stringable('taylor')->contains(['xxx']));
         $this->assertFalse($this->stringable('taylor')->contains(''));
     }
@@ -366,8 +371,10 @@ class SupportStringableTest extends TestCase
     public function testContainsAll()
     {
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor', 'otwell']));
+        $this->assertTrue($this->stringable('Taylor Otwell')->containsAll(['taYlor', 'otWell'], false));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor']));
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
+        $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx'], false));
     }
 
     public function testParseCallback()

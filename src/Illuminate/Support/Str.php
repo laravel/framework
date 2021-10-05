@@ -176,12 +176,19 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|string[]  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $caseSensitive = true)
     {
+        $position = function ($needle) use ($haystack, $caseSensitive) {
+            return $caseSensitive
+                ? mb_strpos($haystack, $needle)
+                : mb_stripos($haystack, $needle);
+        };
+
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+            if ($needle !== '' && $position($needle) !== false) {
                 return true;
             }
         }
@@ -194,12 +201,13 @@ class Str
      *
      * @param  string  $haystack
      * @param  string[]  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public static function containsAll($haystack, array $needles)
+    public static function containsAll($haystack, array $needles, $caseSensitive = true)
     {
         foreach ($needles as $needle) {
-            if (! static::contains($haystack, $needle)) {
+            if (! static::contains($haystack, $needle, $caseSensitive)) {
                 return false;
             }
         }

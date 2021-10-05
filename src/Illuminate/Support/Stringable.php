@@ -144,22 +144,24 @@ class Stringable implements JsonSerializable
      * Determine if a given string contains a given substring.
      *
      * @param  string|array  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public function contains($needles)
+    public function contains($needles, $caseSensitive = true)
     {
-        return Str::contains($this->value, $needles);
+        return Str::contains($this->value, $needles, $caseSensitive);
     }
 
     /**
      * Determine if a given string contains all array values.
      *
      * @param  array  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public function containsAll(array $needles)
+    public function containsAll(array $needles, $caseSensitive = true)
     {
-        return Str::containsAll($this->value, $needles);
+        return Str::containsAll($this->value, $needles, $caseSensitive);
     }
 
     /**

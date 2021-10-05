@@ -187,10 +187,16 @@ class SupportStrTest extends TestCase
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
+        $this->assertTrue(Str::contains('taYlor', 'yLo', false));
         $this->assertTrue(Str::contains('taylor', 'taylor'));
+        $this->assertTrue(Str::contains('Taylor', 'TAYLOR', false));
         $this->assertTrue(Str::contains('taylor', ['ylo']));
+        $this->assertTrue(Str::contains('taYlor', ['yLo'], false));
         $this->assertTrue(Str::contains('taylor', ['xxx', 'ylo']));
+        $this->assertTrue(Str::contains('Taylor', ['xxx', 'yLo'], false));
         $this->assertFalse(Str::contains('taylor', 'xxx'));
+        $this->assertFalse(Str::contains('taylor', 'Taylor'));
+        $this->assertFalse(Str::contains('taylor', 'xxx', false));
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertFalse(Str::contains('taylor', ''));
         $this->assertFalse(Str::contains('', ''));
@@ -199,8 +205,10 @@ class SupportStrTest extends TestCase
     public function testStrContainsAll()
     {
         $this->assertTrue(Str::containsAll('taylor otwell', ['taylor', 'otwell']));
+        $this->assertTrue(Str::containsAll('Taylor Otwell', ['taYlor', 'otWell'], false));
         $this->assertTrue(Str::containsAll('taylor otwell', ['taylor']));
         $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
+        $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx'], false));
     }
 
     public function testParseCallback()
