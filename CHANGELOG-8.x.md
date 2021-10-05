@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.63.0...8.x)
 
 
-## [v8.62.0 (2021-10-05)](https://github.com/laravel/framework/compare/v8.62.0...v8.63.0)
+## [v8.63.0 (2021-10-05)](https://github.com/laravel/framework/compare/v8.62.0...v8.63.0)
 
 ### Added
 - Added new lost connection message to DetectsLostConnections ([#39028](https://github.com/laravel/framework/pull/39028))
