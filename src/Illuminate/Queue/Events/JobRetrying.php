@@ -5,14 +5,14 @@ namespace Illuminate\Queue\Events;
 class JobRetrying
 {
     /**
-     * The job retrying object
+     * The job retrying object.
      *
      * @var \stdClass
      */
     public $job;
 
     /**
-     * The job payload
+     * The job payload.
      *
      * @var array|null
      */
@@ -21,7 +21,7 @@ class JobRetrying
     /**
      * Create a new event instance.
      *
-     * @param  \stdClass   $job
+     * @param  \stdClass  $job
      * @return void
      */
     public function __construct($job)
@@ -30,7 +30,7 @@ class JobRetrying
     }
 
     /**
-     * The job payload
+     * The job payload.
      *
      * @return array
      */
