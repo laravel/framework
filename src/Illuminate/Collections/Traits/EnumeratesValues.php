@@ -752,7 +752,7 @@ trait EnumeratesValues
      * @param  mixed  ...$initial
      * @return array
      *
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      */
     public function reduceMany(callable $callback, ...$initial)
     {
