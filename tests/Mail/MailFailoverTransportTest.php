@@ -36,7 +36,7 @@ class MailFailoverTransportTest extends TestCase
         $transports = $transport->getTransports();
         $this->assertCount(2, $transports);
         $this->assertInstanceOf(\Swift_SendmailTransport::class, $transports[0]);
-        $this->assertEquals('/usr/sbin/sendmail -bs', $transports[0]->getCommand());
+        $this->assertSame('/usr/sbin/sendmail -bs', $transports[0]->getCommand());
         $this->assertInstanceOf(ArrayTransport::class, $transports[1]);
     }
 
@@ -57,7 +57,7 @@ class MailFailoverTransportTest extends TestCase
         $transports = $transport->getTransports();
         $this->assertCount(2, $transports);
         $this->assertInstanceOf(\Swift_SendmailTransport::class, $transports[0]);
-        $this->assertEquals('/usr/sbin/sendmail -bs', $transports[0]->getCommand());
+        $this->assertSame('/usr/sbin/sendmail -bs', $transports[0]->getCommand());
         $this->assertInstanceOf(ArrayTransport::class, $transports[1]);
     }
 }
