@@ -76,6 +76,42 @@ class BladeTest extends TestCase
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
+    public function test_consume_default()
+    {
+        $view = View::make('consume', ['mode' => 'defaults'])->render();
+
+        $this->assertSame('<ul>
+<li>slot=Inline child 1, color=red</li>
+<li>slot=Inline child 2, color=red</li>
+<li>slot=Default item 1, color=red</li>
+<li>slot=Default item 2, color=red</li>
+</ul>', trim($view));
+    }
+
+    public function test_consume_props()
+    {
+        $view = View::make('consume', ['mode' => 'props'])->render();
+
+        $this->assertSame('<ul>
+<li>slot=Inline child 1, color=pink</li>
+<li>slot=Inline child 2, color=pink</li>
+<li>slot=Default item 1, color=pink</li>
+<li>slot=Default item 2, color=pink</li>
+</ul>', trim($view));
+    }
+
+    public function test_consume_with_override()
+    {
+        $view = View::make('consume', ['mode' => 'override'])->render();
+
+        $this->assertSame('<ul>
+<li>slot=Inline child 1, color=pink</li>
+<li>slot=Inline child 2, color=pink</li>
+<li>slot=Default item 1, color=yellow</li>
+<li>slot=Default item 2, color=pink</li>
+</ul>', trim($view));
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);

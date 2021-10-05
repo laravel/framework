@@ -25,6 +25,13 @@ trait ManagesComponents
     protected $componentData = [];
 
     /**
+     * The data that is currently being rendered.
+     *
+     * @var array
+     */
+    protected $activeRenderData = [];
+
+    /**
      * The slot contents for the component.
      *
      * @var array
@@ -83,14 +90,21 @@ trait ManagesComponents
 
         $data = $this->componentData();
 
-        $view = value($view, $data);
+        $previousRenderData = $this->activeRenderData;
+        $this->activeRenderData = array_merge($previousRenderData, $data);
 
-        if ($view instanceof View) {
-            return $view->with($data)->render();
-        } elseif ($view instanceof Htmlable) {
-            return $view->toHtml();
-        } else {
-            return $this->make($view, $data)->render();
+        try {
+            $view = value($view, $data);
+
+            if ($view instanceof View) {
+                return $view->with($data)->render();
+            } elseif ($view instanceof Htmlable) {
+                return $view->toHtml();
+            } else {
+                return $this->make($view, $data)->render();
+            }
+        } finally {
+            $this->activeRenderData = $previousRenderData;
         }
     }
 
@@ -124,6 +138,10 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
+        if (array_key_exists($key, $this->activeRenderData)) {
+            return $this->activeRenderData[$key];
+        }
+
         $currentComponent = count($this->componentStack);
 
         if ($currentComponent === 0) {
