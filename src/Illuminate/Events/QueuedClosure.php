@@ -3,7 +3,7 @@
 namespace Illuminate\Events;
 
 use Closure;
-use Illuminate\Queue\SerializableClosureFactory;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class QueuedClosure
 {
@@ -114,10 +114,10 @@ class QueuedClosure
     {
         return function (...$arguments) {
             dispatch(new CallQueuedListener(InvokeQueuedClosure::class, 'handle', [
-                'closure' => SerializableClosureFactory::make($this->closure),
+                'closure' => new SerializableClosure($this->closure),
                 'arguments' => $arguments,
                 'catch' => collect($this->catchCallbacks)->map(function ($callback) {
-                    return SerializableClosureFactory::make($callback);
+                    return new SerializableClosure($callback);
                 })->all(),
             ]))->onConnection($this->connection)->onQueue($this->queue)->delay($this->delay);
         };
