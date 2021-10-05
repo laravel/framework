@@ -692,6 +692,6 @@ class SupportStringableTest extends TestCase
         $this->assertSame('beforeafter', (string) $this->stringable('before<br>after')->stripTags());
         $this->assertSame('before<br>after', (string) $this->stringable('before<br>after')->stripTags('<br>'));
         $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
-        $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags(['<br>', '<strong>']));
+        $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
     }
 }
