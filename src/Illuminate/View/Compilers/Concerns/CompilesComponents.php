@@ -63,11 +63,10 @@ trait CompilesComponents
     {
         return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
-            '<?php if (isset($__componentData)) { $__env->withComponentConsumableData($__componentData); } ?>',
             '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').'); ?>',
             '<?php $component->withName('.$alias.'); ?>',
             '<?php if ($component->shouldRender()): ?>',
-            '<?php $__env->startComponent($component->resolveView(), $__componentData = $component->data()); ?>',
+            '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
         ]);
     }
 
@@ -160,20 +159,6 @@ trait CompilesComponents
     if (array_key_exists(\$__key, \$__defined_vars)) unset(\$\$__key);
 } ?>
 <?php unset(\$__defined_vars); ?>";
-    }
-
-    /**
-     * Compile the consume statement into valid PHP.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileConsume($expression)
-    {
-        return "<?php foreach ({$expression} as \$__key => \$__value) {
-    \$__consumeVariable = is_string(\$__key) ? \$__key : \$__value;
-    \$\$__consumeVariable = is_string(\$__key) ? \$__env->getConsumableComponentData(\$__key, \$__value) : \$__env->getConsumableComponentData(\$__value);
-} ?>";
     }
 
     /**

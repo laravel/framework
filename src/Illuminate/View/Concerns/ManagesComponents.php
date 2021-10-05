@@ -25,13 +25,6 @@ trait ManagesComponents
     protected $componentData = [];
 
     /**
-     * The currently consumable component data.
-     *
-     * @var array
-     */
-    protected $consumableData = [];
-
-    /**
      * The slot contents for the component.
      *
      * @var array
@@ -123,29 +116,6 @@ trait ManagesComponents
     }
 
     /**
-     * Get an item from the component data that exists above the current component.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed|null
-     */
-    public function getConsumableComponentData($key = null, $default = null)
-    {
-        return Arr::get($this->consumableData, $key, $default);
-    }
-
-    /**
-     * Merge additional component consumable data into the current consumable data array.
-     *
-     * @param  array  $data
-     * @return void
-     */
-    public function withComponentConsumableData(array $data)
-    {
-        $this->consumableData = array_merge($this->consumableData, $data);
-    }
-
-    /**
      * Start the slot rendering process.
      *
      * @param  string  $name
@@ -203,6 +173,5 @@ trait ManagesComponents
     {
         $this->componentStack = [];
         $this->componentData = [];
-        $this->consumableData = [];
     }
 }
