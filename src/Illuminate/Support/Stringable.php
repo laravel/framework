@@ -568,12 +568,12 @@ class Stringable implements JsonSerializable
     /**
      * Strip HTML and PHP tags from the given string.
      *
-     * @param  string|array  $allowed_tags
+     * @param  string|array  $allowedTags
      * @return static
      */
-    public function stripTags($allowed_tags = null)
+    public function stripTags($allowedTags = null)
     {
-        return new static(strip_tags($this->value, $allowed_tags));
+        return new static(strip_tags($this->value, $allowedTags));
     }
 
     /**
