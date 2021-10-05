@@ -218,5 +218,6 @@ trait ManagesComponents
     {
         $this->componentStack = [];
         $this->componentData = [];
+        $this->activeRenderData = [];
     }
 }
