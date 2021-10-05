@@ -791,6 +791,19 @@ if (! function_exists('storage_path')) {
     }
 }
 
+if (! function_exists('lang_path')) {
+    /**
+     * Get the path to the language folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function lang_path($path = '')
+    {
+        return app('path.lang').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+}
+
 if (! function_exists('today')) {
     /**
      * Create a new Carbon instance for the current date.
