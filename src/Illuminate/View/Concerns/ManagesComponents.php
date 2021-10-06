@@ -88,11 +88,10 @@ trait ManagesComponents
     {
         $view = array_pop($this->componentStack);
 
-        $data = $this->componentData();
-
-        $previousComponentData = $this->currentComponentData;
-
-        $this->currentComponentData = array_merge($previousComponentData, $data);
+        $this->currentComponentData = array_merge(
+            $previousComponentData = $this->currentComponentData,
+            $data = $this->componentData()
+        );
 
         try {
             $view = value($view, $data);
