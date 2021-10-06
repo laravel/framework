@@ -332,6 +332,22 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Conditionally merge new input into the current request's input array.
+     *
+     * @param  callable|bool  $condition
+     * @param  array  $input
+     * @return $this
+     */
+    public function mergeWhen($condition, array $input)
+    {
+        $shouldMerge = is_callable($condition) ? call_user_func($condition) : $condition;
+
+        $this->getInputSource()->add($shouldMerge ? $input : []);
+
+        return $this;
+    }
+
+    /**
      * Replace the input for the current request.
      *
      * @param  array  $input

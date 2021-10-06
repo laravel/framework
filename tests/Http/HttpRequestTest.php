@@ -692,6 +692,19 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Dayle', $request->input('buddy'));
     }
 
+    public function testMergeWhenMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $request->mergeWhen(true, ['buddy' => 'Dayle']);
+        $closure = function () {
+            return false;
+        };
+        $request->mergeWhen($closure, ['foo' => 'Bar']);
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame('Dayle', $request->input('buddy'));
+        $this->assertNull($request->input('foo'));
+    }
+
     public function testReplaceMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
