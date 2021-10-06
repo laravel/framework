@@ -4,19 +4,18 @@ namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Support\Str;
 
-trait UUID
+trait HasUUID
 {
     /**
-     * Boot the soft deleting trait for a model.
+     * Boot the UUID trait for a model.
      *
      * @return void
      */
-    protected static function boot()
+    protected static function bootHasUUID()
     {
-        parent::boot();
         static::creating(function ($model) {
-            if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = Str::uuid()->toString();
+            if ($model->getKey() === null) {
+                $model->setAttribute($model->getKeyName(), Str::uuid()->toString());
             }
         });
     }
