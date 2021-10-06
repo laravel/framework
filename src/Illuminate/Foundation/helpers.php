@@ -483,7 +483,6 @@ if (! function_exists('logger')) {
     }
 }
 
-
 if (! function_exists('lang_path')) {
     /**
      * Get the path to the language folder.
