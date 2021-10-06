@@ -374,6 +374,7 @@ trait QueriesRelationships
             function($query) use ($relations, $column, $operator, $value) {
                 $query->whereHas($relations->first(), function ($query) use ($relations, $column, $operator, $value) {
                     $relations->shift();
+
                     $query->whereRelation($relations->implode('.'), $column, $operator, $value);
                 });
             }
@@ -403,6 +404,7 @@ trait QueriesRelationships
             function($query) use ($relations, $column, $operator, $value) {
                 $query->orWhereHas($relations->first(), function ($query) use ($relations, $column, $operator, $value) {
                     $relations->shift();
+
                     $query->orWhereRelation($relations->implode('.'), $column, $operator, $value);
                 });
             }
