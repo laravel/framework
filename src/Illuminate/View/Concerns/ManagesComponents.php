@@ -25,11 +25,11 @@ trait ManagesComponents
     protected $componentData = [];
 
     /**
-     * The data that is currently being rendered.
+     * The component data for the component that is currently being rendered.
      *
      * @var array
      */
-    protected $activeRenderData = [];
+    protected $currentComponentData = [];
 
     /**
      * The slot contents for the component.
@@ -90,9 +90,9 @@ trait ManagesComponents
 
         $data = $this->componentData();
 
-        $previousRenderData = $this->activeRenderData;
+        $previousComponentData = $this->currentComponentData;
 
-        $this->activeRenderData = array_merge($previousRenderData, $data);
+        $this->currentComponentData = array_merge($previousComponentData, $data);
 
         try {
             $view = value($view, $data);
@@ -105,7 +105,7 @@ trait ManagesComponents
                 return $this->make($view, $data)->render();
             }
         } finally {
-            $this->activeRenderData = $previousRenderData;
+            $this->currentComponentData = $previousComponentData;
         }
     }
 
@@ -139,8 +139,8 @@ trait ManagesComponents
      */
     public function getConsumableComponentData($key, $default = null)
     {
-        if (array_key_exists($key, $this->activeRenderData)) {
-            return $this->activeRenderData[$key];
+        if (array_key_exists($key, $this->currentComponentData)) {
+            return $this->currentComponentData[$key];
         }
 
         $currentComponent = count($this->componentStack);
@@ -218,6 +218,6 @@ trait ManagesComponents
     {
         $this->componentStack = [];
         $this->componentData = [];
-        $this->activeRenderData = [];
+        $this->currentComponentData = [];
     }
 }
