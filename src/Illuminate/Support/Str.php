@@ -100,11 +100,11 @@ class Str
             return $subject;
         }
 
-        if (! Str::startsWith($subject, $prefix)) {
+        if (! static::startsWith($subject, $prefix)) {
             return $subject;
         }
 
-        return Str::substr($subject, Str::length($prefix));
+        return static::substr($subject, static::length($prefix));
     }
 
     /**
@@ -172,11 +172,11 @@ class Str
             return $subject;
         }
 
-        if (! Str::endsWith($subject, $suffix)) {
+        if (! static::endsWith($subject, $suffix)) {
             return $subject;
         }
 
-        return Str::substr($subject, 0, Str::length($subject) - Str::length($suffix));
+        return static::substr($subject, 0, static::length($subject) - static::length($suffix));
     }
 
     /**
