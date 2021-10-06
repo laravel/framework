@@ -366,12 +366,12 @@ trait QueriesRelationships
 
         return $this->when(
             $relations->count() == 1,
-            function($query) use ($relations, $column, $operator, $value) {
+            function ($query) use ($relations, $column, $operator, $value) {
                 $query->whereHas($relations->first(), function ($query) use ($column, $operator, $value) {
                     $query->where($column, $operator, $value);
                 });
             },
-            function($query) use ($relations, $column, $operator, $value) {
+            function ($query) use ($relations, $column, $operator, $value) {
                 $query->whereHas($relations->first(), function ($query) use ($relations, $column, $operator, $value) {
                     $relations->shift();
 
@@ -393,15 +393,15 @@ trait QueriesRelationships
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
         $relations = collect(explode('.', $relation));
-        
+
         return $this->when(
             $relations->count() == 1,
-            function($query) use ($relations, $column, $operator, $value) {
+            function ($query) use ($relations, $column, $operator, $value) {
                 $query->orWhereHas($relations->first(), function ($query) use ($column, $operator, $value) {
                     $query->where($column, $operator, $value);
                 });
             },
-            function($query) use ($relations, $column, $operator, $value) {
+            function ($query) use ($relations, $column, $operator, $value) {
                 $query->orWhereHas($relations->first(), function ($query) use ($relations, $column, $operator, $value) {
                     $relations->shift();
 
