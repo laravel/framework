@@ -104,7 +104,7 @@ class Str
             return $subject;
         }
 
-        return static::substr($subject, static::length($prefix));
+        return static::after($subject, $prefix);
     }
 
     /**
@@ -176,7 +176,7 @@ class Str
             return $subject;
         }
 
-        return static::substr($subject, 0, static::length($subject) - static::length($suffix));
+        return static::beforeLast($subject, $suffix);
     }
 
     /**
