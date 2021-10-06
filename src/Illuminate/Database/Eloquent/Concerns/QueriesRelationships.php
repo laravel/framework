@@ -362,9 +362,23 @@ trait QueriesRelationships
      */
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
-        });
+        $relations = collect(explode('.', $relation));
+
+        return $this->when(
+            $relations->count() == 1,
+            function ($query) use ($relations, $column, $operator, $value) {
+                $query->whereHas($relations->first(), function ($query) use ($column, $operator, $value) {
+                    $query->where($column, $operator, $value);
+                });
+            },
+            function ($query) use ($relations, $column, $operator, $value) {
+                $query->whereHas($relations->first(), function ($query) use ($relations, $column, $operator, $value) {
+                    $relations->shift();
+
+                    $query->whereRelation($relations->implode('.'), $column, $operator, $value);
+                });
+            }
+        );
     }
 
     /**
@@ -378,9 +392,23 @@ trait QueriesRelationships
      */
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
-        return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
-        });
+        $relations = collect(explode('.', $relation));
+
+        return $this->when(
+            $relations->count() == 1,
+            function ($query) use ($relations, $column, $operator, $value) {
+                $query->orWhereHas($relations->first(), function ($query) use ($column, $operator, $value) {
+                    $query->where($column, $operator, $value);
+                });
+            },
+            function ($query) use ($relations, $column, $operator, $value) {
+                $query->orWhereHas($relations->first(), function ($query) use ($relations, $column, $operator, $value) {
+                    $relations->shift();
+
+                    $query->orWhereRelation($relations->implode('.'), $column, $operator, $value);
+                });
+            }
+        );
     }
 
     /**
