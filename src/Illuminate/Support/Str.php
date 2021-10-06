@@ -88,6 +88,26 @@ class Str
     }
 
     /**
+     * Get the portion of a string after the occurrence of a given prefix value.
+     *
+     * @param  string  $subject
+     * @param  string  $prefix
+     * @return string
+     */
+    public static function afterPrefix($subject, $prefix)
+    {
+        if ($prefix === '') {
+            return $subject;
+        }
+
+        if (! Str::startsWith($subject, $prefix)) {
+            return $subject;
+        }
+
+        return Str::substr($subject, Str::length($prefix));
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value
@@ -137,6 +157,26 @@ class Str
         }
 
         return static::substr($subject, 0, $pos);
+    }
+
+    /**
+     * Get the portion of a string before the occurrence of a given suffix value.
+     *
+     * @param  string  $subject
+     * @param  string  $suffix
+     * @return string
+     */
+    public static function beforeSuffix($subject, $suffix)
+    {
+        if ($suffix === '') {
+            return $subject;
+        }
+
+        if (! Str::endsWith($subject, $suffix)) {
+            return $subject;
+        }
+
+        return Str::substr($subject, 0, Str::length($subject) - Str::length($suffix));
     }
 
     /**

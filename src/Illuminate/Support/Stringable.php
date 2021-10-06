@@ -54,6 +54,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the portion of a string after the occurrence of a given prefix value.
+     *
+     * @param  string  $prefix
+     * @return static
+     */
+    public function afterPrefix($prefix)
+    {
+        return new static(Str::afterPrefix($this->value, $prefix));
+    }
+
+    /**
      * Append the given values to the string.
      *
      * @param  array  $values
@@ -116,6 +127,17 @@ class Stringable implements JsonSerializable
     public function beforeLast($search)
     {
         return new static(Str::beforeLast($this->value, $search));
+    }
+
+    /**
+     * Get the portion of a string before the occurrence of a given suffix value.
+     *
+     * @param  string  $prefix
+     * @return static
+     */
+    public function beforeSuffix($prefix)
+    {
+        return new static(Str::beforeSuffix($this->value, $prefix));
     }
 
     /**

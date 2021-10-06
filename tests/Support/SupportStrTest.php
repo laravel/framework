@@ -143,6 +143,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('yv2et', Str::beforeLast('yv2et2te', 2));
     }
 
+    public function testStrBeforeSuffix()
+    {
+        $this->assertSame('string', Str::beforeSuffix('string_suffix', '_suffix'));
+        $this->assertSame('string suffix zzz', Str::beforeSuffix('string suffix zzz', 'suffix'));
+        $this->assertSame('suffix xxx', Str::beforeSuffix('suffix xxx', 'suffix'));
+        $this->assertSame('suffix suffix', Str::beforeSuffix('suffix suffix suffix', ' suffix'));
+        $this->assertSame('accented suffix ', Str::beforeSuffix('accented suffix é', 'é'));
+        $this->assertSame('blank suffix', Str::beforeSuffix('blank suffix', ''));
+        $this->assertSame('numeric suffix ', Str::beforeSuffix('numeric suffix 012', '012'));
+        $this->assertSame('zero int suffix ', Str::beforeSuffix('zero int suffix 0', 0));
+        $this->assertSame('int suffix', Str::beforeSuffix('int suffix23', 23));
+        $this->assertSame('', Str::beforeSuffix('all', 'all'));
+    }
+
     public function testStrBetween()
     {
         $this->assertSame('abc', Str::between('abc', '', 'c'));
@@ -182,6 +196,20 @@ class SupportStrTest extends TestCase
         $this->assertSame('te', Str::afterLast('yv0et0te', 0));
         $this->assertSame('te', Str::afterLast('yv2et2te', 2));
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
+    }
+
+    public function testStrAfterPrefix()
+    {
+        $this->assertSame('string', Str::afterPrefix('prefix_string', 'prefix_'));
+        $this->assertSame('string prefix zzz', Str::afterPrefix('string prefix zzz', 'prefix'));
+        $this->assertSame('last prefix', Str::afterPrefix('last prefix', 'prefix'));
+        $this->assertSame('prefix prefix', Str::afterPrefix('prefix prefix prefix', 'prefix '));
+        $this->assertSame(' accented prefix', Str::afterPrefix('é accented prefix', 'é'));
+        $this->assertSame('blank prefix', Str::afterPrefix('blank prefix', ''));
+        $this->assertSame(' numeric prefix', Str::afterPrefix('012 numeric prefix', '012'));
+        $this->assertSame(' zero int prefix', Str::afterPrefix('0 zero int prefix', 0));
+        $this->assertSame(' int prefix', Str::afterPrefix('23 int prefix', 23));
+        $this->assertSame('', Str::afterPrefix('all', 'all'));
     }
 
     public function testStrContains()

@@ -311,6 +311,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('yv2et', (string) $this->stringable('yv2et2te')->beforeLast(2));
     }
 
+    public function testBeforeSuffix()
+    {
+        $this->assertSame('string', (string) $this->stringable('string_suffix')->beforeSuffix('_suffix'));
+        $this->assertSame('string suffix zzz', (string) $this->stringable('string suffix zzz')->beforeSuffix('suffix'));
+        $this->assertSame('suffix xxx', (string) $this->stringable('suffix xxx')->beforeSuffix('suffix'));
+        $this->assertSame('suffix suffix', (string) $this->stringable('suffix suffix suffix')->beforeSuffix(' suffix'));
+        $this->assertSame('accented suffix ', (string) $this->stringable('accented suffix é')->beforeSuffix('é'));
+        $this->assertSame('blank suffix', (string) $this->stringable('blank suffix')->beforeSuffix(''));
+        $this->assertSame('numeric suffix ', (string) $this->stringable('numeric suffix 012')->beforeSuffix('012'));
+        $this->assertSame('zero int suffix ', (string) $this->stringable('zero int suffix 0')->beforeSuffix(0));
+        $this->assertSame('int suffix', (string) $this->stringable('int suffix23')->beforeSuffix(23));
+        $this->assertSame('', (string) $this->stringable('all')->beforeSuffix('all'));
+    }
+
     public function testBetween()
     {
         $this->assertSame('abc', (string) $this->stringable('abc')->between('', 'c'));
@@ -350,6 +364,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('te', (string) $this->stringable('yv0et0te')->afterLast(0));
         $this->assertSame('te', (string) $this->stringable('yv2et2te')->afterLast(2));
         $this->assertSame('foo', (string) $this->stringable('----foo')->afterLast('---'));
+    }
+
+    public function testStrAfterPrefix()
+    {
+        $this->assertSame('string', (string) $this->stringable('prefix_string')->afterPrefix('prefix_'));
+        $this->assertSame('string prefix zzz', (string) $this->stringable('string prefix zzz')->afterPrefix('prefix'));
+        $this->assertSame('last prefix', (string) $this->stringable('last prefix')->afterPrefix('prefix'));
+        $this->assertSame('prefix prefix', (string) $this->stringable('prefix prefix prefix')->afterPrefix('prefix '));
+        $this->assertSame(' accented prefix', (string) $this->stringable('é accented prefix')->afterPrefix('é'));
+        $this->assertSame('blank prefix', (string) $this->stringable('blank prefix')->afterPrefix(''));
+        $this->assertSame(' numeric prefix', (string) $this->stringable('012 numeric prefix')->afterPrefix('012'));
+        $this->assertSame(' zero int prefix', (string) $this->stringable('0 zero int prefix')->afterPrefix(0));
+        $this->assertSame(' int prefix', (string) $this->stringable('23 int prefix')->afterPrefix(23));
+        $this->assertSame('', (string) $this->stringable('all')->afterPrefix('all'));
     }
 
     public function testContains()
