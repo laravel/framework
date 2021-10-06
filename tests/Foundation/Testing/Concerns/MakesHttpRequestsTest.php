@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Testing\Concerns;
+namespace Illuminate\Tests\Foundation\Bootstrap\Testing\Concerns;
 
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
