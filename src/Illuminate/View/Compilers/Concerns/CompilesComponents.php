@@ -162,12 +162,12 @@ trait CompilesComponents
     }
 
     /**
-     * Compile the consume statement into valid PHP.
+     * Compile the aware statement into valid PHP.
      *
      * @param  string  $expression
      * @return string
      */
-    protected function compileConsume($expression)
+    protected function compileAware($expression)
     {
         return "<?php foreach ({$expression} as \$__key => \$__value) {
     \$__consumeVariable = is_string(\$__key) ? \$__key : \$__value;
