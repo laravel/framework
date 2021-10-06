@@ -193,7 +193,7 @@ class ControllerMakeCommand extends GeneratorCommand
     /**
      * Build the model replacement values.
      *
-     * @param  array   $replace
+     * @param  array  $replace
      * @param  string  $modelClass
      * @return array
      */
@@ -203,27 +203,27 @@ class ControllerMakeCommand extends GeneratorCommand
         $namespace = 'Illuminate\\Http';
 
         if ($this->option('requests')) {
-            $storeRequestClass = 'Store' . class_basename($modelClass) . 'Request';
+            $storeRequestClass = 'Store'.class_basename($modelClass).'Request';
             $this->call('make:request', [
                 'name' => $storeRequestClass,
             ]);
-            $updateRequestClass = 'Update' . class_basename($modelClass) . 'Request';
+            $updateRequestClass = 'Update'.class_basename($modelClass).'Request';
             $this->call('make:request', [
                 'name' => $updateRequestClass,
             ]);
             $namespace = 'App\\Http\\Requests';
         }
         if ($this->option('request')) {
-            $storeRequestClass = $updateRequestClass = class_basename($modelClass) . 'Request';
+            $storeRequestClass = $updateRequestClass = class_basename($modelClass).'Request';
             $this->call('make:request', [
-                'name' => $storeRequestClass
+                'name' => $storeRequestClass,
             ]);
             $namespace = 'App\\Http\\Requests';
         }
 
-        $namespacedRequests = $namespace . '\\' . $storeRequestClass . ';';
+        $namespacedRequests = $namespace.'\\'.$storeRequestClass.';';
         if ($storeRequestClass != $updateRequestClass) {
-            $namespacedRequests .= "\r\nuse " . $namespace . "\\" . $updateRequestClass . ";";
+            $namespacedRequests .= "\r\nuse ".$namespace."\\".$updateRequestClass . ";";
         }
 
         return array_merge($replace, [
@@ -231,10 +231,10 @@ class ControllerMakeCommand extends GeneratorCommand
             '{{storeRequest}}' => $storeRequestClass,
             '{{ updateRequest }}' => $updateRequestClass,
             '{{updateRequest}}' => $updateRequestClass,
-            '{{ namespacedStoreRequest }}' => $namespace . '\\' . $storeRequestClass,
-            '{{namespacedStoreRequest}}' => $namespace . '\\' . $storeRequestClass,
-            '{{ namespacedUpdateRequest }}' => $namespace . '\\' . $updateRequestClass,
-            '{{namespacedUpdateRequest}}' => $namespace . '\\' . $updateRequestClass,
+            '{{ namespacedStoreRequest }}' => $namespace.'\\'.$storeRequestClass,
+            '{{namespacedStoreRequest}}' => $namespace.'\\'.$storeRequestClass,
+            '{{ namespacedUpdateRequest }}' => $namespace.'\\'.$updateRequestClass,
+            '{{namespacedUpdateRequest}}' => $namespace.'\\'.$updateRequestClass,
             '{{ namespacedRequests }}' => $namespacedRequests,
             '{{namespacedRequests}}' => $namespacedRequests,
         ]);
