@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Http;
+namespace Illuminate\Tests\Foundation\Bootstrap\Http;
 
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;

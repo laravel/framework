@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
+namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\User as FoundationUser;
