@@ -250,6 +250,16 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('api.users', $this->getRoute()->getName());
     }
 
+    public function testRouteGroupingWithoutPrefix()
+    {
+        $this->router->group([], function ($router) {
+            $router->prefix('bar')->get('baz', ['as' => 'baz', function () {
+                return 'hello';
+            }]);
+        });
+        $this->seeResponse('hello', Request::create('bar/baz', 'GET'));
+    }
+
     public function testRegisteringNonApprovedAttributesThrows()
     {
         $this->expectException(BadMethodCallException::class);
