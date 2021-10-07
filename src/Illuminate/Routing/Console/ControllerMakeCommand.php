@@ -213,13 +213,6 @@ class ControllerMakeCommand extends GeneratorCommand
             ]);
             $namespace = 'App\\Http\\Requests';
         }
-        if ($this->option('request')) {
-            $storeRequestClass = $updateRequestClass = class_basename($modelClass).'Request';
-            $this->call('make:request', [
-                'name' => $storeRequestClass,
-            ]);
-            $namespace = 'App\\Http\\Requests';
-        }
 
         $namespacedRequests = $namespace.'\\'.$storeRequestClass.';';
         if ($storeRequestClass != $updateRequestClass) {
@@ -255,7 +248,6 @@ class ControllerMakeCommand extends GeneratorCommand
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-            ['request', null, InputOption::VALUE_NONE, 'Generate a FormRequest class.'],
             ['requests', null, InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update.'],
         ];
     }
