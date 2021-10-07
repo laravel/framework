@@ -9,6 +9,7 @@ use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
 use voku\helper\ASCII;
+use NumberFormatter;
 
 class Str
 {
@@ -889,5 +890,21 @@ class Str
     public static function createUuidsNormally()
     {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Make a number parsed to words.
+     *
+     * @param  string  $value
+     * @param  string  $locale
+     * @return string
+     */
+    public static function numberToWords($value, $locale = 'en_us'): string
+    {
+        if (! is_numeric($value)) {
+            return false;
+        }
+
+        return numfmt_format(numfmt_create($locale, NumberFormatter::SPELLOUT), $value);
     }
 }
