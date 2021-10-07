@@ -340,12 +340,12 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
-    public function testRandomNumbers()
+    public function testRandomNumberBetween()
     {
-        $this->assertGreaterThan(0, Str::randomNumbers(1, 16));
-        $this->assertLessThan(17, Str::randomNumbers(1, 16));
-        $this->assertIsString(Str::randomNumbers(1, 16));
-        $this->assertTrue(ctype_digit(Str::randomNumbers(1, 16)));
+        $this->assertGreaterThan(0, Str::randomNumberBetween(1, 16));
+        $this->assertLessThan(17, Str::randomNumberBetween(1, 16));
+        $this->assertIsString(Str::randomNumberBetween(1, 16));
+        $this->assertTrue(ctype_digit(Str::randomNumberBetween(1, 16)));
     }
 
     public function testReplace()

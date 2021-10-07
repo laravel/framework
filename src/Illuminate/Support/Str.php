@@ -541,7 +541,7 @@ class Str
      * @param  int  $max
      * @return string
      */
-    public static function randomNumbers(int $min, int $max)
+    public static function randomNumberBetween(int $min, int $max)
     {
         return strval(rand($min, $max));
     }
