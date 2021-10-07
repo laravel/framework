@@ -902,7 +902,7 @@ class Str
     public static function numberToWords($value, $locale = 'en_us'): string
     {
         if (! is_numeric($value)) {
-            return false;
+            return $value;
         }
 
         return numfmt_format(numfmt_create($locale, NumberFormatter::SPELLOUT), $value);
