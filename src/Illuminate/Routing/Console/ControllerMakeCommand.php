@@ -248,7 +248,7 @@ class ControllerMakeCommand extends GeneratorCommand
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
-            ['requests', null, InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update.'],
+            ['requests', 'R', InputOption::VALUE_NONE, 'Generate FormRequest classes for store and update.'],
         ];
     }
 }
