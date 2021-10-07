@@ -5,7 +5,7 @@ namespace Illuminate\Queue\Console;
 use DateTimeInterface;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Queue\Events\JobRetrying;
+use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -42,7 +42,7 @@ class RetryCommand extends Command
             if (is_null($job)) {
                 $this->error("Unable to find failed job with ID [{$id}].");
             } else {
-                $this->laravel['events']->dispatch(new JobRetrying($job));
+                $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
                 $this->retryJob($job);
 

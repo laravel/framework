@@ -2,17 +2,17 @@
 
 namespace Illuminate\Queue\Events;
 
-class JobRetrying
+class JobRetryRequested
 {
     /**
-     * The job retrying object.
+     * The job instance.
      *
      * @var \stdClass
      */
     public $job;
 
     /**
-     * The job payload.
+     * The decoded job payload.
      *
      * @var array|null
      */
@@ -34,7 +34,7 @@ class JobRetrying
      *
      * @return array
      */
-    public function payload(): array
+    public function payload()
     {
         if (is_null($this->payload)) {
             $this->payload = json_decode($this->job->payload, true);
