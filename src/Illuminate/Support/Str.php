@@ -535,6 +535,18 @@ class Str
     }
 
     /**
+     * Generate a "random" numeric string.
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @return string
+     */
+    public static function randomNumbers(int $min, int $max)
+    {
+        return strval(rand($min, $max));
+    }
+
+    /**
      * Repeat the given string.
      *
      * @param  string  $string

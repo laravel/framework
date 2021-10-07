@@ -340,6 +340,14 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testRandomNumbers()
+    {
+        $this->assertGreaterThan(0, Str::randomNumbers(1, 16));
+        $this->assertLessThan(17, Str::randomNumbers(1, 16));
+        $this->assertIsString(Str::randomNumbers(1, 16));
+        $this->assertTrue(ctype_digit(Str::randomNumbers(1, 16)));
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
