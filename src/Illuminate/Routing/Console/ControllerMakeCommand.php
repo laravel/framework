@@ -223,7 +223,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         $namespacedRequests = $namespace.'\\'.$storeRequestClass.';';
         if ($storeRequestClass != $updateRequestClass) {
-            $namespacedRequests .= "\r\nuse ".$namespace.'\\'.$updateRequestClass.';';
+            $namespacedRequests .= PHP_EOL."use ".$namespace.'\\'.$updateRequestClass.';';
         }
 
         return array_merge($replace, [
