@@ -718,8 +718,8 @@ class HttpRequestTest extends TestCase
 
     public function testBearerTokenMethod()
     {
-        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer foo']);
-        $this->assertSame('foo', $request->bearerToken());
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer fooBearerbar']);
+        $this->assertSame('fooBearerbar', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic foo, Bearer bar']);
         $this->assertSame('bar', $request->bearerToken());
