@@ -41,7 +41,7 @@ class RequiredIf
 
         return $this->condition ? 'required' : '';
     }
-    
+
     /**
      * Unserialization is disabled to prevent Remote Code Execution in case
      * application calls unserialize() on user input containing dangerous string.
