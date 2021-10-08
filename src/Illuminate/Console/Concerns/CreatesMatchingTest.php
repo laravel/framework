@@ -37,7 +37,7 @@ trait CreatesMatchingTest
         }
 
         $this->call('make:test', [
-            'name' => Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test'),
+            'name' => Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test')->replace(['\\', '/'], DIRECTORY_SEPARATOR),
             '--pest' => $this->option('pest'),
         ]);
     }
