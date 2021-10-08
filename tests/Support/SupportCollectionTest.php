@@ -2081,6 +2081,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testHasAny($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+
+        $this->assertTrue($data->hasAny('first'));
+        $this->assertFalse($data->hasAny('third'));
+        $this->assertTrue($data->hasAny(['first', 'second']));
+        $this->assertTrue($data->hasAny(['first', 'fourth']));
+        $this->assertFalse($data->hasAny(['third', 'fourth']));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
