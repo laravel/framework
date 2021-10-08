@@ -283,19 +283,16 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Throw a server/client error exception if the condition evaulates to true.
+     * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
-     * @return $this
      * @param  bool  $condition
+     * @return $this
+     *
      * @throws \Illuminate\Http\Client\RequestException
      */
     public function throwIf($condition)
     {
-        if ($condition) {
-            return $this->throw();
-        }
-
-        return $this;
+        return $condition ? $this->throw() : $this;
     }
 
     /**
