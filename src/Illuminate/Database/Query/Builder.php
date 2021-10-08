@@ -3002,7 +3002,7 @@ class Builder
     }
 
     /**
-     * UpdateFrom records in a PostgreSQL database.
+     * Update records in a PostgreSQL database using the update from syntax.
      *
      * @param  array  $values
      * @return int
