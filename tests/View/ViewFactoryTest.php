@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\LazyCollection;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
@@ -685,6 +686,30 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->addLoop('');
+
+        $expectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => null,
+            'count' => null,
+            'first' => true,
+            'last' => null,
+            'odd' => false,
+            'even' => true,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+    }
+
+    public function testAddingLazyCollection()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop(new LazyCollection(function () {
+            $this->fail('LazyCollection\'s generator should not have been called');
+        }));
 
         $expectedLoop = [
             'iteration' => 0,
