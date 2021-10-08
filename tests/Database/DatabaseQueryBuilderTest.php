@@ -2458,10 +2458,10 @@ class DatabaseQueryBuilderTest extends TestCase
             ->join('orders', function ($join) {
                 $join->on('users.id', '=', 'orders.user_id')
                    ->where('users.id', '=', 1);
-           })->where('name', 'baz')
+            })->where('name', 'baz')
            ->updateFrom(['email' => 'foo', 'name' => 'bar']);
-       $this->assertEquals(1, $result);
-   }
+        $this->assertEquals(1, $result);
+    }
 
     public function testUpdateMethodRespectsRaw()
     {
