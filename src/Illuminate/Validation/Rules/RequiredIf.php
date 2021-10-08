@@ -50,6 +50,6 @@ class RequiredIf
      */
     public function __wakeup()
     {
-        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
 }
