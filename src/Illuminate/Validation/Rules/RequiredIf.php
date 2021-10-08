@@ -43,8 +43,7 @@ class RequiredIf
     }
 
     /**
-     * Unserialization is disabled to prevent Remote Code Execution in case
-     * application calls unserialize() on user input containing dangerous string.
+     * Unserialization is disabled to prevent remote code execution.
      *
      * @return void
      */
