@@ -41,4 +41,15 @@ class RequiredIf
 
         return $this->condition ? 'required' : '';
     }
+    
+    /**
+     * Unserialization is disabled to prevent Remote Code Execution in case
+     * application calls unserialize() on user input containing dangerous string.
+     *
+     * @return void
+     */
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
+    }
 }
