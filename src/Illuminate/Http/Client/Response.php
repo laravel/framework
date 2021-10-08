@@ -283,7 +283,7 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Throw an exception if  the condition evaulates to true.
+     * Throw a server/client error exception if the condition evaulates to true.
      *
      * @return $this
      * @param  bool  $condition
