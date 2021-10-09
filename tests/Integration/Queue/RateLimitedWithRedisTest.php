@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Redis\Connection;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
@@ -125,8 +126,27 @@ class RateLimitedWithRedisTest extends TestCase
 
         $this->assertFalse($restoredRateLimited->shouldRelease);
         $this->assertSame('limiterName', $fetch('limiterName'));
+        $this->assertNull($fetch('connectionName'));
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
         $this->assertInstanceOf(Redis::class, $fetch('redis'));
+    }
+
+    public function testMiddlewareSerializationWithConnection()
+    {
+        $rateLimited = new RateLimitedWithRedis('limiterName', 'default');
+        $rateLimited->shouldRelease = false;
+
+        $restoredRateLimited = unserialize(serialize($rateLimited));
+
+        $fetch = (function (string $name) {
+            return $this->{$name};
+        })->bindTo($restoredRateLimited, RateLimitedWithRedis::class);
+
+        $this->assertFalse($restoredRateLimited->shouldRelease);
+        $this->assertSame('limiterName', $fetch('limiterName'));
+        $this->assertSame('default', $fetch('connectionName'));
+        $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
+        $this->assertInstanceOf(Connection::class, $fetch('redis'));
     }
 
     protected function assertJobRanSuccessfully($testJob)
@@ -207,7 +227,7 @@ class RedisRateLimitedTestJob
 
     public function middleware()
     {
-        return [new RateLimitedWithRedis($this->key)];
+        return [new RateLimitedWithRedis($this->key, 'default')];
     }
 }
 
@@ -234,3 +254,4 @@ class RedisRateLimitedDontReleaseTestJob extends RedisRateLimitedTestJob
         return [(new RateLimitedWithRedis($this->key))->dontRelease()];
     }
 }
+
