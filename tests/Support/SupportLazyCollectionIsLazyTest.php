@@ -470,6 +470,17 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testHasAnyIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->hasAny(4);
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasAny([1, 4]);
+        });
+    }
+
     public function testImplodeEnumeratesOnce()
     {
         $this->assertEnumeratesOnce(function ($collection) {
