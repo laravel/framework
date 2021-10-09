@@ -14,7 +14,7 @@ class RateLimitedWithRedis extends RateLimited
     /**
      * The Redis factory implementation.
      *
-     * @var \Illuminate\Contracts\Redis\Factory
+     * @var \Illuminate\Contracts\Redis\Factory|\Illuminate\Contracts\Redis\Connection
      */
     protected $redis;
 
@@ -26,16 +26,42 @@ class RateLimitedWithRedis extends RateLimited
     public $decaysAt = [];
 
     /**
+     * The Redis connection name.
+     *
+     * @var string|null
+     */
+    protected $connectionName;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  string  $limiterName
+     * @param string|null $connectionName
      * @return void
      */
-    public function __construct($limiterName)
+    public function __construct($limiterName, $connectionName = null)
     {
         parent::__construct($limiterName);
 
-        $this->redis = Container::getInstance()->make(Redis::class);
+        $this->connectionName = $connectionName;
+        $this->redis = $this->makeRedis();
+
+    }
+
+    /**
+     * Make the redis instance
+     *
+     * @return \Illuminate\Contracts\Redis\Factory|\Illuminate\Contracts\Redis\Connection
+     */
+    protected function makeRedis()
+    {
+        $redis = Container::getInstance()->make(Redis::class);
+
+        if ($this->connectionName !== null) {
+            $redis = $redis->connection($this->connectionName);
+        }
+
+        return $redis;
     }
 
     /**
@@ -90,6 +116,19 @@ class RateLimitedWithRedis extends RateLimited
     }
 
     /**
+     * Prepare the object for serialization.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        $fields   = parent::__sleep();
+        $fields[] = 'connectionName';
+
+        return $fields;
+    }
+
+    /**
      * Prepare the object after unserialization.
      *
      * @return void
@@ -98,6 +137,6 @@ class RateLimitedWithRedis extends RateLimited
     {
         parent::__wakeup();
 
-        $this->redis = Container::getInstance()->make(Redis::class);
+        $this->redis = $this->makeRedis();
     }
 }
