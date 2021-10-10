@@ -660,6 +660,18 @@ class RouteRegistrarTest extends TestCase
         }
     }
 
+    public function testWhereInRegistration()
+    {
+        $wheres = ['foo' => 'one|two|three'];
+
+        $this->router->get('/{foo}')->whereIn(['foo'], ['one', 'two', 'three']);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertEquals($wheres, $route->wheres);
+        }
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
