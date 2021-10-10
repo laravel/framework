@@ -29,6 +29,18 @@ trait CreatesRegularExpressionRouteConstraints
     }
 
     /**
+     * Specify that the given route parameters are contained within the given array.
+     *
+     * @param $parameters
+     * @param array $values
+     * @return $this
+     */
+    public function whereIn($parameters, $values = [])
+    {
+        return $this->assignExpressionToParameters($parameters, implode('|', $values));
+    }
+
+    /**
      * Specify that the given route parameters must be numeric.
      *
      * @param  array|string  $parameters
