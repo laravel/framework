@@ -604,6 +604,28 @@ class Builder
     }
 
     /**
+     * Execute the query as a "select" statement or throw an exception.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function getOrFail($columns = ['*'])
+    {
+		$builder = $this->applyScopes();
+
+		if (count($models = $builder->getModels($columns)) > 0) {
+            $models = $builder->eagerLoadRelations($models);
+        } else {
+			throw (new ModelNotFoundException)->setModel(
+				get_class($this->model)
+			);
+		}
+
+		return $builder->getModel()->newCollection($models);
+   }
+
+    /**
      * Get the hydrated models without eager loading.
      *
      * @param  array|string  $columns
