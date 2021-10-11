@@ -15,7 +15,7 @@ use Illuminate\Support\Traits\Macroable;
 use Throwable;
 
 /**
- * @template TDestinationModel
+ * @template TDestinationModel of \Illuminate\Database\Eloquent\Model
  */
 abstract class Factory
 {
