@@ -31,8 +31,8 @@ trait CreatesRegularExpressionRouteConstraints
     /**
      * Specify that the given route parameters are contained within the given array.
      *
-     * @param $parameters
-     * @param array $values
+     * @param  array|string  $parameters
+     * @param  array  $values
      * @return $this
      */
     public function whereIn($parameters, $values = [])
