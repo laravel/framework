@@ -14,6 +14,9 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use Throwable;
 
+/**
+ * @template TDestinationModel
+ */
 abstract class Factory
 {
     use ForwardsCalls, Macroable {
@@ -23,7 +26,7 @@ abstract class Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var string
+     * @var class-string<TDestinationModel>
      */
     protected $model;
 
@@ -195,7 +198,7 @@ abstract class Factory
      * Create a single model and persist it to the database.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function createOne($attributes = [])
     {
@@ -206,7 +209,7 @@ abstract class Factory
      * Create a single model and persist it to the database.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function createOneQuietly($attributes = [])
     {
@@ -246,7 +249,7 @@ abstract class Factory
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function create($attributes = [], ?Model $parent = null)
     {
@@ -274,7 +277,7 @@ abstract class Factory
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
@@ -335,7 +338,7 @@ abstract class Factory
      * Make a single instance of the model.
      *
      * @param  callable|array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function makeOne($attributes = [])
     {
@@ -347,7 +350,7 @@ abstract class Factory
      *
      * @param  array  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function make($attributes = [], ?Model $parent = null)
     {
@@ -657,7 +660,7 @@ abstract class Factory
      * Get a new model instance.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|TDestinationModel
      */
     public function newModel(array $attributes = [])
     {
