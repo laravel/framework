@@ -26,7 +26,7 @@ abstract class Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<TDestinationModel>
+     * @var string|class-string<TDestinationModel>
      */
     protected $model;
 
