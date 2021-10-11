@@ -468,6 +468,10 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertEnumerates(5, function ($collection) {
             $collection->has(4);
         });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->has('non-existent');
+        });
     }
 
     public function testHasAnyIsLazy()
@@ -478,6 +482,10 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
         $this->assertEnumerates(2, function ($collection) {
             $collection->hasAny([1, 4]);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->hasAny(['non', 'existent']);
         });
     }
 
