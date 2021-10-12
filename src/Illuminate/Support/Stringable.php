@@ -651,6 +651,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert a value to studly caps case for each word.
+     *
+     * @return static
+     */
+    public function studlyWords()
+    {
+        return new static(Str::studlyWords($this->value));
+    }
+
+    /**
      * Returns the portion of the string specified by the start and length parameters.
      *
      * @param  int  $start

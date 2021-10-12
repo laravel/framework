@@ -781,6 +781,19 @@ class Str
     }
 
     /**
+     * Convert a value to studly caps case for each word.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function studlyWords($value)
+    {
+        $parts = preg_split('/(?=[A-Z])/', static::studly($value), -1, PREG_SPLIT_NO_EMPTY);
+
+        return implode(' ', $parts);
+    }
+
+    /**
      * Returns the portion of the string specified by the start and length parameters.
      *
      * @param  string  $string

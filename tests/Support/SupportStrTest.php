@@ -432,6 +432,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
     }
 
+    public function testStudlyWords()
+    {
+        $this->assertSame('Laravel P H P Framework', Str::studlyWords('laravel_p_h_p_framework'));
+        $this->assertSame('Laravel Php Framework', Str::studlyWords('laravel_php_framework'));
+        $this->assertSame('Laravel Ph P Framework', Str::studlyWords('laravel-phP-framework'));
+        $this->assertSame('Laravel Php Framework', Str::studlyWords('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('Foo Bar', Str::studlyWords('fooBar'));
+        $this->assertSame('Foo Bar', Str::studlyWords('foo_bar'));
+        $this->assertSame('Foo Bar Baz', Str::studlyWords('foo-barBaz'));
+        $this->assertSame('Foo Bar Baz', Str::studlyWords('foo-bar_baz'));
+    }
+
     public function testMatch()
     {
         $this->assertSame('bar', Str::match('/bar/', 'foo bar'));
