@@ -557,6 +557,24 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get the i-th item from the collection.
+     */
+    public function ith(int $index)
+    {
+        $position = 1;
+
+        foreach ($this as $item) {
+            if ($position === $index) {
+                return $item;
+            }
+
+            $position++;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine if the collection contains a single item.
      *
      * @return bool

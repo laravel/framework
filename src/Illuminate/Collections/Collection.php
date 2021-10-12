@@ -475,6 +475,14 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the i-th item from the collection.
+     */
+    public function ith(int $index)
+    {
+        return $this->slice($index - 1, 1)->first();
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): array-key)|array|string  $keyBy

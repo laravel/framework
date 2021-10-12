@@ -4850,6 +4850,21 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testIth($collection)
+    {
+        $data = new $collection([
+            'a' => 'A',
+            'b' => 'B',
+            'c' => 'C',
+            'd' => 'D',
+        ]);
+
+        $this->assertSame('C', $data->ith(3));
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
