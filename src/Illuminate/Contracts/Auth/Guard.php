@@ -41,17 +41,17 @@ interface Guard
     public function validate(array $credentials = []);
 
     /**
+     * Determine if the guard has a user instance.
+     *
+     * @return bool
+     */
+    public function hasUser();
+
+    /**
      * Set the current user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
     public function setUser(Authenticatable $user);
-
-    /**
-     * Determine if the guard has a user instance.
-     *
-     * @return bool
-     */
-    public function hasUser();
 }
