@@ -1,11 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use function PHPStan\Testing\assertType;
-
-class User extends Authenticatable
-{
-}
 
 $collection = User::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection);

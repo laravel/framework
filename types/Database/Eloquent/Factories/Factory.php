@@ -1,12 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use function PHPStan\Testing\assertType;
-
-class User extends Authenticatable
-{
-}
 
 /**
  * @extends Illuminate\Database\Eloquent\Factories\Factory<User>
