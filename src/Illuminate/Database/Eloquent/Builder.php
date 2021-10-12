@@ -593,6 +593,8 @@ class Builder
     {
         $builder = $this->applyScopes();
 
+        $columns = is_array($columns) ? $columns : func_get_args();
+
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
