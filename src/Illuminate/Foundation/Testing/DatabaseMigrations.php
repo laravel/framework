@@ -7,7 +7,7 @@ use Illuminate\Contracts\Console\Kernel;
 trait DatabaseMigrations
 {
     /**
-     * Define hooks to migrate the database before and after each test.
+     * Re-migrate the database before each test.
      *
      * @return void
      */
@@ -16,11 +16,5 @@ trait DatabaseMigrations
         $this->artisan('migrate:fresh');
 
         $this->app[Kernel::class]->setArtisan(null);
-
-        $this->beforeApplicationDestroyed(function () {
-            $this->artisan('migrate:rollback');
-
-            RefreshDatabaseState::$migrated = false;
-        });
     }
 }
