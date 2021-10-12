@@ -939,7 +939,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->bootedCallbacks[] = $callback;
 
         if ($this->isBooted()) {
-            $this->fireAppCallbacks([$callback]);
+            $callback($this);
         }
     }
 
@@ -949,10 +949,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  callable[]  $callbacks
      * @return void
      */
-    protected function fireAppCallbacks(array $callbacks)
+    protected function fireAppCallbacks(array &$callbacks)
     {
-        foreach ($callbacks as $callback) {
-            $callback($this);
+        $iterator = 0;
+        while ($iterator < count($callbacks)) {
+            $callbacks[$iterator]($this);
+            $iterator++;
         }
     }
 
@@ -1138,8 +1140,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminate()
     {
-        foreach ($this->terminatingCallbacks as $terminating) {
-            $this->call($terminating);
+        $iterator = 0;
+        while ($iterator < count($this->terminatingCallbacks)) {
+            $this->call($this->terminatingCallbacks[$iterator]);
+            $iterator++;
         }
     }
 

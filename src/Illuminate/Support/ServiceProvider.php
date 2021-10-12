@@ -97,8 +97,10 @@ abstract class ServiceProvider
      */
     public function callBootingCallbacks()
     {
-        foreach ($this->bootingCallbacks as $callback) {
-            $this->app->call($callback);
+        $iterator = 0;
+        while ($iterator < count($this->bootingCallbacks)) {
+            $this->app->call($this->bootingCallbacks[$iterator]);
+            $iterator++;
         }
     }
 
@@ -109,8 +111,10 @@ abstract class ServiceProvider
      */
     public function callBootedCallbacks()
     {
-        foreach ($this->bootedCallbacks as $callback) {
-            $this->app->call($callback);
+        $iterator = 0;
+        while ($iterator < count($this->bootedCallbacks)) {
+            $this->app->call($this->bootedCallbacks[$iterator]);
+            $iterator++;
         }
     }
 
