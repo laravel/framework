@@ -767,6 +767,8 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertFalse($response->denied());
         $this->assertTrue($response->allowed());
+
+
     }
 
     public function testInspectPolicyCallbackInvoke()
@@ -777,6 +779,26 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertFalse($response->denied());
         $this->assertTrue($response->allowed());
+    }
+
+    public function testCheckUsingPolicyCallback()
+    {
+        $gate = $this->getBasicGate();
+
+        $this->assertTrue($gate->check(
+            [AccessGateTestPolicyWithAllPermissions::class, 'edit'],
+            new AccessGateTestDummy)
+        );
+    }
+
+    public function testAnyUsingPolicyCallback()
+    {
+        $gate = $this->getBasicGate();
+
+        $this->assertTrue($gate->any(
+            [AccessGateTestPolicyWithAllPermissions::class, ['edit', 'update']],
+            new AccessGateTestDummy)
+        );
     }
 
     /**

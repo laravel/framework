@@ -279,6 +279,10 @@ class Gate implements GateContract
      */
     public function check($abilities, $arguments = [])
     {
+        if(is_array($abilities) && class_exists($abilities[0])) {
+            $abilities = [$abilities];
+        }
+
         return collect($abilities)->every(function ($ability) use ($arguments) {
             return $this->inspect($ability, $arguments)->allowed();
         });
@@ -293,6 +297,12 @@ class Gate implements GateContract
      */
     public function any($abilities, $arguments = [])
     {
+        if(is_array($abilities[1])) {
+            $abilities = collect($abilities[1])->map(function($ability) use($abilities) {
+                return [$abilities[0], $ability];
+            })->all();
+        }
+
         return collect($abilities)->contains(function ($ability) use ($arguments) {
             return $this->check($ability, $arguments);
         });
