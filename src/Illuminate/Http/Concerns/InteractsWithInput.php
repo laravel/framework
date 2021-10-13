@@ -299,12 +299,15 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as a collection.
      *
-     * @param  string|null  $key
+     * @param  array|string|null  $key
      * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)
     {
-        return collect($this->input($key));
+        if (is_array($key))
+            return collect($this->only($key));
+        else
+            return collect($this->input($key));
     }
 
     /**
