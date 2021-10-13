@@ -139,6 +139,10 @@ class AuthManager implements FactoryContract
             $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
         }
 
+        if(isset($config['rememberMeTokenDuration'])){
+            $guard->setRememberMeTokenDuration($config['rememberMeTokenDuration']);
+        }
+
         return $guard;
     }
 

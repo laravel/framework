@@ -54,6 +54,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $viaRemember = false;
 
     /**
+     * The duration that "remember me" token should last for.
+     *
+     * @var null
+     */
+    protected $rememberMeTokenDuration = null;
+
+    /**
      * The session used by the guard.
      *
      * @var \Illuminate\Contracts\Session\Session
@@ -532,7 +539,34 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function createRecaller($value)
     {
-        return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+        return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberMeTokenDuration());
+    }
+
+    /**
+     * Returns how long the remember me token should last for.
+     *
+     * @return int
+     */
+    protected function getRememberMeTokenDuration()
+    {
+        if($this->rememberMeTokenDuration === null){
+            return 2628000;
+        }
+
+        return $this->rememberMeTokenDuration;
+    }
+
+    /**
+     * Allows you to set the how long the remember me token will last for.
+     *
+     * @param int  $minutes
+     * @return $this
+     */
+    public function setRememberMeTokenDuration($minutes)
+    {
+        $this->rememberMeTokenDuration = $minutes;
+
+        return $this;
     }
 
     /**
