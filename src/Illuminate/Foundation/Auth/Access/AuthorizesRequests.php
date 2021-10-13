@@ -53,7 +53,7 @@ trait AuthorizesRequests
             return [$ability, $arguments];
         }
 
-        if(is_array($ability)) {
+        if (is_array($ability)) {
             return [$ability, $arguments];
         }
 
