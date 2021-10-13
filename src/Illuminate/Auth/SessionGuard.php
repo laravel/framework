@@ -555,7 +555,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Allows you to set the how long the remember me token will last for.
      *
-     * @param int  $minutes
+     * @param  int  $minutes
      * @return $this
      */
     public function setRememberMeTokenDuration($minutes)
