@@ -297,7 +297,8 @@ class Gate implements GateContract
      */
     public function any($abilities, $arguments = [])
     {
-        if (is_array($abilities[1])) {
+        // Gate::any([Policy::class, ['view', 'create']], $post)...
+        if (isset($abilities[1]) && is_array($abilities[1])) {
             $abilities = collect($abilities[1])->map(function ($ability) use ($abilities) {
                 return [$abilities[0], $ability];
             })->all();
@@ -570,13 +571,13 @@ class Gate implements GateContract
             [$class, $method] = $ability;
 
             if ($this->canBeCalledWithUser($user, $class, $method)) {
-                return $this->getCallableFromCallback($class, $method);
+                return $this->getCallableFromClassAndMethod($class, $method);
             }
         }
 
         if (class_exists($ability) &&
             $this->canBeCalledWithUser($user, $ability, '__invoke')) {
-            return $this->getCallableFromCallback($ability);
+            return $this->getCallableFromClassAndMethod($ability);
         }
 
         if (isset($this->stringCallbacks[$ability])) {
@@ -594,20 +595,6 @@ class Gate implements GateContract
 
         return function () {
             //
-        };
-    }
-
-    /**
-     * Get callable from class method.
-     *
-     * @param  string  $class
-     * @param  string  $method
-     * @return \Closure
-     */
-    protected function getCallableFromCallback($class, $method = '__invoke')
-    {
-        return function (...$params) use ($class, $method) {
-            return app($class)->{$method}(...$params);
         };
     }
 
@@ -816,6 +803,20 @@ class Gate implements GateContract
     protected function resolveUser()
     {
         return call_user_func($this->userResolver);
+    }
+
+    /**
+     * Get a callable from a class and method.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return \Closure
+     */
+    protected function getCallableFromClassAndMethod($class, $method = '__invoke')
+    {
+        return function (...$params) use ($class, $method) {
+            return $this->container->make($class)->{$method}(...$params);
+        };
     }
 
     /**
