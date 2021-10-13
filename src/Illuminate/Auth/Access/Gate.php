@@ -279,7 +279,7 @@ class Gate implements GateContract
      */
     public function check($abilities, $arguments = [])
     {
-        if(is_array($abilities) && class_exists($abilities[0])) {
+        if (is_array($abilities) && class_exists($abilities[0])) {
             $abilities = [$abilities];
         }
 
@@ -297,8 +297,8 @@ class Gate implements GateContract
      */
     public function any($abilities, $arguments = [])
     {
-        if(is_array($abilities[1])) {
-            $abilities = collect($abilities[1])->map(function($ability) use($abilities) {
+        if (is_array($abilities[1])) {
+            $abilities = collect($abilities[1])->map(function ($ability) use ($abilities) {
                 return [$abilities[0], $ability];
             })->all();
         }
@@ -566,17 +566,17 @@ class Gate implements GateContract
             return $callback;
         }
 
-        if(is_array($ability)) {
+        if (is_array($ability)) {
             [$class, $method] = $ability;
 
-            if($this->canBeCalledWithUser($user, $class, $method)) {
+            if ($this->canBeCalledWithUser($user, $class, $method)) {
                 return $this->getCallableFromCallback($class, $method);
             }
         }
 
-        if(class_exists($ability) &&
+        if (class_exists($ability) &&
             $this->canBeCalledWithUser($user, $ability, '__invoke')) {
-                return $this->getCallableFromCallback($ability);
+            return $this->getCallableFromCallback($ability);
         }
 
         if (isset($this->stringCallbacks[$ability])) {
@@ -600,13 +600,13 @@ class Gate implements GateContract
     /**
      * Get callable from class method.
      *
-     * @param  string $class
-     * @param  string $method
+     * @param  string  $class
+     * @param  string  $method
      * @return \Closure
      */
     protected function getCallableFromCallback($class, $method = '__invoke')
     {
-        return function(...$params) use ($class, $method) {
+        return function (...$params) use ($class, $method) {
             return app($class)->{$method}(...$params);
         };
     }

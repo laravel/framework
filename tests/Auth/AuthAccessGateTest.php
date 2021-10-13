@@ -767,8 +767,6 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertFalse($response->denied());
         $this->assertTrue($response->allowed());
-
-
     }
 
     public function testInspectPolicyCallbackInvoke()
