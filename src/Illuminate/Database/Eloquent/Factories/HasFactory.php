@@ -9,7 +9,7 @@ trait HasFactory
      *
      * @param  callable|array|int|null  $count
      * @param  callable|array  $state
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
      */
     public static function factory($count = null, $state = [])
     {
@@ -23,7 +23,7 @@ trait HasFactory
     /**
      * Create a new factory instance for the model.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
      */
     protected static function newFactory()
     {

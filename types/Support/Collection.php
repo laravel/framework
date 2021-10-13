@@ -1,13 +1,8 @@
 <?php
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Collection;
 use function PHPStan\Testing\assertType;
-
-class User extends Authenticatable
-{
-}
 
 $collection = collect([new User]);
 /** @var Arrayable<int, User> $arrayable */
