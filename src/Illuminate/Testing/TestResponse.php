@@ -278,6 +278,25 @@ EOF;
     }
 
     /**
+     * Assert whether the response is redirecting to a given URI that matches the pattern.
+     *
+     * @param  string  $regex
+     * @return $this
+     */
+    public function assertRedirectRegex($regex)
+    {
+        PHPUnit::assertTrue(
+            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
+        );
+
+        PHPUnit::assertMatchesRegularExpression(
+            $regex, $this->headers->get('Location')
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert whether the response is redirecting to a given signed route.
      *
      * @param  string|null  $name
