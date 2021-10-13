@@ -55,7 +55,7 @@ abstract class Component
      */
     public function render()
     {
-        return view('components.' . $this->resolveViewName());
+        return view('components.'.$this->resolveViewName());
     }
 
     /**
