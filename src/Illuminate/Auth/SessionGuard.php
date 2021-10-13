@@ -58,7 +58,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @var null
      */
-    protected $rememberMeTokenDuration = null;
+    protected $rememberMeTokenDuration = 2628000;
 
     /**
      * The session used by the guard.
@@ -549,10 +549,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function getRememberMeTokenDuration()
     {
-        if($this->rememberMeTokenDuration === null){
-            return 2628000;
-        }
-
         return $this->rememberMeTokenDuration;
     }
 
