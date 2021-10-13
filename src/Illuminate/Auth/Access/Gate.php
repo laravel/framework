@@ -556,6 +556,19 @@ class Gate implements GateContract
             return $callback;
         }
 
+        if(is_array($ability)) {
+            [$class, $method] = $ability;
+
+            if($this->canBeCalledWithUser($user, $class, $method)) {
+                return $this->getCallableFromCallback($class, $method);
+            }
+        }
+
+        if(class_exists($ability) &&
+            $this->canBeCalledWithUser($user, $ability, '__invoke')) {
+                return $this->getCallableFromCallback($ability);
+        }
+
         if (isset($this->stringCallbacks[$ability])) {
             [$class, $method] = Str::parseCallback($this->stringCallbacks[$ability]);
 
@@ -571,6 +584,20 @@ class Gate implements GateContract
 
         return function () {
             //
+        };
+    }
+
+    /**
+     * Get callable from class method.
+     *
+     * @param  string $class
+     * @param  string $method
+     * @return \Closure
+     */
+    protected function getCallableFromCallback($class, $method = '__invoke')
+    {
+        return function(...$params) use ($class, $method) {
+            return app($class)->{$method}(...$params);
         };
     }
 

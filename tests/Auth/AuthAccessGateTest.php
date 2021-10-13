@@ -759,6 +759,26 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check(['edit', 'update'], new AccessGateTestDummy));
     }
 
+    public function testInspectPolicyCallback()
+    {
+        $gate = $this->getBasicGate();
+
+        $response = $gate->inspect([AccessGateTestPolicyWithAllPermissions::class, 'edit'], new AccessGateTestDummy);
+
+        $this->assertFalse($response->denied());
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testInspectPolicyCallbackInvoke()
+    {
+        $gate = $this->getBasicGate();
+
+        $response = $gate->inspect(AccessGateTestGuestInvokableClass::class, new AccessGateTestDummy);
+
+        $this->assertFalse($response->denied());
+        $this->assertTrue($response->allowed());
+    }
+
     /**
      * @dataProvider hasAbilitiesTestDataProvider
      *
