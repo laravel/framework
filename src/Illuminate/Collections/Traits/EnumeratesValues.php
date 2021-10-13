@@ -773,6 +773,20 @@ trait EnumeratesValues
     }
 
     /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param  callable  $callback
+     * @param  mixed  ...$initial
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function reduceSpread(callable $callback, ...$initial)
+    {
+        return $this->reduceMany($callback, ...$initial);
+    }
+
+    /**
      * Reduce an associative collection to a single value.
      *
      * @param  callable  $callback
