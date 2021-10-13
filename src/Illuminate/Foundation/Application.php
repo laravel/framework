@@ -951,10 +951,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function fireAppCallbacks(array &$callbacks)
     {
-        $iterator = 0;
-        while ($iterator < count($callbacks)) {
-            $callbacks[$iterator]($this);
-            $iterator++;
+        $index = 0;
+
+        while ($index < count($callbacks)) {
+            $callbacks[$index]($this);
+
+            $index++;
         }
     }
 
@@ -1140,10 +1142,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminate()
     {
-        $iterator = 0;
-        while ($iterator < count($this->terminatingCallbacks)) {
-            $this->call($this->terminatingCallbacks[$iterator]);
-            $iterator++;
+        $index = 0;
+
+        while ($index < count($this->terminatingCallbacks)) {
+            $this->call($this->terminatingCallbacks[$index]);
+
+            $index++;
         }
     }
 
