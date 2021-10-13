@@ -53,7 +53,20 @@ abstract class Component
      *
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
-    abstract public function render();
+    public function render()
+    {
+        return view('components.' . $this->resolveViewName());
+    }
+
+    /**
+     * Get the view name relative to the components directory.
+     *
+     * @return string view
+     */
+    protected function resolveViewName()
+    {
+        return $this->componentName ?: Str::kebab(class_basename(get_class($this)));
+    }
 
     /**
      * Resolve the Blade view or view file that should be used when rendering the component.
