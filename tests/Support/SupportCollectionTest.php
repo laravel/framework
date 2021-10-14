@@ -3920,11 +3920,11 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testReduceMany($collection)
+    public function testReduceSpread($collection)
     {
         $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
 
-        [$sum, $max, $min] = $data->reduceMany(function ($sum, $max, $min, $value) {
+        [$sum, $max, $min] = $data->reduceSpread(function ($sum, $max, $min, $value) {
             $sum += $value;
             $max = max($max, $value);
             $min = min($min, $value);
@@ -3940,13 +3940,13 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testReduceManyThrowsAnExceptionIfReducerDoesNotReturnAnArray($collection)
+    public function testReduceSpreadThrowsAnExceptionIfReducerDoesNotReturnAnArray($collection)
     {
         $data = new $collection([1]);
 
         $this->expectException(UnexpectedValueException::class);
 
-        $data->reduceMany(function () {
+        $data->reduceSpread(function () {
             return false;
         }, null);
     }

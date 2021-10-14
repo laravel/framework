@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Exception;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
@@ -817,12 +818,37 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
-    public function testReduceEnumeratesOnce()
+    public function testReduceIsLazy()
     {
+        $this->assertEnumerates(1, function ($collection) {
+            $this->rescue(function () use ($collection) {
+                $collection->reduce(function ($total, $value) {
+                    throw new Exception('Short-circuit');
+                }, 0);
+            });
+        });
+
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->reduce(function ($total, $value) {
                 return $total + $value;
             }, 0);
+        });
+    }
+
+    public function testReduceSpreadIsLazy()
+    {
+        $this->assertEnumerates(1, function ($collection) {
+            $this->rescue(function () use ($collection) {
+                $collection->reduceSpread(function ($one, $two, $value) {
+                    throw new Exception('Short-circuit');
+                }, 0, 0);
+            });
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->reduceSpread(function ($total, $max, $value) {
+                return [$total + $value, max($max, $value)];
+            }, 0, 0);
         });
     }
 
@@ -1572,5 +1598,14 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     protected function make($source)
     {
         return new LazyCollection($source);
+    }
+
+    protected function rescue($callback)
+    {
+        try {
+            $callback();
+        } catch (Exception $e) {
+            // Silence is golden
+        }
     }
 }
