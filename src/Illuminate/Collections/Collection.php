@@ -476,6 +476,9 @@ class Collection implements ArrayAccess, Enumerable
 
     /**
      * Get the i-th item from the collection.
+     *
+     * @param  int  $index
+     * @return TValue
      */
     public function ith(int $index)
     {

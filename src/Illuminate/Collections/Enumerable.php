@@ -565,6 +565,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function isNotEmpty();
 
     /**
+     * Get the i-th item from the collection.
+     *
+     * @param  int  $index
+     * @return TValue
+     */
+    public function ith(int $index);
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
