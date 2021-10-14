@@ -102,7 +102,9 @@ trait CanBeOneOfMany
 
             if (isset($previous)) {
                 $this->addOneOfManyJoinSubQuery($subQuery, $previous['subQuery'], $previous['column']);
-            } elseif (isset($closure)) {
+            }
+
+            if (isset($closure)) {
                 $closure($subQuery);
             }
 
@@ -186,7 +188,7 @@ trait CanBeOneOfMany
         }
 
         if (! is_null($column)) {
-            $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($column).') as '.$subQuery->getQuery()->grammar->wrap($column));
+            $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($column).') as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
         }
 
         $this->addOneOfManySubQueryConstraints($subQuery, $groupBy, $column, $aggregate);
@@ -208,7 +210,7 @@ trait CanBeOneOfMany
             $subQuery->applyBeforeQueryCallbacks();
 
             $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
-                $join->on($this->qualifySubSelectColumn($on), '=', $this->qualifyRelatedColumn($on));
+                $join->on($this->qualifySubSelectColumn($on.'_aggregate'), '=', $this->qualifyRelatedColumn($on));
 
                 $this->addOneOfManyJoinSubQueryConstraints($join, $on);
             });
