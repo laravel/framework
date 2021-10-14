@@ -304,11 +304,7 @@ trait InteractsWithInput
      */
     public function collect($key = null)
     {
-        if (is_array($key)) {
-            return collect($this->only($key));
-        } else {
-            return collect($this->input($key));
-        }
+        return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
