@@ -54,11 +54,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $viaRemember = false;
 
     /**
-     * The duration that "remember me" token should last for.
+     * The number of minutes that the "remember me" cookie should be valid for.
      *
      * @var int
      */
-    protected $rememberMeTokenDuration = 2628000;
+    protected $rememberDuration = 2628000;
 
     /**
      * The session used by the guard.
@@ -539,30 +539,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function createRecaller($value)
     {
-        return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberMeTokenDuration());
-    }
-
-    /**
-     * Returns how long the remember me token should last for.
-     *
-     * @return int
-     */
-    protected function getRememberMeTokenDuration()
-    {
-        return $this->rememberMeTokenDuration;
-    }
-
-    /**
-     * Allows you to set the how long the remember me token will last for.
-     *
-     * @param  int  $minutes
-     * @return $this
-     */
-    public function setRememberMeTokenDuration($minutes)
-    {
-        $this->rememberMeTokenDuration = $minutes;
-
-        return $this;
+        return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
     }
 
     /**
@@ -844,6 +821,29 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function viaRemember()
     {
         return $this->viaRemember;
+    }
+
+    /**
+     * Get the number of minutes the remember me cookie should be valid for.
+     *
+     * @return int
+     */
+    protected function getRememberDuration()
+    {
+        return $this->rememberDuration;
+    }
+
+    /**
+     * Set the number of minutes the remember me cookie should be valid for.
+     *
+     * @param  int  $minutes
+     * @return $this
+     */
+    public function setRememberDuration($minutes)
+    {
+        $this->rememberDuration = $minutes;
+
+        return $this;
     }
 
     /**

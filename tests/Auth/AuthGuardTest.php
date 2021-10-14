@@ -444,7 +444,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $guard = new SessionGuard('default', $provider, $session, $request);
-        $guard->setRememberMeTokenDuration(5000);
+        $guard->setRememberDuration(5000);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
         $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 5000)->andReturn($foreverCookie);
