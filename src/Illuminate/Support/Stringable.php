@@ -597,6 +597,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert the given string to title case for each word.
+     *
+     * @return static
+     */
+    public function headline()
+    {
+        return new static(Str::headline($this->value));
+    }
+
+    /**
      * Get the singular form of an English word.
      *
      * @return static
@@ -648,16 +658,6 @@ class Stringable implements JsonSerializable
     public function studly()
     {
         return new static(Str::studly($this->value));
-    }
-
-    /**
-     * Convert a value to studly caps case for each word.
-     *
-     * @return static
-     */
-    public function studlyWords()
-    {
-        return new static(Str::studlyWords($this->value));
     }
 
     /**
