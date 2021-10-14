@@ -9,6 +9,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\PendingClosureDispatch;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Str;
@@ -165,12 +167,12 @@ class Schedule
                 );
             }
 
-            $job = CallQueuedClosure::create($job);
+            $job = new PendingClosureDispatch(CallQueuedClosure::create($job));
+        } else {
+            $job = new PendingDispatch($job);
         }
 
-        $this->getDispatcher()->dispatch(
-            $job->onConnection($connection)->onQueue($queue)
-        );
+        $job->onConnection($connection)->onQueue($queue);
     }
 
     /**
