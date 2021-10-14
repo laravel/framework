@@ -61,7 +61,7 @@ abstract class Component
     /**
      * Get the view name relative to the components directory.
      *
-     * @return string view
+     * @return string
      */
     protected function resolveViewName()
     {
