@@ -479,7 +479,7 @@ class Collection implements ArrayAccess, Enumerable
      */
     public function ith(int $index)
     {
-        return $this->slice($index - 1, 1)->first();
+        return $this->slice($index, 1)->first();
     }
 
     /**

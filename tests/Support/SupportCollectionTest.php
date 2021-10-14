@@ -4861,7 +4861,7 @@ class SupportCollectionTest extends TestCase
             'd' => 'D',
         ]);
 
-        $this->assertSame('C', $data->ith(3));
+        $this->assertSame('C', $data->ith(2));
     }
 
     /**

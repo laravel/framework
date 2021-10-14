@@ -561,7 +561,7 @@ class LazyCollection implements Enumerable
      */
     public function ith(int $index)
     {
-        $position = 1;
+        $position = 0;
 
         foreach ($this as $item) {
             if ($position === $index) {
