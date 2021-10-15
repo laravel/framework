@@ -39,9 +39,11 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('Jefferson Costella', Str::headline('jefferson costella'));
         $this->assertSame('Jefferson Costella', Str::headline('jefFErson coSTella'));
-        $this->assertSame('Jefferson Costella Uses Laravel', Str::headline('jefferson_costella uses_Laravel'));
+        $this->assertSame('Jefferson Costella Uses Laravel', Str::headline('jefferson_costella uses-_Laravel'));
+        $this->assertSame('Jefferson Costella Uses Laravel', Str::headline('jefferson_costella uses__Laravel'));
 
         $this->assertSame('Laravel P H P Framework', Str::headline('laravel_p_h_p_framework'));
+        $this->assertSame('Laravel P H P Framework', Str::headline('laravel _p _h _p _framework'));
         $this->assertSame('Laravel Php Framework', Str::headline('laravel_php_framework'));
         $this->assertSame('Laravel Ph P Framework', Str::headline('laravel-phP-framework'));
         $this->assertSame('Laravel Php Framework', Str::headline('laravel  -_-  php   -_-   framework   '));
