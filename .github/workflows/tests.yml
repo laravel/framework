@@ -53,7 +53,7 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Minimum Guzzle Version
+      - name: Set Minimum PHP 8.0 Versions
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 5
@@ -122,7 +122,7 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Minimum Guzzle Version
+      - name: Set Minimum PHP 8.0 Versions
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 5
