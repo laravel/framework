@@ -502,6 +502,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Replace the given case-insensitive value in the given string.
+     *
+     * @param  string|string[]  $search
+     * @param  string|string[]  $replace
+     * @return static
+     */
+    public function replaceIncensitive($search, $replace)
+    {
+        return new static(str_ireplace($search, $replace, $this->value));
+    }
+
+    /**
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
