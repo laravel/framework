@@ -130,7 +130,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function user()
     {
         if ($this->loggedOut) {
-            return;
+            return null;
         }
 
         // If we've already retrieved the user for the current request we can just
@@ -197,12 +197,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function recaller()
     {
         if (is_null($this->request)) {
-            return;
+            return null;
         }
 
         if ($recaller = $this->request->cookies->get($this->getRecallerName())) {
             return new Recaller($recaller);
         }
+
+        return null;
     }
 
     /**
@@ -280,14 +282,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function basic($field = 'email', $extraConditions = [])
     {
         if ($this->check()) {
-            return;
+            return null;
         }
 
         // If a username is set on the HTTP basic request, we will return out without
         // interrupting the request lifecycle. Otherwise, we'll need to generate a
         // request indicating that the given credentials were invalid for login.
         if ($this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
-            return;
+            return null;
         }
 
         return $this->failedBasicResponse();
@@ -642,7 +644,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function logoutOtherDevices($password, $attribute = 'password')
     {
         if (! $this->user()) {
-            return;
+            return null;
         }
 
         $result = $this->rehashUserPassword($password, $attribute);

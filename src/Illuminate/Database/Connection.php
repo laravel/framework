@@ -853,7 +853,7 @@ class Connection implements ConnectionInterface
     protected function fireConnectionEvent($event)
     {
         if (! isset($this->events)) {
-            return;
+            return null;
         }
 
         switch ($event) {
@@ -863,6 +863,8 @@ class Connection implements ConnectionInterface
                 return $this->events->dispatch(new TransactionCommitted($this));
             case 'rollingBack':
                 return $this->events->dispatch(new TransactionRolledBack($this));
+            default:
+                return null;
         }
     }
 

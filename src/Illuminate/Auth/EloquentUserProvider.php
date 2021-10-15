@@ -68,7 +68,7 @@ class EloquentUserProvider implements UserProvider
         )->first();
 
         if (! $retrievedModel) {
-            return;
+            return null;
         }
 
         $rememberToken = $retrievedModel->getRememberToken();
@@ -108,7 +108,7 @@ class EloquentUserProvider implements UserProvider
         if (empty($credentials) ||
            (count($credentials) === 1 &&
             Str::contains($this->firstCredentialKey($credentials), 'password'))) {
-            return;
+            return null;
         }
 
         // First we will add each credential element to the query as a where clause.

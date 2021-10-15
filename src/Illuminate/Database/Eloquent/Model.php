@@ -1239,7 +1239,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
         // immediately and not do anything else. Otherwise, we will continue with a
         // deletion process on the model, firing the proper events, and so forth.
         if (! $this->exists) {
-            return;
+            return null;
         }
 
         if ($this->fireModelEvent('deleting') === false) {
@@ -1516,7 +1516,7 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
     public function fresh($with = [])
     {
         if (! $this->exists) {
-            return;
+            return null;
         }
 
         return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())

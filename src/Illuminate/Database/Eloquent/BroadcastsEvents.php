@@ -112,12 +112,14 @@ trait BroadcastsEvents
     protected function broadcastIfBroadcastChannelsExistForEvent($instance, $event, $channels = null)
     {
         if (! static::$isBroadcasting) {
-            return;
+            return null;
         }
 
         if (! empty($this->broadcastOn($event)) || ! empty($channels)) {
             return broadcast($instance->onChannels(Arr::wrap($channels)));
         }
+
+        return null;
     }
 
     /**

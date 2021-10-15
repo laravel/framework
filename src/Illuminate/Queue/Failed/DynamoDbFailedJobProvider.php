@@ -128,7 +128,7 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
         ]);
 
         if (! isset($result['Item'])) {
-            return;
+            return null;
         }
 
         return (object) [

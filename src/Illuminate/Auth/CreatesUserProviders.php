@@ -24,7 +24,7 @@ trait CreatesUserProviders
     public function createUserProvider($provider = null)
     {
         if (is_null($config = $this->getProviderConfiguration($provider))) {
-            return;
+            return null;
         }
 
         if (isset($this->customProviderCreators[$driver = ($config['driver'] ?? null)])) {

@@ -122,7 +122,7 @@ class Collection implements ArrayAccess, Enumerable
     public function mode($key = null)
     {
         if ($this->count() === 0) {
-            return;
+            return null;
         }
 
         $collection = isset($key) ? $this->pluck($key) : $this;

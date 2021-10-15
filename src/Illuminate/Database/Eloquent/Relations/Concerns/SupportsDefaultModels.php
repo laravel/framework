@@ -45,7 +45,7 @@ trait SupportsDefaultModels
     protected function getDefaultFor(Model $parent)
     {
         if (! $this->withDefault) {
-            return;
+            return null;
         }
 
         $instance = $this->newRelatedInstanceFor($parent);
