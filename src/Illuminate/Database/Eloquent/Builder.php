@@ -1286,9 +1286,27 @@ class Builder
             $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
         }
 
-        $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
+        $this->mergeEagerLoad($eagerLoad);
 
         return $this;
+    }
+
+    /**
+     * Merge the relationships that should be eager loaded.
+     *
+     * @param array $eagerLoad
+     */
+    protected function mergeEagerLoad($eagerLoad)
+    {
+        foreach ($eagerLoad as $name => $constraints) {
+            // Already exists relationships?
+            if (isset($this->eagerLoad[$name])) {
+                // Ignore
+                unset($eagerLoad[$name]);
+            }
+        }
+
+        $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
     }
 
     /**
