@@ -158,7 +158,7 @@ class SimpleMessage
     }
 
     /**
-     * Adds multiple lines of text to the notification by splitting a given 
+     * Adds multiple lines of text to the notification by splitting a given
      * string using a provided or default separator.
      *
      * @param  string  $string
