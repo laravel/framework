@@ -508,7 +508,7 @@ class Stringable implements JsonSerializable
      * @param  string|string[]  $replace
      * @return static
      */
-    public function replaceIncensitive($search, $replace)
+    public function replaceInsensitive($search, $replace)
     {
         return new static(str_ireplace($search, $replace, $this->value));
     }
