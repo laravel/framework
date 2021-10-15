@@ -1294,7 +1294,7 @@ class Builder
     /**
      * Merge the relationships that should be eager loaded.
      *
-     * @param array $eagerLoad
+     * @param  array  $eagerLoad
      */
     protected function mergeEagerLoad($eagerLoad)
     {
