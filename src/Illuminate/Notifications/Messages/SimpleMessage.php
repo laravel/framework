@@ -158,6 +158,22 @@ class SimpleMessage
     }
 
     /**
+     * Adds multiple lines of text to the notification by splitting a given 
+     * string using a provided or default separator.
+     *
+     * @param  string  $string
+     * @return $this
+     */
+    public function multiline($string, $separator = '<br>')
+    {
+        foreach (explode($separator, $string) as $line) {
+            $this->with($line);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a line of text to the notification.
      *
      * @param  mixed  $line
