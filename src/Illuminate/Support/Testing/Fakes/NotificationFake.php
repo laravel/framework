@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -30,6 +31,20 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      * @var string|null
      */
     public $locale;
+
+    /**
+     * Assert if a notification was sent on-demand based on a truth-test callback.
+     *
+     * @param  string|\Closure  $notification
+     * @param  callable|null  $callback
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function assertSentOnDemand($notification, $callback = null)
+    {
+        $this->assertSentTo(new AnonymousNotifiable, $notification, $callback);
+    }
 
     /**
      * Assert if a notification was sent based on a truth-test callback.
@@ -67,6 +82,18 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             $this->sent($notifiable, $notification, $callback)->count() > 0,
             "The expected [{$notification}] notification was not sent."
         );
+    }
+
+    /**
+     * Assert if a notification was sent on-demand a number of times.
+     *
+     * @param  string  $notification
+     * @param  int  $times
+     * @return void
+     */
+    public function assertSentOnDemandTimes($notification, $times = 1)
+    {
+        return $this->assertSentToTimes(new AnonymousNotifiable, $notification, $times);
     }
 
     /**
