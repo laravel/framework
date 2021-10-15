@@ -115,6 +115,13 @@ class Builder
     protected $removedScopes = [];
 
     /**
+     * Overwrite eager loaded.
+     *
+     * @var bool
+     */
+    protected $overwriteEagerLoaded = true;
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1286,7 +1293,40 @@ class Builder
             $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
         }
 
+        $this->mergeEagerLoad($eagerLoad);
+
+        return $this;
+    }
+
+    /**
+     * Merge the relationships that should be eager loaded.
+     *
+     * @param  array  $eagerLoad
+     */
+    protected function mergeEagerLoad($eagerLoad)
+    {
+        if (! $this->overwriteEagerLoaded) {
+            foreach ($eagerLoad as $name => $constraints) {
+                // Already exists relationships?
+                if (isset($this->eagerLoad[$name])) {
+                    // Ignore
+                    unset($eagerLoad[$name]);
+                }
+            }
+        }
+
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
+    }
+
+    /**
+     * Whether to allow overrides when merging relationships that should be eager loaded.
+     *
+     * @param  bool  $overwriteEagerLoaded
+     * @return $this
+     */
+    public function overwriteWith($overwriteEagerLoaded)
+    {
+        $this->overwriteEagerLoaded = $overwriteEagerLoaded;
 
         return $this;
     }

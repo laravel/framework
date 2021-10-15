@@ -387,6 +387,36 @@ class DatabaseEloquentModelTest extends TestCase
         $closure($builder);
     }
 
+    public function eagerLoadingOverwriteSetting()
+    {
+        return [[true], [false]];
+    }
+
+    /**
+     * @dataProvider eagerLoadingOverwriteSetting
+     */
+    public function testEagerLoadingWithOverwrite($overwrite)
+    {
+        $model = new EloquentModelWithoutRelationStub;
+        $instance = $model->newInstance()->newQuery()
+            ->with('foo:bar,baz')
+            ->overwriteWith($overwrite)
+            ->with('foo.yao');
+
+        $builder = m::mock(Builder::class);
+
+        if ($overwrite) {
+            $builder->shouldNotReceive('select');
+        } else {
+            $builder->shouldReceive('select')->once()->with(['bar', 'baz']);
+        }
+
+        $this->assertNotNull($instance->getEagerLoads()['foo']);
+        $this->assertNotNull($instance->getEagerLoads()['foo.yao']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($builder);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
     {
         $result = EloquentModelWithStub::with(['foo', 'bar']);
