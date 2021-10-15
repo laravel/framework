@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Log\LogManager;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Throwable;
@@ -52,7 +53,50 @@ class HandleExceptions
     }
 
     /**
-     * Convert PHP errors to ErrorException instances.
+     * Reports an deprecation to the "deprecations" logger.
+     *
+     * @param  string  $message
+     * @param  string  $file
+     * @param  int  $line
+     * @return void
+     */
+    public function handleDeprecation($message, $file, $line)
+    {
+        try {
+            $logger = $this->getLogger();
+        } catch (Exception $e) {
+            return;
+        }
+
+        $this->ensureDeprecationsLoggerIsConfigured();
+
+        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line) {
+            $log->warning(sprintf('%s in %s on line %s',
+                $message, $file, $line
+            ));
+        });
+    }
+
+    /**
+     * Ensures the "deprecations" logger is configured.
+     *
+     * @return void
+     */
+    public function ensureDeprecationsLoggerIsConfigured()
+    {
+        with($this->app['config'], function ($config) {
+            if ($config->get('logging.channels.deprecations')) {
+                return;
+            }
+
+            $driver = $config->get('logging.deprecations') ?? 'null';
+
+            $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
+        });
+    }
+
+    /**
+     * Report PHP deprecations, or convert PHP errors to ErrorException instances.
      *
      * @param  int  $level
      * @param  string  $message
@@ -66,6 +110,10 @@ class HandleExceptions
     public function handleError($level, $message, $file = '', $line = 0, $context = [])
     {
         if (error_reporting() & $level) {
+            if ($this->isDeprecation($level)) {
+                return $this->handleDeprecation($message, $file, $line);
+            }
+
             throw new ErrorException($message, 0, $level, $file, $line);
         }
     }
@@ -144,6 +192,17 @@ class HandleExceptions
     }
 
     /**
+     * Determine if the error level is a deprecation.
+     *
+     * @param  int  $level
+     * @return bool
+     */
+    protected function isDeprecation($level)
+    {
+        return in_array($level, [E_DEPRECATED, E_USER_DEPRECATED]);
+    }
+
+    /**
      * Determine if the error type is fatal.
      *
      * @param  int  $type
@@ -162,5 +221,15 @@ class HandleExceptions
     protected function getExceptionHandler()
     {
         return $this->app->make(ExceptionHandler::class);
+    }
+
+    /**
+     * Get an instance of the logger implementation.
+     *
+     * @return \Illuminate\Log\LogManager
+     */
+    public function getLogger()
+    {
+        return $this->app->make(LogManager::class);
     }
 }

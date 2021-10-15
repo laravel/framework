@@ -6,6 +6,7 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
+         convertDeprecationsToExceptions="false"
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
