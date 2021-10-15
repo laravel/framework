@@ -26,7 +26,9 @@ class HandleExceptionsTest extends TestCase
         $this->handleExceptions = new HandleExceptions();
 
         with(new ReflectionClass($this->handleExceptions), function ($reflection) {
-            $reflection->getProperty('app')->setValue(
+            $property = tap($reflection->getProperty('app'))->setAccessible(true);
+
+            $property->setValue(
                 $this->handleExceptions,
                 $this->container
             );
