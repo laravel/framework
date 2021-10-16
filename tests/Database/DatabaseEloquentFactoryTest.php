@@ -487,6 +487,23 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('Hello World', $factory->getFoo());
     }
 
+    public function test_factory_can_conditionally_execute_code()
+    {
+        FactoryTestUserFactory::new()
+            ->when(true, function () {
+               $this->assertTrue(true);
+            })
+            ->when(false, function () {
+                $this->fail('Unreachable code that has somehow been reached.');
+            })
+            ->unless(false, function () {
+               $this->assertTrue(true);
+            })
+            ->unless(true, function () {
+                $this->fail('Unreachable code that has somehow been reached.');
+            });
+    }
+
     /**
      * Get a database connection instance.
      *
