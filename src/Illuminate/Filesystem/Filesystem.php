@@ -257,7 +257,7 @@ class Filesystem
      *
      * @param  string  $path
      * @param  int|null  $mode
-     * @return mixed
+     * @return string|bool
      */
     public function chmod($path, $mode = null)
     {
@@ -266,6 +266,35 @@ class Filesystem
         }
 
         return substr(sprintf('%o', fileperms($path)), -4);
+    }
+
+    /**
+     * Make a file or directory executable.
+     *
+     * @param  string  $path
+     * @return string|bool
+     */
+    public function chmodExecutable($path)
+    {
+        $permissions = $this->chmod($path);
+        if ($permissions === false) {
+            return false;
+        }
+
+        for ($i = 1; $i < 4; $i++) {
+            $perm = (int) $permissions[$i];
+            if ($perm === 7) {
+                continue;
+            }
+
+            if ($perm % 2 === 0) {
+                $permissions[$i] = $perm + 1;
+            }
+        }
+
+        clearstatcache(true, $path);
+
+        return $this->chmod($path, octdec($permissions));
     }
 
     /**

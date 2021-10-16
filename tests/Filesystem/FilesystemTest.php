@@ -163,6 +163,20 @@ class FilesystemTest extends TestCase
         $this->assertEquals($expectedPermissions, $filePermission);
     }
 
+    public function testSetChmodExecutable()
+    {
+        $path = self::$tempDir.'/file.txt';
+        file_put_contents($path, 'Hello World');
+
+        $files = new Filesystem;
+        $files->chmod($path, 0744);
+        $files->chmodExecutable($path);
+
+        $filePermission = substr(sprintf('%o', fileperms($path)), -4);
+        $expectedPermissions = DIRECTORY_SEPARATOR === '\\' ? '0666' : '0755';
+        $this->assertEquals($expectedPermissions, $filePermission);
+    }
+
     public function testDeleteRemovesFiles()
     {
         file_put_contents(self::$tempDir.'/file1.txt', 'Hello World');
