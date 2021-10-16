@@ -67,7 +67,7 @@ trait Has
             return $this->has($key, function (self $scope) use ($length, $callback) {
                 return $scope
                     ->tap(function (self $scope) use ($length) {
-                        if (is_int($length)) {
+                        if (! is_null($length)) {
                             $scope->count($length);
                         }
                     })

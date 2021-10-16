@@ -691,6 +691,22 @@ class AssertTest extends TestCase
         });
     }
 
+    public function testScopeShorthandFailsWhenSecondArgumentUnsupportedType()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                ['key' => 'first'],
+                ['key' => 'second'],
+            ],
+        ]);
+
+        $this->expectException(TypeError::class);
+
+        $assert->has('bar', 'invalid', function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
     public function testFirstScope()
     {
         $assert = AssertableJson::fromArray([
