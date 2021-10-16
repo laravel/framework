@@ -63,9 +63,13 @@ trait Has
 
         $this->interactsWith($key);
 
-        if (is_int($length) && ! is_null($callback)) {
+        if (! is_null($callback)) {
             return $this->has($key, function (self $scope) use ($length, $callback) {
-                return $scope->count($length)
+                return $scope->tap(function (self $scope) use ($length) {
+                    if (is_int($length)) {
+                        $scope->count($length);
+                    }
+                })
                     ->first($callback)
                     ->etc();
             });
