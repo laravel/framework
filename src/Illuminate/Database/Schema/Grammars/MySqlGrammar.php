@@ -68,6 +68,16 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the list of tables.
+     *
+     * @return string
+     */
+    public function compileViewExists()
+    {
+        return "select * from information_schema.tables where table_schema = ? and table_name = ? and table_type = 'VIEW'";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @return string

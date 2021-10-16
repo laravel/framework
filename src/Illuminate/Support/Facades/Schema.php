@@ -16,6 +16,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasColumns(string $table, array $columns)
  * @method static bool dropColumns(string $table, array $columns)
  * @method static bool hasTable(string $table)
+ * @method static bool hasView(string $view)
  * @method static void defaultStringLength(int $length)
  * @method static void registerCustomDoctrineType(string $class, string $name, string $type)
  * @method static array getColumnListing(string $table)
