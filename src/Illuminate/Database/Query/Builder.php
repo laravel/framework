@@ -733,11 +733,18 @@ class Builder
             return $this->whereSub($column, $operator, $value, $boolean);
         }
 
-        // If the value is "null", we will just assume the developer wants to add a
-        // where null clause to the query. So, we will allow a short-cut here to
-        // that method for convenience so the developer doesn't have to check.
+        // If the value is "null", two scenarios are possible :
+        // 1 - either the developer passed two parameters where($column, null),
+        //     so he wants to add a where null clause to the query.
+        // 2- or the developer passed only one parameter where($column), and here we will assume the developer
+        //     wants to add a where column is true clause to the query. So, we will allow a short-cut here
+        //     to that method for convenience so the developer doesn't have to check.
         if (is_null($value)) {
-            return $this->whereNull($column, $boolean, $operator !== '=');
+            if (1 === func_num_args()) {
+                $value = 1;
+            } else {
+                return $this->whereNull($column, $boolean, $operator !== '=');
+            }
         }
 
         $type = 'Basic';
