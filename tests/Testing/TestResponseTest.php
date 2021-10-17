@@ -637,6 +637,22 @@ class TestResponseTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function testAssertRedirect()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage("Response status code [{$statusCode}] is not a redirect status code.");
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertRedirect();
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);

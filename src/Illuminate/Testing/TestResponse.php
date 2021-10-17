@@ -83,7 +83,7 @@ class TestResponse implements ArrayAccess
     {
         PHPUnit::assertTrue(
             $this->isSuccessful(),
-            $this->statusMessageWithDetails('>=200, <300', $this->getStatusCode())
+            $this->statusMessageWithDetails($this->statusErrorMessage('>=200, <300', $this->getStatusCode()))
         );
 
         return $this;
@@ -172,7 +172,7 @@ class TestResponse implements ArrayAccess
      */
     public function assertStatus($status)
     {
-        $message = $this->statusMessageWithDetails($status, $actual = $this->getStatusCode());
+        $message = $this->statusMessageWithDetails($this->statusErrorMessage($status, $actual = $this->getStatusCode()));
 
         PHPUnit::assertSame($actual, $status, $message);
 
@@ -180,25 +180,47 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Get an assertion message for a status assertion containing extra details when available.
+     * Get an assertion message for a status assertion that includes the excepted and actual status codes.
      *
      * @param  string|int  $expected
      * @param  string|int  $actual
      * @return string
      */
-    protected function statusMessageWithDetails($expected, $actual)
+    protected function statusErrorMessage($expected, $actual)
+    {
+        return "Expected response status code [{$expected}] but received {$actual}.";
+    }
+
+    /**
+     * Get an assertion message for a redirect assertion that includes the actual status codes.
+     *
+     * @param  string|int  $actual
+     * @return string
+     */
+    protected function redirectErrorMessage($actual)
+    {
+        return "Response status code [{$actual}] is not a redirect status code.";
+    }
+
+    /**
+     * Get an assertion message for a status assertion containing extra details when available.
+     *
+     * @param  string  $message
+     * @return string
+     */
+    protected function statusMessageWithDetails($message)
     {
         $lastException = $this->exceptions->last();
 
         if ($lastException) {
-            return $this->statusMessageWithException($expected, $actual, $lastException);
+            return $this->statusMessageWithException($message, $lastException);
         }
 
         if ($this->baseResponse instanceof RedirectResponse) {
             $session = $this->baseResponse->getSession();
 
             if (! is_null($session) && $session->has('errors')) {
-                return $this->statusMessageWithErrors($expected, $actual, $session->get('errors')->all());
+                return $this->statusMessageWithErrors($message, $session->get('errors')->all());
             }
         }
 
@@ -206,27 +228,26 @@ class TestResponse implements ArrayAccess
             $testJson = new AssertableJsonString($this->getContent());
 
             if (isset($testJson['errors'])) {
-                return $this->statusMessageWithErrors($expected, $actual, $testJson->json());
+                return $this->statusMessageWithErrors($message, $testJson->json());
             }
         }
 
-        return "Expected response status code [{$expected}] but received {$actual}.";
+        return $message;
     }
 
     /**
      * Get an assertion message for a status assertion that has an unexpected exception.
      *
-     * @param  string|int  $expected
-     * @param  string|int  $actual
+     * @param  string  $message
      * @param  \Throwable  $exception
      * @return string
      */
-    protected function statusMessageWithException($expected, $actual, $exception)
+    protected function statusMessageWithException($message, $exception)
     {
         $exception = (string) $exception;
 
         return <<<EOF
-Expected response status code [$expected] but received $actual.
+$message
 
 The following exception occurred during the request:
 
@@ -237,19 +258,18 @@ EOF;
     /**
      * Get an assertion message for a status assertion that contained errors.
      *
-     * @param  string|int  $expected
-     * @param  string|int  $actual
+     * @param  string  $message
      * @param  array  $errors
      * @return string
      */
-    protected function statusMessageWithErrors($expected, $actual, $errors)
+    protected function statusMessageWithErrors($message, $errors)
     {
         $errors = $this->baseResponse->headers->get('Content-Type') === 'application/json'
             ? json_encode($errors, JSON_PRETTY_PRINT)
             : implode(PHP_EOL, Arr::flatten($errors));
 
         return <<<EOF
-Expected response status code [$expected] but received $actual.
+$message
 
 The following errors occurred during the request:
 
@@ -267,7 +287,7 @@ EOF;
     public function assertRedirect($uri = null)
     {
         PHPUnit::assertTrue(
-            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
+            $this->isRedirect(), $this->statusMessageWithDetails($this->redirectErrorMessage($this->getStatusCode()))
         );
 
         if (! is_null($uri)) {
@@ -290,14 +310,12 @@ EOF;
             $uri = route($name, $parameters);
         }
 
-        PHPUnit::assertTrue(
-            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
-        );
-
         $request = Request::create($this->headers->get('Location'));
 
         PHPUnit::assertTrue(
-            $request->hasValidSignature(), 'The response is not a redirect to a signed route.'
+            $request->hasValidSignature(), $this->statusMessageWithDetails(
+                'The response is not a redirect to a signed route.'
+            )
         );
 
         if (! is_null($name)) {
