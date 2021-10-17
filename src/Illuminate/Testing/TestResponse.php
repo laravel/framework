@@ -278,19 +278,19 @@ EOF;
     }
 
     /**
-     * Assert whether the response is redirecting to a given URI that matches the pattern.
+     * Assert whether the response is redirecting to a URI that contains the given URI.
      *
-     * @param  string  $regex
+     * @param  string  $uri
      * @return $this
      */
-    public function assertRedirectRegex($regex)
+    public function assertRedirectContains($uri)
     {
         PHPUnit::assertTrue(
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        PHPUnit::assertMatchesRegularExpression(
-            $regex, $this->headers->get('Location')
+        PHPUnit::assertStringContainsString(
+            $uri, $this->headers->get('Location')
         );
 
         return $this;

@@ -1528,17 +1528,17 @@ class TestResponseTest extends TestCase
         $response->assertCookieMissing('cookie-name');
     }
 
-    public function testAssertRedirectRegex()
+    public function testAssertRedirectContains()
     {
         $response = TestResponse::fromBaseResponse(
             (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
         );
 
-        $response->assertRedirectRegex('/url\.com/');
+        $response->assertRedirectContains('url.com');
 
         $this->expectException(ExpectationFailedException::class);
 
-        $response->assertRedirectRegex('/url\.net/');
+        $response->assertRedirectContains('url.net');
     }
 
     private function makeMockResponse($content)
