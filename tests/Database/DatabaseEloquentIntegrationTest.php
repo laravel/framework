@@ -1004,6 +1004,31 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $post->first()->user->email);
     }
 
+    public function testBasicBelongsToEagerLoading()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post = $user->posts()->create(['name' => 'First Post']);
+
+        $this->assertSame($user->id, $post->user_id);
+
+        $post->load('user');
+
+        $this->assertTrue($post->relationLoaded('user'));
+        $this->assertNotNull($post->user);
+        $this->assertSame($user->id, $post->user->id);
+
+        // Test eager loading when FK is null
+
+        DB::connection()->enableQueryLog();
+
+        $post = new EloquentTestPost();
+        $post->load('user');
+
+        // No queries should be executed, because FK is null
+        $queryLog = DB::connection()->getQueryLog();
+        $this->assertCount(0, $queryLog);
+    }
+
     public function testBasicNestedSelfReferencingHasManyEagerLoading()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);

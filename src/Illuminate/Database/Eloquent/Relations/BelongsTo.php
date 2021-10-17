@@ -44,6 +44,13 @@ class BelongsTo extends Relation
     protected $relationName;
 
     /**
+     * Indication of that there are entities that can be eager loaded
+     *
+     * @var bool
+     */
+    protected $hasEagerModelKeys = false;
+
+    /**
      * Create a new belongs to relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -106,6 +113,13 @@ class BelongsTo extends Relation
      */
     public function addEagerConstraints(array $models)
     {
+        $eagerModelKeys = $this->getEagerModelKeys($models);
+        $this->hasEagerModelKeys = $eagerModelKeys !== [];
+        if (!$this->hasEagerModelKeys) {
+            // There is nothing to load
+            return;
+        }
+
         // We'll grab the primary key name of the related models since it could be set to
         // a non-standard name and not "id". We will then construct the constraint for
         // our eagerly loading query so it returns the proper models from execution.
@@ -113,7 +127,20 @@ class BelongsTo extends Relation
 
         $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
 
-        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
+        $this->query->{$whereIn}($key, $eagerModelKeys);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEager()
+    {
+        if (!$this->hasEagerModelKeys) {
+            // There is nothing to load
+            return new Collection();
+        }
+
+        return parent::getEager();
     }
 
     /**
