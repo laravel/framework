@@ -44,7 +44,7 @@ class BelongsTo extends Relation
     protected $relationName;
 
     /**
-     * Indicates that there are entities that can be eager loaded
+     * Indicates that there are entities that can be eager loaded.
      *
      * @var bool
      */
@@ -115,7 +115,7 @@ class BelongsTo extends Relation
     {
         $eagerModelKeys = $this->getEagerModelKeys($models);
         $this->hasEagerModelKeys = $eagerModelKeys !== [];
-        if (!$this->hasEagerModelKeys) {
+        if (! $this->hasEagerModelKeys) {
             // There is nothing to load
             return;
         }
@@ -135,7 +135,7 @@ class BelongsTo extends Relation
      */
     public function getEager()
     {
-        if (!$this->hasEagerModelKeys) {
+        if (! $this->hasEagerModelKeys) {
             // There is nothing to load
             return new Collection();
         }
