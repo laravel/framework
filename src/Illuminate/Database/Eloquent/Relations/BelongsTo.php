@@ -44,7 +44,7 @@ class BelongsTo extends Relation
     protected $relationName;
 
     /**
-     * Indication of that there are entities that can be eager loaded
+     * Indicates that there are entities that can be eager loaded
      *
      * @var bool
      */
