@@ -408,6 +408,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testBeforeExecutingHooksCanBeRegistered()
     {
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The callback was fired');
 
         $connection = $this->getMockConnection();

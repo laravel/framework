@@ -54,6 +54,7 @@ class BladeEchoHandlerTest extends AbstractBladeTestCase
      */
     public function testHandlerLogicWorksCorrectly($blade)
     {
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The fluent object has been successfully handled!');
 
         $this->compiler->stringable(Fluent::class, function ($object) {
