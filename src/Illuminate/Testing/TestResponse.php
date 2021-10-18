@@ -289,8 +289,8 @@ EOF;
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        PHPUnit::assertStringContainsString(
-            $uri, $this->headers->get('Location')
+        PHPUnit::assertTrue(
+            Str::contains($this->headers->get('Location'), $uri), 'Redirect location ['.$this->headers->get('Location').'] does not contain ['.$uri.'].'
         );
 
         return $this;
