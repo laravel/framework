@@ -32,7 +32,7 @@
         "psr/log": "^1.0 || ^2.0",
         "psr/simple-cache": "^1.0",
         "ramsey/uuid": "^4.2.2",
-        "swiftmailer/swiftmailer": "^6.0",
+        "swiftmailer/swiftmailer": "^6.3",
         "symfony/console": "^5.1.4",
         "symfony/error-handler": "^5.1.4",
         "symfony/finder": "^5.1.4",
