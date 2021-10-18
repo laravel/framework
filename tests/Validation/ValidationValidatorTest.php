@@ -649,7 +649,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, [], []);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
 
         $v->setException(\RuntimeException::class);
