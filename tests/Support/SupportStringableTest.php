@@ -671,8 +671,8 @@ class SupportStringableTest extends TestCase
 
     public function testMarkdown()
     {
-        $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
-        $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+        $this->assertSame("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
+        $this->assertSame("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
     }
 
     public function testRepeat()

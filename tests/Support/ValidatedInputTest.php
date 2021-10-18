@@ -11,8 +11,8 @@ class ValidatedInputTest extends TestCase
     {
         $input = new ValidatedInput(['name' => 'Taylor', 'votes' => 100]);
 
-        $this->assertEquals('Taylor', $input->name);
-        $this->assertEquals('Taylor', $input['name']);
+        $this->assertSame('Taylor', $input->name);
+        $this->assertSame('Taylor', $input['name']);
         $this->assertEquals(['name' => 'Taylor'], $input->only(['name']));
         $this->assertEquals(['name' => 'Taylor'], $input->except(['votes']));
         $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
@@ -24,8 +24,8 @@ class ValidatedInputTest extends TestCase
 
         $input = $input->merge(['votes' => 100]);
 
-        $this->assertEquals('Taylor', $input->name);
-        $this->assertEquals('Taylor', $input['name']);
+        $this->assertSame('Taylor', $input->name);
+        $this->assertSame('Taylor', $input['name']);
         $this->assertEquals(['name' => 'Taylor'], $input->only(['name']));
         $this->assertEquals(['name' => 'Taylor'], $input->except(['votes']));
         $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
