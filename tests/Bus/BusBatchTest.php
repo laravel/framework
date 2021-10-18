@@ -20,6 +20,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
 class BusBatchTest extends TestCase
 {
