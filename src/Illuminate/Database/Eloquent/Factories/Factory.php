@@ -17,7 +17,7 @@ use Throwable;
 
 abstract class Factory
 {
-    use ForwardsCalls, Conditionable, Macroable {
+    use Conditionable, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
