@@ -47,7 +47,7 @@ class BatchRepositoryFake implements BatchRepository
         return new Batch(
             new QueueFake(Facade::getFacadeApplication()),
             $this,
-            (string) Str::orderedUuid(),
+            Str::orderedUuid()->toString(),
             $batch->name,
             count($batch->jobs),
             count($batch->jobs),

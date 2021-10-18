@@ -24,8 +24,8 @@ class ValidatorTest extends DatabaseTestCase
             $table->string('first_name');
         });
 
-        User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'John']);
-        User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'Jim']);
+        User::create(['uuid' => Str::uuid()->toString(), 'first_name' => 'John']);
+        User::create(['uuid' => Str::uuid()->toString(), 'first_name' => 'Jim']);
     }
 
     public function testExists()
