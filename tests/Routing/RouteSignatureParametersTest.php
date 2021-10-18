@@ -11,7 +11,7 @@ use ReflectionParameter;
 
 class RouteSignatureParametersTest extends TestCase
 {
-    public function test_it_can_extract_the_route_action_signature_parameters()
+    public function testItCanExtractTheRouteActionSignatureParameters()
     {
         $callable = function (SignatureParametersUser $user) {
             return $user;

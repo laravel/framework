@@ -77,7 +77,7 @@ class BusBatchTest extends TestCase
         m::close();
     }
 
-    public function test_jobs_can_be_added_to_the_batch()
+    public function testJobsCanBeAddedToTheBatch()
     {
         $queue = m::mock(Factory::class);
 
@@ -116,7 +116,7 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
-    public function test_processed_jobs_can_be_calculated()
+    public function testProcessedJobsCanBeCalculated()
     {
         $queue = m::mock(Factory::class);
 
@@ -129,7 +129,7 @@ class BusBatchTest extends TestCase
         $this->assertEquals(60, $batch->progress());
     }
 
-    public function test_successful_jobs_can_be_recorded()
+    public function testSuccessfulJobsCanBeRecorded()
     {
         $queue = m::mock(Factory::class);
 
@@ -167,7 +167,7 @@ class BusBatchTest extends TestCase
         $this->assertEquals(1, $_SERVER['__then.count']);
     }
 
-    public function test_failed_jobs_can_be_recorded_while_not_allowing_failures()
+    public function testFailedJobsCanBeRecordedWhileNotAllowingFailures()
     {
         $queue = m::mock(Factory::class);
 
@@ -208,7 +208,7 @@ class BusBatchTest extends TestCase
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
-    public function test_failed_jobs_can_be_recorded_while_allowing_failures()
+    public function testFailedJobsCanBeRecordedWhileAllowingFailures()
     {
         $queue = m::mock(Factory::class);
 
@@ -248,7 +248,7 @@ class BusBatchTest extends TestCase
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
-    public function test_batch_can_be_cancelled()
+    public function testBatchCanBeCancelled()
     {
         $queue = m::mock(Factory::class);
 
@@ -261,7 +261,7 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->cancelled());
     }
 
-    public function test_batch_can_be_deleted()
+    public function testBatchCanBeDeleted()
     {
         $queue = m::mock(Factory::class);
 
@@ -274,7 +274,7 @@ class BusBatchTest extends TestCase
         $this->assertNull($batch);
     }
 
-    public function test_batch_state_can_be_inspected()
+    public function testBatchStateCanBeInspected()
     {
         $queue = m::mock(Factory::class);
 
@@ -309,7 +309,7 @@ class BusBatchTest extends TestCase
         $this->assertIsString(json_encode($batch));
     }
 
-    public function test_chain_can_be_added_to_batch()
+    public function testChainCanBeAddedToBatch()
     {
         $queue = m::mock(Factory::class);
 
@@ -345,7 +345,7 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
-    public function test_options_serialization_on_postgres()
+    public function testOptionsSerializationOnPostgres()
     {
         $pendingBatch = (new PendingBatch(new Container, collect()))
             ->onQueue('test-queue');
@@ -370,7 +370,7 @@ class BusBatchTest extends TestCase
     /**
      * @dataProvider serializedOptions
      */
-    public function test_options_unserialize_on_postgres($serialize, $options)
+    public function testOptionsUnserializeOnPostgres($serialize, $options)
     {
         $factory = m::mock(BatchFactory::class);
 

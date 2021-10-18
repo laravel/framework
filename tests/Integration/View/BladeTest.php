@@ -10,14 +10,14 @@ use Orchestra\Testbench\TestCase;
  */
 class BladeTest extends TestCase
 {
-    public function test_basic_blade_rendering()
+    public function testBasicBladeRendering()
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
 
         $this->assertSame('Hello Taylor', trim($view));
     }
 
-    public function test_rendering_a_component()
+    public function testRenderingAComponent()
     {
         $view = View::make('uses-panel', ['name' => 'Taylor'])->render();
 
@@ -26,7 +26,7 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
-    public function test_rendering_a_dynamic_component()
+    public function testRenderingADynamicComponent()
     {
         $view = View::make('uses-panel-dynamically', ['name' => 'Taylor'])->render();
 
@@ -35,7 +35,7 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
-    public function test_rendering_the_same_dynamic_component_with_different_attributes()
+    public function testRenderingTheSameDynamicComponentWithDifferentAttributes()
     {
         $view = View::make('varied-dynamic-calls')->render();
 
@@ -47,14 +47,14 @@ class BladeTest extends TestCase
 </span>', trim($view));
     }
 
-    public function test_inline_link_type_attributes_dont_add_extra_spacing_at_end()
+    public function testInlineLinkTypeAttributesDontAddExtraSpacingAtEnd()
     {
         $view = View::make('uses-link')->render();
 
         $this->assertSame('This is a sentence with a <a href="https://laravel.com">link</a>.', trim($view));
     }
 
-    public function test_appendable_attributes()
+    public function testAppendableAttributes()
     {
         $view = View::make('uses-appendable-panel', ['name' => 'Taylor', 'withInjectedValue' => true])->render();
 
@@ -69,14 +69,14 @@ class BladeTest extends TestCase
 </div>', trim($view));
     }
 
-    public function tested_nested_anonymous_attribute_proxying_works_correctly()
+    public function testedNestedAnonymousAttributeProxyingWorksCorrectly()
     {
         $view = View::make('uses-child-input')->render();
 
         $this->assertSame('<input class="disabled-class" foo="bar" type="text" disabled />', trim($view));
     }
 
-    public function test_consume_defaults()
+    public function testConsumeDefaults()
     {
         $view = View::make('consume')->render();
 
@@ -89,7 +89,7 @@ class BladeTest extends TestCase
 <div>Slot: F, Color: yellow, Default: foo</div>', trim($view));
     }
 
-    public function test_consume_with_props()
+    public function testConsumeWithProps()
     {
         $view = View::make('consume', ['color' => 'rebeccapurple'])->render();
 

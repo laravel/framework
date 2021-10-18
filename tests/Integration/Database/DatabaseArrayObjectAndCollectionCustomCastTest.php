@@ -25,7 +25,7 @@ class DatabaseArrayObjectAndCollectionCustomCastTest extends DatabaseTestCase
         });
     }
 
-    public function test_array_object_and_collection_casting()
+    public function testArrayObjectAndCollectionCasting()
     {
         $model = new TestEloquentModelWithCustomArrayObjectCast;
 

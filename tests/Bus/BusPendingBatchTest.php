@@ -21,7 +21,7 @@ class BusPendingBatchTest extends TestCase
         m::close();
     }
 
-    public function test_pending_batch_may_be_configured_and_dispatched()
+    public function testPendingBatchMayBeConfiguredAndDispatched()
     {
         $container = new Container;
 
@@ -57,7 +57,7 @@ class BusPendingBatchTest extends TestCase
         $pendingBatch->dispatch();
     }
 
-    public function test_batch_is_deleted_from_storage_if_exception_thrown_during_batching()
+    public function testBatchIsDeletedFromStorageIfExceptionThrownDuringBatching()
     {
         $this->expectException(RuntimeException::class);
 

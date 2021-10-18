@@ -15,7 +15,7 @@ class BusBatchableTest extends TestCase
         m::close();
     }
 
-    public function test_batch_may_be_retrieved()
+    public function testBatchMayBeRetrieved()
     {
         $class = new class
         {

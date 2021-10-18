@@ -34,7 +34,7 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_passes()
+    public function testConsoleCommandThatPasses()
     {
         $this->artisan('survey')
              ->expectsQuestion('What is your name?', 'Taylor Otwell')
@@ -44,7 +44,7 @@ class ArtisanCommandTest extends TestCase
              ->assertExitCode(0);
     }
 
-    public function test_console_command_that_passes_with_repeating_output()
+    public function testConsoleCommandThatPassesWithRepeatingOutput()
     {
         $this->artisan('slim')
              ->expectsQuestion('Who?', 'Taylor')
@@ -57,7 +57,7 @@ class ArtisanCommandTest extends TestCase
              ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_from_unexpected_output()
+    public function testConsoleCommandThatFailsFromUnexpectedOutput()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Output "Your name is Taylor Otwell and you prefer PHP." was printed.');
@@ -69,7 +69,7 @@ class ArtisanCommandTest extends TestCase
              ->assertExitCode(0);
     }
 
-    public function test_console_command_that_fails_from_missing_output()
+    public function testConsoleCommandThatFailsFromMissingOutput()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Output "Your name is Taylor Otwell and you prefer PHP." was not printed.');
@@ -83,7 +83,7 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_fails_from_exit_code_mismatch()
+    public function testConsoleCommandThatFailsFromExitCodeMismatch()
     {
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Expected status code 1 but received 0.');
@@ -94,7 +94,7 @@ class ArtisanCommandTest extends TestCase
              ->assertExitCode(1);
     }
 
-    public function test_console_command_that_fails_from_unordered_output()
+    public function testConsoleCommandThatFailsFromUnorderedOutput()
     {
         $this->expectException(InvalidOrderException::class);
 

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class RouteActionTest extends TestCase
 {
-    public function test_it_can_detect_a_serialized_closure()
+    public function testItCanDetectASerializedClosure()
     {
         $callable = function (RouteActionUser $user) {
             return $user;

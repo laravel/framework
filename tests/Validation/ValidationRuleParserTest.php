@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationRuleParserTest extends TestCase
 {
-    public function test_conditional_rules_are_properly_expanded_and_filtered()
+    public function testConditionalRulesAreProperlyExpandedAndFiltered()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when(true, ['required', 'min:2']),
@@ -32,7 +32,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_empty_rules_are_preserved()
+    public function testEmptyRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => [],
@@ -47,7 +47,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_conditional_rules_with_default()
+    public function testConditionalRulesWithDefault()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when(true, ['required', 'min:2'], ['string', 'max:10']),
@@ -66,7 +66,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_empty_conditional_rules_are_preserved()
+    public function testEmptyConditionalRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when(true, '', ['string', 'max:10']),

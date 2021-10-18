@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class QueueSizeTest extends TestCase
 {
-    public function test_queue_size()
+    public function testQueueSize()
     {
         Queue::fake();
 

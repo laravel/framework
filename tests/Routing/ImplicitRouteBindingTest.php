@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ImplicitRouteBindingTest extends TestCase
 {
-    public function test_it_can_resolve_the_implicit_route_bindings_for_the_given_route()
+    public function testItCanResolveTheImplicitRouteBindingsForTheGivenRoute()
     {
         $action = ['uses' => function (ImplicitRouteBindingUser $user) {
             return $user;

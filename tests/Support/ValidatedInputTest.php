@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidatedInputTest extends TestCase
 {
-    public function test_can_access_input()
+    public function testCanAccessInput()
     {
         $input = new ValidatedInput(['name' => 'Taylor', 'votes' => 100]);
 
@@ -18,7 +18,7 @@ class ValidatedInputTest extends TestCase
         $this->assertEquals(['name' => 'Taylor', 'votes' => 100], $input->all());
     }
 
-    public function test_can_merge_items()
+    public function testCanMergeItems()
     {
         $input = new ValidatedInput(['name' => 'Taylor']);
 

@@ -322,7 +322,7 @@ class ModelSerializationTest extends TestCase
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
     }
 
-    public function test_model_serialization_structure()
+    public function testModelSerializationStructure()
     {
         $user = ModelSerializationTestUser::create([
             'email' => 'taylor@laravel.com',
