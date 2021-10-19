@@ -12,30 +12,28 @@ class InteractsWithDeprecationHandlingTest extends TestCase
 
     protected $original;
 
+    protected $deprecationsFound = false;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->original = set_error_handler(function () {
-            // ..
+            $this->deprecationsFound = true;
         });
     }
 
     public function testWithDeprecationHandling()
     {
-        $deprecated = false;
-
         $this->withDeprecationHandling();
 
         trigger_error('Something is deprecated', E_USER_DEPRECATED);
 
-        $this->assertFalse($deprecated);
+        $this->assertTrue($this->deprecationsFound);
     }
 
     public function testWithoutDeprecationHandling()
     {
-        $deprecated = false;
-
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('Something is deprecated');
 
@@ -49,6 +47,7 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         set_error_handler($this->original);
 
         $this->originalDeprecationHandler = null;
+        $this->deprecationsFound = false;
 
         parent::tearDown();
     }
