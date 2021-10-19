@@ -725,9 +725,9 @@ class TestResponseTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('None of properties [data, errors, meta] exist.');
 
-        $response->assertJson(fn (AssertableJson $json) =>
+        $response->assertJson(function (AssertableJson $json) {
             $json->hasAny('data', 'errors', 'meta')
-        );
+        });
     }
 
     public function testAssertJsonWithFluentHasAnyPasses()
@@ -736,9 +736,9 @@ class TestResponseTest extends TestCase
             'data' => [],
         ]));
 
-        $response->assertJson(fn (AssertableJson $json) =>
+        $response->assertJson(function (AssertableJson $json) {
             $json->hasAny('data', 'errors', 'meta')
-        );
+        });
     }
 
     public function testAssertSimilarJsonWithMixed()
