@@ -36,7 +36,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
     }
 
     public function testSoleFailsForMultipleRecords()
@@ -61,13 +61,13 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->select('id', 'title')->first());
-        $this->assertSame($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
     }
 
     public function testSelectReplacesExistingSelects()
     {
-        $this->assertSame(
+        $this->assertEquals(
             ['id' => '1', 'title' => 'Foo Post'],
             (array) DB::table('posts')->select('content')->select(['id', 'title'])->first()
         );
@@ -75,7 +75,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testSelectWithSubQuery()
     {
-        $this->assertSame(
+        $this->assertEquals(
             ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
             (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
                 $query->select('bar');
@@ -87,14 +87,14 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
-        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
-        $this->assertSame($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
     }
 
     public function testAddSelectWithSubQuery()
     {
-        $this->assertSame(
+        $this->assertEquals(
             ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
             (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
                 $query->select('bar');

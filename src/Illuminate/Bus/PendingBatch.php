@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
-use Illuminate\Queue\SerializableClosure;
+use Illuminate\Queue\SerializableClosureFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -78,7 +78,7 @@ class PendingBatch
     public function then($callback)
     {
         $this->options['then'][] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
+                        ? SerializableClosureFactory::make($callback)
                         : $callback;
 
         return $this;
@@ -103,7 +103,7 @@ class PendingBatch
     public function catch($callback)
     {
         $this->options['catch'][] = $callback instanceof Closure
-                    ? new SerializableClosure($callback)
+                    ? SerializableClosureFactory::make($callback)
                     : $callback;
 
         return $this;
@@ -128,7 +128,7 @@ class PendingBatch
     public function finally($callback)
     {
         $this->options['finally'][] = $callback instanceof Closure
-                    ? new SerializableClosure($callback)
+                    ? SerializableClosureFactory::make($callback)
                     : $callback;
 
         return $this;

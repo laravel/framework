@@ -32,6 +32,7 @@ class SupportTestingNotificationFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->fake = new NotificationFake;
         $this->notification = new NotificationStub;
         $this->user = new UserStub;
@@ -143,6 +144,15 @@ class SupportTestingNotificationFakeTest extends TestCase
             return $notifiable === $user && $locale === 'au';
         });
     }
+
+    public function testAssertSentToWhenNotifiableHasFalsyShouldSend()
+    {
+        $user = new LocalizedUserStub;
+
+        $this->fake->send($user, new NotificationWithFalsyShouldSendStub);
+
+        $this->fake->assertNotSentTo($user, NotificationWithFalsyShouldSendStub::class);
+    }
 }
 
 class NotificationStub extends Notification
@@ -150,6 +160,19 @@ class NotificationStub extends Notification
     public function via($notifiable)
     {
         return ['mail'];
+    }
+}
+
+class NotificationWithFalsyShouldSendStub extends Notification
+{
+    public function via($notifiable)
+    {
+        return ['mail'];
+    }
+
+    public function shouldSend($notifiable, $channel)
+    {
+        return false;
     }
 }
 

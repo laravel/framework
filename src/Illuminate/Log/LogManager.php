@@ -95,7 +95,7 @@ class LogManager implements LoggerInterface
      */
     public function driver($driver = null)
     {
-        return $this->get($driver ?? $this->getDefaultDriver());
+        return $this->get($this->parseDriver($driver));
     }
 
     /**
@@ -397,17 +397,13 @@ class LogManager implements LoggerInterface
      */
     protected function prepareHandler(HandlerInterface $handler, array $config = [])
     {
-        $isHandlerFormattable = false;
-
-        if (Monolog::API === 1) {
-            $isHandlerFormattable = true;
-        } elseif (Monolog::API === 2 && $handler instanceof FormattableHandlerInterface) {
-            $isHandlerFormattable = true;
+        if (Monolog::API !== 1 && (Monolog::API !== 2 || ! $handler instanceof FormattableHandlerInterface)) {
+            return $handler;
         }
 
-        if ($isHandlerFormattable && ! isset($config['formatter'])) {
+        if (! isset($config['formatter'])) {
             $handler->setFormatter($this->formatter());
-        } elseif ($isHandlerFormattable && $config['formatter'] !== 'default') {
+        } elseif ($config['formatter'] !== 'default') {
             $handler->setFormatter($this->app->make($config['formatter'], $config['formatter_with'] ?? []));
         }
 
@@ -450,7 +446,7 @@ class LogManager implements LoggerInterface
     /**
      * Get the default log driver name.
      *
-     * @return string
+     * @return string|null
      */
     public function getDefaultDriver()
     {
@@ -490,11 +486,28 @@ class LogManager implements LoggerInterface
      */
     public function forgetChannel($driver = null)
     {
-        $driver = $driver ?? $this->getDefaultDriver();
+        $driver = $this->parseDriver($driver);
 
         if (isset($this->channels[$driver])) {
             unset($this->channels[$driver]);
         }
+    }
+
+    /**
+     * Parse the driver name.
+     *
+     * @param  string|null  $driver
+     * @return string|null
+     */
+    protected function parseDriver($driver)
+    {
+        $driver = $driver ?? $this->getDefaultDriver();
+
+        if ($this->app->runningUnitTests()) {
+            $driver = $driver ?? 'null';
+        }
+
+        return $driver;
     }
 
     /**

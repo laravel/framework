@@ -50,6 +50,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
             $table->string('state');
             $table->string('type');
             $table->foreignId('user_id');
+            $table->timestamps();
         });
 
         $this->schema()->create('prices', function ($table) {
@@ -106,7 +107,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select MAX("id") as "id", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
+        $this->assertSame('select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
     }
 
     public function testQualifyingSubSelectColumn()
@@ -389,6 +390,29 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertNotNull($user->latest_login_with_soft_deletes);
     }
 
+    public function testWithContraintNotInAggregate()
+    {
+        $user = HasOneOfManyTestUser::create();
+
+        $previousFoo = $user->states()->create([
+            'type' => 'foo',
+            'state' => 'bar',
+            'updated_at' => '2020-01-01 00:00:00',
+        ]);
+        $newFoo = $user->states()->create([
+            'type' => 'foo',
+            'state' => 'active',
+            'updated_at' => '2021-01-01 12:00:00',
+        ]);
+        $newBar = $user->states()->create([
+            'type' => 'bar',
+            'state' => 'active',
+            'updated_at' => '2021-01-01 12:00:00',
+        ]);
+
+        $this->assertSame($newFoo->id, $user->last_updated_foo_state->id);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -464,6 +488,16 @@ class HasOneOfManyTestUser extends Eloquent
         );
     }
 
+    public function last_updated_foo_state()
+    {
+        return $this->hasOne(HasOneOfManyTestState::class, 'user_id')->ofMany([
+            'updated_at' => 'max',
+            'id' => 'max',
+        ], function ($q) {
+            $q->where('type', 'foo');
+        });
+    }
+
     public function prices()
     {
         return $this->hasMany(HasOneOfManyTestPrice::class, 'user_id');
@@ -518,8 +552,8 @@ class HasOneOfManyTestState extends Eloquent
 {
     protected $table = 'states';
     protected $guarded = [];
-    public $timestamps = false;
-    protected $fillable = ['type', 'state'];
+    public $timestamps = true;
+    protected $fillable = ['type', 'state', 'updated_at'];
 }
 
 class HasOneOfManyTestPrice extends Eloquent

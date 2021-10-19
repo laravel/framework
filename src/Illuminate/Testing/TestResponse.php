@@ -278,6 +278,25 @@ EOF;
     }
 
     /**
+     * Assert whether the response is redirecting to a URI that contains the given URI.
+     *
+     * @param  string  $uri
+     * @return $this
+     */
+    public function assertRedirectContains($uri)
+    {
+        PHPUnit::assertTrue(
+            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
+        );
+
+        PHPUnit::assertTrue(
+            Str::contains($this->headers->get('Location'), $uri), 'Redirect location ['.$this->headers->get('Location').'] does not contain ['.$uri.'].'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert whether the response is redirecting to a given signed route.
      *
      * @param  string|null  $name
