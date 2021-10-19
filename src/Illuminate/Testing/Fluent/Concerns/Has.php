@@ -123,8 +123,9 @@ trait Has
             sprintf('None of properties [%s] exist.', implode(', ', $keys))
         );
 
-        foreach ($keys as $key)
+        foreach ($keys as $key) {
             $this->interactsWith($key);
+        }
 
         return $this;
     }

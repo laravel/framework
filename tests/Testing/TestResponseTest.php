@@ -726,7 +726,7 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage('None of properties [data, errors, meta] exist.');
 
         $response->assertJson(function (AssertableJson $json) {
-            $json->hasAny('data', 'errors', 'meta')
+            $json->hasAny('data', 'errors', 'meta');
         });
     }
 
@@ -737,7 +737,7 @@ class TestResponseTest extends TestCase
         ]));
 
         $response->assertJson(function (AssertableJson $json) {
-            $json->hasAny('data', 'errors', 'meta')
+            $json->hasAny('data', 'errors', 'meta');
         });
     }
 
