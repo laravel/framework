@@ -613,6 +613,44 @@ if (! function_exists('redirect')) {
     }
 }
 
+if (! function_exists('redirect_if')) {
+    /**
+     * Get an instance of the redirector with the given data if the given condition is true.
+     *
+     * @param  bool $boolean
+     * @param  string|null  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    function redirect_if($boolean, $to = null, $status = 302, $headers = [], $secure = null)
+    {
+        if ($boolean) {
+            return redirect($to, $status, $headers, $secure);
+        }
+    }
+}
+
+if (! function_exists('redirect_unless')) {
+    /**
+     * Get an instance of the redirector with the given data unless the given condition is true.
+     *
+     * @param  bool $boolean
+     * @param  string|null  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    function redirect_unless($boolean, $to = null, $status = 302, $headers = [], $secure = null)
+    {
+        if (! $boolean) {
+            return redirect($to, $status, $headers, $secure);
+        }
+    }
+}
+
 if (! function_exists('report')) {
     /**
      * Report an exception.
