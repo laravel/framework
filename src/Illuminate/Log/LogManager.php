@@ -62,6 +62,17 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Build an on-demand log channel.
+     *
+     * @param  array  $config
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function build(array $config)
+    {
+        return $this->get('ondemand', $config);
+    }
+
+    /**
      * Create a new, on-demand aggregate logger instance.
      *
      * @param  array  $channels
@@ -634,17 +645,6 @@ class LogManager implements LoggerInterface
     public function log($level, $message, array $context = [])
     {
         $this->driver()->log($level, $message, $context);
-    }
-
-    /**
-     * Build an on-demand channel.
-     *
-     * @param  array  $config
-     * @return \Psr\Log\LoggerInterface
-     */
-    public function build(array $config)
-    {
-        return $this->get('ondemand', $config);
     }
 
     /**
