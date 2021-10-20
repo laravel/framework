@@ -332,11 +332,7 @@ class HasManyThrough extends Relation
      */
     public function firstOrAbort($code, $columns = ['*'])
     {
-        try {
-            return $this->firstOrFail($columns);
-        } catch(ModelNotFoundException $exception) {
-            throw new HttpException($code, '', $exception);
-        }
+        return $this->firstOrThrow(new HttpException($code), $columns);
     }
 
     /**
@@ -456,11 +452,7 @@ class HasManyThrough extends Relation
      */
     public function findOrAbort($id, $code, $columns = ['*'])
     {
-        try {
-            return $this->findOrFail($id, $columns);
-        } catch(ModelNotFoundException $exception) {
-            throw new HttpException($code, '', $exception);
-        }
+        return $this->findOrThrow(new HttpException($code), $columns);
     }
 
     /**
