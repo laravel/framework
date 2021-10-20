@@ -617,7 +617,7 @@ if (! function_exists('redirect_if')) {
     /**
      * Get an instance of the redirector with the given data if the given condition is true.
      *
-     * @param  bool $boolean
+     * @param  bool  $boolean
      * @param  string|null  $to
      * @param  int  $status
      * @param  array  $headers
@@ -636,7 +636,7 @@ if (! function_exists('redirect_unless')) {
     /**
      * Get an instance of the redirector with the given data unless the given condition is true.
      *
-     * @param  bool $boolean
+     * @param  bool  $boolean
      * @param  string|null  $to
      * @param  int  $status
      * @param  array  $headers
