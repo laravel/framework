@@ -13,6 +13,7 @@ use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger as Monolog;
+use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
 use ReflectionProperty;
 use RuntimeException;
@@ -376,5 +377,59 @@ class LogManagerTest extends TestCase
         $manager->forgetChannel('single');
 
         $this->assertEmpty($manager->getChannels());
+    }
+
+    public function testLogManagerCanBuildOnDemandChannel()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->build([
+            'driver' => 'single',
+            'path' => storage_path('logs/on-demand.log'),
+        ]);
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+
+        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url->setAccessible(true);
+
+        $this->assertSame(storage_path('logs/on-demand.log'), $url->getValue($handler));
+    }
+
+    public function testLogManagerCanUseOnDemandChannelInOnDemandStack()
+    {
+        $manager = new LogManager($this->app);
+        $this->app['config']->set('logging.channels.test', [
+            'driver' => 'single',
+        ]);
+
+        $factory = new class()
+        {
+            public function __invoke()
+            {
+                return new Monolog(
+                    'uuid',
+                    [new StreamHandler(storage_path('logs/custom.log'))],
+                    [new UidProcessor()]
+                );
+            }
+        };
+        $channel = $manager->build([
+            'driver' => 'custom',
+            'via' => get_class($factory),
+        ]);
+        $logger = $manager->stack(['test', $channel]);
+
+        $handler = $logger->getLogger()->getHandlers()[1];
+        $processor = $logger->getLogger()->getProcessors()[0];
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(UidProcessor::class, $processor);
+
+        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url->setAccessible(true);
+
+        $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
     }
 }
