@@ -716,7 +716,7 @@ class BelongsToMany extends Relation
      * Find a related model by its primary key or throw the given exception.
      *
      * @param  mixed  $id
-     * @param \Throwable $exception
+     * @param  \Throwable  $exception
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
@@ -726,7 +726,7 @@ class BelongsToMany extends Relation
     {
         try {
             return $this->findOrFail($id, $columns);
-        } catch(ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             throw $exception;
         }
     }
@@ -735,8 +735,8 @@ class BelongsToMany extends Relation
      * Find a related model by its primary key or throw an HttpException with the code.
      *
      * @param  mixed  $id
-     * @param int  $code
-     * @param array $columns
+     * @param  int  $code
+     * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Throwable
@@ -793,8 +793,8 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result or throw the given exception.
      *
-     * @param \Throwable|string $exception
-     * @param array $columns
+     * @param  \Throwable|string  $exception
+     * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Throwable
@@ -803,7 +803,7 @@ class BelongsToMany extends Relation
     {
         try {
             return $this->firstOrFail($columns);
-        } catch(ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             throw $exception;
         }
     }
@@ -811,8 +811,8 @@ class BelongsToMany extends Relation
     /**
      * Execute the query and get the first result or throw an HttpException with the code.
      *
-     * @param int  $code
-     * @param array $columns
+     * @param  int  $code
+     * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Throwable
