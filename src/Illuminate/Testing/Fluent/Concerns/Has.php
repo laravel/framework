@@ -109,6 +109,28 @@ trait Has
     }
 
     /**
+     * Assert that at least one of the given props exists.
+     *
+     * @param  array|string  $key
+     * @return $this
+     */
+    public function hasAny($key): self
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        PHPUnit::assertTrue(
+            Arr::hasAny($this->prop(), $keys),
+            sprintf('None of properties [%s] exist.', implode(', ', $keys))
+        );
+
+        foreach ($keys as $key) {
+            $this->interactsWith($key);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that none of the given props exist.
      *
      * @param  array|string  $key
