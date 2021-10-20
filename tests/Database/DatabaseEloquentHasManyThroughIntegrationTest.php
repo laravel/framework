@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
@@ -166,6 +168,27 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
 
+    public function testFirstOrThrowThrowsAnException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('I am a custom exception');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->firstOrThrow(new RuntimeException('I am a custom exception'));
+    }
+
+    public function testFirstOrAbortThrowsAnException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->firstOrAbort(500);
+    }
+
     public function testFindOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -199,6 +222,73 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                                  ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(new Collection([1, 2]));
+    }
+
+    public function testFindOrThrowThrowsAnException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('I am a custom exception');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrThrow(1, new RuntimeException('I am a custom exception'));
+    }
+
+    public function testFindOrThrowWithManyThrowsAnException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('I am a custom exception');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrThrow([1, 2], new RuntimeException('I am a custom exception'));
+    }
+
+    public function testFindOrThrowWithManyUsingCollectionThrowsAnException()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('I am a custom exception');
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrThrow(new Collection([1, 2]), new RuntimeException('I am a custom exception'));
+    }
+
+    public function testFindOrAbortThrowsAnException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrAbort(1, 500);
+    }
+
+    public function testFindOrAbortWithManyThrowsAnException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrAbort([1, 2], 500);
+    }
+
+    public function testFindOrAbortWithManyUsingCollectionThrowsAnException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrAbort(new Collection([1, 2]), 500);
     }
 
     public function testFirstRetrievesFirstRecord()

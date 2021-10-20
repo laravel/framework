@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 {
@@ -127,6 +129,26 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         HasOneThroughTestPosition::first()->contract()->firstOrFail();
     }
 
+    public function testFirstOrThrowThrowsAnException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        HasOneThroughTestPosition::first()->contract()->firstOrThrow(new RuntimeException());
+    }
+
+    public function testFirstOrAbortThrowsAnException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        HasOneThroughTestPosition::first()->contract()->firstOrAbort(500);
+    }
+
     public function testFindOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -135,6 +157,26 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
             ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
 
         HasOneThroughTestPosition::first()->contract()->findOrFail(1);
+    }
+
+    public function testFindOrThrowThrowsAnException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        HasOneThroughTestPosition::first()->contract()->findOrThrow(1, new RuntimeException());
+    }
+
+    public function testFindOrAbortThrowsAnException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasOneThroughTestPosition::create(['id' => 1, 'name' => 'President', 'shortname' => 'ps'])
+            ->user()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'position_short' => 'ps']);
+
+        HasOneThroughTestPosition::first()->contract()->findOrAbort(1, 500);
     }
 
     public function testFirstRetrievesFirstRecord()

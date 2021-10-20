@@ -20,7 +20,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -144,6 +146,76 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail(new Collection([1, 2]), ['column']);
     }
 
+    public function testFindOrThrowMethodThrowsRuntimeException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findOrThrow('bar', new RuntimeException(), ['column']);
+    }
+
+    public function testFindOrThrowMethodWithManyThrowsRuntimeException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->findOrThrow([1, 2], new RuntimeException(), ['column']);
+    }
+
+    public function testFindOrThrowMethodWithManyUsingCollectionThrowsRuntimeException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->findOrThrow(new Collection([1, 2]), new RuntimeException(), ['column']);
+    }
+
+    public function testFindOrAbortMethodThrowsHttpException()
+    {
+        $this->expectException(HttpException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->findOrAbort('bar', 500, ['column']);
+    }
+
+    public function testFindOrAbortMethodWithManyThrowsHttpException()
+    {
+        $this->expectException(HttpException::class);
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->findOrAbort([1, 2], 500, ['column']);
+    }
+
+    public function testFindOrAbortMethodWithManyUsingCollectionThrowsHttpException()
+    {
+        $this->expectException(HttpException::class);
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->findOrAbort(new Collection([1, 2]), 500, ['column']);
+    }
+
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -152,6 +224,26 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
         $builder->firstOrFail(['column']);
+    }
+
+    public function testFirstOrThrowMethodThrowsRuntimeException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->firstOrThrow(new RuntimeException(), ['column']);
+    }
+
+    public function testFirstOrAbortMethodThrowsHttpException()
+    {
+        $this->expectException(HttpException::class);
+
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        $builder->firstOrAbort(500, ['column']);
     }
 
     public function testFindWithMany()

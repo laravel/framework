@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
@@ -410,6 +411,44 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find a related model by its primary key or throw the given exception.
+     *
+     * @param  mixed  $id
+     * @param \Throwable $exception
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
+     *
+     * @throws \Throwable
+     */
+    public function findOrThrow($id, $exception, $columns = ['*'])
+    {
+        try {
+            return $this->findOrFail($id, $columns);
+        } catch(ModelNotFoundException) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Find a related model by its primary key or throw an HttpException with the code.
+     *
+     * @param  mixed  $id
+     * @param int  $code
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Throwable
+     */
+    public function findOrAbort($id, $code, $columns = ['*'])
+    {
+        try {
+            return $this->findOrFail($id, $columns);
+        } catch(ModelNotFoundException $exception) {
+            throw new HttpException($code, '', $exception);
+        }
+    }
+
+    /**
      * Find a model by its primary key or return fresh model instance.
      *
      * @param  mixed  $id
@@ -488,6 +527,42 @@ class Builder implements BuilderContract
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    }
+
+    /**
+     * Execute the query and get the first result or throw the given exception.
+     *
+     * @param \Throwable $exception
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Throwable
+     */
+    public function firstOrThrow($exception, $columns = ['*'])
+    {
+        try {
+            return $this->firstOrFail($columns);
+        } catch(ModelNotFoundException) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Execute the query and get the first result or throw an HttpException with the code.
+     *
+     * @param \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int  $code
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Throwable
+     */
+    public function firstOrAbort($code, $columns = ['*'])
+    {
+        try {
+            return $this->firstOrFail($columns);
+        } catch(ModelNotFoundException $exception) {
+            throw new HttpException($code, '', $exception);
+        }
     }
 
     /**

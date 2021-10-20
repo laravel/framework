@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class HasManyThrough extends Relation
 {
@@ -303,6 +304,42 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Execute the query and get the first result or throw the given exception.
+     *
+     * @param \Throwable $exception
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Throwable
+     */
+    public function firstOrThrow($exception, $columns = ['*'])
+    {
+        try {
+            return $this->firstOrFail($columns);
+        } catch(ModelNotFoundException) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Execute the query and get the first result or throw an HttpException with the code.
+     *
+     * @param int  $code
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Throwable
+     */
+    public function firstOrAbort($code, $columns = ['*'])
+    {
+        try {
+            return $this->firstOrFail($columns);
+        } catch(ModelNotFoundException $exception) {
+            throw new HttpException($code, '', $exception);
+        }
+    }
+
+    /**
      * Execute the query and get the first result or call a callback.
      *
      * @param  \Closure|array  $columns
@@ -386,6 +423,44 @@ class HasManyThrough extends Relation
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+    }
+
+    /**
+     * Find a related model by its primary key or throw the given exception.
+     *
+     * @param  mixed  $id
+     * @param \Throwable $exception
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
+     *
+     * @throws \Throwable
+     */
+    public function findOrThrow($id, $exception, $columns = ['*'])
+    {
+        try {
+            return $this->findOrFail($id, $columns);
+        } catch(ModelNotFoundException) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Find a related model by its primary key or throw an HttpException with the code.
+     *
+     * @param  mixed  $id
+     * @param int  $code
+     * @param array $columns
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Throwable
+     */
+    public function findOrAbort($id, $code, $columns = ['*'])
+    {
+        try {
+            return $this->findOrFail($id, $columns);
+        } catch(ModelNotFoundException $exception) {
+            throw new HttpException($code, '', $exception);
+        }
     }
 
     /**
