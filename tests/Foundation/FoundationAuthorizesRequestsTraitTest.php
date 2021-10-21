@@ -17,18 +17,6 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         Container::setInstance(null);
     }
 
-    public function testCallableGateCheck()
-    {
-        unset($_SERVER['_test.authorizes.trait']);
-
-        $gate = $this->getBasicGate();
-
-        $response = (new FoundationTestAuthorizeTraitClass)->authorize([FoundationAuthorizesRequestTestPolicy::class, 'create']);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
-    }
-
     public function testBasicGateCheck()
     {
         unset($_SERVER['_test.authorizes.trait']);
