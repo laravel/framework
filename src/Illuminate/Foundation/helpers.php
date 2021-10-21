@@ -938,28 +938,12 @@ if (! function_exists('perform')) {
      * execute the first callable if the given condition is true, if not it will execute the second callable if passed.
      *
      * @param  bool  $boolean
-     * @param  callable_true  $callable
-     * @param  callable_false  $callable
-     * @return mixed|ErrorException
+     * @param  callable  $callable_true
+     * @param  callable  $callable_false
+     * @return mixed
      */
-    function perform($boolean, $callable_true, $callable_false = null)
+    function perform(bool $boolean, callable  $callable_true, callable $callable_false = null)
     {
-        if ($boolean) {
-            if (! is_callable($callable_true)) {
-                throw new ErrorException('perform expect a callable', 0, 1);
-            }
-
-            return call_user_func($callable_true);
-        } else {
-            if (isset($callable_false)) {
-                if (! is_callable($callable_false)) {
-                    throw new ErrorException('perform expect a callable', 0, 1);
-                }
-
-                return call_user_func($callable_false);
-            } else {
-                return false;
-            }
-        }
+        $boolean ? $callable_true() : $callable_false();
     }
 }
