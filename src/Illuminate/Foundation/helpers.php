@@ -942,7 +942,7 @@ if (! function_exists('perform')) {
      * @param  callable  $callable_false
      * @return mixed
      */
-    function perform(bool $boolean, callable  $callable_true, callable $callable_false = null)
+    function perform(bool $boolean, callable $callable_true, callable $callable_false = null)
     {
         $boolean ? $callable_true() : $callable_false();
     }
