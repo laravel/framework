@@ -71,7 +71,7 @@ class TagSet
      *
      * @param  string  $name
      */
-    public function resetTag($name)
+    public function flushTag($name)
     {
         $this->store->forget($this->tagKey($name));
     }
