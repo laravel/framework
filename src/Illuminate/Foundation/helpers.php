@@ -948,14 +948,14 @@ if (! function_exists('perform')) {
             if (! is_callable($callable_true)) {
                 throw new ErrorException('perform expect a callable', 0, 1);
             }
-            
+
             return call_user_func($callable_true);
         } else {
             if (isset($callable_false)) {
                 if (! is_callable($callable_false)) {
                     throw new ErrorException('perform expect a callable', 0, 1);
                 }
-                
+
                 return call_user_func($callable_false);
             } else {
                 return false;
