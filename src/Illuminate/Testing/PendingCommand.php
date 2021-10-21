@@ -193,6 +193,18 @@ class PendingCommand
     }
 
     /**
+     * Assert that the command has executed.
+     *
+     * @return $this
+     */
+    public function assertExecuted()
+    {
+        $this->expectedExitCode = 0;
+
+        return $this;
+    }
+
+    /**
      * Execute the command.
      *
      * @return int
