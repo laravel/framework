@@ -932,3 +932,40 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('do_if')) {
+    /**
+     * execute a callable if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  callable $callable
+     * @return mixed|ErrorException
+     */
+    function do_if($boolean,$callable) {
+        if (! is_callable($callable)) {
+            throw new ErrorException('do_if expect a callable', 0, 1);
+        }
+        if ($boolean) {
+            return call_user_func($callable);
+        }
+    }
+}
+
+
+if (! function_exists('do_unless')) {
+    /**
+     * execute a callable unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  callable $callable
+     * @return mixed|ErrorException
+     */
+     function do_unless($boolean ,$callable) {
+        if (! is_callable($callable)) {
+            throw new ErrorException('do_unless expect a callable', 0, 1);
+        }
+        if (! $boolean) {
+            return call_user_func($callable);
+        }
+    }
+}
