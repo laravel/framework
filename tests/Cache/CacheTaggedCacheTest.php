@@ -287,15 +287,6 @@ class CacheTaggedCacheTest extends TestCase
         $redis->flush();
     }
 
-    public function testTagFlushRemovesTag()
-    {
-        $store = new ArrayStore;
-        $tags = ['bop'];
-        $store->tags($tags)->put('foo', 'bar', 10);
-        $store->tags($tags)->flush();
-        $this->assertNull($store->get('tag:bop:key'));
-    }
-
     private function getTestCacheStoreWithTagValues(): ArrayStore
     {
         $store = new ArrayStore;

@@ -78,7 +78,7 @@ class TaggedCache extends Repository
      */
     public function flush()
     {
-        $this->tags->flush();
+        $this->tags->reset();
 
         return true;
     }
