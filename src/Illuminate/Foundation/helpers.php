@@ -941,7 +941,8 @@ if (! function_exists('do_if')) {
      * @param  callable  $callable
      * @return mixed|ErrorException
      */
-    function do_if($boolean, $callable) {
+    function do_if($boolean, $callable) 
+    {
         if (! is_callable($callable)) {
             throw new ErrorException('do_if expect a callable', 0, 1);
         }
@@ -960,7 +961,8 @@ if (! function_exists('do_unless')) {
      * @param  callable  $callable
      * @return mixed|ErrorException
      */
-     function do_unless($boolean, $callable) {
+    function do_unless($boolean, $callable) 
+    {
         if (! is_callable($callable)) {
             throw new ErrorException('do_unless expect a callable', 0, 1);
         }
