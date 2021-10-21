@@ -939,15 +939,12 @@ if (! function_exists('do_if')) {
      *
      * @param  bool  $boolean
      * @param  callable  $callable
-     * @return mixed|ErrorException
+     * @return mixed
      */
-    function do_if($boolean, $callable)
+    function do_if(bool $boolean, callable $callable)
     {
-        if (! is_callable($callable)) {
-            throw new ErrorException('do_if expect a callable', 0, 1);
-        }
         if ($boolean) {
-            return call_user_func($callable);
+            return $callable();
         }
     }
 }
@@ -958,15 +955,12 @@ if (! function_exists('do_unless')) {
      *
      * @param  bool  $boolean
      * @param  callable  $callable
-     * @return mixed|ErrorException
+     * @return mixed
      */
-    function do_unless($boolean, $callable)
+    function do_unless(bool $boolean, callable $callable)
     {
-        if (! is_callable($callable)) {
-            throw new ErrorException('do_unless expect a callable', 0, 1);
-        }
         if (! $boolean) {
-            return call_user_func($callable);
+            return $callable();
         }
     }
 }
