@@ -366,7 +366,7 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $this->fake->assertNothingDispatched();
 
-        $this->fake->push(new BusJobStub);
+        $this->fake->dispatch(new BusJobStub);
 
         try {
             $this->fake->assertNothingDispatched();
