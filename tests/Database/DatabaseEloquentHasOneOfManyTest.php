@@ -110,6 +110,29 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame('select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
     }
 
+    public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScope()
+    {
+        HasOneOfManyTestLogin::addGlobalScope(function ($query) {
+            $query->orderBy('id');
+        });
+
+        $user = HasOneOfManyTestUser::create();
+        $relation = $user->latest_login_without_global_scope();
+        $relation->addEagerConstraints([$user]);
+        $this->assertSame('select * from "logins" inner join (select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
+    }
+
+    public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScopeWithComplexQuery()
+    {
+        HasOneOfManyTestPrice::addGlobalScope(function ($query) {
+            $query->orderBy('id');
+        });
+
+        $user = HasOneOfManyTestUser::create();
+        $relation = $user->price_without_global_scope();
+        $this->assertSame('select * from "prices" inner join (select max("id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
+    }
+
     public function testQualifyingSubSelectColumn()
     {
         $user = HasOneOfManyTestUser::create();
@@ -468,6 +491,11 @@ class HasOneOfManyTestUser extends Eloquent
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany('id', 'count');
     }
 
+    public function latest_login_without_global_scope()
+    {
+        return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->withoutGlobalScopes()->latestOfMany();
+    }
+
     public function first_login()
     {
         return $this->hasOne(HasOneOfManyTestLogin::class, 'user_id')->ofMany('id', 'min');
@@ -521,6 +549,16 @@ class HasOneOfManyTestUser extends Eloquent
     public function price_with_shortcut()
     {
         return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->latestOfMany(['published_at', 'id']);
+    }
+
+    public function price_without_global_scope()
+    {
+        return $this->hasOne(HasOneOfManyTestPrice::class, 'user_id')->withoutGlobalScopes()->ofMany([
+            'published_at' => 'max',
+            'id' => 'max',
+        ], function ($q) {
+            $q->where('published_at', '<', now());
+        });
     }
 }
 

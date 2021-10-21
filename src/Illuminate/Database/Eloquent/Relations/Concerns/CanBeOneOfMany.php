@@ -181,7 +181,8 @@ trait CanBeOneOfMany
     protected function newOneOfManySubQuery($groupBy, $column = null, $aggregate = null)
     {
         $subQuery = $this->query->getModel()
-            ->newQuery();
+            ->newQuery()
+            ->withoutGlobalScopes($this->removedScopes());
 
         foreach (Arr::wrap($groupBy) as $group) {
             $subQuery->groupBy($this->qualifyRelatedColumn($group));
