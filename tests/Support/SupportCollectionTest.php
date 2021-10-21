@@ -4351,7 +4351,7 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([
             new TestSupportCollectionHigherOrderItem,
-            new TestSupportCollectionHigherOrderItem('david', 'bowie')
+            new TestSupportCollectionHigherOrderItem('david', 'bowie'),
         ]);
 
         // By method
