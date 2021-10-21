@@ -942,20 +942,20 @@ if (! function_exists('perform')) {
      * @param  callable_false  $callable
      * @return mixed|ErrorException
      */
-    function perform($boolean, $callable_true, $callable_false = null) {
-       
+    function perform($boolean, $callable_true, $callable_false = null)
+    {
         if ($boolean) {
             if (! is_callable($callable_true)) {
                 throw new ErrorException('perform expect a callable', 0, 1);
             }
             return call_user_func($callable_true);
-        }else{
+        } else {
             if(isset($callable_false)){
                 if (! is_callable($callable_false)) {
                     throw new ErrorException('perform expect a callable', 0, 1);
                 }
                 return call_user_func($callable_false);
-            }else{
+            } else {
                 return false;
             }
             
