@@ -4347,6 +4347,29 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testHigherOrderCollectionMapWithKeys($collection)
+    {
+        $data = new $collection([
+            new TestSupportCollectionHigherOrderItem,
+            new TestSupportCollectionHigherOrderItem('david', 'bowie')
+        ]);
+
+        // By method
+        $this->assertEquals([
+            'otwell' => 'taylor',
+            'bowie' => 'david',
+        ], $data->mapWithKeys->keyByLastName()->toArray());
+
+        // By array
+        $this->assertEquals([
+            'taylor' => 'otwell',
+            'david' => 'bowie',
+        ], $data->mapWithKeys->keyByFirstName->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testPartition($collection)
     {
         $data = new $collection(range(1, 10));
@@ -4864,10 +4887,18 @@ class SupportCollectionTest extends TestCase
 class TestSupportCollectionHigherOrderItem
 {
     public $name;
+    public $lastName;
 
-    public function __construct($name = 'taylor')
+    public $keyByFirstName;
+
+    public function __construct($name = 'taylor', $lastName = 'otwell')
     {
         $this->name = $name;
+        $this->lastName = $lastName;
+
+        $this->keyByFirstName = [
+            $this->name => $this->lastName,
+        ];
     }
 
     public function uppercase()
@@ -4878,6 +4909,13 @@ class TestSupportCollectionHigherOrderItem
     public function is($name)
     {
         return $this->name === $name;
+    }
+
+    public function keyByLastName()
+    {
+        return [
+            $this->lastName => $this->name,
+        ];
     }
 }
 

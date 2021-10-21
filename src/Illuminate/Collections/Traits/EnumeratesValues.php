@@ -29,6 +29,7 @@ use UnexpectedValueException;
  * @property-read HigherOrderCollectionProxy $groupBy
  * @property-read HigherOrderCollectionProxy $keyBy
  * @property-read HigherOrderCollectionProxy $map
+ * @property-read HigherOrderCollectionProxy $mapWithKeys
  * @property-read HigherOrderCollectionProxy $max
  * @property-read HigherOrderCollectionProxy $min
  * @property-read HigherOrderCollectionProxy $partition
@@ -63,6 +64,7 @@ trait EnumeratesValues
         'groupBy',
         'keyBy',
         'map',
+        'mapWithKeys',
         'max',
         'min',
         'partition',
