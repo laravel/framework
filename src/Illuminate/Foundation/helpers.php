@@ -952,7 +952,6 @@ if (! function_exists('do_if')) {
     }
 }
 
-
 if (! function_exists('do_unless')) {
     /**
      * execute a callable unless the given condition is true.
