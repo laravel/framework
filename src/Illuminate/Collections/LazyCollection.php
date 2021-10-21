@@ -134,6 +134,19 @@ class LazyCollection implements Enumerable
     }
 
     /**
+     * Get the percentage of given value or key and value.
+     *
+     * @param string $key
+     * @param mixed|null $operator
+     * @param mixed|null $value
+     * @return int|float
+     */
+    public function percentage(string $key, $operator = null, $value = null)
+    {
+        return $this->collect()->percentage(...func_get_args());
+    }
+
+    /**
      * Get the median of a given key.
      *
      * @param  string|array|null  $key

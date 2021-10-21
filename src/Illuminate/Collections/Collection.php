@@ -84,6 +84,27 @@ class Collection implements ArrayAccess, Enumerable
     }
 
     /**
+     * Get the percentage of given value or key and value.
+     *
+     * @param string $key
+     * @param mixed|null $operator
+     * @param mixed|null $value
+     * @return int|float
+     */
+    public function percentage(string $key, $operator = null, $value = null)
+    {
+        $args = func_get_args();
+
+        if (func_num_args() === 1) {
+            $args = [null, $key];
+        }
+
+        $total = $this->where(...$args)->count();
+
+        return $total * 100 / $this->count();
+    }
+
+    /**
      * Get the median of a given key.
      *
      * @param  string|array|null  $key

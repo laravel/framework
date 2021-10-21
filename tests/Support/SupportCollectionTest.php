@@ -3756,6 +3756,55 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGettingPercentageOfItemFromCollection($collection)
+    {
+        $data = new $collection([
+            'Laravel',
+            'Laravel',
+            'Laravel',
+            'Laravel',
+            'PHP',
+            'PHP',
+            'Livewire',
+            'Livewire',
+            'Blade',
+            'HTML',
+        ]);
+
+        $this->assertEquals(40, $data->percentage('Laravel'));
+        $this->assertEquals(20, $data->percentage('PHP'));
+        $this->assertEquals(20, $data->percentage('Livewire'));
+        $this->assertEquals(10, $data->percentage('Blade'));
+        $this->assertEquals(10, $data->percentage('HTML'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testGettingPercentageOfItemFromCollectionByKey($collection)
+    {
+        $data = new $collection([
+            ['key' => 'Laravel'],
+            ['key' => 'Laravel'],
+            ['key' => 'Laravel'],
+            ['key' => 'Laravel'],
+            ['key' => 'PHP'],
+            ['key' => 'PHP'],
+            ['key' => 'Livewire'],
+            ['key' => 'Livewire'],
+            ['key' => 'Blade'],
+            ['key' => 'Blade'],
+        ]);
+
+        $this->assertEquals(40, $data->percentage('key', 'Laravel'));
+        $this->assertEquals(20, $data->percentage('key', 'PHP'));
+        $this->assertEquals(20, $data->percentage('key', 'Livewire'));
+        $this->assertEquals(20, $data->percentage('key', 'Blade'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testJsonSerialize($collection)
     {
         $c = new $collection([
