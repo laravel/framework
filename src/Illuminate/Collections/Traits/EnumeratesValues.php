@@ -51,7 +51,7 @@ trait EnumeratesValues
      *
      * @var bool
      */
-    protected $escapeWhenConvertingToString = false;
+    protected $escapeWhenCastingToString = false;
 
     /**
      * The methods that can be proxied.
@@ -907,7 +907,7 @@ trait EnumeratesValues
      */
     public function __toString()
     {
-        return $this->escapeWhenConvertingToString
+        return $this->escapeWhenCastingToString
                     ? e($this->toJson())
                     : $this->toJson();
     }
@@ -918,9 +918,9 @@ trait EnumeratesValues
      * @param  bool  $escape
      * @return $this
      */
-    public function escapeWhenConvertingToString($escape = true)
+    public function escapeWhenCastingToString($escape = true)
     {
-        $this->escapeWhenConvertingToString = $escape;
+        $this->escapeWhenCastingToString = $escape;
 
         return $this;
     }

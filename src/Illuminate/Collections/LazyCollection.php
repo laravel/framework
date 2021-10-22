@@ -5,13 +5,13 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
-use Illuminate\Contracts\Support\CanBeEscapedWhenConvertedToString;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use stdClass;
 
-class LazyCollection implements CanBeEscapedWhenConvertedToString, Enumerable
+class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 {
     use EnumeratesValues, Macroable;
 

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Support;
 
-interface CanBeEscapedWhenConvertedToString
+interface CanBeEscapedWhenCastToString
 {
     /**
      * Indicate that the object's string representation should be escaped when __toString is invoked.
@@ -10,5 +10,5 @@ interface CanBeEscapedWhenConvertedToString
      * @param  bool  $escape
      * @return $this
      */
-    public function escapeWhenConvertingToString($escape = true);
+    public function escapeWhenCastingToString($escape = true);
 }

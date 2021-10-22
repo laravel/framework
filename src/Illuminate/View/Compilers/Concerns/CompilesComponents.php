@@ -2,7 +2,7 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
-use Illuminate\Contracts\Support\CanBeEscapedWhenConvertedToString;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Str;
 use Illuminate\View\ComponentAttributeBag;
 
@@ -184,8 +184,8 @@ trait CompilesComponents
      */
     public static function sanitizeComponentAttribute($value)
     {
-        if (is_object($value) && $value instanceof CanBeEscapedWhenConvertedToString) {
-            return $value->escapeWhenConvertingToString();
+        if (is_object($value) && $value instanceof CanBeEscapedWhenCastToString) {
+            return $value->escapeWhenCastingToString();
         }
 
         return is_string($value) ||
