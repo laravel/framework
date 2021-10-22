@@ -57,7 +57,7 @@ class TagSet
     }
 
     /**
-     * Flush all tags in the set.
+     * Flush all the tags in the set.
      *
      * @return void
      */
@@ -67,7 +67,7 @@ class TagSet
     }
 
     /**
-     * Flush the tag from cache.
+     * Flush the tag from the cache.
      *
      * @param  string  $name
      */
