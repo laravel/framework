@@ -185,7 +185,7 @@ trait CompilesComponents
     public static function sanitizeComponentAttribute($value)
     {
         if (is_object($value) && $value instanceof CanBeEscapedWhenConvertedToString) {
-            return $value->escapeWhenConvertingToString(true);
+            return $value->escapeWhenConvertingToString();
         }
 
         return is_string($value) ||
