@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use stdClass;
+
+if (strpos(PHP_VERSION, '8.1') === 0) {
+    include 'Enums.php';
+}
 
 /**
  * @group integration
@@ -27,6 +27,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         });
     }
 
+    /**
+     * @requires PHP 8.1
+     */
     public function testEnumsAreCastable()
     {
         DB::table('enum_casts')->insert([
@@ -41,6 +44,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
     }
 
+    /**
+     * @requires PHP 8.1
+     */
     public function testEnumsAreCastableToArray()
     {
         $model = new EloquentModelEnumCastingTestModel([
@@ -54,6 +60,9 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         ], $model->toArray());
     }
 
+    /**
+     * @requires PHP 8.1
+     */
     public function testEnumsAreConvertedOnSave()
     {
         $model = new EloquentModelEnumCastingTestModel([
@@ -88,14 +97,4 @@ class EloquentModelEnumCastingTestModel extends Model
         'string_status' => StringStatus::class,
         'integer_status' => IntegerStatus::class,
     ];
-}
-
-enum StringStatus : string {
-    case pending = 'pending';
-    case done = 'done';
-}
-
-enum IntegerStatus : int {
-    case pending = 1;
-    case done = 2;
 }

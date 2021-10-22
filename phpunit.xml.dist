@@ -15,7 +15,6 @@
     <testsuites>
         <testsuite name="Laravel Test Suite">
             <directory suffix="Test.php">./tests</directory>
-            <exclude>./tests/Integration/Database/EloquentModelEnumCastingTest.php</exclude>
         </testsuite>
     </testsuites>
     <php>
