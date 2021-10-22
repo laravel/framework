@@ -10,4 +10,4 @@ jobs:
     steps:
     - uses: superbrothers/close-pull-request@v3
       with:
-        comment: "Heya,<br><br>Thanks for your PR. You've submitted this on the Illuminate organization which is a read-only sub split of `laravel/framework`. Please submit your PR on the https://github.com/laravel/framework repository.<br><br>Thanks!"
+        comment: "Thank you for your pull request. However, you have submitted this PR on the Illuminate organization which is a read-only sub split of `laravel/framework`. Please submit your PR on the https://github.com/laravel/framework repository.<br><br>Thanks!"
