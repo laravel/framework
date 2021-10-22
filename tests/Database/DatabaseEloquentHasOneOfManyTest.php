@@ -49,7 +49,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
                     'host' => env('DB_HOST', '127.0.0.1'),
                     'username' => 'root',
                     'database' => 'forge',
-                    'password' => 'root',
+                    'password' => '',
                 ]);
 
                 $db->getConnection('default')->statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
