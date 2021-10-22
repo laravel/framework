@@ -39,7 +39,6 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
         $this->assertEquals(StringStatus::pending, $model->string_status);
         $this->assertEquals(IntegerStatus::pending, $model->integer_status);
-
     }
 
     public function testEnumsAreCastableToArray()
