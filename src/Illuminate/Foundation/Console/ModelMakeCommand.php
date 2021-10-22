@@ -2,12 +2,15 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends GeneratorCommand
 {
+    use CreatesMatchingTest;
+
     /**
      * The console command name.
      *

@@ -427,7 +427,27 @@ class AuthGuardTest extends TestCase
         $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
-        $cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller|bar')->andReturn($foreverCookie);
+        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 2628000)->andReturn($foreverCookie);
+        $cookie->shouldReceive('queue')->once()->with($foreverCookie);
+        $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
+        $session->shouldReceive('migrate')->once();
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+        $user->shouldReceive('getAuthPassword')->andReturn('bar');
+        $user->shouldReceive('getRememberToken')->andReturn('recaller');
+        $user->shouldReceive('setRememberToken')->never();
+        $provider->shouldReceive('updateRememberToken')->never();
+        $guard->login($user, true);
+    }
+
+    public function testLoginMethodQueuesCookieWhenRememberingAndAllowsOverride()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $guard = new SessionGuard('default', $provider, $session, $request);
+        $guard->setRememberDuration(5000);
+        $guard->setCookieJar($cookie);
+        $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
+        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 5000)->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
         $session->shouldReceive('migrate')->once();
@@ -446,7 +466,7 @@ class AuthGuardTest extends TestCase
         $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
-        $cookie->shouldReceive('forever')->once()->andReturn($foreverCookie);
+        $cookie->shouldReceive('make')->once()->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
         $session->shouldReceive('migrate')->once();

@@ -85,6 +85,14 @@ jobs:
           AWS_ACCESS_KEY_ID: random_key
           AWS_SECRET_ACCESS_KEY: random_secret
 
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: |
+            vendor/orchestra/testbench-core/laravel/storage/logs
+            !vendor/**/.gitignore
+
   windows_tests:
     runs-on: windows-latest
 
@@ -137,3 +145,11 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: |
+            vendor/orchestra/testbench-core/laravel/storage/logs
+            !vendor/**/.gitignore

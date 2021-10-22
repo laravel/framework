@@ -566,6 +566,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Strip HTML and PHP tags from the given string.
+     *
+     * @param  string  $allowedTags
+     * @return static
+     */
+    public function stripTags($allowedTags = null)
+    {
+        return new static(strip_tags($this->value, $allowedTags));
+    }
+
+    /**
      * Convert the given string to upper-case.
      *
      * @return static
@@ -583,6 +594,16 @@ class Stringable implements JsonSerializable
     public function title()
     {
         return new static(Str::title($this->value));
+    }
+
+    /**
+     * Convert the given string to title case for each word.
+     *
+     * @return static
+     */
+    public function headline()
+    {
+        return new static(Str::headline($this->value));
     }
 
     /**
@@ -778,7 +799,7 @@ class Stringable implements JsonSerializable
     /**
      * Dump the string and end the script.
      *
-     * @return void
+     * @return never
      */
     public function dd()
     {

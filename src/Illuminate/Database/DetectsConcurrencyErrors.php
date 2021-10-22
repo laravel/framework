@@ -16,7 +16,7 @@ trait DetectsConcurrencyErrors
      */
     protected function causedByConcurrencyError(Throwable $e)
     {
-        if ($e instanceof PDOException && $e->getCode() === '40001') {
+        if ($e instanceof PDOException && ($e->getCode() === 40001 || $e->getCode() === '40001')) {
             return true;
         }
 

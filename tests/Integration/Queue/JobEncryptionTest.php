@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
@@ -68,6 +69,7 @@ class JobEncryptionTest extends DatabaseTestCase
     {
         Bus::dispatch(new JobEncryptionTestNonEncryptedJob);
 
+        $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('The payload is invalid');
 
         $this->assertInstanceOf(JobEncryptionTestNonEncryptedJob::class,

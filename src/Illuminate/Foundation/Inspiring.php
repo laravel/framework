@@ -41,7 +41,7 @@ class Inspiring
             'Smile, breathe, and go slowly. - Thich Nhat Hanh',
             'The only way to do great work is to love what you do. - Steve Jobs',
             'The whole future lies in uncertainty: live immediately. - Seneca',
-            'Very little is needed to make a happy life. - Marcus Antoninus',
+            'Very little is needed to make a happy life. - Marcus Aurelius',
             'Waste no more time arguing what a good man should be, be one. - Marcus Aurelius',
             'Well begun is half done. - Aristotle',
             'When there is no desire, all things are at peace. - Laozi',

@@ -35,6 +35,25 @@ class SupportStrTest extends TestCase
         $this->assertSame('Jefferson Costella', Str::title('jefFErson coSTella'));
     }
 
+    public function testStringHeadline()
+    {
+        $this->assertSame('Jefferson Costella', Str::headline('jefferson costella'));
+        $this->assertSame('Jefferson Costella', Str::headline('jefFErson coSTella'));
+        $this->assertSame('Jefferson Costella Uses Laravel', Str::headline('jefferson_costella uses-_Laravel'));
+        $this->assertSame('Jefferson Costella Uses Laravel', Str::headline('jefferson_costella uses__Laravel'));
+
+        $this->assertSame('Laravel P H P Framework', Str::headline('laravel_p_h_p_framework'));
+        $this->assertSame('Laravel P H P Framework', Str::headline('laravel _p _h _p _framework'));
+        $this->assertSame('Laravel Php Framework', Str::headline('laravel_php_framework'));
+        $this->assertSame('Laravel Ph P Framework', Str::headline('laravel-phP-framework'));
+        $this->assertSame('Laravel Php Framework', Str::headline('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('Foo Bar', Str::headline('fooBar'));
+        $this->assertSame('Foo Bar', Str::headline('foo_bar'));
+        $this->assertSame('Foo Bar Baz', Str::headline('foo-barBaz'));
+        $this->assertSame('Foo Bar Baz', Str::headline('foo-bar_baz'));
+    }
+
     public function testStringWithoutWordsDoesntProduceError()
     {
         $nbsp = chr(0xC2).chr(0xA0);
