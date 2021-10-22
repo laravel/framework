@@ -25,13 +25,6 @@ abstract class Factory
     }
 
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var class-string<\Illuminate\Database\Eloquent\Model|TModel>
-     */
-    protected $model;
-
-    /**
      * The number of models that should be generated.
      *
      * @var int|null
@@ -687,7 +680,11 @@ abstract class Factory
                         : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?: $resolver($this);
+        if (property_exists($this, 'model')) {
+            return $this->model ?: $resolver($this);
+        }
+
+        return $resolver($this);
     }
 
     /**
