@@ -13,19 +13,48 @@ use PHPUnit\Framework\TestCase;
  */
 class DatabaseEloquentHasOneOfManyTest extends TestCase
 {
+
+
     protected function setUp(): void
     {
-        $db = new DB;
+        //
+    }
 
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
+    protected function addConnection($connection)
+    {
+        $this->connection = $connection['driver'];
+        $db = new DB;
+        $db->addConnection($connection);
 
         $db->bootEloquent();
         $db->setAsGlobal();
 
         $this->createSchema();
+
+        return $db;
+    }
+
+    public function dbConnectionProvider() {
+        return [[
+            function() {
+                $this->addConnection([
+                    'driver' => 'sqlite',
+                    'database' => ':memory:',
+                ]);
+            }, 'sqlite'
+        ], [
+            function() {
+                $db = $this->addConnection([
+                    'driver' => 'mysql',
+                    'host' => env('DB_HOST', '127.0.0.1'),
+                    'username' => 'root',
+                    'database' => 'forge',
+                    'password' => 'root',
+                ]);
+
+                $db->getConnection('default')->statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
+            }, 'msyql'
+        ]];
     }
 
     /**
@@ -73,20 +102,35 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->schema()->drop('prices');
     }
 
-    public function testItGuessesRelationName()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItGuessesRelationName($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::make();
         $this->assertSame('latest_login', $user->latest_login()->getRelationName());
     }
 
-    public function testItGuessesRelationNameAndAddsOfManyWhenTableNameIsRelationName()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItGuessesRelationNameAndAddsOfManyWhenTableNameIsRelationName($setupConnection)
     {
+        $setupConnection();
+
         $model = HasOneOfManyTestModel::make();
         $this->assertSame('logins_of_many', $model->logins()->getRelationName());
     }
 
-    public function testRelationNameCanBeSet()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testRelationNameCanBeSet($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
 
         // Using "ofMany"
@@ -102,16 +146,43 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame('baz', $relation->getRelationName());
     }
 
-    public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery($setupConnection, $driver)
     {
+        $setupConnection();
+
+        if(! in_array($driver, ['sqlite', 'msyql'])){
+            $this->markTestSkipped();
+        }
+
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"', $relation->getOneOfManySubQuery()->toSql());
+
+        if($driver == 'msyql') {
+            $rawQuery = 'select MAX(`id`) as `id_aggregate`, `logins`.`user_id` from `logins` where `logins`.`user_id` = ? and `logins`.`user_id` is not null and `logins`.`user_id` in (1) group by `logins`.`user_id`';
+        }
+
+        if($driver == 'sqlite') {
+            $rawQuery = 'select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"';
+        }
+
+        $this->assertSame($rawQuery, $relation->getOneOfManySubQuery()->toSql());
     }
 
-    public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScope()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScope($setupConnection, $driver)
     {
+        $setupConnection();
+
+        if(! in_array($driver, ['sqlite', 'msyql'])){
+            $this->markTestSkipped();
+        }
+
         HasOneOfManyTestLogin::addGlobalScope(function ($query) {
             $query->orderBy('id');
         });
@@ -119,36 +190,78 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login_without_global_scope();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select "logins".* from "logins" inner join (select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
+
+        if($driver == 'msyql') {
+            $rawQuery = 'select `logins`.* from `logins` inner join (select MAX(`id`) as `id_aggregate`, `logins`.`user_id` from `logins` where `logins`.`user_id` = ? and `logins`.`user_id` is not null and `logins`.`user_id` in (1) group by `logins`.`user_id`) as `latestOfMany` on `latestOfMany`.`id_aggregate` = `logins`.`id` and `latestOfMany`.`user_id` = `logins`.`user_id` where `logins`.`user_id` = ? and `logins`.`user_id` is not null';
+        }
+
+        if($driver == 'sqlite') {
+            $rawQuery = 'select "logins".* from "logins" inner join (select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null';
+        }
+
+        $this->assertSame($rawQuery, $relation->getQuery()->toSql());
     }
 
-    public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScopeWithComplexQuery()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScopeWithComplexQuery($setupConnection, $driver)
     {
+        $setupConnection();
+
+        if(! in_array($driver, ['sqlite', 'msyql'])){
+            $this->markTestSkipped();
+        }
+
         HasOneOfManyTestPrice::addGlobalScope(function ($query) {
             $query->orderBy('id');
         });
 
         $user = HasOneOfManyTestUser::create();
         $relation = $user->price_without_global_scope();
-        $this->assertSame('select "prices".* from "prices" inner join (select max("id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
+
+        if($driver == 'msyql') {
+            $rawQuery = 'select `prices`.* from `prices` inner join (select max(`id`) as `id_aggregate`, `prices`.`user_id` from `prices` inner join (select max(`published_at`) as `published_at_aggregate`, `prices`.`user_id` from `prices` where `published_at` < ? and `prices`.`user_id` = ? and `prices`.`user_id` is not null group by `prices`.`user_id`) as `price_without_global_scope` on `price_without_global_scope`.`published_at_aggregate` = `prices`.`published_at` and `price_without_global_scope`.`user_id` = `prices`.`user_id` where `published_at` < ? group by `prices`.`user_id`) as `price_without_global_scope` on `price_without_global_scope`.`id_aggregate` = `prices`.`id` and `price_without_global_scope`.`user_id` = `prices`.`user_id` where `prices`.`user_id` = ? and `prices`.`user_id` is not null';
+        }
+
+        if($driver == 'sqlite') {
+            $rawQuery = 'select "prices".* from "prices" inner join (select max("id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null';
+        }
+
+        $this->assertSame($rawQuery, $relation->getQuery()->toSql());
     }
 
-    public function testQualifyingSubSelectColumn()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testQualifyingSubSelectColumn($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $this->assertSame('latest_login.id', $user->latest_login()->qualifySubSelectColumn('id'));
     }
 
-    public function testItFailsWhenUsingInvalidAggregate()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItFailsWhenUsingInvalidAggregate($setupConnection)
     {
+        $setupConnection();
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid aggregate [count] used within ofMany relation. Available aggregates: MIN, MAX');
         $user = HasOneOfManyTestUser::make();
         $user->latest_login_with_invalid_aggregate();
     }
 
-    public function testItGetsCorrectResults()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItGetsCorrectResults($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $previousLogin = $user->logins()->create();
         $latestLogin = $user->logins()->create();
@@ -158,8 +271,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $result->id);
     }
 
-    public function testResultDoesNotHaveAggregateColumn()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testResultDoesNotHaveAggregateColumn($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->logins()->create();
 
@@ -168,8 +286,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse(isset($result->id_aggregate));
     }
 
-    public function testItGetsCorrectResultsUsingShortcutMethod()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItGetsCorrectResultsUsingShortcutMethod($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $previousLogin = $user->logins()->create();
         $latestLogin = $user->logins()->create();
@@ -179,8 +302,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $result->id);
     }
 
-    public function testItGetsCorrectResultsUsingShortcutReceivingMultipleColumnsMethod()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItGetsCorrectResultsUsingShortcutReceivingMultipleColumnsMethod($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->prices()->create([
             'published_at' => '2021-05-01 00:00:00',
@@ -194,8 +322,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($price->id, $result->id);
     }
 
-    public function testKeyIsAddedToAggregatesWhenMissing()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testKeyIsAddedToAggregatesWhenMissing($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->prices()->create([
             'published_at' => '2021-05-01 00:00:00',
@@ -209,8 +342,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($price->id, $result->id);
     }
 
-    public function testItGetsWithConstraintsCorrectResults()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItGetsWithConstraintsCorrectResults($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $previousLogin = $user->logins()->create();
         $user->logins()->create();
@@ -219,8 +357,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testItEagerLoadsCorrectModels()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testItEagerLoadsCorrectModels($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->logins()->create();
         $latestLogin = $user->logins()->create();
@@ -231,8 +374,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($latestLogin->id, $user->latest_login->id);
     }
 
-    public function testHasNested()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testHasNested($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $previousLogin = $user->logins()->create();
         $latestLogin = $user->logins()->create();
@@ -248,8 +396,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse($found);
     }
 
-    public function testHasCount()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testHasCount($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->logins()->create();
         $user->logins()->create();
@@ -258,8 +411,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertEquals(1, $user->latest_login_count);
     }
 
-    public function testExists()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testExists($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $previousLogin = $user->logins()->create();
         $latestLogin = $user->logins()->create();
@@ -268,8 +426,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->latest_login()->whereKey($latestLogin->getKey())->exists());
     }
 
-    public function testIsMethod()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testIsMethod($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $login1 = $user->latest_login()->create();
         $login2 = $user->latest_login()->create();
@@ -278,8 +441,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->latest_login()->is($login2));
     }
 
-    public function testIsNotMethod()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testIsNotMethod($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $login1 = $user->latest_login()->create();
         $login2 = $user->latest_login()->create();
@@ -288,8 +456,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse($user->latest_login()->isNot($login2));
     }
 
-    public function testGet()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testGet($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $previousLogin = $user->logins()->create();
         $latestLogin = $user->logins()->create();
@@ -302,8 +475,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertCount(0, $latestLogins);
     }
 
-    public function testCount()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testCount($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->logins()->create();
         $user->logins()->create();
@@ -311,8 +489,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame(1, $user->latest_login()->count());
     }
 
-    public function testAggregate()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testAggregate($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $firstLogin = $user->logins()->create();
         $user->logins()->create();
@@ -321,8 +504,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($firstLogin->id, $user->first_login->id);
     }
 
-    public function testJoinConstraints()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testJoinConstraints($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->states()->create([
             'type' => 'foo',
@@ -341,8 +529,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($currentForState->id, $user->foo_state->id);
     }
 
-    public function testMultipleAggregates()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testMultipleAggregates($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
 
         $user->prices()->create([
@@ -356,8 +549,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($price->id, $user->price->id);
     }
 
-    public function testEagerLoadingWithMultipleAggregates()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testEagerLoadingWithMultipleAggregates($setupConnection)
     {
+        $setupConnection();
+
         $user1 = HasOneOfManyTestUser::create();
         $user2 = HasOneOfManyTestUser::create();
 
@@ -387,8 +585,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertSame($user2Price->id, $users[1]->price->id);
     }
 
-    public function testWithExists()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testWithExists($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
 
         $user = HasOneOfManyTestUser::withExists('latest_login')->first();
@@ -399,8 +602,13 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->latest_login_exists);
     }
 
-    public function testWithExistsWithConstraintsInJoinSubSelect()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testWithExistsWithConstraintsInJoinSubSelect($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
 
         $user = HasOneOfManyTestUser::withExists('foo_state')->first();
@@ -415,16 +623,26 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertTrue($user->foo_state_exists);
     }
 
-    public function testWithSoftDeletes()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testWithSoftDeletes($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
         $user->logins()->create();
         $user->latest_login_with_soft_deletes;
         $this->assertNotNull($user->latest_login_with_soft_deletes);
     }
 
-    public function testWithContraintNotInAggregate()
+    /**
+     * @dataProvider dbConnectionProvider
+     */
+    public function testWithContraintNotInAggregate($setupConnection)
     {
+        $setupConnection();
+
         $user = HasOneOfManyTestUser::create();
 
         $previousFoo = $user->states()->create([
