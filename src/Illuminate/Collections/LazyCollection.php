@@ -1374,9 +1374,9 @@ class LazyCollection implements Enumerable
     /**
      * Return only unique items from the collection array.
      *
-     * @param  string|callable|null  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  bool  $strict
-     * @return static
+     * @return static<TKey, TValue>
      */
     public function unique($key = null, $strict = false)
     {
