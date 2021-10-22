@@ -13,8 +13,6 @@ use PHPUnit\Framework\TestCase;
  */
 class DatabaseEloquentHasOneOfManyTest extends TestCase
 {
-
-
     protected function setUp(): void
     {
         //
@@ -34,16 +32,17 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         return $db;
     }
 
-    public function dbConnectionProvider() {
+    public function dbConnectionProvider()
+    {
         return [[
-            function() {
+            function () {
                 $this->addConnection([
                     'driver' => 'sqlite',
                     'database' => ':memory:',
                 ]);
-            }, 'sqlite'
+            }, 'sqlite',
         ], [
-            function() {
+            function () {
                 $db = $this->addConnection([
                     'driver' => 'mysql',
                     'host' => env('DB_HOST', '127.0.0.1'),
@@ -53,7 +52,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
                 ]);
 
                 $db->getConnection('default')->statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
-            }, 'msyql'
+            }, 'msyql',
         ]];
     }
 
@@ -153,7 +152,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $setupConnection();
 
-        if(! in_array($driver, ['sqlite', 'msyql'])){
+        if (! in_array($driver, ['sqlite', 'msyql'])) {
             $this->markTestSkipped();
         }
 
@@ -161,11 +160,11 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $relation = $user->latest_login();
         $relation->addEagerConstraints([$user]);
 
-        if($driver == 'msyql') {
+        if ($driver == 'msyql') {
             $rawQuery = 'select MAX(`id`) as `id_aggregate`, `logins`.`user_id` from `logins` where `logins`.`user_id` = ? and `logins`.`user_id` is not null and `logins`.`user_id` in (1) group by `logins`.`user_id`';
         }
 
-        if($driver == 'sqlite') {
+        if ($driver == 'sqlite') {
             $rawQuery = 'select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id"';
         }
 
@@ -179,7 +178,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $setupConnection();
 
-        if(! in_array($driver, ['sqlite', 'msyql'])){
+        if (! in_array($driver, ['sqlite', 'msyql'])) {
             $this->markTestSkipped();
         }
 
@@ -191,11 +190,11 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $relation = $user->latest_login_without_global_scope();
         $relation->addEagerConstraints([$user]);
 
-        if($driver == 'msyql') {
+        if ($driver == 'msyql') {
             $rawQuery = 'select `logins`.* from `logins` inner join (select MAX(`id`) as `id_aggregate`, `logins`.`user_id` from `logins` where `logins`.`user_id` = ? and `logins`.`user_id` is not null and `logins`.`user_id` in (1) group by `logins`.`user_id`) as `latestOfMany` on `latestOfMany`.`id_aggregate` = `logins`.`id` and `latestOfMany`.`user_id` = `logins`.`user_id` where `logins`.`user_id` = ? and `logins`.`user_id` is not null';
         }
 
-        if($driver == 'sqlite') {
+        if ($driver == 'sqlite') {
             $rawQuery = 'select "logins".* from "logins" inner join (select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null';
         }
 
@@ -209,7 +208,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     {
         $setupConnection();
 
-        if(! in_array($driver, ['sqlite', 'msyql'])){
+        if (! in_array($driver, ['sqlite', 'msyql'])) {
             $this->markTestSkipped();
         }
 
@@ -220,11 +219,11 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
         $relation = $user->price_without_global_scope();
 
-        if($driver == 'msyql') {
+        if ($driver == 'msyql') {
             $rawQuery = 'select `prices`.* from `prices` inner join (select max(`id`) as `id_aggregate`, `prices`.`user_id` from `prices` inner join (select max(`published_at`) as `published_at_aggregate`, `prices`.`user_id` from `prices` where `published_at` < ? and `prices`.`user_id` = ? and `prices`.`user_id` is not null group by `prices`.`user_id`) as `price_without_global_scope` on `price_without_global_scope`.`published_at_aggregate` = `prices`.`published_at` and `price_without_global_scope`.`user_id` = `prices`.`user_id` where `published_at` < ? group by `prices`.`user_id`) as `price_without_global_scope` on `price_without_global_scope`.`id_aggregate` = `prices`.`id` and `price_without_global_scope`.`user_id` = `prices`.`user_id` where `prices`.`user_id` = ? and `prices`.`user_id` is not null';
         }
 
-        if($driver == 'sqlite') {
+        if ($driver == 'sqlite') {
             $rawQuery = 'select "prices".* from "prices" inner join (select max("id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null';
         }
 
