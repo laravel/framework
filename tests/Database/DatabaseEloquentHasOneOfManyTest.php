@@ -119,7 +119,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $user = HasOneOfManyTestUser::create();
         $relation = $user->latest_login_without_global_scope();
         $relation->addEagerConstraints([$user]);
-        $this->assertSame('select * from "logins" inner join (select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
+        $this->assertSame('select "logins".* from "logins" inner join (select MAX("id") as "id_aggregate", "logins"."user_id" from "logins" where "logins"."user_id" = ? and "logins"."user_id" is not null and "logins"."user_id" in (1) group by "logins"."user_id") as "latestOfMany" on "latestOfMany"."id_aggregate" = "logins"."id" and "latestOfMany"."user_id" = "logins"."user_id" where "logins"."user_id" = ? and "logins"."user_id" is not null', $relation->getQuery()->toSql());
     }
 
     public function testGlobalScopeIsNotAppliedWhenRelationIsDefinedWithoutGlobalScopeWithComplexQuery()
@@ -130,7 +130,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
         $user = HasOneOfManyTestUser::create();
         $relation = $user->price_without_global_scope();
-        $this->assertSame('select * from "prices" inner join (select max("id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
+        $this->assertSame('select "prices".* from "prices" inner join (select max("id") as "id_aggregate", "prices"."user_id" from "prices" inner join (select max("published_at") as "published_at_aggregate", "prices"."user_id" from "prices" where "published_at" < ? and "prices"."user_id" = ? and "prices"."user_id" is not null group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."published_at_aggregate" = "prices"."published_at" and "price_without_global_scope"."user_id" = "prices"."user_id" where "published_at" < ? group by "prices"."user_id") as "price_without_global_scope" on "price_without_global_scope"."id_aggregate" = "prices"."id" and "price_without_global_scope"."user_id" = "prices"."user_id" where "prices"."user_id" = ? and "prices"."user_id" is not null', $relation->getQuery()->toSql());
     }
 
     public function testQualifyingSubSelectColumn()
@@ -156,6 +156,16 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $result = $user->latest_login()->getResults();
         $this->assertNotNull($result);
         $this->assertSame($latestLogin->id, $result->id);
+    }
+
+    public function testResultDoesNotHaveAggregateColumn()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $user->logins()->create();
+
+        $result = $user->latest_login()->getResults();
+        $this->assertNotNull($result);
+        $this->assertFalse(isset($result->id_aggregate));
     }
 
     public function testItGetsCorrectResultsUsingShortcutMethod()

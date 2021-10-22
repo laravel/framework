@@ -124,6 +124,12 @@ trait CanBeOneOfMany
 
         $this->addConstraints();
 
+        $columns = $this->query->getQuery()->columns;
+
+        if (is_null($columns) || $columns === ['*']) {
+            $this->select([$this->qualifyColumn('*')]);
+        }
+
         return $this;
     }
 
