@@ -3,7 +3,7 @@ php:
   version: 8
   finder:
     not-name:
-      - tests/Integration/Database/EloquentModelEnumCastingTest.php
+      - tests/Integration/Database/Enums.php
 js:
   finder:
     not-name:
