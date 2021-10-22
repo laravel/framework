@@ -2081,6 +2081,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testHasAny($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+
+        $this->assertTrue($data->hasAny('first'));
+        $this->assertFalse($data->hasAny('third'));
+        $this->assertTrue($data->hasAny(['first', 'second']));
+        $this->assertTrue($data->hasAny(['first', 'fourth']));
+        $this->assertFalse($data->hasAny(['third', 'fourth']));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testImplode($collection)
     {
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
@@ -3909,11 +3923,11 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testReduceMany($collection)
+    public function testReduceSpread($collection)
     {
         $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
 
-        [$sum, $max, $min] = $data->reduceMany(function ($sum, $max, $min, $value) {
+        [$sum, $max, $min] = $data->reduceSpread(function ($sum, $max, $min, $value) {
             $sum += $value;
             $max = max($max, $value);
             $min = min($min, $value);
@@ -3929,13 +3943,13 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testReduceManyThrowsAnExceptionIfReducerDoesNotReturnAnArray($collection)
+    public function testReduceSpreadThrowsAnExceptionIfReducerDoesNotReturnAnArray($collection)
     {
         $data = new $collection([1]);
 
         $this->expectException(UnexpectedValueException::class);
 
-        $data->reduceMany(function () {
+        $data->reduceSpread(function () {
             return false;
         }, null);
     }

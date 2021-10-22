@@ -54,7 +54,7 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer');
+        $position = strrpos($header, 'Bearer ');
 
         if ($position !== false) {
             $header = substr($header, $position + 7);
@@ -299,12 +299,12 @@ trait InteractsWithInput
     /**
      * Retrieve input from the request as a collection.
      *
-     * @param  string|null  $key
+     * @param  array|string|null  $key
      * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)
     {
-        return collect($this->input($key));
+        return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**

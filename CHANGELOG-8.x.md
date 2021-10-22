@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.63.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.64.0...8.x)
+
+
+## [v8.64.0 (2021-10-12)](https://github.com/laravel/framework/compare/v8.63.0...v8.64.0)
+
+### Added
+- Added reduceMany to Collections ([#39078](https://github.com/laravel/framework/pull/39078))
+- Added `Illuminate/Support/Stringable::stripTags()` ([#39098](https://github.com/laravel/framework/pull/39098))
+- Added `Illuminate/Console/OutputStyle::getOutput()` ([#39099](https://github.com/laravel/framework/pull/39099))
+- Added `lang_path` helper function ([#39103](https://github.com/laravel/framework/pull/39103))
+- Added @aware blade directive ([#39100](https://github.com/laravel/framework/pull/39100))
+- New JobRetrying event dispatched ([#39097](https://github.com/laravel/framework/pull/39097))
+- Added throwIf method in Client Response ([#39148](https://github.com/laravel/framework/pull/39148))
+- Added Illuminate/Collections/Collection::hasAny() ([#39155](https://github.com/laravel/framework/pull/39155))
+
+### Fixed
+- Fixed route groups with no prefix on PHP 8.1 ([#39115](https://github.com/laravel/framework/pull/39115))
+- Fixed code locating Bearer token in InteractsWithInput ([#39150](https://github.com/laravel/framework/pull/39150))
+
+### Changed
+- Refactoring `Illuminate/Log/LogManager::prepareHandler()` ([#39093](https://github.com/laravel/framework/pull/39093))
+- Flush component state when done rendering in View ([04fc7c2](https://github.com/laravel/framework/commit/04fc7c2f87372511b0f77e539bc0e2e3357ec200))
+- Ignore tablespaces in dump ([#39126](https://github.com/laravel/framework/pull/39126))
+- Update SchemaState Process to remove timeout ([#39139](https://github.com/laravel/framework/pull/39139))
 
 
 ## [v8.63.0 (2021-10-05)](https://github.com/laravel/framework/compare/v8.62.0...v8.63.0)

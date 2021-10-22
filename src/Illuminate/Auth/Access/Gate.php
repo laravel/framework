@@ -279,6 +279,10 @@ class Gate implements GateContract
      */
     public function check($abilities, $arguments = [])
     {
+        if (is_array($abilities) && class_exists($abilities[0])) {
+            $abilities = [$abilities];
+        }
+
         return collect($abilities)->every(function ($ability) use ($arguments) {
             return $this->inspect($ability, $arguments)->allowed();
         });
@@ -293,6 +297,13 @@ class Gate implements GateContract
      */
     public function any($abilities, $arguments = [])
     {
+        // Gate::any([Policy::class, ['view', 'create']], $post)...
+        if (isset($abilities[1]) && is_array($abilities[1])) {
+            $abilities = collect($abilities[1])->map(function ($ability) use ($abilities) {
+                return [$abilities[0], $ability];
+            })->all();
+        }
+
         return collect($abilities)->contains(function ($ability) use ($arguments) {
             return $this->check($ability, $arguments);
         });
@@ -556,6 +567,19 @@ class Gate implements GateContract
             return $callback;
         }
 
+        if (is_array($ability)) {
+            [$class, $method] = $ability;
+
+            if ($this->canBeCalledWithUser($user, $class, $method)) {
+                return $this->getCallableFromClassAndMethod($class, $method);
+            }
+        }
+
+        if (class_exists($ability) &&
+            $this->canBeCalledWithUser($user, $ability, '__invoke')) {
+            return $this->getCallableFromClassAndMethod($ability);
+        }
+
         if (isset($this->stringCallbacks[$ability])) {
             [$class, $method] = Str::parseCallback($this->stringCallbacks[$ability]);
 
@@ -779,6 +803,20 @@ class Gate implements GateContract
     protected function resolveUser()
     {
         return call_user_func($this->userResolver);
+    }
+
+    /**
+     * Get a callable from a class and method.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return \Closure
+     */
+    protected function getCallableFromClassAndMethod($class, $method = '__invoke')
+    {
+        return function (...$params) use ($class, $method) {
+            return $this->container->make($class)->{$method}(...$params);
+        };
     }
 
     /**
