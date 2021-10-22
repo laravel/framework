@@ -16,10 +16,6 @@ class MailSesTransportTest extends TestCase
 {
     public function testGetTransport()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('SwiftMailer is incompatible with PHP 8.1');
-        }
-
         $container = new Container;
 
         $container->singleton('config', function () {
