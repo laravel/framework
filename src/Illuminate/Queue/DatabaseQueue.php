@@ -253,7 +253,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     {
         $databaseEngine = $this->database->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-        $databaseVersion = $this->database->getConfig('version') ?? 
+        $databaseVersion = $this->database->getConfig('version') ??
                            $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
         if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>=')) ||
