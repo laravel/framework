@@ -649,7 +649,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, [], []);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
 
         $v->setException(\RuntimeException::class);
@@ -3679,6 +3679,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:H:i:s']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:Y-m-d H:i:s,H:i:s']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'date_format:Y-m-d H:i:s,H:i:s']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'date_format:H:i:s']);
         $this->assertTrue($v->passes());

@@ -940,7 +940,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->bootedCallbacks[] = $callback;
 
         if ($this->isBooted()) {
-            $this->fireAppCallbacks([$callback]);
+            $callback($this);
         }
     }
 
@@ -950,10 +950,14 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  callable[]  $callbacks
      * @return void
      */
-    protected function fireAppCallbacks(array $callbacks)
+    protected function fireAppCallbacks(array &$callbacks)
     {
-        foreach ($callbacks as $callback) {
-            $callback($this);
+        $index = 0;
+
+        while ($index < count($callbacks)) {
+            $callbacks[$index]($this);
+
+            $index++;
         }
     }
 
@@ -1105,7 +1109,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @param  int  $code
      * @param  string  $message
      * @param  array  $headers
-     * @return void
+     * @return never
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -1139,8 +1143,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminate()
     {
-        foreach ($this->terminatingCallbacks as $terminating) {
-            $this->call($terminating);
+        $index = 0;
+
+        while ($index < count($this->terminatingCallbacks)) {
+            $this->call($this->terminatingCallbacks[$index]);
+
+            $index++;
         }
     }
 

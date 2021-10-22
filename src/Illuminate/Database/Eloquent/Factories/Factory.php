@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use Throwable;
@@ -19,7 +20,7 @@ use Throwable;
  */
 abstract class Factory
 {
-    use ForwardsCalls, Macroable {
+    use Conditionable, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 

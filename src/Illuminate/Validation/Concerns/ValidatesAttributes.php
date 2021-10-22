@@ -431,11 +431,15 @@ trait ValidatesAttributes
             return false;
         }
 
-        $format = $parameters[0];
+        foreach ($parameters as $format) {
+            $date = DateTime::createFromFormat('!'.$format, $value);
 
-        $date = DateTime::createFromFormat('!'.$format, $value);
+            if ($date && $date->format($format) == $value) {
+                return true;
+            }
+        }
 
-        return $date && $date->format($format) == $value;
+        return false;
     }
 
     /**

@@ -68,4 +68,14 @@ class OutputStyle extends SymfonyStyle
     {
         return $this->output->isDebug();
     }
+
+    /**
+     * Get the underlying Symfony output implementation.
+     *
+     * @return \Symfony\Component\Console\Output\OutputInterface
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
 }

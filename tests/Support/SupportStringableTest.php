@@ -689,4 +689,12 @@ class SupportStringableTest extends TestCase
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
     }
+
+    public function testStripTags()
+    {
+        $this->assertSame('beforeafter', (string) $this->stringable('before<br>after')->stripTags());
+        $this->assertSame('before<br>after', (string) $this->stringable('before<br>after')->stripTags('<br>'));
+        $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
+        $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
+    }
 }

@@ -136,6 +136,16 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
+     * Assert that no jobs were dispatched.
+     *
+     * @return void
+     */
+    public function assertNothingDispatched()
+    {
+        PHPUnit::assertEmpty($this->commands, 'Jobs were dispatched unexpectedly.');
+    }
+
+    /**
      * Assert if a job was explicitly dispatched synchronously based on a truth-test callback.
      *
      * @param  string|\Closure  $command

@@ -618,6 +618,10 @@ class Mailable implements MailableContract, Renderable
      */
     protected function setAddress($address, $name = null, $property = 'to')
     {
+        if (empty($address)) {
+            return $this;
+        }
+
         foreach ($this->addressesToArray($address, $name) as $recipient) {
             $recipient = $this->normalizeRecipient($recipient);
 
@@ -679,6 +683,10 @@ class Mailable implements MailableContract, Renderable
      */
     protected function hasRecipient($address, $name = null, $property = 'to')
     {
+        if (empty($address)) {
+            return false;
+        }
+
         $expected = $this->normalizeRecipient(
             $this->addressesToArray($address, $name)[0]
         );

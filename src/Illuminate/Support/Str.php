@@ -694,6 +694,27 @@ class Str
     }
 
     /**
+     * Convert the given string to title case for each word.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function headline($value)
+    {
+        $parts = explode('_', static::replace(' ', '_', $value));
+
+        if (count($parts) > 1) {
+            $parts = array_map([static::class, 'title'], $parts);
+        }
+
+        $studly = static::studly(implode($parts));
+
+        $words = preg_split('/(?=[A-Z])/', $studly, -1, PREG_SPLIT_NO_EMPTY);
+
+        return implode(' ', $words);
+    }
+
+    /**
      * Get the singular form of an English word.
      *
      * @param  string  $value
