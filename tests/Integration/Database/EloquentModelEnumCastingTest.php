@@ -7,11 +7,12 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-if (strpos(PHP_VERSION, '8.1') === 0) {
+if (PHP_VERSION_ID >= 80100) {
     include 'Enums.php';
 }
 
 /**
+ * @requires PHP 8.1
  * @group integration
  */
 class EloquentModelEnumCastingTest extends DatabaseTestCase
@@ -27,9 +28,6 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         });
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumsAreCastable()
     {
         DB::table('enum_casts')->insert([
@@ -44,9 +42,6 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
 
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumsAreCastableToArray()
     {
         $model = new EloquentModelEnumCastingTestModel([
@@ -60,9 +55,6 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         ], $model->toArray());
     }
 
-    /**
-     * @requires PHP 8.1
-     */
     public function testEnumsAreConvertedOnSave()
     {
         $model = new EloquentModelEnumCastingTestModel([
