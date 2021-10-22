@@ -46,6 +46,16 @@ trait InteractsWithInput
     }
 
     /**
+     * Returns the client User-Agent.
+     *
+     * @return string|null
+     */
+    public function getUserAgent()
+    {
+        return $this->header('User-Agent');
+    }
+
+    /**
      * Get the bearer token from the request headers.
      *
      * @return string|null
