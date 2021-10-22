@@ -1330,8 +1330,6 @@ trait HasAttributes
      *
      * @param  string  $key
      * @return bool
-     *
-     * @throws \Illuminate\Database\Eloquent\InvalidCastException
      */
     protected function isEnumCastable($key)
     {
@@ -1348,8 +1346,6 @@ trait HasAttributes
         if (function_exists('enum_exists') && enum_exists($castType)) {
             return true;
         }
-
-        throw new InvalidCastException($this->getModel(), $key, $castType);
     }
 
     /**
