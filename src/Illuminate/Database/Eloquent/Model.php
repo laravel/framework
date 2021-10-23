@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -1535,16 +1536,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Reload the current model instance with fresh attributes from the database.
      *
+     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function refresh()
+    public function refresh(Closure $callback = null)
     {
         if (! $this->exists) {
             return $this;
         }
 
+        $query = $this->setKeysForSelectQuery($this->newQueryWithoutScopes());
+
+        if ($callback) {
+            $query = $callback($query);
+        }
+
         $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())->firstOrFail()->attributes
+            $query->firstOrFail()->attributes
         );
 
         $this->load(collect($this->relations)->reject(function ($relation) {
