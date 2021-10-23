@@ -459,7 +459,9 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [foo] does not contain a value that satisfies closures at [0].');
 
-        $assert->whereContains('foo', [function ($actual) { return $actual === 5; }]);
+        $assert->whereContains('foo', [function ($actual) {
+            return $actual === 5;
+        }]);
     }
 
     public function testAssertWhereContainsFailsWhenHavingExpectedValueButDoesNotSatisfyClosure()
@@ -471,7 +473,9 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [foo] does not contain a value that satisfies closures at [1].');
 
-        $assert->whereContains('foo', [1, function ($actual) { return $actual === 5; }]);
+        $assert->whereContains('foo', [1, function ($actual) {
+            return $actual === 5;
+        }]);
     }
 
     public function testAssertWhereContainsFailsWhenSatisfiesClosureButDoesNotHaveExpectedValue()
@@ -483,7 +487,9 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [foo] does not contain [5].');
 
-        $assert->whereContains('foo', [5, function ($actual) { return $actual === 1; }]);
+        $assert->whereContains('foo', [5, function ($actual) {
+            return $actual === 1;
+        }]);
     }
 
     public function testAssertWhereContainsWithNestedValue()
@@ -546,7 +552,9 @@ class AssertTest extends TestCase
             'foo' => [1, 2, 3, 4],
         ]);
 
-        $assert->whereContains('foo', function ($actual) { return $actual % 3 === 0; });
+        $assert->whereContains('foo', function ($actual) {
+            return $actual % 3 === 0;
+        });
     }
 
     public function testAssertWhereContainsWithNestedClosure()
@@ -557,7 +565,9 @@ class AssertTest extends TestCase
             'baz' => 3,
         ]);
 
-        $assert->whereContains('baz', function ($actual) { return $actual % 3 === 0; });
+        $assert->whereContains('baz', function ($actual) {
+            return $actual % 3 === 0;
+        });
     }
 
     public function testAssertWhereContainsWithMultipleClosure()
@@ -567,8 +577,12 @@ class AssertTest extends TestCase
         ]);
 
         $assert->whereContains('foo', [
-            function ($actual) { return $actual % 3 === 0; },
-            function ($actual) { return $actual % 2 === 0; },
+            function ($actual) {
+                return $actual % 3 === 0;
+            },
+            function ($actual) {
+                return $actual % 2 === 0;
+            },
         ]);
     }
 

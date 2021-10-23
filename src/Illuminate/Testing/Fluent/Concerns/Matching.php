@@ -130,7 +130,7 @@ trait Matching
             if (! is_string($condition) && is_callable($condition)) {
                 $unsatisfiedClosures[] = $idx;
             } else {
-                $missingValues[] = (string)$condition;
+                $missingValues[] = (string) $condition;
             }
         }
 
