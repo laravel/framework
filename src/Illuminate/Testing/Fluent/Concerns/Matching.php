@@ -107,7 +107,7 @@ trait Matching
      * Asserts that the property contains the expected values.
      *
      * @param  string  $key
-     * @param  array|string  $expected
+     * @param  array|string|Closure  $expected
      * @return $this
      */
     public function whereContains(string $key, $expected)
@@ -122,14 +122,32 @@ trait Matching
             }
 
             return $actual->containsStrict($search);
-        })->toArray();
+        });
+
+        $missingValues = [];
+        $unsatisfiedClosures = [];
+        foreach ($missing as $idx => $condition) {
+            if (! is_string($condition) && is_callable($condition)) {
+                $unsatisfiedClosures[] = $idx;
+            } else {
+                $missingValues[] = (string)$condition;
+            }
+        }
 
         PHPUnit::assertEmpty(
-            $missing,
+            $missingValues,
             sprintf(
                 'Property [%s] does not contain [%s].',
                 $key,
-                implode(', ', array_values($missing))
+                implode(', ', array_values($missingValues))
+            )
+        );
+        PHPUnit::assertEmpty(
+            $unsatisfiedClosures,
+            sprintf(
+                'Property [%s] does not contain a value that satisfies closures at [%s].',
+                $key,
+                implode(', ', array_values($unsatisfiedClosures))
             )
         );
 
