@@ -107,7 +107,7 @@ trait Matching
      * Asserts that the property contains the expected values.
      *
      * @param  string  $key
-     * @param  array|string|Closure  $expected
+     * @param  array|Closure|mixed  $expected
      * @return $this
      */
     public function whereContains(string $key, $expected)
