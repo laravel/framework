@@ -466,6 +466,19 @@ abstract class Relation
     }
 
     /**
+     * Ability to modify relation query
+     *
+     * @param $callback
+     * @return $this
+     */
+    public function modifyQuery($callback)
+    {
+        $callback($this->query);
+
+        return $this;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
