@@ -403,6 +403,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', '=', new Raw('NOW()'));
         $this->assertSame('select * from `users` where date(`created_at`) = NOW()', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDateBefore('created_at', new Raw('NOW()'));
+        $this->assertSame('select * from `users` where date(`created_at`) < NOW()', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDateAfter('created_at', new Raw('NOW()'));
+        $this->assertSame('select * from `users` where date(`created_at`) > NOW()', $builder->toSql());
     }
 
     public function testWhereDayMySql()
