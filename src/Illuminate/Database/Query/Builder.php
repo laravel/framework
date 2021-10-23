@@ -1280,7 +1280,7 @@ class Builder
     }
 
     /**
-     * Add an "where date" statement to the query which is before the given date
+     * Add an "where date" statement to the query which is before the given date.
      *
      * @param $column
      * @param  null  $value
@@ -1299,18 +1299,19 @@ class Builder
     }
 
     /**
-     * Add an "or where date" statement to the query which is before the given date
+     * Add an "or where date" statement to the query which is before the given date.
      *
      * @param $column
      * @param  null  $value
      * @return $this
      */
-    public function orWhereDateBefore($column, $value = null) {
+    public function orWhereDateBefore($column, $value = null)
+    {
         return $this->whereDateBefore($column, $value, 'or');
     }
 
     /**
-     * Add an "where date" statement to the query which is after the given date
+     * Add an "where date" statement to the query which is after the given date.
      *
      * @param $column
      * @param  null  $value
@@ -1329,13 +1330,14 @@ class Builder
     }
 
     /**
-     * Add an "or where date" statement to the query which if after the given date
+     * Add an "or where date" statement to the query which if after the given date.
      *
      * @param $column
      * @param  null  $value
      * @return $this
      */
-    public function orWhereDateAfter($column, $value = null) {
+    public function orWhereDateAfter($column, $value = null)
+    {
         return $this->whereDateAfter($column, $value, 'or');
     }
 
