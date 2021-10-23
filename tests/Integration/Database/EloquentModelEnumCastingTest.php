@@ -71,13 +71,6 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
     }
 }
 
-/**
- * @property $secret
- * @property $secret_array
- * @property $secret_json
- * @property $secret_object
- * @property $secret_collection
- */
 class EloquentModelEnumCastingTestModel extends Model
 {
     public $timestamps = false;

@@ -914,10 +914,10 @@ trait HasAttributes
     }
 
     /**
-     * Set the value of a enum castable attribute.
+     * Set the value of an enum castable attribute.
      *
      * @param  string  $key
-     * @param  mixed  $value
+     * @param  \BackedEnum  $value
      * @return void
      */
     protected function setEnumCastableAttribute($key, $value)
