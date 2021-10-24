@@ -800,6 +800,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
     }
 
+    public function testHasOnNestedSelfReferencingBelongsToManyRelationshipWithWherePivotUsingClosure()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $friend->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::has('friendsOneOrTwoUsingClosure')->get();
+
+        $this->assertCount(2, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+    }
+
     public function testHasOnSelfReferencingBelongsToRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
@@ -1999,6 +2011,14 @@ class EloquentTestUser extends Eloquent
     public function friendsTwo()
     {
         return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')->wherePivot('user_id', 2);
+    }
+
+    public function friendsOneOrTwoUsingClosure()
+    {
+        return $this->belongsToMany(self::class, 'friends', 'user_id', 'friend_id')
+            ->wherePivot(function ($query) {
+                $query->where('user_id', 1)->orWhere('user_id', 2);
+            });
     }
 
     public function posts()

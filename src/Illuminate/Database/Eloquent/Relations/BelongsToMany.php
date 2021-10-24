@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,6 +24,13 @@ class BelongsToMany extends Relation
      * @var string
      */
     protected $table;
+
+    /**
+     * The pivot model instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    protected $model;
 
     /**
      * The foreign key of the parent model.
@@ -177,6 +185,8 @@ class BelongsToMany extends Relation
             $this->using($table);
         }
 
+        $this->model = $model;
+
         return $model->getTable();
     }
 
@@ -324,6 +334,22 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get an instance of pivot model.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getPivotModel()
+    {
+        if (! is_null($this->model)) {
+            return $this->model;
+        }
+
+        $pivotClass = $this->getPivotClass();
+
+        return $this->model = new $pivotClass;
+    }
+
+    /**
      * Specify the custom pivot model to use for the relationship.
      *
      * @param  string  $class
@@ -332,6 +358,7 @@ class BelongsToMany extends Relation
     public function using($class)
     {
         $this->using = $class;
+        $this->model = null;
 
         return $this;
     }
@@ -352,7 +379,7 @@ class BelongsToMany extends Relation
     /**
      * Set a where clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @param  string  $boolean
@@ -360,9 +387,17 @@ class BelongsToMany extends Relation
      */
     public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $this->pivotWheres[] = func_get_args();
+        if ($column instanceof Closure && is_null($operator)) {
+            $column($query = $this->getPivotModel()->newQueryWithoutRelationships());
 
-        return $this->where($this->qualifyPivotColumn($column), $operator, $value, $boolean);
+            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+        } else {
+            $this->pivotWheres[] = func_get_args();
+
+            $this->where($this->qualifyPivotColumn($column), $operator, $value, $boolean);
+        }
+
+        return $this;
     }
 
     /**
@@ -435,7 +470,7 @@ class BelongsToMany extends Relation
     /**
      * Set an "or where" clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
