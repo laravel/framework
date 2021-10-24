@@ -189,13 +189,13 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_after_creating_and_making_callbacks_are_called()
     {
         $user = FactoryTestUserFactory::new()
-                        ->afterMaking(function ($user) {
-                            $_SERVER['__test.user.making'] = $user;
-                        })
-                        ->afterCreating(function ($user) {
-                            $_SERVER['__test.user.creating'] = $user;
-                        })
-                        ->create();
+            ->afterMaking(function ($user) {
+                $_SERVER['__test.user.making'] = $user;
+            })
+            ->afterCreating(function ($user) {
+                $_SERVER['__test.user.creating'] = $user;
+            })
+            ->create();
 
         $this->assertSame($user, $_SERVER['__test.user.making']);
         $this->assertSame($user, $_SERVER['__test.user.creating']);
@@ -206,22 +206,22 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_has_many_relationship()
     {
         $users = FactoryTestUserFactory::times(10)
-                        ->has(
-                            FactoryTestPostFactory::times(3)
-                                    ->state(function ($attributes, $user) {
-                                        // Test parent is passed to child state mutations...
-                                        $_SERVER['__test.post.state-user'] = $user;
+            ->has(
+                FactoryTestPostFactory::times(3)
+                    ->state(function ($attributes, $user) {
+                        // Test parent is passed to child state mutations...
+                        $_SERVER['__test.post.state-user'] = $user;
 
-                                        return [];
-                                    })
-                                    // Test parents passed to callback...
-                                    ->afterCreating(function ($post, $user) {
-                                        $_SERVER['__test.post.creating-post'] = $post;
-                                        $_SERVER['__test.post.creating-user'] = $user;
-                                    }),
-                            'posts'
-                        )
-                        ->create();
+                        return [];
+                    })
+                    // Test parents passed to callback...
+                    ->afterCreating(function ($post, $user) {
+                        $_SERVER['__test.post.creating-post'] = $post;
+                        $_SERVER['__test.post.creating-user'] = $user;
+                    }),
+                'posts'
+            )
+            ->create();
 
         $this->assertCount(10, FactoryTestUser::all());
         $this->assertCount(30, FactoryTestPost::all());
@@ -237,8 +237,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_belongs_to_relationship()
     {
         $posts = FactoryTestPostFactory::times(3)
-                        ->for(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
-                        ->create();
+            ->for(FactoryTestUserFactory::new(['name' => 'Taylor Otwell']), 'user')
+            ->create();
 
         $this->assertCount(3, $posts->filter(function ($post) {
             return $post->user->name === 'Taylor Otwell';
@@ -252,8 +252,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
         $posts = FactoryTestPostFactory::times(3)
-                        ->for($user, 'user')
-                        ->create();
+            ->for($user, 'user')
+            ->create();
 
         $this->assertCount(3, $posts->filter(function ($post) use ($user) {
             return $post->user->is($user);
@@ -267,8 +267,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
         $posts = FactoryTestPostFactory::times(3)
-                        ->for($user)
-                        ->create();
+            ->for($user)
+            ->create();
 
         $this->assertCount(3, $posts->filter(function ($post) use ($user) {
             return $post->factoryTestUser->is($user);
@@ -281,8 +281,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_morph_to_relationship()
     {
         $posts = FactoryTestCommentFactory::times(3)
-                        ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
-                        ->create();
+            ->for(FactoryTestPostFactory::new(['title' => 'Test Title']), 'commentable')
+            ->create();
 
         $this->assertSame('Test Title', FactoryTestPost::first()->title);
         $this->assertCount(3, FactoryTestPost::first()->comments);
@@ -295,8 +295,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         $post = FactoryTestPostFactory::new(['title' => 'Test Title'])->create();
         $posts = FactoryTestCommentFactory::times(3)
-                        ->for($post, 'commentable')
-                        ->create();
+            ->for($post, 'commentable')
+            ->create();
 
         $this->assertSame('Test Title', FactoryTestPost::first()->title);
         $this->assertCount(3, FactoryTestPost::first()->comments);
@@ -308,15 +308,15 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_belongs_to_many_relationship()
     {
         $users = FactoryTestUserFactory::times(3)
-                        ->hasAttached(
-                            FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
-                                $_SERVER['__test.role.creating-role'] = $role;
-                                $_SERVER['__test.role.creating-user'] = $user;
-                            }),
-                            ['admin' => 'Y'],
-                            'roles'
-                        )
-                        ->create();
+            ->hasAttached(
+                FactoryTestRoleFactory::times(3)->afterCreating(function ($role, $user) {
+                    $_SERVER['__test.role.creating-role'] = $role;
+                    $_SERVER['__test.role.creating-user'] = $user;
+                }),
+                ['admin' => 'Y'],
+                'roles'
+            )
+            ->create();
 
         $this->assertCount(9, FactoryTestRole::all());
 
@@ -334,13 +334,13 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_belongs_to_many_relationship_with_existing_model_instances()
     {
         $roles = FactoryTestRoleFactory::times(3)
-                        ->afterCreating(function ($role) {
-                            $_SERVER['__test.role.creating-role'] = $role;
-                        })
-                        ->create();
+            ->afterCreating(function ($role) {
+                $_SERVER['__test.role.creating-role'] = $role;
+            })
+            ->create();
         FactoryTestUserFactory::times(3)
-                        ->hasAttached($roles, ['admin' => 'Y'], 'roles')
-                        ->create();
+            ->hasAttached($roles, ['admin' => 'Y'], 'roles')
+            ->create();
 
         $this->assertCount(3, FactoryTestRole::all());
 
@@ -357,13 +357,13 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_belongs_to_many_relationship_with_existing_model_instances_with_relationship_name_implied_from_model()
     {
         $roles = FactoryTestRoleFactory::times(3)
-                        ->afterCreating(function ($role) {
-                            $_SERVER['__test.role.creating-role'] = $role;
-                        })
-                        ->create();
+            ->afterCreating(function ($role) {
+                $_SERVER['__test.role.creating-role'] = $role;
+            })
+            ->create();
         FactoryTestUserFactory::times(3)
-                        ->hasAttached($roles, ['admin' => 'Y'])
-                        ->create();
+            ->hasAttached($roles, ['admin' => 'Y'])
+            ->create();
 
         $this->assertCount(3, FactoryTestRole::all());
 
@@ -388,12 +388,12 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('Abigail Otwell', $users[1]->name);
 
         $user = FactoryTestUserFactory::new()
-                        ->hasAttached(
-                            FactoryTestRoleFactory::times(4),
-                            new Sequence(['admin' => 'Y'], ['admin' => 'N']),
-                            'roles'
-                        )
-                        ->create();
+            ->hasAttached(
+                FactoryTestRoleFactory::times(4),
+                new Sequence(['admin' => 'Y'], ['admin' => 'N']),
+                'roles'
+            )
+            ->create();
 
         $this->assertCount(4, $user->roles);
 
@@ -468,9 +468,9 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertCount(3, $user->posts);
 
         $post = FactoryTestPostFactory::new()
-                            ->forAuthor(['name' => 'Taylor Otwell'])
-                            ->hasComments(2)
-                            ->create();
+            ->forAuthor(['name' => 'Taylor Otwell'])
+            ->hasComments(2)
+            ->create();
 
         $this->assertInstanceOf(FactoryTestUser::class, $post->author);
         $this->assertSame('Taylor Otwell', $post->author->name);
@@ -485,6 +485,23 @@ class DatabaseEloquentFactoryTest extends TestCase
         });
 
         $this->assertSame('Hello World', $factory->getFoo());
+    }
+
+    public function test_factory_can_conditionally_execute_code()
+    {
+        FactoryTestUserFactory::new()
+            ->when(true, function () {
+                $this->assertTrue(true);
+            })
+            ->when(false, function () {
+                $this->fail('Unreachable code that has somehow been reached.');
+            })
+            ->unless(false, function () {
+                $this->assertTrue(true);
+            })
+            ->unless(true, function () {
+                $this->fail('Unreachable code that has somehow been reached.');
+            });
     }
 
     /**

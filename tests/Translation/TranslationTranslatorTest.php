@@ -150,6 +150,13 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('bar onetwo three', $t->get('foo :i:c :u', ['i' => 'one', 'c' => 'two', 'u' => 'three']));
     }
 
+    public function testGetJsonHasAtomicReplacements()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['Hello :foo!' => 'Hello :foo!']);
+        $this->assertSame('Hello baz:bar!', $t->get('Hello :foo!', ['foo' => 'baz:bar', 'bar' => 'abcdef']));
+    }
+
     public function testGetJsonReplacesForAssociativeInput()
     {
         $t = new Translator($this->getLoader(), 'en');

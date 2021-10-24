@@ -607,6 +607,24 @@ class AssertTest extends TestCase
         $this->assertTrue($called, 'The scoped query was never actually called.');
     }
 
+    public function testScopeShorthandWithoutCount()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                ['key' => 'first'],
+                ['key' => 'second'],
+            ],
+        ]);
+
+        $called = false;
+        $assert->has('bar', null, function (AssertableJson $item) use (&$called) {
+            $item->where('key', 'first');
+            $called = true;
+        });
+
+        $this->assertTrue($called, 'The scoped query was never actually called.');
+    }
+
     public function testScopeShorthandFailsWhenAssertingZeroItems()
     {
         $assert = AssertableJson::fromArray([
@@ -637,6 +655,54 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', 1, function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testScopeShorthandFailsWhenAssertingEmptyArray()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'Cannot scope directly onto the first element of property [bar] because it is empty.'
+        );
+
+        $assert->has('bar', 0, function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testScopeShorthandFailsWhenAssertingEmptyArrayWithoutCount()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'Cannot scope directly onto the first element of property [bar] because it is empty.'
+        );
+
+        $assert->has('bar', null, function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testScopeShorthandFailsWhenSecondArgumentUnsupportedType()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                ['key' => 'first'],
+                ['key' => 'second'],
+            ],
+        ]);
+
+        $this->expectException(TypeError::class);
+
+        $assert->has('bar', 'invalid', function (AssertableJson $item) {
             $item->where('key', 'first');
         });
     }

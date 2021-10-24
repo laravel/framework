@@ -47,6 +47,13 @@ use UnexpectedValueException;
 trait EnumeratesValues
 {
     /**
+     * Indicates that the object's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
+
+    /**
      * The methods that can be proxied.
      *
      * @var string[]
@@ -900,7 +907,22 @@ trait EnumeratesValues
      */
     public function __toString()
     {
-        return $this->toJson();
+        return $this->escapeWhenCastingToString
+                    ? e($this->toJson())
+                    : $this->toJson();
+    }
+
+    /**
+     * Indicate that the model's string representation should be escaped when __toString is invoked.
+     *
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true)
+    {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 
     /**

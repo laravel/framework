@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BadMethodCallException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
@@ -326,6 +327,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresDroppingMultipleColumnsIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
@@ -336,6 +338,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresRenamingMultipleColumnsIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
@@ -346,6 +349,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresRenamingAndDroppingMultipleColumnsIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
@@ -356,6 +360,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support dropping foreign keys (you would need to re-create the table).");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {

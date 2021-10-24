@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MergeValue;

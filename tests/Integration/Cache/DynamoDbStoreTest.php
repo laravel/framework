@@ -20,10 +20,6 @@ class DynamoDbStoreTest extends TestCase
             $this->markTestSkipped('DynamoDB not configured.');
         }
 
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         parent::setUp();
     }
 

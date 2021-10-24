@@ -362,6 +362,20 @@ class SupportTestingBusFakeTest extends TestCase
         }
     }
 
+    public function testAssertNothingDispatched()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatch(new BusJobStub);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Jobs were dispatched unexpectedly.'));
+        }
+    }
+
     public function testAssertDispatchedWithIgnoreClass()
     {
         $dispatcher = m::mock(QueueingDispatcher::class);

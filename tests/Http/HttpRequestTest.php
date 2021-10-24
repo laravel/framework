@@ -521,6 +521,15 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', []);
         $this->assertInstanceOf(Collection::class, $request->collect());
         $this->assertTrue($request->collect()->isEmpty());
+
+        $request = Request::create('/', 'GET', ['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
+        $this->assertInstanceOf(Collection::class, $request->collect(['users']));
+        $this->assertTrue($request->collect(['developers'])->isEmpty());
+        $this->assertTrue($request->collect(['roles'])->isNotEmpty());
+        $this->assertEquals(['roles' => [4, 5, 6]], $request->collect(['roles'])->all());
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->collect(['users', 'email'])->all());
+        $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $request->collect(['roles', 'foo']));
+        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
     }
 
     public function testArrayAccess()
