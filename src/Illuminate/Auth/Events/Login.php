@@ -30,17 +30,26 @@ class Login
     public $remember;
 
     /**
+     * Indicates if the user has been retrieved using a "recaller" (remember) cookie.
+     *
+     * @var bool
+     */
+    public $recalled;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  bool  $remember
+     * @param  bool  $recalled
      * @return void
      */
-    public function __construct($guard, $user, $remember)
+    public function __construct($guard, $user, $remember, $recalled)
     {
         $this->user = $user;
         $this->guard = $guard;
         $this->remember = $remember;
+        $this->recalled = $recalled;
     }
 }
