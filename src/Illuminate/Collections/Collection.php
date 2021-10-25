@@ -537,6 +537,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $first = $this->first();
 
         if (is_array($first) || (is_object($first) && ! $first instanceof Stringable)) {
+            if(is_callable($value)) {
+                return $this->map($value)->implode($glue ?? '');
+            }
             return implode($glue ?? '', $this->pluck($value)->all());
         }
 

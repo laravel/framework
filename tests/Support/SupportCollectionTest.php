@@ -2100,6 +2100,12 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
+        $this->assertSame('taylor:foodayle:bar', $data->implode(function($item) {
+            return "{$item['name']}:{$item['email']}";
+        }));
+        $this->assertSame('taylor:foo,dayle:bar', $data->implode(function($item) {
+            return "{$item['name']}:{$item['email']}";
+        }, ','));
 
         $data = new $collection(['taylor', 'dayle']);
         $this->assertSame('taylordayle', $data->implode(''));
@@ -2111,6 +2117,12 @@ class SupportCollectionTest extends TestCase
         ]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
+        $this->assertSame('taylor:foodayle:bar', $data->implode(function($item) {
+            return "{$item['name']}:{$item['email']}";
+        }));
+        $this->assertSame('taylor:foo,dayle:bar', $data->implode(function($item) {
+            return "{$item['name']}:{$item['email']}";
+        }, ','));
 
         $data = new $collection([Str::of('taylor'), Str::of('dayle')]);
         $this->assertSame('taylordayle', $data->implode(''));
