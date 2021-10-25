@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -10,6 +11,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -188,9 +190,13 @@ class VerifyCsrfToken
             $response = $response->toResponse($request);
         }
 
+        $cookie_expire_date = $config['expire_on_close']
+            ? 0
+            : Date::instance(Carbon::now()->addRealMinutes($config['lifetime']));
+
         $response->headers->setCookie(
             new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
+                'XSRF-TOKEN', $request->session()->token(), $cookie_expire_date,
                 $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
             )
         );
