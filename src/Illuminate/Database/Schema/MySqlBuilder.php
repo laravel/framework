@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
+use Closure;
+
 class MySqlBuilder extends Builder
 {
     /**
@@ -27,6 +29,48 @@ class MySqlBuilder extends Builder
     {
         return $this->connection->statement(
             $this->grammar->compileDropDatabaseIfExists($name)
+        );
+    }
+
+    /**
+     * Create a view in the schema.
+     *
+     * @param $name
+     * @param  \Closure  $callback
+     * @return bool
+     */
+    public function createView($name, Closure $callback)
+    {
+        $query = tap($this->connection->query(), $callback);
+
+        return $this->connection->statement(
+            $this->grammar->compileCreateView($name, $query), $query->getBindings()
+        );
+    }
+
+    /**
+     * Drop the given view from the schema.
+     *
+     * @param $name
+     * @return bool
+     */
+    public function dropView($name)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileDropView($name)
+        );
+    }
+
+    /**
+     * Drop the given view from schema if it exists.
+     *
+     * @param $name
+     * @return bool
+     */
+    public function dropViewIfExists($name)
+    {
+        return $this->connection->statement(
+            $this->grammar->compileDropViewIfExists($name)
         );
     }
 

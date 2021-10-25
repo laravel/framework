@@ -269,6 +269,46 @@ class Builder
     }
 
     /**
+     * Create a view in the schema.
+     *
+     * @param $name
+     * @param  \Closure  $callback
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    public function createView($name, Closure $callback)
+    {
+        throw new LogicException('This database driver does not support creating views.');
+    }
+
+    /**
+     * Drop the given view from the schema.
+     *
+     * @param $name
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    public function dropView($name)
+    {
+        throw new LogicException('This database driver does not support dropping views.');
+    }
+
+    /**
+     * Drop the given view from schema if it exists.
+     *
+     * @param $name
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    public function dropViewIfExists($name)
+    {
+        throw new LogicException('This database driver does not support dropping views.');
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void

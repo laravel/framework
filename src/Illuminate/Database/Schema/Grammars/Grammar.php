@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
@@ -53,6 +54,40 @@ abstract class Grammar extends BaseGrammar
     public function compileDropDatabaseIfExists($name)
     {
         throw new LogicException('This database driver does not support dropping databases.');
+    }
+
+    /**
+     * Compile a create view command.
+     *
+     * @param  string  $name
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileCreateView($name, QueryBuilder $query)
+    {
+        throw new LogicException('This database driver does not support creating views.');
+    }
+
+    /**
+     * Compile a drop view command.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileDropView($name)
+    {
+        throw new LogicException('This database driver does not support dropping views.');
+    }
+
+    /**
+     * Compile a drop view if exists command.
+     *
+     * @param $name
+     * @return string
+     */
+    public function compileDropViewIfExists($name)
+    {
+        throw new LogicException('This database driver does not support dropping views.');
     }
 
     /**

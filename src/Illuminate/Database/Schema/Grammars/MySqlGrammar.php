@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use RuntimeException;
@@ -53,6 +54,50 @@ class MySqlGrammar extends Grammar
     {
         return sprintf(
             'drop database if exists %s',
+            $this->wrapValue($name)
+        );
+    }
+
+    /**
+     * Compile a create view command.
+     *
+     * @param  string  $name
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileCreateView($name, QueryBuilder $query)
+    {
+        return sprintf(
+            'create view %s as %s',
+            $this->wrapValue($name),
+            $query->toSql()
+        );
+    }
+
+    /**
+     * Compile a drop view command.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileDropView($name)
+    {
+        return sprintf(
+            'drop view %s',
+            $this->wrapValue($name)
+        );
+    }
+
+    /**
+     * Compile a drop view if exists command.
+     *
+     * @param $name
+     * @return string
+     */
+    public function compileDropViewIfExists($name)
+    {
+        return sprintf(
+            'drop view if exists %s',
             $this->wrapValue($name)
         );
     }
