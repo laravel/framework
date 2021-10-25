@@ -267,7 +267,7 @@ class Dispatcher implements QueueingDispatcher
 
             return;
         }
-        
+
         $this->container->terminating(function () use ($command, $handler) {
             $this->dispatchNow($command, $handler);
         });
