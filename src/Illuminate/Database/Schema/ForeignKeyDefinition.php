@@ -25,16 +25,6 @@ class ForeignKeyDefinition extends Fluent
     }
 
     /**
-     * Indicate that deletes should cascade.
-     *
-     * @return $this
-     */
-    public function cascadeOnDelete()
-    {
-        return $this->onDelete('cascade');
-    }
-
-    /**
      * Indicate that updates should be restricted.
      *
      * @return $this
@@ -42,6 +32,16 @@ class ForeignKeyDefinition extends Fluent
     public function restrictOnUpdate()
     {
         return $this->onUpdate('restrict');
+    }
+
+    /**
+     * Indicate that deletes should cascade.
+     *
+     * @return $this
+     */
+    public function cascadeOnDelete()
+    {
+        return $this->onDelete('cascade');
     }
 
     /**
