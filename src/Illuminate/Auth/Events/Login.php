@@ -30,7 +30,7 @@ class Login
     public $remember;
 
     /**
-     * Indicates if the user has been retrieved using a "recaller" (remember) cookie.
+     * Indicates if the user was authenticated using a "remember me" cookie.
      *
      * @var bool
      */
