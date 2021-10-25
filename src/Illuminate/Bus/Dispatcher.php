@@ -262,6 +262,12 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchAfterResponse($command, $handler = null)
     {
+        if ($this->container->runningInConsole()) {
+            $this->dispatchNow($command, $handler);
+
+            return;
+        }
+        
         $this->container->terminating(function () use ($command, $handler) {
             $this->dispatchNow($command, $handler);
         });
