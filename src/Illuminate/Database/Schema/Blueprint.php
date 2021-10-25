@@ -8,6 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -320,6 +321,23 @@ class Blueprint
         $columns = is_array($columns) ? $columns : func_get_args();
 
         return $this->addCommand('dropColumn', compact('columns'));
+    }
+    
+    /**
+     * Indicate that the given columns should be dropped if it exists.
+     *
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropColumnIfExists($columns)
+    {
+        $columns = is_array($columns) ? $columns : func_get_args();
+        
+        $columns = collect($columns)->filter(function($column) {
+            return Schema::hasColumn($this->getTable(), $column);
+        })->values()->all();
+
+        return $this->dropColumns($columns);
     }
 
     /**
