@@ -337,7 +337,7 @@ class Blueprint
             return Schema::hasColumn($this->getTable(), $column);
         })->values()->all();
 
-        return $this->dropColumns($columns);
+        return $this->dropColumn($columns);
     }
 
     /**
