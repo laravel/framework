@@ -45,7 +45,7 @@ class Login
      * @param  bool  $recalled
      * @return void
      */
-    public function __construct($guard, $user, $remember, $recalled)
+    public function __construct($guard, $user, $remember, $recalled = false)
     {
         $this->user = $user;
         $this->guard = $guard;
