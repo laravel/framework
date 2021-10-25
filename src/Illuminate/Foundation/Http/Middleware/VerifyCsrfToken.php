@@ -12,13 +12,10 @@ use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class VerifyCsrfToken
 {
-    use InteractsWithTime;
-
     /**
      * The application instance.
      *
