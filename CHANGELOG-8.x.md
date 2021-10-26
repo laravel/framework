@@ -1,6 +1,34 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.64.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.65.0...8.x)
+
+
+## [v8.65.0 (2021-10-9)](https://github.com/laravel/framework/compare/v8.64.0...v8.65.0)
+
+### Added
+- Allow queueing application and service provider callbacks while callbacks are already being processed ([#39175](https://github.com/laravel/framework/pull/39175), [63dab48](https://github.com/laravel/framework/commit/63dab486a990e26500b1a6520b1493192d6c5104))
+- Added ability to validate one of multiple date formats ([#39170](https://github.com/laravel/framework/pull/39170))
+- Re-add update from support for PostgreSQL ([#39151](https://github.com/laravel/framework/pull/39151))
+- Added `Illuminate/Collections/Traits/EnumeratesValues::reduceSpread()` ([a01e9ed](https://github.com/laravel/framework/commit/a01e9edfadb140559d1bbf9999dda49148bfa5f7))
+- Added `Illuminate/Testing/TestResponse::assertRedirectContains()` ([#39233](https://github.com/laravel/framework/pull/39233), [ff340a6](https://github.com/laravel/framework/commit/ff340a6809d07b349aa227c2e4caf3a3ad8f47d5))
+- Added gate policy callback ([#39185](https://github.com/laravel/framework/pull/39185))
+- Allow Remember Me cookie time to be overriden ([#39186](https://github.com/laravel/framework/pull/39186))
+- Adds `--test` and `--pest` options to various `make` commands ([#38997](https://github.com/laravel/framework/pull/38997))
+- Added new lost connection message to DetectsLostConnections for Vapor ([#39209](https://github.com/laravel/framework/pull/39209))
+- Added `Illuminate/Support/Testing/Fakes/NotificationFake::assertSentOnDemand()` ([#39203](https://github.com/laravel/framework/pull/39203))
+- Added Subset in request's collect ([#39191](https://github.com/laravel/framework/pull/39191))
+- Added Conditional trait to Eloquent Factory ([#39228](https://github.com/laravel/framework/pull/39228))
+- Added a way to skip count check but check $callback at the same time for AssertableJson->has() ([#39224](https://github.com/laravel/framework/pull/39224))
+- Added `Illuminate/Support/Str::headline()` ([#39174](https://github.com/laravel/framework/pull/39174))
+
+### Deprecated
+- Deprecate `reduceMany` in favor of `reduceSpread` in `Illuminate/Collections/Traits/EnumeratesValues` ([#39201](https://github.com/laravel/framework/pull/39201))
+
+### Fixed
+- Fixed HasOneOfMany with callback issue ([#39187](https://github.com/laravel/framework/pull/39187))
+
+### Changed
+- Logs deprecations instead of treating them as exceptions ([#39219](https://github.com/laravel/framework/pull/39219))
 
 
 ## [v8.64.0 (2021-10-12)](https://github.com/laravel/framework/compare/v8.63.0...v8.64.0)
