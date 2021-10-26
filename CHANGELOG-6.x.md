@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.35...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.36...6.x)
+
+
+## [v6.20.36 (2021-10-19)](https://github.com/laravel/framework/compare/v6.20.35...v6.20.36)
+
+### Fixed
+- Add new lost connection message to DetectsLostConnections for Vapor ([#39209](https://github.com/laravel/framework/pull/39209))
 
 
 ## [v6.20.35 (2021-10-05)](https://github.com/laravel/framework/compare/v6.20.34...v6.20.35)
