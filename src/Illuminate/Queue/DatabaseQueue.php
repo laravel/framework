@@ -256,8 +256,8 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
         $databaseVersion = $this->database->getConfig('version') ??
                            $this->database->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-        if (($databaseEngine === 'mysql' && version_compare($databaseVersion, '8.0.1', '>=')) ||
-            (strpos($databaseVersion, 'MariaDB') && version_compare(Str::after($databaseVersion, '-'), '10.6.0', '>=')) ||
+        if (($databaseEngine === 'mysql' && ! strpos($databaseVersion, 'MariaDB') && version_compare($databaseVersion, '8.0.1', '>=')) ||
+            (strpos($databaseVersion, 'MariaDB') && version_compare(Str::after($databaseVersion, '5.5.5-'), '10.6.0', '>=')) ||
             ($databaseEngine === 'pgsql' && version_compare($databaseVersion, '9.5', '>='))) {
             return 'FOR UPDATE SKIP LOCKED';
         }
