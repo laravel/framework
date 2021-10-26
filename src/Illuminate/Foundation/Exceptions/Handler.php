@@ -418,7 +418,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldReturnJson(request)
     {
-        return return $request->expectsJson();
+        return $request->expectsJson();
     }
 
     /**
