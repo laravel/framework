@@ -377,3 +377,18 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('when')) {
+    /**
+     * If condition is true call the given Closure with the condition value then return the result.
+     *
+     * @param  mixed  $condition
+     * @param  callable  $callback
+     * @param  mixed  $otherwise
+     * @return mixed
+     */
+    function when($condition, callable $callback, $otherwise = null)
+    {
+        return $condition ? $callback($condition) : $otherwise;
+    }
+}
