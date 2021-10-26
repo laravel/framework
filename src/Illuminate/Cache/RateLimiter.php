@@ -153,6 +153,6 @@ class RateLimiter
      */
     public function cleanRateLimiterKey($key)
     {
-        return preg_replace("/&([a-z])[a-z]+;/i", "$1", htmlentities($key));
+        return preg_replace('/&([a-z])[a-z]+;/i', '$1', htmlentities($key));
     }
 }
