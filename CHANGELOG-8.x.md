@@ -1,6 +1,21 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.66.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.67.0...8.x)
+
+
+## [v8.67.0 (2021-10-22)](https://github.com/laravel/framework/compare/v8.66.0...v8.67.0)
+
+### Added
+- Added support for MariaDB to skip locked rows with the database queue driver ([#39311](https://github.com/laravel/framework/pull/39311))
+- Added PHP 8.1 Support ([#39034](https://github.com/laravel/framework/pull/39034))
+
+### Fixed
+- Fixed translation bug ([#39298](https://github.com/laravel/framework/pull/39298))
+- Fixed Illuminate/Database/DetectsConcurrencyErrors::causedByConcurrencyError() when code is intager ([#39280](https://github.com/laravel/framework/pull/39280))
+- Fixed unique bug in Bus ([#39302](https://github.com/laravel/framework/pull/39302))
+
+### Changed
+- Only select related columns by default in CanBeOneOfMany::ofMany ([#39307](https://github.com/laravel/framework/pull/39307))
 
 
 ## [v8.66.0 (2021-10-21)](https://github.com/laravel/framework/compare/v8.65.0...v8.66.0)
