@@ -1,6 +1,22 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.67.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.68.0...8.x)
+
+
+## [v8.68.0 (2021-10-26)](https://github.com/laravel/framework/compare/v8.67.0...v8.68.0)
+
+### Added
+- Added ThrottleRequestsWithRedis to $middlewarePriority ([#39316](https://github.com/laravel/framework/pull/39316))
+- Added `Illuminate/Database/Schema/ForeignKeyDefinition::restrictOnUpdate()` ([#39350](https://github.com/laravel/framework/pull/39350))
+- Added `ext-bcmath` as an extension suggestion to the composer.json ([#39360](https://github.com/laravel/framework/pull/39360))
+- Added `TestResponse::dd` ([#39359](https://github.com/laravel/framework/pull/39359))
+
+### Fixed
+- TaggedCache flush should also remove tags from cache ([#39299](https://github.com/laravel/framework/pull/39299))
+- Fixed model serialization on anonymous components ([#39319](https://github.com/laravel/framework/pull/39319))
+
+### Changed
+- Changed to Guess database factory model by default ([#39310](https://github.com/laravel/framework/pull/39310))
 
 
 ## [v8.67.0 (2021-10-22)](https://github.com/laravel/framework/compare/v8.66.0...v8.67.0)
