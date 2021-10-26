@@ -23,7 +23,7 @@ trait InteractsWithContentTypes
      */
     public function expectsJson()
     {
-        return ($this->ajax() && ! $this->pjax() && $this->acceptsAnyContentType()) || Str::contains($this->prefers(['text/html', 'application/json', 'application/ld+json']) ?? '', 'json'));
+        return ($this->ajax() && ! $this->pjax() && $this->acceptsAnyContentType()) || $this->wantsJson();
     }
 
     /**
