@@ -405,9 +405,20 @@ class Handler implements ExceptionHandlerContract
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return $request->expectsJson()
+        return $this->shouldReturnJson($request)
                     ? response()->json(['message' => $exception->getMessage()], 401)
                     : redirect()->guest($exception->redirectTo() ?? route('login'));
+    }
+
+    /**
+     * Determine if the response should be json.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function shouldReturnJson(request)
+    {
+        return return $request->expectsJson();
     }
 
     /**
