@@ -1,6 +1,21 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.65.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.66.0...8.x)
+
+
+## [v8.66.0 (2021-10-21)](https://github.com/laravel/framework/compare/v8.65.0...v8.66.0)
+
+### Added
+- Added withoutDeprecationHandling to testing ([#39261](https://github.com/laravel/framework/pull/39261))
+- Added method for on-demand log creation ([#39273](https://github.com/laravel/framework/pull/39273))
+- Added dateTime to columns that don't need character options ([#39269](https://github.com/laravel/framework/pull/39269))
+- Added `AssertableJson::hasAny` ([#39265](https://github.com/laravel/framework/pull/39265))
+- Added `Arr::isList()` method ([#39277](https://github.com/laravel/framework/pull/39277))
+- Apply withoutGlobalScope in CanBeOneOfMany subqueries ([#39295](https://github.com/laravel/framework/pull/39295))
+- Added `Illuminate/Support/Testing/Fakes/BusFake::assertNothingDispatched()` ([#39286](https://github.com/laravel/framework/pull/39286))
+
+### Reverted
+- Revert ["[8.x] Add gate policy callback"](https://github.com/laravel/framework/pull/39185) ([#39290](https://github.com/laravel/framework/pull/39290))
 
 
 ## [v8.65.0 (2021-10-19)](https://github.com/laravel/framework/compare/v8.64.0...v8.65.0)
