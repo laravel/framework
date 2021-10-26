@@ -416,7 +416,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function shouldReturnJson(request)
+    protected function shouldReturnJson($request)
     {
         return $request->expectsJson();
     }
