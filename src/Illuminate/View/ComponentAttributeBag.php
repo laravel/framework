@@ -119,7 +119,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Return a bag of attributes that have keys starting with the given value / pattern.
      *
-     * @param  array|string  $needles
+     * @param  string|string[]  $needles
      * @return static
      */
     public function whereStartsWith($needles)
@@ -132,7 +132,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Return a bag of attributes with keys that do not start with the given value / pattern.
      *
-     * @param  array|string  $needles
+     * @param  string|string[]  $needles
      * @return static
      */
     public function whereDoesntStartWith($needles)
@@ -145,7 +145,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
     /**
      * Return a bag of attributes that have keys starting with the given value / pattern.
      *
-     * @param  array|string  $needles
+     * @param  string|string[]  $needles
      * @return static
      */
     public function thatStartWith($needles)
