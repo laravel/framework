@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.65.0...8.x)
 
 
-## [v8.65.0 (2021-10-9)](https://github.com/laravel/framework/compare/v8.64.0...v8.65.0)
+## [v8.65.0 (2021-10-19)](https://github.com/laravel/framework/compare/v8.64.0...v8.65.0)
 
 ### Added
 - Allow queueing application and service provider callbacks while callbacks are already being processed ([#39175](https://github.com/laravel/framework/pull/39175), [63dab48](https://github.com/laravel/framework/commit/63dab486a990e26500b1a6520b1493192d6c5104))
