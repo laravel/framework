@@ -150,10 +150,9 @@ if (! function_exists('js')) {
     /**
      * Compile an $expression into JSON.parse(atob('base64_encoded')), Json or string.
      *
-     * @param  mixed    $expression
-     * @param  int|null $options
-     * @param  int      $depth
-     * @return string
+     * @param  mixed  $expression
+     * @param  int|null  $options
+     * @param  int  $depth
      */
     function js($expression, $options = null, $depth = 512)
     {
