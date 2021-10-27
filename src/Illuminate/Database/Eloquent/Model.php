@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -1511,33 +1512,44 @@ abstract class Model implements Arrayable, ArrayAccess, HasBroadcastChannel, Jso
      * Reload a fresh model instance from the database.
      *
      * @param  array|string  $with
+     * @param  \Closure|null  $callback
      * @return static|null
      */
-    public function fresh($with = [])
+    public function fresh($with = [], Closure $callback = null)
     {
         if (! $this->exists) {
             return;
         }
 
-        return $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
-                        ->with(is_string($with) ? func_get_args() : $with)
-                        ->first();
+        $query = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                        ->with(is_string($with) ? func_get_args() : $with);
+
+        if ($callback) {
+            $query = $callback($query);
+        }
+
+        return $query->first();
     }
 
     /**
      * Reload the current model instance with fresh attributes from the database.
      *
+     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function refresh()
+    public function refresh(Closure $callback = null)
     {
         if (! $this->exists) {
             return $this;
         }
 
-        $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())->firstOrFail()->attributes
-        );
+        $query = $this->setKeysForSelectQuery($this->newQueryWithoutScopes());
+
+        if ($callback) {
+            $query = $callback($query);
+        }
+
+        $this->setRawAttributes($query->firstOrFail()->attributes);
 
         $this->load(collect($this->relations)->reject(function ($relation) {
             return $relation instanceof Pivot
