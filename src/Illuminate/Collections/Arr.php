@@ -733,17 +733,22 @@ class Arr
     }
 
     /**
-     * Explode the given key into segments that are delimtied by "dot".
-     * This way, we can also catch the escaped strings that are surrounded
-     * by quote strings, which can contain dots, and treat them as keys instead
-     * of further parsing them down as nested array.
+     * Explode the given key into segments that are delimtied by "dot"
+     * and escape strings that are surrounded by quote strings,
+     * which can contain dots, and treat them as keys instead of nested keys.
      *
      * @param  string  $key
      * @return array
      */
     protected static function explode(string $key)
     {
-        preg_match_all('/(?:"(.+?)"|[^\.]+)/', $key, $matches);
+        if (! Str::contains($key, '"')) {
+            return explode('.', $key);
+        }
+
+        // Search for keys like a."b.c".d and separate them by dots
+        // that are not within quotes.
+        preg_match_all('/(?:"(.+?)"|[^\.\s]+)/', $key, $matches);
 
         [$keys, ] = $matches;
 
