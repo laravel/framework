@@ -351,7 +351,7 @@ class Handler implements ExceptionHandlerContract
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
-        return $request->expectsJson()
+        return $this->shouldReturnJson($request, $e)
                     ? $this->prepareJsonResponse($request, $e)
                     : $this->prepareResponse($request, $e);
     }
@@ -414,9 +414,10 @@ class Handler implements ExceptionHandlerContract
      * Determine if the response should be json.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
      * @return bool
      */
-    protected function shouldReturnJson($request)
+    protected function shouldReturnJson($request, Throwable $e)
     {
         return $request->expectsJson();
     }
@@ -434,7 +435,7 @@ class Handler implements ExceptionHandlerContract
             return $e->response;
         }
 
-        return $request->expectsJson()
+        return $this->shouldReturnJson($request, $e)
                     ? $this->invalidJson($request, $e)
                     : $this->invalid($request, $e);
     }
