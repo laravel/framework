@@ -991,4 +991,35 @@ class SupportArrTest extends TestCase
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
         ], $sortedWithCallable);
     }
+
+    public function testSetKeysThatContainsDot()
+    {
+        $array = [
+            'a' => [],
+            'b' => [],
+        ];
+
+        Arr::set($array, '"a.b/c"', '1');
+        Arr::set($array, 'a."b.c"', '2');
+        Arr::set($array, 'a.b."c"."d"', '3');
+
+        Arr::set($array, 'b.0', '1');
+        Arr::set($array, 'b."1"', '2');
+        Arr::set($array, 'c', '3');
+
+        $this->assertEquals([
+            'a.b/c' => '1',
+            'a' => [
+                'b.c' => '2',
+                'b' => [
+                    'c' => ['d' => '3'],
+                ],
+            ],
+            'b' => [
+                '1',
+                '2',
+            ],
+            'c' => '3',
+        ], $array);
+    }
 }

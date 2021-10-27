@@ -256,7 +256,7 @@ class Arr
                 continue;
             }
 
-            $parts = explode('.', $key);
+            $parts = static::explode($key);
 
             // clean up before each pass
             $array = &$original;
@@ -301,7 +301,7 @@ class Arr
             return $array[$key] ?? value($default);
         }
 
-        foreach (explode('.', $key) as $segment) {
+        foreach (static::explode($key) as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
@@ -334,7 +334,7 @@ class Arr
                 continue;
             }
 
-            foreach (explode('.', $key) as $segment) {
+            foreach (static::explode($key) as $segment) {
                 if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
                     $subKeyArray = $subKeyArray[$segment];
                 } else {
@@ -463,9 +463,9 @@ class Arr
      */
     protected static function explodePluckParameters($value, $key)
     {
-        $value = is_string($value) ? explode('.', $value) : $value;
+        $value = is_string($value) ? static::explode($value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = is_null($key) || is_array($key) ? $key : static::explode($key);
 
         return [$value, $key];
     }
@@ -580,7 +580,7 @@ class Arr
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
+        $keys = static::explode($key);
 
         foreach ($keys as $i => $key) {
             if (count($keys) === 1) {
@@ -713,5 +713,44 @@ class Arr
         }
 
         return is_array($value) ? $value : [$value];
+    }
+
+    /**
+     * Escape strings that start and end with double quotes
+     * and treat them as acual array key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected static function escapeKey(string $key)
+    {
+        if (Str::startsWith($key, '"') && Str::endsWith($key, '"')) {
+            $key = Str::replaceFirst('"', '', $key);
+            $key = Str::replaceLast('"', '', $key);
+        }
+
+        return $key;
+    }
+
+    /**
+     * Explode the given key into segments that are delimtied by "dot".
+     * This way, we can also catch the escaped strings that are surrounded
+     * by quote strings, which can contain dots, and treat them as keys instead
+     * of further parsing them down as nested array.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    protected static function explode(string $key)
+    {
+        preg_match_all('/(?:"(.+?)"|[^\.]+)/', $key, $matches);
+
+        [$keys, ] = $matches;
+
+        foreach ($keys as &$key) {
+            $key = static::escapeKey($key);
+        }
+
+        return $keys;
     }
 }
