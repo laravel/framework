@@ -114,14 +114,14 @@ class Clock implements IClock
 {
     public function utcNow(): string
     {
-        return time();
+        return (string)time();
     }
 }
 
 class CachedClock implements IClock
 {
     public IClock $origin;
-    private ?string $timestamp;
+    private ?string $timestamp = null;
 
     public function __construct(IClock $origin)
     {
@@ -130,7 +130,7 @@ class CachedClock implements IClock
 
     public function utcNow(): string
     {
-        if (!isset($this->timestamp)) {
+        if (is_null($this->timestamp)) {
             $this->timestamp = $this->origin->utcNow();
         }
         return $this->timestamp;
@@ -164,6 +164,7 @@ class ClockFormatter implements IClockFormatter
     public function format(IClock $clock): string
     {
         $timestamp = $clock->utcNow();
+
         return sprintf('[%s]', $timestamp);
     }
 }
@@ -176,5 +177,4 @@ class ClockHolder
     {
         $this->clock = $clock;
     }
-
 }
