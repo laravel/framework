@@ -427,7 +427,7 @@ class Str
         $start = mb_substr($string, 0, mb_strpos($string, $swap, 0, $encoding), $encoding);
         $end = mb_substr($string, mb_strpos($string, $swap, 0, $encoding) + mb_strlen($swap, $encoding));
 
-        return $start . str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($swap, $encoding)) . $end;
+        return $start.str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($swap, $encoding)).$end;
     }
 
     /**
