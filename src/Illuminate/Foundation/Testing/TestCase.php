@@ -15,8 +15,6 @@ use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Throwable;
 
-use function class_uses_recursive;
-
 abstract class TestCase extends BaseTestCase
 {
     use Concerns\InteractsWithContainer,
