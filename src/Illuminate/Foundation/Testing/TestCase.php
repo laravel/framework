@@ -142,15 +142,15 @@ abstract class TestCase extends BaseTestCase
         }
 
         foreach ($uses as $trait => $int) {
-            if (method_exists($this, $method = 'setUp'.$trait)) {
+            if (method_exists($trait, $method = 'setUp'.$trait)) {
                 $this->{$method}();
             }
 
-            if (method_exists($this, $method = 'created'.$trait)) {
+            if (method_exists($trait, $method = 'created'.$trait)) {
                 $this->afterApplicationCreated([$this, $method]);
             }
 
-            if (method_exists($this, $method = 'destroying'.$trait)) {
+            if (method_exists($trait, $method = 'destroying'.$trait)) {
                 $this->beforeApplicationDestroyed([$this, $method]);
             }
         }
