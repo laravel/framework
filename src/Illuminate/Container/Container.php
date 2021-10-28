@@ -1182,12 +1182,11 @@ class Container implements ArrayAccess, ContainerContract
             throw new InvalidArgumentException(sprintf('%s type has not been registered', $abstract));
         }
         $binding = $this->bindings[$abstract];
-        $shared = $binding['shared'];
         $concrete = function ($container, $parameters = []) use ($abstract, $decorator, $binding) {
             $container->addContextualBinding($decorator, $abstract, $binding['concrete']);
-            return $container->make($decorator);
+            return $container->resolve($decorator, $parameters);
         };
-        $this->bindings[$abstract] = compact('concrete', 'shared');
+        $this->bind($abstract, $concrete, $binding['shared']);
     }
 
     /**
