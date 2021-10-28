@@ -141,7 +141,7 @@ abstract class TestCase extends BaseTestCase
             $this->setUpFaker();
         }
 
-        foreach ($uses as $trait => $int) {
+        foreach (array_reverse($uses) as $trait => $int) {
             if (method_exists($trait, $method = 'setUp'.$trait)) {
                 $this->{$method}();
             }
