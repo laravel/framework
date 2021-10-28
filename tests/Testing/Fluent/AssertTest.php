@@ -457,7 +457,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain a value that satisfies closures at [0].');
+        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
 
         $assert->whereContains('foo', [function ($actual) {
             return $actual === 5;
@@ -471,7 +471,7 @@ class AssertTest extends TestCase
         ]);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Property [foo] does not contain a value that satisfies closures at [1].');
+        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
 
         $assert->whereContains('foo', [1, function ($actual) {
             return $actual === 5;
