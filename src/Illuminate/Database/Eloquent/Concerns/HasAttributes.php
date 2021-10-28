@@ -666,7 +666,7 @@ trait HasAttributes
     }
 
     /**
-     * Cast the given attribute using a custom cast class.
+     * Cast the given attribute to an enum.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -922,10 +922,7 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        $this->attributes = array_merge(
-            $this->attributes,
-            [$key => $value->value]
-        );
+        $this->attributes[$key] = $value->value;
     }
 
     /**
