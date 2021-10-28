@@ -6,6 +6,7 @@ use PDO;
 
 /**
  * @requires extension pdo_mysql
+ * @requires OSFAMILY Linux|Darwin
  */
 class DatabaseEmulatePreparesMySqlConnectionTest extends DatabaseMySqlConnectionTest
 {
