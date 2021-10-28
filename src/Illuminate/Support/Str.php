@@ -409,11 +409,11 @@ class Str
      */
     public static function mask($string, $character, $index, $length = null)
     {
-        if ($character === '' || ! $replace = mb_strlen(mb_substr($string, $index, $length, 'UTF-8'), 'UTF-8')) {
+        if ($character === '' || ! $replace = strlen(substr($string, $index, $length))) {
             return $string;
         }
 
-        return substr_replace($string, str_repeat(mb_substr($character, 0, 1, 'UTF-8'), $replace), $index, $length);
+        return substr_replace($string, str_repeat($character[0], $replace), $index, $length);
     }
 
     /**

@@ -691,12 +691,6 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('', 3));
 
         $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->mask('something', 3));
-        $this->assertEquals('tay1111111111111', $this->stringable('taylor@email.com')->mask(12, 3));
-
-        $this->assertEquals('这***', $this->stringable('这是一段中文')->mask('*', 3));
-        $this->assertEquals('******一段中文', $this->stringable('这是一段中文')->mask('*', 0, 6));
-        $this->assertEquals('这是******', $this->stringable('这是一段中文')->mask('*', -12));
-        $this->assertEquals('这是***段中文', $this->stringable('这是一段中文')->mask('*', -12, 3));
     }
 
     public function testRepeat()
