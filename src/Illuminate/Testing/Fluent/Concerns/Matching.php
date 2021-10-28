@@ -124,32 +124,24 @@ trait Matching
             return $actual->containsStrict($search);
         });
 
-        $missingValues = [];
-        $unsatisfiedClosures = [];
-        foreach ($missing as $idx => $condition) {
-            if (! is_string($condition) && is_callable($condition)) {
-                $unsatisfiedClosures[] = $idx;
-            } else {
-                $missingValues[] = (string) $condition;
-            }
+        if ($missing->whereInstanceOf('Closure')->isNotEmpty()) {
+            PHPUnit::assertEmpty(
+                $missing->toArray(),
+                sprintf(
+                    'Property [%s] does not contain a value that passes the truth test within the given closure.',
+                    $key,
+                )
+            );
+        } else {
+            PHPUnit::assertEmpty(
+                $missing->toArray(),
+                sprintf(
+                    'Property [%s] does not contain [%s].',
+                    $key,
+                    implode(', ', array_values($missing->toArray()))
+                )
+            );
         }
-
-        PHPUnit::assertEmpty(
-            $missingValues,
-            sprintf(
-                'Property [%s] does not contain [%s].',
-                $key,
-                implode(', ', array_values($missingValues))
-            )
-        );
-        PHPUnit::assertEmpty(
-            $unsatisfiedClosures,
-            sprintf(
-                'Property [%s] does not contain a value that satisfies closures at [%s].',
-                $key,
-                implode(', ', array_values($unsatisfiedClosures))
-            )
-        );
 
         return $this;
     }

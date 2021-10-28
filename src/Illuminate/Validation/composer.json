@@ -37,6 +37,7 @@
         }
     },
     "suggest": {
+        "ext-bcmath": "Required to use the multiple_of validation rule.",
         "illuminate/database": "Required to use the database presence verifier (^8.0)."
     },
     "config": {

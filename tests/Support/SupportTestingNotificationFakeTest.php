@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Exception;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
@@ -57,6 +58,22 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->send($this->user, new NotificationStub);
 
         $this->fake->assertSentTo($this->user, function (NotificationStub $notification) {
+            return true;
+        });
+    }
+
+    public function testAssertSentOnDemand()
+    {
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->assertSentOnDemand(NotificationStub::class);
+    }
+
+    public function testAssertSentOnDemandClosure()
+    {
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->assertSentOnDemand(NotificationStub::class, function (NotificationStub $notification) {
             return true;
         });
     }
@@ -132,6 +149,32 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->fake->send(new UserStub, new NotificationStub);
 
         $this->fake->assertTimesSent(3, NotificationStub::class);
+    }
+
+    public function testAssertSentToTimes()
+    {
+        $this->fake->assertSentToTimes($this->user, NotificationStub::class, 0);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->assertSentToTimes($this->user, NotificationStub::class, 3);
+    }
+
+    public function testAssertSentOnDemandTimes()
+    {
+        $this->fake->assertSentOnDemandTimes(NotificationStub::class, 0);
+
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->send(new AnonymousNotifiable, new NotificationStub);
+
+        $this->fake->assertSentOnDemandTimes(NotificationStub::class, 3);
     }
 
     public function testAssertSentToWhenNotifiableHasPreferredLocale()

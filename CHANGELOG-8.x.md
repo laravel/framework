@@ -1,6 +1,80 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.64.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.68.0...8.x)
+
+
+## [v8.68.0 (2021-10-26)](https://github.com/laravel/framework/compare/v8.67.0...v8.68.0)
+
+### Added
+- Added ThrottleRequestsWithRedis to $middlewarePriority ([#39316](https://github.com/laravel/framework/pull/39316))
+- Added `Illuminate/Database/Schema/ForeignKeyDefinition::restrictOnUpdate()` ([#39350](https://github.com/laravel/framework/pull/39350))
+- Added `ext-bcmath` as an extension suggestion to the composer.json ([#39360](https://github.com/laravel/framework/pull/39360))
+- Added `TestResponse::dd` ([#39359](https://github.com/laravel/framework/pull/39359))
+
+### Fixed
+- TaggedCache flush should also remove tags from cache ([#39299](https://github.com/laravel/framework/pull/39299))
+- Fixed model serialization on anonymous components ([#39319](https://github.com/laravel/framework/pull/39319))
+
+### Changed
+- Changed to Guess database factory model by default ([#39310](https://github.com/laravel/framework/pull/39310))
+
+
+## [v8.67.0 (2021-10-22)](https://github.com/laravel/framework/compare/v8.66.0...v8.67.0)
+
+### Added
+- Added support for MariaDB to skip locked rows with the database queue driver ([#39311](https://github.com/laravel/framework/pull/39311))
+- Added PHP 8.1 Support ([#39034](https://github.com/laravel/framework/pull/39034))
+
+### Fixed
+- Fixed translation bug ([#39298](https://github.com/laravel/framework/pull/39298))
+- Fixed Illuminate/Database/DetectsConcurrencyErrors::causedByConcurrencyError() when code is intager ([#39280](https://github.com/laravel/framework/pull/39280))
+- Fixed unique bug in Bus ([#39302](https://github.com/laravel/framework/pull/39302))
+
+### Changed
+- Only select related columns by default in CanBeOneOfMany::ofMany ([#39307](https://github.com/laravel/framework/pull/39307))
+
+
+## [v8.66.0 (2021-10-21)](https://github.com/laravel/framework/compare/v8.65.0...v8.66.0)
+
+### Added
+- Added withoutDeprecationHandling to testing ([#39261](https://github.com/laravel/framework/pull/39261))
+- Added method for on-demand log creation ([#39273](https://github.com/laravel/framework/pull/39273))
+- Added dateTime to columns that don't need character options ([#39269](https://github.com/laravel/framework/pull/39269))
+- Added `AssertableJson::hasAny` ([#39265](https://github.com/laravel/framework/pull/39265))
+- Added `Arr::isList()` method ([#39277](https://github.com/laravel/framework/pull/39277))
+- Apply withoutGlobalScope in CanBeOneOfMany subqueries ([#39295](https://github.com/laravel/framework/pull/39295))
+- Added `Illuminate/Support/Testing/Fakes/BusFake::assertNothingDispatched()` ([#39286](https://github.com/laravel/framework/pull/39286))
+
+### Reverted
+- Revert ["[8.x] Add gate policy callback"](https://github.com/laravel/framework/pull/39185) ([#39290](https://github.com/laravel/framework/pull/39290))
+
+
+## [v8.65.0 (2021-10-19)](https://github.com/laravel/framework/compare/v8.64.0...v8.65.0)
+
+### Added
+- Allow queueing application and service provider callbacks while callbacks are already being processed ([#39175](https://github.com/laravel/framework/pull/39175), [63dab48](https://github.com/laravel/framework/commit/63dab486a990e26500b1a6520b1493192d6c5104))
+- Added ability to validate one of multiple date formats ([#39170](https://github.com/laravel/framework/pull/39170))
+- Re-add update from support for PostgreSQL ([#39151](https://github.com/laravel/framework/pull/39151))
+- Added `Illuminate/Collections/Traits/EnumeratesValues::reduceSpread()` ([a01e9ed](https://github.com/laravel/framework/commit/a01e9edfadb140559d1bbf9999dda49148bfa5f7))
+- Added `Illuminate/Testing/TestResponse::assertRedirectContains()` ([#39233](https://github.com/laravel/framework/pull/39233), [ff340a6](https://github.com/laravel/framework/commit/ff340a6809d07b349aa227c2e4caf3a3ad8f47d5))
+- Added gate policy callback ([#39185](https://github.com/laravel/framework/pull/39185))
+- Allow Remember Me cookie time to be overriden ([#39186](https://github.com/laravel/framework/pull/39186))
+- Adds `--test` and `--pest` options to various `make` commands ([#38997](https://github.com/laravel/framework/pull/38997))
+- Added new lost connection message to DetectsLostConnections for Vapor ([#39209](https://github.com/laravel/framework/pull/39209))
+- Added `Illuminate/Support/Testing/Fakes/NotificationFake::assertSentOnDemand()` ([#39203](https://github.com/laravel/framework/pull/39203))
+- Added Subset in request's collect ([#39191](https://github.com/laravel/framework/pull/39191))
+- Added Conditional trait to Eloquent Factory ([#39228](https://github.com/laravel/framework/pull/39228))
+- Added a way to skip count check but check $callback at the same time for AssertableJson->has() ([#39224](https://github.com/laravel/framework/pull/39224))
+- Added `Illuminate/Support/Str::headline()` ([#39174](https://github.com/laravel/framework/pull/39174))
+
+### Deprecated
+- Deprecate `reduceMany` in favor of `reduceSpread` in `Illuminate/Collections/Traits/EnumeratesValues` ([#39201](https://github.com/laravel/framework/pull/39201))
+
+### Fixed
+- Fixed HasOneOfMany with callback issue ([#39187](https://github.com/laravel/framework/pull/39187))
+
+### Changed
+- Logs deprecations instead of treating them as exceptions ([#39219](https://github.com/laravel/framework/pull/39219))
 
 
 ## [v8.64.0 (2021-10-12)](https://github.com/laravel/framework/compare/v8.63.0...v8.64.0)
