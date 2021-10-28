@@ -153,6 +153,7 @@ if (! function_exists('js')) {
      * @param  mixed  $expression
      * @param  int|null  $options
      * @param  int  $depth
+     * @return string
      */
     function js($expression, $options = null, $depth = 512)
     {
