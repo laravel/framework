@@ -180,4 +180,13 @@ interface Container extends ContainerInterface
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);
+
+    /**
+     * Decorate already registered service.
+     *
+     * @param  string  $abstract
+     * @param  string  $decorator
+     * @return void
+     */
+    public function decorate($abstract, $decorator);
 }
