@@ -5,14 +5,13 @@ namespace Illuminate\Tests\Http;
 use Illuminate\Http\Testing\FileFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @requires extension gd
+ */
 class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
     {
-        if (! function_exists('imagepng')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without PNG support.');
-        }
-
         $image = (new FileFactory)->image('test.png', 15, 20);
 
         $info = getimagesize($image->getRealPath());
@@ -24,10 +23,6 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
-        if (! function_exists('imagejpeg')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without JPEG support.');
-        }
-
         $jpeg = (new FileFactory)->image('test.jpeg', 15, 20);
         $jpg = (new FileFactory)->image('test.jpg');
 
@@ -44,10 +39,6 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
-        if (! function_exists('imagegif')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without GIF support.');
-        }
-
         $image = (new FileFactory)->image('test.gif');
 
         $this->assertSame(
@@ -58,10 +49,6 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
-        if (! function_exists('imagewebp')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without WEBP support.');
-        }
-
         $image = (new FileFactory)->image('test.webp');
 
         $this->assertSame(
@@ -72,10 +59,6 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
-        if (! function_exists('imagewbmp')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without WBMP support.');
-        }
-
         $image = (new FileFactory)->image('test.wbmp');
 
         $this->assertSame(
@@ -86,10 +69,6 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageBmp()
     {
-        if (! function_exists('imagebmp')) {
-            $this->markTestSkipped('The extension gd is missing from your system or was compiled without BMP support.');
-        }
-
         $image = (new FileFactory)->image('test.bmp');
 
         $imagePath = $image->getRealPath();

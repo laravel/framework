@@ -138,14 +138,13 @@ class PhpRedisCacheLockTest extends TestCase
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
     }
 
+    /**
+     * @requires extension lzf
+     */
     public function testRedisLockCanBeAcquiredAndReleasedWithLzfCompression()
     {
         if (! defined('Redis::COMPRESSION_LZF')) {
             $this->markTestSkipped('Redis extension is not configured to support the lzf compression.');
-        }
-
-        if (! extension_loaded('lzf')) {
-            $this->markTestSkipped('Lzf extension is not installed.');
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
@@ -168,14 +167,13 @@ class PhpRedisCacheLockTest extends TestCase
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
     }
 
+    /**
+     * @requires extension zstd
+     */
     public function testRedisLockCanBeAcquiredAndReleasedWithZstdCompression()
     {
         if (! defined('Redis::COMPRESSION_ZSTD')) {
             $this->markTestSkipped('Redis extension is not configured to support the zstd compression.');
-        }
-
-        if (! extension_loaded('zstd')) {
-            $this->markTestSkipped('Zstd extension is not installed.');
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');
@@ -217,14 +215,13 @@ class PhpRedisCacheLockTest extends TestCase
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
     }
 
+    /**
+     * @requires extension lz4
+     */
     public function testRedisLockCanBeAcquiredAndReleasedWithLz4Compression()
     {
         if (! defined('Redis::COMPRESSION_LZ4')) {
             $this->markTestSkipped('Redis extension is not configured to support the lz4 compression.');
-        }
-
-        if (! extension_loaded('lz4')) {
-            $this->markTestSkipped('Lz4 extension is not installed.');
         }
 
         $this->markTestIncomplete(
@@ -271,14 +268,13 @@ class PhpRedisCacheLockTest extends TestCase
         $this->assertNull($store->lockConnection()->get($store->getPrefix().'foo'));
     }
 
+    /**
+     * @requires extension Lzf
+     */
     public function testRedisLockCanBeAcquiredAndReleasedWithSerializationAndCompression()
     {
         if (! defined('Redis::COMPRESSION_LZF')) {
             $this->markTestSkipped('Redis extension is not configured to support the lzf compression.');
-        }
-
-        if (! extension_loaded('lzf')) {
-            $this->markTestSkipped('Lzf extension is not installed.');
         }
 
         $this->app['config']->set('database.redis.client', 'phpredis');

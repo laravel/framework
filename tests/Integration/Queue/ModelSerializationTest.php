@@ -284,12 +284,11 @@ class ModelSerializationTest extends TestCase
         $this->assertInstanceOf(ModelSerializationTestCustomUserCollection::class, $unserialized->users);
     }
 
+    /**
+     * @requires php < 7.4
+     */
     public function testItSerializesTypedProperties()
     {
-        if (version_compare(phpversion(), '7.4.0-dev', '<')) {
-            $this->markTestSkipped('Typed properties are only available from PHP 7.4 and up.');
-        }
-
         require_once __DIR__.'/typed-properties.php';
 
         $user = ModelSerializationTestUser::create([
