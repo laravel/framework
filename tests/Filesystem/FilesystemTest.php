@@ -494,7 +494,7 @@ class FilesystemTest extends TestCase
 
     /**
      * @requires extension pcntl
-     * @requires OS Linux
+     * @requires OS Linux|Darwin
      */
     public function testSharedGet()
     {
