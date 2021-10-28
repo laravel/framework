@@ -123,11 +123,11 @@ abstract class TestCase extends BaseTestCase
                 $this->{$method}();
             }
 
-            if (method_exists($this, $method = 'after' . $trait)) {
+            if (method_exists($this, $method = 'created' . $trait)) {
                 $this->afterApplicationCreated([$this, $method]);
             }
 
-            if (method_exists($this, $method = 'before' . $trait)) {
+            if (method_exists($this, $method = 'destroying' . $trait)) {
                 $this->beforeApplicationDestroyed([$this, $method]);
             }
         }
