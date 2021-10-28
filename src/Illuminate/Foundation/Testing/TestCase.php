@@ -10,13 +10,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Str;
+use function method_exists;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Throwable;
-
-use function array_flip;
-use function method_exists;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -119,15 +117,15 @@ abstract class TestCase extends BaseTestCase
     protected function setUpTraits()
     {
         foreach ($uses = class_uses_recursive(static::class) as $trait) {
-            if (method_exists($this, $method = 'setUp' . $trait)) {
+            if (method_exists($this, $method = 'setUp'.$trait)) {
                 $this->{$method}();
             }
 
-            if (method_exists($this, $method = 'created' . $trait)) {
+            if (method_exists($this, $method = 'created'.$trait)) {
                 $this->afterApplicationCreated([$this, $method]);
             }
 
-            if (method_exists($this, $method = 'destroying' . $trait)) {
+            if (method_exists($this, $method = 'destroying'.$trait)) {
                 $this->beforeApplicationDestroyed([$this, $method]);
             }
         }
