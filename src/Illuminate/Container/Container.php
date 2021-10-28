@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
+use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
@@ -1166,6 +1167,27 @@ class Container implements ArrayAccess, ContainerContract
         } else {
             $this->afterResolvingCallbacks[$abstract][] = $callback;
         }
+    }
+
+    /**
+     * Decorate already registered service.
+     *
+     * @param  string  $abstract
+     * @param  string  $decorator
+     * @return void
+     */
+    public function decorate($abstract, $decorator)
+    {
+        if (!isset($this->bindings[$abstract])) {
+            throw new InvalidArgumentException(sprintf('%s type has not been registered', $abstract));
+        }
+        $binding = $this->bindings[$abstract];
+        $shared = $binding['shared'];
+        $concrete = function ($container, $parameters = []) use ($abstract, $decorator, $binding) {
+            $container->addContextualBinding($decorator, $abstract, $binding['concrete']);
+            return $container->make($decorator);
+        };
+        $this->bindings[$abstract] = compact('concrete', 'shared');
     }
 
     /**
