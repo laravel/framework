@@ -405,23 +405,29 @@ class Str
      * @param  string  $character
      * @param  int  $index
      * @param  int|null  $length
+     * @param  string  $encoding
      * @return string
      */
-    public static function mask($string, $character, $index, $length = null)
+    public static function mask($string, $character, $index, $length = null, $encoding = 'UTF-8')
     {
-        if ($character === '') {
+        if ('' === $character) {
             return $string;
         }
 
-        if (null === $length) {
-            return substr_replace(
-                $string, str_repeat($character[0], strlen(substr($string, $index))), $index
-            );
+        // On older versions, if length is null an empty string is returned.
+        if (null === $length && PHP_MAJOR_VERSION < 8) {
+            $length = mb_strlen($string, $encoding);
         }
 
-        return substr_replace(
-            $string, str_repeat($character[0], strlen(substr($string, $index, $length))), $index, $length
-        );
+        // When the index is out of bounds, there is nothing to replace.
+        if ('' === $swap = mb_substr($string, $index, $length, $encoding)) {
+            return $string;
+        }
+
+        $start = mb_substr($string, 0, mb_strpos($string, $swap, 0, $encoding), $encoding);
+        $end = mb_substr($string, mb_strpos($string, $swap, 0, $encoding) + mb_strlen($swap, $encoding));
+
+        return $start . str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($swap, $encoding)) . $end;
     }
 
     /**

@@ -467,6 +467,10 @@ class SupportStrTest extends TestCase
         $this->assertSame('taylor@email.com', Str::mask('taylor@email.com', '', 3));
 
         $this->assertSame('taysssssssssssss', Str::mask('taylor@email.com', 'something', 3));
+        $this->assertSame('taysssssssssssss', Str::mask('taylor@email.com', Str::of('something'), 3));
+
+        $this->assertSame('这是一***', Str::mask('这是一段中文', '*', 3));
+        $this->assertSame('**一段中文', Str::mask('这是一段中文', '*', 0, 2));
     }
 
     public function testMatch()

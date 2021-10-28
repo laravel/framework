@@ -348,11 +348,12 @@ class Stringable implements JsonSerializable
      * @param  string  $character
      * @param  int  $index
      * @param  int|null  $length
+     * @param  string  $encoding
      * @return static
      */
-    public function mask($character, $index, $length = null)
+    public function mask($character, $index, $length = null, $encoding = 'UTF-8')
     {
-        return new static(Str::mask($this->value, $character, $index, $length));
+        return new static(Str::mask($this->value, $character, $index, $length, $encoding));
     }
 
     /**
