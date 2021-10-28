@@ -88,6 +88,11 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
+        /* @link https://github.com/php-memcached-dev/php-memcached/pull/468 */
+        if (version_compare(phpversion(), '8.0.0', '>=')) {
+            $this->markTestSkipped('Test broken due to parse error in PHP Memcached.');
+        }
+
         $memcached = m::mock(Memcached::class);
         $memcached->shouldReceive('increment')->with('foo', 5)->once()->andReturn(5);
 
@@ -99,6 +104,11 @@ class CacheMemcachedStoreTest extends TestCase
     {
         if (! class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
+        }
+
+        /* @link https://github.com/php-memcached-dev/php-memcached/pull/468 */
+        if (version_compare(phpversion(), '8.0.0', '>=')) {
+            $this->markTestSkipped('Test broken due to parse error in PHP Memcached.');
         }
 
         $memcached = m::mock(Memcached::class);
