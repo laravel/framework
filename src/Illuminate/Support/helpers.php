@@ -158,15 +158,16 @@ if (! function_exists('js')) {
     {
         if (is_object($expression) || is_array($expression)) {
             $base64 = base64_encode(json_encode($expression, $options, $depth));
-            
+
             return "JSON.parse(atob('$base64'))";
         }
+
         if (is_string($expression)) {
             $string = str_replace("'", "\'", $expression);
-            
+
             return "'$string'";
         }
-        
+
         return json_encode($expression, $options, $depth);
     }
 }
