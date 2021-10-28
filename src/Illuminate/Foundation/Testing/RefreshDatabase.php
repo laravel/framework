@@ -11,7 +11,7 @@ trait RefreshDatabase
      *
      * @return void
      */
-    public function refreshDatabase()
+    public function setUpRefreshDatabase()
     {
         $this->usingInMemoryDatabase()
                         ? $this->refreshInMemoryDatabase()

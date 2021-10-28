@@ -15,6 +15,9 @@ use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Throwable;
 
+use function array_flip;
+use function method_exists;
+
 abstract class TestCase extends BaseTestCase
 {
     use Concerns\InteractsWithContainer,
@@ -115,30 +118,18 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        foreach ($uses = class_uses_recursive(static::class) as $trait) {
+            if (method_exists($this, $method = 'setUp' . $trait)) {
+                $this->{$method}();
+            }
 
-        if (isset($uses[RefreshDatabase::class])) {
-            $this->refreshDatabase();
-        }
+            if (method_exists($this, $method = 'after' . $trait)) {
+                $this->afterApplicationCreated([$this, $method]);
+            }
 
-        if (isset($uses[DatabaseMigrations::class])) {
-            $this->runDatabaseMigrations();
-        }
-
-        if (isset($uses[DatabaseTransactions::class])) {
-            $this->beginDatabaseTransaction();
-        }
-
-        if (isset($uses[WithoutMiddleware::class])) {
-            $this->disableMiddlewareForAllTests();
-        }
-
-        if (isset($uses[WithoutEvents::class])) {
-            $this->disableEventsForAllTests();
-        }
-
-        if (isset($uses[WithFaker::class])) {
-            $this->setUpFaker();
+            if (method_exists($this, $method = 'before' . $trait)) {
+                $this->beforeApplicationDestroyed([$this, $method]);
+            }
         }
 
         return $uses;
