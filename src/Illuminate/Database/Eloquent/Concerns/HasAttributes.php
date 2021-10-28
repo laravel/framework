@@ -597,7 +597,7 @@ trait HasAttributes
             case 'decimal':
                 return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
             case 'string':
-                return (string) $value;
+                return Str::of($value);
             case 'bool':
             case 'boolean':
                 return (bool) $value;
