@@ -411,18 +411,6 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
-     * Determine if the response should be json.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * @return bool
-     */
-    protected function shouldReturnJson($request, Throwable $e)
-    {
-        return $request->expectsJson();
-    }
-
-    /**
      * Create a response object from the given validation exception.
      *
      * @param  \Illuminate\Validation\ValidationException  $e
@@ -467,6 +455,18 @@ class Handler implements ExceptionHandlerContract
             'message' => $exception->getMessage(),
             'errors' => $exception->errors(),
         ], $exception->status);
+    }
+
+    /**
+     * Determine if the exception handler response should be JSON.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function shouldReturnJson($request, Throwable $e)
+    {
+        return $request->expectsJson();
     }
 
     /**
