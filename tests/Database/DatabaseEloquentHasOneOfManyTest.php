@@ -8,9 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group one-of-many
- */
 class DatabaseEloquentHasOneOfManyTest extends TestCase
 {
     protected function setUp(): void
