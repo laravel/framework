@@ -8,7 +8,7 @@ use stdClass;
 
 /**
  * @requires extension pdo_mysql
- * @requires OSFAMILY Linux|Darwin
+ * @requires OS Linux|Darwin
  */
 class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
 {

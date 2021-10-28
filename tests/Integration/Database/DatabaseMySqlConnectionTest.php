@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * @requires extension pdo_mysql
- * @requires OSFAMILY Linux|Darwin
+ * @requires OS Linux|Darwin
  */
 class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
 {

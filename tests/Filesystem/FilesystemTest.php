@@ -100,7 +100,7 @@ class FilesystemTest extends TestCase
     }
 
     /**
-     * @requires OSFAMILY Linux|Darwin
+     * @requires OS Linux|Darwin
      */
     public function testReplaceWhenUnixSymlinkExists()
     {
@@ -494,7 +494,7 @@ class FilesystemTest extends TestCase
 
     /**
      * @requires extension pcntl
-     * @requires OSFAMILY Linux
+     * @requires OS Linux
      */
     public function testSharedGet()
     {

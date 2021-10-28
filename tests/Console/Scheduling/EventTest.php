@@ -17,7 +17,7 @@ class EventTest extends TestCase
     }
 
     /**
-     * @requires OSFAMILY Linux|Darwin
+     * @requires OS Linux|Darwin
      */
     public function testBuildCommandUsingUnix()
     {
@@ -27,7 +27,7 @@ class EventTest extends TestCase
     }
 
     /**
-     * @requires OSFAMILY Windows
+     * @requires OS Windows
      */
     public function testBuildCommandUsingWindows()
     {
@@ -37,7 +37,7 @@ class EventTest extends TestCase
     }
 
     /**
-     * @requires OSFAMILY Linux|Darwin
+     * @requires OS Linux|Darwin
      */
     public function testBuildCommandInBackgroundUsingUnix()
     {
@@ -50,7 +50,7 @@ class EventTest extends TestCase
     }
 
     /**
-     * @requires OSFAMILY Windows
+     * @requires OS Windows
      */
     public function testBuildCommandInBackgroundUsingWindows()
     {
