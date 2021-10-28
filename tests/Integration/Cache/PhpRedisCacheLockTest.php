@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 use Redis;
 
-/**
- * @group integration
- */
 class PhpRedisCacheLockTest extends TestCase
 {
     use InteractsWithRedis;

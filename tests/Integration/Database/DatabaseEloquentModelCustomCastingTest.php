@@ -13,9 +13,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 {
     protected function setUp(): void

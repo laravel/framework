@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use stdClass;
 
-/**
- * @group integration
- */
 class EloquentModelJsonCastingTest extends DatabaseTestCase
 {
     protected function setUp(): void

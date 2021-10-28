@@ -4,9 +4,6 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Support\Facades\Cache;
 
-/**
- * @group integration
- */
 class MemcachedTaggedCacheTestCase extends MemcachedIntegrationTestCase
 {
     public function testMemcachedCanStoreAndRetrieveTaggedCacheItems()

@@ -5,9 +5,6 @@ namespace Illuminate\Tests\Integration\Cache;
 use Memcached;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 abstract class MemcachedIntegrationTestCase extends TestCase
 {
     protected function setUp(): void

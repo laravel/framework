@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
-/**
- * @group integration
- */
 class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 {
     protected $encrypter;

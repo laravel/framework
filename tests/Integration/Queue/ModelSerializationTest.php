@@ -11,9 +11,6 @@ use LogicException;
 use Orchestra\Testbench\TestCase;
 use Schema;
 
-/**
- * @group integration
- */
 class ModelSerializationTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

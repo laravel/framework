@@ -5,9 +5,6 @@ namespace Illuminate\Tests\Integration\View;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class BladeTest extends TestCase
 {
     public function test_basic_blade_rendering()
