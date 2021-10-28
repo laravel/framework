@@ -9,7 +9,7 @@ trait DatabaseTransactions
      *
      * @return void
      */
-    public function setUpDatabaseTransactions()
+    public function beginDatabaseTransaction()
     {
         $database = $this->app->make('db');
 

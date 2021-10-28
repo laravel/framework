@@ -19,7 +19,7 @@ trait WithFaker
      *
      * @return void
      */
-    protected function setUpWithFaker()
+    protected function setUpFaker()
     {
         $this->faker = $this->makeFaker();
     }

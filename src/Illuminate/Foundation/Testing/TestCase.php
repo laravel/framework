@@ -15,6 +15,8 @@ use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Throwable;
 
+use function class_uses_recursive;
+
 abstract class TestCase extends BaseTestCase
 {
     use Concerns\InteractsWithContainer,
@@ -115,7 +117,33 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
-        foreach ($uses = class_uses_recursive(static::class) as $trait) {
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[RefreshDatabase::class])) {
+            $this->refreshDatabase();
+        }
+
+        if (isset($uses[DatabaseMigrations::class])) {
+            $this->runDatabaseMigrations();
+        }
+
+        if (isset($uses[DatabaseTransactions::class])) {
+            $this->beginDatabaseTransaction();
+        }
+
+        if (isset($uses[WithoutMiddleware::class])) {
+            $this->disableMiddlewareForAllTests();
+        }
+
+        if (isset($uses[WithoutEvents::class])) {
+            $this->disableEventsForAllTests();
+        }
+
+        if (isset($uses[WithFaker::class])) {
+            $this->setUpFaker();
+        }
+
+        foreach ($uses as $trait => $int) {
             if (method_exists($this, $method = 'setUp'.$trait)) {
                 $this->{$method}();
             }
