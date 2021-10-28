@@ -21,7 +21,7 @@ class FilesystemTest extends TestCase
      */
     public static function setUpTempDir()
     {
-        self::$tempDir = sys_get_temp_dir() .  '/tmp';
+        self::$tempDir = sys_get_temp_dir().'/tmp';
         mkdir(self::$tempDir);
     }
 
