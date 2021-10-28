@@ -11,9 +11,6 @@ use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * @group integration
- */
 class CompiledRouteCollectionTest extends TestCase
 {
     /**

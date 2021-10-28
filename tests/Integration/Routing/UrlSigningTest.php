@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class UrlSigningTest extends TestCase
 {
     public function testSigningUrl()

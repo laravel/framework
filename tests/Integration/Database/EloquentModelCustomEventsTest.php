@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentModelCustomEventsTest extends DatabaseTestCase
 {
     protected function setUp(): void

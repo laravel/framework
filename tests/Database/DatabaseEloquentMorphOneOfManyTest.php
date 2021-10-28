@@ -6,9 +6,6 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group one-of-many
- */
 class DatabaseEloquentMorphOneOfManyTest extends TestCase
 {
     protected function setUp(): void

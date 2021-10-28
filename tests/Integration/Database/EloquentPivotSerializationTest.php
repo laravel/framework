@@ -10,9 +10,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentPivotSerializationTest extends DatabaseTestCase
 {
     protected function setUp(): void

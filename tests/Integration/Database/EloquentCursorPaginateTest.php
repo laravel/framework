@@ -8,9 +8,6 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentCursorPaginateTest extends DatabaseTestCase
 {
     protected function setUp(): void

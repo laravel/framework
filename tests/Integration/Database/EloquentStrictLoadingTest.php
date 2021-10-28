@@ -8,9 +8,6 @@ use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentStrictLoadingTest extends DatabaseTestCase
 {
     protected function setUp(): void

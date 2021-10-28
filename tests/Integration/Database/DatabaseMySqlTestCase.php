@@ -16,7 +16,7 @@ abstract class DatabaseMySqlTestCase extends TestCase
     {
         parent::setUp();
 
-        if (! isset($_SERVER['CI']) || windows_os()) {
+        if (! isset($_SERVER['CI'])) {
             $this->markTestSkipped('This test is only executed on CI.');
         }
     }

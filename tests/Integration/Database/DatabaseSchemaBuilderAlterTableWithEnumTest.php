@@ -6,8 +6,31 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
+/**
+ * @requires extension pdo_mysql
+ * @requires OS Linux|Darwin
+ */
 class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('name');
+            $table->string('age');
+            $table->enum('color', ['red', 'blue']);
+        });
+    }
+
+    protected function tearDown(): void
+    {
+        Schema::drop('users');
+
+        parent::tearDown();
+    }
+
     public function testRenameColumnOnTableWithEnum()
     {
         Schema::table('users', function (Blueprint $table) {
@@ -44,24 +67,5 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
         $tables = Schema::getAllTables();
         $this->assertCount(2, $tables);
         Schema::drop('posts');
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Schema::create('users', function (Blueprint $table) {
-            $table->integer('id');
-            $table->string('name');
-            $table->string('age');
-            $table->enum('color', ['red', 'blue']);
-        });
-    }
-
-    protected function tearDown(): void
-    {
-        Schema::drop('users');
-
-        parent::tearDown();
     }
 }

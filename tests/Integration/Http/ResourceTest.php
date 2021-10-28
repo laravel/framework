@@ -35,9 +35,6 @@ use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class ResourceTest extends TestCase
 {
     public function testResourcesMayBeConvertedToJson()

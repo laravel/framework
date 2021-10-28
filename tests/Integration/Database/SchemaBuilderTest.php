@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
-/**
- * @group integration
- */
 class SchemaBuilderTest extends DatabaseTestCase
 {
     public function testDropAllTables()

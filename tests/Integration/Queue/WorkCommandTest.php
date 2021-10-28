@@ -9,9 +9,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
-/**
- * @group integration
- */
 class WorkCommandTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

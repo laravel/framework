@@ -5,9 +5,6 @@ namespace Illuminate\Tests\Integration\Foundation;
 use Illuminate\Support\ServiceProvider;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class FoundationServiceProvidersTest extends TestCase
 {
     protected function getPackageProviders($app)

@@ -11,9 +11,6 @@ use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
-/**
- * @group integration
- */
 class QueueConnectionTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

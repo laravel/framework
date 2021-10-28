@@ -192,12 +192,11 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    /**
+     * @requires extension odbc
+     */
     public function testSqlServerConnectCallsCreateConnectionWithPreferredODBC()
     {
-        if (! in_array('odbc', PDO::getAvailableDrivers())) {
-            $this->markTestSkipped('PHP was compiled without PDO ODBC support.');
-        }
-
         $config = ['odbc' => true, 'odbc_datasource_name' => 'server=localhost;database=test;'];
         $dsn = $this->getDsn($config);
         $connector = $this->getMockBuilder(SqlServerConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();

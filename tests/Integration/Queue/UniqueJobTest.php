@@ -14,9 +14,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class UniqueJobTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

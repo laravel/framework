@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JobChainingTest extends TestCase
 {
     public static $catchCallbackRan = false;
