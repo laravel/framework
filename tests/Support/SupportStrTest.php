@@ -451,6 +451,30 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
     }
 
+    public function testMask()
+    {
+        $this->assertSame('tay*************', Str::mask('taylor@email.com', '*', 3));
+        $this->assertSame('******@email.com', Str::mask('taylor@email.com', '*', 0, 6));
+        $this->assertSame('tay*************', Str::mask('taylor@email.com', '*', -13));
+        $this->assertSame('tay***@email.com', Str::mask('taylor@email.com', '*', -13, 3));
+
+        $this->assertSame('****************', Str::mask('taylor@email.com', '*', -17));
+        $this->assertSame('*****r@email.com', Str::mask('taylor@email.com', '*', -99, 5));
+
+        $this->assertSame('taylor@email.com', Str::mask('taylor@email.com', '*', 16));
+        $this->assertSame('taylor@email.com', Str::mask('taylor@email.com', '*', 16, 99));
+
+        $this->assertSame('taylor@email.com', Str::mask('taylor@email.com', '', 3));
+
+        $this->assertSame('taysssssssssssss', Str::mask('taylor@email.com', 'something', 3));
+        $this->assertSame('tay1111111111111', Str::mask('taylor@email.com', 12, 3));
+
+        $this->assertSame('这***', Str::mask('这是一段中文', '*', 3));
+        $this->assertSame('******一段中文', Str::mask('这是一段中文', '*', 0, 6));
+        $this->assertSame('这是******', Str::mask('这是一段中文', '*', -12));
+        $this->assertSame('这是***段中文', Str::mask('这是一段中文', '*', -12, 3));
+    }
+
     public function testMatch()
     {
         $this->assertSame('bar', Str::match('/bar/', 'foo bar'));
