@@ -36,7 +36,7 @@ class ParallelTestingTest extends TestCase
                 $this->assertNull($testCase);
             }
 
-            $this->assertEquals(1, $token);
+            $this->assertSame('1', $token);
             $state = true;
         });
 
