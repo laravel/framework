@@ -7,7 +7,6 @@ use ArrayAccess;
 use Mockery as m;
 use LogicException;
 use RuntimeException;
-use Illuminate\Support\Js;
 use Illuminate\Support\Env;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
@@ -724,13 +723,6 @@ class SupportHelpersTest extends TestCase
         $_ENV['foo'] = 'From $_ENV';
         $_SERVER['foo'] = 'From $_SERVER';
         $this->assertSame('From $_SERVER', env('foo'));
-    }
-
-    public function testJsHelper()
-    {
-        $this->assertEquals("'hey'", Js::from('hey'));
-        $this->assertEquals("JSON.parse(atob('eyJoZXkiOiJ0aGVyZSJ9'))", Js::from(['hey' => 'there']));
-        $this->assertEquals("JSON.parse(atob('WyJoZXkiLCJ0aGVyZSJd'))", Js::from(['hey', 'there']));
     }
 
     public function providesPregReplaceArrayData()
