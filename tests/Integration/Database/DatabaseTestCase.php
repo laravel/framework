@@ -10,9 +10,9 @@ abstract class DatabaseTestCase extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
-        $app['config']->set('database.default', 'testbench');
-
         if (! env('DB_CONNECTION')) {
+            $app['config']->set('database.default', 'testbench');
+
             $app['config']->set('database.connections.testbench', [
                 'driver' => 'sqlite',
                 'database' => ':memory:',

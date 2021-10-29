@@ -111,15 +111,6 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
         $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
     }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        Container::setInstance(null);
-
-        m::close();
-    }
 }
 
 class PrunableTestModel extends Model
