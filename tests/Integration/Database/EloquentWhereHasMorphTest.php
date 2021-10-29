@@ -97,9 +97,9 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         try {
             $comments = Comment::whereHasMorph('commentable', '*', function (Builder $query) {
                 $query->where('title', 'foo');
-            })->get();
+            })->orderBy('id')->get();
 
-            $this->assertEquals([4, 1], $comments->pluck('id')->all());
+            $this->assertEquals([1, 4], $comments->pluck('id')->all());
         } finally {
             Relation::morphMap([], false);
         }

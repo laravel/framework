@@ -101,7 +101,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testFromWithAlias()
     {
-        $this->assertSame('select * from "posts" as "alias"', DB::table('posts', 'alias')->toSql());
+        $this->assertCount(2, DB::table('posts', 'alias')->select('alias.*'));
     }
 
     public function testFromWithSubQuery()
