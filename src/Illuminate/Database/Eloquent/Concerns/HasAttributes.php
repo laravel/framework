@@ -265,7 +265,7 @@ trait HasAttributes
             }
 
             if ($this->isEnumCastable($key)) {
-                $attributes[$key] = $attributes[$key]->value;
+                $attributes[$key] = isset($attributes[$key] ) ? $attributes[$key]->value : null;
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -926,7 +926,7 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        $this->attributes[$key] = $value->value;
+        $this->attributes[$key] = isset($value) ? $value->value : null;
     }
 
     /**

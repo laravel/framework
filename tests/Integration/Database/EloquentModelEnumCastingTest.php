@@ -67,6 +67,19 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         ], $model->toArray());
     }
 
+    public function testEnumsAreCastableToArrayWhenNull()
+    {
+        $model = new EloquentModelEnumCastingTestModel([
+            'string_status' => null,
+            'integer_status' => null,
+        ]);
+
+        $this->assertEquals([
+            'string_status' => null,
+            'integer_status' => null,
+        ], $model->toArray());
+    }
+
     public function testEnumsAreConvertedOnSave()
     {
         $model = new EloquentModelEnumCastingTestModel([
@@ -80,6 +93,22 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'id' => $model->id,
             'string_status' => 'pending',
             'integer_status' => 1,
+        ], DB::table('enum_casts')->where('id', $model->id)->first());
+    }
+
+    public function testEnumsAcceptNullOnSave()
+    {
+        $model = new EloquentModelEnumCastingTestModel([
+            'string_status' => null,
+            'integer_status' => null,
+        ]);
+
+        $model->save();
+
+        $this->assertEquals((object) [
+            'id' => $model->id,
+            'string_status' => null,
+            'integer_status' => null,
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
 }
