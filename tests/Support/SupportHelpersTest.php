@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
+use Closure;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -26,6 +27,17 @@ class SupportHelpersTest extends TestCase
         $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
+    }
+
+    public function testEnclose(): void
+    {
+        $enclosed = enclose(function (int $number) {
+            return $number * 3;
+        }, 10);
+
+        $this->assertInstanceOf(Closure::class, $enclosed);
+        $this->assertSame(30, $enclosed());
+        $this->assertSame(60, $enclosed(20));
     }
 
     public function testClassBasename()

@@ -119,6 +119,22 @@ if (! function_exists('e')) {
     }
 }
 
+if (! function_exists('enclose')) {
+    /**
+     * Creates a Closure to be called with the given argument values.
+     *
+     * @param  callable  $callable
+     * @param  mixed ...$arguments
+     * @return \Closure
+     */
+    function enclose(callable $callable, ...$arguments)
+    {
+        return function (...$override) use ($callable, $arguments) {
+            return $callable(...array_replace($arguments, $override));
+        };
+    }
+}
+
 if (! function_exists('env')) {
     /**
      * Gets the value of an environment variable.
