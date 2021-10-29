@@ -18,10 +18,8 @@ jobs:
 
     strategy:
       fail-fast: true
-      matrix:
-        php: ['8.0']
 
-    name: PHP ${{ matrix.php }} - MySQL 5.7
+    name: MySQL 5.7
 
     steps:
       - name: Checkout code
@@ -30,7 +28,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 8.0
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql
           tools: composer:v2
           coverage: none
