@@ -41,6 +41,19 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         $this->assertEquals(IntegerStatus::pending, $model->integer_status);
     }
 
+    public function testEnumsReturnNullWhenNull()
+    {
+        DB::table('enum_casts')->insert([
+            'string_status' => null,
+            'integer_status' => null,
+        ]);
+
+        $model = EloquentModelEnumCastingTestModel::first();
+
+        $this->assertEquals(null, $model->string_status);
+        $this->assertEquals(null, $model->integer_status);
+    }
+
     public function testEnumsAreCastableToArray()
     {
         $model = new EloquentModelEnumCastingTestModel([

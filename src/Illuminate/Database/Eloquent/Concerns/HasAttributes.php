@@ -674,6 +674,10 @@ trait HasAttributes
      */
     protected function getEnumCastableAttributeValue($key, $value)
     {
+        if (is_null($value)) {
+            return;
+        }
+
         $castType = $this->getCasts()[$key];
 
         return $castType::from($value);
