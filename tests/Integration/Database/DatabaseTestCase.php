@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase;
 
 abstract class DatabaseTestCase extends TestCase
@@ -24,7 +25,7 @@ abstract class DatabaseTestCase extends TestCase
     protected function tearDown(): void
     {
         if ($this->app['config']->get('database.default') !== 'testbench') {
-            $this->artisan('db:wipe');
+            $this->artisan('db:wipe', ['--drop-views' => true]);
         }
 
         parent::tearDown();

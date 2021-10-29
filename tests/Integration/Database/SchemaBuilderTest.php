@@ -31,11 +31,11 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         $this->expectNotToPerformAssertions();
 
-        DB::statement('create view "view"("id") as select 1');
+        DB::statement('create view foo (id) as select 1');
 
         Schema::dropAllViews();
 
-        DB::statement('create view "view"("id") as select 1');
+        DB::statement('create view foo (id) as select 1');
     }
 
     public function testRegisterCustomDoctrineType()
