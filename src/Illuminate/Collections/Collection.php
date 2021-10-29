@@ -380,6 +380,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         return new static(array_flip($this->items));
     }
+    
+   /**
+     * Flush the existings items in the colllection
+     *
+     * @return static
+     */
+    public function flush()
+    {
+        $this->items = [];
+
+        return $this;
+    }
 
     /**
      * Remove an item from the collection by key.
