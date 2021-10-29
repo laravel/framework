@@ -410,24 +410,24 @@ class Str
      */
     public static function mask($string, $character, $index, $length = null, $encoding = 'UTF-8')
     {
-        if ('' === $character) {
+        if ($character === '') {
             return $string;
         }
 
-        // On older versions, if length is null an empty string is returned.
-        if (null === $length && PHP_MAJOR_VERSION < 8) {
+        if (is_null($length) && PHP_MAJOR_VERSION < 8) {
             $length = mb_strlen($string, $encoding);
         }
 
-        // When the index is out of bounds, there is nothing to replace.
-        if ('' === $swap = mb_substr($string, $index, $length, $encoding)) {
+        $segment = mb_substr($string, $index, $length, $encoding);
+
+        if ($segment === '') {
             return $string;
         }
 
-        $start = mb_substr($string, 0, mb_strpos($string, $swap, 0, $encoding), $encoding);
-        $end = mb_substr($string, mb_strpos($string, $swap, 0, $encoding) + mb_strlen($swap, $encoding));
+        $start = mb_substr($string, 0, mb_strpos($string, $segment, 0, $encoding), $encoding);
+        $end = mb_substr($string, mb_strpos($string, $segment, 0, $encoding) + mb_strlen($segment, $encoding));
 
-        return $start.str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($swap, $encoding)).$end;
+        return $start.str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($segment, $encoding)).$end;
     }
 
     /**
