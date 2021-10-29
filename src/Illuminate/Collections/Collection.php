@@ -382,7 +382,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
     
    /**
-     * Flush the existings items in the colllection
+     * Flush the existings items in the collection
      *
      * @return static
      */
