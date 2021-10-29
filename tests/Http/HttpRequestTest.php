@@ -1006,6 +1006,15 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->accepts('text/html'));
     }
 
+    public function testCaseInsensitiveAcceptHeader()
+    {
+        $request1 = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/JSON']);
+        $this->assertTrue($request1->accepts(['text/html', 'application/json']));
+
+        $request2 = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'AppLiCaTion/JsOn']);
+        $this->assertTrue($request2->accepts(['text/html', 'application/json']));
+    }
+
     public function testSessionMethod()
     {
         $this->expectException(RuntimeException::class);

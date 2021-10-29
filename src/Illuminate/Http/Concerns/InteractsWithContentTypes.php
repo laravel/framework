@@ -143,6 +143,11 @@ trait InteractsWithContentTypes
      */
     public static function matchesType($actual, $type)
     {
+        // Type should be case-insensitive
+        // Ref: https://www.rfc-editor.org/rfc/rfc2045
+        $actual = strtolower($actual);
+        $type = strtolower($type);
+
         if ($actual === $type) {
             return true;
         }
