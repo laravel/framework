@@ -124,7 +124,7 @@ if (! function_exists('enclose')) {
      * Creates a Closure to be called with the given argument values.
      *
      * @param  callable  $callable
-     * @param  mixed ...$arguments
+     * @param  mixed  ...$arguments
      * @return \Closure
      */
     function enclose(callable $callable, ...$arguments)
