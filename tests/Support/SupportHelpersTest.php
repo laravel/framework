@@ -2,15 +2,16 @@
 
 namespace Illuminate\Tests\Support;
 
-use ArrayAccess;
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Env;
-use Illuminate\Support\Optional;
-use LogicException;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use stdClass;
+use ArrayAccess;
+use Mockery as m;
+use LogicException;
+use RuntimeException;
+use Illuminate\Support\Js;
+use Illuminate\Support\Env;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Optional;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SupportHelpersTest extends TestCase
 {
@@ -727,9 +728,9 @@ class SupportHelpersTest extends TestCase
 
     public function testJsHelper()
     {
-        $this->assertEquals("'hey'", js('hey'));
-        $this->assertEquals("JSON.parse(atob('eyJoZXkiOiJ0aGVyZSJ9'))", js(['hey' => 'there']));
-        $this->assertEquals("JSON.parse(atob('WyJoZXkiLCJ0aGVyZSJd'))", js(['hey', 'there']));
+        $this->assertEquals("'hey'", Js::from('hey'));
+        $this->assertEquals("JSON.parse(atob('eyJoZXkiOiJ0aGVyZSJ9'))", Js::from(['hey' => 'there']));
+        $this->assertEquals("JSON.parse(atob('WyJoZXkiLCJ0aGVyZSJd'))", Js::from(['hey', 'there']));
     }
 
     public function providesPregReplaceArrayData()
