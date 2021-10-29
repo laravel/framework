@@ -35,9 +35,6 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
-        // Type checking should be case-insensitive
-        // Ref: https://www.rfc-editor.org/rfc/rfc2045
-        // RFC: https://datatracker.ietf.org/doc/html/rfc7231#section-5.3
         return isset($acceptable[0]) && Str::contains(strtolower($acceptable[0]), ['/json', '+json']);
     }
 
@@ -63,10 +60,8 @@ trait InteractsWithContentTypes
             }
 
             foreach ($types as $type) {
-                // Type checking should be case-insensitive
-                // Ref: https://www.rfc-editor.org/rfc/rfc2045
-                // RFC: https://datatracker.ietf.org/doc/html/rfc7231#section-5.3
                 $accept = strtolower($accept);
+
                 $type = strtolower($type);
 
                 if ($this->matchesType($accept, $type) || $accept === strtok($type, '/').'/*') {
@@ -102,10 +97,8 @@ trait InteractsWithContentTypes
                     $type = $mimeType;
                 }
 
-                // Type checking should be case-insensitive
-                // Ref: https://www.rfc-editor.org/rfc/rfc2045
-                // RFC: https://datatracker.ietf.org/doc/html/rfc7231#section-5.3
                 $accept = strtolower($accept);
+
                 $type = strtolower($type);
 
                 if ($this->matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
