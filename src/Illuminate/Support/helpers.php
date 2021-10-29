@@ -148,7 +148,7 @@ if (! function_exists('filled')) {
 
 if (! function_exists('js')) {
     /**
-     * Compile an $expression into JSON.parse(atob('base64_encoded')), Json or string.
+     * Compile an expression into a valid JavaScript object, JSON string, or string.
      *
      * @param  mixed  $expression
      * @param  int|null  $options
@@ -160,13 +160,11 @@ if (! function_exists('js')) {
         if (is_object($expression) || is_array($expression)) {
             $base64 = base64_encode(json_encode($expression, $options, $depth));
 
-            return "JSON.parse(atob('$base64'))";
+            return "JSON.parse(atob('{$base64}'))";
         }
 
         if (is_string($expression)) {
-            $string = str_replace("'", "\'", $expression);
-
-            return "'$string'";
+            return "'".str_replace("'", "\'", $expression)."'";
         }
 
         return json_encode($expression, $options, $depth);

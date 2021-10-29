@@ -725,6 +725,13 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('From $_SERVER', env('foo'));
     }
 
+    public function testJsHelper()
+    {
+        $this->assertEquals("'hey'", js('hey'));
+        $this->assertEquals("JSON.parse(atob('eyJoZXkiOiJ0aGVyZSJ9'))", js(['hey' => 'there']));
+        $this->assertEquals("JSON.parse(atob('WyJoZXkiLCJ0aGVyZSJd'))", js(['hey', 'there']));
+    }
+
     public function providesPregReplaceArrayData()
     {
         $pointerArray = ['Taylor', 'Otwell'];
