@@ -10,8 +10,15 @@ use stdClass;
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */
-class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
+class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('database.default', 'mysql');
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

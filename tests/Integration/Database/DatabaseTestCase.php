@@ -10,20 +10,20 @@ abstract class DatabaseTestCase extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
         if (! env('DB_CONNECTION')) {
             $app['config']->set('database.default', 'testbench');
-
-            $app['config']->set('database.connections.testbench', [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-            ]);
         }
     }
 
     protected function tearDown(): void
     {
-        if (env('DB_CONNECTION')) {
+        if ($this->app['config']->get('database.default') !== 'testbench') {
             $this->artisan('db:wipe');
         }
 
