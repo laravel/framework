@@ -123,6 +123,8 @@ class EloquentUserProvider implements UserProvider
 
             if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
+            } elseif (is_callable($value)) {
+                $value($query);
             } else {
                 $query->where($key, $value);
             }

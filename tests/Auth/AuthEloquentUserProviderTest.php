@@ -100,6 +100,23 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame('bar', $user);
     }
 
+    public function testRetrieveByCredentialsAcceptsCallback()
+    {
+        $provider = $this->getProviderMock();
+        $mock = m::mock(stdClass::class);
+        $mock->shouldReceive('newQuery')->once()->andReturn($mock);
+        $mock->shouldReceive('where')->once()->with('username', 'dayle');
+        $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
+        $mock->shouldReceive('first')->once()->andReturn('bar');
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
+        $user = $provider->retrieveByCredentials([function ($builder) {
+            $builder->where('username', 'dayle');
+            $builder->whereIn('group', ['one', 'two']);
+        }]);
+
+        $this->assertSame('bar', $user);
+    }
+
     public function testCredentialValidation()
     {
         $hasher = m::mock(Hasher::class);
