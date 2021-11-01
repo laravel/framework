@@ -53,6 +53,13 @@ class PendingCommand
     protected $expectedExitCode;
 
     /**
+     * The not expected exit code.
+     *
+     * @var int
+     */
+    protected $notExpectedExitCode;
+
+    /**
      * Determine if the command has executed.
      *
      * @var bool
@@ -194,6 +201,19 @@ class PendingCommand
     }
 
     /**
+     * Assert that the command does not have the given exit code.
+     *
+     * @param  int  $exitCode
+     * @return $this
+     */
+    public function assertNotExitCode($exitCode)
+    {
+        $this->notExpectedExitCode = $exitCode;
+
+        return $this;
+    }
+
+    /**
      * Assert that the command has the success exit code.
      *
      * @return $this
@@ -204,13 +224,13 @@ class PendingCommand
     }
 
     /**
-     * Assert that the command has the failure exit code.
+     * Assert that the command does not have the success exit code.
      *
      * @return $this
      */
     public function assertFailed()
     {
-        return $this->assertExitCode(Command::FAILURE);
+        return $this->assertNotExitCode(Command::SUCCESS);
     }
 
     /**
@@ -250,6 +270,11 @@ class PendingCommand
             $this->test->assertEquals(
                 $this->expectedExitCode, $exitCode,
                 "Expected status code {$this->expectedExitCode} but received {$exitCode}."
+            );
+        } elseif ($this->notExpectedExitCode !== null) {
+            $this->test->assertNotEquals(
+                $this->notExpectedExitCode, $exitCode,
+                "Not expected status code {$this->notExpectedExitCode} was received."
             );
         }
 
