@@ -56,7 +56,7 @@ class Enum implements Rule
     public function message()
     {
         return [
-            'The selected :attribute is invalid.'
+            'The selected :attribute is invalid.',
         ];
     }
 }

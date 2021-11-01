@@ -27,7 +27,7 @@ class ValidationEnumRuleTest extends TestCase
             resolve('translator'),
             [
                 'status' => 'pending',
-                'int_status' => 1
+                'int_status' => 1,
             ],
             [
                 'status' => new Enum(StringStatus::class),
