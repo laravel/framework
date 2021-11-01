@@ -45,20 +45,20 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             $bindings = $query->bindings;
         });
 
-        $user = TestModel1::create([
-            'date_field' => '2019-10',
+        TestModel1::create([
+            'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',
             'immutable_date_field' => '2019-10-01',
             'immutable_datetime_field' => '2019-10-01 10:15',
         ]);
 
-        $this->assertSame(['2019-10', '2019-10-01 10:15:20', '2019-10-01', '2019-10-01 10:15'], $bindings);
+        $this->assertSame(['2019-10-01', '2019-10-01 10:15:20', '2019-10-01', '2019-10-01 10:15'], $bindings);
     }
 
     public function testDatesFormattedArrayAndJson()
     {
         $user = TestModel1::create([
-            'date_field' => '2019-10',
+            'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',
             'immutable_date_field' => '2019-10-01',
             'immutable_datetime_field' => '2019-10-01 10:15',
@@ -78,7 +78,6 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
     public function testCustomDateCastsAreComparedAsDatesForCarbonInstances()
     {
-        /** @var TestModel1 */
         $user = TestModel1::create([
             'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',
@@ -99,7 +98,6 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
     public function testCustomDateCastsAreComparedAsDatesForStringValues()
     {
-        /** @var TestModel1 */
         $user = TestModel1::create([
             'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',

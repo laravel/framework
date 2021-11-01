@@ -14,7 +14,7 @@ class RefreshCommandTest extends DatabaseTestCase
             '--path' => 'stubs/',
         ];
 
-        $this->migrate_refresh_with($options);
+        $this->migrateRefreshWith($options);
     }
 
     public function testRefreshWithRealpath()
@@ -24,10 +24,10 @@ class RefreshCommandTest extends DatabaseTestCase
             '--realpath' => true,
         ];
 
-        $this->migrate_refresh_with($options);
+        $this->migrateRefreshWith($options);
     }
 
-    private function migrate_refresh_with(array $options)
+    private function migrateRefreshWith(array $options)
     {
         $this->beforeApplicationDestroyed(function () use ($options) {
             $this->artisan('migrate:rollback', $options);
