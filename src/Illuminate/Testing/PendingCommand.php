@@ -198,7 +198,7 @@ class PendingCommand
      *
      * @return $this
      */
-    public function assertSuccessExitCode()
+    public function assertSuccessful()
     {
         return $this->assertExitCode(Command::SUCCESS);
     }
@@ -208,7 +208,7 @@ class PendingCommand
      *
      * @return $this
      */
-    public function assertFailureExitCode()
+    public function assertFailed()
     {
         return $this->assertExitCode(Command::FAILURE);
     }
