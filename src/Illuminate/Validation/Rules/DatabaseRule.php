@@ -81,7 +81,7 @@ trait DatabaseRule
      * Set a "where" constraint on the query.
      *
      * @param  \Closure|string  $column
-     * @param  array|string|int|null  $value
+     * @param  \Illuminate\Database\Eloquent\Model|array|string|int|null  $value
      * @return $this
      */
     public function where($column, $value = null)
@@ -96,6 +96,10 @@ trait DatabaseRule
 
         if (is_null($value)) {
             return $this->whereNull($column);
+        }
+
+        if ($value instanceof Model) {
+            $value = $value->getKey();
         }
 
         $this->wheres[] = compact('column', 'value');

@@ -51,6 +51,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('exists:table,column,foo,"bar"', (string) $rule);
 
+        $rule = new Exists('table', 'column');
+        $rule->where('foo', User::create(['id' => '1', 'type' => 'foo']));
+        $this->assertSame('exists:table,column,foo,"1"', (string) $rule);
+
         $rule = new Exists(User::class, 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,column,foo,"bar"', (string) $rule);
