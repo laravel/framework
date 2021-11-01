@@ -828,7 +828,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $value = ucwords(str_replace(['-', '_'], ' ', $value));
+        $value = ucwords(str_replace(['-', '_', '.'], ' ', $value));
 
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
     }
