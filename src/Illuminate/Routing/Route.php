@@ -1078,6 +1078,16 @@ class Route
     }
 
     /**
+     * Determine if the route should enforce scoping of multiple Eloquent bindings.
+     *
+     * @return bool
+     */
+    public function enforcesScoping()
+    {
+        return (bool) ($this->action['scoping'] ?? false);
+    }
+
+    /**
      * Specify that the route should not allow concurrent requests from the same session.
      *
      * @param  int|null  $lockSeconds
