@@ -219,7 +219,7 @@ class Str
         foreach ((array) $needles as $needle) {
             if (
                 $needle !== '' && $needle !== null
-                && 0 === substr_compare($haystack, $needle, - strlen($needle))
+                && 0 === substr_compare($haystack, $needle, -strlen($needle))
             ) {
                 return true;
             }
