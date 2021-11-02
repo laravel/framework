@@ -126,7 +126,7 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($mock->attempt(['foo']));
     }
 
-    public function testAttemptAndWithCallbacks()
+    public function testAttemptWithCallbacks()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $mock = $this->getMockBuilder(SessionGuard::class)->onlyMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -145,14 +145,14 @@ class AuthGuardTest extends TestCase
         $mock->getProvider()->shouldReceive('validateCredentials')->twice()->andReturnTrue();
         $mock->getProvider()->shouldReceive('validateCredentials')->once()->andReturnFalse();
 
-        $this->assertTrue($mock->attemptWhen(['foo'], function ($user, $guard) {
+        $this->assertTrue($mock->attempt(['foo'], false, function ($user, $guard) {
             static::assertInstanceOf(Authenticatable::class, $user);
             static::assertInstanceOf(SessionGuard::class, $guard);
 
             return true;
         }));
 
-        $this->assertFalse($mock->attemptWhen(['foo'], function ($user, $guard) {
+        $this->assertFalse($mock->attempt(['foo'], false, function ($user, $guard) {
             static::assertInstanceOf(Authenticatable::class, $user);
             static::assertInstanceOf(SessionGuard::class, $guard);
 
@@ -161,7 +161,7 @@ class AuthGuardTest extends TestCase
 
         $executed = false;
 
-        $this->assertFalse($mock->attemptWhen(['foo'], false, function () use (&$executed) {
+        $this->assertFalse($mock->attempt(['foo'], false, function () use (&$executed) {
             return $executed = true;
         }));
 
