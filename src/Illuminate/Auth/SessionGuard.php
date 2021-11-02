@@ -357,9 +357,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  array  $credentials
      * @param  bool  $remember
+     * @param  callable  ...$callbacks
      * @return bool
      */
-    public function attempt(array $credentials = [], $remember = false)
+    public function attempt(array $credentials = [], $remember = false, ...$callbacks)
     {
         $this->fireAttemptEvent($credentials, $remember);
 
@@ -368,7 +369,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If an implementation of UserInterface was returned, we'll ask the provider
         // to validate the user against the given credentials, and if they are in
         // fact valid we'll log the users into the application and return true.
-        if ($this->hasValidCredentials($user, $credentials)) {
+        if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
             $this->login($user, $remember);
 
             return true;
@@ -377,34 +378,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If the authentication attempt fails we will fire an event so that the user
         // may be notified of any suspicious attempts to access their account from
         // an unrecognized user. A developer may listen to this event as needed.
-        $this->fireFailedEvent($user, $credentials);
-
-        return false;
-    }
-
-    /**
-     * Attempt to authenticate a user with credentials and additional callbacks.
-     *
-     * @param  array  $credentials
-     * @param  array|callable  $callbacks
-     * @param  false  $remember
-     * @return bool
-     */
-    public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false)
-    {
-        $this->fireAttemptEvent($credentials, $remember);
-
-        $this->lastAttempted = $user = $this->provider->retrieveByCredentials($credentials);
-
-        // This method does the exact same thing as attempt, but also executes callbacks after
-        // the user is retrieved and validated. If one of the callbacks returns falsy we do
-        // not login the user. Instead, we will fail the specific authentication attempt.
-        if ($this->hasValidCredentials($user, $credentials) && $this->shouldLogin($callbacks, $user)) {
-            $this->login($user, $remember);
-
-            return true;
-        }
-
         $this->fireFailedEvent($user, $credentials);
 
         return false;
@@ -431,13 +404,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Determine if the user should login by executing the given callbacks.
      *
-     * @param  array|callable|null  $callbacks
+     * @param  callable[]  $callbacks
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return bool
      */
     protected function shouldLogin($callbacks, AuthenticatableContract $user)
     {
-        foreach (Arr::wrap($callbacks) as $callback) {
+        foreach ($callbacks as $callback) {
             if (! $callback($user, $this)) {
                 return false;
             }
