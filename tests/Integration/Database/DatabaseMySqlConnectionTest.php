@@ -10,12 +10,19 @@ use Illuminate\Support\Facades\Schema;
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */
-class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
+class DatabaseMySqlConnectionTest extends DatabaseTestCase
 {
     const TABLE = 'player';
     const FLOAT_COL = 'float_col';
     const JSON_COL = 'json_col';
     const FLOAT_VAL = 0.2;
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('database.default', 'mysql');
+    }
 
     protected function setUp(): void
     {

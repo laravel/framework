@@ -3,12 +3,32 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
-class MigrateWithRealpathTest extends DatabaseTestCase
+class MigrateWithRealpathTest extends TestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('app.debug', 'true');
+
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
+        if (! env('DB_CONNECTION')) {
+            $app['config']->set('database.default', 'testbench');
+        }
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        if ($this->app['config']->get('database.default') !== 'testbench') {
+            $this->artisan('db:wipe', ['--drop-views' => true]);
+        }
 
         $options = [
             '--path' => realpath(__DIR__.'/stubs/'),

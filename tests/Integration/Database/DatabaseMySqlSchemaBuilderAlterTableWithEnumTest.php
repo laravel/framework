@@ -10,8 +10,15 @@ use stdClass;
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */
-class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
+class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('database.default', 'mysql');
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -58,7 +65,12 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
 
         $tableProperties = array_values((array) $tables[0]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
-        $this->assertEquals(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
+
+        $columns = Schema::getColumnListing('users');
+
+        foreach (['id', 'name', 'age', 'color'] as $column) {
+            $this->assertContains($column, $columns);
+        }
 
         Schema::create('posts', function (Blueprint $table) {
             $table->integer('id');
