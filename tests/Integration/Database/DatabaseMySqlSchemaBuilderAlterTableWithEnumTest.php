@@ -66,8 +66,10 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
         $tableProperties = array_values((array) $tables[0]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
 
-        foreach (Schema::getColumnListing('users') as $column) {
-            $this->assertContains($column, ['id', 'name', 'age', 'color']);
+        $columns = Schema::getColumnListing('users');
+
+        foreach (['id', 'name', 'age', 'color'] as $column) {
+            $this->assertContains($column, $columns);
         }
 
         Schema::create('posts', function (Blueprint $table) {
