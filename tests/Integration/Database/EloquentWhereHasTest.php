@@ -26,7 +26,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         Schema::create('texts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');
-            $table->boolean('content');
+            $table->text('content');
         });
 
         Schema::create('comments', function (Blueprint $table) {
