@@ -6,10 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- * @group one-of-many
- */
 class EloquentHasOneOfManyTest extends DatabaseTestCase
 {
     protected function setUp(): void

@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EloquentDeleteTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

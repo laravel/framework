@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingMailWithLocaleTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

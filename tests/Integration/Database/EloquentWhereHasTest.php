@@ -7,9 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentWhereHasTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -29,7 +26,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
         Schema::create('texts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');
-            $table->boolean('content');
+            $table->text('content');
         });
 
         Schema::create('comments', function (Blueprint $table) {

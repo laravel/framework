@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Mockery as m;
 
-/**
- * @group integration
- */
 class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 {
     protected function setUp(): void

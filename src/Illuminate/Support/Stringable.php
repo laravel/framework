@@ -343,6 +343,20 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Masks a portion of a string with a repeated character.
+     *
+     * @param  string  $character
+     * @param  int  $index
+     * @param  int|null  $length
+     * @param  string  $encoding
+     * @return static
+     */
+    public function mask($character, $index, $length = null, $encoding = 'UTF-8')
+    {
+        return new static(Str::mask($this->value, $character, $index, $length, $encoding));
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern

@@ -93,6 +93,14 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
+        if ($key === 'middleware' && ! is_string($value)) {
+            $value = Arr::wrap($value);
+
+            foreach ($value as $index => $middleware) {
+                $value[$index] = (string) $middleware;
+            }
+        }
+
         $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
 
         return $this;

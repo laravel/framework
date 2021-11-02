@@ -8,9 +8,6 @@ use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @group integration
- */
 class EloquentModelStringCastingTest extends TestCase
 {
     protected function setUp(): void

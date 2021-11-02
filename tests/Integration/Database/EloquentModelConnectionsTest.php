@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EloquentModelConnectionsTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

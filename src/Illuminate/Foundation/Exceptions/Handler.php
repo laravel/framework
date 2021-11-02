@@ -351,7 +351,7 @@ class Handler implements ExceptionHandlerContract
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
-        return $request->expectsJson()
+        return $this->shouldReturnJson($request, $e)
                     ? $this->prepareJsonResponse($request, $e)
                     : $this->prepareResponse($request, $e);
     }
@@ -405,7 +405,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
-        return $request->expectsJson()
+        return $this->shouldReturnJson($request, $exception)
                     ? response()->json(['message' => $exception->getMessage()], 401)
                     : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
@@ -423,7 +423,7 @@ class Handler implements ExceptionHandlerContract
             return $e->response;
         }
 
-        return $request->expectsJson()
+        return $this->shouldReturnJson($request, $e)
                     ? $this->invalidJson($request, $e)
                     : $this->invalid($request, $e);
     }
@@ -455,6 +455,18 @@ class Handler implements ExceptionHandlerContract
             'message' => $exception->getMessage(),
             'errors' => $exception->errors(),
         ], $exception->status);
+    }
+
+    /**
+     * Determine if the exception handler response should be JSON.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
+     * @return bool
+     */
+    protected function shouldReturnJson($request, Throwable $e)
+    {
+        return $request->expectsJson();
     }
 
     /**
