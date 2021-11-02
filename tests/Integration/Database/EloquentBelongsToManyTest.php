@@ -48,7 +48,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         Schema::create('posts_tags', function (Blueprint $table) {
             $table->integer('post_id');
-            $table->integer('tag_id');
+            $table->string('tag_id');
             $table->string('flag')->default('')->nullable();
             $table->timestamps();
         });
@@ -132,7 +132,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tagsWithCustomPivot()->attach($tag->id);
 
         $this->assertInstanceOf(PostTagPivot::class, $post->tagsWithCustomPivot[0]->pivot);
-        $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->getAttributes()['created_at']);
+        $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->created_at);
 
         $this->assertInstanceOf(PostTagPivot::class, $post->tagsWithCustomPivotClass[0]->pivot);
         $this->assertSame('posts_tags', $post->tagsWithCustomPivotClass()->getTable());
@@ -213,8 +213,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         DB::table('posts_tags')->insert([
             [
                 'post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty',
-                'created_at' => '1507630210',
-                'updated_at' => '1507630210',
+                'created_at' => '2017-10-10 10:10:10',
+                'updated_at' => '2017-10-10 10:10:10',
             ],
         ]);
 
@@ -226,8 +226,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
-            $this->assertEquals('1507630210', $tag->pivot->getAttributes()['created_at']);
-            $this->assertEquals('1507630220', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            $this->assertEquals('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
+            $this->assertEquals('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
         }
     }
 
@@ -1068,7 +1068,11 @@ class UserPostPivot extends Pivot
 class PostTagPivot extends Pivot
 {
     protected $table = 'posts_tags';
-    protected $dateFormat = 'U';
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('U');
+    }
 }
 
 class TagWithGlobalScope extends Model

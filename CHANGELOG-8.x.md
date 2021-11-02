@@ -1,6 +1,41 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.68.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.69.0...8.x)
+
+
+## [v8.69.0 (2021-11-02)](https://github.com/laravel/framework/compare/v8.68.1...v8.69.0)
+
+### Added
+- Improve content negotiation for exception handling ([#39385](https://github.com/laravel/framework/pull/39385))
+- Added support for SKIP LOCKED to MariaDB ([#39396](https://github.com/laravel/framework/pull/39396))
+- Custom cast string into Stringable ([#39410](https://github.com/laravel/framework/pull/39410))
+- Added `Illuminate/Support/Str::mask()` ([#39393](https://github.com/laravel/framework/pull/39393))
+- Allow model attributes to be casted to/from an Enum ([#39315](https://github.com/laravel/framework/pull/39315))
+- Added an Enum validation rule ([#39437](https://github.com/laravel/framework/pull/39437))
+- Auth: Allows to use a callback in credentials array ([#39420](https://github.com/laravel/framework/pull/39420))
+- Added success and failure command assertions ([#39435](https://github.com/laravel/framework/pull/39435))
+
+### Fixed
+- Fixed CURRENT_TIMESTAMP as default when changing column ([#39377](https://github.com/laravel/framework/pull/39377))
+- Make accept header comparison case-insensitive ([#39413](https://github.com/laravel/framework/pull/39413))
+- Fixed regression with capitalizing translation params ([#39424](https://github.com/laravel/framework/pull/39424))
+
+### Changed
+- Added bound check to env resolving in `Illuminate/Foundation/Application::runningUnitTests()` ([#39434](https://github.com/laravel/framework/pull/39434))
+
+
+## [v8.68.1 (2021-10-27)](https://github.com/laravel/framework/compare/v8.68.0...v8.68.1)
+
+### Reverted
+- Reverted ["Added support for MariaDB to skip locked rows with the database queue driver"](https://github.com/laravel/framework/pull/39311) ([#39386](https://github.com/laravel/framework/pull/39386))
+
+### Fixed
+- Fixed code to address different connection strings for MariaDB in the database queue driver ([#39374](https://github.com/laravel/framework/pull/39374))
+- Fixed rate limiting unicode issue ([#39375](https://github.com/laravel/framework/pull/39375))
+- Fixed bug with closure formatting in `Illuminate/Testing/Fluent/Concerns/Matching::whereContains()` ([37217d5](https://github.com/laravel/framework/commit/37217d56ca38c407395bb98ef2532cafd86efa30))
+
+### Refactoring
+- Change whereStartsWith, DocBlock to reflect that array is supported ([#39370](https://github.com/laravel/framework/pull/39370))
 
 
 ## [v8.68.0 (2021-10-26)](https://github.com/laravel/framework/compare/v8.67.0...v8.68.0)

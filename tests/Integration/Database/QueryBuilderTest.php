@@ -73,9 +73,9 @@ class QueryBuilderTest extends DatabaseTestCase
     public function testSelectWithSubQuery()
     {
         $this->assertEquals(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
-                $query->select('bar');
+                $query->select('content');
             }])->first()
         );
     }
@@ -92,16 +92,16 @@ class QueryBuilderTest extends DatabaseTestCase
     public function testAddSelectWithSubQuery()
     {
         $this->assertEquals(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
-                $query->select('bar');
+                $query->select('content');
             }])->first()
         );
     }
 
     public function testFromWithAlias()
     {
-        $this->assertSame('select * from "posts" as "alias"', DB::table('posts', 'alias')->toSql());
+        $this->assertCount(2, DB::table('posts', 'alias')->select('alias.*')->get());
     }
 
     public function testFromWithSubQuery()
@@ -127,7 +127,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testWhereValueSubQueryBuilder()
     {
-        $subQuery = DB::table('posts')->selectRaw("'Sub query value'");
+        $subQuery = DB::table('posts')->selectRaw("'Sub query value'")->limit(1);
 
         $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
         $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());
