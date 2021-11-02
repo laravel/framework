@@ -79,6 +79,24 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame(['one'], $this->getRoute()->middleware());
     }
 
+    public function testMiddlewareAsStringableObjectOnRouteInstance()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware($one);
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame(['one'], $this->getRoute()->middleware());
+    }
+
     public function testMiddlewareAsArrayWithStringables()
     {
         $one = new class implements Stringable
