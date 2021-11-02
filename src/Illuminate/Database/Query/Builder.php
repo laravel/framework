@@ -769,7 +769,7 @@ class Builder
 
     public function whereIfFilled ($field, $column, $operator = null, $value = null, $boolean = 'and') {
         if (!empty($field)) {
-            $this->where($column, $operator = null, $value = null, $boolean = 'and');
+            $this->where($column, $operator, $value, $boolean);
         }
     }
 
