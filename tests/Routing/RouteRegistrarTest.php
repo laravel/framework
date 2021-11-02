@@ -227,6 +227,26 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+    public function testCanRegisterGroupWithStringableMiddleware()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware($one)->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->seeMiddleware('one');
+    }
+
     public function testCanRegisterGroupWithNamespace()
     {
         $this->router->namespace('App\Http\Controllers')->group(function ($router) {
