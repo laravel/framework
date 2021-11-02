@@ -149,6 +149,14 @@ class PendingResourceRegistration
      */
     public function middleware($middleware)
     {
+        if (! is_string($middleware)) {
+            $middleware = Arr::wrap($middleware);
+
+            foreach ($middleware as $key => $value) {
+                $middleware[$key] = (string) $value;
+            }
+        }
+
         $this->options['middleware'] = $middleware;
 
         return $this;

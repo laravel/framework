@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Stringable;
 
 class RouteRegistrarTest extends TestCase
 {
@@ -58,6 +59,42 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareAsStringableObject()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware($one)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame(['one'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareAsArrayWithStringables()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware([$one, 'two'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
     }
 
     public function testWithoutMiddlewareRegistration()
@@ -188,6 +225,26 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->seeMiddleware('group-middleware');
+    }
+
+    public function testCanRegisterGroupWithStringableMiddleware()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware($one)->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->seeMiddleware('one');
     }
 
     public function testCanRegisterGroupWithNamespace()
@@ -603,6 +660,27 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('controller', Request::create('users', 'GET'));
 
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
+    public function testResourceWithMiddlewareAsStringable()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->only('index')
+                     ->middleware([$one, 'two'])
+                     ->withoutMiddleware('one');
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
