@@ -18,7 +18,6 @@ use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
 use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 use ReflectionFunction;
-use Stringable;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
@@ -1026,7 +1025,7 @@ class Route
             return (array) ($this->action['middleware'] ?? []);
         }
 
-        if (is_string($middleware) || $middleware instanceof Stringable) {
+        if (! is_array($middleware)) {
             $middleware = func_get_args();
         }
 
