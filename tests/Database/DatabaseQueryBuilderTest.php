@@ -2201,6 +2201,46 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->insertOrIgnore(['email' => 'foo']);
     }
 
+    public function testUpdateOrIgnoreMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getBuilder();
+        $builder->from('users')->updateOrIgnore(['email' => 'foo']);
+    }
+
+    public function testMySqlUpdateOrIgnoreMethod()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('update ignore `users` set `email` = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->updateOrIgnore(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testPostgresUpdateOrIgnoreMethod()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('update "users" set "email" = ? on conflict do nothing', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->updateOrIgnore(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testSQLiteUpdateOrIgnoreMethod()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('update or ignore "users" set "email" = ?', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->updateOrIgnore(['email' => 'foo']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testSqlServerUpdateOrIgnoreMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
+        $builder = $this->getSqlServerBuilder();
+        $builder->from('users')->updateOrIgnore(['email' => 'foo']);
+    }
+
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();

@@ -170,6 +170,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile an update ignore statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileUpdateOrIgnore(Builder $query, array $values)
+    {
+        return $this->compileUpdate($query, $values).' on conflict do nothing';
+    }
+
+    /**
      * Compile an insert and get ID statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

@@ -161,6 +161,18 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an update ignore statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileUpdateOrIgnore(Builder $query, array $values)
+    {
+        return Str::replaceFirst('update', 'update or ignore', $this->compileUpdate($query, $values));
+    }
+
+    /**
      * Compile the columns for an update statement.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

@@ -3023,6 +3023,23 @@ class Builder
     }
 
     /**
+     * Update records into the database while ignoring errors.
+     *
+     * @param  array  $values
+     * @return int
+     */
+    public function updateOrIgnore(array $values)
+    {
+        $this->applyBeforeQueryCallbacks();
+
+        $sql = $this->grammar->compileUpdateOrIgnore($this, $values);
+
+        return $this->connection->affectingStatement($sql, $this->cleanBindings(
+            $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+        ));
+    }
+
+    /**
      * Insert or update a record matching the attributes, and fill it with values.
      *
      * @param  array  $attributes

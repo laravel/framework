@@ -791,6 +791,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('foo', $builder->insertOrIgnore(['bar']));
 
         $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('updateOrIgnore')->once()->with(['bar'])->andReturn('foo');
+
+        $this->assertSame('foo', $builder->updateOrIgnore(['bar']));
+
+        $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('insertGetId')->once()->with(['bar'])->andReturn('foo');
 
         $this->assertSame('foo', $builder->insertGetId(['bar']));

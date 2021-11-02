@@ -63,6 +63,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an update ignore statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileUpdateOrIgnore(Builder $query, array $values)
+    {
+        return Str::replaceFirst('update', 'update ignore', $this->compileUpdate($query, $values));
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column
