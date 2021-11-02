@@ -767,6 +767,12 @@ class Builder
         return $this;
     }
 
+    public function whereIfFilled ($field, $column, $operator = null, $value = null, $boolean = 'and') {
+        if (!empty($field)) {
+            $this->where($column, $operator = null, $value = null, $boolean = 'and');
+        }
+    }
+
     /**
      * Add an array of where clauses to the query.
      *
