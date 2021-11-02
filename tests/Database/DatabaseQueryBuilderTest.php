@@ -2219,10 +2219,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testPostgresUpdateOrIgnoreMethod()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not support');
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('affectingStatement')->once()->with('update "users" set "email" = ? on conflict do nothing', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->updateOrIgnore(['email' => 'foo']);
-        $this->assertEquals(1, $result);
+        $builder->from('users')->updateOrIgnore(['email' => 'foo']);
     }
 
     public function testSQLiteUpdateOrIgnoreMethod()
