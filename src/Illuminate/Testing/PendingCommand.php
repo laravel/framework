@@ -53,11 +53,11 @@ class PendingCommand
     protected $expectedExitCode;
 
     /**
-     * The not expected exit code.
+     * The unexpected exit code.
      *
      * @var int
      */
-    protected $notExpectedExitCode;
+    protected $unexpectedExitCode;
 
     /**
      * Determine if the command has executed.
@@ -208,7 +208,7 @@ class PendingCommand
      */
     public function assertNotExitCode($exitCode)
     {
-        $this->notExpectedExitCode = $exitCode;
+        $this->unexpectedExitCode = $exitCode;
 
         return $this;
     }
@@ -271,10 +271,10 @@ class PendingCommand
                 $this->expectedExitCode, $exitCode,
                 "Expected status code {$this->expectedExitCode} but received {$exitCode}."
             );
-        } elseif ($this->notExpectedExitCode !== null) {
+        } elseif (! is_null($this->unexpectedExitCode)) {
             $this->test->assertNotEquals(
-                $this->notExpectedExitCode, $exitCode,
-                "Not expected status code {$this->notExpectedExitCode} was received."
+                $this->unexpectedExitCode, $exitCode,
+                "Unexpected status code {$this->unexpectedExitCode} was received."
             );
         }
 
