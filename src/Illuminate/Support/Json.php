@@ -7,9 +7,9 @@ class Json
     /**
      * Compile a PHP expression into a JavaScript object, array or single-quoted string.
      *
-     * @param mixed $expression
-     * @param int|null $options
-     * @param int $depth
+     * @param  mixed  $expression
+     * @param  int|null  $options
+     * @param  int  $depth
      * @return string
      */
     public static function parse($expression, $options = null, $depth = 512)
@@ -30,9 +30,9 @@ class Json
     /**
      * Compile the PHP statement into encoded JSON with double-quoted strings.
      *
-     * @param mixed $expression
-     * @param int|string $options
-     * @param int $depth
+     * @param  mixed  $expression
+     * @param  int|null  $options
+     * @param  int  $depth
      * @return string
      */
     public static function encode($expression, $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT, $depth = 512)
@@ -43,7 +43,7 @@ class Json
     /**
      * Compile a PHP boolean into JavaScript true/false.
      *
-     * @param bool $expression
+     * @param  bool  $expression
      * @return string
      */
     public static function bool($expression)
@@ -54,7 +54,7 @@ class Json
     /**
      * Compile a PHP string into JavaScript single-quoted string.
      *
-     * @param string $expression
+     * @param  string  $expression
      * @return string
      */
     public static function str($expression)

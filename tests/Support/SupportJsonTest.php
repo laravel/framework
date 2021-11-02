@@ -31,7 +31,7 @@ class SupportJsonTest extends TestCase
 
     public function testJsonBool()
     {
-        $this->assertEquals("true", Json::bool((bool) 1));
-        $this->assertEquals("false", Json::bool((bool) 0));
+        $this->assertEquals('true', Json::bool((bool) 1));
+        $this->assertEquals('false', Json::bool((bool) 0));
     }
 }
