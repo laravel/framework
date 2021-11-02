@@ -3,9 +3,25 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\DB;
+use Orchestra\Testbench\TestCase;
 
-class RefreshCommandTest extends DatabaseTestCase
+class RefreshCommandTest extends TestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('app.debug', 'true');
+
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
+        if (! env('DB_CONNECTION')) {
+            $app['config']->set('database.default', 'testbench');
+        }
+    }
+
     public function testRefreshWithoutRealpath()
     {
         $this->app->setBasePath(__DIR__);
@@ -29,6 +45,10 @@ class RefreshCommandTest extends DatabaseTestCase
 
     private function migrateRefreshWith(array $options)
     {
+        if ($this->app['config']->get('database.default') !== 'testbench') {
+            $this->artisan('db:wipe', ['--drop-views' => true]);
+        }
+
         $this->beforeApplicationDestroyed(function () use ($options) {
             $this->artisan('migrate:rollback', $options);
         });
