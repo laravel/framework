@@ -180,7 +180,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             TestPost::create(['title' => 'Goodbye world']);
         }
 
-        $query = TestPost::query()->distinct('title')->select('title');
+        $query = TestPost::query()->orderBy('title')->distinct('title')->select('title');
 
         $this->assertEquals(2, $query->get()->count());
         $this->assertEquals(2, $query->count());
