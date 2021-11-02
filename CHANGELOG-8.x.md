@@ -1,6 +1,20 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.68.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.68.1...8.x)
+
+
+## [v8.68.1 (2021-10-27)](https://github.com/laravel/framework/compare/v8.68.0...v8.68.1)
+
+### Reverted
+- Reverted ["Added support for MariaDB to skip locked rows with the database queue driver"](https://github.com/laravel/framework/pull/39311) ([#39386](https://github.com/laravel/framework/pull/39386))
+
+### Fixed
+- Fixed code to address different connection strings for MariaDB in the database queue driver ([#39374](https://github.com/laravel/framework/pull/39374))
+- Fixed rate limiting unicode issue ([#39375](https://github.com/laravel/framework/pull/39375))
+- Fixed bug with closure formatting in `Illuminate/Testing/Fluent/Concerns/Matching::whereContains()` ([37217d5](https://github.com/laravel/framework/commit/37217d56ca38c407395bb98ef2532cafd86efa30))
+
+### Refactoring
+- Change whereStartsWith, DocBlock to reflect that array is supported ([#39370](https://github.com/laravel/framework/pull/39370))
 
 
 ## [v8.68.0 (2021-10-26)](https://github.com/laravel/framework/compare/v8.67.0...v8.68.0)
