@@ -21,7 +21,7 @@ class Js
         }
 
         if (is_string($expression)) {
-            return "'".str_replace("'", "\'", $expression)."'";
+            return str_replace('"', "'", json_encode($expression));
         }
 
         return json_encode($expression, $options, $depth);
