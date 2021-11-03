@@ -822,6 +822,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testQueryWhereSQLInjection()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $name = [[
+            'id',
+            '=',
+            1,
+            'and 1=2) UNION SELECT user()#'
+        ]];
+
+        $this->expectExceptionMessage("When the operator is not null, the column shouldn't be array");
+
+        // select "id" from "category" where (1=2) UNION SELECT user()# "id" = ?)
+        $builder->from('category')->select('id')->where($name, '=', 'bar');
+    }
+
     public function testNestedWhere()
     {
         $nestedQuery = m::mock(Builder::class);
