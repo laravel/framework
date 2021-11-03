@@ -207,10 +207,20 @@ class View implements ArrayAccess, Htmlable, ViewContract
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array  $provider
      * @param  string  $bag
+     * @param  bool  $share
      * @return $this
      */
-    public function withErrors($provider, $bag = 'default')
+    public function withErrors($provider, $bag = 'default', $share = false)
     {
+        if ($share) { // Add the errors to the globally shared $errors
+            $this->factory->share('errors', (new ViewErrorBag)->put(
+                $bag, $this->formatErrors($provider)
+            ));
+
+            return $this;
+        }
+
+        // Add the errors to a local $errors only accessable but this view
         return $this->with('errors', (new ViewErrorBag)->put(
             $bag, $this->formatErrors($provider)
         ));
