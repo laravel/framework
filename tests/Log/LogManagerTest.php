@@ -442,7 +442,7 @@ class LogManagerTest extends TestCase
             'path' => storage_path('foo/on-demand.log'),
         ];
 
-        $fooLogger = $manager->build($fooConfig);
+        $fooLogger = $manager->build($fooConfig, 'foo-channel');
         $fooHandler = $fooLogger->getLogger()->getHandlers()[0];
         $fooUrl = new ReflectionProperty(get_class($fooHandler), 'url');
         $fooUrl->setAccessible(true);
@@ -452,7 +452,7 @@ class LogManagerTest extends TestCase
             'path' => storage_path('bar/on-demand.log'),
         ];
 
-        $barLogger = $manager->build($barConfig);
+        $barLogger = $manager->build($barConfig, 'bar-channel');
         $barHandler = $barLogger->getLogger()->getHandlers()[0];
         $barUrl = new ReflectionProperty(get_class($barHandler), 'url');
         $barUrl->setAccessible(true);
