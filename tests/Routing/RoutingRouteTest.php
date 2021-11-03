@@ -1926,6 +1926,24 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    public function testRouteCanMiddlewareCanBeAssigned()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->middleware(['foo'])->can('create', Route::class);
+
+        $this->assertEquals([
+            'foo',
+            'can:create,Illuminate\Routing\Route',
+        ], $route->middleware());
+
+        $route = new Route(['GET'], '/', []);
+        $route->can('create');
+
+        $this->assertEquals([
+            'can:create',
+        ], $route->middleware());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
