@@ -65,11 +65,12 @@ class LogManager implements LoggerInterface
      * Build an on-demand log channel.
      *
      * @param  array  $config
+     * @param  string|null  $name
      * @return \Psr\Log\LoggerInterface
      */
-    public function build(array $config)
+    public function build(array $config, ?string $name = null)
     {
-        return $this->get('ondemand', $config);
+        return $this->get($name ?? 'ondemand', $config);
     }
 
     /**

@@ -432,4 +432,32 @@ class LogManagerTest extends TestCase
 
         $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
     }
+
+    public function testLogManagerCanBuildMultipleOnDemandChannels()
+    {
+        $manager = new LogManager($this->app);
+
+        $fooConfig = [
+            'driver' => 'single',
+            'path' => storage_path('foo/on-demand.log'),
+        ];
+
+        $fooLogger = $manager->build($fooConfig, 'foo-channel');
+        $fooHandler = $fooLogger->getLogger()->getHandlers()[0];
+        $fooUrl = new ReflectionProperty(get_class($fooHandler), 'url');
+        $fooUrl->setAccessible(true);
+
+        $barConfig = [
+            'driver' => 'single',
+            'path' => storage_path('bar/on-demand.log'),
+        ];
+
+        $barLogger = $manager->build($barConfig, 'bar-channel');
+        $barHandler = $barLogger->getLogger()->getHandlers()[0];
+        $barUrl = new ReflectionProperty(get_class($barHandler), 'url');
+        $barUrl->setAccessible(true);
+
+        $this->assertSame($fooConfig['path'], $fooUrl->getValue($fooHandler));
+        $this->assertSame($barConfig['path'], $barUrl->getValue($barHandler));
+    }
 }
