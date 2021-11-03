@@ -695,6 +695,7 @@ class Builder
             if (! is_null($operator)) {
                 throw new \RuntimeException("When the operator is not null, the column shouldn't be array");
             }
+            
             return $this->addArrayOfWheres($column, $boolean);
         }
 

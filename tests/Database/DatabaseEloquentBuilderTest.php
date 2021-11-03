@@ -830,7 +830,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             'id',
             '=',
             1,
-            'and 1=2) UNION SELECT user()#'
+            'and 1=2) UNION SELECT user()#',
         ]];
 
         $this->expectExceptionMessage("When the operator is not null, the column shouldn't be array");
