@@ -9,7 +9,6 @@ use JsonSerializable;
 
 class JsString implements Htmlable
 {
-
     /**
      * Flags that must always be used when encoding to JSON for JsString.
      *
@@ -30,7 +29,6 @@ class JsString implements Htmlable
      * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
-     *
      * @return static
      *
      * @throws \JsonException
@@ -46,7 +44,6 @@ class JsString implements Htmlable
      * @param  mixed  $data
      * @param  int|null  $flags
      * @param  int  $depth
-     *
      * @return void
      *
      * @throws \JsonException
@@ -82,7 +79,6 @@ class JsString implements Htmlable
      * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
-     *
      * @return string
      *
      * @throws \JsonException
@@ -104,7 +100,6 @@ class JsString implements Htmlable
      * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
-     *
      * @return string
      *
      * @throws \JsonException
@@ -127,7 +122,6 @@ class JsString implements Htmlable
      *
      * @param  string  $json
      * @param  int  $flags
-     *
      * @return string
      *
      * @throws \JsonException
