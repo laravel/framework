@@ -5,57 +5,26 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesJson
 {
     /**
-     * Compile the PHP statement into encoded JSON with double-quoted strings.
+     * The default JSON encoding options.
+     *
+     * @var int
+     */
+    private $encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+
+    /**
+     * Compile the JSON statement into valid PHP.
      *
      * @param  string  $expression
      * @return string
      */
     protected function compileJson($expression)
     {
-        return "<?php echo Illuminate\Support\Json::encode($expression) ?>";
-    }
+        $parts = explode(',', $this->stripParentheses($expression));
 
-    /**
-     * Compile the PHP statement into encoded JSON with double-quoted strings.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileJsonEncode($expression)
-    {
-        return "<?php echo Illuminate\Support\Json::encode($expression) ?>";
-    }
+        $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
 
-    /**
-     * Compile a PHP expression into a JavaScript object, array or single-quoted string.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileJsonParse($expression)
-    {
-        return "<?php echo Illuminate\Support\Json::parse($expression) ?>";
-    }
+        $depth = isset($parts[2]) ? trim($parts[2]) : 512;
 
-    /**
-     * Compile a PHP boolean into JavaScript true/false.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileJsonBool($expression)
-    {
-        return "<?php echo Illuminate\Support\Json::bool($expression) ?>";
-    }
-
-    /**
-     * Compile a PHP string into JavaScript single-quoted string.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileJsonStr($expression)
-    {
-        return "<?php echo Illuminate\Support\Json::str($expression) ?>";
+        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
     }
 }
