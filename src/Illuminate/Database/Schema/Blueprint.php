@@ -1187,6 +1187,20 @@ class Blueprint
     }
 
     /**
+     * Create a new varbinary column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function varbinary($column, $length = null)
+    {
+        $length = $length ?: Builder::$defaultStringLength;
+        
+        return $this->addColumn('varbinary', $column, compact('length'));
+    }
+
+    /**
      * Create a new uuid column on the table.
      *
      * @param  string  $column

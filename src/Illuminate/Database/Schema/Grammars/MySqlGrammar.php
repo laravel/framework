@@ -793,6 +793,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a varbinary type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeVarBinary(Fluent $column)
+    {
+        return "varbinary({$column->length})";
+    }
+
+    /**
      * Create the column definition for a uuid type.
      *
      * @param  \Illuminate\Support\Fluent  $column
