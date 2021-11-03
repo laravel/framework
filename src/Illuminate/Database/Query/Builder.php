@@ -872,6 +872,10 @@ class Builder
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
         if (is_array($first)) {
+            if (! is_null($operator)) {
+                throw new \RuntimeException("When the operator is not null, the column shouldn't be array");
+            }
+
             return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
         }
 
