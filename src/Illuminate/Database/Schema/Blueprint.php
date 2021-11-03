@@ -1196,7 +1196,7 @@ class Blueprint
     public function varbinary($column, $length = null)
     {
         $length = $length ?: Builder::$defaultStringLength;
-        
+
         return $this->addColumn('varbinary', $column, compact('length'));
     }
 
