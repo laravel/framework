@@ -460,5 +460,4 @@ class LogManagerTest extends TestCase
         $this->assertSame($fooConfig['path'], $fooUrl->getValue($fooHandler));
         $this->assertSame($barConfig['path'], $barUrl->getValue($barHandler));
     }
-
 }
