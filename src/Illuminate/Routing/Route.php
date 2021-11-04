@@ -1275,7 +1275,7 @@ class Route
     public function __call($method, $parameters)
     {
         if (static::hasMacro($method)) {
-            $this->macroCall($method, $parameters);
+            return $this->macroCall($method, $parameters);
         }
 
         if ($this->existsInRouteMiddleware($middleware = Str::snake($method, '.'))) {
