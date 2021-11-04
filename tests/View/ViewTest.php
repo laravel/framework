@@ -218,6 +218,7 @@ class ViewTest extends TestCase
         $errors = ['foo' => 'bar', 'qu' => 'ux'];
         $this->assertSame($view, $view->withErrors($errors));
         $this->assertInstanceOf(ViewErrorBag::class, $view->errors);
+        $this->assertEmpty($view->getFactory()->getShared('errors'));
         $foo = $view->errors->get('foo');
         $this->assertSame('bar', $foo[0]);
         $qu = $view->errors->get('qu');
@@ -231,6 +232,12 @@ class ViewTest extends TestCase
         $this->assertSame($view, $view->withErrors(new MessageBag($data), 'login'));
         $foo = $view->errors->getBag('login')->get('foo');
         $this->assertSame('baz', $foo[0]);
+        $this->assertSame($view, $view->withErrors($errors, 'default', true));
+        $this->assertInstanceOf(ViewErrorBag::class, $view->errors);
+        $foo = $view->getFactory()->getShared('errors')->get('foo');
+        $this->assertSame('bar', $foo[0]);
+        $qu = $view->getFactory()->getShared('errors')->get('qu');
+        $this->assertSame('ux', $qu[0]);
     }
 
     protected function getView($data = [])
