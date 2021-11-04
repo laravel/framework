@@ -48,7 +48,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         Schema::create('posts_tags', function (Blueprint $table) {
             $table->integer('post_id');
-            $table->string('tag_id');
+            $table->integer('tag_id');
             $table->string('flag')->default('')->nullable();
             $table->timestamps();
         });
@@ -935,6 +935,7 @@ class User extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($model) {
             $model->setAttribute('uuid', Str::random());
         });
@@ -959,6 +960,7 @@ class Post extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($model) {
             $model->setAttribute('uuid', Str::random());
         });
