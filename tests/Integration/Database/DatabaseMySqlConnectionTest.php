@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
+ * @group MySQL
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */

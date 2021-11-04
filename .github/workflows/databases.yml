@@ -128,7 +128,7 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database --verbose
+        run: vendor/bin/phpunit tests/Integration/Database --verbose --exclude-group MySQL
         env:
           DB_CONNECTION: pgsql
           DB_PASSWORD: password
