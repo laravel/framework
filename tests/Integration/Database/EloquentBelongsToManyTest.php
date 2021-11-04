@@ -680,6 +680,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    /** @group SkipMSSQL */
     public function testWherePivotOnBoolean()
     {
         $tag = Tag::create(['name' => Str::random()]);
