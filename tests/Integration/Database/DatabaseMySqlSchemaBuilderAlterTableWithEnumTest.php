@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use stdClass;
 
 /**
+ * @group MySQL
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */

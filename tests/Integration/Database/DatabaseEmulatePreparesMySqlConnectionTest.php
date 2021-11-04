@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database;
 use PDO;
 
 /**
+ * @group MySQL
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */

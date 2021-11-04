@@ -136,6 +136,10 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         });
 
         Schema::table('comments', function (Blueprint $table) {
+            $table->dropIndex('comments_commentable_type_commentable_id_index');
+        });
+
+        Schema::table('comments', function (Blueprint $table) {
             $table->string('commentable_id')->change();
         });
 
