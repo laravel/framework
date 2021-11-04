@@ -8,11 +8,14 @@ use Exception;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -37,6 +40,18 @@ use UnexpectedValueException;
 
 class RoutingRouteTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        Container::getInstance()->instance(ApplicationContract::class, new Application());
+        Container::getInstance()->instance(Kernel::class, new Kernel(new Application(), new Router(new Dispatcher())));
+    }
+
+    protected function tearDown(): void
+    {
+        Container::getInstance()->flush();
+        Container::setInstance();
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
