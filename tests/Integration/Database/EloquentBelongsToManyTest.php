@@ -663,6 +663,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals($relationTag->getAttributes(), $tag->getAttributes());
     }
 
+    /** @group SkipMSSQL */
     public function testFirstWhere()
     {
         $tag = Tag::create(['name' => 'foo']);
@@ -912,6 +913,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(0, $user->postsWithCustomPivot()->first()->pivot->is_draft);
     }
 
+    /** @group SkipMSSQL */
     public function testOrderByPivotMethod()
     {
         $tag1 = Tag::create(['name' => Str::random()]);
