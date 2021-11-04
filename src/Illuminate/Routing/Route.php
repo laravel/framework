@@ -1078,13 +1078,25 @@ class Route
     }
 
     /**
-     * Determine if the route should enforce scoping of multiple Eloquent bindings.
+     * Indicate that the route should enforce scoping of multiple implicit Eloquent bindings.
      *
      * @return bool
      */
-    public function enforcesScoping()
+    public function scopeBindings()
     {
-        return (bool) ($this->action['scoping'] ?? false);
+        $this->action['scope_bindings'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the route should enforce scoping of multiple implicit Eloquent bindings.
+     *
+     * @return bool
+     */
+    public function enforcesScopedBindings()
+    {
+        return (bool) ($this->action['scope_bindings'] ?? false);
     }
 
     /**

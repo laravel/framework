@@ -147,7 +147,7 @@ PHP);
 
         config(['app.key' => str_repeat('a', 32)]);
 
-        Route::group(['scoping' => true], function () {
+        Route::scopeBindings()->group(function () {
             Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
                 return [$user, $post];
             })->middleware(['web']);
