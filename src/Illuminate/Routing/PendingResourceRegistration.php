@@ -2,12 +2,18 @@
 
 namespace Illuminate\Routing;
 
+use BadMethodCallException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class PendingResourceRegistration
 {
-    use CreatesRegularExpressionRouteConstraints, Macroable;
+    use CreatesRegularExpressionRouteConstraints;
+    use ForwardsCallToMiddleware;
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The resource registrar.
@@ -241,6 +247,30 @@ class PendingResourceRegistration
         return $this->registrar->register(
             $this->name, $this->controller, $this->options
         );
+    }
+
+    /**
+     * Dynamically handle calls to the class.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            $this->macroCall($method, $parameters);
+        }
+
+        if ($this->existsInRouteMiddleware($middleware = Str::snake($method, '.'))) {
+            return $this->forwardToMiddleware($middleware, $parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 
     /**

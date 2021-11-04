@@ -12,6 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -31,6 +32,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  */
 class Router implements BindingRegistrar, RegistrarContract
 {
+    use ForwardsCallToMiddleware;
     use Macroable {
         __call as macroCall;
     }
@@ -1310,6 +1312,17 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Check if the method name exists as a route middleware key.
+     *
+     * @param  string  $method
+     * @return bool
+     */
+    protected function existsInRouteMiddleware($method)
+    {
+        return isset($this->container->make(Kernel::class)->getRouteMiddleware()[$method]);
+    }
+
+    /**
      * Dynamically handle calls into the router instance.
      *
      * @param  string  $method
@@ -1320,6 +1333,10 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if ($this->existsInRouteMiddleware($middleware = Str::snake($method, '.'))) {
+            [$method, $parameters] = ['middleware', $this->parseMiddlewareFromMethod($middleware, $parameters)];
         }
 
         if ($method === 'middleware') {

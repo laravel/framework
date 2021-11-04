@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -22,7 +23,12 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class Route
 {
-    use CreatesRegularExpressionRouteConstraints, Macroable, RouteDependencyResolverTrait;
+    use CreatesRegularExpressionRouteConstraints;
+    use RouteDependencyResolverTrait;
+    use ForwardsCallToMiddleware;
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The URI pattern the route responds to.
@@ -1255,5 +1261,29 @@ class Route
     public function __get($key)
     {
         return $this->parameter($key);
+    }
+
+    /**
+     * Dynamically handle calls to the class.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            $this->macroCall($method, $parameters);
+        }
+
+        if ($this->existsInRouteMiddleware($middleware = Str::snake($method, '.'))) {
+            return $this->forwardToMiddleware($middleware, $parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 }

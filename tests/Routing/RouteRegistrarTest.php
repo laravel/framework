@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Routing;
 use BadMethodCallException;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Mockery as m;
@@ -18,16 +19,29 @@ class RouteRegistrarTest extends TestCase
      */
     protected $router;
 
+    /**
+     * @var \Illuminate\Foundation\Http\Kernel
+     */
+    protected $kernel;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
+        $container = Container::getInstance();
+
+        $this->kernel = m::mock(Kernel::class);
+        $this->kernel->shouldReceive('getRouteMiddleware')->andReturn([]);
+        $container->instance(Kernel::class, $this->kernel);
+
+        $this->router = new Router(m::mock(Dispatcher::class), $container);
     }
 
     protected function tearDown(): void
     {
         m::close();
+
+        Container::getInstance()->forgetInstance(Kernel::class);
     }
 
     public function testMiddlewareFluentRegistration()
@@ -756,6 +770,84 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame('users.index', $this->getRoute()->getName());
+    }
+
+    public function testCanSetMiddlewareDynamically()
+    {
+        Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
+
+        $mock->shouldReceive('getRouteMiddleware')
+            ->withNoArgs()
+            ->andReturn(['one' => 'foo']);
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->one();
+
+        $this->assertEquals(['one'], $this->getRoute()->middleware());
+    }
+
+    public function testCanSetMiddlewareDynamicallyWithParameters()
+    {
+        Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
+
+        $mock->shouldReceive('getRouteMiddleware')
+            ->withNoArgs()
+            ->andReturn(['one' => 'foo']);
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->one('bar');
+
+        $this->assertEquals(['one:bar'], $this->getRoute()->middleware());
+    }
+
+    public function testCanSetMiddlewareDynamicallyInDotNotation()
+    {
+        Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
+
+        $mock->shouldReceive('getRouteMiddleware')
+            ->withNoArgs()
+            ->andReturn(['one.two' => 'foo']);
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->oneTwo('bar');
+
+        $this->assertEquals(['one.two:bar'], $this->getRoute()->middleware());
+    }
+
+    public function testCanSetMiddlewareDynamicallyInResourceRoute()
+    {
+        Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
+
+        $mock->shouldReceive('getRouteMiddleware')
+            ->withNoArgs()
+            ->andReturn(['one.two' => 'foo']);
+
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->oneTwo('bar');
+
+        $this->assertEquals(['one.two:bar'], $this->getRoute()->middleware());
+    }
+
+    public function testCanSetMiddlewareDynamicallyPrependingMiddlewareBeforeRouteGroup()
+    {
+        Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
+
+        $mock->shouldReceive('getRouteMiddleware')
+            ->withNoArgs()
+            ->andReturn(['one.two' => 'foo']);
+
+        $this->router
+            ->oneTwo('bar')
+            ->group(function ($router) {
+                $router->get('users', function () {
+                    return 'all-users';
+                });
+            });
+
+        $this->assertEquals(['one.two:bar'], $this->getRoute()->middleware());
     }
 
     /**
