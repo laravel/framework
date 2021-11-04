@@ -1336,7 +1336,7 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         if ($this->existsInRouteMiddleware($middleware = Str::snake($method, '.'))) {
-            [$method, $parameters] = ['middleware', $this->parseMiddlewareFromMethod($middleware, $parameters)];
+            [$method, $parameters] = ['middleware', [$this->parseMiddlewareFromMethod($middleware, $parameters)]];
         }
 
         if ($method === 'middleware') {

@@ -831,7 +831,7 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one.two:bar'], $this->getRoute()->middleware());
     }
 
-    public function testCanSetMiddlewareDynamicallyPrependingMiddlewareBeforeRouteGroup()
+    public function testCanSetMiddlewareDynamicallyPrependingBeforeRouteGroup()
     {
         Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
 
