@@ -88,7 +88,7 @@ class JsString implements Htmlable
         $json = $this->jsonEncode($data, $flags, $depth);
 
         if (is_string($data)) {
-            return "'".substr($json, 1, '-1')."'";
+            return "'".substr($json, 1, -1)."'";
         }
 
         return $this->convertJsonToJavaScriptExpression($json, $flags);
