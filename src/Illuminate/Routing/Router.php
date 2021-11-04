@@ -1312,17 +1312,6 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Check if the method name exists as a route middleware key.
-     *
-     * @param  string  $method
-     * @return bool
-     */
-    protected function existsInRouteMiddleware($method)
-    {
-        return isset($this->container->make(Kernel::class)->getRouteMiddleware()[$method]);
-    }
-
-    /**
      * Dynamically handle calls into the router instance.
      *
      * @param  string  $method
