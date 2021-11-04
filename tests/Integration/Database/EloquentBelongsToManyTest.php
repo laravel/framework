@@ -599,6 +599,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertNotSame('2017-10-10 10:10:10', $tag->fresh()->updated_at->toDateTimeString());
     }
 
+    /** @group SkipMSSQL */
     public function testCanRetrieveRelatedIds()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -617,6 +618,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals([200, 400], $post->tags()->allRelatedIds()->toArray());
     }
 
+    /** @group SkipMSSQL */
     public function testCanTouchRelatedModels()
     {
         $post = Post::create(['title' => Str::random()]);
