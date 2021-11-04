@@ -85,6 +85,10 @@ class JsString implements Htmlable
      */
     protected function convertDataToJavaScriptExpression($data, $flags = 0, $depth = 512)
     {
+        if ($data instanceof self) {
+            return $data->toHtml();
+        }
+
         $json = $this->jsonEncode($data, $flags, $depth);
 
         if (is_string($data)) {
