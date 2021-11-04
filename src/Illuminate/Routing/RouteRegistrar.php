@@ -55,7 +55,14 @@ class RouteRegistrar
      * @var string[]
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where',
+        'as',
+        'domain',
+        'middleware',
+        'name',
+        'namespace',
+        'prefix',
+        'scopeBindings',
+        'where',
     ];
 
     /**
@@ -65,6 +72,7 @@ class RouteRegistrar
      */
     protected $aliases = [
         'name' => 'as',
+        'scopeBindings' => 'scope_bindings',
     ];
 
     /**
@@ -222,7 +230,7 @@ class RouteRegistrar
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 
-            return $this->attribute($method, $parameters[0]);
+            return $this->attribute($method, $parameters[0] ?? true);
         }
 
         throw new BadMethodCallException(sprintf(
