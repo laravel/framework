@@ -38,6 +38,9 @@ class SchemaBuilderTest extends DatabaseTestCase
         DB::statement('create view foo (id) as select 1');
     }
 
+    /**
+     * @requires pdo_sqlite
+     */
     public function testRegisterCustomDoctrineType()
     {
         Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');

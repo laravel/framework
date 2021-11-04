@@ -59,6 +59,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
     public function testAsPivot()
     {
         Schema::create('post_posts', function (Blueprint $table) {
+            $table->increments('id');
             $table->bigInteger('foreign_id');
             $table->bigInteger('related_id');
         });

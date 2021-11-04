@@ -48,7 +48,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         Schema::create('posts_tags', function (Blueprint $table) {
             $table->integer('post_id');
-            $table->integer('tag_id');
+            $table->integer('tag_id')->default(0);
+            $table->string('tag_name')->default('')->nullable();
             $table->string('flag')->default('')->nullable();
             $table->timestamps();
         });
@@ -402,8 +403,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals($tag->id, $post->tags()->findOrNew($tag->id)->id);
 
-        $this->assertNull($post->tags()->findOrNew('asd')->id);
-        $this->assertInstanceOf(Tag::class, $post->tags()->findOrNew('asd'));
+        $this->assertNull($post->tags()->findOrNew(666)->id);
+        $this->assertInstanceOf(Tag::class, $post->tags()->findOrNew(666));
     }
 
     public function testFirstOrNewMethod()
@@ -416,8 +417,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertEquals($tag->id, $post->tags()->firstOrNew(['id' => $tag->id])->id);
 
-        $this->assertNull($post->tags()->firstOrNew(['id' => 'asd'])->id);
-        $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 'asd']));
+        $this->assertNull($post->tags()->firstOrNew(['id' => 666])->id);
+        $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 666]));
     }
 
     public function testFirstOrCreateMethod()
@@ -446,7 +447,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tags()->updateOrCreate(['id' => $tag->id], ['name' => 'wavez']);
         $this->assertSame('wavez', $tag->fresh()->name);
 
-        $post->tags()->updateOrCreate(['id' => 'asd'], ['name' => 'dives']);
+        $post->tags()->updateOrCreate(['id' => 666], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
     }
 
@@ -853,17 +854,17 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post = Post::create(['title' => Str::random()]);
 
         $tag = $post->tagsWithCustomRelatedKey()->create(['name' => Str::random()]);
-        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_name);
 
         $post->tagsWithCustomRelatedKey()->detach($tag);
 
         $post->tagsWithCustomRelatedKey()->attach($tag);
-        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_name);
 
         $post->tagsWithCustomRelatedKey()->detach(new Collection([$tag]));
 
         $post->tagsWithCustomRelatedKey()->attach(new Collection([$tag]));
-        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_name);
 
         $post->tagsWithCustomRelatedKey()->updateExistingPivot($tag, ['flag' => 'exclude']);
         $this->assertSame('exclude', $post->tagsWithCustomRelatedKey()->first()->pivot->flag);
@@ -1015,7 +1016,7 @@ class Post extends Model
 
     public function tagsWithCustomRelatedKey()
     {
-        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id', 'id', 'name')
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_name', 'id', 'name')
             ->withPivot('flag');
     }
 
