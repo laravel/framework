@@ -4,7 +4,8 @@ namespace Illuminate\Tests\Routing;
 
 use BadMethodCallException;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -19,22 +20,15 @@ class RouteRegistrarTest extends TestCase
      */
     protected $router;
 
-    /**
-     * @var \Illuminate\Foundation\Http\Kernel
-     */
-    protected $kernel;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $container = Container::getInstance();
 
-        $this->kernel = m::mock(Kernel::class);
-        $this->kernel->shouldReceive('getRouteMiddleware')->andReturn([]);
-        $container->instance(Kernel::class, $this->kernel);
+        $this->router = new Router(m::mock(DispatcherContract::class), $container);
 
-        $this->router = new Router(m::mock(Dispatcher::class), $container);
+        $container->instance(Kernel::class, new Kernel(new Application(), $this->router));
     }
 
     protected function tearDown(): void
@@ -42,6 +36,8 @@ class RouteRegistrarTest extends TestCase
         m::close();
 
         Container::getInstance()->forgetInstance(Kernel::class);
+        Container::getInstance()->flush();
+        Container::setInstance();
     }
 
     public function testMiddlewareFluentRegistration()
