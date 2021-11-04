@@ -9,6 +9,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -781,6 +782,41 @@ class RouteRegistrarTest extends TestCase
         })->one();
 
         $this->assertEquals(['one'], $this->getRoute()->middleware());
+    }
+
+    public function testDeclaringMiddlewareFluentlyIsAdditive()
+    {
+        Container::getInstance()->instance(Kernel::class, $mock = m::mock(Kernel::class));
+
+        $mock->shouldReceive('getRouteMiddleware')
+            ->withNoArgs()
+            ->andReturn(['one' => 'foo', 'two' => 'bar']);
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->one()->two();
+
+        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
+    }
+
+    public function testReturnsBadMethodCallExceptionIfMiddlewareDoesntExists()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Method Illuminate\Routing\Route::one does not exist.');
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->one();
+    }
+
+    public function testReturnsBadMethodCallExceptionIfPrependedMiddlewareDoesntExists()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Attribute [one] does not exist.');
+
+        $this->router->one()->get('users', function () {
+            return 'all-users';
+        });
     }
 
     public function testCanSetMiddlewareDynamicallyWithParameters()
