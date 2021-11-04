@@ -176,7 +176,7 @@ jobs:
           DB_CONNECTION: pgsql
           DB_PASSWORD: password
 
-  sqlsrv:
+  mssql:
     runs-on: ubuntu-20.04
 
     services:
