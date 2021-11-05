@@ -162,6 +162,16 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($queueUrl, $queue->getQueue($queueUrl));
     }
 
+    public function testGetQueueProperlyResolvesFifoUrlWithoutPrefix()
+    {
+        $this->queueName = 'emails.fifo';
+        $this->queueUrl = $this->prefix . $this->queueName;
+        $queue = new SqsQueue($this->sqs, $this->queueUrl);
+        $this->assertEquals($this->queueUrl, $queue->getQueue(null));
+        $fifoQueueUrl = $this->baseUrl . '/' . $this->account . '/test.fifo';
+        $this->assertEquals($fifoQueueUrl, $queue->getQueue($fifoQueueUrl));
+    }
+
     public function testGetQueueProperlyResolvesUrlWithSuffix()
     {
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging');
