@@ -199,23 +199,21 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function buildFormRequestReplacements(array $replace, $modelClass)
     {
-        $storeRequestClass = $updateRequestClass = 'Request';
-        $namespace = 'Illuminate\\Http';
+        [$namespace, $storeRequestClass, $updateRequestClass] = [
+            'Illuminate\\Http', 'Request', 'Request',
+        ];
 
         if ($this->option('requests')) {
-            $storeRequestClass = 'Store'.class_basename($modelClass).'Request';
-            $this->call('make:request', [
-                'name' => $storeRequestClass,
-            ]);
-            $updateRequestClass = 'Update'.class_basename($modelClass).'Request';
-            $this->call('make:request', [
-                'name' => $updateRequestClass,
-            ]);
             $namespace = 'App\\Http\\Requests';
+
+            [$storeRequestClass, $updateRequestClass] = $this->generateFormRequests(
+                $modelClass, $storeRequestClass, $updateRequestClass
+            );
         }
 
         $namespacedRequests = $namespace.'\\'.$storeRequestClass.';';
-        if ($storeRequestClass != $updateRequestClass) {
+
+        if ($storeRequestClass !== $updateRequestClass) {
             $namespacedRequests .= PHP_EOL.'use '.$namespace.'\\'.$updateRequestClass.';';
         }
 
@@ -231,6 +229,31 @@ class ControllerMakeCommand extends GeneratorCommand
             '{{ namespacedRequests }}' => $namespacedRequests,
             '{{namespacedRequests}}' => $namespacedRequests,
         ]);
+    }
+
+    /**
+     * Generate the form requests for the given model and classes.
+     *
+     * @param  string  $modelName
+     * @param  string  $storeRequestClass
+     * @param  string  $updateRequestClass
+     * @return array
+     */
+    protected function generateFormRequests($modelClass, $storeRequestClass, $updateRequestClass)
+    {
+        $storeRequestClass = 'Store'.class_basename($modelClass).'Request';
+
+        $this->call('make:request', [
+            'name' => $storeRequestClass,
+        ]);
+
+        $updateRequestClass = 'Update'.class_basename($modelClass).'Request';
+
+        $this->call('make:request', [
+            'name' => $updateRequestClass,
+        ]);
+
+        return [$storeRequestClass, $updateRequestClass];
     }
 
     /**
