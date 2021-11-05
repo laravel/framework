@@ -32,6 +32,13 @@ class CallbackEvent extends Event
     protected $result;
 
     /**
+     * The exception that was thrown when calling the callback.
+     *
+     * @var \Throwable
+     */
+    protected $exception;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -68,6 +75,10 @@ class CallbackEvent extends Event
     {
         parent::run($container);
 
+        if ($this->exception) {
+            throw $this->exception;
+        }
+
         return $this->result;
     }
 
@@ -80,9 +91,8 @@ class CallbackEvent extends Event
 
             return $this->result === false ? 1 : 0;
         } catch (Throwable $e) {
-            $this->exitCode = 1;
-
-            throw $e;
+            $this->exception = $e;
+            return 1;
         }
     }
 
