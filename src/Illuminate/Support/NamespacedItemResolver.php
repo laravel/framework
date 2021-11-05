@@ -89,16 +89,6 @@ class NamespacedItemResolver
     }
 
     /**
-     * Clear the parsed keys.
-     *
-     * @return void
-     */
-    public function flushParsedKeys()
-    {
-        $this->parsed = [];
-    }
-
-    /**
      * Set the parsed value of a key.
      *
      * @param  string  $key
@@ -108,5 +98,15 @@ class NamespacedItemResolver
     public function setParsedKey($key, $parsed)
     {
         $this->parsed[$key] = $parsed;
+    }
+
+    /**
+     * Flush the cache of parsed keys.
+     *
+     * @return void
+     */
+    public function flushParsedKeys()
+    {
+        $this->parsed = [];
     }
 }
