@@ -228,7 +228,7 @@ class Event
 
             $this->callAfterCallbacks($container);
         } finally {
-            $this->deleteMutex();
+            $this->removeMutex();
         }
     }
 
@@ -245,7 +245,7 @@ class Event
 
             Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
         } catch (Throwable $exception) {
-            $this->deleteMutex();
+            $this->removeMutex();
 
             throw $exception;
         }
@@ -291,7 +291,7 @@ class Event
         try {
             $this->callAfterCallbacks($container);
         } finally {
-            $this->deleteMutex();
+            $this->removeMutex();
         }
     }
 
@@ -936,7 +936,7 @@ class Event
      *
      * @return void
      */
-    protected function deleteMutex()
+    protected function removeMutex()
     {
         if ($this->withoutOverlapping) {
             $this->mutex->forget($this);
