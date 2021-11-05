@@ -7,39 +7,24 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 
-class JsString implements Htmlable
+class Js implements Htmlable
 {
     /**
-     * Flags that must always be used when encoding to JSON for JsString.
-     *
-     * @var int
-     */
-    protected const REQUIRED_FLAGS = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
-
-    /**
-     * The javascript string.
+     * The JavaScript string.
      *
      * @var string
      */
     protected $js;
 
     /**
-     * Create a new JsString from data.
+     * Flags that should be used when encoding to JSON.
      *
-     * @param  mixed  $data
-     * @param  int  $flags
-     * @param  int  $depth
-     * @return static
-     *
-     * @throws \JsonException
+     * @var int
      */
-    public static function from($data, $flags = 0, $depth = 512)
-    {
-        return new static($data, $flags, $depth);
-    }
+    protected const REQUIRED_FLAGS = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
 
     /**
-     * Create a new JsString.
+     * Create a new class instance.
      *
      * @param  mixed  $data
      * @param  int|null  $flags
@@ -54,27 +39,22 @@ class JsString implements Htmlable
     }
 
     /**
-     * Get string representation of data for use in HTML.
+     * Create a new JavaScript string from the given data.
      *
-     * @return string
+     * @param  mixed  $data
+     * @param  int  $flags
+     * @param  int  $depth
+     * @return static
+     *
+     * @throws \JsonException
      */
-    public function toHtml()
+    public static function from($data, $flags = 0, $depth = 512)
     {
-        return $this->js;
+        return new static($data, $flags, $depth);
     }
 
     /**
-     * Get string representation of data for use in HTML.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toHtml();
-    }
-
-    /**
-     * Convert data to a JavaScript expression.
+     * Convert the given data to a JavaScript expression.
      *
      * @param  mixed  $data
      * @param  int  $flags
@@ -99,7 +79,7 @@ class JsString implements Htmlable
     }
 
     /**
-     * Encode data as JSON.
+     * Encode the given data as JSON.
      *
      * @param  mixed  $data
      * @param  int  $flags
@@ -122,7 +102,7 @@ class JsString implements Htmlable
     }
 
     /**
-     * Convert JSON to a JavaScript expression.
+     * Convert the given JSON to a JavaScript expression.
      *
      * @param  string  $json
      * @param  int  $flags
@@ -137,11 +117,29 @@ class JsString implements Htmlable
         }
 
         if (Str::startsWith($json, ['"', '{', '['])) {
-            $json = json_encode($json, $flags | static::REQUIRED_FLAGS);
-
-            return "JSON.parse('".substr($json, 1, -1)."')";
+            return "JSON.parse('".substr(json_encode($json, $flags | static::REQUIRED_FLAGS), 1, -1)."')";
         }
 
         return $json;
+    }
+
+    /**
+     * Get the string representation of the data for use in HTML.
+     *
+     * @return string
+     */
+    public function toHtml()
+    {
+        return $this->js;
+    }
+
+    /**
+     * Get the string representation of the data for use in HTML.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toHtml();
     }
 }

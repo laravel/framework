@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\JsString;
+use Illuminate\Support\Js;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
@@ -12,13 +12,13 @@ class SupportJsStringTest extends TestCase
 {
     public function testScalars()
     {
-        $this->assertEquals('false', (string) JsString::from(false));
-        $this->assertEquals('true', (string) JsString::from(true));
-        $this->assertEquals('1', (string) JsString::from(1));
-        $this->assertEquals('1.1', (string) JsString::from(1.1));
+        $this->assertEquals('false', (string) Js::from(false));
+        $this->assertEquals('true', (string) Js::from(true));
+        $this->assertEquals('1', (string) Js::from(1));
+        $this->assertEquals('1.1', (string) Js::from(1.1));
         $this->assertEquals(
             "'\\u003Cdiv class=\\u0022foo\\u0022\\u003E\\u0027quoted html\\u0027\\u003C\\/div\\u003E'",
-            (string) JsString::from('<div class="foo">\'quoted html\'</div>')
+            (string) Js::from('<div class="foo">\'quoted html\'</div>')
         );
     }
 
@@ -26,12 +26,12 @@ class SupportJsStringTest extends TestCase
     {
         $this->assertEquals(
             "JSON.parse('[\\u0022hello\\u0022,\\u0022world\\u0022]')",
-            (string) JsString::from(['hello', 'world'])
+            (string) Js::from(['hello', 'world'])
         );
 
         $this->assertEquals(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
-            (string) JsString::from(['foo' => 'hello', 'bar' => 'world'])
+            (string) Js::from(['foo' => 'hello', 'bar' => 'world'])
         );
     }
 
@@ -39,7 +39,7 @@ class SupportJsStringTest extends TestCase
     {
         $this->assertEquals(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
-            (string) JsString::from((object) ['foo' => 'hello', 'bar' => 'world'])
+            (string) Js::from((object) ['foo' => 'hello', 'bar' => 'world'])
         );
     }
 
@@ -66,7 +66,7 @@ class SupportJsStringTest extends TestCase
 
         $this->assertEquals(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
-            (string) JsString::from($data)
+            (string) Js::from($data)
         );
     }
 
@@ -98,7 +98,7 @@ class SupportJsStringTest extends TestCase
 
         $this->assertEquals(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
-            (string) JsString::from($data)
+            (string) Js::from($data)
         );
     }
 
@@ -118,7 +118,7 @@ class SupportJsStringTest extends TestCase
 
         $this->assertEquals(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
-            (string) JsString::from($data)
+            (string) Js::from($data)
         );
     }
 }
