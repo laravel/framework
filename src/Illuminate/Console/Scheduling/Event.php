@@ -228,7 +228,7 @@ class Event
 
             $this->callAfterCallbacks($container);
         } finally {
-            $this->removeMutex();
+            $this->deleteMutex();
         }
     }
 
@@ -245,7 +245,7 @@ class Event
 
             Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
         } catch (Throwable $exception) {
-            $this->removeMutex();
+            $this->deleteMutex();
 
             throw $exception;
         }
@@ -291,7 +291,7 @@ class Event
         try {
             $this->callAfterCallbacks($container);
         } finally {
-            $this->removeMutex();
+            $this->deleteMutex();
         }
     }
 
@@ -653,18 +653,6 @@ class Event
     }
 
     /**
-     * Clear the mutex for the event.
-     *
-     * @return void
-     */
-    protected function removeMutex()
-    {
-        if ($this->withoutOverlapping) {
-            $this->mutex->forget($this);
-        }
-    }
-
-    /**
      * Do not allow the event to overlap each other.
      *
      * @param  int  $expiresAt
@@ -943,5 +931,17 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
+    }
+
+    /**
+     * Delete the mutex for the event.
+     *
+     * @return void
+     */
+    protected function deleteMutex()
+    {
+        if ($this->withoutOverlapping) {
+            $this->mutex->forget($this);
+        }
     }
 }
