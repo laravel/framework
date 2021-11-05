@@ -98,6 +98,7 @@ class CallbackEvent extends Event
             return $this->result === false ? 1 : 0;
         } catch (Throwable $e) {
             $this->exception = $e;
+
             return 1;
         }
     }
