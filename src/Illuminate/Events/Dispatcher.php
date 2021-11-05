@@ -462,6 +462,13 @@ class Dispatcher implements DispatcherContract
                     : [$listener, $method];
     }
 
+    /**
+     * Determine if the listener should run based on a given callback.
+     *
+     * @param   string  $listener
+     * @param  array  $payload
+     * @return mixed
+     */
     protected function listenerShouldRun($listener, $payload)
     {
         return [$listener, 'shouldRun'](...array_values($payload));
