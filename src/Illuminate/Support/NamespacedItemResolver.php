@@ -89,6 +89,16 @@ class NamespacedItemResolver
     }
 
     /**
+     * Clear the parsed keys.
+     *
+     * @return void
+     */
+    public function flushParsedKeys()
+    {
+        $this->parsed = [];
+    }
+
+    /**
      * Set the parsed value of a key.
      *
      * @param  string  $key
