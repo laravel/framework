@@ -122,6 +122,26 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals(['baz'], $response);
     }
 
+    public function testContainerResolutionOfEventHandlersShouldNotRunTheListener()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $container->shouldReceive('make')->once()->with(TestEventListenerShouldNotRun::class)->andReturn(new TestEventListenerShouldNotRun);
+        $d->listen('foo', TestEventListenerShouldNotRun::class.'@onFooEvent');
+        $response = $d->dispatch('foo', ['foo', 'bar']);
+
+        $this->assertEquals([null], $response);
+    }
+
+    public function testContainerResolutionOfEventHandlersShouldRunTheListener()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $container->shouldReceive('make')->once()->with(TestEventListenerShouldRun::class)->andReturn(new TestEventListenerShouldRun);
+        $d->listen('foo', TestEventListenerShouldRun::class.'@onFooEvent');
+        $response = $d->dispatch('foo', ['foo', 'bar']);
+
+        $this->assertEquals(['baz'], $response);
+    }
+
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
         $d = new Dispatcher(new Container);
@@ -472,11 +492,21 @@ class TestEventListener
     {
         return 'baz';
     }
+
+    public function shouldRun()
+    {
+        return true;
+    }
 }
 
 class TestEventListenerShouldNotRun
 {
     public function handle($foo)
+    {
+        return 'baz';
+    }
+
+    public function onFooEvent($foo, $bar)
     {
         return 'baz';
     }
@@ -490,6 +520,11 @@ class TestEventListenerShouldNotRun
 class TestEventListenerShouldRun
 {
     public function handle($foo, $bar)
+    {
+        return 'baz';
+    }
+
+    public function onFooEvent($foo, $bar)
     {
         return 'baz';
     }
