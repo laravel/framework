@@ -197,10 +197,10 @@ class Event
             return;
         }
 
-        $exitCode = $this->startCommand($container);
+        $exitCode = $this->start($container);
 
         if (! $this->runInBackground) {
-            $this->finishCommand($container, $exitCode);
+            $this->finish($container, $exitCode);
         }
     }
 
@@ -222,12 +222,12 @@ class Event
      *
      * @throws \Throwable
      */
-    protected function startCommand($container)
+    protected function start($container)
     {
         try {
             $this->callBeforeCallbacks($container);
 
-            return $this->executeCommand($container);
+            return $this->execute($container);
         } catch (Throwable $exception) {
             $this->removeMutex();
 
@@ -241,7 +241,7 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return int
      */
-    protected function executeCommand($container)
+    protected function execute($container)
     {
         return Process::fromShellCommandline(
             $this->buildCommand(), base_path(), null, null, null
@@ -255,7 +255,7 @@ class Event
      * @param  int  $exitCode
      * @return void
      */
-    public function finishCommand(Container $container, $exitCode)
+    public function finish(Container $container, $exitCode)
     {
         $this->exitCode = (int) $exitCode;
 

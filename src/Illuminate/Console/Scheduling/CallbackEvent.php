@@ -34,7 +34,7 @@ class CallbackEvent extends Event
     /**
      * The exception that was thrown when calling the callback.
      *
-     * @var \Throwable
+     * @var \Throwable|null
      */
     protected $exception;
 
@@ -42,7 +42,7 @@ class CallbackEvent extends Event
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
-     * @param  string  $callback
+     * @param  string|callable  $callback
      * @param  array  $parameters
      * @param  \DateTimeZone|string|null  $timezone
      * @return void
@@ -82,7 +82,13 @@ class CallbackEvent extends Event
         return $this->result;
     }
 
-    protected function executeCommand($container)
+    /**
+     * Run the callback.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return int
+     */
+    protected function execute($container)
     {
         try {
             $this->result = is_object($this->callback)
