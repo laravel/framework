@@ -418,12 +418,20 @@ class Dispatcher implements DispatcherContract
             if ($wildcard) {
                 $callable = $this->createClassCallable($listener);
 
+                if ($callable instanceof Closure) {
+                    return call_user_func($callable, $event, $payload);
+                }
+
                 return $this->listenerShouldRun($callable[0], $payload)
                     ? call_user_func($callable, $event, $payload)
                     : null;
             }
 
             $callable = $this->createClassCallable($listener);
+
+            if ($callable instanceof Closure) {
+                return $callable(...array_values($payload));
+            }
 
             if (! method_exists($callable[0], 'shouldRun')) {
                 return $callable(...array_values($payload));
