@@ -17,6 +17,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 class Event
 {
@@ -187,17 +188,20 @@ class Event
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
+     *
+     * @throws \Throwable
      */
     public function run(Container $container)
     {
-        if ($this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
+        if ($this->shouldSkipDueToOverlapping()) {
             return;
         }
 
-        $this->runInBackground
-                    ? $this->runCommandInBackground($container)
-                    : $this->runCommandInForeground($container);
+        $exitCode = $this->startCommand($container);
+
+        if (! $this->runInBackground) {
+            $this->finishCommand($container, $exitCode);
+        }
     }
 
     /**
@@ -211,31 +215,55 @@ class Event
     }
 
     /**
-     * Run the command in the foreground.
+     * Run the command process.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
+     * @return int
+     *
+     * @throws \Throwable
      */
-    protected function runCommandInForeground(Container $container)
+    protected function startCommand($container)
     {
-        $this->callBeforeCallbacks($container);
+        try {
+            $this->callBeforeCallbacks($container);
 
-        $this->exitCode = Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+            return $this->executeCommand($container);
+        } catch (Throwable $exception) {
+            $this->removeMutex();
 
-        $this->callAfterCallbacks($container);
+            throw $exception;
+        }
     }
 
     /**
-     * Run the command in the background.
+     * Run the command process.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return int
+     */
+    protected function executeCommand($container)
+    {
+        return Process::fromShellCommandline(
+            $this->buildCommand(), base_path(), null, null, null
+        )->run();
+    }
+
+    /**
+     * Mark the command process as finished and run callbacks/cleanup.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  int  $exitCode
      * @return void
      */
-    protected function runCommandInBackground(Container $container)
+    public function finishCommand(Container $container, $exitCode)
     {
-        $this->callBeforeCallbacks($container);
+        $this->exitCode = (int) $exitCode;
 
-        Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+        try {
+            $this->callAfterCallbacks($container);
+        } finally {
+            $this->removeMutex();
+        }
     }
 
     /**
@@ -262,20 +290,6 @@ class Event
         foreach ($this->afterCallbacks as $callback) {
             $container->call($callback);
         }
-    }
-
-    /**
-     * Call all of the "after" callbacks for the event.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  int  $exitCode
-     * @return void
-     */
-    public function callAfterCallbacksWithExitCode(Container $container, $exitCode)
-    {
-        $this->exitCode = (int) $exitCode;
-
-        $this->callAfterCallbacks($container);
     }
 
     /**
@@ -362,6 +376,16 @@ class Event
         }
 
         return true;
+    }
+
+    /**
+     * Determine if the event should skip because another process is overlapping.
+     *
+     * @return bool
+     */
+    public function shouldSkipDueToOverlapping()
+    {
+        return $this->withoutOverlapping && ! $this->mutex->create($this);
     }
 
     /**
@@ -647,9 +671,7 @@ class Event
 
         $this->expiresAt = $expiresAt;
 
-        return $this->then(function () {
-            $this->mutex->forget($this);
-        })->skip(function () {
+        return $this->skip(function () {
             return $this->mutex->exists($this);
         });
     }
@@ -914,5 +936,17 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
+    }
+
+    /**
+     * Delete the mutex for the event.
+     *
+     * @return void
+     */
+    protected function removeMutex()
+    {
+        if ($this->withoutOverlapping) {
+            $this->mutex->forget($this);
+        }
     }
 }
