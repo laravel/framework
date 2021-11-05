@@ -111,6 +111,48 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'integer_status' => null,
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
+
+    public function testFirstOrNew()
+    {
+        DB::table('enum_casts')->insert([
+            'string_status' => 'pending',
+            'integer_status' => 1,
+        ]);
+
+        $model = EloquentModelEnumCastingTestModel::firstOrNew([
+            'string_status' => StringStatus::pending,
+        ]);
+
+        $model2 = EloquentModelEnumCastingTestModel::firstOrNew([
+            'string_status' => StringStatus::done,
+        ]);
+
+        $this->assertTrue($model->exists);
+        $this->assertFalse($model2->exists);
+
+        $model2->save();
+
+        $this->assertEquals(StringStatus::done, $model2->string_status);
+    }
+
+    public function testFirstOrCreate()
+    {
+        DB::table('enum_casts')->insert([
+            'string_status' => 'pending',
+            'integer_status' => 1,
+        ]);
+
+        $model = EloquentModelEnumCastingTestModel::firstOrCreate([
+            'string_status' => StringStatus::pending,
+        ]);
+
+        $model2 = EloquentModelEnumCastingTestModel::firstOrCreate([
+            'string_status' => StringStatus::done,
+        ]);
+
+        $this->assertEquals(StringStatus::pending, $model->string_status);
+        $this->assertEquals(StringStatus::done, $model2->string_status);
+    }
 }
 
 class EloquentModelEnumCastingTestModel extends Model
