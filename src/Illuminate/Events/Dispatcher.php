@@ -465,7 +465,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the listener should run based on a given callback.
      *
-     * @param   string  $listener
+     * @param  string  $listener
      * @param  array  $payload
      * @return mixed
      */
