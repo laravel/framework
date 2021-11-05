@@ -45,6 +45,7 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/notification.stub' => $stubsPath.'/notification.stub',
             __DIR__.'/stubs/observer.plain.stub' => $stubsPath.'/observer.plain.stub',
             __DIR__.'/stubs/observer.stub' => $stubsPath.'/observer.stub',
+            __DIR__.'/stubs/provider.stub' => $stubsPath.'/provider.stub',
             __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
             __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
             __DIR__.'/stubs/resource.stub' => $stubsPath.'/resource.stub',
