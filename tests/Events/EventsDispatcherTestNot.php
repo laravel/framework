@@ -130,6 +130,27 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals(['baz'], $response);
     }
 
+    public function testListenersAreNotExecuteIfShouldRunIsDefinedAndReturnsFalse()
+    {
+        $d = new Dispatcher(new Container);
+        $d->listen('foo', TestEventListenerShouldNotRun::class);
+        $response = $d->dispatch('foo', ['foo', 'bar']);
+        $this->assertEquals([null], $response);
+    }
+
+    public function testShouldRunReceivesListenerPayloadParameters()
+    {
+        $d = new Dispatcher(new Container);
+        $d->listen('foo', TestEventListenerShouldRun::class);
+        $response = $d->dispatch('foo', ['foo', 'bar']);
+        $this->assertEquals(['baz'], $response);
+
+        $d = new Dispatcher(new Container);
+        $d->listen('foo', TestEventListenerShouldRun::class);
+        $response = $d->dispatch('foo', ['bar', 'foo']);
+        $this->assertEquals([null], $response);
+    }
+
     public function testQueuedEventsAreFired()
     {
         unset($_SERVER['__event.test']);
@@ -450,6 +471,32 @@ class TestEventListener
     public function onFooEvent($foo, $bar)
     {
         return 'baz';
+    }
+}
+
+class TestEventListenerShouldNotRun
+{
+    public function handle($foo)
+    {
+        return 'baz';
+    }
+
+    public function shouldRun($event)
+    {
+        return false;
+    }
+}
+
+class TestEventListenerShouldRun
+{
+    public function handle($foo, $bar)
+    {
+        return 'baz';
+    }
+
+    public function shouldRun($foo, $bar)
+    {
+        return $foo === 'foo' && $bar === 'bar';
     }
 }
 

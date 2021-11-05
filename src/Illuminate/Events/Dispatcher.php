@@ -410,18 +410,28 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string  $listener
      * @param  bool  $wildcard
-     * @return \Closure
+     * @return \Closure|null
      */
     public function createClassListener($listener, $wildcard = false)
     {
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
-                return call_user_func($this->createClassCallable($listener), $event, $payload);
+                $callable = $this->createClassCallable($listener);
+
+                return $this->listenerShouldRun($listener, $payload)
+                    ? call_user_func($callable, $event, $payload)
+                    : null;
             }
 
             $callable = $this->createClassCallable($listener);
 
-            return $callable(...array_values($payload));
+            if (! method_exists($listener, 'shouldRun')) {
+                return $callable(...array_values($payload));
+            }
+
+            return $this->listenerShouldRun($listener, $payload)
+                ? $callable(...array_values($payload))
+                : null;
         };
     }
 
@@ -450,6 +460,11 @@ class Dispatcher implements DispatcherContract
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
                     ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
                     : [$listener, $method];
+    }
+
+    protected function listenerShouldRun($listener, $payload)
+    {
+        return [$listener, 'shouldRun'](...array_values($payload));
     }
 
     /**
