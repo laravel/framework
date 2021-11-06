@@ -945,7 +945,7 @@ class Str
     }
 
     /**
-     * Get query parameters from a url string as an associative array.
+     * Get the query parameters from a url string as an associative array.
      *
      * @param  string  $url
      * @return array
