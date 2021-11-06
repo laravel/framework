@@ -616,6 +616,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
     }
+
+    public function testParams()
+    {
+        $this->assertSame([
+            'name' => 'Ben Sherred',
+            'foo' => 'bar',
+            'array' => ['ping', 'pong']
+        ], Str::params('https://laravel.com/?name=Ben%20Sherred&foo=bar&array[]=ping&array[]=pong'));
+    }
 }
 
 class StringableObjectStub

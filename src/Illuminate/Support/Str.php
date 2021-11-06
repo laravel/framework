@@ -943,4 +943,19 @@ class Str
     {
         static::$uuidFactory = null;
     }
+
+    /**
+     * Get query parameters from a url string as an associative array.
+     *
+     * @param  string  $url
+     * @return array
+     */
+    public static function params($url)
+    {
+        $queryString = parse_url($url, PHP_URL_QUERY);
+
+        parse_str($queryString, $params);
+
+        return $params;
+    }
 }
