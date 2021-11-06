@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 
 use function PHPStan\Testing\assertType;
@@ -808,12 +807,11 @@ assertType(
  *
  * @extends \Illuminate\Support\LazyCollection<TKey, TValue>
  */
-class CustomCollection extends LazyCollection
+class CustomLazyCollection extends LazyCollection
 {
 }
 
-// assertType('CustomCollection<int, User>', CustomCollection::make([new User]));
-assertType('Illuminate\Support\Collection<int, User>', CustomCollection::make([new User])->toBase());
+// assertType('CustomLazyCollection<int, User>', CustomLazyCollection::make([new User]));
 
 assertType('array<int, mixed>', $collection->toArray());
 assertType('array<string, mixed>', LazyCollection::make(['string' => 'string'])->toArray());
