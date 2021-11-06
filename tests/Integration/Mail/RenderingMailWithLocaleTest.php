@@ -6,9 +6,6 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RenderingMailWithLocaleTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
@@ -29,10 +26,6 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInDefaultLocale()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $mail = new RenderedTestMail;
 
         $this->assertStringContainsString('name', $mail->render());
@@ -40,10 +33,6 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInSelectedLocale()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $mail = (new RenderedTestMail)->locale('es');
 
         $this->assertStringContainsString('nombre', $mail->render());
@@ -51,10 +40,6 @@ class RenderingMailWithLocaleTest extends TestCase
 
     public function testMailableRendersInAppSelectedLocale()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         $this->app->setLocale('es');
 
         $mail = new RenderedTestMail;

@@ -7,9 +7,6 @@ use Illuminate\Tests\Integration\Routing\Fixtures\ApiResourceTaskController;
 use Illuminate\Tests\Integration\Routing\Fixtures\ApiResourceTestController;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RouteApiResourceTest extends TestCase
 {
     public function testApiResource()

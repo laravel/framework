@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentCollectionLoadCountTest extends DatabaseTestCase
 {
     protected function setUp(): void

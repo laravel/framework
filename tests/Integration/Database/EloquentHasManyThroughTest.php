@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentHasManyThroughTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -47,7 +44,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
     {
         $user = User::create(['name' => Str::random()]);
 
-        $team1 = Team::create(['id' => 10, 'owner_id' => $user->id]);
+        $team1 = Team::create(['owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
 
         $mate1 = User::create(['name' => 'John', 'team_id' => $team1->id]);

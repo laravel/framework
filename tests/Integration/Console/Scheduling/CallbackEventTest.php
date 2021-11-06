@@ -8,9 +8,6 @@ use Illuminate\Console\Scheduling\EventMutex;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class CallbackEventTest extends TestCase
 {
     protected function tearDown(): void

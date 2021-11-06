@@ -7,9 +7,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JobDispatchingTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

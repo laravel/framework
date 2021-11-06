@@ -58,7 +58,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
 @include("users")
 @verbatim
     {{ $fourth }} @include("test")
-@endverbatim 
+@endverbatim
 @php echo $fifth; @endphp';
 
         $expected = '<?php echo e($first); ?>
@@ -73,7 +73,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
 <?php echo $__env->make("users", \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>
 
     {{ $fourth }} @include("test")
- 
+
 <?php echo $fifth; ?>';
 
         $this->assertSame($expected, $this->compiler->compileString($string));

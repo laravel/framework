@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
@@ -16,7 +17,7 @@ use stdClass;
  *
  * @implements \Illuminate\Support\Enumerable<TKey, TValue>
  */
-class LazyCollection implements Enumerable
+class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 {
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>

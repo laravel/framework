@@ -124,6 +124,12 @@ trait CanBeOneOfMany
 
         $this->addConstraints();
 
+        $columns = $this->query->getQuery()->columns;
+
+        if (is_null($columns) || $columns === ['*']) {
+            $this->select([$this->qualifyColumn('*')]);
+        }
+
         return $this;
     }
 
@@ -189,7 +195,7 @@ trait CanBeOneOfMany
         }
 
         if (! is_null($column)) {
-            $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($column).') as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
+            $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column)).') as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
         }
 
         $this->addOneOfManySubQueryConstraints($subQuery, $groupBy, $column, $aggregate);

@@ -32,7 +32,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * The Illuminate application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Illuminate\Foundation\Application
      */
     protected $app;
 

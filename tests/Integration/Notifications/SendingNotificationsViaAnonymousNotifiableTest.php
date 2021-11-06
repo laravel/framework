@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 {
     public $mailer;

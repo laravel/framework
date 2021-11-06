@@ -7,9 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentWithCountTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -70,9 +67,10 @@ class EloquentWithCountTest extends DatabaseTestCase
         $one = Model1::create();
         $one->twos()->create();
 
-        $result = Model1::withCount('twos')->toSql();
+        $query = Model1::withCount('twos')->getQuery();
 
-        $this->assertSame('select "one".*, (select count(*) from "two" where "one"."id" = "two"."one_id") as "twos_count" from "one"', $result);
+        $this->assertNull($query->orders);
+        $this->assertSame([], $query->getRawBindings()['order']);
     }
 }
 

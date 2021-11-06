@@ -1,6 +1,9 @@
 php:
   preset: laravel
   version: 8
+  finder:
+    not-name:
+      - Enums.php
 js:
   finder:
     not-name:

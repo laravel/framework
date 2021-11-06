@@ -450,6 +450,48 @@ class AssertTest extends TestCase
         $assert->whereContains('foo', ['1']);
     }
 
+    public function testAssertWhereContainsFailsWhenDoesNotSatisfyClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
+
+        $assert->whereContains('foo', [function ($actual) {
+            return $actual === 5;
+        }]);
+    }
+
+    public function testAssertWhereContainsFailsWhenHavingExpectedValueButDoesNotSatisfyClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
+
+        $assert->whereContains('foo', [1, function ($actual) {
+            return $actual === 5;
+        }]);
+    }
+
+    public function testAssertWhereContainsFailsWhenSatisfiesClosureButDoesNotHaveExpectedValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain [5].');
+
+        $assert->whereContains('foo', [5, function ($actual) {
+            return $actual === 1;
+        }]);
+    }
+
     public function testAssertWhereContainsWithNestedValue()
     {
         $assert = AssertableJson::fromArray([
@@ -502,6 +544,46 @@ class AssertTest extends TestCase
         ]);
 
         $assert->whereContains('baz', 4);
+    }
+
+    public function testAssertWhereContainsWithClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $assert->whereContains('foo', function ($actual) {
+            return $actual % 3 === 0;
+        });
+    }
+
+    public function testAssertWhereContainsWithNestedClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 1,
+            'bar' => 2,
+            'baz' => 3,
+        ]);
+
+        $assert->whereContains('baz', function ($actual) {
+            return $actual % 3 === 0;
+        });
+    }
+
+    public function testAssertWhereContainsWithMultipleClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $assert->whereContains('foo', [
+            function ($actual) {
+                return $actual % 3 === 0;
+            },
+            function ($actual) {
+                return $actual % 2 === 0;
+            },
+        ]);
     }
 
     public function testAssertWhereContainsWithNullExpectation()

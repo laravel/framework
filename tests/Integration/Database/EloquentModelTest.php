@@ -8,9 +8,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-/**
- * @group integration
- */
 class EloquentModelTest extends DatabaseTestCase
 {
     protected function setUp(): void

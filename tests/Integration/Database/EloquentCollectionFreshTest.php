@@ -7,9 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 
-/**
- * @group integration
- */
 class EloquentCollectionFreshTest extends DatabaseTestCase
 {
     protected function setUp(): void

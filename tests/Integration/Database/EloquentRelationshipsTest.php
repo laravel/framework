@@ -16,9 +16,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EloquentRelationshipsTest extends TestCase
 {
     public function testStandardRelationships()

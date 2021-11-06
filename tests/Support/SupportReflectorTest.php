@@ -49,7 +49,7 @@ class SupportReflectorTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
+     * @requires PHP >= 8
      */
     public function testUnionTypeName()
     {

@@ -629,7 +629,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function files($directory = null, $recursive = false)
     {
-        return $this->driver->listContents($directory, $recursive)
+        return $this->driver->listContents($directory ?? '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isFile();
             })
@@ -659,7 +659,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directories($directory = null, $recursive = false)
     {
-        return $this->driver->listContents($directory, $recursive)
+        return $this->driver->listContents($directory ?? '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isDir();
             })

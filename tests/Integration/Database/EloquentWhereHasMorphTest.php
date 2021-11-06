@@ -10,9 +10,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentWhereHasMorphTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -56,7 +53,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
     {
         $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
             $query->where('title', 'foo');
-        })->get();
+        })->orderBy('id')->get();
 
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
@@ -70,7 +67,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         try {
             $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
                 $query->where('title', 'foo');
-            })->get();
+            })->orderBy('id')->get();
 
             $this->assertEquals([1, 4], $comments->pluck('id')->all());
         } finally {
@@ -86,7 +83,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $comments = Comment::withTrashed()
             ->whereHasMorph('commentable', '*', function (Builder $query) {
                 $query->where('title', 'foo');
-            })->get();
+            })->orderBy('id')->get();
 
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
@@ -100,9 +97,9 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         try {
             $comments = Comment::whereHasMorph('commentable', '*', function (Builder $query) {
                 $query->where('title', 'foo');
-            })->get();
+            })->orderBy('id')->get();
 
-            $this->assertEquals([4, 1], $comments->pluck('id')->all());
+            $this->assertEquals([1, 4], $comments->pluck('id')->all());
         } finally {
             Relation::morphMap([], false);
         }
@@ -112,7 +109,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
     {
         $comments = Comment::whereHasMorph('commentableWithConstraint', Video::class, function (Builder $query) {
             $query->where('title', 'like', 'ba%');
-        })->get();
+        })->orderBy('id')->get();
 
         $this->assertEquals([5], $comments->pluck('id')->all());
     }
@@ -127,7 +124,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
             if ($type === Video::class) {
                 $query->where('title', 'bar');
             }
-        })->get();
+        })->orderBy('id')->get();
 
         $this->assertEquals([1, 5], $comments->pluck('id')->all());
     }
@@ -136,6 +133,10 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
     {
         Schema::table('posts', function (Blueprint $table) {
             $table->string('slug')->nullable();
+        });
+
+        Schema::table('comments', function (Blueprint $table) {
+            $table->dropIndex('comments_commentable_type_commentable_id_index');
         });
 
         Schema::table('comments', function (Blueprint $table) {
@@ -148,35 +149,35 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         $comments = Comment::whereHasMorph('commentableWithOwnerKey', Post::class, function (Builder $query) {
             $query->where('title', 'foo');
-        })->get();
+        })->orderBy('id')->get();
 
         $this->assertEquals([1], $comments->pluck('id')->all());
     }
 
     public function testHasMorph()
     {
-        $comments = Comment::hasMorph('commentable', Post::class)->get();
+        $comments = Comment::hasMorph('commentable', Post::class)->orderBy('id')->get();
 
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
     }
 
     public function testOrHasMorph()
     {
-        $comments = Comment::where('id', 1)->orHasMorph('commentable', Video::class)->get();
+        $comments = Comment::where('id', 1)->orHasMorph('commentable', Video::class)->orderBy('id')->get();
 
         $this->assertEquals([1, 4, 5, 6], $comments->pluck('id')->all());
     }
 
     public function testDoesntHaveMorph()
     {
-        $comments = Comment::doesntHaveMorph('commentable', Post::class)->get();
+        $comments = Comment::doesntHaveMorph('commentable', Post::class)->orderBy('id')->get();
 
         $this->assertEquals([3], $comments->pluck('id')->all());
     }
 
     public function testOrDoesntHaveMorph()
     {
-        $comments = Comment::where('id', 1)->orDoesntHaveMorph('commentable', Post::class)->get();
+        $comments = Comment::where('id', 1)->orDoesntHaveMorph('commentable', Post::class)->orderBy('id')->get();
 
         $this->assertEquals([1, 3], $comments->pluck('id')->all());
     }
@@ -186,7 +187,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $comments = Comment::where('id', 1)
             ->orWhereHasMorph('commentable', Video::class, function (Builder $query) {
                 $query->where('title', 'foo');
-            })->get();
+            })->orderBy('id')->get();
 
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
@@ -195,7 +196,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
     {
         $comments = Comment::whereDoesntHaveMorph('commentable', Post::class, function (Builder $query) {
             $query->where('title', 'foo');
-        })->get();
+        })->orderBy('id')->get();
 
         $this->assertEquals([2, 3], $comments->pluck('id')->all());
     }
@@ -205,7 +206,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         $comments = Comment::where('id', 1)
             ->orWhereDoesntHaveMorph('commentable', Post::class, function (Builder $query) {
                 $query->where('title', 'foo');
-            })->get();
+            })->orderBy('id')->get();
 
         $this->assertEquals([1, 2, 3], $comments->pluck('id')->all());
     }
@@ -214,7 +215,7 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
     {
         $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
             $query->someSharedModelScope();
-        })->get();
+        })->orderBy('id')->get();
 
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }

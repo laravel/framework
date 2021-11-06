@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
-/**
- * @group integration
- */
 class SchemaBuilderTest extends DatabaseTestCase
 {
     public function testDropAllTables()
@@ -34,15 +31,22 @@ class SchemaBuilderTest extends DatabaseTestCase
     {
         $this->expectNotToPerformAssertions();
 
-        DB::statement('create view "view"("id") as select 1');
+        DB::statement('create view foo (id) as select 1');
 
         Schema::dropAllViews();
 
-        DB::statement('create view "view"("id") as select 1');
+        DB::statement('create view foo (id) as select 1');
     }
 
     public function testRegisterCustomDoctrineType()
     {
+        $connection = $this->app['config']->get('database.default');
+        $driver = $this->app['config']->get("database.connections.$connection.driver");
+
+        if ($driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
         Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
@@ -53,20 +57,9 @@ class SchemaBuilderTest extends DatabaseTestCase
             $table->tinyInteger('test_column')->change();
         });
 
-        $expected = [
-            'CREATE TEMPORARY TABLE __temp__test AS SELECT test_column FROM test',
-            'DROP TABLE test',
-            'CREATE TABLE test (test_column TINYINT NOT NULL)',
-            'INSERT INTO test (test_column) SELECT test_column FROM __temp__test',
-            'DROP TABLE __temp__test',
-        ];
-
-        $statements = $blueprint->toSql($this->getConnection(), new SQLiteGrammar);
-
         $blueprint->build($this->getConnection(), new SQLiteGrammar);
 
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
         $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
-        $this->assertEquals($expected, $statements);
     }
 }
