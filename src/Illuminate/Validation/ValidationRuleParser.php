@@ -265,14 +265,11 @@ class ValidationRuleParser
      */
     protected static function normalizeRule($rule)
     {
-        switch ($rule) {
-            case 'Int':
-                return 'Integer';
-            case 'Bool':
-                return 'Boolean';
-            default:
-                return $rule;
-        }
+        return match ($rule) {
+            'Int' => 'Integer',
+            'Bool' => 'Boolean',
+            default => $rule,
+        };
     }
 
     /**
