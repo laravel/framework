@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class FoundationHelpersTest extends TestCase
 {
     public function testRescue()

@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EloquentUpdateTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)

@@ -8,9 +8,6 @@ use Illuminate\Redis\Limiters\DurationLimiter;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-/**
- * @group redislimiters
- */
 class DurationLimiterTest extends TestCase
 {
     use InteractsWithRedis;

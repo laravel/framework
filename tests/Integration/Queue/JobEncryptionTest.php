@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class JobEncryptionTest extends DatabaseTestCase
 {
     protected function getEnvironmentSetUp($app)
@@ -31,10 +28,6 @@ class JobEncryptionTest extends DatabaseTestCase
 
     protected function setUp(): void
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         parent::setUp();
 
         Schema::create('jobs', function (Blueprint $table) {

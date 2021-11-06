@@ -19,9 +19,6 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;

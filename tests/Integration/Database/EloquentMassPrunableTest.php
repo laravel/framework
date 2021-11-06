@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Mockery as m;
 
+/** @group SkipMSSQL */
 class EloquentMassPrunableTest extends DatabaseTestCase
 {
     protected function setUp(): void

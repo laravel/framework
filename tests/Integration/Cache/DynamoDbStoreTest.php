@@ -9,19 +9,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class DynamoDbStoreTest extends TestCase
 {
     protected function setUp(): void
     {
         if (! env('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
-        }
-
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
         }
 
         parent::setUp();

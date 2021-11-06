@@ -19,9 +19,6 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingNotificationsWithLocaleTest extends TestCase
 {
     public $mailer;

@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class DatabaseLockTest extends DatabaseTestCase
 {
     protected function setUp(): void

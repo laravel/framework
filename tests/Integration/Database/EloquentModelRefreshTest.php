@@ -9,9 +9,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentModelRefreshTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -62,6 +59,7 @@ class EloquentModelRefreshTest extends DatabaseTestCase
     public function testAsPivot()
     {
         Schema::create('post_posts', function (Blueprint $table) {
+            $table->increments('id');
             $table->bigInteger('foreign_id');
             $table->bigInteger('related_id');
         });

@@ -8,9 +8,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentMorphConstrainTest extends DatabaseTestCase
 {
     protected function setUp(): void

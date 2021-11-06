@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
-/**
- * @group integration
- */
 class MaintenanceModeTest extends TestCase
 {
     protected function tearDown(): void

@@ -6,8 +6,39 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
-class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
+/**
+ * @group MySQL
+ * @requires extension pdo_mysql
+ * @requires OS Linux|Darwin
+ */
+class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('database.default', 'mysql');
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('name');
+            $table->string('age');
+            $table->enum('color', ['red', 'blue']);
+        });
+    }
+
+    protected function tearDown(): void
+    {
+        Schema::drop('users');
+
+        parent::tearDown();
+    }
+
     public function testRenameColumnOnTableWithEnum()
     {
         Schema::table('users', function (Blueprint $table) {
@@ -35,7 +66,12 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
 
         $tableProperties = array_values((array) $tables[0]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
-        $this->assertEquals(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
+
+        $columns = Schema::getColumnListing('users');
+
+        foreach (['id', 'name', 'age', 'color'] as $column) {
+            $this->assertContains($column, $columns);
+        }
 
         Schema::create('posts', function (Blueprint $table) {
             $table->integer('id');
@@ -44,24 +80,5 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
         $tables = Schema::getAllTables();
         $this->assertCount(2, $tables);
         Schema::drop('posts');
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Schema::create('users', function (Blueprint $table) {
-            $table->integer('id');
-            $table->string('name');
-            $table->string('age');
-            $table->enum('color', ['red', 'blue']);
-        });
-    }
-
-    protected function tearDown(): void
-    {
-        Schema::drop('users');
-
-        parent::tearDown();
     }
 }

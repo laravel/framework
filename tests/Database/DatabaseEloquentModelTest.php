@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -28,6 +29,8 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -192,6 +195,24 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->ascollectionAttribute = ['foo' => 'baz'];
         $this->assertTrue($model->isDirty('ascollectionAttribute'));
+    }
+
+    public function testDirtyOnCastedStringable()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asStringableAttribute' => 'foo bar',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Stringable::class, $model->asStringableAttribute);
+        $this->assertFalse($model->isDirty('asStringableAttribute'));
+
+        $model->asStringableAttribute = Str::of('foo bar');
+        $this->assertFalse($model->isDirty('asStringableAttribute'));
+
+        $model->asStringableAttribute = Str::of('foo baz');
+        $this->assertTrue($model->isDirty('asStringableAttribute'));
     }
 
     public function testCleanAttributes()
@@ -2611,6 +2632,7 @@ class EloquentModelCastingStub extends Model
         'timestampAttribute' => 'timestamp',
         'asarrayobjectAttribute' => AsArrayObject::class,
         'ascollectionAttribute' => AsCollection::class,
+        'asStringableAttribute' => AsStringable::class,
     ];
 
     public function jsonAttributeValue()

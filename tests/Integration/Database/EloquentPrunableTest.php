@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Mockery as m;
 
+/** @group SkipMSSQL */
 class EloquentPrunableTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -110,15 +111,6 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::first()->pruned);
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
         $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        Container::setInstance(null);
-
-        m::close();
     }
 }
 

@@ -7,9 +7,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class FileCacheLockTest extends TestCase
 {
     /**

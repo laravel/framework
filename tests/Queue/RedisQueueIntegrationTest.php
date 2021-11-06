@@ -30,10 +30,6 @@ class RedisQueueIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         Carbon::setTestNow(Carbon::now());
         parent::setUp();
         $this->setUpRedis();
@@ -89,10 +85,6 @@ class RedisQueueIntegrationTest extends TestCase
      */
     public function testBlockingPop($driver)
     {
-        if (! function_exists('pcntl_fork')) {
-            $this->markTestSkipped('Skipping since the pcntl extension is not available');
-        }
-
         $this->tearDownRedis();
 
         if ($pid = pcntl_fork() > 0) {

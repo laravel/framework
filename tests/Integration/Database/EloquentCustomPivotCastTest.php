@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
     protected function setUp(): void
