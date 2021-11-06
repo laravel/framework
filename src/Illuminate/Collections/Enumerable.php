@@ -458,7 +458,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @template TFirstDefault
      *
-     * @param  (callable(TValue): bool)|null  $callback
+     * @param  (callable(TValue,TKey): bool)|null  $callback
      * @param  TFirstDefault  $default
      * @return TValue|TFirstDefault
      */
@@ -878,7 +878,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
-     * @return static<int, static<int, TValue>>
+     * @return static<int, static<TKey, TValue>>
      */
     public function chunk($size);
 
@@ -1047,8 +1047,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Count the number of items in the collection using a given truth test.
      *
-     * @param  (callable(TValue, TKey): mixed)|string|null  $callback
-     * @return static<TValue, int>
+     * @template TGroup of array-key
+     *
+     * @param  (callable(TValue, TKey): TGroup)|string|null  $callback
+     * @return static<TGroup, int>
      */
     public function countBy($callback = null);
 

@@ -93,6 +93,8 @@ assertType('bool', $collection->containsStrict(function ($user) {
 }));
 assertType('bool', $collection::make(['string'])->containsStrict('string', 'string'));
 
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection->lazy());
+
 assertType('float|int|null', $collection->avg());
 assertType('float|int|null', $collection->avg('string'));
 assertType('float|int|null', $collection->avg(function ($user) {
@@ -609,6 +611,16 @@ assertType('User', $collection->sole(function ($user, $int) {
     return true;
 }));
 
+assertType('User', $collection->firstOrFail());
+assertType('User', $collection->firstOrFail('string', 'string'));
+assertType('User', $collection->firstOrFail('string', '=', 'string'));
+assertType('User', $collection->firstOrFail(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return true;
+}));
+
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->chunk(1));
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunk(2));
 
@@ -681,8 +693,8 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->takeWhile(fu
     return true;
 }));
 
-assertType('Illuminate\Support\Collection<int, User>', $collection->tap(function ($user) {
-    assertType('User', $user);
+assertType('Illuminate\Support\Collection<int, User>', $collection->tap(function ($collection) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
 }));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->pipe(function ($collection) {

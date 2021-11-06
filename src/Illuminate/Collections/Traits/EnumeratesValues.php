@@ -812,7 +812,7 @@ trait EnumeratesValues
     /**
      * Pass the collection to the given callback and then return it.
      *
-     * @param  callable(TValue): mixed  $callback
+     * @param  callable($this): mixed  $callback
      * @return $this
      */
     public function tap(callable $callback)
@@ -962,7 +962,7 @@ trait EnumeratesValues
      * Results array of items from Collection or Arrayable.
      *
      * @param  mixed  $items
-     * @return array
+     * @return array<TKey, TValue>
      */
     protected function getArrayableItems($items)
     {
@@ -1064,7 +1064,7 @@ trait EnumeratesValues
      * Make a function to check an item's equality.
      *
      * @param  mixed  $value
-     * @return \Closure
+     * @return \Closure(mixed): bool
      */
     protected function equality($value)
     {
@@ -1089,7 +1089,7 @@ trait EnumeratesValues
     /**
      * Make a function that returns what's passed to it.
      *
-     * @return \Closure
+     * @return \Closure(TValue): TValue
      */
     protected function identity()
     {
