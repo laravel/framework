@@ -652,7 +652,6 @@ class HttpClientTest extends TestCase
         $this->assertSame(403, $response->status());
     }
 
-
     public function testOnErrorCallsClosureOnServerError()
     {
         $status = 0;
