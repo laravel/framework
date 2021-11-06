@@ -636,6 +636,23 @@ class HttpClientTest extends TestCase
         $this->assertSame(401, $response->status());
     }
 
+    public function testOnErrorCallsClosureOnUnauthorizedError()
+    {
+        $status = 0;
+        $client = $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 403),
+        ]);
+
+        $response = $client->get('laravel.com')
+            ->onError(function ($response) use (&$status) {
+                $status = $response->status();
+            });
+
+        $this->assertSame(403, $status);
+        $this->assertSame(403, $response->status());
+    }
+
+
     public function testOnErrorCallsClosureOnServerError()
     {
         $status = 0;

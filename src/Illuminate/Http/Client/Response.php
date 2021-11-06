@@ -191,6 +191,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if the response indicates the request is unauthorized or forbidden.
+     *
+     * @return bool
+     */
+    public function unauthorized()
+    {
+        return $this->status() == 401 || $this->status() == 403;
+    }
+
+    /**
      * Execute the given callback if there was a server or client error.
      *
      * @param  callable  $callback
