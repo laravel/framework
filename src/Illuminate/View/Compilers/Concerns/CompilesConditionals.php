@@ -160,6 +160,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the if-count statements into valid PHP.
+     *
+     * @param  array  $expression
+     * @return string
+     */
+    protected function compileCount($expression)
+    {
+        return "<?php if(count{$expression}): ?>";
+    }
+
+    /**
      * Compile the unless statements into valid PHP.
      *
      * @param  string  $expression
@@ -197,6 +208,16 @@ trait CompilesConditionals
      * @return string
      */
     protected function compileEndif()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-count statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndCount()
     {
         return '<?php endif; ?>';
     }
