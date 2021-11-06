@@ -139,11 +139,7 @@
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
-<<<<<<< HEAD
-        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.189.0).",
-=======
-        "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage and SES mail driver (^3.198.1).",
->>>>>>> 8.x
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.198.1).",
         "brianium/paratest": "Required to run tests in parallel (^6.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3|^3.1.2).",
         "filp/whoops": "Required for friendly error pages in development (^2.14.3).",
@@ -156,13 +152,8 @@
         "mockery/mockery": "Required to use mocking (^1.4.4).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-<<<<<<< HEAD
         "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8).",
-        "predis/predis": "Required to use the predis connector (^1.1.2).",
-=======
-        "phpunit/phpunit": "Required to use assertions and run tests (^8.5.19|^9.5.8).",
         "predis/predis": "Required to use the predis connector (^1.1.9).",
->>>>>>> 8.x
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0).",
         "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
