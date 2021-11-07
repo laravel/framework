@@ -7,7 +7,7 @@ use Illuminate\Support\JsString;
 trait CompilesJs
 {
     /**
-     * Compile the @js() directive into valid PHP.
+     * Compile the "@js" directive into valid PHP.
      *
      * @param  string  $expression
      * @return string
