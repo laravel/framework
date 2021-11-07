@@ -67,14 +67,16 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('queued')) {
-            return $this->option('event')
+            $path = $this->option('event')
                         ? __DIR__.'/stubs/listener-queued.stub'
                         : __DIR__.'/stubs/listener-queued-duck.stub';
+        } else {
+            $path = $this->option('event')
+                        ? __DIR__.'/stubs/listener.stub'
+                        : __DIR__.'/stubs/listener-duck.stub';
         }
 
-        return $this->option('event')
-                    ? __DIR__.'/stubs/listener.stub'
-                    : __DIR__.'/stubs/listener-duck.stub';
+        return $this->resolveStubPath($path);
     }
 
     /**
@@ -111,5 +113,18 @@ class ListenerMakeCommand extends GeneratorCommand
 
             ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued'],
         ];
+    }
+
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+                    ? $customPath
+                    : __DIR__.$stub;
     }
 }
