@@ -193,17 +193,21 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
-     * Suffixes a queue
+     * Add the given suffix to the given queue name.
      *
-     * @param string $queue
-     * @param string $suffix
+     * @param  string  $queue
+     * @param  string  $suffix
      * @return string
      */
-    private function suffixQueue($queue, $suffix = '')
+    protected function suffixQueue($queue, $suffix = '')
     {
-        $fifo = Str::endsWith($queue, '.fifo') ? '.fifo' : '';
-        $queue = rtrim($queue, '.fifo');
-        return rtrim($this->prefix, '/') . '/' . Str::finish($queue, $suffix) . $fifo;
+        if (Str::endsWith($queue, '.fifo')) {
+            $queue = Str::beforeLast($queue, '.fifo');
+
+            return rtrim($this->prefix, '/').'/'.Str::finish($queue, $suffix).'.fifo';
+        }
+
+        return rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix);
     }
 
     /**
