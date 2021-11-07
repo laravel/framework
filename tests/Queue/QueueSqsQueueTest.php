@@ -147,10 +147,10 @@ class QueueSqsQueueTest extends TestCase
     public function testGetQueueProperlyResolvesFifoUrlWithPrefix()
     {
         $this->queueName = 'emails.fifo';
-        $this->queueUrl = $this->prefix . $this->queueName;
+        $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test.fifo';
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test.fifo';
         $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
     }
 
@@ -165,10 +165,10 @@ class QueueSqsQueueTest extends TestCase
     public function testGetQueueProperlyResolvesFifoUrlWithoutPrefix()
     {
         $this->queueName = 'emails.fifo';
-        $this->queueUrl = $this->prefix . $this->queueName;
+        $this->queueUrl = $this->prefix.$this->queueName;
         $queue = new SqsQueue($this->sqs, $this->queueUrl);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
-        $fifoQueueUrl = $this->baseUrl . '/' . $this->account . '/test.fifo';
+        $fifoQueueUrl = $this->baseUrl.'/'.$this->account.'/test.fifo';
         $this->assertEquals($fifoQueueUrl, $queue->getQueue($fifoQueueUrl));
     }
 
@@ -185,7 +185,7 @@ class QueueSqsQueueTest extends TestCase
         $this->queueName = 'emails.fifo';
         $queue = new SqsQueue($this->sqs, $this->queueName, $this->prefix, $suffix = '-staging');
         $this->assertEquals("{$this->prefix}emails-staging.fifo", $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test' . $suffix . '.fifo';
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
         $this->assertEquals($queueUrl, $queue->getQueue('test.fifo'));
     }
 
@@ -201,7 +201,7 @@ class QueueSqsQueueTest extends TestCase
     {
         $queue = new SqsQueue($this->sqs, "{$this->queueName}-staging.fifo", $this->prefix, $suffix = '-staging');
         $this->assertEquals("{$this->prefix}{$this->queueName}{$suffix}.fifo", $queue->getQueue(null));
-        $queueUrl = $this->baseUrl . '/' . $this->account . '/test' . $suffix . '.fifo';
+        $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
         $this->assertEquals($queueUrl, $queue->getQueue('test-staging.fifo'));
     }
 }
