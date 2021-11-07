@@ -2,7 +2,6 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\LazyCollection;
-
 use function PHPStan\Testing\assertType;
 
 $collection = new LazyCollection([new User]);
