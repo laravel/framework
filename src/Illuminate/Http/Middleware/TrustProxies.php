@@ -116,9 +116,6 @@ class TrustProxies
             case 'HEADER_X_FORWARDED_PROTO':
             case Request::HEADER_X_FORWARDED_PROTO:
                 return Request::HEADER_X_FORWARDED_PROTO;
-
-            default:
-                return Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_AWS_ELB;
         }
 
         return $this->headers;
