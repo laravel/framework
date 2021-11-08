@@ -2,10 +2,13 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use InvalidArgumentException;
+
 /**
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed(bool $withTrashed = true)
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
+ * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder futureTrashed()
  */
 trait SoftDeletes
 {
@@ -69,19 +72,19 @@ trait SoftDeletes
             return $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
         }
 
-        return $this->runSoftDelete();
+        return $this->runSoftDelete($this->freshTimestamp(), 'trashed');
     }
 
     /**
      * Perform the actual delete query on this model instance.
      *
+     * @param \DatetimeInterface $time
+     * @param string $event
      * @return void
      */
-    protected function runSoftDelete()
+    protected function runSoftDelete($time, $event)
     {
         $query = $this->setKeysForSaveQuery($this->newModelQuery());
-
-        $time = $this->freshTimestamp();
 
         $columns = [$this->getDeletedAtColumn() => $this->fromDateTime($time)];
 
@@ -97,7 +100,22 @@ trait SoftDeletes
 
         $this->syncOriginalAttributes(array_keys($columns));
 
-        $this->fireModelEvent('trashed', false);
+        $this->fireModelEvent($event, false);
+    }
+
+    /**
+     * Sets the model to be deleted in the future.
+     *
+     * @param \DatetimeInterface $datetime
+     * @return void
+     */
+    public function deleteAt($datetime)
+    {
+        if ($this->freshTimestamp() >= $datetime) {
+            throw new InvalidArgumentException("The $datetime must be set in the future.");
+        }
+
+        $this->runSoftDelete($datetime, 'willTrash')
     }
 
     /**
@@ -135,7 +153,17 @@ trait SoftDeletes
      */
     public function trashed()
     {
-        return ! is_null($this->{$this->getDeletedAtColumn()});
+        return (bool) $this->{$this->getDeletedAtColumn()}?->isPast();
+    }
+
+    /**
+     * Determine if the model instance will be soft-deleted in the future.
+     *
+     * @return bool
+     */
+    public function willBeTrashed()
+    {
+        return (bool) $this->{$this->getDeletedAtColumn}}?->isFuture();
     }
 
     /**
@@ -147,6 +175,17 @@ trait SoftDeletes
     public static function softDeleted($callback)
     {
         static::registerModelEvent('trashed', $callback);
+    }
+
+    /**
+     * Register a "willTrash" model event callback with the dispatcher.
+     *
+     * @param \Closure|string $callback
+     * @return void
+     */
+    public static function willTrash($callback)
+    {
+        static::registerModelEvent('willTrash', $callback);
     }
 
     /**
