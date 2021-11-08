@@ -92,8 +92,12 @@ class RouteGroup
      */
     protected static function formatAs($new, $old)
     {
-        if (isset($old['as'])) {
-            $new['as'] = $old['as'].($new['as'] ?? '');
+        if ($prefix = $old['as'] ?? $old['as_prefix'] ?? null) {
+            $new['as_prefix'] = $prefix;
+        }
+
+        if ($prefix && isset($new['as'])) {
+            $new['as'] = $prefix.$new['as'];
         }
 
         return $new;

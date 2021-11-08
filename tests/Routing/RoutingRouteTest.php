@@ -1014,7 +1014,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['domain' => 'baz'], $old));
 
         $old = ['as' => 'foo.'];
-        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['as' => 'bar'], $old));
+        $this->assertEquals(['as' => 'foo.bar', 'as_prefix' => 'foo.', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['as' => 'bar'], $old));
 
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [

@@ -306,6 +306,24 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame('api.users', $this->getRoute()->getName());
     }
 
+    public function testUnnamedRoutesRemainUnnamedInsideGroupWithNamePrefix()
+    {
+        $this->router->name('api.')->group(function ($router) {
+            $router->get('users', 'UsersController@index');
+        });
+
+        $this->assertSame(null, $this->getRoute()->getName());
+    }
+
+    public function testSettingNameTwiceUsesInitialPrefix()
+    {
+        $this->router->name('api.')->group(function ($router) {
+            $router->get('users', 'UsersController@index')->name('users')->name('foo');
+        });
+
+        $this->assertSame('api.foo', $this->getRoute()->getName());
+    }
+
     public function testCanRegisterGroupWithDomain()
     {
         $this->router->domain('{account}.myapp.com')->group(function ($router) {
