@@ -138,7 +138,7 @@ trait SoftDeletes
         if (is_null($this->{$this->getDeletedAtColumn()})) {
             return false;
         }
-        return $this->{$this->getDeletedAtColumn()} < now();
+        return $this->{$this->getDeletedAtColumn()} <= now();
     }
 
     /**
