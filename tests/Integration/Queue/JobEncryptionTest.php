@@ -22,7 +22,6 @@ class JobEncryptionTest extends DatabaseTestCase
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('app.key', Str::random(32));
-        $app['config']->set('app.debug', 'true');
         $app['config']->set('queue.default', 'database');
     }
 

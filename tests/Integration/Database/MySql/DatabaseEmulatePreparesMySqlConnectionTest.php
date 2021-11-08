@@ -1,11 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\MySql;
 
 use PDO;
 
 /**
- * @group MySQL
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */

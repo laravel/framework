@@ -18,9 +18,6 @@ class ImplicitRouteBindingTest extends TestCase
         'routes/testbench.php',
     ];
 
-    /**
-     * Teardown the test environment.
-     */
     protected function tearDown(): void
     {
         $this->tearDownInteractsWithPublishedFiles();
@@ -30,8 +27,6 @@ class ImplicitRouteBindingTest extends TestCase
 
     protected function defineEnvironment($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [

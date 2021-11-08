@@ -12,11 +12,6 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 {
     public $mailer;
 
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-    }
-
     public function testMailIsSent()
     {
         $notifiable = (new AnonymousNotifiable)

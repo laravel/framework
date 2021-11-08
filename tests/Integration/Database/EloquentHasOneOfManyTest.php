@@ -22,12 +22,6 @@ class EloquentHasOneOfManyTest extends DatabaseTestCase
         });
     }
 
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('app.debug', 'true');
-    }
-
     public function testItOnlyEagerLoadsRequiredModels()
     {
         $this->retrievedLogins = 0;
