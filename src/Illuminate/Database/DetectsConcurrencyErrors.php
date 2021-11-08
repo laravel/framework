@@ -38,7 +38,7 @@ trait DetectsConcurrencyErrors
     {
         if (
             is_callable($this->concurrencyErrorCheck)
-            && call_user_func($this->concurrencyErrorCheck, $e)
+            && ($this->concurrencyErrorCheck)($e)
         ) {
             return true;
         }

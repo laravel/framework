@@ -37,7 +37,7 @@ trait DetectsLostConnections
     {
         if (
             is_callable($this->lostConnectionCheck)
-            && call_user_func($this->lostConnectionCheck, $e)
+            && ($this->lostConnectionCheck)($e)
         ) {
             return true;
         }
