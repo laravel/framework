@@ -10,9 +10,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-/**
- * @group integration
- */
 class DatabaseCustomCastsTest extends DatabaseTestCase
 {
     protected function setUp(): void
