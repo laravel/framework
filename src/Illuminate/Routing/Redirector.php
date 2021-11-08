@@ -84,7 +84,7 @@ class Redirector
     {
         $request = $this->generator->getRequest();
 
-        $intended = $request->method() === 'GET' && $request->route() && ! $request->expectsJson()
+        $intended = $request->isMethod('GET') && $request->route() && ! $request->expectsJson()
                         ? $this->generator->full()
                         : $this->generator->previous();
 
