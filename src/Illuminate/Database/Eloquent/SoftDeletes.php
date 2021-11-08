@@ -116,7 +116,7 @@ trait SoftDeletes
             throw new InvalidArgumentException("The $datetime must be set in the future.");
         }
 
-        $this->runSoftDelete($datetime, 'willTrash')
+        $this->runSoftDelete($datetime, 'willTrash');
     }
 
     /**
