@@ -113,7 +113,7 @@ trait SoftDeletes
     public function deleteAt($datetime)
     {
         if ($this->freshTimestamp() >= $datetime) {
-            throw new InvalidArgumentException("The $datetime must be set in the future.");
+            throw new InvalidArgumentException('The datetime must be set in the future.');
         }
 
         $this->runSoftDelete($datetime, 'willTrash');
@@ -164,7 +164,7 @@ trait SoftDeletes
      */
     public function willBeTrashed()
     {
-        return (bool) $this->{$this->getDeletedAtColumn}}?->isFuture();
+        return (bool) $this->{$this->getDeletedAtColumn()}?->isFuture();
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use InvalidArgumentException;
+
 class SoftDeletingScope implements Scope
 {
     /**
@@ -160,7 +162,7 @@ class SoftDeletingScope implements Scope
     {
         $builder->macro('deleteAt', function (Builder $builder, $datetime) {
             if ($builder->getModel()->freshTimestamp() >= $datetime) {
-                throw new InvalidArgumentException("The $datetime must be set in the future.");
+                throw new InvalidArgumentException('The datetime must be set in the future.');
             }
 
             $builder->withTrashed();
