@@ -407,6 +407,37 @@ class DatabaseConnectionTest extends TestCase
         $this->assertTrue($isLostConnection, 'Expected a lost connection exception to be caught.');
     }
 
+    public function testConcurrencyErrorCheckIgnoreUndefinedMessage()
+    {
+        $method = (new ReflectionClass(Connection::class))->getMethod('causedByConcurrencyError');
+        $method->setAccessible(true);
+
+        $isConcurrencyError = $method->invokeArgs($this->getMockConnection(), [
+            new Exception('not a previously defined exception message'),
+        ]);
+
+        $this->assertFalse($isConcurrencyError, 'Did not expect catch this concurrency error exception.');
+    }
+
+    public function testConcurrencyErrorCheckUsingCustomCheck()
+    {
+        $method = (new ReflectionClass(Connection::class))->getMethod('causedByConcurrencyError');
+        $method->setAccessible(true);
+
+        $connection = $this->getMockConnection();
+        $connection->setConcurrencyErrorCheck(function (Throwable $e) {
+            return Str::contains($e->getMessage(), [
+                'not a previously defined exception message'
+            ]);
+        });
+
+        $isConcurrencyError = $method->invokeArgs($connection, [
+            new Exception('not a previously defined exception message'),
+        ]);
+
+        $this->assertTrue($isConcurrencyError, 'Expected a concurrency error exception to be caught.');
+    }
+
     public function testFromCreatesNewQueryBuilder()
     {
         $conn = $this->getMockConnection();

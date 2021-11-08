@@ -9,6 +9,26 @@ use Throwable;
 trait DetectsConcurrencyErrors
 {
     /**
+     * A configurable check for a concurrency error exception.
+     *
+     * @var callable|null
+     */
+    protected $concurrencyErrorCheck;
+
+    /**
+     * Set a custom check to be used in the concurrency error check.
+     *
+     * @param callable $check
+     * @return $this
+     */
+    public function setConcurrencyErrorCheck(callable $check)
+    {
+        $this->concurrencyErrorCheck = $check;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given exception was caused by a concurrency error such as a deadlock or serialization failure.
      *
      * @param  \Throwable  $e
@@ -16,6 +36,13 @@ trait DetectsConcurrencyErrors
      */
     protected function causedByConcurrencyError(Throwable $e)
     {
+        if (
+            is_callable($this->concurrencyErrorCheck)
+            && call_user_func($this->concurrencyErrorCheck, $e)
+        ) {
+            return true;
+        }
+
         if ($e instanceof PDOException && ($e->getCode() === 40001 || $e->getCode() === '40001')) {
             return true;
         }
