@@ -34,6 +34,7 @@ class EloquentDeleteTest extends DatabaseTestCase
         });
     }
 
+    /** @group SkipMSSQL */
     public function testDeleteWithLimit()
     {
         for ($i = 1; $i <= 10; $i++) {
