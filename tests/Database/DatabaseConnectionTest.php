@@ -3,8 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
+use Throwable;
 use ErrorException;
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
@@ -372,6 +374,37 @@ class DatabaseConnectionTest extends TestCase
         $method->invokeArgs($mock, ['', [], function () {
             throw new QueryException('', [], new Exception);
         }]);
+    }
+
+    public function testLostConnectionCheckIgnoreUndefinedMessage()
+    {
+        $method = (new ReflectionClass(Connection::class))->getMethod('causedByLostConnection');
+        $method->setAccessible(true);
+
+        $isLostConnection = $method->invokeArgs($this->getMockConnection(), [
+            new Exception('not a previously defined exception message'),
+        ]);
+
+        $this->assertFalse($isLostConnection, 'Did not expect catch this lost connection exception.');
+    }
+
+    public function testLostConnectionCheckUsingCustomCheck()
+    {
+        $method = (new ReflectionClass(Connection::class))->getMethod('causedByLostConnection');
+        $method->setAccessible(true);
+
+        $connection = $this->getMockConnection();
+        $connection->setLostConnectionCheck(function (Throwable $e) {
+            return Str::contains($e->getMessage(), [
+                'not a previously defined exception message'
+            ]);
+        });
+
+        $isLostConnection = $method->invokeArgs($connection, [
+            new Exception('not a previously defined exception message'),
+        ]);
+
+        $this->assertTrue($isLostConnection, 'Expected a lost connection exception to be caught.');
     }
 
     public function testFromCreatesNewQueryBuilder()

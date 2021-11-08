@@ -8,6 +8,26 @@ use Throwable;
 trait DetectsLostConnections
 {
     /**
+     * A configurable check for a lost connection exception.
+     *
+     * @var callable|null
+     */
+    protected $lostConnectionCheck;
+
+    /**
+     * Set a custom check to be used in the lost connection check.
+     *
+     * @param callable $check
+     * @return $this
+     */
+    public function setLostConnectionCheck(callable $check)
+    {
+        $this->lostConnectionCheck = $check;
+
+        return $this;
+    }
+
+    /**
      * Determine if the given exception was caused by a lost connection.
      *
      * @param  \Throwable  $e
@@ -15,6 +35,13 @@ trait DetectsLostConnections
      */
     protected function causedByLostConnection(Throwable $e)
     {
+        if (
+            is_callable($this->lostConnectionCheck)
+            && call_user_func($this->lostConnectionCheck, $e)
+        ) {
+            return true;
+        }
+
         $message = $e->getMessage();
 
         return Str::contains($message, [
