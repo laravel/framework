@@ -422,7 +422,7 @@ EOF;
                 PHPUnit::assertSame(
                     $filename,
                     isset(explode('=', $contentDisposition[1])[1])
-                        ? trim(explode('=', $contentDisposition[1])[1])
+                        ? trim(explode('=', $contentDisposition[1])[1], " \"'")
                         : '',
                     $message
                 );
