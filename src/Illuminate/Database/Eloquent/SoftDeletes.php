@@ -9,6 +9,7 @@ use InvalidArgumentException;
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder futureTrashed()
+ * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder deleteAt(\DateTimeInterface $datetime)
  */
 trait SoftDeletes
 {

@@ -9,7 +9,7 @@ class SoftDeletingScope implements Scope
      *
      * @var string[]
      */
-    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'FutureTrashed'];
+    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'FutureTrashed', 'DeleteAt'];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -147,6 +147,27 @@ class SoftDeletingScope implements Scope
             );
 
             return $builder;
+        });
+    }
+
+    /**
+     * Add the delete-at extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function addDeleteAt(Builder $builder)
+    {
+        $builder->macro('deleteAt', function (Builder $builder, $datetime) {
+            if ($builder->getModel()->freshTimestamp() >= $datetime) {
+                throw new InvalidArgumentException("The $datetime must be set in the future.");
+            }
+
+            $builder->withTrashed();
+
+            return $builder->update([
+                $builder->getModel()->getDeletedAtColumn() => $this->getModel()->fromDateTime($time)
+            ]);
         });
     }
 }
