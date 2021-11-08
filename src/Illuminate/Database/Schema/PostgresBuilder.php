@@ -237,7 +237,7 @@ class PostgresBuilder extends Builder
             $searchPath = $matches[0];
         }
 
-        array_walk($searchPath, function (&$schema) {
+        array_walk($searchPath ?? [], function (&$schema) {
             $schema = trim($schema, '\'"');
 
             $schema = $schema === '$user'
@@ -245,6 +245,6 @@ class PostgresBuilder extends Builder
                 : $schema;
         });
 
-        return $searchPath;
+        return $searchPath ?? [];
     }
 }
