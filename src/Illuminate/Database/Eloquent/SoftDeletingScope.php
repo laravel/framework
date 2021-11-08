@@ -139,7 +139,7 @@ class SoftDeletingScope implements Scope
      */
     protected function addFutureTrashed(Builder $builder)
     {
-        $builder->macro('futureTrashed', function (Builder $builder)) {
+        $builder->macro('futureTrashed', function (Builder $builder) {
             $model = $builder->getModel();
 
             $builder->withoutGlobalScope($this)->where(
@@ -147,6 +147,6 @@ class SoftDeletingScope implements Scope
             );
 
             return $builder;
-        }
+        });
     }
 }
