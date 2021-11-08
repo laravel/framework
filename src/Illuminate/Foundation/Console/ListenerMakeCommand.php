@@ -51,11 +51,11 @@ class ListenerMakeCommand extends GeneratorCommand
         }
 
         $stub = str_replace(
-            'DummyEvent', class_basename($event), parent::buildClass($name)
+            '{{ event }}', class_basename($event), parent::buildClass($name)
         );
 
         return str_replace(
-            'DummyFullEvent', trim($event, '\\'), $stub
+            '{{ eventNamespace }}', trim($event, '\\'), $stub
         );
     }
 
