@@ -18,7 +18,7 @@ trait DetectsConcurrencyErrors
     /**
      * Set a custom check to be used in the concurrency error check.
      *
-     * @param callable $check
+     * @param  callable  $check
      * @return $this
      */
     public function setConcurrencyErrorCheck(callable $check)

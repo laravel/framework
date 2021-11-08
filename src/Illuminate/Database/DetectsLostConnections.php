@@ -17,7 +17,7 @@ trait DetectsLostConnections
     /**
      * Set a custom check to be used in the lost connection check.
      *
-     * @param callable $check
+     * @param  callable  $check
      * @return $this
      */
     public function setLostConnectionCheck(callable $check)

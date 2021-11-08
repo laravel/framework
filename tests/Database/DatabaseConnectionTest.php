@@ -3,10 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use Throwable;
 use ErrorException;
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
@@ -18,6 +16,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PDO;
 use PDOException;
@@ -25,6 +24,7 @@ use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+use Throwable;
 
 class DatabaseConnectionTest extends TestCase
 {
@@ -396,7 +396,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection();
         $connection->setLostConnectionCheck(function (Throwable $e) {
             return Str::contains($e->getMessage(), [
-                'not a previously defined exception message'
+                'not a previously defined exception message',
             ]);
         });
 
@@ -427,7 +427,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection();
         $connection->setConcurrencyErrorCheck(function (Throwable $e) {
             return Str::contains($e->getMessage(), [
-                'not a previously defined exception message'
+                'not a previously defined exception message',
             ]);
         });
 
