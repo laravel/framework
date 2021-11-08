@@ -25,10 +25,24 @@ class CallbackEvent extends Event
     protected $parameters;
 
     /**
+     * The result of the callback execution.
+     *
+     * @var mixed
+     */
+    protected $result;
+
+    /**
+     * The exception that was thrown when calling the callback.
+     *
+     * @var \Throwable|null
+     */
+    protected $exception;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
-     * @param  string  $callback
+     * @param  string|callable  $callback
      * @param  array  $parameters
      * @param  \DateTimeZone|string|null  $timezone
      * @return void
@@ -50,47 +64,43 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Run the given event.
+     * Run the callback event.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return mixed
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function run(Container $container)
     {
-        if ($this->description && $this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
-            return;
+        parent::run($container);
+
+        if ($this->exception) {
+            throw $this->exception;
         }
 
-        $pid = getmypid();
+        return $this->result;
+    }
 
-        register_shutdown_function(function () use ($pid) {
-            if ($pid === getmypid()) {
-                $this->removeMutex();
-            }
-        });
-
-        parent::callBeforeCallbacks($container);
-
+    /**
+     * Run the callback.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return int
+     */
+    protected function execute($container)
+    {
         try {
-            $response = is_object($this->callback)
-                        ? $container->call([$this->callback, '__invoke'], $this->parameters)
-                        : $container->call($this->callback, $this->parameters);
+            $this->result = is_object($this->callback)
+                ? $container->call([$this->callback, '__invoke'], $this->parameters)
+                : $container->call($this->callback, $this->parameters);
 
-            $this->exitCode = $response === false ? 1 : 0;
+            return $this->result === false ? 1 : 0;
         } catch (Throwable $e) {
-            $this->exitCode = 1;
+            $this->exception = $e;
 
-            throw $e;
-        } finally {
-            $this->removeMutex();
-
-            parent::callAfterCallbacks($container);
+            return 1;
         }
-
-        return $response;
     }
 
     /**
@@ -100,8 +110,8 @@ class CallbackEvent extends Event
      */
     protected function removeMutex()
     {
-        if ($this->description && $this->withoutOverlapping) {
-            $this->mutex->forget($this);
+        if ($this->description) {
+            parent::removeMutex();
         }
     }
 
@@ -121,13 +131,7 @@ class CallbackEvent extends Event
             );
         }
 
-        $this->withoutOverlapping = true;
-
-        $this->expiresAt = $expiresAt;
-
-        return $this->skip(function () {
-            return $this->mutex->exists($this);
-        });
+        return parent::withoutOverlapping($expiresAt);
     }
 
     /**
@@ -145,9 +149,7 @@ class CallbackEvent extends Event
             );
         }
 
-        $this->onOneServer = true;
-
-        return $this;
+        return parent::onOneServer();
     }
 
     /**
@@ -172,5 +174,15 @@ class CallbackEvent extends Event
         }
 
         return is_string($this->callback) ? $this->callback : 'Callback';
+    }
+
+    /**
+     * Determine if the event should skip because another process is overlapping.
+     *
+     * @return bool
+     */
+    public function shouldSkipDueToOverlapping()
+    {
+        return $this->description && parent::shouldSkipDueToOverlapping();
     }
 }

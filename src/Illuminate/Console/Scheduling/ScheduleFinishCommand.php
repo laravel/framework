@@ -49,7 +49,7 @@ class ScheduleFinishCommand extends Command
         collect($schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
         })->each(function ($event) {
-            $event->callafterCallbacksWithExitCode($this->laravel, $this->argument('code'));
+            $event->finish($this->laravel, $this->argument('code'));
 
             $this->laravel->make(Dispatcher::class)->dispatch(new ScheduledBackgroundTaskFinished($event));
         });
