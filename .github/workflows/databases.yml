@@ -171,7 +171,7 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database --verbose --exclude-group MySQL
+        run: vendor/bin/phpunit tests/Integration/Database --verbose
         env:
           DB_CONNECTION: pgsql
           DB_PASSWORD: password
@@ -213,7 +213,7 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Database --verbose --exclude-group MySQL,SkipMSSQL
+        run: vendor/bin/phpunit tests/Integration/Database --verbose --exclude-group SkipMSSQL
         env:
           DB_CONNECTION: sqlsrv
           DB_DATABASE: master

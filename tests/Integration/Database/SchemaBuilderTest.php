@@ -40,10 +40,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testRegisterCustomDoctrineType()
     {
-        $connection = $this->app['config']->get('database.default');
-        $driver = $this->app['config']->get("database.connections.$connection.driver");
-
-        if ($driver !== 'sqlite') {
+        if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
 
