@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\MySql\MySqlTestCase;
 
 /**
  * @requires extension pdo_mysql
