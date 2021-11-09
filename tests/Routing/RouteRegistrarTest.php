@@ -61,6 +61,15 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
     }
 
+    public function testNullNamespaceIsRespected()
+    {
+        $this->router->middleware(['one'])->namespace(null)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertNull($this->getRoute()->getAction()['namespace']);
+    }
+
     public function testMiddlewareAsStringableObject()
     {
         $one = new class implements Stringable
