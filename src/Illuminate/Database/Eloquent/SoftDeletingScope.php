@@ -172,7 +172,7 @@ class SoftDeletingScope implements Scope
             $builder->withTrashed();
 
             return $builder->update([
-                $model->getDeletedAtColumn() => $datetime
+                $model->getDeletedAtColumn() => $datetime,
             ]);
         });
     }

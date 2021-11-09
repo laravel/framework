@@ -184,7 +184,7 @@ trait SoftDeletes
     /**
      * Register a "willTrash" model event callback with the dispatcher.
      *
-     * @param \Closure|string $callback
+     * @param  \Closure|string  $callback
      * @return void
      */
     public static function willTrash($callback)

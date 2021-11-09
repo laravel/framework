@@ -9,8 +9,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-use function now;
-
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
     protected function tearDown(): void

@@ -15,8 +15,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-use function now;
-
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
     protected function tearDown(): void
