@@ -23,6 +23,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
  * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
+ * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string  $middleware)
  */
 class RouteRegistrar
 {
@@ -63,6 +64,7 @@ class RouteRegistrar
         'prefix',
         'scopeBindings',
         'where',
+        'withoutMiddleware',
     ];
 
     /**
@@ -73,6 +75,7 @@ class RouteRegistrar
     protected $aliases = [
         'name' => 'as',
         'scopeBindings' => 'scope_bindings',
+        'withoutMiddleware' => 'excluded_middleware',
     ];
 
     /**
@@ -107,7 +110,15 @@ class RouteRegistrar
             }
         }
 
-        $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
+        $attributeKey = Arr::get($this->aliases, $key, $key);
+
+        if ($key === 'withoutMiddleware') {
+            $value = array_merge(
+                (array) ($this->attributes[$attributeKey] ?? []), Arr::wrap($value)
+            );
+        }
+
+        $this->attributes[$attributeKey] = $value;
 
         return $this;
     }

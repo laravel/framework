@@ -245,6 +245,18 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+    public function testCanRegisterGroupWithoutMiddleware()
+    {
+        $this->router->withoutMiddleware('one')->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            })->middleware(['one', 'two']);
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
     public function testCanRegisterGroupWithStringableMiddleware()
     {
         $one = new class implements Stringable
