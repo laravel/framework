@@ -177,9 +177,9 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function setTable($stub, $table)
     {
-        return $table ?
-        str_replace('{{ table }}', 'protected $table = \''.$table.'\';', $stub) :
-            str_replace('{{ table }}', '//', $stub);
+        return $table
+            ? str_replace('{{ table }}', 'protected $table = \''.$table.'\';', $stub)
+            : str_replace('{{ table }}', '//', $stub);
     }
 
     /**
