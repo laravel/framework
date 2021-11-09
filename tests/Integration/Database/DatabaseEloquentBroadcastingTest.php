@@ -71,6 +71,25 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         });
     }
 
+    public function testBroadcastingOnModelWillTrash()
+    {
+        Event::fake([BroadcastableModelEventOccurred::class]);
+
+        $model = new SoftDeletableTestEloquentBroadcastUser;
+        $model->name = 'Bean';
+        $model->saveQuietly();
+
+        $model->deleteAt(now()->addDay());
+
+        Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
+            return $event->model instanceof SoftDeletableTestEloquentBroadcastUser
+                && $event->event() == 'willTrash'
+                && count($event->broadcastOn()) === 1
+                && $event->model->name === 'Bean'
+                && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.SoftDeletableTestEloquentBroadcastUser.{$event->model->id}";
+        });
+    }
+
     public function testBroadcastingForSpecificEventsOnly()
     {
         Event::fake([BroadcastableModelEventOccurred::class]);

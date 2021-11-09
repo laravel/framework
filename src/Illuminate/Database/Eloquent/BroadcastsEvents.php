@@ -26,6 +26,10 @@ trait BroadcastsEvents
                 $model->broadcastTrashed();
             });
 
+            static::willTrash(function ($model) {
+                $model->broadcastWillTrash();
+            });
+
             static::restored(function ($model) {
                 $model->broadcastRestored();
             });
@@ -72,6 +76,19 @@ trait BroadcastsEvents
     {
         return $this->broadcastIfBroadcastChannelsExistForEvent(
             $this->newBroadcastableModelEvent('trashed'), 'trashed', $channels
+        );
+    }
+
+    /**
+     * Broadcast that the model will be trashed.
+     *
+     * @param  \Illuminate\Broadcasting\Channel|\Illuminate\Contracts\Broadcasting\HasBroadcastChannel|array|null  $channels
+     * @return \Illuminate\Broadcasting\PendingBroadcast
+     */
+    public function broadcastWillTrash($channels = null)
+    {
+        return $this->broadcastIfBroadcastChannelsExistForEvent(
+            $this->newBroadcastableModelEvent('willTrash'), 'willTrash', $channels
         );
     }
 
