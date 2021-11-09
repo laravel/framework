@@ -55,12 +55,14 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected function writeMarkdownTemplate()
     {
-        if (! ($viewName = $this->option('markdown'))) {
-            $viewName = 'emails.'.Str::kebab(class_basename($this->argument('name')));
+        $view = $this->option('markdown');
+
+        if (! $view) {
+            $view = 'mail.'.Str::kebab(class_basename($this->argument('name')));
         }
 
         $path = $this->viewPath(
-            str_replace('.', '/', $viewName).'.blade.php'
+            str_replace('.', '/', $view).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
