@@ -9,9 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+
+use function now;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
@@ -75,6 +78,9 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             m::mock(Grammar::class),
             m::mock(Processor::class)
         ));
+
+        Carbon::setTestNow($now = now());
+
         $model = m::mock(Model::class);
         $model->makePartial();
         $scope = m::mock(SoftDeletingScope::class.'[remove]');
@@ -85,7 +91,12 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $givenBuilder->shouldReceive('whereNotNull')->once()->with('table.deleted_at');
+        $givenBuilder->shouldReceive('where')->once()->withArgs(function ($column, $operator, $datetime) use ($now) {
+            $this->assertSame('table.deleted_at', $column);
+            $this->assertSame('<=', $operator);
+            $this->assertEquals($now, $datetime);
+            return true;
+        });
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
@@ -98,6 +109,9 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             m::mock(Grammar::class),
             m::mock(Processor::class)
         ));
+
+        Carbon::setTestNow($now = now());
+
         $model = m::mock(Model::class);
         $model->makePartial();
         $scope = m::mock(SoftDeletingScope::class.'[remove]');
@@ -108,7 +122,14 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
-        $givenBuilder->shouldReceive('whereNull')->once()->with('table.deleted_at');
+        $givenBuilder->shouldReceive('whereNull')->once()->with('table.deleted_at')->andReturn($givenBuilder);
+        $givenBuilder->shouldReceive('orWhere')->once()->withArgs(function ($column, $operator, $datetime) use ($now) {
+            $this->assertSame('table.deleted_at', $column);
+            $this->assertSame('>', $operator);
+            $this->assertEquals($now, $datetime);
+
+            return true;
+        });
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
