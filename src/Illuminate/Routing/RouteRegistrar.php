@@ -242,7 +242,7 @@ class RouteRegistrar
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 
-            return $this->attribute($method, $parameters[0] ?? true);
+            return $this->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);
         }
 
         throw new BadMethodCallException(sprintf(
