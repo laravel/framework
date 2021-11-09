@@ -29,6 +29,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         m::close();
     }
 
+    public function testToRawSql()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->select('*')->where('id', 1);
+
+        $this->assertSame('select * from "table" where "id" = 1', $builder->toRawSql());
+    }
+
     public function testFindMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);

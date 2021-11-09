@@ -33,6 +33,13 @@ class DatabaseQueryBuilderTest extends TestCase
         m::close();
     }
 
+    public function testToRawSql()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 1);
+        $this->assertSame('select * from "users" where "id" = 1', $builder->toRawSql());
+    }
+
     public function testBasicSelect()
     {
         $builder = $this->getBuilder();
