@@ -2304,7 +2304,7 @@ class Builder
     }
 
     /**
-     * Get the SQL representation of the query including the bindings
+     * Get the SQL representation of the query including the bindings.
      *
      * @return string
      */
@@ -2314,7 +2314,7 @@ class Builder
             $binding = str_replace(['\\', "'"], ['\\\\', "\'"], $binding);
             return preg_replace('/\?/', is_numeric($binding)
                 ? $binding
-                : "'" . $binding . "'", $sql, 1);
+                : "'".$binding."'", $sql, 1);
         }, $this->toSql());
     }
 
