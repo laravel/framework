@@ -73,6 +73,19 @@ class ModelMakeCommand extends GeneratorCommand
         }
     }
 
+        /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        return $this->setTable($stub, $this->option('table'));
+    }
+
     /**
      * Create a model factory for the model.
      *
@@ -156,6 +169,20 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Set the table property for the model.
+     *
+     * @param  string $stub
+     * @param  string $table
+     * @return string
+     */
+    protected function setTable($stub, $table)
+    {
+        return $table ?
+            str_replace('{{ table }}', 'protected $table = \'' . $table . '\';', $stub) :
+            str_replace('{{ table }}', '//', $stub);
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -210,6 +237,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
+            ['table', 't', InputOption::VALUE_REQUIRED, 'Sets the table name for the model.'],
         ];
     }
 }
