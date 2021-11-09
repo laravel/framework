@@ -10,6 +10,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -133,5 +134,119 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
+    }
+
+    public function testWillBeTrashedExtension()
+    {
+        $builder = new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        ));
+
+        Carbon::setTestNow($now = now());
+
+        $model = m::mock(Model::class);
+        $model->makePartial();
+        $scope = m::mock(SoftDeletingScope::class.'[remove]');
+        $scope->extend($builder);
+        $callback = $builder->getMacro('willBeTrashed');
+        $givenBuilder = m::mock(EloquentBuilder::class);
+        $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock(stdClass::class));
+        $givenBuilder->shouldReceive('getModel')->andReturn($model);
+        $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
+        $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
+        $givenBuilder->shouldReceive('where')->once()->withArgs(function ($column, $operator, $datetime) use ($now) {
+            $this->assertSame('table.deleted_at', $column);
+            $this->assertSame('>', $operator);
+            $this->assertEquals($now, $datetime);
+
+            return true;
+        });
+        $result = $callback($givenBuilder);
+
+        $this->assertEquals($givenBuilder, $result);
+    }
+
+    public function testDeleteAtExtension()
+    {
+        $builder = new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        ));
+
+        Carbon::setTestNow(now());
+
+        $now = now()->addSecond();
+
+        $scope = new SoftDeletingScope;
+        $scope->extend($builder);
+        $callback = $builder->getMacro('deleteAt');
+        $givenBuilder = m::mock(EloquentBuilder::class);
+        $givenBuilder->shouldReceive('withTrashed')->once();
+        $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
+        $model->shouldReceive('fromDateTime')->once()->with($now)->andReturn($now->format('Y-m-d H:i:s'));
+        $model->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
+        $model->shouldReceive('freshTimestamp')->once()->andReturn(now());
+        $givenBuilder->shouldReceive('update')->once()->with(['deleted_at' => $now->format('Y-m-d H:i:s')]);
+
+        $callback($givenBuilder, $now);
+    }
+
+    public function testDeleteAtExtensionExceptionIfTimePresent()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The datetime must be set in the future.');
+
+        $builder = new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        ));
+
+        Carbon::setTestNow(now());
+
+        $now = now();
+
+        $scope = new SoftDeletingScope;
+        $scope->extend($builder);
+        $callback = $builder->getMacro('deleteAt');
+        $givenBuilder = m::mock(EloquentBuilder::class);
+        $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
+        $model->shouldReceive('freshTimestamp')->once()->andReturn(now());
+        $model->shouldReceive('fromDateTime')->once()->with($now)->andReturn($now->format('Y-m-d H:i:s'));
+        $givenBuilder->shouldNotReceive('withTrashed');
+        $givenBuilder->shouldNotReceive('update');
+
+        $callback($givenBuilder, $now);
+    }
+
+    public function testDeleteAtExtensionExceptionIfTimePast()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The datetime must be set in the future.');
+
+        $builder = new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        ));
+
+        Carbon::setTestNow(now());
+
+        $now = now()->subSecond();
+
+        $scope = new SoftDeletingScope;
+        $scope->extend($builder);
+        $callback = $builder->getMacro('deleteAt');
+        $givenBuilder = m::mock(EloquentBuilder::class);
+        $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
+        $model->shouldReceive('freshTimestamp')->once()->andReturn(now());
+        $model->shouldReceive('fromDateTime')->once()->with($now)->andReturn($now->format('Y-m-d H:i:s'));
+        $givenBuilder->shouldNotReceive('withTrashed');
+        $givenBuilder->shouldNotReceive('update');
+
+        $callback($givenBuilder, $now);
     }
 }

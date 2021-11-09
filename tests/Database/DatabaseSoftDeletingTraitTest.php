@@ -4,9 +4,12 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+
+use function now;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
@@ -55,6 +58,62 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $model->shouldReceive('save')->never();
 
         $this->assertFalse($model->restore());
+    }
+
+    public function testDeleteAt()
+    {
+        Carbon::setTestNow($now = now());
+
+        $now = $now->clone()->addSecond();
+
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $model->shouldReceive('newModelQuery')->once()->andReturn($query = m::mock(stdClass::class));
+        $model->shouldReceive('fireModelEvent')->once()->with('willTrash', false)->andReturn(true);
+        $query->shouldReceive('where')->once()->with('id', '=', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+            'updated_at' => 'date-time',
+        ]);
+        $model->shouldReceive('syncOriginalAttributes')->once()->with([
+            'deleted_at',
+            'updated_at',
+        ]);
+
+        $model->deleteAt($now->addSecond());
+
+        $this->assertInstanceOf(Carbon::class, $model->deleted_at);
+        $this->assertEquals($now, $model->deleted_at);
+    }
+
+    public function testDeleteAtThrowsExceptionIfDatetimePresent()
+    {
+        $this->expectExceptionMessage(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The datetime must be set in the future.');
+
+        Carbon::setTestNow($now = now());
+
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $model->shouldNotReceive('newModelQuery');
+
+        $model->deleteAt($now->addSecond());
+    }
+
+    public function testDeleteAtThrowsExceptionIfDatetimePast()
+    {
+        $this->expectExceptionMessage(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The datetime must be set in the future.');
+
+        Carbon::setTestNow($now = now());
+
+        $now = $now->clone()->subSecond();
+
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $model->shouldNotReceive('newModelQuery');
+
+        $model->deleteAt($now->addSecond());
     }
 }
 
