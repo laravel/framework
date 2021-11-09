@@ -11,10 +11,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -27,8 +25,6 @@ class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
             $table->string('title');
             $table->timestamps();
         });
-
-        Carbon::setTestNow(null);
     }
 
     public function testBasicCreateAndRetrieve()

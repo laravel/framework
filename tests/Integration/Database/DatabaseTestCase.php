@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Orchestra\Testbench\TestCase;
 
 abstract class DatabaseTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     /**
      * The current database driver.

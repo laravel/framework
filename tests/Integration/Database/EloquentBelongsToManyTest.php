@@ -15,10 +15,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('uuid');
@@ -53,8 +51,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $table->string('flag')->default('')->nullable();
             $table->timestamps();
         });
-
-        Carbon::setTestNow(null);
     }
 
     public function testBasicCreateAndRetrieve()

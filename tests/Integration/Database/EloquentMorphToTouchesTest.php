@@ -10,10 +10,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphToTouchesTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();

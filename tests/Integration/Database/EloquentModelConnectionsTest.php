@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -27,10 +28,8 @@ class EloquentModelConnectionsTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrations()
     {
-        parent::setUp();
-
         Schema::create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

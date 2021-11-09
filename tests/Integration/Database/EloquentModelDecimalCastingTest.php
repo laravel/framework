@@ -9,10 +9,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelDecimalCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->decimal('decimal_field_2', 8, 2)->nullable();

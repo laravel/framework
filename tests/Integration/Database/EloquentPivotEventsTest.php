@@ -13,6 +13,12 @@ class EloquentPivotEventsTest extends DatabaseTestCase
     {
         parent::setUp();
 
+        // clear event log between requests
+        PivotEventsTestCollaborator::$eventsCalled = [];
+    }
+
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -32,8 +38,6 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->string('role')->nullable();
         });
 
-        // clear event log between requests
-        PivotEventsTestCollaborator::$eventsCalled = [];
     }
 
     public function testPivotWillTriggerEventsToBeFired()
