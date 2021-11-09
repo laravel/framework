@@ -1,6 +1,26 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.69.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.70.0...8.x)
+
+
+## [v8.70.0 (2021-11-09)](https://github.com/laravel/framework/compare/v8.69.0...v8.70.0)
+
+### Added
+- New flag `--requests` `-R` to `make:controller` and `make:model` Commands ([#39120](https://github.com/laravel/framework/pull/39120), [8fbfc9f](https://github.com/laravel/framework/commit/8fbfc9f16e48b202670e4b21588d8d752c3fbe90))
+- Allows Stringable objects as middleware. ([#39439](https://github.com/laravel/framework/pull/39439), [#39449](https://github.com/laravel/framework/pull/39449))
+- Introduce `Js` for encoding data to use in JavaScript ([#39389](https://github.com/laravel/framework/pull/39389), [#39460](https://github.com/laravel/framework/pull/39460), [bbf47d5](https://github.com/laravel/framework/commit/bbf47d5507c0ff018763170988284eeca6021fe8))
+- Added new lost connection error message for sqlsrv ([#39466](https://github.com/laravel/framework/pull/39466))
+- Allow can method to be chained onto route for quick authorization ([#39464](https://github.com/laravel/framework/pull/39464))
+- Publish `provider.stub` in stub:publish command ([#39491](https://github.com/laravel/framework/pull/39491))
+- Added `Illuminate/Support/NamespacedItemResolver::flushParsedKeys()` ([#39490](https://github.com/laravel/framework/pull/39490))
+- Accept enums for insert update and where ([#39492](https://github.com/laravel/framework/pull/39492))
+- Fifo support for queue name suffix ([#39497](https://github.com/laravel/framework/pull/39497), [12e47bb](https://github.com/laravel/framework/commit/12e47bb3dad10294268fa3167112b198fd0a2036))
+
+### Changed
+- Dont cache ondemand loggers ([5afa0f1](https://github.com/laravel/framework/commit/5afa0f1ee680e66360bc05f293eadca0d558f028), [bc50a9b](https://github.com/laravel/framework/commit/bc50a9b10097e66b59f0dfcabc6e100b8fedc760))
+- Enforce implicit Route Model scoping ([#39440](https://github.com/laravel/framework/pull/39440))
+- Ensure event mutex is always removed ([#39498](https://github.com/laravel/framework/pull/39498))
+- Added missing "flags" to redis zadd options list... ([#39538](https://github.com/laravel/framework/pull/39538))
 
 
 ## [v8.69.0 (2021-11-02)](https://github.com/laravel/framework/compare/v8.68.1...v8.69.0)
