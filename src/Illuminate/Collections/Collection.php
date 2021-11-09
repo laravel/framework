@@ -717,6 +717,24 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         return new static($result);
     }
+    
+    /**
+     * Run an associative map over each of the items with setting the value of the given key as associative index.
+     *
+     *
+     * @param  string  $key
+     * @return static
+     */
+    public function mapItemsWithKey(string $key)
+    {
+        $result = [];
+
+        foreach ($this->items as $item) {
+            $result[data_get($item, $key)] = $item;
+        }
+
+        return new static($result);
+    }
 
     /**
      * Merge the collection with the given items.
