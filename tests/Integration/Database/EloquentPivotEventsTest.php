@@ -37,7 +37,6 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->text('permissions')->nullable();
             $table->string('role')->nullable();
         });
-
     }
 
     public function testPivotWillTriggerEventsToBeFired()
