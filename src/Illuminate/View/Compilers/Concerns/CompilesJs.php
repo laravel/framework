@@ -2,7 +2,7 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
-use Illuminate\Support\JsString;
+use Illuminate\Support\Js;
 
 trait CompilesJs
 {
@@ -16,7 +16,7 @@ trait CompilesJs
     {
         return sprintf(
             "<?php echo \%s::from(%s)->toHtml() ?>",
-            JsString::class, $this->stripParentheses($expression)
+            Js::class, $this->stripParentheses($expression)
         );
     }
 }

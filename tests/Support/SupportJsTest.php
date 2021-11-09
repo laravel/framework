@@ -8,7 +8,7 @@ use Illuminate\Support\Js;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
-class SupportJsStringTest extends TestCase
+class SupportJsTest extends TestCase
 {
     public function testScalars()
     {
