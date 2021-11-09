@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.70.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.70.1...8.x)
+
+
+## [v8.70.1 (2021-11-09)](https://github.com/laravel/framework/compare/v8.70.0...v8.70.1)
+
+### Fixed
+- Fixed problem with fallback in Router ([5fda5a3](https://github.com/laravel/framework/commit/5fda5a335bce1527e6796a91bb36ccb48d6807a8))
 
 
 ## [v8.70.0 (2021-11-09)](https://github.com/laravel/framework/compare/v8.69.0...v8.70.0)
