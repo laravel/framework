@@ -11,7 +11,7 @@ class SoftDeletingScope implements Scope
      *
      * @var string[]
      */
-    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'WillBeTrashed', 'DeleteAt'];
+    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'PendingTrash', 'DeleteAt'];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -22,7 +22,9 @@ class SoftDeletingScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull($model->getQualifiedDeletedAtColumn());
+        $column = $model->getQualifiedDeletedAtColumn();
+
+        $builder->whereNull($column)->orWhere($column, '>', now());
     }
 
     /**
@@ -139,9 +141,9 @@ class SoftDeletingScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    protected function addWillBeTrashed(Builder $builder)
+    protected function addPendingTrash(Builder $builder)
     {
-        $builder->macro('willBeTrashed', function (Builder $builder) {
+        $builder->macro('pendingTrash', function (Builder $builder) {
             $model = $builder->getModel();
 
             $builder->withoutGlobalScope($this)->where(
@@ -161,14 +163,16 @@ class SoftDeletingScope implements Scope
     protected function addDeleteAt(Builder $builder)
     {
         $builder->macro('deleteAt', function (Builder $builder, $datetime) {
-            if ($builder->getModel()->freshTimestamp() >= $datetime) {
+            $model = $builder->getModel();
+
+            if ($model->freshTimestamp() >= $datetime = $model->fromDateTime($datetime)) {
                 throw new InvalidArgumentException('The datetime must be set in the future.');
             }
 
             $builder->withTrashed();
 
             return $builder->update([
-                $builder->getModel()->getDeletedAtColumn() => $this->getModel()->fromDateTime($time)
+                $model->getDeletedAtColumn() => $datetime
             ]);
         });
     }
