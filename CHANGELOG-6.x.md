@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.37...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.38...6.x)
+
+
+## [v6.20.38 (2021-11-09)](https://github.com/laravel/framework/compare/v6.20.37...v6.20.38)
+
+### Added
+- Added new lost connection error message for sqlsrv ([#39466](https://github.com/laravel/framework/pull/39466))
 
 
 ## [v6.20.37 (2021-11-02)](https://github.com/laravel/framework/compare/v6.20.36...v6.20.37)
