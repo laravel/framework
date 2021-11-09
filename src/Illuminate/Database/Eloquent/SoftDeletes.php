@@ -8,8 +8,7 @@ use InvalidArgumentException;
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withTrashed(bool $withTrashed = true)
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder onlyTrashed()
  * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder withoutTrashed()
- * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder willBeTrashed()
- * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder deleteAt(\DateTimeInterface $datetime)
+ * @method static static|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder pendingTrash()
  */
 trait SoftDeletes
 {
@@ -73,28 +72,32 @@ trait SoftDeletes
             return $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
         }
 
-        return $this->runSoftDelete($this->freshTimestamp(), 'trashed');
+        $this->runSoftDelete($this->freshTimestamp(), 'trashed');
     }
 
     /**
      * Perform the actual delete query on this model instance.
      *
-     * @param \DatetimeInterface $time
-     * @param string $event
+     * @param  \DatetimeInterface|string  $time
+     * @param  string  $event
      * @return void
      */
     protected function runSoftDelete($time, $event)
     {
         $query = $this->setKeysForSaveQuery($this->newModelQuery());
 
-        $columns = [$this->getDeletedAtColumn() => $this->fromDateTime($time)];
+        $time = $this->fromDateTime($time);
+
+        $columns = [$this->getDeletedAtColumn() => $time];
 
         $this->{$this->getDeletedAtColumn()} = $time;
 
         if ($this->timestamps && ! is_null($this->getUpdatedAtColumn())) {
-            $this->{$this->getUpdatedAtColumn()} = $time;
+            $updatedAt = $this->freshTimestamp();
 
-            $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
+            $columns[$this->getUpdatedAtColumn()] = $updatedAt;
+
+            $this->{$this->getUpdatedAtColumn()} = $updatedAt;
         }
 
         $query->update($columns);
@@ -107,7 +110,7 @@ trait SoftDeletes
     /**
      * Sets the model to be deleted in the future.
      *
-     * @param \DatetimeInterface $datetime
+     * @param  \DateTimeInterface|string  $datetime
      * @return void
      */
     public function deleteAt($datetime)
