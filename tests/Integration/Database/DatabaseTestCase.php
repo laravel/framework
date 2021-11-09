@@ -2,10 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase;
 
 abstract class DatabaseTestCase extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * The current database driver.
      *
@@ -28,14 +31,5 @@ abstract class DatabaseTestCase extends TestCase
         $connection = $app['config']->get('database.default');
 
         $this->driver = $app['config']->get("database.connections.$connection.driver");
-    }
-
-    protected function tearDown(): void
-    {
-        if ($this->app['config']->get('database.default') !== 'testbench') {
-            $this->artisan('db:wipe', ['--drop-views' => true]);
-        }
-
-        parent::tearDown();
     }
 }
