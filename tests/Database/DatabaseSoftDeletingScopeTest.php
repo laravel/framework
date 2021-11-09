@@ -94,6 +94,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             $this->assertSame('table.deleted_at', $column);
             $this->assertSame('<=', $operator);
             $this->assertEquals($now, $datetime);
+
             return true;
         });
         $result = $callback($givenBuilder);
