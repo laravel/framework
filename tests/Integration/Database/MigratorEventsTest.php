@@ -13,6 +13,19 @@ use Orchestra\Testbench\TestCase;
 
 class MigratorEventsTest extends TestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
+        if (! env('DB_CONNECTION')) {
+            $app['config']->set('database.default', 'testbench');
+        }
+    }
+
     protected function migrateOptions()
     {
         return [
