@@ -12,10 +12,9 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Mockery as m;
+use function now;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-
-use function now;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
@@ -37,10 +36,12 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             $this->assertSame('table.deleted_at', $column);
             $this->assertSame('>', $operator);
             $this->assertEquals($now, $datetime);
+
             return true;
         });
         $builder->shouldReceive('where')->once()->withArgs(function ($callback) use ($builder) {
             $callback($builder);
+
             return true;
         });
 
@@ -147,6 +148,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         });
         $givenBuilder->shouldReceive('where')->once()->withArgs(function ($callback) use ($givenBuilder) {
             $callback($givenBuilder);
+
             return true;
         })->andReturn($givenBuilder);
         $result = $callback($givenBuilder);
