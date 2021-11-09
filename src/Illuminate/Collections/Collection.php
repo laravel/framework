@@ -717,7 +717,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         return new static($result);
     }
-    
+
     /**
      * Run an associative map over each of the items with setting the value of the given key as associative index.
      *
