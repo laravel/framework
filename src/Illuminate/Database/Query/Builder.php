@@ -2304,6 +2304,21 @@ class Builder
     }
 
     /**
+     * Get the SQL representation of the query including the bindings
+     *
+     * @return string
+     */
+    public function toRawSql()
+    {
+        return array_reduce($this->getBindings(), function ($sql, $binding) {
+            $binding = str_replace(['\\', "'"], ['\\\\', "\'"], $binding);
+            return preg_replace('/\?/', is_numeric($binding)
+                ? $binding
+                : "'" . $binding . "'", $sql, 1);
+        }, $this->toSql());
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
