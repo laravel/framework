@@ -73,7 +73,7 @@ class ModelMakeCommand extends GeneratorCommand
         }
     }
 
-        /**
+    /**
      * Build the class with the given name.
      *
      * @param  string  $name
@@ -171,14 +171,14 @@ class ModelMakeCommand extends GeneratorCommand
     /**
      * Set the table property for the model.
      *
-     * @param  string $stub
-     * @param  string $table
+     * @param  string  $stub
+     * @param  string  $table
      * @return string
      */
     protected function setTable($stub, $table)
     {
         return $table ?
-            str_replace('{{ table }}', 'protected $table = \'' . $table . '\';', $stub) :
+        str_replace('{{ table }}', 'protected $table = \''.$table.'\';', $stub) :
             str_replace('{{ table }}', '//', $stub);
     }
 
