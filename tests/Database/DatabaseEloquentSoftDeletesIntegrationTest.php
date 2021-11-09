@@ -1089,7 +1089,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail->deleteAt(now()->addDay());
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
 
-        $this->assertNull($comment->owner);
+        $this->assertNotNull($comment->owner);
 
         $abigail->delete();
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
