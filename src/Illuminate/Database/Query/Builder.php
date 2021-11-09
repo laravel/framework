@@ -2312,6 +2312,7 @@ class Builder
     {
         return array_reduce($this->getBindings(), function ($sql, $binding) {
             $binding = str_replace(['\\', "'"], ['\\\\', "\'"], $binding);
+
             return preg_replace('/\?/', is_numeric($binding)
                 ? $binding
                 : "'".$binding."'", $sql, 1);
