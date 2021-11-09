@@ -4,6 +4,7 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
+use ErrorException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,6 @@ use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
-use ErrorException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
