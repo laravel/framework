@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class MailMakeCommand extends GeneratorCommand
@@ -42,7 +43,7 @@ class MailMakeCommand extends GeneratorCommand
             return;
         }
 
-        if ($this->option('markdown')) {
+        if ($this->hasOption('markdown')) {
             $this->writeMarkdownTemplate();
         }
     }
@@ -54,8 +55,14 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected function writeMarkdownTemplate()
     {
+        $view = $this->option('markdown');
+
+        if (! $view) {
+            $view = 'mail.'.Str::kebab(class_basename($this->argument('name')));
+        }
+
         $path = $this->viewPath(
-            str_replace('.', '/', $this->option('markdown')).'.blade.php'
+            str_replace('.', '/', $view).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
