@@ -15,6 +15,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+use function now;
+
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
     protected function tearDown(): void
@@ -24,11 +26,23 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
     public function testApplyingScopeToABuilder()
     {
+        Carbon::setTestNow($now = now());
+
         $scope = m::mock(SoftDeletingScope::class.'[extend]');
         $builder = m::mock(EloquentBuilder::class);
         $model = m::mock(Model::class);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->once()->andReturn('table.deleted_at');
-        $builder->shouldReceive('whereNull')->once()->with('table.deleted_at');
+        $builder->shouldReceive('whereNull')->once()->with('table.deleted_at')->andReturn($builder);
+        $builder->shouldReceive('orWhere')->once()->withArgs(function ($column, $operator, $datetime) use ($now) {
+            $this->assertSame('table.deleted_at', $column);
+            $this->assertSame('>', $operator);
+            $this->assertEquals($now, $datetime);
+            return true;
+        });
+        $builder->shouldReceive('where')->once()->withArgs(function ($callback) use ($builder) {
+            $callback($builder);
+            return true;
+        });
 
         $scope->apply($builder, $model);
     }
@@ -122,6 +136,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
         $givenBuilder->shouldReceive('withoutGlobalScope')->with($scope)->andReturn($givenBuilder);
         $model->shouldReceive('getQualifiedDeletedAtColumn')->andReturn('table.deleted_at');
+
         $givenBuilder->shouldReceive('whereNull')->once()->with('table.deleted_at')->andReturn($givenBuilder);
         $givenBuilder->shouldReceive('orWhere')->once()->withArgs(function ($column, $operator, $datetime) use ($now) {
             $this->assertSame('table.deleted_at', $column);
@@ -130,12 +145,16 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
             return true;
         });
+        $givenBuilder->shouldReceive('where')->once()->withArgs(function ($callback) use ($givenBuilder) {
+            $callback($givenBuilder);
+            return true;
+        })->andReturn($givenBuilder);
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
     }
 
-    public function testWillBeTrashedExtension()
+    public function testPendingTrashExtension()
     {
         $builder = new EloquentBuilder(new BaseBuilder(
             m::mock(ConnectionInterface::class),
@@ -149,7 +168,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $model->makePartial();
         $scope = m::mock(SoftDeletingScope::class.'[remove]');
         $scope->extend($builder);
-        $callback = $builder->getMacro('willBeTrashed');
+        $callback = $builder->getMacro('pendingTrash');
         $givenBuilder = m::mock(EloquentBuilder::class);
         $givenBuilder->shouldReceive('getQuery')->andReturn($query = m::mock(stdClass::class));
         $givenBuilder->shouldReceive('getModel')->andReturn($model);
@@ -161,7 +180,8 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             $this->assertEquals($now, $datetime);
 
             return true;
-        });
+        })->andReturn($givenBuilder);
+
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
