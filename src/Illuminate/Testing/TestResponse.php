@@ -19,6 +19,7 @@ use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
+use ErrorException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -223,7 +224,11 @@ class TestResponse implements ArrayAccess
      */
     protected function statusMessageWithException($expected, $actual, $exception)
     {
-        $exception = (string) $exception;
+        try {
+            $exception = (string) $exception;
+        } catch (ErrorException $e) {
+            $exception = var_export($exception, true);
+        }
 
         return <<<EOF
 Expected response status code [$expected] but received $actual.
