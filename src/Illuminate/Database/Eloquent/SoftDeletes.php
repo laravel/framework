@@ -111,7 +111,7 @@ trait SoftDeletes
      * @param  \DateTimeInterface|string  $datetime
      * @return void
      */
-    public function deleteAt($datetime)
+    public function trashAt($datetime)
     {
         if ($this->freshTimestamp() >= $datetime) {
             throw new InvalidArgumentException('The datetime must be set in the future.');

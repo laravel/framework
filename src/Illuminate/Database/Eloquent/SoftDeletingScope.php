@@ -7,11 +7,11 @@ use InvalidArgumentException;
 class SoftDeletingScope implements Scope
 {
     /**
-     * All of the extensions to be added to the builder.
+     * All the extensions to be added to the builder.
      *
      * @var string[]
      */
-    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'PendingTrash', 'DeleteAt'];
+    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed', 'PendingTrash', 'TrashAt'];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -155,14 +155,14 @@ class SoftDeletingScope implements Scope
     }
 
     /**
-     * Add the delete-at extension to the builder.
+     * Add the trash-at extension to the builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
-    protected function addDeleteAt(Builder $builder)
+    protected function addTrashAt(Builder $builder)
     {
-        $builder->macro('deleteAt', function (Builder $builder, $datetime) {
+        $builder->macro('trashAt', function (Builder $builder, $datetime) {
             $model = $builder->getModel();
 
             if ($model->freshTimestamp() >= $datetime = $model->fromDateTime($datetime)) {

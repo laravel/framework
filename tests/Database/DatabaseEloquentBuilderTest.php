@@ -843,35 +843,54 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testRealNestedWhereWithScopes()
     {
+        Carbon::setTestNow($now = now());
+
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
             $query->where('baz', '>', 9000);
         });
-        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
-        $this->assertEquals(['bar', 9000], $query->getBindings());
+        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and ("table"."deleted_at" is null or "table"."deleted_at" > ?)', $query->toSql());
+        $this->assertEquals(['bar', 9000, $now], $query->getBindings());
     }
 
-    public function testRealNestedWhereWithScopesMacro()
+    public function testRealNestedWhereWithOnlyTrashedScopesMacro()
     {
+        Carbon::setTestNow($now = now());
+
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
             $query->where('baz', '>', 9000)->onlyTrashed();
         })->withTrashed();
-        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ? and "table"."deleted_at" is not null)', $query->toSql());
-        $this->assertEquals(['bar', 9000], $query->getBindings());
+        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ? and "table"."deleted_at" <= ?)', $query->toSql());
+        $this->assertEquals(['bar', 9000, $now], $query->getBindings());
+    }
+
+    public function testRealNestedWhereWithPendingTrashMacro()
+    {
+        Carbon::setTestNow($now = now());
+
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
+            $query->where('baz', '>', 9000)->pendingTrash();
+        })->withTrashed();
+        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ? and "table"."deleted_at" > ?)', $query->toSql());
+        $this->assertEquals(['bar', 9000, $now], $query->getBindings());
     }
 
     public function testRealNestedWhereWithMultipleScopesAndOneDeadScope()
     {
+        Carbon::setTestNow($now = now());
+
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(function ($query) {
             $query->empty()->where('baz', '>', 9000);
         });
-        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
-        $this->assertEquals(['bar', 9000], $query->getBindings());
+        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and ("table"."deleted_at" is null or "table"."deleted_at" > ?)', $query->toSql());
+        $this->assertEquals(['bar', 9000, $now], $query->getBindings());
     }
 
     public function testRealQueryHigherOrderOrWhereScopes()
@@ -1583,7 +1602,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = new EloquentBuilderTestNestedStub;
         $this->mockConnectionForModel($model, '');
         $query = $model->newQuery()->withoutGlobalScopes()->whereIn('foo', $model->newQuery()->select('id'));
-        $expected = 'select * from "table" where "foo" in (select "id" from "table" where "table"."deleted_at" is null)';
+        $expected = 'select * from "table" where "foo" in (select "id" from "table" where ("table"."deleted_at" is null or "table"."deleted_at" > ?))';
         $this->assertEquals($expected, $query->toSql());
     }
 

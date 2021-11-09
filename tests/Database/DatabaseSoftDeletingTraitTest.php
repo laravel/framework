@@ -58,7 +58,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertFalse($model->restore());
     }
 
-    public function testDeleteAt()
+    public function testTrashAt()
     {
         Carbon::setTestNow($now = now());
 
@@ -78,13 +78,13 @@ class DatabaseSoftDeletingTraitTest extends TestCase
             'updated_at',
         ]);
 
-        $model->deleteAt($now->addSecond());
+        $model->trashAt($now->addSecond());
 
         $this->assertInstanceOf(Carbon::class, $model->deleted_at);
         $this->assertEquals($now, $model->deleted_at);
     }
 
-    public function testDeleteAtThrowsExceptionIfDatetimePresent()
+    public function testTrashAtThrowsExceptionIfDatetimePresent()
     {
         $this->expectExceptionMessage(InvalidArgumentException::class);
         $this->expectExceptionMessage('The datetime must be set in the future.');
@@ -95,10 +95,10 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $model->makePartial();
         $model->shouldNotReceive('newModelQuery');
 
-        $model->deleteAt($now->addSecond());
+        $model->trashAt($now->addSecond());
     }
 
-    public function testDeleteAtThrowsExceptionIfDatetimePast()
+    public function testTrashAtThrowsExceptionIfDatetimePast()
     {
         $this->expectExceptionMessage(InvalidArgumentException::class);
         $this->expectExceptionMessage('The datetime must be set in the future.');
@@ -111,7 +111,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $model->makePartial();
         $model->shouldNotReceive('newModelQuery');
 
-        $model->deleteAt($now->addSecond());
+        $model->trashAt($now->addSecond());
     }
 }
 

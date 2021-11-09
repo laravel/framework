@@ -79,7 +79,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         $model->name = 'Bean';
         $model->saveQuietly();
 
-        $model->deleteAt(now()->addDay());
+        $model->trashAt(now()->addDay());
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof SoftDeletableTestEloquentBroadcastUser

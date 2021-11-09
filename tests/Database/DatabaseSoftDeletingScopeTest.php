@@ -201,9 +201,9 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
-        $callback = $builder->getMacro('deleteAt');
+        $callback = $builder->getMacro('trashAt');
         $givenBuilder = m::mock(EloquentBuilder::class);
-        $givenBuilder->shouldReceive('withTrashed')->once();
+        $givenBuilder->shouldReceive('withTrashed')->once()->andReturn($givenBuilder);
         $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
         $model->shouldReceive('fromDateTime')->once()->with($now)->andReturn($now->format('Y-m-d H:i:s'));
         $model->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
@@ -230,7 +230,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
-        $callback = $builder->getMacro('deleteAt');
+        $callback = $builder->getMacro('trashAt');
         $givenBuilder = m::mock(EloquentBuilder::class);
         $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
         $model->shouldReceive('freshTimestamp')->once()->andReturn(now());
@@ -258,7 +258,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
 
         $scope = new SoftDeletingScope;
         $scope->extend($builder);
-        $callback = $builder->getMacro('deleteAt');
+        $callback = $builder->getMacro('trashAt');
         $givenBuilder = m::mock(EloquentBuilder::class);
         $givenBuilder->shouldReceive('getModel')->once()->andReturn($model = m::mock(stdClass::class));
         $model->shouldReceive('freshTimestamp')->once()->andReturn(now());
