@@ -344,8 +344,7 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildMarkdownText($markdown, $data)
     {
-        return $this->textView
-                ?? $markdown->renderText($this->markdown, $data);
+        return $markdown->renderText($this->textView ?? $markdown, $data);
     }
 
     /**
