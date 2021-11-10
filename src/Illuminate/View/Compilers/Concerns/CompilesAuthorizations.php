@@ -38,6 +38,19 @@ trait CompilesAuthorizations
     }
 
     /**
+     * Compile the allows statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileAllows($expression)
+    {
+        return '<?php $access = app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->inspect' . $expression . '; ?>
+<?php if ($access->allowed()): ?>
+<?php if (isset($message)) { $__messageOriginal = $message; } $message = $access->message(); ?>';
+    }
+
+    /**
      * Compile the else-can statements into valid PHP.
      *
      * @param  string  $expression
@@ -71,6 +84,18 @@ trait CompilesAuthorizations
     }
 
     /**
+     * Compile the else-allows statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElseallows($expression)
+    {
+        return '<?php else: ?>
+<?php if (isset($message)) { $__messageOriginal = $message; } $message = $access->message(); ?>';
+    }
+
+    /**
      * Compile the end-can statements into valid PHP.
      *
      * @return string
@@ -96,6 +121,16 @@ trait CompilesAuthorizations
      * @return string
      */
     protected function compileEndcanany()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-allows statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndallows()
     {
         return '<?php endif; ?>';
     }
