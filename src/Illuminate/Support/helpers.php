@@ -210,6 +210,37 @@ if (! function_exists('preg_replace_array')) {
     }
 }
 
+if (! function_exists('rethrow')) {
+    /**
+     * Return callback result, but convert to specified exception when exception thrown.
+     *
+     * @param  callable  $callback
+     * @param  \Throwable|string|callable  $exception
+     * @param  mixed  ...$parameters
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    function rethrow(callable $callback, $exception, ...$parameters)
+    {
+        try {
+            return $callback();
+        } catch (Exception $e) {
+            if (is_callable($exception)) {
+                throw $exception($e);
+            }
+
+            if (is_string($exception) && class_exists($exception)) {
+                $exception = $parameters
+                    ? new $exception(...$parameters)
+                    : new $exception($e->getMessage(), $e->getCode());
+            }
+
+            throw is_string($exception) ? $e : $exception;
+        }
+    }
+}
+
 if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
