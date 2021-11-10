@@ -68,7 +68,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
     public function testStrictModeDoesntThrowAnExceptionOnEagerLoading()
     {
-        $this->app['config']->set('database.connections.testbench.zxc', false);
+        $this->app['config']->set('database.connections.testing.zxc', false);
 
         EloquentStrictLoadingTestModel1::create();
         EloquentStrictLoadingTestModel1::create();

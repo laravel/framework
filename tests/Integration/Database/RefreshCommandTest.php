@@ -9,14 +9,8 @@ class RefreshCommandTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         if (! env('DB_CONNECTION')) {
-            $app['config']->set('database.default', 'testbench');
+            $app['config']->set('database.default', 'testing');
         }
     }
 
@@ -43,7 +37,7 @@ class RefreshCommandTest extends TestCase
 
     private function migrateRefreshWith(array $options)
     {
-        if ($this->app['config']->get('database.default') !== 'testbench') {
+        if ($this->app['config']->get('database.default') !== 'testing') {
             $this->artisan('db:wipe', ['--drop-views' => true]);
         }
 
