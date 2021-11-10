@@ -19,7 +19,9 @@ allowed
 <?php else: ?>
 <?php if (isset($message)) { $__messageOriginal = $message; } $message = $access->message(); ?>
 forbidden
-<?php endif; ?>';
+<?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif; ?>';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }

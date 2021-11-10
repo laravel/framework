@@ -132,6 +132,8 @@ trait CompilesAuthorizations
      */
     protected function compileEndallows()
     {
-        return '<?php endif; ?>';
+        return '<?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif; ?>';
     }
 }
