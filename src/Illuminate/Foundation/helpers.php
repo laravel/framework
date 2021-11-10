@@ -935,7 +935,7 @@ if (! function_exists('view')) {
 
 if (! function_exists('composer')) {
     /**
-     * Get the current composer file
+     * Get the current composer file.
      *
      * @return string
      */
