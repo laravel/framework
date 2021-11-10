@@ -377,3 +377,15 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('composer')) {
+    /**
+     * Get the current composer file.
+     *
+     * @return string
+     */
+    function composer($fileName = 'composer.json')
+    {
+        return env('COMPOSER', $fileName);
+    }
+}
