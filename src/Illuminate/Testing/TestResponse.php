@@ -867,7 +867,6 @@ EOF;
      *
      * @param  string  $key
      * @param  string  $responseKey
-     *
      * @return $this
      */
     public function assertJsonValidationErrorFor($key, $responseKey = 'errors')
