@@ -932,3 +932,15 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('composer')) {
+    /**
+     * Get the current composer file
+     *
+     * @return string
+     */
+    function composer($fileName = 'composer.json')
+    {
+        return env('COMPOSER', $fileName);
+    }
+}

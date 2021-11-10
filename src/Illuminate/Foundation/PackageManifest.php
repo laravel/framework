@@ -154,12 +154,14 @@ class PackageManifest
      */
     protected function packagesToIgnore()
     {
-        if (! is_file($this->basePath.'/composer.json')) {
+        $composer = composer();
+
+        if (! is_file($this->basePath.DIRECTORY_SEPARATOR.$composer)) {
             return [];
         }
 
         return json_decode(file_get_contents(
-            $this->basePath.'/composer.json'
+            $this->basePath.DIRECTORY_SEPARATOR.$composer
         ), true)['extra']['laravel']['dont-discover'] ?? [];
     }
 

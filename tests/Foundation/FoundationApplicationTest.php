@@ -369,6 +369,15 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
     }
 
+    public function testGetNamespaceWithAnotherComposer()
+    {
+        putenv('COMPOSER=composer-dev.json');
+        $app = new Application(realpath(__DIR__.'/fixtures/laravel3'));
+
+        $this->assertSame('Laravel\\Three\\', $app->getNamespace());
+        unset($_ENV['COMPOSER']);
+    }
+
     public function testCachePathsResolveToBootstrapCacheDirectory()
     {
         $app = new Application('/base/path');
