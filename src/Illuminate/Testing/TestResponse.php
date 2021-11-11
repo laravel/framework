@@ -871,7 +871,7 @@ EOF;
      */
     public function assertJsonValidationErrorFor($key, $responseKey = 'errors')
     {
-        $jsonErrors = $this->jsonErrors($responseKey);
+        $jsonErrors = Arr::get($this->json(), $responseKey) ?? [];
 
         $errorMessage = $jsonErrors
             ? 'Response has the following JSON validation errors:'.
@@ -927,17 +927,6 @@ EOF;
         }
 
         return $this;
-    }
-
-    /**
-     * Return decoded JSON validation errors.
-     *
-     * @param  string  $responseKey
-     * @return array
-     */
-    protected function jsonErrors($responseKey = 'errors')
-    {
-        return Arr::get($this->json(), $responseKey) ?? [];
     }
 
     /**
