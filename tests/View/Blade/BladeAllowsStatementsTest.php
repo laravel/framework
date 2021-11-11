@@ -12,7 +12,8 @@ allowed
 forbidden
 @endallows';
 
-        $expected = '<?php $access = app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->inspect("create", $post); ?>
+        $expected = '<?php if (isset($access)) { $__accessOriginal = $access; }
+$access = app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->inspect("create", $post); ?>
 <?php if ($access->allowed()): ?>
 <?php if (isset($message)) { $__messageOriginal = $message; } $message = $access->message(); ?>
 allowed
@@ -21,6 +22,8 @@ allowed
 forbidden
 <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+unset($access);
+if (isset($__accessOriginal)) { $access = $__accessOriginal; }
 endif; ?>';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));

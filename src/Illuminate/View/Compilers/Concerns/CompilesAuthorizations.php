@@ -45,7 +45,8 @@ trait CompilesAuthorizations
      */
     protected function compileAllows($expression)
     {
-        return '<?php $access = app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->inspect'.$expression.'; ?>
+        return '<?php if (isset($access)) { $__accessOriginal = $access; }
+$access = app(\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->inspect'.$expression.'; ?>
 <?php if ($access->allowed()): ?>
 <?php if (isset($message)) { $__messageOriginal = $message; } $message = $access->message(); ?>';
     }
@@ -134,6 +135,8 @@ trait CompilesAuthorizations
     {
         return '<?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+unset($access);
+if (isset($__accessOriginal)) { $access = $__accessOriginal; }
 endif; ?>';
     }
 }
