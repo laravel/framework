@@ -1212,6 +1212,45 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors(['one' => 'taylor', 'otwell']);
     }
 
+    public function testAssertJsonValidationErrorMessagesMultipleErrors()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => [
+                'one' => [
+                    'First error message.',
+                    'Second error message.',
+                ],
+            ],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => ['First error message.', 'Second error message.']]);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMultipleErrorsCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => [
+                'one' => [
+                    'First error message.',
+                ],
+            ],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => ['First error message.', 'Second error message.']]);
+    }
+
     public function testAssertJsonMissingValidationErrors()
     {
         $baseResponse = tap(new Response, function ($response) {
