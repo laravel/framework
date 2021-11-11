@@ -65,6 +65,45 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute was "declined".
+     *
+     * This validation rule implies the attribute is "required".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateDeclined($attribute, $value)
+    {
+        $acceptable = ['no', 'off', '0', 0, false, 'false'];
+
+        return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+    }
+
+    /**
+     * Validate that an attribute was "declined" when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateDeclinedIf($attribute, $value, $parameters)
+    {
+        $acceptable = ['no', 'off', '0', 0, false, 'false'];
+
+        $this->requireParameterCount(2, $parameters, 'declined_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute is an active URL.
      *
      * @param  string  $attribute
