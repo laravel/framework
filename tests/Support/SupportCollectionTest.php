@@ -2645,6 +2645,14 @@ class SupportCollectionTest extends TestCase
         $cut = $data->splice(1, 1, 'bar');
         $this->assertEquals(['foo', 'bar'], $data->all());
         $this->assertEquals(['baz'], $cut->all());
+
+        $data = new Collection(['foo', 'baz']);
+        $data->splice(1, 0, ['bar']);
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
+
+        $data = new Collection(['foo', 'baz']);
+        $data->splice(1, 0, new Collection(['bar']));
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
     }
 
     /**
