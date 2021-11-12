@@ -359,6 +359,12 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testRandomWithIgnoreChars()
+    {
+        $ignoreChars = array_merge(range('B', 'z'), range('0', '9'));
+        $this->assertEquals('A', Str::random(1, $ignoreChars));
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
