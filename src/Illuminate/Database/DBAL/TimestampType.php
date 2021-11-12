@@ -16,7 +16,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return match($name = $platform->getName()) {
+        return match ($name = $platform->getName()) {
             'mysql',
             'mysql2' => $this->getMySqlPlatformSQLDeclaration($fieldDeclaration),
             'postgresql',

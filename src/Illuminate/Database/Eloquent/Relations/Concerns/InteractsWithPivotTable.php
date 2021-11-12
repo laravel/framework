@@ -669,7 +669,7 @@ trait InteractsWithPivotTable
      */
     protected function getTypeSwapValue($type, $value)
     {
-        return match(strtolower($type)) {
+        return match (strtolower($type)) {
             'int', 'integer' => (int) $value,
             'real', 'float', 'double' => (float) $value,
             'string' => (string) $value,

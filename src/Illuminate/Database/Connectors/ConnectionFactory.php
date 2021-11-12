@@ -268,7 +268,7 @@ class ConnectionFactory
             return $resolver($connection, $database, $prefix, $config);
         }
 
-        return match($driver) {
+        return match ($driver) {
             'mysql' => new MySqlConnection($connection, $database, $prefix, $config),
             'pgsql' => new PostgresConnection($connection, $database, $prefix, $config),
             'sqlite' => new SQLiteConnection($connection, $database, $prefix, $config),
