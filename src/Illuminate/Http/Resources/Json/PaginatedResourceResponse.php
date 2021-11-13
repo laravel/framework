@@ -41,6 +41,10 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function paginationInformation($request)
     {
+        if (method_exists($this->resource, 'paginationInformation')) {
+            return $this->resource->paginationInformation($request);
+        }
+
         $paginated = $this->resource->resource->toArray();
 
         return [
