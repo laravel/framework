@@ -61,8 +61,7 @@ unset($__errorArgs, $__bag);?>';
     {
         $string = '@errorclass(\'email\', \'is-danger\', \'custom-bag\')';
 
-        $expected = '
-<?php $__errorArgs = [\'email\',\'custom-bag\'];
+        $expected = '<?php $__errorArgs = [\'email\',\'custom-bag\'];
 $__bag = $errors->getBag($__errorArgs[1]);
 if ($__bag->has($__errorArgs[0])){ echo \'is-danger\';}
 unset($__errorArgs, $__bag);?>';
