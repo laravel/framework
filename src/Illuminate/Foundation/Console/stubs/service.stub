@@ -1,0 +1,19 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+
+class {{ class }}
+{
+	/**
+	 * Create New Service Instance
+	 * 
+	 * @return void
+	 */
+	public function __construct()
+	{
+		//
+	}
+}
