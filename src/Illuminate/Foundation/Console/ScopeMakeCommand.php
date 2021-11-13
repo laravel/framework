@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\GeneratorCommand;
 
 class ScopeMakeCommand extends GeneratorCommand
-{   
+{
     /**
      * The name and signature of the console command.
      *
