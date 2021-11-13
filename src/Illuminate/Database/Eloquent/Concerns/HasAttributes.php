@@ -679,7 +679,7 @@ trait HasAttributes
         }
 
         $castType = $this->getCasts()[$key];
-        
+
         if ($value instanceof $castType) {
             return $value;
         }
