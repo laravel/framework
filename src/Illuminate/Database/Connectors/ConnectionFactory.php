@@ -246,7 +246,7 @@ class ConnectionFactory
             'pgsql' => new PostgresConnector,
             'sqlite' => new SQLiteConnector,
             'sqlsrv' => new SqlServerConnector,
-            default => (throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].")),
+            default => throw new InvalidArgumentException("Unsupported driver [{$config['driver']}]."),
         };
     }
 
@@ -273,7 +273,7 @@ class ConnectionFactory
             'pgsql' => new PostgresConnection($connection, $database, $prefix, $config),
             'sqlite' => new SQLiteConnection($connection, $database, $prefix, $config),
             'sqlsrv' => new SqlServerConnection($connection, $database, $prefix, $config),
-            default => (throw new InvalidArgumentException("Unsupported driver [{$driver}].")),
+            default => throw new InvalidArgumentException("Unsupported driver [{$driver}]."),
         };
     }
 }

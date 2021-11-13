@@ -761,7 +761,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         return match ($visibility) {
             FilesystemContract::VISIBILITY_PUBLIC => Visibility::PUBLIC,
             FilesystemContract::VISIBILITY_PRIVATE => Visibility::PRIVATE,
-            default => (throw new InvalidArgumentException("Unknown visibility: {$visibility}.")),
+            default => throw new InvalidArgumentException("Unknown visibility: {$visibility}."),
         };
     }
 

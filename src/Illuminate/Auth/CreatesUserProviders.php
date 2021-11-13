@@ -36,9 +36,9 @@ trait CreatesUserProviders
         return match ($driver) {
             'database' => $this->createDatabaseProvider($config),
             'eloquent' => $this->createEloquentProvider($config),
-            default => (throw new InvalidArgumentException(
+            default => throw new InvalidArgumentException(
                 "Authentication user provider [{$driver}] is not defined."
-            )),
+            ),
         };
     }
 

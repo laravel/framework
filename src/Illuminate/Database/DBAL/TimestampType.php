@@ -25,7 +25,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
             'mssql' => $this->getSqlServerPlatformSQLDeclaration($fieldDeclaration),
             'sqlite',
             'sqlite3' => $this->getSQLitePlatformSQLDeclaration($fieldDeclaration),
-            default => (throw new DBALException('Invalid platform: '.$name)),
+            default => throw new DBALException('Invalid platform: '.$name),
         };
     }
 
