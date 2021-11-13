@@ -22,7 +22,7 @@ class ScopeMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = "Create a new Scope Class";
+    protected $description = 'Create a new Scope Class';
 
     /**
      * The type of class being generated.

@@ -22,7 +22,7 @@ class ServiceMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = "Create a new Service Class";
+    protected $description = 'Create a new Service Class';
 
     /**
      * The type of class being generated.
