@@ -38,7 +38,7 @@ unset($__errorArgs, $__bag); ?>';
     /**
      * Complie error classes into valid PHP.
      *
-     * @param mixed $expression
+     * @param  mixed  $expression
      * @return void
      */
     protected function compileErrorclass($expression)
