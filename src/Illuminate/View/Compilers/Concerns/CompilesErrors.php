@@ -34,4 +34,20 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>';
     }
+
+    /**
+     * Complie error classes into valid PHP.
+     *
+     * @param mixed $expression
+     * @return void
+     */
+    protected function compileErrorclass($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+        $expression = explode(', ', $expression);
+        return '<?php $__errorArgs = [' . $expression[0].','.$expression[2] ?? '\'default\''.'];
+$__bag = $errors->getBag($__errorArgs[1]);
+if ($__bag->has($__errorArgs[0])){ echo ' . $expression[1] . ';}
+unset($__errorArgs, $__bag);?>';
+    }
 }

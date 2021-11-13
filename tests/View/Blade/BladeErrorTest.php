@@ -44,4 +44,16 @@ endif;
 unset($__errorArgs, $__bag); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testErrorClassesAreComplied()
+    {
+        $string = '@errorclass(\'email\', \'is-danger\')';
+
+        $expected = '
+<?php $__errorArgs = [\'email\',\'is-danger\'];
+$__bag = $errors->getBag($__errorArgs[1]);
+if ($__bag->has($__errorArgs[0])){ echo \'is-danger\';}
+unset($__errorArgs, $__bag);?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
