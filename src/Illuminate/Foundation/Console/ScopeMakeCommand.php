@@ -2,13 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 
 class ScopeMakeCommand extends GeneratorCommand
-{
-    use CreatesMatchingTest;
-    
+{   
     /**
      * The name and signature of the console command.
      *
