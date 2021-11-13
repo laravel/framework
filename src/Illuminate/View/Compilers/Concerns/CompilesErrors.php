@@ -45,7 +45,8 @@ unset($__errorArgs, $__bag); ?>';
     {
         $expression = $this->stripParentheses($expression);
         $expression = explode(', ', $expression);
-        return '<?php $__errorArgs = ['.$expression[0].','.$expression[2] ?? '\'default\''.'];
+        $bag = $expression[2] ?? '\'default\'';
+        return '<?php $__errorArgs = ['.$expression[0].','.$bag.'];
 $__bag = $errors->getBag($__errorArgs[1]);
 if ($__bag->has($__errorArgs[0])){ echo '.$expression[1].';}
 unset($__errorArgs, $__bag);?>';
