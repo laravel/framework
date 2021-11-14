@@ -85,14 +85,14 @@ class ComponentMakeCommand extends GeneratorCommand
     {
         if ($this->option('inline')) {
             return str_replace(
-                '{{ view }}',
+                ['DummyView', '{{ view }}'],
                 "<<<'blade'\n<div>\n    <!-- ".Inspiring::quote()." -->\n</div>\nblade",
                 parent::buildClass($name)
             );
         }
 
         return str_replace(
-            '{{ view }}',
+            ['DummyView', '{{ view }}'],
             'view(\'components.'.$this->getView().'\')',
             parent::buildClass($name)
         );
