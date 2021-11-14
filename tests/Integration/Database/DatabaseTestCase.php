@@ -6,10 +6,15 @@ use Orchestra\Testbench\TestCase;
 
 abstract class DatabaseTestCase extends TestCase
 {
+    /**
+     * The current database driver.
+     *
+     * @return string
+     */
+    protected $driver;
+
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         $app['config']->set('database.connections.testbench', [
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -19,6 +24,10 @@ abstract class DatabaseTestCase extends TestCase
         if (! env('DB_CONNECTION')) {
             $app['config']->set('database.default', 'testbench');
         }
+
+        $connection = $app['config']->get('database.default');
+
+        $this->driver = $app['config']->get("database.connections.$connection.driver");
     }
 
     protected function tearDown(): void

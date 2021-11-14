@@ -1,25 +1,17 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
 /**
- * @group MySQL
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */
-class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
+class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('database.default', 'mysql');
-    }
-
     protected function setUp(): void
     {
         parent::setUp();

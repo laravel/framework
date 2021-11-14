@@ -26,7 +26,6 @@ class AuthenticationTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
 
         $app['config']->set('database.default', 'testbench');

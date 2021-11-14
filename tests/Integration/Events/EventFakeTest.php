@@ -19,8 +19,6 @@ class EventFakeTest extends TestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         // Database configuration
         $app['config']->set('database.default', 'testbench');
 

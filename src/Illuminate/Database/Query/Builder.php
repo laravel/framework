@@ -3313,7 +3313,7 @@ class Builder
                     })
                     ->map([$this, 'castBinding'])
                     ->values()
-                    ->toArray();
+                    ->all();
     }
 
     /**
