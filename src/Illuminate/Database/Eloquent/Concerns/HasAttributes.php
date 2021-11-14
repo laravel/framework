@@ -930,7 +930,7 @@ trait HasAttributes
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } else if ($value instanceof $enumClass) {
+        } elseif ($value instanceof $enumClass) {
             $this->attributes[$key] = $value->value;
         } else {
             $this->attributes[$key] = $enumClass::from($value)->value;
