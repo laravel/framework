@@ -220,7 +220,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         $options = [];
 
         foreach (array_slice($dictionary, 0, 3) as $i => $value) {
-            if (in_array($value, ['nx', 'xx', 'ch', 'incr', 'NX', 'XX', 'CH', 'INCR'], true)) {
+            if (in_array($value, ['nx', 'xx', 'ch', 'incr', 'gt', 'lt', 'NX', 'XX', 'CH', 'INCR', 'GT', 'LT'], true)) {
                 $options[] = $value;
 
                 unset($dictionary[$i]);

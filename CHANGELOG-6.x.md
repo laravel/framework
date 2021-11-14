@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.36...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.37...6.x)
+
+
+## [v6.20.37 (2021-11-02)](https://github.com/laravel/framework/compare/v6.20.36...v6.20.37)
+
+### Fixed
+- Fixed rate limiting unicode issue ([#39375](https://github.com/laravel/framework/pull/39375))
 
 
 ## [v6.20.36 (2021-10-19)](https://github.com/laravel/framework/compare/v6.20.35...v6.20.36)
