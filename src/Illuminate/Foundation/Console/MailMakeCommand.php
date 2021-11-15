@@ -77,7 +77,7 @@ class MailMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown') !== false) {
-            $class = str_replace('DummyView', $this->getView(), $class);
+            $class = str_replace(['DummyView', '{{ view }}'], $this->getView(), $class);
         }
 
         return $class;

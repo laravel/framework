@@ -76,7 +76,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $class = parent::buildClass($name);
 
         if ($this->option('markdown')) {
-            $class = str_replace('DummyView', $this->option('markdown'), $class);
+            $class = str_replace(['DummyView', '{{ view }}'], $this->option('markdown'), $class);
         }
 
         return $class;
