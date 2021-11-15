@@ -82,7 +82,7 @@ trait DatabaseRule
      * Set a "where" constraint on the query.
      *
      * @param  \Closure|string  $column
-     * @param  array|string|int|null  $value
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string|int|null  $value
      * @return $this
      */
     public function where($column, $value = null)
@@ -108,7 +108,7 @@ trait DatabaseRule
      * Set a "where not" constraint on the query.
      *
      * @param  string  $column
-     * @param  array|string  $value
+     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $value
      * @return $this
      */
     public function whereNot($column, $value)
