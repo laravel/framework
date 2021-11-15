@@ -606,6 +606,50 @@ class AuthAccessGateTest extends TestCase
         $gate->authorize('view', new AccessGateTestDummy);
     }
 
+    public function testAuthorizeThrowsUnauthorizedExceptionWhenUsingAllowIfHelper()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('You must be an admin.');
+        $this->expectExceptionCode('some_code');
+
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithConditionalResponse::class);
+
+        $gate->authorize('view', new AccessGateTestDummy);
+    }
+
+    public function testAuthorizeReturnsAccessResponseWhenUsinlAllowIfHelper()
+    {
+        $gate = $this->getBasicGate(true);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithConditionalResponse::class);
+
+        $this->assertTrue($gate->check('view', new AccessGateTestDummy));
+    }
+
+    public function testAuthorizeThrowsUnauthorizedExceptionWhenUsingDenyIfHelper()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('You must be an admin.');
+        $this->expectExceptionCode('some_code');
+
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithConditionalResponse::class);
+
+        $gate->authorize('update', new AccessGateTestDummy);
+    }
+
+    public function testAuthorizeReturnsAccessResponseWhenUsinlDenyIfHelper()
+    {
+        $gate = $this->getBasicGate(true);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithConditionalResponse::class);
+
+        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
+    }
+
     public function testAuthorizeWithPolicyThatReturnsDeniedResponseObjectThrowsException()
     {
         $this->expectException(AuthorizationException::class);
@@ -1118,5 +1162,20 @@ class AccessGateTestPolicyThrowingAuthorizationException
     public function create()
     {
         throw new AuthorizationException('Not allowed.', 'some_code');
+    }
+}
+
+class AccessGateTestPolicyWithConditionalResponse
+{
+    use HandlesAuthorization;
+
+    public function view($user)
+    {
+        return $this->allowIf($user->isAdmin, 'You must be an admin.', 'some_code');
+    }
+
+    public function update($user)
+    {
+        return $this->denyIf(!$user->isAdmin, 'You must be an admin.', 'some_code');
     }
 }
