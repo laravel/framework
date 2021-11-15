@@ -109,6 +109,21 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
         ], DB::table('enum_casts')->where('id', $model->id)->first());
     }
 
+    public function testEnumsAcceptBackedValueOnSave()
+    {
+        $model = new EloquentModelEnumCastingTestModel([
+            'string_status' => 'pending',
+            'integer_status' => 1,
+        ]);
+
+        $model->save();
+
+        $model = EloquentModelEnumCastingTestModel::first();
+
+        $this->assertEquals(StringStatus::pending, $model->string_status);
+        $this->assertEquals(IntegerStatus::pending, $model->integer_status);
+    }
+
     public function testFirstOrNew()
     {
         DB::table('enum_casts')->insert([

@@ -930,7 +930,15 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        $this->attributes[$key] = isset($value) ? $value->value : null;
+        $enumClass = $this->getCasts()[$key];
+
+        if (! isset($value)) {
+            $this->attributes[$key] = null;
+        } elseif ($value instanceof $enumClass) {
+            $this->attributes[$key] = $value->value;
+        } else {
+            $this->attributes[$key] = $enumClass::from($value)->value;
+        }
     }
 
     /**
