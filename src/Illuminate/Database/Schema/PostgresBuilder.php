@@ -134,7 +134,9 @@ class PostgresBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables(
-                $this->parseSearchPath($this->connection->getConfig('search_path'))
+                $this->parseSearchPath(
+                    $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema')
+                )
             )
         );
     }
@@ -148,7 +150,9 @@ class PostgresBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllViews(
-                $this->parseSearchPath($this->connection->getConfig('search_path'))
+                $this->parseSearchPath(
+                    $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema')
+                )
             )
         );
     }
