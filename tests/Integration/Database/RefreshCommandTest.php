@@ -7,13 +7,6 @@ use Orchestra\Testbench\TestCase;
 
 class RefreshCommandTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        if (! env('DB_CONNECTION')) {
-            $app['config']->set('database.default', 'testing');
-        }
-    }
-
     public function testRefreshWithoutRealpath()
     {
         $this->app->setBasePath(__DIR__);

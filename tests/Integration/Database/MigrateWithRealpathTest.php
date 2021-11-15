@@ -7,13 +7,6 @@ use Orchestra\Testbench\TestCase;
 
 class MigrateWithRealpathTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        if (! env('DB_CONNECTION')) {
-            $app['config']->set('database.default', 'testing');
-        }
-    }
-
     protected function setUp(): void
     {
         parent::setUp();

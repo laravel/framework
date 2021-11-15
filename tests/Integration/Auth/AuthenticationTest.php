@@ -28,13 +28,6 @@ class AuthenticationTest extends TestCase
     {
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
 
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
