@@ -14,9 +14,6 @@ jobs:
       fail-fast: true
       matrix:
         php: ['8.0']
-        include:
-          - php: '8.1'
-            flags: "--ignore-platform-req=php"
 
     name: PHP ${{ matrix.php }}
 
@@ -39,5 +36,4 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
 
       - name: Execute type checking
-        continue-on-error: ${{ matrix.php > 8 }}
         run: vendor/bin/phpstan
