@@ -138,8 +138,7 @@ class FileStore implements Store, LockProvider
         if (! $this->files->exists($directory)) {
             $this->files->makeDirectory($directory, 0777, true, true);
 
-            // We are creating two levels of prefix directories, e.g. 7e/24.
-            // So have to check them both.
+            // We're creating two levels of directories (e.g. 7e/24), so we check them both...
             $this->ensurePermissionsAreCorrect($directory);
             $this->ensurePermissionsAreCorrect(dirname($directory));
         }
