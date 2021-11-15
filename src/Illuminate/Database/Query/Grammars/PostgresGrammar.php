@@ -138,7 +138,7 @@ class PostgresGrammar extends Grammar
     {
         $column = str_replace('->>', '->', $this->wrap($column));
 
-        return 'json_array_length(('.$column.')::json) '.$operator.' '.$value;
+        return 'jsonb_array_length(('.$column.')::jsonb) '.$operator.' '.$value;
     }
 
     /**

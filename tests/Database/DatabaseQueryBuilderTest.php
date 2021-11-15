@@ -4170,22 +4170,22 @@ SQL;
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereJsonLength('options', 0);
-        $this->assertSame('select * from "users" where json_array_length(("options")::json) = ?', $builder->toSql());
+        $this->assertSame('select * from "users" where jsonb_array_length(("options")::jsonb) = ?', $builder->toSql());
         $this->assertEquals([0], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereJsonLength('users.options->languages', '>', 0);
-        $this->assertSame('select * from "users" where json_array_length(("users"."options"->\'languages\')::json) > ?', $builder->toSql());
+        $this->assertSame('select * from "users" where jsonb_array_length(("users"."options"->\'languages\')::jsonb) > ?', $builder->toSql());
         $this->assertEquals([0], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', new Raw('0'));
-        $this->assertSame('select * from "users" where "id" = ? or json_array_length(("options"->\'languages\')::json) = 0', $builder->toSql());
+        $this->assertSame('select * from "users" where "id" = ? or jsonb_array_length(("options"->\'languages\')::jsonb) = 0', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', '>', new Raw('0'));
-        $this->assertSame('select * from "users" where "id" = ? or json_array_length(("options"->\'languages\')::json) > 0', $builder->toSql());
+        $this->assertSame('select * from "users" where "id" = ? or jsonb_array_length(("options"->\'languages\')::jsonb) > 0', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
