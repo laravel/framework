@@ -168,12 +168,10 @@ class RedisManager implements Factory
             return $customCreator();
         }
 
-        switch ($this->driver) {
-            case 'predis':
-                return new PredisConnector;
-            case 'phpredis':
-                return new PhpRedisConnector;
-        }
+        return match ($this->driver) {
+            'predis' => new PredisConnector,
+            'phpredis' => new PhpRedisConnector,
+        };
     }
 
     /**
