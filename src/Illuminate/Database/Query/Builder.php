@@ -3259,11 +3259,10 @@ class Builder
         }
 
         if (is_array($value)) {
-            $this->bindings[$type] = collect($this->bindings[$type])
-                            ->merge($value)
-                            ->map([$this, 'castBinding'])
-                            ->values()
-                            ->toArray();
+            $this->bindings[$type] = array_values(array_map(
+                [$this, 'castBinding'],
+                array_merge($this->bindings[$type], $value),
+            ));
         } else {
             $this->bindings[$type][] = $this->castBinding($value);
         }
