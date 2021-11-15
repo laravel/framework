@@ -680,6 +680,10 @@ trait HasAttributes
 
         $castType = $this->getCasts()[$key];
 
+        if ($value instanceof $castType) {
+            return $value;
+        }
+
         return $castType::from($value);
     }
 
