@@ -619,7 +619,7 @@ class AuthAccessGateTest extends TestCase
         $gate->authorize('view', new AccessGateTestDummy);
     }
 
-    public function testAuthorizeReturnsAccessResponseWhenUsinlAllowIfHelper()
+    public function testAuthorizeReturnsAccessResponseWhenUsingAllowIfHelper()
     {
         $gate = $this->getBasicGate(true);
 
@@ -641,7 +641,7 @@ class AuthAccessGateTest extends TestCase
         $gate->authorize('update', new AccessGateTestDummy);
     }
 
-    public function testAuthorizeReturnsAccessResponseWhenUsinlDenyIfHelper()
+    public function testAuthorizeReturnsAccessResponseWhenUsingDenyIfHelper()
     {
         $gate = $this->getBasicGate(true);
 
