@@ -10,10 +10,8 @@ use Illuminate\Support\Str;
 
 class EloquentUpdateTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();

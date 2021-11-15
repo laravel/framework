@@ -16,8 +16,6 @@ class JobChainingTest extends TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('database.default', 'testbench');
-
         $app['config']->set('queue.connections.sync1', [
             'driver' => 'sync',
         ]);

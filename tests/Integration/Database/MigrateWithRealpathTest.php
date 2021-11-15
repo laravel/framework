@@ -7,24 +7,11 @@ use Orchestra\Testbench\TestCase;
 
 class MigrateWithRealpathTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
-        if (! env('DB_CONNECTION')) {
-            $app['config']->set('database.default', 'testbench');
-        }
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        if ($this->app['config']->get('database.default') !== 'testbench') {
+        if ($this->app['config']->get('database.default') !== 'testing') {
             $this->artisan('db:wipe', ['--drop-views' => true]);
         }
 

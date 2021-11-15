@@ -12,10 +12,8 @@ use stdClass;
  */
 class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
@@ -24,11 +22,9 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
         });
     }
 
-    protected function tearDown(): void
+    protected function destroyDatabaseMigrations()
     {
         Schema::drop('users');
-
-        parent::tearDown();
     }
 
     public function testRenameColumnOnTableWithEnum()
@@ -53,10 +49,13 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
     {
         $tables = Schema::getAllTables();
 
-        $this->assertCount(1, $tables);
-        $this->assertInstanceOf(stdClass::class, $tables[0]);
-
+        $this->assertCount(2, $tables);
         $tableProperties = array_values((array) $tables[0]);
+        $this->assertEquals(['migrations', 'BASE TABLE'], $tableProperties);
+
+        $this->assertInstanceOf(stdClass::class, $tables[1]);
+
+        $tableProperties = array_values((array) $tables[1]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
 
         $columns = Schema::getColumnListing('users');
@@ -70,7 +69,7 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
             $table->string('title');
         });
         $tables = Schema::getAllTables();
-        $this->assertCount(2, $tables);
+        $this->assertCount(3, $tables);
         Schema::drop('posts');
     }
 }

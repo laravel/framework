@@ -17,10 +17,8 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
     const JSON_COL = 'json_col';
     const FLOAT_VAL = 0.2;
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         if (! Schema::hasTable(self::TABLE)) {
             Schema::create(self::TABLE, function (Blueprint $table) {
                 $table->json(self::JSON_COL)->nullable();
@@ -29,11 +27,9 @@ class DatabaseMySqlConnectionTest extends MySqlTestCase
         }
     }
 
-    protected function tearDown(): void
+    protected function destroyDatabaseMigrations()
     {
         Schema::drop(self::TABLE);
-
-        parent::tearDown();
     }
 
     /**

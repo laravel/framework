@@ -12,6 +12,11 @@ use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
+    protected function destroyDatabaseMigrations()
+    {
+        Schema::dropAllViews();
+    }
+
     public function testDropAllTables()
     {
         $this->expectNotToPerformAssertions();
@@ -21,6 +26,8 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         Schema::dropAllTables();
+
+        $this->artisan('migrate:install');
 
         Schema::create('table', function (Blueprint $table) {
             $table->increments('id');

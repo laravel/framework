@@ -27,10 +27,8 @@ class EloquentModelConnectionsTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrations()
     {
-        parent::setUp();
-
         Schema::create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

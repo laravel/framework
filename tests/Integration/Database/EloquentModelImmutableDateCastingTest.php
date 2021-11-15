@@ -10,10 +10,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelImmutableDateCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_model_immutable', function (Blueprint $table) {
             $table->increments('id');
             $table->date('date_field')->nullable();

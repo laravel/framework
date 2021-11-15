@@ -27,7 +27,10 @@ class EloquentPrunableTest extends DatabaseTestCase
         });
 
         $container->alias(Dispatcher::class, 'events');
+    }
 
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         collect([
             'prunable_test_models',
             'prunable_soft_delete_test_models',
