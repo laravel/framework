@@ -1176,6 +1176,6 @@ class AccessGateTestPolicyWithConditionalResponse
 
     public function update($user)
     {
-        return $this->denyIf(!$user->isAdmin, 'You must be an admin.', 'some_code');
+        return $this->denyIf(! $user->isAdmin, 'You must be an admin.', 'some_code');
     }
 }

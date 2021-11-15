@@ -32,7 +32,7 @@ trait HandlesAuthorization
      * Conditionally create an access response or throw
      * an unauthorized exception.
      *
-     * @param  mixed $condition
+     * @param  mixed  $condition
      * @param  string|null  $message
      * @param  mixed|null  $code
      * @return \Illuminate\Auth\Access\Response
@@ -46,7 +46,7 @@ trait HandlesAuthorization
      * Conditionally throw an unauthorized exception
      * or create an access response.
      *
-     * @param  mixed $condition
+     * @param  mixed  $condition
      * @param  string|null  $message
      * @param  mixed|null  $code
      * @return \Illuminate\Auth\Access\Response
