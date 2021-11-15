@@ -368,9 +368,11 @@ if (! function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): TValue)|null  $callback
+     * @return TValue
      */
     function with($value, callable $callback = null)
     {
