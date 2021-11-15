@@ -78,9 +78,7 @@ trait CompilesComponents
      */
     protected function compileEndComponent()
     {
-        return implode("\n", [
-            '<?php echo $__env->renderComponent(); ?>',
-        ]);
+        return '<?php echo $__env->renderComponent(); ?>';
     }
 
     /**
