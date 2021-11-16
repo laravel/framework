@@ -25,6 +25,20 @@ class PusherBroadcasterTest extends TestCase
         $this->broadcaster = m::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();
     }
 
+    public function testAuthCallValidAuthenticationResponseWithMultiplePrivateChannelsWhenCallbackReturnTrue()
+    {
+        $this->broadcaster->channel('test', function () {
+            return true;
+        });
+
+        $this->broadcaster->shouldReceive('validAuthenticationResponse')
+                        ->once();
+
+        $this->broadcaster->auth(
+            $this->getMockRequestWithUserForMultipleChannels(['private-test', 'private-test.2'])
+        );
+    }
+
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {
         $this->broadcaster->channel('test', function () {
@@ -37,6 +51,21 @@ class PusherBroadcasterTest extends TestCase
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
         );
+    }
+
+    public function testAuthReturn403ResponseWithPrivateChannelWhenCallbackReturnFalse()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->broadcaster->channel('test', function () {
+            return false;
+        });
+
+        $response = $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('private-test')
+        );
+
+        $this->assertEquals(403, $response['private-test']['status']);
     }
 
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
@@ -180,6 +209,47 @@ class PusherBroadcasterTest extends TestCase
     {
         $request = m::mock(Request::class);
         $request->channel_name = $channel;
+
+        $request->shouldReceive('user')
+                ->andReturn(null);
+
+        return $request;
+    }
+
+    /**
+     * @param  array  $channels
+     * @return \Illuminate\Http\Request
+     */
+    protected function getMockRequestWithUserForMultipleChannels($channels)
+    {
+        $request = m::mock(Request::class);
+        $request->channel_name = $channels;
+        $request->socket_id = 'abcd.1234';
+
+        $request->shouldReceive('input')
+                ->with('callback', false)
+                ->andReturn(false);
+
+        $user = m::mock('User');
+        $user->shouldReceive('getAuthIdentifierForBroadcasting')
+             ->andReturn(42);
+        $user->shouldReceive('getAuthIdentifier')
+             ->andReturn(42);
+
+        $request->shouldReceive('user')
+                ->andReturn($user);
+
+        return $request;
+    }
+
+    /**
+     * @param  array  $channels
+     * @return \Illuminate\Http\Request
+     */
+    protected function getMockRequestWithoutUserForMultipleChannels($channels)
+    {
+        $request = m::mock(Request::class);
+        $request->channel_name = $channels;
 
         $request->shouldReceive('user')
                 ->andReturn(null);

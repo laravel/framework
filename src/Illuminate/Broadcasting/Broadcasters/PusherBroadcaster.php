@@ -41,16 +41,56 @@ class PusherBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        $channelName = $this->normalizeChannelName($request->channel_name);
-
-        if (empty($request->channel_name) ||
-            ($this->isGuardedChannel($request->channel_name) &&
-            ! $this->retrieveUser($request, $channelName))) {
+        if (empty($request->channel_name)) {
             throw new AccessDeniedHttpException;
         }
 
+        if (is_array($request->channel_name)) {
+            $response = [];
+            // we're working with batched channels
+            foreach ($request->channel_name as $channelName) {
+                $normalizedChannelName = $this->normalizeChannelName($channelName);
+
+                if ($this->isGuardedChannel($channelName) &&
+                    !$this->retrieveUser($request, $normalizedChannelName)) {
+                    $response[$channelName] = [
+                        'status' => 403,
+                    ];
+                } else {
+                    try {
+                        $req = $request;
+                        $req->channel_name = $channelName;
+                        $authResponse = parent::verifyUserCanAccessChannel($req, $normalizedChannelName);
+
+                        $response[$channelName] = [
+                            'status' => 200,
+                            'data' => [
+                                'auth' => $authResponse['auth']
+                            ]
+                        ];
+                    } catch (AccessDeniedHttpException $e) {
+                        $response[$channelName] = [
+                            'status' => 403,
+                        ];
+                    }
+                }
+            }
+
+            return $response;
+        } else {
+            $normalizedChannelName = $this->normalizeChannelName($request->channel_name);
+
+            // we're working with a single channel
+            if($this->isGuardedChannel($request->channel_name) && 
+                !$this->retrieveUser($request, $normalizedChannelName)) {
+                throw new AccessDeniedHttpException;
+            }
+        }
+
+        
+
         return parent::verifyUserCanAccessChannel(
-            $request, $channelName
+            $request, $normalizedChannelName
         );
     }
 
