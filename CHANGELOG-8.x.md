@@ -1,6 +1,30 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.70.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.71.0...8.x)
+
+
+## [v8.71.0 (2021-11-16)](https://github.com/laravel/framework/compare/v8.70.2...v8.71.0)
+
+### Added
+- Added declined and declined_if validation rules ([#39579](https://github.com/laravel/framework/pull/39579))
+- Arrayable/collection support for Collection::splice() replacement param ([#39592](https://github.com/laravel/framework/pull/39592))
+- Introduce `@js()` directive ([#39522](https://github.com/laravel/framework/pull/39522))
+- Enum casts accept backed values ([#39608](https://github.com/laravel/framework/pull/39608))
+- Added a method to the Macroable trait that removes all configured macros. ([#39633](https://github.com/laravel/framework/pull/39633))
+
+### Fixed
+- Fixed auto-generated Markdown views ([#39565](https://github.com/laravel/framework/pull/39565))
+- DB command: Cope with missing driver parameters for mysql ([#39582](https://github.com/laravel/framework/pull/39582))
+- Fixed typo in Connection property name in `Illuminate/Database/Connection` ([#39590](https://github.com/laravel/framework/pull/39590))
+- Fixed: prevent re-casting of enum values ([#39597](https://github.com/laravel/framework/pull/39597))
+- Casts value to the int in `Illuminate/Database/Query/Builder::limit()` ([62273d2](https://github.com/laravel/framework/commit/62273d20dd13b7e35885436d7327be31e3f54b0e))
+- Fix $component not being reverted if component doesn't render ([#39595](https://github.com/laravel/framework/pull/39595))
+
+### Changed
+- `make:model --all` flag would auto-fire make:controller with --requests ([#39578](https://github.com/laravel/framework/pull/39578))
+- Allow assertion of multiple JSON validation errors. ([#39568](https://github.com/laravel/framework/pull/39568))
+- Ensure cache directory permissions ([#39591](https://github.com/laravel/framework/pull/39591))
+- Update placeholders for stubs ([#39527](https://github.com/laravel/framework/pull/39527))
 
 
 ## [v8.70.2 (2021-11-10)](https://github.com/laravel/framework/compare/v8.70.1...v8.70.2)
