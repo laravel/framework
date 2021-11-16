@@ -7,9 +7,8 @@ use Illuminate\Foundation\Testing\Traits\HasMigrateFreshUsing;
 
 trait DatabaseMigrations
 {
-
     use HasMigrateFreshUsing;
-    
+
     /**
      * Define hooks to migrate the database before and after each test.
      *

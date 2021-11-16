@@ -2,16 +2,14 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationsTest extends TestCase
 {
-
     protected $traitObject;
-
 
     protected function setUp(): void
     {
@@ -19,7 +17,7 @@ class DatabaseMigrationsTest extends TestCase
 
         $this->traitObject = $this->getMockForTrait(DatabaseMigrations::class, [], '', true, true, true, [
             'artisan',
-            'beforeApplicationDestroyed'
+            'beforeApplicationDestroyed',
         ]);
 
         $kernelObj = \Mockery::mock();
@@ -27,7 +25,7 @@ class DatabaseMigrationsTest extends TestCase
             ->with(null);
 
         $this->traitObject->app = [
-            Kernel::class => $kernelObj
+            Kernel::class => $kernelObj,
         ];
     }
 
@@ -52,7 +50,7 @@ class DatabaseMigrationsTest extends TestCase
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
-                '--seed' => false
+                '--seed' => false,
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');
@@ -70,7 +68,7 @@ class DatabaseMigrationsTest extends TestCase
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
-                '--seed' => false
+                '--seed' => false,
             ]);
 
 
@@ -89,7 +87,7 @@ class DatabaseMigrationsTest extends TestCase
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,
-                '--seed' => false
+                '--seed' => false,
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');

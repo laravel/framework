@@ -2,16 +2,14 @@
 
 namespace Illuminate\Tests\Foundation\Testing;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use PHPUnit\Framework\TestCase;
 
 class RefreshDatabaseTest extends TestCase
 {
-
     protected $traitObject;
-
 
     protected function setUp(): void
     {
@@ -19,7 +17,7 @@ class RefreshDatabaseTest extends TestCase
 
         $this->traitObject = $this->getMockForTrait(RefreshDatabase::class, [], '', true, true, true, [
             'artisan',
-            'beginDatabaseTransaction'
+            'beginDatabaseTransaction',
         ]);
 
         $kernelObj = \Mockery::mock();
@@ -52,7 +50,7 @@ class RefreshDatabaseTest extends TestCase
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => false,
-                '--seed' => false
+                '--seed' => false,
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
@@ -70,7 +68,7 @@ class RefreshDatabaseTest extends TestCase
             ->with('migrate:fresh', [
                 '--drop-views' => true,
                 '--drop-types' => false,
-                '--seed' => false
+                '--seed' => false,
             ]);
 
 
@@ -89,7 +87,7 @@ class RefreshDatabaseTest extends TestCase
             ->with('migrate:fresh', [
                 '--drop-views' => false,
                 '--drop-types' => true,
-                '--seed' => false
+                '--seed' => false,
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');

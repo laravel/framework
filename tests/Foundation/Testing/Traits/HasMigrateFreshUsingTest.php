@@ -1,15 +1,12 @@
 <?php
 
-
 namespace Illuminate\Tests\Foundation\Testing\Traits;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Testing\Traits\HasMigrateFreshUsing;
-
+use PHPUnit\Framework\TestCase;
 
 class HasMigrateFreshUsingTest extends TestCase
 {
-
     protected $traitObject;
 
     protected function setup(): void
@@ -31,13 +28,12 @@ class HasMigrateFreshUsingTest extends TestCase
 
     public function testMigrateFreshUsingDefault(): void
     {
-
         $migrateFreshUsingReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('migrateFreshUsing');
 
         $expected = [
             '--drop-views' => false,
             '--drop-types' => false,
-            '--seed' => false
+            '--seed' => false,
         ];
 
         $this->assertEquals($expected, $migrateFreshUsingReflection->invoke($this->traitObject));
@@ -50,7 +46,7 @@ class HasMigrateFreshUsingTest extends TestCase
         $expected = [
             '--drop-views' => true,
             '--drop-types' => false,
-            '--seed' => false
+            '--seed' => false,
         ];
 
         $this->traitObject->dropViews = true;
@@ -60,7 +56,7 @@ class HasMigrateFreshUsingTest extends TestCase
         $expected = [
             '--drop-views' => false,
             '--drop-types' => true,
-            '--seed' => false
+            '--seed' => false,
         ];
 
         $this->traitObject->dropViews = false;
@@ -71,7 +67,7 @@ class HasMigrateFreshUsingTest extends TestCase
         $expected = [
             '--drop-views' => true,
             '--drop-types' => true,
-            '--seed' => false
+            '--seed' => false,
         ];
 
         $this->traitObject->dropViews = true;
