@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.38...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.39...6.x)
+
+
+## [v6.20.39 (2021-11-16)](https://github.com/laravel/framework/compare/v6.20.38...v6.20.39)
+
+### Fixed
+- Fixed $value in `Illuminate/Database/Query/Builder::limit()` ([ddfa71e](https://github.com/laravel/framework/commit/ddfa71ee9f101394b4ff682471bc31a7ba6de5cf))
 
 
 ## [v6.20.38 (2021-11-09)](https://github.com/laravel/framework/compare/v6.20.37...v6.20.38)
