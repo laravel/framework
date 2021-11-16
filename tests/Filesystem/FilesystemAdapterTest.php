@@ -319,4 +319,16 @@ class FilesystemAdapterTest extends TestCase
             'uploaded file content'
         );
     }
+
+    public function testMacroable()
+    {
+        $this->filesystem->write('foo.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->macro('getFoo', function () {
+            return $this->get('foo.txt');
+        });
+
+        $this->assertSame('Hello World', $filesystemAdapter->getFoo());
+    }
 }

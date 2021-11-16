@@ -10,7 +10,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Stringable;
@@ -18,6 +17,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 class Event
 {
@@ -219,11 +219,17 @@ class Event
      */
     protected function runCommandInForeground(Container $container)
     {
-        $this->callBeforeCallbacks($container);
+        try {
+            $this->callBeforeCallbacks($container);
 
-        $this->exitCode = Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+            $this->exitCode = Process::fromShellCommandline(
+                $this->buildCommand(), base_path(), null, null, null
+            )->run();
 
-        $this->callAfterCallbacks($container);
+            $this->callAfterCallbacks($container);
+        } finally {
+            $this->removeMutex();
+        }
     }
 
     /**
@@ -234,9 +240,15 @@ class Event
      */
     protected function runCommandInBackground(Container $container)
     {
-        $this->callBeforeCallbacks($container);
+        try {
+            $this->callBeforeCallbacks($container);
 
-        Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+            Process::fromShellCommandline($this->buildCommand(), base_path(), null, null, null)->run();
+        } catch (Throwable $exception) {
+            $this->removeMutex();
+
+            throw $exception;
+        }
     }
 
     /**
@@ -276,7 +288,11 @@ class Event
     {
         $this->exitCode = (int) $exitCode;
 
-        $this->callAfterCallbacks($container);
+        try {
+            $this->callAfterCallbacks($container);
+        } finally {
+            $this->removeMutex();
+        }
     }
 
     /**
@@ -322,10 +338,10 @@ class Event
      */
     protected function expressionPasses()
     {
-        $date = Carbon::now();
+        $date = Date::now();
 
         if ($this->timezone) {
-            $date->setTimezone($this->timezone);
+            $date = $date->setTimezone($this->timezone);
         }
 
         return (new CronExpression($this->expression))->isDue($date->toDateTimeString());
@@ -580,7 +596,7 @@ class Event
         return function (Container $container, HttpClient $http) use ($url) {
             try {
                 $http->request('GET', $url);
-            } catch (ClientExceptionInterface | TransferException $e) {
+            } catch (ClientExceptionInterface|TransferException $e) {
                 $container->make(ExceptionHandler::class)->report($e);
             }
         };
@@ -648,9 +664,7 @@ class Event
 
         $this->expiresAt = $expiresAt;
 
-        return $this->then(function () {
-            $this->mutex->forget($this);
-        })->skip(function () {
+        return $this->skip(function () {
             return $this->mutex->exists($this);
         });
     }
@@ -915,5 +929,17 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
+    }
+
+    /**
+     * Delete the mutex for the event.
+     *
+     * @return void
+     */
+    protected function removeMutex()
+    {
+        if ($this->withoutOverlapping) {
+            $this->mutex->forget($this);
+        }
     }
 }

@@ -1,6 +1,71 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.27...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.37...6.x)
+
+
+## [v6.20.37 (2021-11-02)](https://github.com/laravel/framework/compare/v6.20.36...v6.20.37)
+
+### Fixed
+- Fixed rate limiting unicode issue ([#39375](https://github.com/laravel/framework/pull/39375))
+
+
+## [v6.20.36 (2021-10-19)](https://github.com/laravel/framework/compare/v6.20.35...v6.20.36)
+
+### Fixed
+- Add new lost connection message to DetectsLostConnections for Vapor ([#39209](https://github.com/laravel/framework/pull/39209))
+
+
+## [v6.20.35 (2021-10-05)](https://github.com/laravel/framework/compare/v6.20.34...v6.20.35)
+
+### Added
+- Added new lost connection message to DetectsLostConnections ([#39028](https://github.com/laravel/framework/pull/39028))
+
+
+## [v6.20.34 (2021-09-07)](https://github.com/laravel/framework/compare/v6.20.33...v6.20.34)
+
+### Fixed
+- Silence validator date parse warnings ([#38670](https://github.com/laravel/framework/pull/38670))
+
+
+## [v6.20.33 (2021-08-31)](https://github.com/laravel/framework/compare/v6.20.32...v6.20.33)
+
+### Changed
+- Error out when detecting incompatible DBAL version ([#38543](https://github.com/laravel/framework/pull/38543))
+
+
+## [v6.20.32 (2021-08-10)](https://github.com/laravel/framework/compare/v6.20.31...v6.20.32)
+
+### Fixed
+- Bump AWS PHP SDK ([#38297](https://github.com/laravel/framework/pull/38297))
+
+
+## [v6.20.31 (2021-08-03)](https://github.com/laravel/framework/compare/v6.20.30...v6.20.31)
+ 
+### Fixed
+- Fixed signed routes with expires parameter ([#38111](https://github.com/laravel/framework/pull/38111), [732c0e0](https://github.com/laravel/framework/commit/732c0e0f64b222e7fc7daef6553f8e99007bb32c))
+
+### Refactoring
+- Remove hardcoded Carbon reference from scheduler event ([#38063](https://github.com/laravel/framework/pull/38063))
+
+
+## [v6.20.30 (2021-07-07)](https://github.com/laravel/framework/compare/v6.20.29...v6.20.30)
+
+### Fixed
+- Fix edge case causing a BadMethodCallExceptions to be thrown when using loadMissing() ([#37871](https://github.com/laravel/framework/pull/37871))
+
+
+## [v6.20.29 (2021-06-22)](https://github.com/laravel/framework/compare/v6.20.28...v6.20.29)
+
+### Changed
+- Removed unnecessary checks in RequiredIf validation, fixed tests ([#37700](https://github.com/laravel/framework/pull/37700))
+
+
+## [v6.20.28 (2021-06-15)](https://github.com/laravel/framework/compare/v6.20.27...v6.20.28)
+
+### Fixed
+- Fixed dns_get_record loose check of A records for active_url rule ([#37675](https://github.com/laravel/framework/pull/37675))
+- Type hinted arguments for Illuminate\Validation\Rules\RequiredIf ([#37688](https://github.com/laravel/framework/pull/37688))
+- Fixed when passed object as parameters to scopes method ([#37692](https://github.com/laravel/framework/pull/37692))
 
 
 ## [v6.20.27 (2021-05-11)](https://github.com/laravel/framework/compare/v6.20.26...v6.20.27)

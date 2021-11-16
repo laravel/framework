@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
+use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -729,6 +730,10 @@ trait HasRelationships
 
         if (! empty($morphMap) && in_array(static::class, $morphMap)) {
             return array_search(static::class, $morphMap, true);
+        }
+
+        if (Relation::requiresMorphMap()) {
+            throw new ClassMorphViolationException($this);
         }
 
         return static::class;

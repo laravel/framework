@@ -34,9 +34,9 @@ class CacheApcStoreTest extends TestCase
         ]);
         $store = new ApcStore($apc);
         $this->assertEquals([
-            'foo'   => 'qux',
-            'bar'   => null,
-            'baz'   => 'norf',
+            'foo' => 'qux',
+            'bar' => null,
+            'baz' => 'norf',
         ], $store->many(['foo', 'bar', 'baz']));
     }
 
@@ -63,9 +63,9 @@ class CacheApcStoreTest extends TestCase
         ])->willReturn(true);
         $store = new ApcStore($apc);
         $result = $store->putMany([
-            'foo'   => 'bar',
-            'baz'   => 'qux',
-            'bar'   => 'norf',
+            'foo' => 'bar',
+            'baz' => 'qux',
+            'bar' => 'norf',
         ], 60);
         $this->assertTrue($result);
     }

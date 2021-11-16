@@ -66,6 +66,13 @@ class Worker
     protected $isDownForMaintenance;
 
     /**
+     * The callback used to reset the application's scope.
+     *
+     * @var callable
+     */
+    protected $resetScope;
+
+    /**
      * Indicates if the worker should exit.
      *
      * @var bool
@@ -93,17 +100,20 @@ class Worker
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @param  callable  $isDownForMaintenance
+     * @param  callable|null  $resetScope
      * @return void
      */
     public function __construct(QueueManager $manager,
                                 Dispatcher $events,
                                 ExceptionHandler $exceptions,
-                                callable $isDownForMaintenance)
+                                callable $isDownForMaintenance,
+                                callable $resetScope = null)
     {
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
         $this->isDownForMaintenance = $isDownForMaintenance;
+        $this->resetScope = $resetScope;
     }
 
     /**
@@ -116,7 +126,7 @@ class Worker
      */
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
-        if ($this->supportsAsyncSignals()) {
+        if ($supportsAsyncSignals = $this->supportsAsyncSignals()) {
             $this->listenForSignals();
         }
 
@@ -138,6 +148,10 @@ class Worker
                 continue;
             }
 
+            if (isset($this->resetScope)) {
+                ($this->resetScope)();
+            }
+
             // First, we will attempt to get the next job off of the queue. We will also
             // register the timeout handler and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
@@ -145,7 +159,7 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            if ($this->supportsAsyncSignals()) {
+            if ($supportsAsyncSignals) {
                 $this->registerTimeoutHandler($job, $options);
             }
 
@@ -164,7 +178,7 @@ class Worker
                 $this->sleep($options->sleep);
             }
 
-            if ($this->supportsAsyncSignals()) {
+            if ($supportsAsyncSignals) {
                 $this->resetTimeoutHandler();
             }
 
@@ -712,7 +726,7 @@ class Worker
      * Kill the process.
      *
      * @param  int  $status
-     * @return void
+     * @return never
      */
     public function kill($status = 0)
     {

@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -50,6 +51,13 @@ class PendingCommand
      * @var int
      */
     protected $expectedExitCode;
+
+    /**
+     * The unexpected exit code.
+     *
+     * @var int
+     */
+    protected $unexpectedExitCode;
 
     /**
      * Determine if the command has executed.
@@ -193,6 +201,39 @@ class PendingCommand
     }
 
     /**
+     * Assert that the command does not have the given exit code.
+     *
+     * @param  int  $exitCode
+     * @return $this
+     */
+    public function assertNotExitCode($exitCode)
+    {
+        $this->unexpectedExitCode = $exitCode;
+
+        return $this;
+    }
+
+    /**
+     * Assert that the command has the success exit code.
+     *
+     * @return $this
+     */
+    public function assertSuccessful()
+    {
+        return $this->assertExitCode(Command::SUCCESS);
+    }
+
+    /**
+     * Assert that the command does not have the success exit code.
+     *
+     * @return $this
+     */
+    public function assertFailed()
+    {
+        return $this->assertNotExitCode(Command::SUCCESS);
+    }
+
+    /**
      * Execute the command.
      *
      * @return int
@@ -229,6 +270,11 @@ class PendingCommand
             $this->test->assertEquals(
                 $this->expectedExitCode, $exitCode,
                 "Expected status code {$this->expectedExitCode} but received {$exitCode}."
+            );
+        } elseif (! is_null($this->unexpectedExitCode)) {
+            $this->test->assertNotEquals(
+                $this->unexpectedExitCode, $exitCode,
+                "Unexpected status code {$this->unexpectedExitCode} was received."
             );
         }
 

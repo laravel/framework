@@ -41,6 +41,25 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(new Password(8), ['88888888']);
     }
 
+    public function testConditional()
+    {
+        $is_privileged_user = true;
+        $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
+            $rule->symbols();
+        });
+
+        $this->fails($rule, ['aaaaaaaa', '11111111'], [
+            'The my password must contain at least one symbol.',
+        ]);
+
+        $is_privileged_user = false;
+        $rule = (new Password(8))->when($is_privileged_user, function ($rule) {
+            $rule->symbols();
+        });
+
+        $this->passes($rule, ['aaaaaaaa', '11111111']);
+    }
+
     public function testMixedCase()
     {
         $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM'], [
@@ -211,6 +230,29 @@ class ValidationPasswordRuleTest extends TestCase
         $this->expectExceptionMessage('given callback should be callable');
 
         Password::defaults('required|password');
+    }
+
+    public function testItPassesWithValidDataIfTheSameValidationRulesAreReused()
+    {
+        $rules = [
+            'password' => Password::default(),
+        ];
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => '1234'],
+            $rules
+        );
+
+        $this->assertFalse($v->passes());
+
+        $v1 = new Validator(
+            resolve('translator'),
+            ['password' => '12341234'],
+            $rules
+        );
+
+        $this->assertTrue($v1->passes());
     }
 
     protected function passes($rule, $values)

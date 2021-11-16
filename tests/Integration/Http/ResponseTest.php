@@ -6,9 +6,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class ResponseTest extends TestCase
 {
     public function testResponseWithInvalidJsonThrowsException()
@@ -19,7 +16,7 @@ class ResponseTest extends TestCase
         Route::get('/response', function () {
             return (new Response())->setContent(new class implements \JsonSerializable
             {
-                public function jsonSerialize()
+                public function jsonSerialize(): string
                 {
                     return "\xB1\x31";
                 }

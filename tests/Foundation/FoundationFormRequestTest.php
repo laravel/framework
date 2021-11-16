@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
@@ -99,6 +100,19 @@ class FoundationFormRequestTest extends TestCase
         $this->expectExceptionMessage('This action is unauthorized.');
 
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
+    }
+
+    public function testValidateThrowsExceptionFromAuthorizationResponse()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+
+        $this->createRequest([], FoundationTestFormRequestForbiddenWithResponseStub::class)->validateResolved();
+    }
+
+    public function testValidateDoesntThrowExceptionFromResponseAllowed()
+    {
+        $this->createRequest([], FoundationTestFormRequestPassesWithResponseStub::class)->validateResolved();
     }
 
     public function testPrepareForValidationRunsBeforeValidation()
@@ -320,5 +334,26 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function passedValidation()
     {
         $this->replace(['name' => 'Adam']);
+    }
+}
+
+class FoundationTestFormRequestForbiddenWithResponseStub extends FormRequest
+{
+    public function authorize()
+    {
+        return Response::deny('foo');
+    }
+}
+
+class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
+{
+    public function rules()
+    {
+        return [];
+    }
+
+    public function authorize()
+    {
+        return Response::allow('baz');
     }
 }

@@ -116,7 +116,8 @@ trait InteractsWithPivotTable
         // have done any attaching or detaching, and if we have we will touch these
         // relationships if they are configured to touch on any database updates.
         if (count($changes['attached']) ||
-            count($changes['updated'])) {
+            count($changes['updated']) ||
+            count($changes['detached'])) {
             $this->touchIfTouching();
         }
 

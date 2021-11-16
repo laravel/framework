@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
-use InvalidArgumentException;
+use Illuminate\View\ComponentSlot;
 
 trait ManagesComponents
 {
@@ -23,6 +23,13 @@ trait ManagesComponents
      * @var array
      */
     protected $componentData = [];
+
+    /**
+     * The component data for the component that is currently being rendered.
+     *
+     * @var array
+     */
+    protected $currentComponentData = [];
 
     /**
      * The slot contents for the component.
@@ -81,16 +88,23 @@ trait ManagesComponents
     {
         $view = array_pop($this->componentStack);
 
-        $data = $this->componentData();
+        $this->currentComponentData = array_merge(
+            $previousComponentData = $this->currentComponentData,
+            $data = $this->componentData()
+        );
 
-        $view = value($view, $data);
+        try {
+            $view = value($view, $data);
 
-        if ($view instanceof View) {
-            return $view->with($data)->render();
-        } elseif ($view instanceof Htmlable) {
-            return $view->toHtml();
-        } else {
-            return $this->make($view, $data)->render();
+            if ($view instanceof View) {
+                return $view->with($data)->render();
+            } elseif ($view instanceof Htmlable) {
+                return $view->toHtml();
+            } else {
+                return $this->make($view, $data)->render();
+            }
+        } finally {
+            $this->currentComponentData = $previousComponentData;
         }
     }
 
@@ -116,24 +130,51 @@ trait ManagesComponents
     }
 
     /**
+     * Get an item from the component data that exists above the current component.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed|null
+     */
+    public function getConsumableComponentData($key, $default = null)
+    {
+        if (array_key_exists($key, $this->currentComponentData)) {
+            return $this->currentComponentData[$key];
+        }
+
+        $currentComponent = count($this->componentStack);
+
+        if ($currentComponent === 0) {
+            return value($default);
+        }
+
+        for ($i = $currentComponent - 1; $i >= 0; $i--) {
+            $data = $this->componentData[$i] ?? [];
+
+            if (array_key_exists($key, $data)) {
+                return $data[$key];
+            }
+        }
+
+        return value($default);
+    }
+
+    /**
      * Start the slot rendering process.
      *
      * @param  string  $name
      * @param  string|null  $content
+     * @param  array  $attributes
      * @return void
-     *
-     * @throws \InvalidArgumentException
      */
-    public function slot($name, $content = null)
+    public function slot($name, $content = null, $attributes = [])
     {
-        if (func_num_args() > 2) {
-            throw new InvalidArgumentException('You passed too many arguments to the ['.$name.'] slot.');
-        } elseif (func_num_args() === 2) {
+        if (func_num_args() === 2 || $content !== null) {
             $this->slots[$this->currentComponent()][$name] = $content;
         } elseif (ob_start()) {
             $this->slots[$this->currentComponent()][$name] = '';
 
-            $this->slotStack[$this->currentComponent()][] = $name;
+            $this->slotStack[$this->currentComponent()][] = [$name, $attributes];
         }
     }
 
@@ -150,7 +191,11 @@ trait ManagesComponents
             $this->slotStack[$this->currentComponent()]
         );
 
-        $this->slots[$this->currentComponent()][$currentSlot] = new HtmlString(trim(ob_get_clean()));
+        [$currentName, $currentAttributes] = $currentSlot;
+
+        $this->slots[$this->currentComponent()][$currentName] = new ComponentSlot(
+            trim(ob_get_clean()), $currentAttributes
+        );
     }
 
     /**
@@ -161,5 +206,17 @@ trait ManagesComponents
     protected function currentComponent()
     {
         return count($this->componentStack) - 1;
+    }
+
+    /**
+     * Flush all of the component state.
+     *
+     * @return void
+     */
+    protected function flushComponents()
+    {
+        $this->componentStack = [];
+        $this->componentData = [];
+        $this->currentComponentData = [];
     }
 }

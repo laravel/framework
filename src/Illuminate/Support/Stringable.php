@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
@@ -10,7 +11,7 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class Stringable implements JsonSerializable
 {
-    use Macroable, Tappable;
+    use Conditionable, Macroable, Tappable;
 
     /**
      * The underlying string value.
@@ -258,6 +259,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Determine if a given string is a valid UUID.
+     *
+     * @return bool
+     */
+    public function isUuid()
+    {
+        return Str::isUuid($this->value);
+    }
+
+    /**
      * Determine if the given string is empty.
      *
      * @return bool
@@ -332,6 +343,20 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Masks a portion of a string with a repeated character.
+     *
+     * @param  string  $character
+     * @param  int  $index
+     * @param  int|null  $length
+     * @param  string  $encoding
+     * @return static
+     */
+    public function mask($character, $index, $length = null, $encoding = 'UTF-8')
+    {
+        return new static(Str::mask($this->value, $character, $index, $length, $encoding));
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
@@ -339,13 +364,7 @@ class Stringable implements JsonSerializable
      */
     public function match($pattern)
     {
-        preg_match($pattern, $this->value, $matches);
-
-        if (! $matches) {
-            return new static;
-        }
-
-        return new static($matches[1] ?? $matches[0]);
+        return new static(Str::match($pattern, $this->value));
     }
 
     /**
@@ -356,13 +375,7 @@ class Stringable implements JsonSerializable
      */
     public function matchAll($pattern)
     {
-        preg_match_all($pattern, $this->value, $matches);
-
-        if (empty($matches[0])) {
-            return collect();
-        }
-
-        return collect($matches[1] ?? $matches[0]);
+        return Str::matchAll($pattern, $this->value);
     }
 
     /**
@@ -567,6 +580,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Strip HTML and PHP tags from the given string.
+     *
+     * @param  string  $allowedTags
+     * @return static
+     */
+    public function stripTags($allowedTags = null)
+    {
+        return new static(strip_tags($this->value, $allowedTags));
+    }
+
+    /**
      * Convert the given string to upper-case.
      *
      * @return static
@@ -584,6 +608,16 @@ class Stringable implements JsonSerializable
     public function title()
     {
         return new static(Str::title($this->value));
+    }
+
+    /**
+     * Convert the given string to title case for each word.
+     *
+     * @return static
+     */
+    public function headline()
+    {
+        return new static(Str::headline($this->value));
     }
 
     /**
@@ -709,38 +743,6 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Apply the callback's string changes if the given "value" is false.
-     *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return mixed|$this
-     */
-    public function unless($value, $callback, $default = null)
-    {
-        return $this->when(! $value, $callback, $default);
-    }
-
-    /**
-     * Apply the callback's string changes if the given "value" is true.
-     *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return mixed|$this
-     */
-    public function when($value, $callback, $default = null)
-    {
-        if ($value) {
-            return $callback($this, $value) ?: $this;
-        } elseif ($default) {
-            return $default($this, $value) ?: $this;
-        }
-
-        return $this;
-    }
-
-    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback
@@ -811,7 +813,7 @@ class Stringable implements JsonSerializable
     /**
      * Dump the string and end the script.
      *
-     * @return void
+     * @return never
      */
     public function dd()
     {
@@ -825,6 +827,7 @@ class Stringable implements JsonSerializable
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->__toString();

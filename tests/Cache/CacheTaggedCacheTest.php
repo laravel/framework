@@ -282,7 +282,7 @@ class CacheTaggedCacheTest extends TestCase
         $conn->shouldReceive('del')->once()->with('prefix:foo:standard_ref');
         $conn->shouldReceive('del')->once()->with('prefix:bar:standard_ref');
 
-        $tagSet->shouldReceive('reset')->once();
+        $tagSet->shouldReceive('flush')->once();
 
         $redis->flush();
     }

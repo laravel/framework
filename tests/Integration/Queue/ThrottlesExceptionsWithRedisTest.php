@@ -14,9 +14,6 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class ThrottlesExceptionsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;

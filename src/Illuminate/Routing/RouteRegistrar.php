@@ -22,7 +22,9 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar name(string $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
+ * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
+ * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string  $middleware)
  */
 class RouteRegistrar
 {
@@ -55,7 +57,15 @@ class RouteRegistrar
      * @var string[]
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where',
+        'as',
+        'domain',
+        'middleware',
+        'name',
+        'namespace',
+        'prefix',
+        'scopeBindings',
+        'where',
+        'withoutMiddleware',
     ];
 
     /**
@@ -65,6 +75,8 @@ class RouteRegistrar
      */
     protected $aliases = [
         'name' => 'as',
+        'scopeBindings' => 'scope_bindings',
+        'withoutMiddleware' => 'excluded_middleware',
     ];
 
     /**
@@ -93,7 +105,21 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
-        $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
+        if ($key === 'middleware') {
+            foreach ($value as $index => $middleware) {
+                $value[$index] = (string) $middleware;
+            }
+        }
+
+        $attributeKey = Arr::get($this->aliases, $key, $key);
+
+        if ($key === 'withoutMiddleware') {
+            $value = array_merge(
+                (array) ($this->attributes[$attributeKey] ?? []), Arr::wrap($value)
+            );
+        }
+
+        $this->attributes[$attributeKey] = $value;
 
         return $this;
     }
@@ -216,7 +242,7 @@ class RouteRegistrar
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 
-            return $this->attribute($method, $parameters[0]);
+            return $this->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);
         }
 
         throw new BadMethodCallException(sprintf(

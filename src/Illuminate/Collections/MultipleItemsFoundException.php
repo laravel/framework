@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Collections;
+namespace Illuminate\Support;
 
 use RuntimeException;
 

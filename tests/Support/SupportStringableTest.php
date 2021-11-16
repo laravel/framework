@@ -31,6 +31,12 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testIsUuid()
+    {
+        $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
+        $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());
@@ -163,6 +169,34 @@ class SupportStringableTest extends TestCase
         }, function ($stringable) {
             return $stringable->append('fallbacks to default');
         }));
+    }
+
+    public function testUnlessTruthy()
+    {
+        $this->assertSame('unless', (string) $this->stringable('unless')->unless(1, function ($stringable, $value) {
+            return $stringable->append($value)->append('true');
+        }));
+
+        $this->assertSame('unless true fallbacks to default with value 1',
+            (string) $this->stringable('unless true ')->unless(1, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable, $value) {
+                return $stringable->append('fallbacks to default with value ')->append($value);
+            }));
+    }
+
+    public function testUnlessFalsy()
+    {
+        $this->assertSame('unless 0', (string) $this->stringable('unless ')->unless(0, function ($stringable, $value) {
+            return $stringable->append($value);
+        }));
+
+        $this->assertSame('gets the value 0',
+            (string) $this->stringable('gets the value ')->unless(0, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable) {
+                return $stringable->append('fallbacks to default');
+            }));
     }
 
     public function testTrimmedOnlyWhereNecessary()
@@ -641,6 +675,27 @@ class SupportStringableTest extends TestCase
         $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
     }
 
+    public function testMask()
+    {
+        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', 3));
+        $this->assertEquals('******@email.com', $this->stringable('taylor@email.com')->mask('*', 0, 6));
+        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', -13));
+        $this->assertEquals('tay***@email.com', $this->stringable('taylor@email.com')->mask('*', -13, 3));
+
+        $this->assertEquals('****************', $this->stringable('taylor@email.com')->mask('*', -17));
+        $this->assertEquals('*****r@email.com', $this->stringable('taylor@email.com')->mask('*', -99, 5));
+
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16));
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16, 99));
+
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('', 3));
+
+        $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->mask('something', 3));
+
+        $this->assertEquals('这是一***', $this->stringable('这是一段中文')->mask('*', 3));
+        $this->assertEquals('**一段中文', $this->stringable('这是一段中文')->mask('*', 0, 2));
+    }
+
     public function testRepeat()
     {
         $this->assertSame('aaaaa', (string) $this->stringable('a')->repeat(5));
@@ -651,5 +706,13 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testStripTags()
+    {
+        $this->assertSame('beforeafter', (string) $this->stringable('before<br>after')->stripTags());
+        $this->assertSame('before<br>after', (string) $this->stringable('before<br>after')->stripTags('<br>'));
+        $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
+        $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
     }
 }

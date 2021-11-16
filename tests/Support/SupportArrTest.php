@@ -424,6 +424,22 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
+    public function testIsList()
+    {
+        $this->assertTrue(Arr::isList([]));
+        $this->assertTrue(Arr::isList([1, 2, 3]));
+        $this->assertTrue(Arr::isList(['foo', 2, 3]));
+        $this->assertTrue(Arr::isList(['foo', 'bar']));
+        $this->assertTrue(Arr::isList([0 => 'foo', 'bar']));
+        $this->assertTrue(Arr::isList([0 => 'foo', 1 => 'bar']));
+
+        $this->assertFalse(Arr::isList([1 => 'foo', 'bar']));
+        $this->assertFalse(Arr::isList([1 => 'foo', 0 => 'bar']));
+        $this->assertFalse(Arr::isList([0 => 'foo', 'bar' => 'baz']));
+        $this->assertFalse(Arr::isList([0 => 'foo', 2 => 'bar']));
+        $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
@@ -806,6 +822,25 @@ class SupportArrTest extends TestCase
         ];
 
         $this->assertEquals($expect, Arr::sortRecursive($array));
+    }
+
+    public function testToCssClasses()
+    {
+        $classes = Arr::toCssClasses([
+            'font-bold',
+            'mt-4',
+        ]);
+
+        $this->assertEquals('font-bold mt-4', $classes);
+
+        $classes = Arr::toCssClasses([
+            'font-bold',
+            'mt-4',
+            'ml-2' => true,
+            'mr-2' => false,
+        ]);
+
+        $this->assertEquals('font-bold mt-4 ml-2', $classes);
     }
 
     public function testWhere()

@@ -7,7 +7,6 @@ use Closure;
 use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use JsonSerializable;
@@ -156,7 +155,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Add additional jobs to the batch.
      *
-     * @param  \Illuminate\Support\Collection|array  $jobs
+     * @param  \Illuminate\Support\Enumerable|array  $jobs
      * @return self
      */
     public function add($jobs)
@@ -420,16 +419,20 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Invoke a batch callback handler.
      *
-     * @param  \Illuminate\Queue\SerializableClosure|callable  $handler
+     * @param  callable  $handler
      * @param  \Illuminate\Bus\Batch  $batch
      * @param  \Throwable|null  $e
      * @return void
      */
     protected function invokeHandlerCallback($handler, Batch $batch, Throwable $e = null)
     {
-        return $handler instanceof SerializableClosure
-                    ? $handler->__invoke($batch, $e)
-                    : call_user_func($handler, $batch, $e);
+        try {
+            return $handler($batch, $e);
+        } catch (Throwable $e) {
+            if (function_exists('report')) {
+                report($e);
+            }
+        }
     }
 
     /**
@@ -459,6 +462,7 @@ class Batch implements Arrayable, JsonSerializable
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Ftp;
 use League\Flysystem\Adapter\Local as LocalAdapter;
@@ -32,6 +33,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class FilesystemAdapter implements CloudFilesystemContract
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The Flysystem filesystem implementation.
      *
@@ -646,7 +651,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function files($directory = null, $recursive = false)
     {
-        $contents = $this->driver->listContents($directory, $recursive);
+        $contents = $this->driver->listContents($directory ?? '', $recursive);
 
         return $this->filterContentsByType($contents, 'file');
     }
@@ -671,7 +676,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directories($directory = null, $recursive = false)
     {
-        $contents = $this->driver->listContents($directory, $recursive);
+        $contents = $this->driver->listContents($directory ?? '', $recursive);
 
         return $this->filterContentsByType($contents, 'dir');
     }
@@ -784,6 +789,10 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function __call($method, array $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->driver->{$method}(...array_values($parameters));
     }
 }

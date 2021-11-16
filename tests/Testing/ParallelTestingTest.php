@@ -36,7 +36,7 @@ class ParallelTestingTest extends TestCase
                 $this->assertNull($testCase);
             }
 
-            $this->assertEquals(1, $token);
+            $this->assertSame('1', $token);
             $state = true;
         });
 
@@ -44,7 +44,7 @@ class ParallelTestingTest extends TestCase
         $this->assertFalse($state);
 
         $parallelTesting->resolveTokenUsing(function () {
-            return 1;
+            return '1';
         });
 
         $parallelTesting->{$caller}($this);
@@ -56,13 +56,21 @@ class ParallelTestingTest extends TestCase
         $parallelTesting = new ParallelTesting(Container::getInstance());
 
         $this->assertFalse($parallelTesting->option('recreate_databases'));
+        $this->assertFalse($parallelTesting->option('without_databases'));
 
         $parallelTesting->resolveOptionsUsing(function ($option) {
             return $option === 'recreate_databases';
         });
 
         $this->assertFalse($parallelTesting->option('recreate_caches'));
+        $this->assertFalse($parallelTesting->option('without_databases'));
         $this->assertTrue($parallelTesting->option('recreate_databases'));
+
+        $parallelTesting->resolveOptionsUsing(function ($option) {
+            return $option === 'without_databases';
+        });
+
+        $this->assertTrue($parallelTesting->option('without_databases'));
     }
 
     public function testToken()
@@ -72,10 +80,10 @@ class ParallelTestingTest extends TestCase
         $this->assertFalse($parallelTesting->token());
 
         $parallelTesting->resolveTokenUsing(function () {
-            return 1;
+            return '1';
         });
 
-        $this->assertSame(1, $parallelTesting->token());
+        $this->assertSame('1', $parallelTesting->token());
     }
 
     public function callbacks()

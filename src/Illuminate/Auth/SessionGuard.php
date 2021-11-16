@@ -54,6 +54,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $viaRemember = false;
 
     /**
+     * The number of minutes that the "remember me" cookie should be valid for.
+     *
+     * @var int
+     */
+    protected $rememberDuration = 2628000;
+
+    /**
      * The session used by the guard.
      *
      * @var \Illuminate\Contracts\Session\Session
@@ -532,7 +539,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function createRecaller($value)
     {
-        return $this->getCookieJar()->forever($this->getRecallerName(), $value);
+        return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
     }
 
     /**
@@ -628,7 +635,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return bool|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -655,7 +662,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return bool|null
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \InvalidArgumentException
      */
@@ -814,6 +821,29 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function viaRemember()
     {
         return $this->viaRemember;
+    }
+
+    /**
+     * Get the number of minutes the remember me cookie should be valid for.
+     *
+     * @return int
+     */
+    protected function getRememberDuration()
+    {
+        return $this->rememberDuration;
+    }
+
+    /**
+     * Set the number of minutes the remember me cookie should be valid for.
+     *
+     * @param  int  $minutes
+     * @return $this
+     */
+    public function setRememberDuration($minutes)
+    {
+        $this->rememberDuration = $minutes;
+
+        return $this;
     }
 
     /**

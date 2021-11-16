@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -304,7 +305,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $bar = false;
 
         $request->whenHas('name', function ($value) use (&$name) {
             $name = $value;
@@ -322,17 +323,24 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenHas('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertSame('', $age);
         $this->assertNull($city);
         $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testWhenFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $bar = false;
 
         $request->whenFilled('name', function ($value) use (&$name) {
             $name = $value;
@@ -350,10 +358,17 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenFilled('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertFalse($age);
         $this->assertFalse($city);
         $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testMissingMethod()
@@ -486,6 +501,35 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->boolean('unchecked'));
         $this->assertFalse($request->boolean('with_trashed'));
         $this->assertFalse($request->boolean('some_undefined_key'));
+    }
+
+    public function testCollectMethod()
+    {
+        $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);
+
+        $this->assertInstanceOf(Collection::class, $request->collect('users'));
+        $this->assertTrue($request->collect('developers')->isEmpty());
+        $this->assertEquals([1, 2, 3], $request->collect('users')->all());
+        $this->assertEquals(['users' => [1, 2, 3]], $request->collect()->all());
+
+        $request = Request::create('/', 'GET', ['text-payload']);
+        $this->assertEquals(['text-payload'], $request->collect()->all());
+
+        $request = Request::create('/', 'GET', ['email' => 'test@example.com']);
+        $this->assertEquals(['test@example.com'], $request->collect('email')->all());
+
+        $request = Request::create('/', 'GET', []);
+        $this->assertInstanceOf(Collection::class, $request->collect());
+        $this->assertTrue($request->collect()->isEmpty());
+
+        $request = Request::create('/', 'GET', ['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
+        $this->assertInstanceOf(Collection::class, $request->collect(['users']));
+        $this->assertTrue($request->collect(['developers'])->isEmpty());
+        $this->assertTrue($request->collect(['roles'])->isNotEmpty());
+        $this->assertEquals(['roles' => [4, 5, 6]], $request->collect(['roles'])->all());
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->collect(['users', 'email'])->all());
+        $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $request->collect(['roles', 'foo']));
+        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
     }
 
     public function testArrayAccess()
@@ -679,6 +723,15 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo', $request->header('do-this'));
         $all = $request->header(null);
         $this->assertSame('foo', $all['do-this'][0]);
+    }
+
+    public function testBearerTokenMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer fooBearerbar']);
+        $this->assertSame('fooBearerbar', $request->bearerToken());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic foo, Bearer bar']);
+        $this->assertSame('bar', $request->bearerToken());
     }
 
     public function testJSONMethod()
@@ -951,6 +1004,21 @@ class HttpRequestTest extends TestCase
         // Should not produce compilation error on invalid regex.
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '(/(']);
         $this->assertFalse($request->accepts('text/html'));
+    }
+
+    public function testCaseInsensitiveAcceptHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/JSON']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'AppLiCaTion/JsOn']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/*']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/JSON']);
+        $this->assertTrue($request->expectsJson());
     }
 
     public function testSessionMethod()

@@ -52,6 +52,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $instances = [];
 
     /**
+     * The container's scoped instances.
+     *
+     * @var array
+     */
+    protected $scopedInstances = [];
+
+    /**
      * The registered type aliases.
      *
      * @var string[]
@@ -180,7 +187,9 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
+     *
+     * @return bool
      */
     public function has($id)
     {
@@ -389,6 +398,36 @@ class Container implements ArrayAccess, ContainerContract
     public function singletonIf($abstract, $concrete = null)
     {
         if (! $this->bound($abstract)) {
+            $this->singleton($abstract, $concrete);
+        }
+    }
+
+    /**
+     * Register a scoped binding in the container.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function scoped($abstract, $concrete = null)
+    {
+        $this->scopedInstances[] = $abstract;
+
+        $this->singleton($abstract, $concrete);
+    }
+
+    /**
+     * Register a scoped binding if it hasn't already been registered.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @return void
+     */
+    public function scopedIf($abstract, $concrete = null)
+    {
+        if (! $this->bound($abstract)) {
+            $this->scopedInstances[] = $abstract;
+
             $this->singleton($abstract, $concrete);
         }
     }
@@ -656,7 +695,9 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function get($id)
     {
@@ -1200,7 +1241,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  object  $object
      * @param  array  $callbacksPerType
-     *
      * @return array
      */
     protected function getCallbacksForType($abstract, $object, array $callbacksPerType)
@@ -1308,6 +1348,18 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Clear all of the scoped instances from the container.
+     *
+     * @return void
+     */
+    public function forgetScopedInstances()
+    {
+        foreach ($this->scopedInstances as $scoped) {
+            unset($this->instances[$scoped]);
+        }
+    }
+
+    /**
      * Flush the container of all bindings and resolved instances.
      *
      * @return void
@@ -1319,6 +1371,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->bindings = [];
         $this->instances = [];
         $this->abstractAliases = [];
+        $this->scopedInstances = [];
     }
 
     /**
@@ -1352,6 +1405,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $key
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return $this->bound($key);
@@ -1363,6 +1417,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->make($key);
@@ -1375,6 +1430,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  mixed  $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $this->bind($key, $value instanceof Closure ? $value : function () use ($value) {
@@ -1388,6 +1444,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $key
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         unset($this->bindings[$key], $this->instances[$key], $this->resolved[$key]);

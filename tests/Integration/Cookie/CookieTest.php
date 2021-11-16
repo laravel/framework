@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class CookieTest extends TestCase
 {
     public function test_cookie_is_sent_back_with_proper_expire_time_when_should_expire_on_close()

@@ -52,7 +52,7 @@ class ComponentTagCompiler
      *
      * @param  array  $aliases
      * @param  array  $namespaces
-     * @param  \Illuminate\View\Compilers\BladeCompiler|null $blade
+     * @param  \Illuminate\View\Compilers\BladeCompiler|null  $blade
      * @return void
      */
     public function __construct(array $aliases = [], array $namespaces = [], ?BladeCompiler $blade = null)
@@ -272,6 +272,10 @@ class ComponentTagCompiler
             return $view;
         }
 
+        if ($viewFactory->exists($view = $this->guessViewName($component).'.index')) {
+            return $view;
+        }
+
         throw new InvalidArgumentException(
             "Unable to locate a class or view for component [{$component}]."
         );
@@ -395,14 +399,53 @@ class ComponentTagCompiler
      */
     public function compileSlots(string $value)
     {
-        $value = preg_replace_callback('/<\s*x[\-\:]slot\s+(:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))\s*>/', function ($matches) {
+        $pattern = "/
+            <
+                \s*
+                x[\-\:]slot
+                \s+
+                (:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))
+                (?<attributes>
+                    (?:
+                        \s+
+                        (?:
+                            (?:
+                                \{\{\s*\\\$attributes(?:[^}]+?)?\s*\}\}
+                            )
+                            |
+                            (?:
+                                [\w\-:.@]+
+                                (
+                                    =
+                                    (?:
+                                        \\\"[^\\\"]*\\\"
+                                        |
+                                        \'[^\']*\'
+                                        |
+                                        [^\'\\\"=<>]+
+                                    )
+                                )?
+                            )
+                        )
+                    )*
+                    \s*
+                )
+                (?<![\/=\-])
+            >
+        /x";
+
+        $value = preg_replace_callback($pattern, function ($matches) {
             $name = $this->stripQuotes($matches['name']);
 
             if ($matches[1] !== ':') {
                 $name = "'{$name}'";
             }
 
-            return " @slot({$name}) ";
+            $this->boundAttributes = [];
+
+            $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
+
+            return " @slot({$name}, null, [".$this->attributesToString($attributes).']) ';
         }, $value);
 
         return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);

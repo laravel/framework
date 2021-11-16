@@ -80,8 +80,8 @@ class CacheRedisStoreTest extends TestCase
         $connection->shouldReceive('exec')->once();
 
         $result = $redis->putMany([
-            'foo'   => 'bar',
-            'baz'   => 'qux',
+            'foo' => 'bar',
+            'baz' => 'qux',
             'bar' => 'norf',
         ], 60);
         $this->assertTrue($result);

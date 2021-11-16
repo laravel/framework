@@ -42,6 +42,68 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute was "accepted" when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateAcceptedIf($attribute, $value, $parameters)
+    {
+        $acceptable = ['yes', 'on', '1', 1, true, 'true'];
+
+        $this->requireParameterCount(2, $parameters, 'accepted_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate that an attribute was "declined".
+     *
+     * This validation rule implies the attribute is "required".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateDeclined($attribute, $value)
+    {
+        $acceptable = ['no', 'off', '0', 0, false, 'false'];
+
+        return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+    }
+
+    /**
+     * Validate that an attribute was "declined" when another attribute has a given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateDeclinedIf($attribute, $value, $parameters)
+    {
+        $acceptable = ['no', 'off', '0', 0, false, 'false'];
+
+        $this->requireParameterCount(2, $parameters, 'declined_if');
+
+        [$values, $other] = $this->parseDependentRuleParameters($parameters);
+
+        if (in_array($other, $values, is_bool($other) || is_null($other))) {
+            return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
+        }
+
+        return true;
+    }
+
+    /**
      * Validate that an attribute is an active URL.
      *
      * @param  string  $attribute
@@ -56,7 +118,7 @@ trait ValidatesAttributes
 
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
-                return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
+                return count(dns_get_record($url.'.', DNS_A | DNS_AAAA)) > 0;
             } catch (Exception $e) {
                 return false;
             }
@@ -234,7 +296,7 @@ trait ValidatesAttributes
     protected function getDateTime($value)
     {
         try {
-            return Date::parse($value);
+            return @Date::parse($value) ?: null;
         } catch (Exception $e) {
             //
         }
@@ -349,6 +411,28 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that the password of the currently authenticated user matches the given value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function validateCurrentPassword($attribute, $value, $parameters)
+    {
+        $auth = $this->container->make('auth');
+        $hasher = $this->container->make('hash');
+
+        $guard = $auth->guard(Arr::first($parameters));
+
+        if ($guard->guest()) {
+            return false;
+        }
+
+        return $hasher->check($value, $guard->user()->getAuthPassword());
+    }
+
+    /**
      * Validate that an attribute is a valid date.
      *
      * @param  string  $attribute
@@ -386,11 +470,15 @@ trait ValidatesAttributes
             return false;
         }
 
-        $format = $parameters[0];
+        foreach ($parameters as $format) {
+            $date = DateTime::createFromFormat('!'.$format, $value);
 
-        $date = DateTime::createFromFormat('!'.$format, $value);
+            if ($date && $date->format($format) == $value) {
+                return true;
+            }
+        }
 
-        return $date && $date->format($format) == $value;
+        return false;
     }
 
     /**
@@ -805,6 +893,11 @@ trait ValidatesAttributes
 
             $table = $model->getTable();
             $connection = $connection ?? $model->getConnectionName();
+
+            if (Str::contains($table, '.') && Str::startsWith($table, $connection)) {
+                $connection = null;
+            }
+
             $idColumn = $model->getKeyName();
         }
 
@@ -1320,7 +1413,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that the current logged in user's password matches the given value.
+     * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -1329,16 +1422,7 @@ trait ValidatesAttributes
      */
     protected function validatePassword($attribute, $value, $parameters)
     {
-        $auth = $this->container->make('auth');
-        $hasher = $this->container->make('hash');
-
-        $guard = $auth->guard(Arr::first($parameters));
-
-        if ($guard->guest()) {
-            return false;
-        }
-
-        return $hasher->check($value, $guard->user()->getAuthPassword());
+        return $this->validateCurrentPassword($attribute, $value, $parameters);
     }
 
     /**
@@ -1491,6 +1575,29 @@ trait ValidatesAttributes
         }
 
         return true;
+    }
+
+    /**
+     * Validate that other attributes do not exist when this attribute exists.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateProhibits($attribute, $value, $parameters)
+    {
+        return ! Arr::hasAny($this->data, $parameters);
+    }
+
+    /**
+     * Indicate that an attribute is excluded.
+     *
+     * @return bool
+     */
+    public function validateExclude()
+    {
+        return false;
     }
 
     /**
@@ -1907,7 +2014,7 @@ trait ValidatesAttributes
             return $value->getSize() / 1024;
         }
 
-        return mb_strlen($value);
+        return mb_strlen($value ?? '');
     }
 
     /**
@@ -2004,7 +2111,6 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  string  $rule
-     *
      * @return void
      */
     protected function shouldBeNumeric($attribute, $rule)

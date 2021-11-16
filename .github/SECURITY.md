@@ -4,15 +4,7 @@
 
 ## Supported Versions
 
-Version | Security Fixes Until
---- | ---
-8 | September 8th, 2021
-7 | March 3rd, 2021
-6 (LTS) | September 3rd, 2022
-5.8	| February 26th, 2020
-5.7	| September 4th, 2019
-5.6	| February 7th, 2019
-5.5 (LTS) | August 30th, 2020
+Please see [our support policy](https://laravel.com/docs/releases#support-policy) for information on supported versions for security releases.
 
 ## Reporting a Vulnerability
 

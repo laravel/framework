@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -159,18 +160,8 @@ class PendingDispatch
             return true;
         }
 
-        $uniqueId = method_exists($this->job, 'uniqueId')
-                    ? $this->job->uniqueId()
-                    : ($this->job->uniqueId ?? '');
-
-        $cache = method_exists($this->job, 'uniqueVia')
-                    ? $this->job->uniqueVia()
-                    : Container::getInstance()->make(Cache::class);
-
-        return (bool) $cache->lock(
-            $key = 'laravel_unique_job:'.get_class($this->job).$uniqueId,
-            $this->job->uniqueFor ?? 0
-        )->get();
+        return (new UniqueLock(Container::getInstance()->make(Cache::class)))
+                    ->acquire($this->job);
     }
 
     /**

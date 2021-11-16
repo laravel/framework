@@ -7,15 +7,18 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentPivotEventsTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
+        // clear event log between requests
+        PivotEventsTestCollaborator::$eventsCalled = [];
+    }
+
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
@@ -34,9 +37,6 @@ class EloquentPivotEventsTest extends DatabaseTestCase
             $table->text('permissions')->nullable();
             $table->string('role')->nullable();
         });
-
-        // clear event log between requests
-        PivotEventsTestCollaborator::$eventsCalled = [];
     }
 
     public function testPivotWillTriggerEventsToBeFired()
@@ -91,7 +91,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         $project->collaborators()->updateExistingPivot($user->id, ['role' => 'Lead Developer']);
 
-        $this->assertSame(
+        $this->assertEquals(
             [
                 'user_id' => '1',
                 'project_id' => '1',

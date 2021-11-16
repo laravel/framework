@@ -2,10 +2,12 @@
 
 namespace Illuminate\Foundation\Console;
 
+use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
-use Illuminate\Support\Facades\View;
+use Throwable;
 
 class DownCommand extends Command
 {
@@ -52,6 +54,8 @@ class DownCommand extends Command
                 file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
             );
 
+            $this->laravel->get('events')->dispatch(MaintenanceModeEnabled::class);
+
             $this->comment('Application is now in maintenance mode.');
         } catch (Exception $e) {
             $this->error('Failed to enter maintenance mode.');
@@ -70,6 +74,7 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
+            'except' => $this->excludedPaths(),
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
@@ -77,6 +82,20 @@ class DownCommand extends Command
             'status' => (int) $this->option('status', 503),
             'template' => $this->option('render') ? $this->prerenderView() : null,
         ];
+    }
+
+    /**
+     * Get the paths that should be excluded from maintenance mode.
+     *
+     * @return array
+     */
+    protected function excludedPaths()
+    {
+        try {
+            return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExcludedPaths();
+        } catch (Throwable $e) {
+            return [];
+        }
     }
 
     /**

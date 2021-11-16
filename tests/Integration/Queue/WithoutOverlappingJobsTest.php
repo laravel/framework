@@ -13,9 +13,6 @@ use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class WithoutOverlappingJobsTest extends TestCase
 {
     protected function tearDown(): void
