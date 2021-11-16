@@ -43,7 +43,6 @@ class DatabaseMigrationsTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-
         $this->traitObject
             ->expects($this->exactly(1))
             ->method('artisan')
@@ -70,7 +69,6 @@ class DatabaseMigrationsTest extends TestCase
                 '--drop-types' => false,
                 '--seed' => false,
             ]);
-
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('runDatabaseMigrations');
 

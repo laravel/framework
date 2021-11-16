@@ -25,7 +25,7 @@ class RefreshDatabaseTest extends TestCase
             ->with(null);
 
         $this->traitObject->app = [
-            Kernel::class => $kernelObj
+            Kernel::class => $kernelObj,
         ];
     }
 
@@ -43,7 +43,6 @@ class RefreshDatabaseTest extends TestCase
 
     public function testRefreshTestDatabaseDefault()
     {
-
         $this->traitObject
             ->expects($this->exactly(1))
             ->method('artisan')
@@ -70,7 +69,6 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-types' => false,
                 '--seed' => false,
             ]);
-
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
 
