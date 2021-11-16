@@ -7,7 +7,7 @@ interface ResponseFactory
     /**
      * Create a new response instance.
      *
-     * @param  mixed  $content
+     * @param  array|string  $content
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\Response
