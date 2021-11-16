@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.70.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.70.2...8.x)
+
+
+## [v8.70.2 (2021-11-10)](https://github.com/laravel/framework/compare/v8.70.1...v8.70.2)
+
+### Changed
+- Use all in `Illuminate/Database/Query/Builder::cleanBindings()` ([74dcc02](https://github.com/laravel/framework/commit/74dcc024d5ac78a1c7c23a95c493736c2cd8d5a7))
 
 
 ## [v8.70.1 (2021-11-09)](https://github.com/laravel/framework/compare/v8.70.0...v8.70.1)
