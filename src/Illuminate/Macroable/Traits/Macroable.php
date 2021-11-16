@@ -63,7 +63,7 @@ trait Macroable
     }
 
     /**
-     * Flush the macros, removing them all.
+     * Flush the existing macros.
      *
      * @return void
      */
