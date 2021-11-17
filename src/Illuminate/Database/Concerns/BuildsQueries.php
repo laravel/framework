@@ -237,7 +237,6 @@ trait BuildsQueries
         return $this->orderedLazyById($chunkSize, $column, $alias, true);
     }
 
-
     /**
      * Query lazily, by chunking the results of a query by comparing IDs in a given order.
      *
