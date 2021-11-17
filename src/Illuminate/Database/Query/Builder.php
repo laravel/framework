@@ -2049,7 +2049,7 @@ class Builder
         $property = $this->unions ? 'unionLimit' : 'limit';
 
         if ($value >= 0) {
-            $this->$property = $value;
+            $this->$property = ! is_null($value) ? (int) $value : null;
         }
 
         return $this;
