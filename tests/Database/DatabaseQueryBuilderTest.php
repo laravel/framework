@@ -1380,6 +1380,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->limit(null);
+        $this->assertSame('select * from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->limit(0);
+        $this->assertSame('select * from "users" limit 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(5)->take(10);
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
@@ -1390,6 +1398,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(-5)->take(-10);
         $this->assertSame('select * from "users" offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(null)->take(null);
+        $this->assertSame('select * from "users" offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(5)->take(null);
+        $this->assertSame('select * from "users" offset 5', $builder->toSql());
     }
 
     public function testForPage()
