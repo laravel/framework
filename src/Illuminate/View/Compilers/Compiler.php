@@ -38,7 +38,7 @@ abstract class Compiler
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files, $cachePath, $basePath)
+    public function __construct(Filesystem $files, $cachePath, $basePath = '')
     {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
