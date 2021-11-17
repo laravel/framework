@@ -1918,7 +1918,6 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  string  $rule
-     *
      * @return void
      */
     protected function shouldBeNumeric($attribute, $rule)

@@ -430,7 +430,6 @@ class Validator implements ValidatorContract
      * Remove the given attribute.
      *
      * @param  string  $attribute
-     *
      * @return void
      */
     protected function removeAttribute($attribute)

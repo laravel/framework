@@ -223,7 +223,8 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
     public function testAttributeSanitization()
     {
-        $class = new class {
+        $class = new class
+        {
             public function __toString()
             {
                 return '<hi>';
