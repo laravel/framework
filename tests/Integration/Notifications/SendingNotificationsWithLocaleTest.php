@@ -25,19 +25,9 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         $app['config']->set('mail.driver', 'array');
 
         $app['config']->set('app.locale', 'en');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
 
         View::addLocation(__DIR__.'/Fixtures');
 

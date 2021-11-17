@@ -11,10 +11,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelDateCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->date('date_field')->nullable();

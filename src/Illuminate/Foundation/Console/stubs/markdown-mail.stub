@@ -28,6 +28,6 @@ class {{ class }} extends Mailable
      */
     public function build()
     {
-        return $this->markdown('DummyView');
+        return $this->markdown('{{ view }}');
     }
 }

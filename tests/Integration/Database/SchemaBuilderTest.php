@@ -12,6 +12,11 @@ use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 class SchemaBuilderTest extends DatabaseTestCase
 {
+    protected function destroyDatabaseMigrations()
+    {
+        Schema::dropAllViews();
+    }
+
     public function testDropAllTables()
     {
         $this->expectNotToPerformAssertions();
@@ -21,6 +26,8 @@ class SchemaBuilderTest extends DatabaseTestCase
         });
 
         Schema::dropAllTables();
+
+        $this->artisan('migrate:install');
 
         Schema::create('table', function (Blueprint $table) {
             $table->increments('id');
@@ -40,10 +47,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
     public function testRegisterCustomDoctrineType()
     {
-        $connection = $this->app['config']->get('database.default');
-        $driver = $this->app['config']->get("database.connections.$connection.driver");
-
-        if ($driver !== 'sqlite') {
+        if ($this->driver !== 'sqlite') {
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
 

@@ -9,10 +9,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphLazyEagerLoadingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
         });

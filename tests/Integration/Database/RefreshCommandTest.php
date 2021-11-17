@@ -7,21 +7,6 @@ use Orchestra\Testbench\TestCase;
 
 class RefreshCommandTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
-        if (! env('DB_CONNECTION')) {
-            $app['config']->set('database.default', 'testbench');
-        }
-    }
-
     public function testRefreshWithoutRealpath()
     {
         $this->app->setBasePath(__DIR__);
@@ -45,7 +30,7 @@ class RefreshCommandTest extends TestCase
 
     private function migrateRefreshWith(array $options)
     {
-        if ($this->app['config']->get('database.default') !== 'testbench') {
+        if ($this->app['config']->get('database.default') !== 'testing') {
             $this->artisan('db:wipe', ['--drop-views' => true]);
         }
 

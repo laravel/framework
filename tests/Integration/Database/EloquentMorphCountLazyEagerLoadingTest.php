@@ -9,10 +9,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentMorphCountLazyEagerLoadingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('likes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('post_id');

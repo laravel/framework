@@ -15,10 +15,8 @@ if (PHP_VERSION_ID >= 80100) {
  */
 class QueryingWithEnumsTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('enum_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('string_status', 100)->nullable();

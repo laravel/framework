@@ -1714,7 +1714,7 @@ class Builder implements BuilderContract
         $property = $this->unions ? 'unionLimit' : 'limit';
 
         if ($value >= 0) {
-            $this->$property = $value;
+            $this->$property = ! is_null($value) ? (int) $value : null;
         }
 
         return $this;
@@ -2818,11 +2818,10 @@ class Builder implements BuilderContract
         }
 
         if (is_array($value)) {
-            $this->bindings[$type] = collect($this->bindings[$type])
-                            ->merge($value)
-                            ->map([$this, 'castBinding'])
-                            ->values()
-                            ->toArray();
+            $this->bindings[$type] = array_values(array_map(
+                [$this, 'castBinding'],
+                array_merge($this->bindings[$type], $value),
+            ));
         } else {
             $this->bindings[$type][] = $this->castBinding($value);
         }
@@ -2866,7 +2865,7 @@ class Builder implements BuilderContract
                     })
                     ->map([$this, 'castBinding'])
                     ->values()
-                    ->toArray();
+                    ->all();
     }
 
     /**

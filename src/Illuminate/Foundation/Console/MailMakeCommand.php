@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class MailMakeCommand extends GeneratorCommand
@@ -51,7 +52,7 @@ class MailMakeCommand extends GeneratorCommand
             return;
         }
 
-        if ($this->option('markdown')) {
+        if ($this->option('markdown') !== false) {
             $this->writeMarkdownTemplate();
         }
     }
@@ -64,7 +65,7 @@ class MailMakeCommand extends GeneratorCommand
     protected function writeMarkdownTemplate()
     {
         $path = $this->viewPath(
-            str_replace('.', '/', $this->option('markdown')).'.blade.php'
+            str_replace('.', '/', $this->getView()).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -84,11 +85,27 @@ class MailMakeCommand extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        if ($this->option('markdown')) {
-            $class = str_replace('DummyView', $this->option('markdown'), $class);
+        if ($this->option('markdown') !== false) {
+            $class = str_replace(['DummyView', '{{ view }}'], $this->getView(), $class);
         }
 
         return $class;
+    }
+
+    /**
+     * Get the view name.
+     *
+     * @return string
+     */
+    protected function getView()
+    {
+        $view = $this->option('markdown');
+
+        if (! $view) {
+            $view = 'mail.'.Str::kebab(class_basename($this->argument('name')));
+        }
+
+        return $view;
     }
 
     /**
@@ -99,7 +116,7 @@ class MailMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->resolveStubPath(
-            $this->option('markdown')
+            $this->option('markdown') !== false
                 ? '/stubs/markdown-mail.stub'
                 : '/stubs/mail.stub');
     }
@@ -138,7 +155,7 @@ class MailMakeCommand extends GeneratorCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the mailable already exists'],
 
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable'],
+            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the mailable', false],
         ];
     }
 }

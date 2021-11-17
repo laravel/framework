@@ -7,27 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
 
-class EloquentUpdateTest extends TestCase
+class EloquentUpdateTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
@@ -62,6 +46,7 @@ class EloquentUpdateTest extends TestCase
         $this->assertCount(0, TestUpdateModel1::all());
     }
 
+    /** @group SkipMSSQL */
     public function testUpdateWithLimitsAndOrders()
     {
         for ($i = 1; $i <= 10; $i++) {
@@ -126,7 +111,7 @@ class EloquentUpdateTest extends TestCase
 
         TestUpdateModel3::increment('counter');
 
-        $models = TestUpdateModel3::withoutGlobalScopes()->get();
+        $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
         $this->assertEquals(1, $models[0]->counter);
         $this->assertEquals(0, $models[1]->counter);
     }

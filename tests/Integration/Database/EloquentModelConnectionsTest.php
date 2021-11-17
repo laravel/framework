@@ -12,8 +12,6 @@ class EloquentModelConnectionsTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         $app['config']->set('database.default', 'conn1');
 
         $app['config']->set('database.connections.conn1', [
@@ -29,10 +27,8 @@ class EloquentModelConnectionsTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrations()
     {
-        parent::setUp();
-
         Schema::create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

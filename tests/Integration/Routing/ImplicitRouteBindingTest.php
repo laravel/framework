@@ -18,27 +18,11 @@ class ImplicitRouteBindingTest extends TestCase
         'routes/testbench.php',
     ];
 
-    /**
-     * Teardown the test environment.
-     */
     protected function tearDown(): void
     {
         $this->tearDownInteractsWithPublishedFiles();
 
         parent::tearDown();
-    }
-
-    protected function defineEnvironment($app)
-    {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
     }
 
     protected function defineDatabaseMigrations(): void

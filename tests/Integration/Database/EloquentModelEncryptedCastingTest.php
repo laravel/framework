@@ -21,6 +21,11 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $this->encrypter = $this->mock(Encrypter::class);
         Crypt::swap($this->encrypter);
 
+        Model::$encrypter = null;
+    }
+
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         Schema::create('encrypted_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('secret', 1000)->nullable();
@@ -29,8 +34,6 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             $table->text('secret_object')->nullable();
             $table->text('secret_collection')->nullable();
         });
-
-        Model::$encrypter = null;
     }
 
     public function testStringsAreCastable()

@@ -101,6 +101,14 @@ class SortedMiddleware extends Collection
                 yield $interface;
             }
         }
+
+        $parents = @class_parents($stripped);
+
+        if ($parents !== false) {
+            foreach ($parents as $parent) {
+                yield $parent;
+            }
+        }
     }
 
     /**
