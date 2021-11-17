@@ -459,7 +459,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function storagePath($path = '')
     {
         return ($this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage')
-            .($path ? DIRECTORY_SEPARATOR . $path : '');
+            .($path ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
