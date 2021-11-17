@@ -36,7 +36,21 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function constrained($table = null, $column = 'id')
     {
-        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
+        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_' . $column)));
+    }
+
+    /**
+     * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table from another database local.
+     *
+     * @param  string  $dataBase
+     * @param  string|null  $table
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ForeignKeyDefinition
+     */
+    public function constrainedWithDataBase($dataBase, $table = null, $column = 'id')
+    {
+        $table = $table ?? Str::plural(Str::beforeLast($this->name, '_' . $column));
+        return $this->references($column)->on($dataBase . '.' . $table);
     }
 
     /**
