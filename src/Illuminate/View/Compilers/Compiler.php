@@ -9,21 +9,21 @@ use InvalidArgumentException;
 abstract class Compiler
 {
     /**
-     * The Filesystem instance.
+     * The filesystem instance.
      *
      * @var \Illuminate\Filesystem\Filesystem
      */
     protected $files;
 
     /**
-     * Get the cache path for the compiled views.
+     * The cache path for the compiled views.
      *
      * @var string
      */
     protected $cachePath;
 
     /**
-     * Get the base path of your application.
+     * The base path that should be removed from paths before hashing.
      *
      * @var string
      */
@@ -34,6 +34,7 @@ abstract class Compiler
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
+     * @param  string  $basePath
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -57,20 +58,7 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
-        $relativePath = $this->getRelativeViewPath($path);
-
-        return $this->cachePath.'/'.sha1($relativePath).'.php';
-    }
-
-    /**
-     * Get the relative path of a view.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    public function getRelativeViewPath($path)
-    {
-        return Str::after($path, $this->basePath);
+        return $this->cachePath.'/'.sha1(Str::after($path, $this->basePath)).'.php';
     }
 
     /**
