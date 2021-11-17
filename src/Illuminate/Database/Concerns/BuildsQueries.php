@@ -228,7 +228,7 @@ trait BuildsQueries
 
         $alias = $alias ?? $column;
 
-        return LazyCollection::make(function () use ($chunkSize, $column, $alias) {
+        return LazyCollection::make(function () use ($chunkSize, $column, $alias, $descending) {
             $lastId = null;
 
             while (true) {
