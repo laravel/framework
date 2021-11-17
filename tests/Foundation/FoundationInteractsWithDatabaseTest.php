@@ -143,14 +143,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseCount($this->table, 3);
     }
 
-    public function testAssertDeletedPassesWhenDoesNotFindResults()
+    public function testAssertDatabaseMissingPassesWhenDoesNotFindResults()
     {
         $this->mockCountBuilder(0);
 
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
-    public function testAssertDeletedFailsWhenFindsResults()
+    public function testAssertDatabaseMissingFailsWhenFindsResults()
     {
         $this->expectException(ExpectationFailedException::class);
 
