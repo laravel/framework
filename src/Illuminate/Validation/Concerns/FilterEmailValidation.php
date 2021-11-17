@@ -39,10 +39,9 @@ class FilterEmailValidation implements EmailValidation
      * Returns true if the given email is valid.
      *
      * @param  string  $email
-     * @param  \Egulias\EmailValidator\EmailLexer  $emailLexer
      * @return bool
      */
-    public function isValid($email, EmailLexer $emailLexer)
+    public function isValid($email)
     {
         return is_null($this->flags)
                     ? filter_var($email, FILTER_VALIDATE_EMAIL) !== false
