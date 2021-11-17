@@ -3,6 +3,7 @@
 namespace Illuminate\View\Compilers;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 abstract class Compiler
@@ -22,6 +23,13 @@ abstract class Compiler
     protected $cachePath;
 
     /**
+     * Get the base path of your application.
+     *
+     * @var string
+     */
+    protected $basePath;
+
+    /**
      * Create a new compiler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -30,7 +38,7 @@ abstract class Compiler
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files, $cachePath)
+    public function __construct(Filesystem $files, $cachePath, $basePath)
     {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
@@ -38,6 +46,7 @@ abstract class Compiler
 
         $this->files = $files;
         $this->cachePath = $cachePath;
+        $this->basePath = $basePath;
     }
 
     /**
@@ -48,7 +57,20 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
-        return $this->cachePath.'/'.sha1($path).'.php';
+        $relativePath = $this->getRelativeViewPath($path);
+
+        return $this->cachePath.'/'.sha1($relativePath).'.php';
+    }
+
+    /**
+     * Get the relative path of a view.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function getRelativeViewPath($path)
+    {
+        return Str::after($path, $this->basePath);
     }
 
     /**
