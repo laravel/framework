@@ -465,17 +465,19 @@ class DatabaseEloquentCollectionTest extends TestCase
     public function testQueueableRelationshipsReturnsOnlyRelationsCommonToAllModels()
     {
         // This is needed to prevent loading non-existing relationships on polymorphic model collections (#26126)
-        $c = new Collection([new class {
+        $c = new Collection([new class
+        {
             public function getQueueableRelations()
             {
                 return ['user'];
             }
-        }, new class {
+        }, new class
+        {
             public function getQueueableRelations()
             {
                 return ['user', 'comments'];
             }
-        }]);
+        }, ]);
 
         $this->assertEquals(['user'], $c->getQueueableRelations());
     }

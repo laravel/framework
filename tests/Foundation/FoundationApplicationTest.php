@@ -45,7 +45,8 @@ class FoundationApplicationTest extends TestCase
     public function testClassesAreBoundWhenServiceProviderIsRegistered()
     {
         $app = new Application;
-        $app->register($provider = new class($app) extends ServiceProvider {
+        $app->register($provider = new class($app) extends ServiceProvider
+        {
             public $bindings = [
                 AbstractClass::class => ConcreteClass::class,
             ];
@@ -62,7 +63,8 @@ class FoundationApplicationTest extends TestCase
     public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
     {
         $app = new Application;
-        $app->register($provider = new class($app) extends ServiceProvider {
+        $app->register($provider = new class($app) extends ServiceProvider
+        {
             public $singletons = [
                 AbstractClass::class => ConcreteClass::class,
             ];

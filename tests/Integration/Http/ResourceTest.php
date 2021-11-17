@@ -857,7 +857,8 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeKeyedValueIsMergedCorrectly()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -877,7 +878,8 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -901,7 +903,8 @@ class ResourceTest extends TestCase
 
     public function testLeadingMergeValueIsMergedCorrectly()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -926,7 +929,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValuesMayBeMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -951,7 +955,8 @@ class ResourceTest extends TestCase
 
     public function testInitialMergeValuesMayBeMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -976,7 +981,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValueCanMergeJsonSerializable()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1007,7 +1013,8 @@ class ResourceTest extends TestCase
 
     public function testMergeValueCanMergeCollectionOfJsonSerializable()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1033,7 +1040,8 @@ class ResourceTest extends TestCase
 
     public function testAllMergeValuesMayBeMissing()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -1058,7 +1066,8 @@ class ResourceTest extends TestCase
 
     public function testNestedMerges()
     {
-        $filter = new class {
+        $filter = new class
+        {
             use ConditionallyLoadsAttributes;
 
             public function work()
