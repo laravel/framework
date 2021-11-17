@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Traits;
 
-trait HasMigrateFreshUsing
+trait CanConfigureMigrationCommands
 {
     /**
      * The parameters that should be used when running "migrate:fresh".

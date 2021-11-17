@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Traits;
 
-use Illuminate\Foundation\Testing\Traits\HasMigrateFreshUsing;
+use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 use PHPUnit\Framework\TestCase;
 
-class HasMigrateFreshUsingTest extends TestCase
+class CanConfigureMigrationCommandsTest extends TestCase
 {
     protected $traitObject;
 
     protected function setup(): void
     {
-        $this->traitObject = $this->getObjectForTrait(HasMigrateFreshUsing::class);
+        $this->traitObject = $this->getObjectForTrait(CanConfigureMigrationCommands::class);
     }
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)

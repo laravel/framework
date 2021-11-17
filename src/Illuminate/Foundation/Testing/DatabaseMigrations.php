@@ -3,11 +3,11 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Foundation\Testing\Traits\HasMigrateFreshUsing;
+use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 
 trait DatabaseMigrations
 {
-    use HasMigrateFreshUsing;
+    use CanConfigureMigrationCommands;
 
     /**
      * Define hooks to migrate the database before and after each test.
