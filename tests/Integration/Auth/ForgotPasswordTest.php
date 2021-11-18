@@ -6,40 +6,22 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 
 class ForgotPasswordTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
     protected function defineEnvironment($app)
     {
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
     }
 
-    /**
-     * Define database migrations.
-     *
-     * @return void
-     */
     protected function defineDatabaseMigrations()
     {
         $this->loadLaravelMigrations();
     }
 
-    /**
-     * Define routes setup.
-     *
-     * @param  \Illuminate\Routing\Router  $router
-     *
-     * @return void
-     */
     protected function defineRoutes($router)
     {
         $router->get('password/reset/{token}', function ($token) {
