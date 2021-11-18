@@ -113,7 +113,7 @@ class CacheRepositoryTest extends TestCase
             return 'qux';
         });
         $this->assertSame('qux', $result);
-        
+
         /*
          * Use a callable...
          */
