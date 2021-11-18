@@ -34,13 +34,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Create a collection with the given range.
      *
-     * @param  int  $from
-     * @param  int  $to
+     * @param  int|float  $from
+     * @param  int|float  $to
+     * @param  int|float  $step
      * @return static
      */
-    public static function range($from, $to)
+    public static function range($from, $to, $step = 1)
     {
-        return new static(range($from, $to));
+        return new static(range($from, $to, $step));
     }
 
     /**

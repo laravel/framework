@@ -2563,6 +2563,36 @@ class SupportCollectionTest extends TestCase
             [-2, -3, -4],
             $collection::range(-2, -4)->all()
         );
+
+        $this->assertSame(
+            [1, 3, 5, 7, 9],
+            $collection::range(1, 10, 2)->all()
+        );
+
+        $this->assertSame(
+            [-6, -3, 0, 3, 6],
+            $collection::range(-6, 6, 3)->all()
+        );
+
+        $this->assertSame(
+            [-8, -6, -4, -2],
+            $collection::range(-8, -2, 2)->all()
+        );
+
+        $this->assertSame(
+            [10, 8, 6, 4, 2],
+            $collection::range(10, 1, 2)->all()
+        );
+
+        $this->assertSame(
+            [6, 4, 2, 0, -2, -4, -6],
+            $collection::range(6, -6, 2)->all()
+        );
+
+        $this->assertSame(
+            [-2, -4, -6, -8, -10],
+            $collection::range(-2, -10, 2)->all()
+        );
     }
 
     /**
