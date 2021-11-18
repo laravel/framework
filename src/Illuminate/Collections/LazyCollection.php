@@ -51,11 +51,11 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         return new static(function () use ($from, $to, $step) {
             if ($from <= $to) {
-                for (; $from <= $to; $from++) {
+                for (; $from <= $to; $from+= $step) {
                     yield $from;
                 }
             } else {
-                for (; $from >= $to; $from--) {
+                for (; $from >= $to; $from-= $step) {
                     yield $from;
                 }
             }
