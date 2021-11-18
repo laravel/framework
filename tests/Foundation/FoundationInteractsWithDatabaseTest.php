@@ -241,13 +241,14 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('The table is empty.');
 
-        $this->data = ['id' => 1];
+        $model = new CustomProductStub(['id' => 1, 'name' => 'Laravel']);
+        $this->data = ['id' => 1, 'name' => 'Tailwind'];
 
         $builder = $this->mockCountBuilder(0, 'trashed_at');
 
         $builder->shouldReceive('get')->andReturn(collect());
 
-        $this->assertSoftDeleted(new CustomProductStub($this->data));
+        $this->assertSoftDeleted($model, ['name' => 'Tailwind']);
     }
 
     public function testAssertNotSoftDeletedInDatabaseFindsResults()
