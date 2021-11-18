@@ -1515,7 +1515,7 @@ class ValidationValidatorTest extends TestCase
             'foo' => [
                 ['email' => 'foo', 'emails' => 'foo'],
                 ['emails' => 'foo'],
-            ]
+            ],
         ], ['foo.*.email' => 'prohibits:foo.*.emails']);
         $this->assertFalse($v->passes());
         $this->assertTrue($v->messages()->has('foo.0.email'));
