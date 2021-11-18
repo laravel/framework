@@ -44,11 +44,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @param  int  $from
      * @param  int  $to
+     * @param  int|float  $step
      * @return static
      */
-    public static function range($from, $to)
+    public static function range($from, $to, $step = 1)
     {
-        return new static(function () use ($from, $to) {
+        return new static(function () use ($from, $to, $step) {
             if ($from <= $to) {
                 for (; $from <= $to; $from++) {
                     yield $from;
