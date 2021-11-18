@@ -69,25 +69,6 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Assert the given record has been deleted.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $table
-     * @param  array  $data
-     * @param  string|null  $connection
-     * @return $this
-     */
-    protected function assertDeleted($table, array $data = [], $connection = null)
-    {
-        if ($table instanceof Model) {
-            return $this->assertDatabaseMissing($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
-        }
-
-        $this->assertDatabaseMissing($this->getTable($table), $data, $connection);
-
-        return $this;
-    }
-
-    /**
      * Assert the given record has been "soft deleted".
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
