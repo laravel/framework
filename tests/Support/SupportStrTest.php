@@ -536,6 +536,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
     }
 
+    public function testOnlyNumbers()
+    {
+        $this->assertSame(123, Str::onlyNumbers("f1o2o3"));
+        $this->assertSame(45612, Str::onlyNumbers("U$ 456.12"));
+        $this->assertSame(9870, Str::onlyNumbers("foo987bar ,.0-."));
+        $this->assertSame(0, Str::onlyNumbers("0foo"));
+        $this->assertNull(Str::onlyNumbers("bar"));
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());

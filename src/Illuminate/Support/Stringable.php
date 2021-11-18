@@ -743,6 +743,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get only the numbers from a string
+     *
+     * @return static
+     */
+    public function onlyNumbers()
+    {
+        return new static(Str::onlyNumbers($this->value));
+    }
+
+    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback

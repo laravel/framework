@@ -886,6 +886,24 @@ class Str
         return str_word_count($string);
     }
 
+
+    /**
+     * Get only the numbers from a string
+     *
+     * @param  string $string
+     * @return int|null
+     */
+    public static function onlyNumbers($string)
+    {
+        preg_match('/[0-9]/', $string, $matches);
+
+        if ( ! count($matches)) {
+            return null;
+        }
+
+        return (int) preg_replace('/[^0-9]/', '', $string);
+    }
+
     /**
      * Generate a UUID (version 4).
      *
