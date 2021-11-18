@@ -106,12 +106,24 @@ class Migrator
             $files, $this->repository->getRan()
         ));
 
+        // This section filters ignorable migrations out from pending migration files.
+        $runnableMigrations = Collection::make($migrations)->reject(function($file) {
+            $migration = $this->resolve(
+                $this->getMigrationName($file)
+            );
+
+            $hasIgnoreProperty = property_exists($migration, 'ignore') && $migration->ignore;
+            $hasIgnoreMethod = method_exists($migration, 'ignore') && $migration->ignore();
+
+            return $hasIgnoreProperty || $hasIgnoreMethod;
+        })->values()->all();
+
         // Once we have all these migrations that are outstanding we are ready to run
         // we will go ahead and run them "up". This will execute each migration as
         // an operation against a database. Then we'll return this list of them.
-        $this->runPending($migrations, $options);
+        $this->runPending($runnableMigrations, $options);
 
-        return $migrations;
+        return $runnableMigrations;
     }
 
     /**

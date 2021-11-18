@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Schema;
 class {{ class }} extends Migration
 {
     /**
+     * Allows Migrator to ignore file during migration (optional)
+     */
+    public bool $ignore = false;
+
+    /**
      * Run the migrations.
      *
      * @return void
@@ -27,5 +32,15 @@ class {{ class }} extends Migration
     public function down()
     {
         Schema::dropIfExists('{{ table }}');
+    }
+
+    /**
+     * Condition to evaluate for ignoring migration file
+     *
+     * @return bool
+     */
+    public function ignore()
+    {
+        return false;
     }
 }
