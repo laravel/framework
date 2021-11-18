@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\EntityResolver;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class DatabaseServiceProvider extends ServiceProvider
@@ -123,9 +124,7 @@ class DatabaseServiceProvider extends ServiceProvider
         $types = $this->app['config']->get('database.dbal.types', []);
 
         foreach ($types as $name => $class) {
-            if (! Type::hasType($name)) {
-                Type::addType($name, $class);
-            }
+            Schema::registerCustomDoctrineType($class, $name, $name);
         }
     }
 }
