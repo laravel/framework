@@ -107,7 +107,7 @@ class Migrator
         ));
 
         // This section filters ignorable migrations out from pending migration files.
-        $runnableMigrations = Collection::make($migrations)->reject(function($file) {
+        $runnableMigrations = Collection::make($migrations)->reject(function ($file) {
             $migration = $this->resolve(
                 $this->getMigrationName($file)
             );
