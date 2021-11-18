@@ -248,7 +248,7 @@ trait BuildsQueries
      *
      * @throws \InvalidArgumentException
      */
-    private function orderedLazyById($chunkSize = 1000, $column = null, $alias = null, $descending = false)
+    protected function orderedLazyById($chunkSize = 1000, $column = null, $alias = null, $descending = false)
     {
         if ($chunkSize < 1) {
             throw new InvalidArgumentException('The chunk size should be at least 1');
