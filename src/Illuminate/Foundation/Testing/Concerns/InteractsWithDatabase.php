@@ -99,7 +99,12 @@ trait InteractsWithDatabase
     protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
         if ($this->isSoftDeletableModel($table)) {
-            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName(), $table->getDeletedAtColumn());
+            return $this->assertSoftDeleted(
+                $table->getTable(),
+                array_merge($data, [$table->getKeyName() => $table->getKey()]),
+                $table->getConnectionName(),
+                $table->getDeletedAtColumn()
+            );
         }
 
         $this->assertThat(
@@ -121,7 +126,12 @@ trait InteractsWithDatabase
     protected function assertNotSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
         if ($this->isSoftDeletableModel($table)) {
-            return $this->assertNotSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName(), $table->getDeletedAtColumn());
+            return $this->assertNotSoftDeleted(
+                $table->getTable(),
+                array_merge($data, [$table->getKeyName() => $table->getKey()]),
+                $table->getConnectionName(),
+                $table->getDeletedAtColumn()
+            );
         }
 
         $this->assertThat(
