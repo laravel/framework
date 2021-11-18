@@ -373,7 +373,7 @@ class Repository implements ArrayAccess, CacheContract
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -388,7 +388,7 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $ttl);
+        $this->put($key, $value = $callback(), value($ttl));
 
         return $value;
     }
