@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasManyThroughPivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -418,6 +419,47 @@ trait HasRelationships
     protected function newHasManyThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey)
     {
         return new HasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
+    }
+
+    /**
+     * Define a has-many-through-pivot relationship.
+     *
+     * @param  string  $related
+     * @param  string  $through
+     * @param  string  $localKey
+     * @param  string  $foreignRelatedKey
+     * @param  string|null  $farForeignRelatedKey
+     * @param  string|null  $relatedKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThroughPivot
+     */
+    public function hasManyThroughPivot(string $related, string $through, string $localKey, string $foreignRelatedKey, string $farForeignRelatedKey = null, string $relatedKey = null) : HasManyThroughPivot
+    {
+        return new HasManyThroughPivot(
+            $this->newRelatedInstance($related)->newQuery(),
+            $this,
+            new $through,
+            $localKey,
+            $foreignRelatedKey,
+            $farForeignRelatedKey,
+            $relatedKey,
+        );
+    }
+
+    /**
+     * Instantiate a new HasManyThrough relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $farParent
+     * @param  \Illuminate\Database\Eloquent\Model  $throughParent
+     * @param  string  $localKey
+     * @param  string  $foreignRelatedKey
+     * @param  string  $farForeignRelatedKey
+     * @param  string  $relatedKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    protected function newHasManyThroughPivot(Builder $query, Model $farParent, Model $throughParent, $localKey, $foreignRelatedKey, $farForeignRelatedKey, $relatedKey)
+    {
+        return new HasManyThroughPivot($query, $farParent, $throughParent, $localKey, $foreignRelatedKey, $farForeignRelatedKey, $relatedKey);
     }
 
     /**
