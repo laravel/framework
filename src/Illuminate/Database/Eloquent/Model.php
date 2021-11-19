@@ -1685,13 +1685,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Get the table name associated with the model.
+     * Get the default table name associated with the model.
      *
+     * @param self|null $class
      * @return string
      */
-    public static function getTableName()
+    public static function getDefaultTableName($class = null)
     {
-        return Str::snake(Str::pluralStudly(class_basename(get_called_class())));
+        return Str::snake(Str::pluralStudly(class_basename($class ?? get_called_class())));
     }
 
     /**
@@ -1701,7 +1702,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getTable()
     {
-        return $this->table ?? self::getTableName();
+        return $this->table ?? self::getDefaultTableName($this);
     }
 
     /**
