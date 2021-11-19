@@ -316,7 +316,7 @@ class ComponentTagCompiler
 
         $class = $this->formatClassName($component);
 
-        return $namespace.'View\\Components\\'.$class;
+        return $namespace.config('view.component_namespace', 'View\\Components').'\\'.$class;
     }
 
     /**

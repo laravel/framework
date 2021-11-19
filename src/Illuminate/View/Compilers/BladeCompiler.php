@@ -565,8 +565,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         if (is_null($alias)) {
-            $alias = Str::contains($class, '\\View\\Components\\')
-                            ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {
+            $namespace = config('view.component_namespace', 'View\\Components');
+            
+            $alias = Str::contains($class, '\\'.$namespace.'\\')
+                            ? collect(explode('\\', Str::after($class, '\\'.$namespace.'\\')))->map(function ($segment) {
                                 return Str::kebab($segment);
                             })->implode(':')
                             : Str::kebab(class_basename($class));
