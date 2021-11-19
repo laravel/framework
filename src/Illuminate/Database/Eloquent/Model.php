@@ -1687,7 +1687,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the default table name associated with the model.
      *
-     * @param self|null  $class
+     * @param string|null $class
      * @return string
      */
     public static function getDefaultTableName($class = null)
