@@ -1685,6 +1685,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Get the table name for the model.
+     *
+     * @return string
+     */
+    public static function getTableName()
+    {
+        return (new static)->getTable();
+    }
+
+    /**
      * Get the table associated with the model.
      *
      * @return string
