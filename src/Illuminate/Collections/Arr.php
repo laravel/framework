@@ -738,6 +738,7 @@ class Arr
             foreach ($keysArray as $i => $segment) {
                 $result[$segment] = $values[$i] ?? null;
             }
+
             return $result;
         }
 
