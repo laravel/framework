@@ -714,4 +714,35 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Create array from strings.
+     *
+     * @param string $keys
+     * @param string|null $values
+     * @param bool $join
+     * @return array
+     */
+    public static function create($keys, $values = null, $join = false)
+    {
+        $result = [];
+
+        $keysArray = explode('.', $keys);
+
+        if (empty($values)) {
+            return $keysArray;
+        }
+
+        if ($join) {
+            $values = explode('.', $values);
+            foreach ($keysArray as $i => $segment) {
+                $result[$segment] = $values[$i] ?? null;
+            }
+            return $result;
+        }
+
+        $values = Str::contains($values, '.') ? explode('.', $values) : value($values);
+
+        return data_fill($result, $keys, $values);
+    }
 }
