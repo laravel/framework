@@ -779,6 +779,17 @@ class Builder
     }
 
     /**
+     * Get an array of primary keys, or the values of a given column, indexed by the primary keys.
+     *
+     * @param $column
+     * @return \Illuminate\Support\Collection
+     */
+    public function modelKeys($column = null)
+    {
+        return $this->pluck(...array_filter([$column, $this->model->getKeyName()]));
+    }
+
+    /**
      * Paginate the given query.
      *
      * @param  int|null  $perPage
