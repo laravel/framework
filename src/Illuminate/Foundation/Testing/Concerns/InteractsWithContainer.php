@@ -80,7 +80,7 @@ trait InteractsWithContainer
     /**
      * Forget and clear a mocked/spied instance of an object in the container.
      *
-     * @param  string $abstract
+     * @param  string  $abstract
      * @return $this
      */
     protected function forgetMock($abstract)
