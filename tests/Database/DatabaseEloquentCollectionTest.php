@@ -202,7 +202,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$one, $two, $three]);
 
-        $this->assertEquals([1 => 'one', 2 => 'two', 3 => 'three'], $c->modelKeys('name')->all());
+        $this->assertEquals([1 => 'one', 2 => 'two', 3 => 'three'], $c->modelKeys('name'));
     }
 
     public function testCollectionMergesWithGivenCollection()
