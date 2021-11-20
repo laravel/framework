@@ -718,9 +718,9 @@ class Arr
     /**
      * Create array from strings.
      *
-     * @param string $keys
-     * @param string|null $values
-     * @param bool $join
+     * @param  string  $keys
+     * @param  string|null  $values
+     * @param  bool  $join
      * @return array
      */
     public static function create($keys, $values = null, $join = false)
