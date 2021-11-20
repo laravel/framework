@@ -579,6 +579,32 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
+    public function testEloquentBuilderReturnsModelKeys()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('pluck')->with('foo', '')->andReturn(new BaseCollection([1, 12, 15, 18, 20, 25]));
+        $builder->setModel($this->getMockModel());
+        $builder->getModel()->shouldReceive('hasGetMutator')->with('foo')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with('foo')->andReturn(false);
+        $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
+
+        $this->assertEquals([1, 12, 15, 18, 20, 25], $builder->modelKeys()->all());
+    }
+
+    public function testEloquentBuilderReturnsColumnsByModelKeys()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('pluck')->with('name', 'foo')->andReturn(new BaseCollection([5 => 'five', 7 => 'seven', 9 => 'nine']));
+        $builder->setModel($this->getMockModel());
+        $builder->getModel()->shouldReceive('hasGetMutator')->with('foo')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasGetMutator')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with('foo')->andReturn(false);
+        $builder->getModel()->shouldReceive('hasCast')->with('name')->andReturn(false);
+        $builder->getModel()->shouldReceive('getDates')->andReturn(['created_at']);
+
+        $this->assertEquals([5 => 'five', 7 => 'seven', 9 => 'nine'], $builder->modelKeys('name')->all());
+    }
+
     public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
