@@ -3415,6 +3415,34 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('foo', $value);
     }
 
+    public function testGetDeeplyRetrievesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertSame('foo', $c->getDeeply(0));
+    }
+
+    public function testGetDeeplyRetrievesItemFromCollectionMultidimensionally()
+    {
+        $c = new Collection(['products' => ['desk' => ['price' => 100]]]);
+
+        $this->assertSame(100, $c->getDeeply('products.desk.price'));
+    }
+
+    public function testGetDeeplyDoesntRemoveItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $c->getDeeply(0);
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $c->all());
+    }
+
+    public function testGetDeeplyReturnsDefault()
+    {
+        $c = new Collection([]);
+        $value = $c->getDeeply(0, 'foo');
+        $this->assertSame('foo', $value);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
