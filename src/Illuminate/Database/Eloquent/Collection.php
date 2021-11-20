@@ -309,15 +309,19 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Get the array of primary keys.
+     * Get an array of primary keys, or the values of a given column, indexed by the primary keys.
      *
-     * @return array
+     * @return array|static
      */
-    public function modelKeys()
+    public function modelKeys($column = null)
     {
-        return array_map(function ($model) {
-            return $model->getKey();
-        }, $this->items);
+        if ($column === null) {
+            return $this->map->getKey()->toArray();
+        }
+
+        return $this->mapWithKeys(function ($model) use ($column) {
+            return [$model->getKey() => $model->getAttribute($column)];
+        });
     }
 
     /**
