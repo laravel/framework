@@ -78,6 +78,19 @@ trait InteractsWithContainer
     }
 
     /**
+     * Forget and clear a mocked/spied instance of an object in the container.
+     *
+     * @param  string $abstract
+     * @return $this
+     */
+    protected function forgetMock($abstract)
+    {
+        $this->app->forgetInstance($abstract);
+
+        return $this;
+    }
+
+    /**
      * Register an empty handler for Laravel Mix in the container.
      *
      * @return $this
