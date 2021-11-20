@@ -223,6 +223,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the else-isset statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileElseIsset($expression)
+    {
+        return "<?php elseif(isset{$expression}): ?>";
+    }
+
+    /**
      * Compile the end-isset statements into valid PHP.
      *
      * @return string
