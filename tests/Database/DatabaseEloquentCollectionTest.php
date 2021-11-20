@@ -186,6 +186,25 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([1, 2, 3], $c->modelKeys());
     }
 
+    public function testCollectionDictionaryPlucksColumnByModelKeys()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+        $one->shouldReceive('getAttribute')->with('name')->andReturn('one');
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+        $two->shouldReceive('getAttribute')->with('name')->andReturn('two');
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturn(3);
+        $three->shouldReceive('getAttribute')->with('name')->andReturn('three');
+
+        $c = new Collection([$one, $two, $three]);
+
+        $this->assertEquals([1 => 'one', 2 => 'two', 3 => 'three'], $c->modelKeys('name')->all());
+    }
+
     public function testCollectionMergesWithGivenCollection()
     {
         $one = m::mock(Model::class);
