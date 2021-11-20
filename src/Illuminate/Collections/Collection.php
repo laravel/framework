@@ -893,6 +893,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get an item from the collection using "dot" notation.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function getDeeply($key, $default = null)
+    {
+        return Arr::get($this->items, $key, $default);
+    }
+
+    /**
      * Put an item in the collection by key.
      *
      * @param  mixed  $key
