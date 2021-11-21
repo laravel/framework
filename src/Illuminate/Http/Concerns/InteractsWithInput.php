@@ -297,6 +297,20 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input as an integer value.
+     *
+     * Returns an integer when value is a boolean or a number in string form i.e. "123". Otherwise, returns false.
+     *
+     * @param  null  $key
+     * @param  false  $default
+     * @return  mixed
+     */
+    public function integer($key = null, $default = false)
+    {
+        return filter_var($this->input($key, $default), FILTER_VALIDATE_INT);
+    }
+
+    /**
      * Retrieve input from the request as a collection.
      *
      * @param  array|string|null  $key

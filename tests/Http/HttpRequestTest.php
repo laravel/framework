@@ -503,6 +503,17 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->boolean('some_undefined_key'));
     }
 
+    public function testIntegerMethod()
+    {
+        $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'price' => '1.23', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'id' => '123']);
+        $this->assertFalse($request->integer('with_trashed'));
+        $this->assertFalse($request->integer('price'));
+        $this->assertIsInt($request->integer('download'));
+        $this->assertIsInt($request->integer('checked'));
+        $this->assertIsInt($request->integer('unchecked'));
+        $this->assertIsInt($request->integer('id'));
+    }
+
     public function testCollectMethod()
     {
         $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);
