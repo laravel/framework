@@ -303,7 +303,7 @@ trait InteractsWithInput
      *
      * @param  null  $key
      * @param  false  $default
-     * @return  mixed
+     * @return mixed
      */
     public function integer($key = null, $default = false)
     {
