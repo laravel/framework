@@ -1,6 +1,22 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.30.4...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.5...7.x)
+
+
+## [v7.30.5 (2021-11-17)](https://github.com/laravel/framework/compare/v7.30.4...v7.30.5)
+
+### Added
+- Added new line to `DetectsLostConnections` ([#36373](https://github.com/laravel/framework/pull/36373))
+
+### Fixed
+- Fixed `Illuminate\View\ViewException::report()` ([#36110](https://github.com/laravel/framework/pull/36110))
+- Fixed `Illuminate\Redis\Connections\PhpRedisConnection::spop()` ([#36106](https://github.com/laravel/framework/pull/36106))
+- Fixed `Illuminate/Database/Query/Builder::limit()` to only cast integer when given other than null ([#39653](https://github.com/laravel/framework/pull/39653))
+- Fixes database offset value with non numbers ([#39656](https://github.com/laravel/framework/pull/39656))
+
+### Changed
+- Pipe new through render and report exception methods ([#36037](https://github.com/laravel/framework/pull/36037))
+- Typecast page number as integer in `Illuminate\Pagination\AbstractPaginator::resolveCurrentPage()` ([#36055](https://github.com/laravel/framework/pull/36055))
 
 
 ## [v7.30.4 (2021-01-21)](https://github.com/laravel/framework/compare/v7.30.3...v7.30.4)
