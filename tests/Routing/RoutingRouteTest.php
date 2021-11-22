@@ -194,6 +194,13 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testTraitMiddleware()
+    {
+        $router = $this->getRouter();
+        $router->get('test-trait', [RouteTestControllerMiddlewareTraitStub::class, 'index']);
+        $this->assertSame('trait', $router->dispatch(Request::create('test-trait', 'GET'))->getContent());
+    }
+
     public function testMiddlewareCanBeSkipped()
     {
         $router = $this->getRouter();
@@ -2063,6 +2070,16 @@ class RouteTestClosureMiddlewareController extends Controller
     }
 }
 
+class RouteTestControllerMiddlewareTraitStub extends Controller
+{
+    use RouteTestControllerMiddlewareTrait;
+
+    public function index()
+    {
+        return 'no trait middleware';
+    }
+}
+
 class RouteTestControllerMiddleware
 {
     public function handle($request, $next)
@@ -2110,6 +2127,14 @@ class RouteTestControllerExceptMiddleware
         $_SERVER['route.test.controller.except.middleware'] = true;
 
         return $next($request);
+    }
+}
+
+class RouteTestControllerTraitMiddleware
+{
+    public function handle($request, $next)
+    {
+        return new Response('trait');
     }
 }
 
@@ -2314,5 +2339,13 @@ class ExampleMiddleware implements ExampleMiddlewareContract
     public function handle($request, Closure $next)
     {
         return $next($request);
+    }
+}
+
+trait RouteTestControllerMiddlewareTrait
+{
+    public function initializeRouteTestControllerMiddlewareTrait()
+    {
+        $this->middleware(RouteTestControllerTraitMiddleware::class);
     }
 }

@@ -151,6 +151,13 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * The traits that have been initialized for the current controller.
+     *
+     * @var array
+     */
+    protected $initializedTraits = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -274,9 +281,21 @@ class Route
             $class = $this->parseControllerCallback()[0];
 
             $this->controller = $this->container->make(ltrim($class, '\\'));
+            $this->initializeTraits();
         }
 
         return $this->controller;
+    }
+
+    protected function initializeTraits()
+    {
+        foreach (class_uses_recursive($this->controller) as $trait) {
+            $method = 'initialize'.class_basename($trait);
+            if (method_exists($this->controller, $method) && !in_array($method, $this->initializedTraits)) {
+                $this->controller->{$method}();
+                $this->initializedTraits[] = $method;
+            }
+        }
     }
 
     /**
