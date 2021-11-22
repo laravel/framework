@@ -1,6 +1,20 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.71.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.72.0...8.x)
+
+
+## [v8.72.0 (2021-11-17)](https://github.com/laravel/framework/compare/v8.71.0...v8.72.0)
+
+### Added
+- Added extra method in PasswortReset for reset URL to match the structure of VerifyEmail ([#39652](https://github.com/laravel/framework/pull/39652))
+- Added support for countables to the `Illuminate/Support/Pluralizer::plural()` ([#39641](https://github.com/laravel/framework/pull/39641))
+- Allow users to specify options for migrate:fresh for DatabaseMigration trait ([#39637](https://github.com/laravel/framework/pull/39637))
+
+### Fixed
+- Casts $value to the int only when not null in `Illuminate/Database/Query/Builder::limit()` ([#39644](https://github.com/laravel/framework/pull/39644))
+
+### Changed
+- Use parents to resolve middleware priority in `SortedMiddleware` ([#39647](https://github.com/laravel/framework/pull/39647))
 
 
 ## [v8.71.0 (2021-11-16)](https://github.com/laravel/framework/compare/v8.70.2...v8.71.0)
