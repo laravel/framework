@@ -43,10 +43,16 @@ class PaginatedResourceResponse extends ResourceResponse
     {
         $paginated = $this->resource->resource->toArray();
 
-        return [
+        $default = [
             'links' => $this->paginationLinks($paginated),
             'meta' => $this->meta($paginated),
         ];
+
+        if (method_exists($this->resource, 'paginationInformation')) {
+            return $this->resource->paginationInformation($request, $paginated, $default);
+        }
+
+        return $default;
     }
 
     /**
