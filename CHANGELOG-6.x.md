@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.39...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.40...6.x)
+
+
+## [v6.20.40 (2021-11-17)](https://github.com/laravel/framework/compare/v6.20.39...v6.20.40)
+
+### Fixed
+- Fixes `Illuminate/Database/Query/Builder::limit()` to only cast integer when given other than null ([#39644](https://github.com/laravel/framework/pull/39644))
 
 
 ## [v6.20.39 (2021-11-16)](https://github.com/laravel/framework/compare/v6.20.38...v6.20.39)
