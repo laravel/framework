@@ -291,7 +291,7 @@ class Route
     {
         foreach (class_uses_recursive($this->controller) as $trait) {
             $method = 'initialize'.class_basename($trait);
-            if (method_exists($this->controller, $method) && !in_array($method, $this->initializedTraits)) {
+            if (method_exists($this->controller, $method) && ! in_array($method, $this->initializedTraits)) {
                 $this->controller->{$method}();
                 $this->initializedTraits[] = $method;
             }
