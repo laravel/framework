@@ -78,7 +78,7 @@ trait InteractsWithContainer
     }
 
     /**
-     * Forget and clear a mocked/spied instance of an object in the container.
+     * Instruct the container to forget a previously mocked / spied instance of an object.
      *
      * @param  string  $abstract
      * @return $this
