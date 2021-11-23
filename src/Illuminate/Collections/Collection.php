@@ -1548,6 +1548,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Elevate the collection to one that holds a multi-dimensional array.
+     *
+     * @return static
+     */
+    public function elevate()
+    {
+        return new static(Arr::elevate($this->all()));
+    }
+
+    /**
      * Get a base Support collection instance from this collection.
      *
      * @return \Illuminate\Support\Collection

@@ -1465,6 +1465,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Elevate the lazy collection to one that holds a multi-dimensional array.
+     *
+     * @return static
+     */
+    public function elevate()
+    {
+        return $this->passthru('elevate', []);
+    }
+
+    /**
      * Get the values iterator.
      *
      * @return \Traversable

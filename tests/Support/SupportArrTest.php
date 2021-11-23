@@ -113,6 +113,30 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
+    public function testElevate()
+    {
+        $array = Arr::elevate([
+            'user.name' => 'Taylor',
+            'user.age' => 25,
+            'user.languages.0' => 'PHP',
+            'user.languages.1' => 'C#',
+        ]);
+        $this->assertEquals(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]], $array);
+
+        $array = Arr::elevate([
+            'pagination.previous' => '<<',
+            'pagination.next' => '>>',
+        ]);
+        $this->assertEquals(['pagination' => ['previous' => '<<', 'next' => '>>']], $array);
+
+        $array = Arr::elevate([
+            'foo',
+            'foo.bar' => 'baz',
+            'foo.baz' => ['a' => 'b'],
+        ]);
+        $this->assertEquals(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
