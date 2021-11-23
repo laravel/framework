@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.73.1...8.x)
 
 
-## [v8.73.0 (2021-11-20)](https://github.com/laravel/framework/compare/v8.73.0...v8.73.1)
+## [v8.73.1 (2021-11-20)](https://github.com/laravel/framework/compare/v8.73.0...v8.73.1)
 
 ### Revert
 - Revert of [Use parents to resolve middleware priority in `SortedMiddleware`](https://github.com/laravel/framework/pull/39647) ([#39706](https://github.com/laravel/framework/pull/39706))
