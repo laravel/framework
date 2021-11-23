@@ -1,6 +1,13 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.73.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.73.2...8.x)
+
+
+## [v8.73.2 (2021-11-23)](https://github.com/laravel/framework/compare/v8.73.1...v8.73.2)
+
+### Added
+- Added `Illuminate/Foundation/Testing/Concerns/InteractsWithContainer::forgetMock()` ([#39713](https://github.com/laravel/framework/pull/39713))
+- Added custom pagination information in resource ([#39600](https://github.com/laravel/framework/pull/39600))
 
 
 ## [v8.73.1 (2021-11-20)](https://github.com/laravel/framework/compare/v8.73.0...v8.73.1)
