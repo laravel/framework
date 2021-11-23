@@ -174,6 +174,15 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     protected function performUpdate($sessionId, $payload)
     {
+        if ($this->container->bound('request')) {
+            if (! $payload['ip_address']) {
+                unset($payload['ip_address']);
+            }
+            if (! $payload['user_agent']) {
+                unset($payload['user_agent']);
+            }
+        }
+
         return $this->getQuery()->where('id', $sessionId)->update($payload);
     }
 
