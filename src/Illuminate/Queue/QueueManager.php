@@ -148,7 +148,7 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Queue\Queue
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     protected function resolve($name)
