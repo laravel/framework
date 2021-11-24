@@ -19,6 +19,7 @@ class PruneCommand extends Command
      */
     protected $signature = 'model:prune
                                 {--model=* : Class names of the models to be pruned}
+                                {--exclude=* : Class names of the models to be excluded}
                                 {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
                                 {--pretend : Display the number of prunable records found instead of deleting them}';
 
@@ -87,6 +88,8 @@ class PruneCommand extends Command
             return collect($models);
         }
 
+        $exclude = $this->option('exclude');
+
         return collect((new Finder)->in(app_path('Models'))->files()->name('*.php'))
             ->map(function ($model) {
                 $namespace = $this->laravel->getNamespace();
@@ -96,6 +99,10 @@ class PruneCommand extends Command
                     ['\\', ''],
                     Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
                 );
+            })->when(! empty($exclude), function ($models) use ($exclude) {
+                return $models->filter(function ($model) use ($exclude) {
+                    return ! in_array($model, $exclude);
+                });
             })->filter(function ($model) {
                 return $this->isPrunable($model);
             })->values();
