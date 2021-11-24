@@ -46,6 +46,21 @@ class Event extends Facade
     }
 
     /**
+     * Replace the bound instance with a fake, but allow the given events.
+     *
+     * @param  string|string[]  $eventsToAllow
+     * @return \Illuminate\Support\Testing\Fakes\EventFake
+     */
+    public static function fakeExcept($eventsToAllow)
+    {
+        return static::fake([
+            function (string $eventName) use ($eventsToAllow) {
+                return ! in_array($eventName, (array) $eventsToAllow);
+            },
+        ]);
+    }
+
+    /**
      * Replace the bound instance with a fake during the given callable's execution.
      *
      * @param  callable  $callable
