@@ -154,8 +154,9 @@ class QueueManager implements FactoryContract, MonitorContract
     protected function resolve($name)
     {
         $config = $this->getConfig($name);
-        if ($config === null){
-            throw new InvalidArgumentException("No config for connection [$name].");
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("The [{$name}] queue connection has not been configured.");
         }
 
         return $this->getConnector($config['driver'])
