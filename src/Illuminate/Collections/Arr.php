@@ -124,7 +124,7 @@ class Arr
     /**
      * Elevate an associative array with dots to a multi-dimensional array.
      *
-     * @param iterable $array
+     * @param  iterable $array
      * @return array
      */
     public static function elevate($array)
