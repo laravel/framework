@@ -299,7 +299,7 @@ class DatabaseConnectionTest extends TestCase
         try {
             $mock->transaction(function () {
                 throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
-            }, 4, 30);
+            }, 4, 50);
         } catch (QueryException) {
             $this->assertGreaterThan(0.1, microtime(true) - $timeBefore);
         }
@@ -319,7 +319,7 @@ class DatabaseConnectionTest extends TestCase
             $mock->transaction(function () {
                 throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
             }, 4, function () {
-                return 30;
+                return 50;
             });
         } catch (QueryException) {
             $this->assertGreaterThan(0.1, microtime(true) - $timeBefore);
