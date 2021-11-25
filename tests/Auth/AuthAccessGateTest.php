@@ -686,7 +686,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testAuthorizeIfAuthorizesCallbackTrue()
     {
-        $response = $this->getBasicGate()->authorizeIf(function($user) {
+        $response = $this->getBasicGate()->authorizeIf(function ($user) {
             $this->assertSame(1, $user->id);
 
             return true;
@@ -697,7 +697,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testAuthorizeIfAuthorizesCallbackResponseAllowed()
     {
-        $response = $this->getBasicGate()->authorizeIf(function() {
+        $response = $this->getBasicGate()->authorizeIf(function () {
             return Response::allow();
         });
 
@@ -719,7 +719,7 @@ class AuthAccessGateTest extends TestCase
         $this->expectExceptionMessage('Not allowed.');
         $this->expectExceptionCode('some_code');
 
-        $response = $this->getBasicGate()->authorizeIf(function() {
+        $response = $this->getBasicGate()->authorizeIf(function () {
             return false;
         }, 'Not allowed.', 'some_code');
     }
@@ -729,7 +729,7 @@ class AuthAccessGateTest extends TestCase
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('Not allowed.');
         $this->expectExceptionCode('some_code');
-        
+
         $this->getBasicGate()->authorizeIf(function () {
             return Response::deny('Not allowed.', 'some_code');
         });
@@ -744,7 +744,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testAuthorizeUnlessAuthorizesCallbackFalse()
     {
-        $response = $this->getBasicGate()->authorizeUnless(function($user) {
+        $response = $this->getBasicGate()->authorizeUnless(function ($user) {
             $this->assertSame(1, $user->id);
 
             return false;
@@ -755,7 +755,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testAuthorizeUnlessAuthorizesCallbackResponseAllowed()
     {
-        $response = $this->getBasicGate()->authorizeUnless(function() {
+        $response = $this->getBasicGate()->authorizeUnless(function () {
             return Response::allow();
         });
 
@@ -777,7 +777,7 @@ class AuthAccessGateTest extends TestCase
         $this->expectExceptionMessage('Not allowed.');
         $this->expectExceptionCode('some_code');
 
-        $response = $this->getBasicGate()->authorizeUnless(function() {
+        $response = $this->getBasicGate()->authorizeUnless(function () {
             return true;
         }, 'Not allowed.', 'some_code');
     }
@@ -787,7 +787,7 @@ class AuthAccessGateTest extends TestCase
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('Not allowed.');
         $this->expectExceptionCode('some_code');
-        
+
         $this->getBasicGate()->authorizeUnless(function () {
             return Response::deny('Not allowed.', 'some_code');
         });
