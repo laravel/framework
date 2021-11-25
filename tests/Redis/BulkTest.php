@@ -23,7 +23,6 @@ class BulkTest extends TestCase
         $this->tearDownRedis();
     }
 
-
     public function testItCacheItemWhenCacheIsNotFull()
     {
         $store = [];
