@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
@@ -226,7 +227,7 @@ class Worker
         });
 
         pcntl_alarm(
-            max($this->timeoutForJob($job, $options), 0)
+            ($job) ? max($this->timeoutForJob($job, $options), 0) : 0
         );
     }
 
@@ -243,13 +244,13 @@ class Worker
     /**
      * Get the appropriate timeout for the given job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return int
      */
-    protected function timeoutForJob($job, WorkerOptions $options)
+    protected function timeoutForJob(Job $job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+        return is_null($job->timeout()) ? $job->timeout() : $options->timeout;
     }
 
     /**
