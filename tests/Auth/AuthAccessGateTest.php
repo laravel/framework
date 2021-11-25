@@ -716,7 +716,7 @@ class AuthAccessGateTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
 
-        $response = $this->getBasicGate()->authorizeIf(function($user, $string) {
+        $response = $this->getBasicGate()->authorizeIf(function() {
             return false;
         });
     }
@@ -771,7 +771,7 @@ class AuthAccessGateTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
 
-        $response = $this->getBasicGate()->authorizeUnless(function($user, $string) {
+        $response = $this->getBasicGate()->authorizeUnless(function() {
             return true;
         });
     }
