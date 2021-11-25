@@ -38,7 +38,7 @@ class BulkBuilder
     public $item = null;
 
     /**
-     * force to release the cache
+     * force to release the cache.
      *
      * @var bool
      */
@@ -99,9 +99,10 @@ class BulkBuilder
      * Execute the given callback when cached items count is equal to max item count,
      * if error raise call the failure callback.
      *
-     * @param callable $callback
-     * @param callable|null $failure
+     * @param  callable  $callback
+     * @param  callable|null  $failure
      * @return mixed
+     *
      * @throws LimiterTimeoutException
      */
     public function then(callable $callback, callable $failure = null)

@@ -2,11 +2,6 @@
 
 namespace Illuminate\Redis\Limiters;
 
-use Illuminate\Contracts\Redis\LimiterTimeoutException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Throwable;
-
 class Bulk
 {
     /**
@@ -39,6 +34,7 @@ class Bulk
 
     /**
      * force to release the cache.
+     *
      * @var false|mixed
      */
     protected $forceRelease;
@@ -46,11 +42,11 @@ class Bulk
     /**
      * Create a new bulk instance.
      *
-     * @param \Illuminate\Redis\Connections\Connection $redis
-     * @param string $name
-     * @param string $item
-     * @param int $maxItemCount
-     * @param bool $forceRelease
+     * @param  \Illuminate\Redis\Connections\Connection  $redis
+     * @param  string  $name
+     * @param  string  $item
+     * @param  int  $maxItemCount
+     * @param  bool  $forceRelease
      */
     public function __construct($redis, $name, $item, $maxItemCount, $forceRelease)
     {
@@ -64,7 +60,7 @@ class Bulk
     /**
      * Decide to store items in cache or release them according to cache size or ForceRelease.
      *
-     * @param callable $callable
+     * @param  callable  $callable
      */
     public function then($callable)
     {
@@ -82,28 +78,28 @@ class Bulk
      */
     private function isCacheFull(): bool
     {
-        return $this->redis->command('lLen', [$this->name]) >= $this->maxItemCount - 1 ;
+        return $this->redis->command('lLen', [$this->name]) >= $this->maxItemCount - 1;
     }
 
     /**
-     * add item to cache
+     * add item to cache.
      *
-     * @param string $item
+     * @param  string  $item
      */
     private function addToCache($item)
     {
-        $this->redis->command('lpush', [$this->name,$item]);
+        $this->redis->command('lpush', [$this->name, $item]);
     }
 
     /**
      * Get items from the cache and add the current item to them and return with an ordinary sort.
      *
-     * @param callable $callable
-     * @param string|null $item
+     * @param  callable  $callable
+     * @param  string|null  $item
      */
     private function bulkFromCache($callable, $item = null)
     {
-        $items = $this->redis->command('lrange', [$this->name,0,$this->maxItemCount]);
+        $items = $this->redis->command('lrange', [$this->name, 0, $this->maxItemCount]);
 
         $items = array_reverse($items);
 

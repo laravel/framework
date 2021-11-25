@@ -2,13 +2,9 @@
 
 namespace Illuminate\Tests\Redis;
 
-use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Limiters\Bulk;
-use Illuminate\Redis\Limiters\DurationLimiter;
-use Illuminate\Support\Env;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 
 class BulkTest extends TestCase
 {
@@ -51,7 +47,7 @@ class BulkTest extends TestCase
 
         $this->assertEquals(3, count($store));
 
-        $this->assertSame(['1', '2','3'], $store);
+        $this->assertSame(['1', '2', '3'], $store);
 
         $store = [];
 
