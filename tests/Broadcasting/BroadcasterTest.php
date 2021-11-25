@@ -44,8 +44,8 @@ class BroadcasterTest extends TestCase
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
             //
         };
-        $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
-        $this->assertEquals(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
+        $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.2.something', $callback);
+        $this->assertEquals(['model.1.instance', 'model.2.instance', 'something'], $parameters);
 
         $callback = function ($user) {
             //
