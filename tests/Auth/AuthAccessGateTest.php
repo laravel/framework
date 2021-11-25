@@ -755,7 +755,7 @@ class AuthAccessGateTest extends TestCase
     {
         $response = $this->getBasicGate()->authorizeUnless(function() {
             return Response::allow();
-        })
+        });
 
         $this->assertNull($response);
     }
