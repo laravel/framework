@@ -389,12 +389,12 @@ class Gate implements GateContract
      * @param  array  $arguments
      * @return void
      */
-    public function authorizeIf($condition, $arguments = [])
+    public function authorizeIf($condition, $message = null, $code = null)
     {
-        $response = value($condition, ...array_merge([$this->resolveUser()], Arr::wrap($arguments)));
+        $response = value($condition, $this->resolveUser());
 
         if (! $response instanceof Response) {
-            $response = new Response($response);
+            $response = new Response($response, $message, $code);
         }
 
         $response->authorize();
@@ -407,12 +407,12 @@ class Gate implements GateContract
      * @param  array  $arguments
      * @return void
      */
-    public function authorizeUnless($condition, $arguments = [])
+    public function authorizeUnless($condition, $message = null, $code = null)
     {
-        $response = value($condition, ...array_merge([$this->resolveUser()], Arr::wrap($arguments)));
+        $response = value($condition, $this->resolveUser());
 
         if (! $response instanceof Response) {
-            $response = new Response(! $response);
+            $response = new Response(! $response, $message, $code);
         }
 
         $response->authorize();

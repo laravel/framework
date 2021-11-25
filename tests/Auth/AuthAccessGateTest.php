@@ -686,9 +686,8 @@ class AuthAccessGateTest extends TestCase
 
     public function testAuthorizeIfAuthorizesCallbackTrue()
     {
-        $response = $this->getBasicGate()->authorizeIf(function($user, $string) {
+        $response = $this->getBasicGate()->authorizeIf(function($user) {
             $this->assertSame(1, $user->id);
-            $this->assertSame('foo', $string);
 
             return true;
         }, 'foo');
@@ -708,17 +707,21 @@ class AuthAccessGateTest extends TestCase
     public function testAuthorizeIfThrowsExceptionWhenFalse()
     {
         $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
 
-        $this->getBasicGate()->authorizeIf(false);
+        $this->getBasicGate()->authorizeIf(false, 'Not allowed.', 'some_code');
     }
 
     public function testAuthorizeIfThrowsExceptionWhenCallbackFalse()
     {
         $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
 
         $response = $this->getBasicGate()->authorizeIf(function() {
             return false;
-        });
+        }, 'Not allowed.', 'some_code');
     }
 
     public function testAuthorizeIfThrowsExceptionWhenCallbackResponseDenied()
@@ -741,12 +744,11 @@ class AuthAccessGateTest extends TestCase
 
     public function testAuthorizeUnlessAuthorizesCallbackFalse()
     {
-        $response = $this->getBasicGate()->authorizeUnless(function($user, $string) {
+        $response = $this->getBasicGate()->authorizeUnless(function($user) {
             $this->assertSame(1, $user->id);
-            $this->assertSame('foo', $string);
 
             return false;
-        }, 'foo');
+        });
 
         $this->assertNull($response);
     }
@@ -763,17 +765,21 @@ class AuthAccessGateTest extends TestCase
     public function testAuthorizeUnlessThrowsExceptionWhenTrue()
     {
         $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
 
-        $this->getBasicGate()->authorizeUnless(true);
+        $this->getBasicGate()->authorizeUnless(true, 'Not allowed.', 'some_code');
     }
 
     public function testAuthorizeUnlessThrowsExceptionWhenCallbackTrue()
     {
         $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
 
         $response = $this->getBasicGate()->authorizeUnless(function() {
             return true;
-        });
+        }, 'Not allowed', 'some_code');
     }
 
     public function testAuthorizeUnlessThrowsExceptionWhenCallbackResponseDenied()
