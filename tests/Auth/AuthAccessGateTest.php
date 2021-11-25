@@ -700,7 +700,7 @@ class AuthAccessGateTest extends TestCase
     {
         $response = $this->getBasicGate()->authorizeIf(function() {
             return Response::allow();
-        })
+        });
 
         $this->assertNull($response);
     }
@@ -718,7 +718,7 @@ class AuthAccessGateTest extends TestCase
 
         $response = $this->getBasicGate()->authorizeIf(function($user, $string) {
             return false;
-        })
+        });
     }
 
     public function testAuthorizeIfThrowsExceptionWhenCallbackResponseDenied()
@@ -773,7 +773,7 @@ class AuthAccessGateTest extends TestCase
 
         $response = $this->getBasicGate()->authorizeUnless(function($user, $string) {
             return true;
-        })
+        });
     }
 
     public function testAuthorizeUnlessThrowsExceptionWhenCallbackResponseDenied()
