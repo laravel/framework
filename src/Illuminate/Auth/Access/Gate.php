@@ -383,6 +383,42 @@ class Gate implements GateContract
     }
 
     /**
+     * Throws an authorization exception if the condition is truthy.
+     *
+     * @param  bool|callable  $condition
+     * @param  array  $arguments
+     * @return void
+     */
+    public function authorizeIf($condition, $arguments = [])
+    {
+        $response = value($condition, ...array_merge([$this->resolveUser()], $arguments);
+
+        if (! $response instanceof Response) {
+            $response = new Response($response);
+        }
+
+        $response->authorize();
+    }
+
+    /**
+     * Throws an authorization exception if the condition is truthy.
+     *
+     * @param  bool|callable  $condition
+     * @param  array  $arguments
+     * @return void
+     */
+    public function authorizeUnless($condition, $arguments = [])
+    {
+        $response = value($condition, ...array_merge([$this->resolveUser()], $arguments);
+
+        if (! $response instanceof Response) {
+            $response = new Response(! $response);
+        }
+
+        $response->authorize();
+    }
+
+    /**
      * Determine whether the callback/method can be called with the given user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user

@@ -677,6 +677,116 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('unpublished', $response->code());
     }
 
+    public function testAuthorizeIfAuthorizesConditionTrue()
+    {
+        $response = $this->getBasicGate()->authorizeIf(true);
+
+        $this->assertNull($response);
+    }
+
+    public function testAuthorizeIfAuthorizesCallbackTrue()
+    {
+        $response = $this->getBasicGate()->authorizeIf(function($user, $string) {
+            $this->assertSame(1, $user->id);
+            $this->assertSame('foo', $string)
+
+            return true;
+        }, 'foo')
+
+        $this->assertNull($response);
+    }
+
+    public function testAuthorizeIfAuthorizesCallbackResponseAllowed()
+    {
+        $response = $this->getBasicGate()->authorizeIf(function() {
+            return Response::allow();
+        })
+
+        $this->assertNull($response);
+    }
+
+    public function testAuthorizeIfThrowsExceptionWhenFalse()
+    {
+        $this->expectException(AuthorizationException::class);
+
+        $this->getBasicGate()->authorizeIf(false);
+    }
+
+    public function testAuthorizeIfThrowsExceptionWhenCallbackFalse()
+    {
+        $this->expectException(AuthorizationException::class);
+
+        $response = $this->getBasicGate()->authorizeIf(function($user, $string) {
+            return false;
+        })
+    }
+
+    public function testAuthorizeIfThrowsExceptionWhenCallbackResponseDenied()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
+        
+        $this->getBasicGate()->authorizeIf(function () {
+            return Response::deny('Not allowed.', 'some_code');
+        });
+    }
+
+    public function testAuthorizeUnlessAuthorizesConditionFalse()
+    {
+        $response = $this->getBasicGate()->authorizeUnless(false);
+
+        $this->assertNull($response);
+    }
+
+    public function testAuthorizeUnlessAuthorizesCallbackFalse()
+    {
+        $response = $this->getBasicGate()->authorizeUnless(function($user, $string) {
+            $this->assertSame(1, $user->id);
+            $this->assertSame('foo', $string)
+
+            return false;
+        }, 'foo')
+
+        $this->assertNull($response);
+    }
+
+    public function testAuthorizeUnlessAuthorizesCallbackResponseAllowed()
+    {
+        $response = $this->getBasicGate()->authorizeUnless(function() {
+            return Response::allow();
+        })
+
+        $this->assertNull($response);
+    }
+
+    public function testAuthorizeUnlessThrowsExceptionWhenTrue()
+    {
+        $this->expectException(AuthorizationException::class);
+
+        $this->getBasicGate()->authorizeUnless(true);
+    }
+
+    public function testAuthorizeUnlessThrowsExceptionWhenCallbackTrue()
+    {
+        $this->expectException(AuthorizationException::class);
+
+        $response = $this->getBasicGate()->authorizeUnless(function($user, $string) {
+            return true;
+        })
+    }
+
+    public function testAuthorizeUnlessThrowsExceptionWhenCallbackResponseDenied()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Not allowed.');
+        $this->expectExceptionCode('some_code');
+        
+        $this->getBasicGate()->authorizeUnless(function () {
+            return Response::deny('Not allowed.', 'some_code');
+        });
+    }
+
     public function testAuthorizeReturnsAnAllowedResponseForATruthyReturn()
     {
         $gate = $this->getBasicGate();
