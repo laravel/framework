@@ -1621,7 +1621,23 @@ class RoutingRouteTest extends TestCase
             },
         ]);
 
-        $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertSame('123', $router->dispatch(Request::create('foo/123', 'GET'))->getContent());
+    }
+
+    public function testPrimaryKeyCastingInImplicitBindings()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUserModel $bar) {
+                $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
+
+                return $bar->value;
+            },
+        ]);
+
+        $this->assertSame('123', $router->dispatch(Request::create('foo/123taylor', 'GET'))->getContent());
     }
 
     public function testParentChildImplicitBindings()
@@ -1669,7 +1685,7 @@ class RoutingRouteTest extends TestCase
                 return $bar->value;
             },
         ]);
-        $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+        $this->assertSame('123', $router->dispatch(Request::create('foo/123', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithMissingModelHandledByMissing()
@@ -2141,6 +2157,11 @@ class RouteModelBindingStub extends Model
         return 'id';
     }
 
+    public function getKeyType()
+    {
+        return 'string';
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -2215,6 +2236,11 @@ class RoutingTestUserModel extends Model
         return 'id';
     }
 
+    public function getKeyType()
+    {
+        return 'int';
+    }
+
     public function where($key, $value)
     {
         $this->value = $value;
@@ -2258,6 +2284,11 @@ class RoutingTestTeamModel extends Model
     public function getRouteKeyName()
     {
         return 'id';
+    }
+
+    public function getKeyType()
+    {
+        return 'string';
     }
 
     public function where($key, $value)

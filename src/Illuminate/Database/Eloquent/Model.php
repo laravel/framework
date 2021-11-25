@@ -1877,7 +1877,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where($field ?? $this->getRouteKeyName(), $value)->first();
+        $field = $field ?? $this->getRouteKeyName();
+
+        return $this->where($field, $this->castAttribute($field, $value))->first();
     }
 
     /**
