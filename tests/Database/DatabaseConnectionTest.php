@@ -286,6 +286,46 @@ class DatabaseConnectionTest extends TestCase
         }, 3);
     }
 
+    public function testTransactionMethodSleepsOnDeadlockWhenRetryingIfSpecified()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+        $pdo->expects($this->exactly(4))->method('beginTransaction');
+        $pdo->expects($this->exactly(4))->method('rollBack');
+        $pdo->expects($this->never())->method('commit');
+
+        $timeBefore = microtime(true);
+
+        try {
+            $mock->transaction(function () {
+                throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
+            }, 4, 30);
+        } catch (QueryException) {
+            $this->assertGreaterThan(0.1, microtime(true) - $timeBefore );
+        }
+    }
+
+    public function testTransactionMethodSleepsOnDeadlockWhenRetryingWithClosureIfSpecified()
+    {
+        $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
+        $mock = $this->getMockConnection([], $pdo);
+        $pdo->expects($this->exactly(4))->method('beginTransaction');
+        $pdo->expects($this->exactly(4))->method('rollBack');
+        $pdo->expects($this->never())->method('commit');
+
+        $timeBefore = microtime(true);
+
+        try {
+            $mock->transaction(function () {
+                throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
+            }, 4, function () {
+                return 30;
+            });
+        } catch (QueryException) {
+            $this->assertGreaterThan(0.1, microtime(true) - $timeBefore );
+        }
+    }
+
     public function testTransactionMethodRollsbackAndThrows()
     {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();

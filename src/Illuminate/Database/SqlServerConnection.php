@@ -19,11 +19,12 @@ class SqlServerConnection extends Connection
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
+     * @param  int|\Closure  $sleepMilliseconds
      * @return mixed
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, $sleepMilliseconds = 0)
     {
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {

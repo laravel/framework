@@ -119,11 +119,12 @@ interface ConnectionInterface
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
+     * @param  int|\Closure  $sleepMilliseconds
      * @return mixed
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1);
+    public function transaction(Closure $callback, $attempts = 1, $sleepMilliseconds = 0);
 
     /**
      * Start a new database transaction.

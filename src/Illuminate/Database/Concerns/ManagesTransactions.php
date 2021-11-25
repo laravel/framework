@@ -13,11 +13,12 @@ trait ManagesTransactions
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
+     * @param  int|\Closure  $sleepMilliseconds
      * @return mixed
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, $sleepMilliseconds = 0)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
@@ -36,6 +37,10 @@ trait ManagesTransactions
                 $this->handleTransactionException(
                     $e, $currentAttempt, $attempts
                 );
+
+                if ($sleepMilliseconds) {
+                    usleep(value($sleepMilliseconds, $currentAttempt) * 1000);
+                }
 
                 continue;
             }
