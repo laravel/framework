@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
+use Illuminate\Redis\Limiters\BulkBuilder;
 use Illuminate\Support\Traits\Macroable;
 
 abstract class Connection
@@ -66,6 +67,17 @@ abstract class Connection
     public function throttle($name)
     {
         return new DurationLimiterBuilder($this, $name);
+    }
+
+    /**
+     * Cache items until the max number of items will be received then execute a callback with cached data
+     *
+     * @param string $name
+     * @return \Illuminate\Redis\Limiters\BulkBuilder
+     */
+    public function bulk($name)
+    {
+        return new BulkBuilder($this, $name);
     }
 
     /**
