@@ -391,7 +391,7 @@ class Gate implements GateContract
      */
     public function authorizeIf($condition, $arguments = [])
     {
-        $response = value($condition, ...array_merge([$this->resolveUser()], $arguments));
+        $response = value($condition, ...array_merge([$this->resolveUser()], Arr::wrap($arguments)));
 
         if (! $response instanceof Response) {
             $response = new Response($response);
@@ -409,7 +409,7 @@ class Gate implements GateContract
      */
     public function authorizeUnless($condition, $arguments = [])
     {
-        $response = value($condition, ...array_merge([$this->resolveUser()], $arguments));
+        $response = value($condition, ...array_merge([$this->resolveUser()], Arr::wrap($arguments)));
 
         if (! $response instanceof Response) {
             $response = new Response(! $response);
