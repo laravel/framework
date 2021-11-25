@@ -245,12 +245,12 @@ class FoundationApplicationTest extends TestCase
         $debugOff = new Application;
         $debugOff['config'] = new Repository(['app' => ['debug' => false]]);
 
-        $this->assertFalse($debugOff->isDebug());
+        $this->assertFalse($debugOff->hasDebugModeEnabled());
 
         $debugOn = new Application;
         $debugOn['config'] = new Repository(['app' => ['debug' => true]]);
 
-        $this->assertTrue($debugOn->isDebug());
+        $this->assertTrue($debugOn->hasDebugModeEnabled());
     }
 
     public function testMethodAfterLoadingEnvironmentAddsClosure()
