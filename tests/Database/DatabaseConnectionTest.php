@@ -301,7 +301,7 @@ class DatabaseConnectionTest extends TestCase
                 throw new QueryException('', [], new Exception('Deadlock found when trying to get lock'));
             }, 4, 30);
         } catch (QueryException) {
-            $this->assertGreaterThan(0.1, microtime(true) - $timeBefore );
+            $this->assertGreaterThan(0.1, microtime(true) - $timeBefore);
         }
     }
 
@@ -322,7 +322,7 @@ class DatabaseConnectionTest extends TestCase
                 return 30;
             });
         } catch (QueryException) {
-            $this->assertGreaterThan(0.1, microtime(true) - $timeBefore );
+            $this->assertGreaterThan(0.1, microtime(true) - $timeBefore);
         }
     }
 
