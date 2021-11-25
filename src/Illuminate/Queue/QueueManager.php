@@ -209,7 +209,7 @@ class QueueManager implements FactoryContract, MonitorContract
      * Get the queue connection configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {
