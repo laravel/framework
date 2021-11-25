@@ -691,7 +691,7 @@ class AuthAccessGateTest extends TestCase
             $this->assertSame('foo', $string);
 
             return true;
-        }, 'foo')
+        }, 'foo');
 
         $this->assertNull($response);
     }
@@ -746,7 +746,7 @@ class AuthAccessGateTest extends TestCase
             $this->assertSame('foo', $string);
 
             return false;
-        }, 'foo')
+        }, 'foo');
 
         $this->assertNull($response);
     }
