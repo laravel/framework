@@ -779,7 +779,7 @@ class AuthAccessGateTest extends TestCase
 
         $response = $this->getBasicGate()->authorizeUnless(function() {
             return true;
-        }, 'Not allowed', 'some_code');
+        }, 'Not allowed.', 'some_code');
     }
 
     public function testAuthorizeUnlessThrowsExceptionWhenCallbackResponseDenied()

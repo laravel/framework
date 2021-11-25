@@ -386,7 +386,8 @@ class Gate implements GateContract
      * Throws an authorization exception if the condition is truthy.
      *
      * @param  bool|callable  $condition
-     * @param  array  $arguments
+     * @param  string|null  $message
+     * @param  mixed  $code
      * @return void
      */
     public function authorizeIf($condition, $message = null, $code = null)
@@ -404,7 +405,8 @@ class Gate implements GateContract
      * Throws an authorization exception if the condition is truthy.
      *
      * @param  bool|callable  $condition
-     * @param  array  $arguments
+     * @param  string|null  $message
+     * @param  mixed  $code
      * @return void
      */
     public function authorizeUnless($condition, $message = null, $code = null)
