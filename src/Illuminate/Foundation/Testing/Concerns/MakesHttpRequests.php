@@ -438,8 +438,10 @@ trait MakesHttpRequests
             'Accept' => 'application/json',
         ], $headers);
 
+        $cookies = $this->prepareCookiesForRequest();
+
         return $this->call(
-            $method, $uri, [], [], $files, $this->transformHeadersToServerVars($headers), $content
+            $method, $uri, [], $cookies, $files, $this->transformHeadersToServerVars($headers), $content
         );
     }
 
