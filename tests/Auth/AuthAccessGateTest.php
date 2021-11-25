@@ -688,7 +688,7 @@ class AuthAccessGateTest extends TestCase
     {
         $response = $this->getBasicGate()->authorizeIf(function($user, $string) {
             $this->assertSame(1, $user->id);
-            $this->assertSame('foo', $string)
+            $this->assertSame('foo', $string);
 
             return true;
         }, 'foo')
@@ -743,7 +743,7 @@ class AuthAccessGateTest extends TestCase
     {
         $response = $this->getBasicGate()->authorizeUnless(function($user, $string) {
             $this->assertSame(1, $user->id);
-            $this->assertSame('foo', $string)
+            $this->assertSame('foo', $string);
 
             return false;
         }, 'foo')
