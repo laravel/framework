@@ -21,6 +21,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
@@ -390,6 +391,8 @@ class Handler implements ExceptionHandlerContract
         } elseif ($e instanceof SuspiciousOperationException) {
             $e = new NotFoundHttpException('Bad hostname provided.', $e);
         } elseif ($e instanceof RecordsNotFoundException) {
+            $e = new NotFoundHttpException('Not found.', $e);
+        } elseif ($e instanceof ItemNotFoundException) {
             $e = new NotFoundHttpException('Not found.', $e);
         }
 
