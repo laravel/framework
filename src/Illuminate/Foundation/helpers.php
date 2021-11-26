@@ -133,6 +133,19 @@ if (! function_exists('app_path')) {
     }
 }
 
+if (! function_exists('app_storage_path')) {
+    /**
+     * Get the path to the app storage folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function app_storage_path($path = '')
+    {
+        return storage_path('app/' . $path);
+    }
+}
+
 if (! function_exists('asset')) {
     /**
      * Generate an asset path for the application.
