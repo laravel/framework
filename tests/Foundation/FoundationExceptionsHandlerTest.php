@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
@@ -284,6 +285,23 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldNotReceive('error');
 
         $this->handler->report(new RecordsNotFoundException);
+    }
+
+    public function testItemNotFoundReturns404WithoutReporting()
+    {
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
+        $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
+
+        $response = $this->handler->render($this->request, new ItemNotFoundException);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertStringContainsString('"message": "Not found."', $response->getContent());
+
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->report(new ItemNotFoundException);
     }
 }
 

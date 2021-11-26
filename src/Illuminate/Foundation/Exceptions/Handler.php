@@ -90,6 +90,7 @@ class Handler implements ExceptionHandlerContract
         AuthorizationException::class,
         HttpException::class,
         HttpResponseException::class,
+        ItemNotFoundException::class,
         ModelNotFoundException::class,
         MultipleRecordsFoundException::class,
         RecordsNotFoundException::class,
