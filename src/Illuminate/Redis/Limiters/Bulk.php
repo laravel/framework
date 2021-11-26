@@ -88,7 +88,7 @@ class Bulk
      */
     private function addToCache($item)
     {
-        $this->redis->command('lpush', [$this->name, $item]);
+        $this->redis->command('rpush', [$this->name, $item]);
     }
 
     /**
@@ -100,8 +100,6 @@ class Bulk
     private function bulkFromCache($callable, $item = null)
     {
         $items = $this->redis->command('lrange', [$this->name, 0, $this->maxItemCount]);
-
-        $items = array_reverse($items);
 
         if ($item) {
             $items[count($items)] = $item;
