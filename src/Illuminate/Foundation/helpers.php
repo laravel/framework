@@ -142,7 +142,7 @@ if (! function_exists('app_storage_path')) {
      */
     function app_storage_path($path = '')
     {
-        return storage_path('app/' . $path);
+        return storage_path('app/'.$path);
     }
 }
 
