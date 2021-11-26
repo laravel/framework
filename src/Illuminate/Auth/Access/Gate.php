@@ -809,29 +809,6 @@ class Gate implements GateContract
     }
 
     /**
-     * Evaluates an on-demand condition and returns a Response.
-     *
-     * @param  \Closure|bool  $condition
-     * @param  array  $arguments
-     * @param  string|null  $message
-     * @param  mixed  $code
-     * @param  bool  $straight
-     * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    protected function inspectOnDemand($condition, $arguments, $message, $code, $straight)
-    {
-        $condition = value($condition, $this->resolveUser(), ...$arguments);
-
-        if (! $condition instanceof Response) {
-            $condition = new Response($straight == $condition, $message, $code);
-        }
-
-        return $condition->authorize();
-    }
-
-    /**
      * Resolve the user from the user resolver.
      *
      * @return mixed
