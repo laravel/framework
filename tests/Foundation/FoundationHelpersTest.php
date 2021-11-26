@@ -244,4 +244,13 @@ class FoundationHelpersTest extends TestCase
 
         $this->assertSame('expected', mix('asset.png'));
     }
+
+    public function testAppStoragePathWithStoragePath()
+    {
+        app()->singleton('path.storage', function () {
+            return __DIR__;
+        });
+
+        $this->assertSame(app_storage_path(), storage_path('app/'));
+    }
 }
