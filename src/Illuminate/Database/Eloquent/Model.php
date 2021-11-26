@@ -1891,7 +1891,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveSoftDeletableRouteBinding($value, $field = null)
     {
-        return $this->where($field ?? $this->getRouteKeyName(), $value)->withTrashed()->first();
+        $field ??= $this->getRouteKeyName();
+
+        return $this->where($field, $this->castAttribute($field, $value))->withTrashed()->first();
     }
 
     /**
