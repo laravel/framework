@@ -113,9 +113,9 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
-    public function testElevate()
+    public function testUndot()
     {
-        $array = Arr::elevate([
+        $array = Arr::undot([
             'user.name' => 'Taylor',
             'user.age' => 25,
             'user.languages.0' => 'PHP',
@@ -123,13 +123,13 @@ class SupportArrTest extends TestCase
         ]);
         $this->assertEquals(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]], $array);
 
-        $array = Arr::elevate([
+        $array = Arr::undot([
             'pagination.previous' => '<<',
             'pagination.next' => '>>',
         ]);
         $this->assertEquals(['pagination' => ['previous' => '<<', 'next' => '>>']], $array);
 
-        $array = Arr::elevate([
+        $array = Arr::undot([
             'foo',
             'foo.bar' => 'baz',
             'foo.baz' => ['a' => 'b'],

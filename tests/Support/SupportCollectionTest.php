@@ -4858,14 +4858,14 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testElevate($collection)
+    public function testUndot($collection)
     {
         $data = $collection::make([
             'name' => 'Taylor',
             'meta.foo' => 'bar',
             'meta.baz' => 'boom',
             'meta.bam.boom' => 'bip',
-        ])->elevate();
+        ])->undot();
         $this->assertSame([
             'name' => 'Taylor',
             'meta' => [
@@ -4881,7 +4881,7 @@ class SupportCollectionTest extends TestCase
             'foo.0' => 'bar',
             'foo.1' => 'baz',
             'foo.baz' => 'boom',
-        ])->elevate();
+        ])->undot();
         $this->assertSame([
             'foo' => [
                 'bar',

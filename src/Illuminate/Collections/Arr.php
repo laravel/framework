@@ -122,12 +122,12 @@ class Arr
     }
 
     /**
-     * Elevate an associative array with dots to a multi-dimensional array.
+     * Convert a flatten "dot" notation array into an expanded array.
      *
      * @param  iterable  $array
      * @return array
      */
-    public static function elevate($array)
+    public static function undot($array)
     {
         $results = [];
 
