@@ -2867,8 +2867,8 @@ SQL;
         $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
-        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
+        $builder->select('*')->from('users')->skip(11)->take(10)->orderBy('email', 'desc');
+        $this->assertSame('select * from [users] order by [email] desc OFFSET 11 ROWS FETCH NEXT 10 ROWS ONLY', $builder->toSql());
     }
 
     public function testMySqlSoundsLikeOperator()

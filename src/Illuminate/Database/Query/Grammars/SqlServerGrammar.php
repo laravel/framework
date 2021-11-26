@@ -38,8 +38,14 @@ class SqlServerGrammar extends Grammar
             $query->columns = ['*'];
         }
 
+        // For order by queries we can paginate, to avoid sorting issues.
+        $components = $this->compileComponents($query);
+        if (!empty($components['orders'])) {
+            return parent::compileSelect($query) . " OFFSET {$query->offset} ROWS FETCH NEXT {$query->limit} ROWS ONLY";
+        }
+
         return $this->compileAnsiOffset(
-            $query, $this->compileComponents($query)
+            $query, $components
         );
     }
 
