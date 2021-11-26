@@ -313,7 +313,7 @@ class Gate implements GateContract
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  \Closure|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -769,6 +769,66 @@ class Gate implements GateContract
             $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
             $this->guessPolicyNamesUsingCallback
         );
+    }
+
+    /**
+     * Throws an authorization exception if the condition or callback is falsy.
+     *
+     * @param  \Closure|bool $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @param  bool  $allow
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function permit($condition, $message = null, $code = null, $allow = true)
+    {
+        $response = value($condition, $this->resolveUser());
+
+        if (! $response instanceof Response) {
+            $response = new Response($allow === (bool) $response, $message, $code);
+        }
+
+        return $response->authorize();
+    }
+
+    /**
+     * Throws an authorization exception if the condition or callback is truthy.
+     *
+     * @param  \Closure|bool $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function forbid($condition, $message = null, $code = null)
+    {
+        return $this->permit($condition, $message, $code, false);
+    }
+
+    /**
+     * Evaluates an on-demand condition and returns a Response.
+     *
+     * @param  \Closure|bool  $condition
+     * @param  array  $arguments
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @param  bool  $straight
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function inspectOnDemand($condition, $arguments, $message, $code, $straight)
+    {
+        $condition = value($condition, $this->resolveUser(), ...$arguments);
+
+        if (! $condition instanceof Response) {
+            $condition = new Response($straight == $condition, $message, $code);
+        }
+
+        return $condition->authorize();
     }
 
     /**

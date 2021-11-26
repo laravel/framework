@@ -689,6 +689,176 @@ class AuthAccessGateTest extends TestCase
         $this->assertNull($response->message());
     }
 
+    public function testPermitAuthorizesTrue()
+    {
+        $response = $this->getBasicGate()->permit(true);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testPermitAuthorizesTruthy()
+    {
+        $response = $this->getBasicGate()->permit('truthy');
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testPermitAuthorizesCallbackTrue()
+    {
+        $response = $this->getBasicGate()->permit(function ($user) {
+            $this->assertSame(1, $user->id);
+
+            return true;
+        }, 'foo', 'bar');
+
+        $this->assertTrue($response->allowed());
+        $this->assertSame('foo', $response->message());
+        $this->assertSame('bar', $response->code());
+    }
+
+    public function testPermitAuthorizesResponseAllowed()
+    {
+        $response = $this->getBasicGate()->permit(Response::allow('foo', 'bar'));
+
+        $this->assertTrue($response->allowed());
+        $this->assertSame('foo', $response->message());
+        $this->assertSame('bar', $response->code());
+    }
+
+    public function testPermitAuthorizesCallbackResponseAllowed()
+    {
+        $response = $this->getBasicGate()->permit(function () {
+            return Response::allow('quz', 'qux');
+        }, 'foo', 'bar');
+
+        $this->assertTrue($response->allowed());
+        $this->assertSame('quz', $response->message());
+        $this->assertSame('qux', $response->code());
+    }
+
+    public function testPermitThrowsExceptionWhenFalse()
+    {
+        $this->expectException(AuthorizationException::class);
+
+        $this->getBasicGate()->permit(false);
+    }
+
+    public function testPermitThrowsExceptionWhenCallbackFalse()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $this->getBasicGate()->permit(function () {
+            return false;
+        }, 'foo', 'bar');
+    }
+
+    public function testPermitThrowsExceptionWhenResponseDenied()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $this->getBasicGate()->permit(Response::deny('foo', 'bar'));
+    }
+
+    public function testPermitThrowsExceptionWhenCallbackResponseDenied()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('quz');
+        $this->expectExceptionCode('qux');
+
+        $this->getBasicGate()->permit(function () {
+            return Response::deny('quz', 'qux');
+        }, 'foo', 'bar');
+    }
+
+    public function testForbidAuthorizesFalse()
+    {
+        $response = $this->getBasicGate()->forbid(false);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testForbidAuthorizesFalsy()
+    {
+        $response = $this->getBasicGate()->forbid(0);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testForbidAuthorizesCallbackFalse()
+    {
+        $response = $this->getBasicGate()->forbid(function ($user) {
+            $this->assertSame(1, $user->id);
+
+            return false;
+        }, 'foo', 'bar');
+
+        $this->assertTrue($response->allowed());
+        $this->assertSame('foo', $response->message());
+        $this->assertSame('bar', $response->code());
+    }
+
+    public function testForbidAuthorizesResponseAllowed()
+    {
+        $response = $this->getBasicGate()->forbid(Response::allow('foo', 'bar'));
+
+        $this->assertTrue($response->allowed());
+        $this->assertSame('foo', $response->message());
+        $this->assertSame('bar', $response->code());
+    }
+
+    public function testForbidAuthorizesCallbackResponseAllowed()
+    {
+        $response = $this->getBasicGate()->forbid(function () {
+            return Response::allow('quz', 'qux');
+        }, 'foo', 'bar');
+
+        $this->assertTrue($response->allowed());
+        $this->assertSame('quz', $response->message());
+        $this->assertSame('qux', $response->code());
+    }
+
+    public function testForbidThrowsExceptionWhenTrue()
+    {
+        $this->expectException(AuthorizationException::class);
+
+        $this->getBasicGate()->forbid(true);
+    }
+
+    public function testForbidThrowsExceptionWhenCallbackTrue()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $this->getBasicGate()->forbid(function () {
+            return true;
+        }, 'foo', 'bar');
+    }
+
+    public function testForbidThrowsExceptionWhenResponseDenied()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $this->getBasicGate()->forbid(Response::deny('foo', 'bar'));
+    }
+
+    public function testForbidThrowsExceptionWhenCallbackResponseDenied()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('quz');
+        $this->expectExceptionCode('qux');
+
+        $this->getBasicGate()->forbid(function () {
+            return Response::deny('quz', 'qux');
+        }, 'foo', 'bar');
+    }
+
     protected function getBasicGate($isAdmin = false)
     {
         return new Gate(new Container, function () use ($isAdmin) {
