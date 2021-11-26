@@ -774,7 +774,7 @@ class Gate implements GateContract
     /**
      * Throws an authorization exception if the condition or callback is falsy.
      *
-     * @param  \Closure|bool $condition
+     * @param  \Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
      * @param  bool  $allow
@@ -796,7 +796,7 @@ class Gate implements GateContract
     /**
      * Throws an authorization exception if the condition or callback is truthy.
      *
-     * @param  \Closure|bool $condition
+     * @param  \Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
      * @return \Illuminate\Auth\Access\Response
