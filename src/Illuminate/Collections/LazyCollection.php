@@ -1373,6 +1373,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot()
+    {
+        return $this->passthru('undot', []);
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
