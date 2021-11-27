@@ -502,6 +502,8 @@ class ComponentTagCompiler
                 $attribute = Str::after($attribute, 'bind:');
 
                 $this->boundAttributes[$attribute] = true;
+            } elseif (Str::startsWith($attribute, 'x-for')) {
+                $this->boundAttributes[$attribute] = true;
             } else {
                 $value = "'".$this->compileAttributeEchos($value)."'";
             }

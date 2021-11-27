@@ -97,6 +97,12 @@ trait ManagesComponents
             $view = value($view, $data);
 
             if ($view instanceof View) {
+                if ($data['attributes']->has('x-for')) {
+                    [$resources, $bindingAttributeKey] = $data['attributes']->offsetGet('x-for');
+
+                    return $this->renderLoopComponent($view, $data, $bindingAttributeKey, $resources);
+                }
+
                 return $view->with($data)->render();
             } elseif ($view instanceof Htmlable) {
                 return $view->toHtml();
@@ -218,5 +224,32 @@ trait ManagesComponents
         $this->componentStack = [];
         $this->componentData = [];
         $this->currentComponentData = [];
+    }
+
+    /**
+     * Render component that need to loop through an iterable
+     *
+     * @param View $view
+     * @param array $data
+     * @param string $bindingAttributeKey
+     * @param iterable $resources
+     *
+     * @return string
+     */
+    protected function renderLoopComponent(
+        View $view,
+        array $data,
+        string $bindingAttributeKey,
+        iterable $resources
+    ): string {
+        $components = '';
+
+        foreach ($resources as $resource) {
+            $data[$bindingAttributeKey] = $resource;
+
+            $components .= $view->with($data)->render();
+        }
+
+        return $components;
     }
 }
