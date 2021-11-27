@@ -573,7 +573,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return mixed
      */
-    public function castAttribute($key, $value)
+    protected function castAttribute($key, $value)
     {
         $castType = $this->getCastType($key);
 
