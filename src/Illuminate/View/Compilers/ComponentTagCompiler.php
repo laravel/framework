@@ -498,11 +498,10 @@ class ComponentTagCompiler
 
             $value = $this->stripQuotes($value);
 
-            if (Str::startsWith($attribute, 'bind:')) {
+            // x-for should be considered as bound attribute
+            if (Str::startsWith($attribute, 'bind:') || $attribute === 'x-for') {
                 $attribute = Str::after($attribute, 'bind:');
 
-                $this->boundAttributes[$attribute] = true;
-            } elseif (Str::startsWith($attribute, 'x-for')) {
                 $this->boundAttributes[$attribute] = true;
             } else {
                 $value = "'".$this->compileAttributeEchos($value)."'";

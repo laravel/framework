@@ -97,7 +97,7 @@ trait ManagesComponents
             $view = value($view, $data);
 
             if ($view instanceof View) {
-                if ($data['attributes']->has('x-for')) {
+                if (isset($data['attributes']) && $data['attributes']->has('x-for')) {
                     [$resources, $bindingAttributeKey] = $data['attributes']->offsetGet('x-for');
 
                     return $this->renderLoopComponent($view, $data, $bindingAttributeKey, $resources);

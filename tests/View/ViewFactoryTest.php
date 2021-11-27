@@ -13,6 +13,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\LazyCollection;
 use Illuminate\View\Compilers\CompilerInterface;
+use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Engines\PhpEngine;
@@ -407,6 +408,62 @@ class ViewFactoryTest extends TestCase
         $factory->startComponent(new HtmlString('laravel.com'));
         $contents = $factory->renderComponent();
         $this->assertSame('laravel.com', $contents);
+    }
+
+    public function testComponentLoopHandling()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine(new Filesystem));
+        $factory->getDispatcher()->shouldReceive('dispatch');
+        $factory->startComponent(
+            $view = $this->createMock(View::class),
+            $data = [
+                'attributes' => new ComponentAttributeBag([
+                    'x-for' => [
+                        [ // iterable
+                            'Taylor',
+                            'Seth Phat',
+                        ],
+                        'name', // attribute for component
+                    ],
+                ]),
+            ],
+        );
+
+        $view->expects($this->exactly(2))
+            ->method('with')
+            ->withConsecutive(
+                [
+                    $data + [
+                        'name' => 'Taylor',
+                        'slot' => new HtmlString(''),
+                        '__laravel_slots' => [
+                            '__default' => new HtmlString(''),
+                        ],
+                    ],
+                ],
+                [
+                    $data + [
+                        'name' => 'Seth Phat',
+                        'slot' => new HtmlString(''),
+                        '__laravel_slots' => [
+                            '__default' => new HtmlString(''),
+                        ],
+                    ],
+                ]
+            )
+            ->willReturnSelf();
+        $view->expects($this->exactly(2))
+            ->method('render')
+            ->willReturnOnConsecutiveCalls(
+                'Taylor',
+                'Seth Phat'
+            );
+
+        $contents = $factory->renderComponent();
+        $this->assertStringContainsString('Taylor', $contents);
+        $this->assertStringContainsString('Seth Phat', $contents);
     }
 
     public function testTranslation()
