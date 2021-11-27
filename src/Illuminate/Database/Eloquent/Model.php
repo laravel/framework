@@ -1879,7 +1879,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $field ??= $this->getRouteKeyName();
 
-        return $this->where($field, $this->castAttribute($field, $value))->first();
+        return $this->where($field, $this->hasCast($field) ? $this->castAttribute($field, $value) : $value)->first();
     }
 
     /**
@@ -1893,7 +1893,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $field ??= $this->getRouteKeyName();
 
-        return $this->where($field, $this->castAttribute($field, $value))->withTrashed()->first();
+        return $this->where($field, $this->hasCast($field) ? $this->castAttribute($field, $value) : $values)->withTrashed()->first();
     }
 
     /**
