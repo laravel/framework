@@ -1936,6 +1936,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $field = $field ?: $relationship->getRelated()->getRouteKeyName();
 
+        if ($relationship->getRelated()->hasCast($field)) {
+            $value = $relationship->getRelated()->castAttribute($field, $value);
+        }
+
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {
             return $relationship->where($relationship->getRelated()->getTable().'.'.$field, $value);

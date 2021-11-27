@@ -1657,6 +1657,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('1|test-slug', $router->dispatch(Request::create('foo/1/test-slug', 'GET'))->getContent());
     }
 
+    public function testParentChildImplicitBindingsCast()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/{user}/{post:user_id}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestIdCastUserModel $user, RoutingTestPostModel $post) {
+                $this->assertInstanceOf(RoutingTestIdCastUserModel::class, $user);
+                $this->assertInstanceOf(RoutingTestPostModel::class, $post);
+
+                return $user->value.'|'.$post->value;
+            },
+        ]);
+
+        $this->assertSame('1|2', $router->dispatch(Request::create('foo/1/2team', 'GET'))->getContent());
+    }
+
     public function testParentChildImplicitBindingsProperlyCamelCased()
     {
         $router = $this->getRouter();
@@ -1685,7 +1702,7 @@ class RoutingRouteTest extends TestCase
                 return $bar->value;
             },
         ]);
-        $this->assertSame('123', $router->dispatch(Request::create('foo/123', 'GET'))->getContent());
+        $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
     public function testImplicitBindingsWithMissingModelHandledByMissing()
@@ -2261,6 +2278,8 @@ class RoutingTestUserModel extends Model
 
 class RoutingTestPostModel extends Model
 {
+    protected $casts = ['user_id' => 'integer'];
+
     public function getRouteKeyName()
     {
         return 'id';
@@ -2274,6 +2293,11 @@ class RoutingTestPostModel extends Model
     }
 
     public function first()
+    {
+        return $this;
+    }
+
+    public function getRelated()
     {
         return $this;
     }
@@ -2304,6 +2328,11 @@ class RoutingTestTeamModel extends Model
     }
 
     public function firstOrFail()
+    {
+        return $this;
+    }
+
+    public function getRelated()
     {
         return $this;
     }
