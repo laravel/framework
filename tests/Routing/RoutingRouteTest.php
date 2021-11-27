@@ -1621,17 +1621,17 @@ class RoutingRouteTest extends TestCase
             },
         ]);
 
-        $this->assertSame('123', $router->dispatch(Request::create('foo/123', 'GET'))->getContent());
+        $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testPrimaryKeyCastingInImplicitBindings()
+    public function testCastInImplicitBindings()
     {
         $router = $this->getRouter();
 
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar) {
-                $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
+            'uses' => function (RoutingTestIdCastUserModel $bar) {
+                $this->assertInstanceOf(RoutingTestIdCastUserModel::class, $bar);
 
                 return $bar->value;
             },
@@ -2238,7 +2238,7 @@ class RoutingTestUserModel extends Model
 
     public function getKeyType()
     {
-        return 'int';
+        return 'string';
     }
 
     public function where($key, $value)
@@ -2312,6 +2312,14 @@ class RoutingTestTeamModel extends Model
 class RoutingTestExtendedUserModel extends RoutingTestUserModel
 {
     //
+}
+
+class RoutingTestIdCastUserModel extends RoutingTestUserModel
+{
+    public function getKeyType()
+    {
+        return 'int';
+    }
 }
 
 class RoutingTestNonExistingUserModel extends RoutingTestUserModel
