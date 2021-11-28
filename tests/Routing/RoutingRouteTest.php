@@ -1661,7 +1661,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
 
-        $router->get('foo/{user}/{post:user_id}', [
+        $router->get('foo/{user}/{post:team_id}', [
             'middleware' => SubstituteBindings::class,
             'uses' => function (RoutingTestIdCastUserModel $user, RoutingTestPostModel $post) {
                 $this->assertInstanceOf(RoutingTestIdCastUserModel::class, $user);
@@ -2278,7 +2278,7 @@ class RoutingTestUserModel extends Model
 
 class RoutingTestPostModel extends Model
 {
-    protected $casts = ['user_id' => 'integer'];
+    protected $casts = ['team_id' => 'integer'];
 
     public function getRouteKeyName()
     {
