@@ -89,6 +89,8 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function compileFulltext(Blueprint $blueprint, Fluent $command)
     {
