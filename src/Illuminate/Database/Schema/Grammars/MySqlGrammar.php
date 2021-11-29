@@ -363,6 +363,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a drop fulltext index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropFulltext(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileDropIndex($blueprint, $command);
+    }
+
+    /**
      * Compile a drop spatial index command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
