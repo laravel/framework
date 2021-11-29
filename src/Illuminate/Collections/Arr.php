@@ -432,7 +432,7 @@ class Arr
      */
     public static function multiples($array, $multiple)
     {
-        return array_map(function($item) use ($multiple) {
+        return array_map(function ($item) use ($multiple) {
             return (int) $item * $multiple;
         }, $array);
     }
