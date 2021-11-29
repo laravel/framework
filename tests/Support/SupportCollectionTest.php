@@ -4891,6 +4891,20 @@ class SupportCollectionTest extends TestCase
         ], $data->all());
     }
 
+    public function testDoubleMethod()
+    {
+        $data = collect([2, 3, 4]);
+        $result = $data->double()->all();
+        $this->assertSame([4, 6, 8], $result);
+    }
+
+    public function testTripleMethod()
+    {
+        $data = collect([2, 3, 4]);
+        $result = $data->triple()->all();
+        $this->assertSame([6, 9, 12], $result);
+    }
+
     /**
      * Provides each collection class, respectively.
      *

@@ -317,6 +317,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Double up each item.
+     *
+     * @return static
+     */
+    public function double()
+    {
+        return new static(Arr::multiples($this->items,2));
+    }
+
+    /**
      * Get all items except for those with the specified keys.
      *
      * @param  \Illuminate\Support\Collection|mixed  $keys
@@ -1433,6 +1443,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $this->items = $this->map($callback)->all();
 
         return $this;
+    }
+
+    /**
+     * Triple up each item.
+     *
+     * @return static
+     */
+    public function triple()
+    {
+        return new static(Arr::multiples($this->items,3));
     }
 
     /**

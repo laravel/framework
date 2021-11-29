@@ -424,6 +424,20 @@ class Arr
     }
 
     /**
+     * Map over an array multiples each value by passed value
+     *
+     * @param  array  $array
+     * @param  int|float  $multiple
+     * @return array
+     */
+    public static function multiples($array, $multiple)
+    {
+        return array_map(function($item) use($multiple){
+            return (int) $item * $multiple;
+        },$array);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
