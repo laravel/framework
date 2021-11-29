@@ -55,9 +55,24 @@ class DatabaseChannel
     {
         return [
             'id' => $notification->id,
-            'type' => get_class($notification),
+            'type' => $this->chooseType($notification),
             'data' => $this->getData($notifiable, $notification),
             'read_at' => null,
         ];
+    }
+
+    /**
+     * Use databaseType method or the notification class name for the type column.
+     *
+     * @param  mixed  $notification
+     * @return string
+     */
+    private function chooseType($notification)
+    {
+        if (method_exists($notification, 'databaseType')) {
+            return $notification->databaseType();
+        }
+
+        return get_class($notification);
     }
 }
