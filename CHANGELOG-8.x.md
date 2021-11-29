@@ -2,6 +2,21 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.73.2...8.x)
 
+### Added
+- Added optional `except` parameter to the PruneCommand ([#39749](https://github.com/laravel/framework/pull/39749), [be4afcc](https://github.com/laravel/framework/commit/be4afcc6c2a42402d4404263c6a5ca901d067dd2))
+- Added `Illuminate/Foundation/Application::hasDebugModeEnabled()` ([#39755](https://github.com/laravel/framework/pull/39755))
+- Added `Illuminate/Support/Facades/Event::fakeExcept()` and `Illuminate/Support/Facades/Event::fakeExceptFor()` ([#39752](https://github.com/laravel/framework/pull/39752))
+- Added aggregate method to Eloquent passthru ([#39772](https://github.com/laravel/framework/pull/39772))
+- Added `undot()` method to Arr helpers and Collections ([#39729](https://github.com/laravel/framework/pull/39729))
+- Added `reverse` method to `Str` ([#39816](https://github.com/laravel/framework/pull/39816))
+
+### Fixed
+- Fixed bus service provider when loaded outside of the framework ([#39740](https://github.com/laravel/framework/pull/39740))
+- Fixes logging deprecations when null driver do not exist ([#39809](https://github.com/laravel/framework/pull/39809))
+
+### Changed
+- Validate connection name before resolve queue connection ([#39751](https://github.com/laravel/framework/pull/39751))
+
 
 ## [v8.73.2 (2021-11-23)](https://github.com/laravel/framework/compare/v8.73.1...v8.73.2)
 
