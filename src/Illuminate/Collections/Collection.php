@@ -323,7 +323,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function double()
     {
-        return new static(Arr::multiples($this->items,2));
+        return new static(Arr::multiples($this->items, 2));
     }
 
     /**
@@ -1452,7 +1452,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function triple()
     {
-        return new static(Arr::multiples($this->items,3));
+        return new static(Arr::multiples($this->items, 3));
     }
 
     /**

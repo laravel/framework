@@ -424,7 +424,7 @@ class Arr
     }
 
     /**
-     * Map over an array multiples each value by passed value
+     * Map over an array multiples each value by passed value.
      *
      * @param  array  $array
      * @param  int|float  $multiple
@@ -432,9 +432,9 @@ class Arr
      */
     public static function multiples($array, $multiple)
     {
-        return array_map(function($item) use($multiple){
+        return array_map(function($item) use ($multiple) {
             return (int) $item * $multiple;
-        },$array);
+        }, $array);
     }
 
     /**
