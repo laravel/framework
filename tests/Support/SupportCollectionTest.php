@@ -4907,6 +4907,42 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUndot($collection)
+    {
+        $data = $collection::make([
+            'name' => 'Taylor',
+            'meta.foo' => 'bar',
+            'meta.baz' => 'boom',
+            'meta.bam.boom' => 'bip',
+        ])->undot();
+        $this->assertSame([
+            'name' => 'Taylor',
+            'meta' => [
+                'foo' => 'bar',
+                'baz' => 'boom',
+                'bam' => [
+                    'boom' => 'bip',
+                ],
+            ],
+        ], $data->all());
+
+        $data = $collection::make([
+            'foo.0' => 'bar',
+            'foo.1' => 'baz',
+            'foo.baz' => 'boom',
+        ])->undot();
+        $this->assertSame([
+            'foo' => [
+                'bar',
+                'baz',
+                'baz' => 'boom',
+            ],
+        ], $data->all());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array

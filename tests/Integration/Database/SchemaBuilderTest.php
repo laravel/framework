@@ -1,13 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\SchemaTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Tests\Integration\Database\Fixtures\TinyInteger;
 
 class SchemaBuilderTest extends DatabaseTestCase

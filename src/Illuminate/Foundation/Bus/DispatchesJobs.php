@@ -31,7 +31,7 @@ trait DispatchesJobs
     }
 
     /**
-     * Dispatch a command to its appropriate handler in the current process.
+     * Dispatch a job to its appropriate handler in the current process.
      *
      * Queueable jobs will be dispatched to the "sync" queue.
      *

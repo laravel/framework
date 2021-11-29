@@ -1467,6 +1467,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot()
+    {
+        return new static(Arr::undot($this->all()));
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param  (callable(TValue, TKey): bool)|string|null  $key
