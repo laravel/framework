@@ -24,6 +24,13 @@ abstract class Seeder
     protected $command;
 
     /**
+     * Seeders that have been called at least one time.
+     *
+     * @var array
+     */
+    protected static $called = [];
+
+    /**
      * Run the given seeder class.
      *
      * @param  array|string  $class
@@ -53,6 +60,8 @@ abstract class Seeder
             if ($silent === false && isset($this->command)) {
                 $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime}ms)");
             }
+
+            static::$called[] = $class;
         }
 
         return $this;
@@ -80,6 +89,22 @@ abstract class Seeder
     public function callSilent($class, array $parameters = [])
     {
         $this->call($class, true, $parameters);
+    }
+
+    /**
+     * Run the given seeder class once.
+     *
+     * @param  array|string  $class
+     * @param  bool  $silent
+     * @return void
+     */
+    public function callOnce($class, $silent = false, array $parameters = [])
+    {
+        if (in_array($class, static::$called)) {
+            return;
+        }
+
+        $this->call($class, $silent, $parameters);
     }
 
     /**
