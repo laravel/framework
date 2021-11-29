@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\SchemaTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Schema\Blueprint;
