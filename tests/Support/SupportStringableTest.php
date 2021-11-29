@@ -538,6 +538,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
     }
 
+    public function testReverse()
+    {
+        $this->assertSame('FooBar', (string) $this->stringable('raBooF')->reverse());
+        $this->assertSame('Teniszütő', (string) $this->stringable('őtüzsineT')->reverse());
+        $this->assertSame('❤MultiByte☆', (string) $this->stringable('☆etyBitluM❤')->reverse());
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', (string) $this->stringable('LaravelPHPFramework')->snake());
