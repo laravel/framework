@@ -134,6 +134,14 @@ class FileViewFinder implements ViewFinderInterface
             }
         }
 
+        foreach ((array) $paths as $path) {
+            foreach ($this->getPossibleViewFiles($name) as $file) {
+                if ($this->files->exists($viewPath = $path.'/'.str_replace(explode('.', $file)[0], explode('.', $file)[0] . '/index', $file))) {
+                    return $viewPath;
+                }
+            }
+        }
+
         throw new InvalidArgumentException("View [{$name}] not found.");
     }
 
