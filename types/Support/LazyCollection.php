@@ -364,6 +364,9 @@ assertType('string|User', $collection->first(function ($user) {
 
     return false;
 }, 'string'));
+assertType('string|User', $collection->first(null, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));
@@ -412,6 +415,9 @@ assertType('User|null', $collection->last(function ($user, $int) {
 assertType('string|User', $collection->last(function () {
     return true;
 }, 'string'));
+assertType('string|User', $collection->last(null, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->map(function () {
     return 1;
@@ -779,6 +785,9 @@ assertType('array<int, User>', $collection->all());
 
 assertType('User|null', $collection->get(0));
 assertType('string|User', $collection->get(0, 'string'));
+assertType('string|User', $collection->get(0, function () {
+    return 'string';
+}));
 
 assertType(
     'Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>',

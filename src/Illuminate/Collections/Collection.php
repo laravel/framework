@@ -367,7 +367,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TFirstDefault
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @param  TFirstDefault  $default
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
     public function first(callable $callback = null, $default = null)
@@ -417,7 +417,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TGetDefault
      *
      * @param  TKey  $key
-     * @param  TGetDefault  $default
+     * @param  TGetDefault|(\Closure(): TGetDefault)  $default
      * @return TValue|TGetDefault
      */
     public function get($key, $default = null)
@@ -650,7 +650,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @param  TLastDefault  $default
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
      * @return TValue|TLastDefault
      */
     public function last(callable $callback = null, $default = null)
@@ -915,7 +915,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TPullDefault
      *
      * @param  TKey  $key
-     * @param  TPullDefault  $default
+     * @param  TPullDefault|(\Closure(): TPullDefault)  $default
      * @return TValue|TPullDefault
      */
     public function pull($key, $default = null)

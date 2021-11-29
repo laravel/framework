@@ -404,7 +404,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @template TFirstDefault
      *
      * @param  (callable(TValue): bool)|null  $callback
-     * @param  TFirstDefault  $default
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
     public function first(callable $callback = null, $default = null)
@@ -471,7 +471,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @template TGetDefault
      *
      * @param  TKey|null  $key
-     * @param  TGetDefault  $default
+     * @param  TGetDefault|(\Closure(): TGetDefault)  $default
      * @return TValue|TGetDefault
      */
     public function get($key, $default = null)
@@ -649,7 +649,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @param  TLastDefault  $default
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
      * @return TValue|TLastDefault
      */
     public function last(callable $callback = null, $default = null)
