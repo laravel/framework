@@ -493,6 +493,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Reverse the string.
+     *
+     * @return static
+     */
+    public function reverse()
+    {
+        return new static(Str::reverse($this->value));
+    }
+
+    /**
      * Repeat the string.
      *
      * @param  int  $times

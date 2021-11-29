@@ -418,6 +418,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
     }
 
+    public function testReverse()
+    {
+        $this->assertSame('FooBar', Str::reverse('raBooF'));
+        $this->assertSame('Teniszütő', Str::reverse('őtüzsineT'));
+        $this->assertSame('❤MultiByte☆', Str::reverse('☆etyBitluM❤'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
