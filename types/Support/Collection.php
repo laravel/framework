@@ -364,6 +364,9 @@ assertType('string|User', $collection->first(function ($user) {
 
     return false;
 }, 'string'));
+assertType('string|User', $collection->first(null, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, mixed>', $collection->flatten());
 assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['string' => 'string'])->flatten(4));
@@ -412,6 +415,9 @@ assertType('User|null', $collection->last(function ($user, $int) {
 assertType('string|User', $collection->last(function () {
     return true;
 }, 'string'));
+assertType('string|User', $collection->last(null, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->map(function () {
     return 1;
@@ -772,6 +778,9 @@ assertType('array<int, User>', $collection->all());
 
 assertType('User|null', $collection->get(0));
 assertType('string|User', $collection->get(0, 'string'));
+assertType('string|User', $collection->get(0, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->forget([1, 2]));
@@ -790,6 +799,9 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->push(new Use
 
 assertType('User|null', $collection->pull(1));
 assertType('string|User', $collection->pull(1, 'string'));
+assertType('string|User', $collection->pull(1, function () {
+    return 'string';
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->put(1, new User));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make([

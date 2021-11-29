@@ -1415,6 +1415,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibits:emails,email_address']);
         $this->assertFalse($v->passes());
         $this->assertSame('The email field prohibits emails / email address being present.', $v->messages()->first('email'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'foo' => [
+                ['email' => 'foo', 'emails' => 'foo'],
+                ['emails' => 'foo'],
+            ],
+        ], ['foo.*.email' => 'prohibits:foo.*.emails']);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.email'));
+        $this->assertFalse($v->messages()->has('foo.1.email'));
     }
 
     public function testFailedFileUploads()

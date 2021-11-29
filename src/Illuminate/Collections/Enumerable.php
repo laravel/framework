@@ -459,7 +459,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TFirstDefault
      *
      * @param  (callable(TValue,TKey): bool)|null  $callback
-     * @param  TFirstDefault  $default
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
      * @return TValue|TFirstDefault
      */
     public function first(callable $callback = null, $default = null);
@@ -495,7 +495,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TGetDefault
      *
      * @param  TKey  $key
-     * @param  TGetDefault  $default
+     * @param  TGetDefault|(\Closure(): TGetDefault)  $default
      * @return TValue|TGetDefault
      */
     public function get($key, $default = null);
@@ -586,7 +586,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
-     * @param  TLastDefault  $default
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
      * @return TValue|TLastDefault
      */
     public function last(callable $callback = null, $default = null);

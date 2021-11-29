@@ -20,7 +20,9 @@ use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
@@ -883,6 +885,68 @@ class ResourceTest extends TestCase
         $createdPosts->each(function ($post) use ($response) {
             $this->assertTrue($response->getOriginalContent()->contains($post));
         });
+    }
+
+    public function testCollectionResourceWithPaginationInfomation()
+    {
+        $posts = collect([
+            new Post(['id' => 5, 'title' => 'Test Title']),
+        ]);
+
+        Route::get('/', function () use ($posts) {
+            return new PostCollectionResourceWithPaginationInformation(new LengthAwarePaginator($posts, 10, 1, 1));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/',
+            ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                ],
+            ],
+            'current_page' => 1,
+            'per_page' => 1,
+            'total_page' => 10,
+            'total' => 10,
+        ]);
+    }
+
+    public function testResourceWithPaginationInfomation()
+    {
+        $posts = collect([
+            new Post(['id' => 5, 'title' => 'Test Title']),
+        ]);
+
+        Route::get('/', function () use ($posts) {
+            return PostResourceWithAnonymousResourceCollectionWithPaginationInformation::collection(new LengthAwarePaginator($posts, 10, 1, 1));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/',
+            ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                ],
+            ],
+            'current_page' => 1,
+            'per_page' => 1,
+            'total_page' => 10,
+            'total' => 10,
+        ]);
     }
 
     public function testCollectionResourcesAreCountable()

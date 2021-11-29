@@ -635,6 +635,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application is running with debug mode enabled.
+     *
+     * @return bool
+     */
+    public function hasDebugModeEnabled()
+    {
+        return (bool) $this['config']->get('app.debug');
+    }
+
+    /**
      * Register all of the configured providers.
      *
      * @return void
