@@ -676,6 +676,17 @@ class Str
     }
 
     /**
+     * Reverse the given string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function reverse(string $value)
+    {
+        return implode(array_reverse(mb_str_split($value)));
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $value
