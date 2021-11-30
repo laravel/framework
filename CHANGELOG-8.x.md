@@ -1,6 +1,9 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.73.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.74.0...8.x)
+
+
+## [v8.74.0 (2021-11-30)](https://github.com/laravel/framework/compare/v8.73.2...v8.74.0)
 
 ### Added
 - Added optional `except` parameter to the PruneCommand ([#39749](https://github.com/laravel/framework/pull/39749), [be4afcc](https://github.com/laravel/framework/commit/be4afcc6c2a42402d4404263c6a5ca901d067dd2))
@@ -9,6 +12,8 @@
 - Added aggregate method to Eloquent passthru ([#39772](https://github.com/laravel/framework/pull/39772))
 - Added `undot()` method to Arr helpers and Collections ([#39729](https://github.com/laravel/framework/pull/39729))
 - Added `reverse` method to `Str` ([#39816](https://github.com/laravel/framework/pull/39816))
+- Added possibility to customize type column in database notifications using databaseType method ([#39811](https://github.com/laravel/framework/pull/39811))
+- Added Fulltext Index ([#39821](https://github.com/laravel/framework/pull/39821))
 
 ### Fixed
 - Fixed bus service provider when loaded outside of the framework ([#39740](https://github.com/laravel/framework/pull/39740))
@@ -16,6 +21,8 @@
 
 ### Changed
 - Validate connection name before resolve queue connection ([#39751](https://github.com/laravel/framework/pull/39751))
+- Bump Symfony to 5.4 ([#39827](https://github.com/laravel/framework/pull/39827))
+- Optimize the execution time of the unique method ([#39822](https://github.com/laravel/framework/pull/39822))
 
 
 ## [v8.73.2 (2021-11-23)](https://github.com/laravel/framework/compare/v8.73.1...v8.73.2)
