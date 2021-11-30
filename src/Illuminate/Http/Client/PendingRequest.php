@@ -690,11 +690,11 @@ class PendingRequest
                     $this->populateResponse($response);
 
                     if ($this->tries > 1) {
-                        if($this->retryTargetStatusCode !== null && $this->retryTargetStatusCode !== $response->status()) {
+                        if ($this->retryTargetStatusCode !== null && $this->retryTargetStatusCode !== $response->status()) {
                             throw new \Illuminate\Http\Client\RequestException($response);
                         }
 
-                        if(! $response->successful()) {
+                        if (! $response->successful()) {
                             $response->throw();
                         }
                     }
@@ -702,7 +702,7 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
                 });
             } catch (Throwable $e) {
-                if($e instanceof ConnectException) {
+                if ($e instanceof ConnectException) {
                     $this->dispatchConnectionFailedEvent();
 
                     throw new ConnectionException($e->getMessage(), 0, $e);
