@@ -66,7 +66,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require symfony/symfony:5.4.x-dev league/commonmark:^2.0.2 phpunit/phpunit:^9.5.8 --no-interaction --no-update
+          command: composer require league/commonmark:^2.0.2 phpunit/phpunit:^9.5.8 --no-interaction --no-update
         if: matrix.php >= 8.1
 
       - name: Install dependencies
@@ -135,7 +135,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require symfony/symfony:5.4.x-dev league/commonmark:^2.0.2 phpunit/phpunit:^9.5.8 --no-interaction --no-update
+          command: composer require league/commonmark:^2.0.2 phpunit/phpunit:^9.5.8 --no-interaction --no-update
         if: matrix.php >= 8.1
 
       - name: Install dependencies
