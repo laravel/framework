@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Message\MessageInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Throwable;
 
 class PendingRequest
 {
@@ -700,7 +701,7 @@ class PendingRequest
 
                     $this->dispatchResponseReceivedEvent($response);
                 });
-            } catch (ConnectException|RequestException $e) {
+            } catch (Throwable $e) {
                 if($e instanceof ConnectException) {
                     $this->dispatchConnectionFailedEvent();
 
