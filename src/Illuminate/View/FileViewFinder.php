@@ -136,7 +136,8 @@ class FileViewFinder implements ViewFinderInterface
 
         foreach ((array) $paths as $path) {
             foreach ($this->getPossibleViewFiles($name) as $file) {
-                if ($this->files->exists($viewPath = $path.'/'.str_replace(explode('.', $file)[0], explode('.', $file)[0].'/index', $file))) {
+                $fileName = explode('.', $file, 2)[0];
+                if ($this->files->exists($viewPath = $path.'/'.str_replace($fileName, $fileName.'/index', $file))) {
                     return $viewPath;
                 }
             }
