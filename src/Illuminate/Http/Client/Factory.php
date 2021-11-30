@@ -123,7 +123,7 @@ class Factory
 
         $response = new Psr7Response($status, $headers, $body);
 
-        return class_exists(GuzzleHttp\Promise\Create::class)
+        return class_exists(\GuzzleHttp\Promise\Create::class)
             ? \GuzzleHttp\Promise\Create::promiseFor($response)
             : \GuzzleHttp\Promise\promise_for($response);
     }
