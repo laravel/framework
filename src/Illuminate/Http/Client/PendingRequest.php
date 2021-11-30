@@ -110,7 +110,7 @@ class PendingRequest
      *
      * @var int|null
      */
-    protected ?int $retryTargetStatusCode;
+    protected ?int $retryTargetStatusCode = null;
 
     /**
      * The callbacks that should execute before the request is sent.
@@ -688,20 +688,26 @@ class PendingRequest
                 return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) {
                     $this->populateResponse($response);
 
-                    if($this->retryTargetStatusCode !== null && $this->retryTargetStatusCode !== $response->status()) {
-                        throw new \Illuminate\Http\Client\RequestException($response);
-                    }
+                    if ($this->tries > 1) {
+                        if($this->retryTargetStatusCode !== null && $this->retryTargetStatusCode !== $response->status()) {
+                            throw new \Illuminate\Http\Client\RequestException($response);
+                        }
 
-                    if ($this->tries > 1 && ! $response->successful()) {
-                        $response->throw();
+                        if(! $response->successful()) {
+                            $response->throw();
+                        }
                     }
 
                     $this->dispatchResponseReceivedEvent($response);
                 });
-            } catch (ConnectException $e) {
-                $this->dispatchConnectionFailedEvent();
+            } catch (ConnectException|RequestException $e) {
+                if($e instanceof ConnectException) {
+                    $this->dispatchConnectionFailedEvent();
 
-                throw new ConnectionException($e->getMessage(), 0, $e);
+                    throw new ConnectionException($e->getMessage(), 0, $e);
+                }
+
+                throw $e;
             }
         }, $this->retryDelay ?? 100, $this->retryWhenCallback);
     }
