@@ -106,6 +106,13 @@ class PendingRequest
     protected $retryWhenCallback = null;
 
     /**
+     * The target status code to pass as a successful try.
+     *
+     * @var int|null
+     */
+    protected ?int $retryTargetStatusCode;
+
+    /**
      * The callbacks that should execute before the request is sent.
      *
      * @var \Illuminate\Support\Collection
@@ -451,13 +458,15 @@ class PendingRequest
      * @param  int  $times
      * @param  int  $sleep
      * @param  callable|null  $when
+     * @param  int|null  $targetStatusCode
      * @return $this
      */
-    public function retry(int $times, int $sleep = 0, ?callable $when = null)
+    public function retry(int $times, int $sleep = 0, ?callable $when = null, ?int $targetStatusCode = null)
     {
         $this->tries = $times;
         $this->retryDelay = $sleep;
         $this->retryWhenCallback = $when;
+        $this->retryTargetStatusCode = $targetStatusCode;
 
         return $this;
     }
@@ -678,6 +687,10 @@ class PendingRequest
             try {
                 return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) {
                     $this->populateResponse($response);
+
+                    if($this->retryTargetStatusCode !== null && $this->retryTargetStatusCode !== $response->status()) {
+                        throw new \Illuminate\Http\Client\RequestException($response);
+                    }
 
                     if ($this->tries > 1 && ! $response->successful()) {
                         $response->throw();

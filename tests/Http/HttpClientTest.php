@@ -1028,4 +1028,49 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('https://example.com');
     }
+
+    public function testRetryDoesReturnSuccessfulResponse()
+    {
+        $this->factory->fakeSequence()
+            ->pushStatus(400)
+            ->pushStatus(200);
+
+        $this->factory->retry(2)->get('http://example.com');
+
+        $this->factory->assertSentInOrder(
+            [
+                function (Request $request, Response $response) {
+                    return $request->url() === 'http://example.com'
+                        && $response->status() === 400;
+                },
+                function (Request $request, Response $response) {
+                    return $request->url() === 'http://example.com'
+                        && $response->status() === 200;
+                },
+            ]
+        );
+    }
+
+    public function testRetryWithTargetStatusCode()
+    {
+        $this->factory->fakeSequence()
+            ->pushStatus(202)
+            ->pushStatus(200);
+
+        $this->factory->retry(2, 0, null, 200)
+            ->get('http://example.com');
+
+        $this->factory->assertSentInOrder(
+            [
+                function (Request $request, Response $response) {
+                    return $request->url() === 'http://example.com'
+                        && $response->status() === 202;
+                },
+                function (Request $request, Response $response) {
+                    return $request->url() === 'http://example.com'
+                        && $response->status() === 200;
+                },
+            ]
+        );
+    }
 }
