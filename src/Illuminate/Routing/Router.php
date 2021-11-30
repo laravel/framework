@@ -24,6 +24,7 @@ use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use ReflectionClass;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
@@ -1307,6 +1308,45 @@ class Router implements BindingRegistrar, RegistrarContract
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Discover and routes resource controllers by the given path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function discover($path)
+    {
+        $files = (new Finder)->in($path)->files();
+
+        $namespace = app()->getNamespace();
+
+        return collect($files)
+            ->map(fn ($file) => $namespace.str_replace(
+                ['/', '.php'],
+                ['\\', ''],
+                Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+            ))->map(fn ($fileClass) => new ReflectionClass($fileClass))
+            ->reject->isAbstract()
+            ->map(function (ReflectionClass $reflection) use ($path) {
+                $methods = collect($reflection->getMethods())
+                    ->filter->isPublic()
+                    ->map->getName()
+                    ->filter(fn ($name) => in_array($name, ['index', 'show', 'store', 'update', 'destroy']));
+
+                $relativeRouteName = rtrim($reflection->getShortName(), 'Controller');
+
+                if (empty($relativeRouteName)) {
+                    return;
+                }
+
+                $routeName = strtolower(ltrim($reflection->getFileName(), $path));
+                $routeName = rtrim($routeName, '.php');
+                $this->resource(Str::kebab($routeName), $reflection->getName(), [
+                    'only' => $methods->all(),
+                ])->names(str_replace('/', '.', $routeName));
+            });
     }
 
     /**

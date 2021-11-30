@@ -35,6 +35,7 @@ namespace Illuminate\Support\Facades;
  * @method static string|null currentRouteName()
  * @method static void apiResources(array $resources, array $options = [])
  * @method static void bind(string $key, string|callable $binder)
+ * @method static void discover(string $path)
  * @method static void model(string $key, string $class, \Closure|null $callback = null)
  * @method static void pattern(string $key, string $pattern)
  * @method static void resources(array $resources, array $options = [])
