@@ -1457,7 +1457,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         if ($key === null && $strict === false) {
             return new static(array_unique($this->items, SORT_REGULAR));
         }
-        
+
         $callback = $this->valueRetriever($key);
 
         $exists = [];
