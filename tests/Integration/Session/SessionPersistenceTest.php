@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SessionPersistenceTest extends TestCase
 {
     public function testSessionIsPersistedEvenIfExceptionIsThrownFromRoute()

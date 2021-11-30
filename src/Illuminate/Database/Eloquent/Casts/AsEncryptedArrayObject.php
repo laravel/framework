@@ -16,7 +16,8 @@ class AsEncryptedArrayObject implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes {
+        return new class implements CastsAttributes
+        {
             public function get($model, $key, $value, $attributes)
             {
                 return new ArrayObject(json_decode(Crypt::decryptString($attributes[$key]), true));

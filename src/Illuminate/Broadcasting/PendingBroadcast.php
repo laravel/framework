@@ -34,6 +34,21 @@ class PendingBroadcast
     }
 
     /**
+     * Broadcast the event using a specific broadcaster.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function via($connection = null)
+    {
+        if (method_exists($this->event, 'broadcastVia')) {
+            $this->event->broadcastVia($connection);
+        }
+
+        return $this;
+    }
+
+    /**
      * Broadcast the event to everyone except the current user.
      *
      * @return $this

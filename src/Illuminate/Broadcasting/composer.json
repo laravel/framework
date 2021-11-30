@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^8.0.2",
         "ext-json": "*",
         "psr/log": "^1.0",
         "illuminate/bus": "^9.0",
@@ -34,7 +34,7 @@
         }
     },
     "suggest": {
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0|^7.0))."
     },
     "config": {
         "sort-packages": true

@@ -16,9 +16,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EloquentRelationshipsTest extends TestCase
 {
     public function testStandardRelationships()
@@ -56,11 +53,11 @@ class EloquentRelationshipsTest extends TestCase
     public function testAlwaysUnsetBelongsToRelationWhenReceivedModelId()
     {
         // create users
-        $user1 = (new FakeRelationship())->forceFill(['id' => 1]);
-        $user2 = (new FakeRelationship())->forceFill(['id' => 2]);
+        $user1 = (new FakeRelationship)->forceFill(['id' => 1]);
+        $user2 = (new FakeRelationship)->forceFill(['id' => 2]);
 
         // sync user 1 using Model
-        $post = new Post();
+        $post = new Post;
         $post->author()->associate($user1);
         $post->syncOriginal();
 

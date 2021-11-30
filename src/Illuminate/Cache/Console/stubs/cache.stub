@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCacheTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,14 @@ class CreateCacheTable extends Migration
     public function up()
     {
         Schema::create('cache', function (Blueprint $table) {
-            $table->string('key')->unique();
+            $table->string('key')->primary();
             $table->mediumText('value');
+            $table->integer('expiration');
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
             $table->integer('expiration');
         });
     }
@@ -28,5 +34,6 @@ class CreateCacheTable extends Migration
     public function down()
     {
         Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
     }
-}
+};

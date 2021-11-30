@@ -55,7 +55,7 @@ abstract class TrustHosts
      */
     protected function shouldSpecifyTrustedHosts()
     {
-        return config('app.env') !== 'local' &&
+        return ! $this->app->environment('local') &&
                ! $this->app->runningUnitTests();
     }
 

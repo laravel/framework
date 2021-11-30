@@ -49,6 +49,14 @@ trait DetectsLostConnections
             'SQLSTATE[HY000] [2002] Connection timed out',
             'SSL: Connection timed out',
             'SQLSTATE[HY000]: General error: 1105 The last transaction was aborted due to Seamless Scaling. Please retry.',
+            'Temporary failure in name resolution',
+            'SSL: Broken pipe',
+            'SQLSTATE[08S01]: Communication link failure',
+            'SQLSTATE[08006] [7] could not connect to server: Connection refused Is the server running on host',
+            'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: No route to host',
+            'The client was disconnected by the server because of inactivity. See wait_timeout and interactive_timeout for configuring this behavior.',
+            'SQLSTATE[08006] [7] could not translate host name',
+            'TCP Provider: Error code 0x274C',
         ]);
     }
 }

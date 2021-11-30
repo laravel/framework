@@ -165,6 +165,16 @@ class FileLoader implements Loader
     }
 
     /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        return $this->hints;
+    }
+
+    /**
      * Add a new JSON path to the loader.
      *
      * @param  string  $path
@@ -176,12 +186,12 @@ class FileLoader implements Loader
     }
 
     /**
-     * Get an array of all the registered namespaces.
+     * Get an array of all the registered paths to JSON translation files.
      *
      * @return array
      */
-    public function namespaces()
+    public function jsonPaths()
     {
-        return $this->hints;
+        return $this->jsonPaths;
     }
 }

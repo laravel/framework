@@ -28,8 +28,7 @@ class PipelineTest extends TestCase
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
         $this->assertSame('foo', $_SERVER['__test.pipe.two']);
 
-        unset($_SERVER['__test.pipe.one']);
-        unset($_SERVER['__test.pipe.two']);
+        unset($_SERVER['__test.pipe.one'], $_SERVER['__test.pipe.two']);
     }
 
     public function testPipelineUsageWithObjects()

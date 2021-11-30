@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Testing;
+namespace Illuminate\Tests\Foundation\Bootstrap\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\Wormhole;

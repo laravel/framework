@@ -49,6 +49,17 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $compiler->compile('foo');
+    }
+
+    public function testCompileCompilesFileAndReturnsContentsCreatingDirectory()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(false);
+        $files->shouldReceive('makeDirectory')->once()->with(__DIR__, 0777, true, true);
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
@@ -57,6 +68,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
         $this->assertSame('foo', $compiler->getPath());
@@ -73,6 +85,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
+        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         // set path before compilation
         $compiler->setPath('foo');
@@ -94,15 +107,16 @@ class ViewBladeCompilerTest extends TestCase
     }
 
     /**
+     * @dataProvider appendViewPathDataProvider
+     *
      * @param  string  $content
      * @param  string  $compiled
-     *
-     * @dataProvider appendViewPathDataProvider
      */
     public function testIncludePathToTemplate($content, $compiled)
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn($content);
+        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', $compiled);
 
         $compiler->compile('foo');
@@ -157,17 +171,9 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
+        $files->shouldReceive('exists')->once()->with(__DIR__)->andReturn(true);
         $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('').'.php', 'Hello World');
         $compiler->setPath('');
-        $compiler->compile();
-    }
-
-    public function testDontIncludeNullPath()
-    {
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1(null).'.php', 'Hello World');
-        $compiler->setPath(null);
         $compiler->compile();
     }
 

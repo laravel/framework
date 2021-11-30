@@ -81,5 +81,14 @@ tag info
         $string = '@foreach ($tasks as $task)';
         $expected = '<?php $__currentLoopData = $tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@foreach(resolve('App\\\\DataProviders\\\\'.\$provider)->data() as \$key => \$value)
+    <input {{ \$foo ? 'bar': 'baz' }}>
+@endforeach";
+        $expected = "<?php \$__currentLoopData = resolve('App\\\\DataProviders\\\\'.\$provider)->data(); \$__env->addLoop(\$__currentLoopData); foreach(\$__currentLoopData as \$key => \$value): \$__env->incrementLoopIndices(); \$loop = \$__env->getLastLoop(); ?>
+    <input <?php echo e(\$foo ? 'bar': 'baz'); ?>>
+<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getLastLoop(); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

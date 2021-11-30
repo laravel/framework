@@ -386,8 +386,8 @@ class ContextualBindingTest extends TestCase
 
         $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigIndividualValues::class);
 
-        $this->assertEquals('laravel', $resolvedInstance->username);
-        $this->assertEquals('hunter42', $resolvedInstance->password);
+        $this->assertSame('laravel', $resolvedInstance->username);
+        $this->assertSame('hunter42', $resolvedInstance->password);
         $this->assertNull($resolvedInstance->alias);
     }
 
@@ -422,9 +422,9 @@ class ContextualBindingTest extends TestCase
 
         $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigIndividualValues::class);
 
-        $this->assertEquals('laravel', $resolvedInstance->username);
-        $this->assertEquals('hunter42', $resolvedInstance->password);
-        $this->assertEquals('lumen', $resolvedInstance->alias);
+        $this->assertSame('laravel', $resolvedInstance->username);
+        $this->assertSame('hunter42', $resolvedInstance->password);
+        $this->assertSame('lumen', $resolvedInstance->alias);
     }
 
     public function testContextualBindingGivesValuesFromConfigWithDefault()
@@ -451,8 +451,8 @@ class ContextualBindingTest extends TestCase
 
         $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigIndividualValues::class);
 
-        $this->assertEquals('DEFAULT_USERNAME', $resolvedInstance->username);
-        $this->assertEquals('hunter42', $resolvedInstance->password);
+        $this->assertSame('DEFAULT_USERNAME', $resolvedInstance->username);
+        $this->assertSame('hunter42', $resolvedInstance->password);
         $this->assertNull($resolvedInstance->alias);
     }
 
@@ -477,9 +477,9 @@ class ContextualBindingTest extends TestCase
 
         $resolvedInstance = $container->make(ContainerTestContextInjectFromConfigArray::class);
 
-        $this->assertEquals('laravel', $resolvedInstance->settings['username']);
-        $this->assertEquals('hunter42', $resolvedInstance->settings['password']);
-        $this->assertEquals('lumen', $resolvedInstance->settings['alias']);
+        $this->assertSame('laravel', $resolvedInstance->settings['username']);
+        $this->assertSame('hunter42', $resolvedInstance->settings['password']);
+        $this->assertSame('lumen', $resolvedInstance->settings['alias']);
     }
 }
 

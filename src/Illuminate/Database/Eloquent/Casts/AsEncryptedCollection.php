@@ -17,7 +17,8 @@ class AsEncryptedCollection implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes {
+        return new class implements CastsAttributes
+        {
             public function get($model, $key, $value, $attributes)
             {
                 return new Collection(json_decode(Crypt::decryptString($attributes[$key]), true));

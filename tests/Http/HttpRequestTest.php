@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -304,7 +305,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $bar = false;
 
         $request->whenHas('name', function ($value) use (&$name) {
             $name = $value;
@@ -322,17 +323,24 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenHas('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertSame('', $age);
         $this->assertNull($city);
         $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testWhenFilledMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $name = $age = $city = $foo = false;
+        $name = $age = $city = $foo = $bar = false;
 
         $request->whenFilled('name', function ($value) use (&$name) {
             $name = $value;
@@ -350,10 +358,17 @@ class HttpRequestTest extends TestCase
             $foo = 'test';
         });
 
+        $request->whenFilled('bar', function () use (&$bar) {
+            $bar = 'test';
+        }, function () use (&$bar) {
+            $bar = true;
+        });
+
         $this->assertSame('Taylor', $name);
         $this->assertFalse($age);
         $this->assertFalse($city);
         $this->assertFalse($foo);
+        $this->assertTrue($bar);
     }
 
     public function testMissingMethod()
@@ -486,6 +501,35 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->boolean('unchecked'));
         $this->assertFalse($request->boolean('with_trashed'));
         $this->assertFalse($request->boolean('some_undefined_key'));
+    }
+
+    public function testCollectMethod()
+    {
+        $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);
+
+        $this->assertInstanceOf(Collection::class, $request->collect('users'));
+        $this->assertTrue($request->collect('developers')->isEmpty());
+        $this->assertEquals([1, 2, 3], $request->collect('users')->all());
+        $this->assertEquals(['users' => [1, 2, 3]], $request->collect()->all());
+
+        $request = Request::create('/', 'GET', ['text-payload']);
+        $this->assertEquals(['text-payload'], $request->collect()->all());
+
+        $request = Request::create('/', 'GET', ['email' => 'test@example.com']);
+        $this->assertEquals(['test@example.com'], $request->collect('email')->all());
+
+        $request = Request::create('/', 'GET', []);
+        $this->assertInstanceOf(Collection::class, $request->collect());
+        $this->assertTrue($request->collect()->isEmpty());
+
+        $request = Request::create('/', 'GET', ['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com']);
+        $this->assertInstanceOf(Collection::class, $request->collect(['users']));
+        $this->assertTrue($request->collect(['developers'])->isEmpty());
+        $this->assertTrue($request->collect(['roles'])->isNotEmpty());
+        $this->assertEquals(['roles' => [4, 5, 6]], $request->collect(['roles'])->all());
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->collect(['users', 'email'])->all());
+        $this->assertEquals(collect(['roles' => [4, 5, 6], 'foo' => ['bar', 'baz']]), $request->collect(['roles', 'foo']));
+        $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
     }
 
     public function testArrayAccess()
@@ -679,6 +723,15 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo', $request->header('do-this'));
         $all = $request->header(null);
         $this->assertSame('foo', $all['do-this'][0]);
+    }
+
+    public function testBearerTokenMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer fooBearerbar']);
+        $this->assertSame('fooBearerbar', $request->bearerToken());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic foo, Bearer bar']);
+        $this->assertSame('bar', $request->bearerToken());
     }
 
     public function testJSONMethod()
@@ -953,6 +1006,21 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->accepts('text/html'));
     }
 
+    public function testCaseInsensitiveAcceptHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/JSON']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'AppLiCaTion/JsOn']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/*']);
+        $this->assertTrue($request->accepts(['text/html', 'application/json']));
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'APPLICATION/JSON']);
+        $this->assertTrue($request->expectsJson());
+    }
+
     public function testSessionMethod()
     {
         $this->expectException(RuntimeException::class);
@@ -993,7 +1061,12 @@ class HttpRequestTest extends TestCase
         $request->fingerprint();
     }
 
-    public function testCreateFromBase()
+    /**
+     * Ensure JSON GET requests populate $request->request with the JSON content.
+     *
+     * @link https://github.com/laravel/framework/pull/7052 Correctly fill the $request->request parameter bag on creation.
+     */
+    public function testJsonRequestFillsRequestBodyParams()
     {
         $body = [
             'foo' => 'bar',
@@ -1012,6 +1085,24 @@ class HttpRequestTest extends TestCase
     }
 
     /**
+     * Ensure non-JSON GET requests don't pollute $request->request with the GET parameters.
+     *
+     * @link https://github.com/laravel/framework/pull/37921 Manually populate POST request body with JSON data only when required.
+     */
+    public function testNonJsonRequestDoesntFillRequestBodyParams()
+    {
+        $params = ['foo' => 'bar'];
+
+        $getRequest = Request::create('/', 'GET', $params, [], [], []);
+        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertEquals($getRequest->query->all(), $params);
+
+        $postRequest = Request::create('/', 'POST', $params, [], [], []);
+        $this->assertEquals($postRequest->request->all(), $params);
+        $this->assertEquals($postRequest->query->all(), []);
+    }
+
+    /**
      * Tests for Http\Request magic methods `__get()` and `__isset()`.
      *
      * @link https://github.com/laravel/framework/issues/10403 Form request object attribute returns empty when have some string.
@@ -1024,7 +1115,7 @@ class HttpRequestTest extends TestCase
         // Parameter 'foo' is 'bar', then it ISSET and is NOT EMPTY.
         $this->assertSame('bar', $request->foo);
         $this->assertTrue(isset($request->foo));
-        $this->assertFalse(empty($request->foo));
+        $this->assertNotEmpty($request->foo);
 
         // Parameter 'empty' is '', then it ISSET and is EMPTY.
         $this->assertSame('', $request->empty);
@@ -1034,7 +1125,7 @@ class HttpRequestTest extends TestCase
         // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertNull($request->undefined);
         $this->assertFalse(isset($request->undefined));
-        $this->assertTrue(empty($request->undefined));
+        $this->assertEmpty($request->undefined);
 
         // Simulates Route parameters.
         $request = Request::create('/example/bar', 'GET', ['xyz' => 'overwritten']);
@@ -1049,18 +1140,18 @@ class HttpRequestTest extends TestCase
         $this->assertSame('bar', $request->foo);
         $this->assertSame('bar', $request['foo']);
         $this->assertTrue(isset($request->foo));
-        $this->assertFalse(empty($request->foo));
+        $this->assertNotEmpty($request->foo);
 
         // Router parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertNull($request->undefined);
         $this->assertFalse(isset($request->undefined));
-        $this->assertTrue(empty($request->undefined));
+        $this->assertEmpty($request->undefined);
 
         // Special case: router parameter 'xyz' is 'overwritten' by QueryString, then it ISSET and is NOT EMPTY.
         // Basically, QueryStrings have priority over router parameters.
         $this->assertSame('overwritten', $request->xyz);
         $this->assertTrue(isset($request->foo));
-        $this->assertFalse(empty($request->foo));
+        $this->assertNotEmpty($request->foo);
 
         // Simulates empty QueryString and Routes.
         $request = Request::create('/', 'GET');
@@ -1074,7 +1165,7 @@ class HttpRequestTest extends TestCase
         // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertNull($request->undefined);
         $this->assertFalse(isset($request->undefined));
-        $this->assertTrue(empty($request->undefined));
+        $this->assertEmpty($request->undefined);
 
         // Special case: simulates empty QueryString and Routes, without the Route Resolver.
         // It'll happen when you try to get a parameter outside a route.
@@ -1083,7 +1174,7 @@ class HttpRequestTest extends TestCase
         // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertNull($request->undefined);
         $this->assertFalse(isset($request->undefined));
-        $this->assertTrue(empty($request->undefined));
+        $this->assertEmpty($request->undefined);
     }
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()

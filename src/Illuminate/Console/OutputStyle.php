@@ -34,7 +34,7 @@ class OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isQuiet()
+    public function isQuiet(): bool
     {
         return $this->output->isQuiet();
     }
@@ -44,7 +44,7 @@ class OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isVerbose()
+    public function isVerbose(): bool
     {
         return $this->output->isVerbose();
     }
@@ -54,7 +54,7 @@ class OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isVeryVerbose()
+    public function isVeryVerbose(): bool
     {
         return $this->output->isVeryVerbose();
     }
@@ -64,8 +64,18 @@ class OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return $this->output->isDebug();
+    }
+
+    /**
+     * Get the underlying Symfony output implementation.
+     *
+     * @return \Symfony\Component\Console\Output\OutputInterface
+     */
+    public function getOutput()
+    {
+        return $this->output;
     }
 }

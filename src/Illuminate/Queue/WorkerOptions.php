@@ -40,6 +40,13 @@ class WorkerOptions
     public $sleep;
 
     /**
+     * The number of seconds to rest between jobs.
+     *
+     * @var int
+     */
+    public $rest;
+
+    /**
      * The maximum amount of times a job may be attempted.
      *
      * @var int
@@ -87,14 +94,16 @@ class WorkerOptions
      * @param  bool  $stopWhenEmpty
      * @param  int  $maxJobs
      * @param  int  $maxTime
+     * @param  int  $rest
      * @return void
      */
     public function __construct($name = 'default', $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1,
-                                $force = false, $stopWhenEmpty = false, $maxJobs = 0, $maxTime = 0)
+                                $force = false, $stopWhenEmpty = false, $maxJobs = 0, $maxTime = 0, $rest = 0)
     {
         $this->name = $name;
         $this->backoff = $backoff;
         $this->sleep = $sleep;
+        $this->rest = $rest;
         $this->force = $force;
         $this->memory = $memory;
         $this->timeout = $timeout;

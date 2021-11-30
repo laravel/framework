@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
-use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
 class PendingBatch
@@ -52,6 +52,21 @@ class PendingBatch
     {
         $this->container = $container;
         $this->jobs = $jobs;
+    }
+
+    /**
+     * Add jobs to the batch.
+     *
+     * @param  iterable  $jobs
+     * @return $this
+     */
+    public function add($jobs)
+    {
+        foreach ($jobs as $job) {
+            $this->jobs->push($job);
+        }
+
+        return $this;
     }
 
     /**

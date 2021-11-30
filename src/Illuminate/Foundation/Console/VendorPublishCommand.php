@@ -4,10 +4,11 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
-use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\Filesystem as Flysystem;
+use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\MountManager;
 
 class VendorPublishCommand extends Command
@@ -168,14 +169,18 @@ class VendorPublishCommand extends Command
     {
         $published = false;
 
-        foreach ($this->pathsToPublish($tag) as $from => $to) {
+        $pathsToPublish = $this->pathsToPublish($tag);
+
+        foreach ($pathsToPublish as $from => $to) {
             $this->publishItem($from, $to);
 
             $published = true;
         }
 
         if ($published === false) {
-            $this->error('Unable to locate publishable resources.');
+            $this->comment('No publishable resources for tag ['.$tag.'].');
+        } else {
+            $this->laravel['events']->dispatch(new VendorTagPublished($tag, $pathsToPublish));
         }
     }
 
@@ -254,8 +259,8 @@ class VendorPublishCommand extends Command
     protected function moveManagedFiles($manager)
     {
         foreach ($manager->listContents('from://', true) as $file) {
-            if ($file['type'] === 'file' && (! $manager->has('to://'.$file['path']) || $this->option('force'))) {
-                $manager->put('to://'.$file['path'], $manager->read('from://'.$file['path']));
+            if ($file['type'] === 'file' && (! $manager->fileExists('to://'.$file['path']) || $this->option('force'))) {
+                $manager->write('to://'.$file['path'], $manager->read('from://'.$file['path']));
             }
         }
     }

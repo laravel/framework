@@ -2,8 +2,10 @@
 
 namespace Illuminate\Database\Query;
 
+use BackedEnum;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -20,9 +22,10 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use LogicException;
 use RuntimeException;
 
-class Builder
+class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
@@ -181,6 +184,13 @@ class Builder
     public $lock;
 
     /**
+     * The callbacks that should be invoked before the query is executed.
+     *
+     * @var array
+     */
+    public $beforeQueryCallbacks = [];
+
+    /**
      * All of the available clause operators.
      *
      * @var string[]
@@ -188,7 +198,7 @@ class Builder
     public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
         'like', 'like binary', 'not like', 'ilike',
-        '&', '|', '^', '<<', '>>',
+        '&', '|', '^', '<<', '>>', '&~',
         'rlike', 'not rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to', 'not ilike', '~~*', '!~~*',
@@ -219,10 +229,7 @@ class Builder
     }
 
     /**
-     * Set the columns to be selected.
-     *
-     * @param  array|mixed  $columns
-     * @return $this
+     * {@inheritdoc}
      */
     public function select($columns = ['*'])
     {
@@ -242,13 +249,7 @@ class Builder
     }
 
     /**
-     * Add a subselect expression to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @param  string  $as
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function selectSub($query, $as)
     {
@@ -260,11 +261,7 @@ class Builder
     }
 
     /**
-     * Add a new "raw" select expression to the query.
-     *
-     * @param  string  $expression
-     * @param  array  $bindings
-     * @return $this
+     * {@inheritdoc}
      */
     public function selectRaw($expression, array $bindings = [])
     {
@@ -278,13 +275,7 @@ class Builder
     }
 
     /**
-     * Makes "from" fetch from a subquery.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @param  string  $as
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function fromSub($query, $as)
     {
@@ -294,11 +285,7 @@ class Builder
     }
 
     /**
-     * Add a raw from clause to the query.
-     *
-     * @param  string  $expression
-     * @param  mixed  $bindings
-     * @return $this
+     * {@inheritdoc}
      */
     public function fromRaw($expression, $bindings = [])
     {
@@ -373,10 +360,7 @@ class Builder
     }
 
     /**
-     * Add a new select column to the query.
-     *
-     * @param  array|mixed  $column
-     * @return $this
+     * {@inheritdoc}
      */
     public function addSelect($column)
     {
@@ -398,9 +382,7 @@ class Builder
     }
 
     /**
-     * Force the query to only return distinct results.
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function distinct()
     {
@@ -416,11 +398,7 @@ class Builder
     }
 
     /**
-     * Set the table which the query is targeting.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
-     * @param  string|null  $as
-     * @return $this
+     * {@inheritdoc}
      */
     public function from($table, $as = null)
     {
@@ -434,15 +412,7 @@ class Builder
     }
 
     /**
-     * Add a join clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $type
-     * @param  bool  $where
-     * @return $this
+     * {@inheritdoc}
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -474,14 +444,7 @@ class Builder
     }
 
     /**
-     * Add a "join where" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @param  string  $type
-     * @return $this
+     * {@inheritdoc}
      */
     public function joinWhere($table, $first, $operator, $second, $type = 'inner')
     {
@@ -489,18 +452,7 @@ class Builder
     }
 
     /**
-     * Add a subquery join clause to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
-     * @param  string  $as
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $type
-     * @param  bool  $where
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
@@ -514,13 +466,7 @@ class Builder
     }
 
     /**
-     * Add a left join to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
     {
@@ -528,13 +474,7 @@ class Builder
     }
 
     /**
-     * Add a "join where" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function leftJoinWhere($table, $first, $operator, $second)
     {
@@ -542,14 +482,7 @@ class Builder
     }
 
     /**
-     * Add a subquery left join to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
-     * @param  string  $as
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -557,13 +490,7 @@ class Builder
     }
 
     /**
-     * Add a right join to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
     {
@@ -571,13 +498,7 @@ class Builder
     }
 
     /**
-     * Add a "right join where" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function rightJoinWhere($table, $first, $operator, $second)
     {
@@ -585,14 +506,7 @@ class Builder
     }
 
     /**
-     * Add a subquery right join to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string  $query
-     * @param  string  $as
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
     {
@@ -600,13 +514,7 @@ class Builder
     }
 
     /**
-     * Add a "cross join" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string|null  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
     {
@@ -620,11 +528,7 @@ class Builder
     }
 
     /**
-     * Add a subquery cross join to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @param  string  $as
-     * @return $this
+     * {@inheritdoc}
      */
     public function crossJoinSub($query, $as)
     {
@@ -653,11 +557,7 @@ class Builder
     }
 
     /**
-     * Merge an array of where clauses and bindings.
-     *
-     * @param  array  $wheres
-     * @param  array  $bindings
-     * @return void
+     * {@inheritdoc}
      */
     public function mergeWheres($wheres, $bindings)
     {
@@ -666,16 +566,12 @@ class Builder
         $this->bindings['where'] = array_values(
             array_merge($this->bindings['where'], (array) $bindings)
         );
+
+        return $this;
     }
 
     /**
-     * Add a basic where clause to the query.
-     *
-     * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -780,14 +676,7 @@ class Builder
     }
 
     /**
-     * Prepare the value and operator for a where clause.
-     *
-     * @param  string  $value
-     * @param  string  $operator
-     * @param  bool  $useDefault
-     * @return array
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
@@ -828,12 +717,7 @@ class Builder
     }
 
     /**
-     * Add an "or where" clause to the query.
-     *
-     * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhere($column, $operator = null, $value = null)
     {
@@ -845,13 +729,7 @@ class Builder
     }
 
     /**
-     * Add a "where" clause comparing two columns to the query.
-     *
-     * @param  string|array  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string|null  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
     {
@@ -882,12 +760,7 @@ class Builder
     }
 
     /**
-     * Add an "or where" clause comparing two columns to the query.
-     *
-     * @param  string|array  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereColumn($first, $operator = null, $second = null)
     {
@@ -895,12 +768,7 @@ class Builder
     }
 
     /**
-     * Add a raw where clause to the query.
-     *
-     * @param  string  $sql
-     * @param  mixed  $bindings
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereRaw($sql, $bindings = [], $boolean = 'and')
     {
@@ -912,11 +780,7 @@ class Builder
     }
 
     /**
-     * Add a raw or where clause to the query.
-     *
-     * @param  string  $sql
-     * @param  mixed  $bindings
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereRaw($sql, $bindings = [])
     {
@@ -924,13 +788,7 @@ class Builder
     }
 
     /**
-     * Add a "where in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
@@ -965,11 +823,7 @@ class Builder
     }
 
     /**
-     * Add an "or where in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereIn($column, $values)
     {
@@ -977,12 +831,7 @@ class Builder
     }
 
     /**
-     * Add a "where not in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereNotIn($column, $values, $boolean = 'and')
     {
@@ -990,11 +839,7 @@ class Builder
     }
 
     /**
-     * Add an "or where not in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereNotIn($column, $values)
     {
@@ -1002,13 +847,7 @@ class Builder
     }
 
     /**
-     * Add a "where in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
     {
@@ -1028,11 +867,7 @@ class Builder
     }
 
     /**
-     * Add an "or where in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereIntegerInRaw($column, $values)
     {
@@ -1040,12 +875,7 @@ class Builder
     }
 
     /**
-     * Add a "where not in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
     {
@@ -1053,11 +883,7 @@ class Builder
     }
 
     /**
-     * Add an "or where not in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereIntegerNotInRaw($column, $values)
     {
@@ -1065,12 +891,7 @@ class Builder
     }
 
     /**
-     * Add a "where null" clause to the query.
-     *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereNull($columns, $boolean = 'and', $not = false)
     {
@@ -1084,10 +905,7 @@ class Builder
     }
 
     /**
-     * Add an "or where null" clause to the query.
-     *
-     * @param  string  $column
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereNull($column)
     {
@@ -1095,11 +913,7 @@ class Builder
     }
 
     /**
-     * Add a "where not null" clause to the query.
-     *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereNotNull($columns, $boolean = 'and')
     {
@@ -1107,15 +921,9 @@ class Builder
     }
 
     /**
-     * Add a where between statement to the query.
-     *
-     * @param  string|\Illuminate\Database\Query\Expression  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
 
@@ -1127,13 +935,7 @@ class Builder
     }
 
     /**
-     * Add a where between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereBetweenColumns($column, array $values, $boolean = 'and', $not = false)
     {
@@ -1145,23 +947,15 @@ class Builder
     }
 
     /**
-     * Add an or where between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
+     * {@inheritdoc}
      */
-    public function orWhereBetween($column, array $values)
+    public function orWhereBetween($column, iterable $values)
     {
         return $this->whereBetween($column, $values, 'or');
     }
 
     /**
-     * Add an or where between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereBetweenColumns($column, array $values)
     {
@@ -1169,25 +963,15 @@ class Builder
     }
 
     /**
-     * Add a where not between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
-    public function whereNotBetween($column, array $values, $boolean = 'and')
+    public function whereNotBetween($column, iterable $values, $boolean = 'and')
     {
         return $this->whereBetween($column, $values, $boolean, true);
     }
 
     /**
-     * Add a where not between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereNotBetweenColumns($column, array $values, $boolean = 'and')
     {
@@ -1195,23 +979,15 @@ class Builder
     }
 
     /**
-     * Add an or where not between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
+     * {@inheritdoc}
      */
-    public function orWhereNotBetween($column, array $values)
+    public function orWhereNotBetween($column, iterable $values)
     {
         return $this->whereNotBetween($column, $values, 'or');
     }
 
     /**
-     * Add an or where not between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereNotBetweenColumns($column, array $values)
     {
@@ -1219,10 +995,7 @@ class Builder
     }
 
     /**
-     * Add an "or where not null" clause to the query.
-     *
-     * @param  string  $column
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereNotNull($column)
     {
@@ -1230,13 +1003,7 @@ class Builder
     }
 
     /**
-     * Add a "where date" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1254,12 +1021,7 @@ class Builder
     }
 
     /**
-     * Add an "or where date" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereDate($column, $operator, $value = null)
     {
@@ -1271,13 +1033,7 @@ class Builder
     }
 
     /**
-     * Add a "where time" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1295,12 +1051,7 @@ class Builder
     }
 
     /**
-     * Add an "or where time" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereTime($column, $operator, $value = null)
     {
@@ -1312,13 +1063,7 @@ class Builder
     }
 
     /**
-     * Add a "where day" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1340,12 +1085,7 @@ class Builder
     }
 
     /**
-     * Add an "or where day" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereDay($column, $operator, $value = null)
     {
@@ -1357,13 +1097,7 @@ class Builder
     }
 
     /**
-     * Add a "where month" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1385,12 +1119,7 @@ class Builder
     }
 
     /**
-     * Add an "or where month" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereMonth($column, $operator, $value = null)
     {
@@ -1402,13 +1131,7 @@ class Builder
     }
 
     /**
-     * Add a "where year" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|int|null  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1426,12 +1149,7 @@ class Builder
     }
 
     /**
-     * Add an "or where year" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|int|null  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereYear($column, $operator, $value = null)
     {
@@ -1464,11 +1182,7 @@ class Builder
     }
 
     /**
-     * Add a nested where statement to the query.
-     *
-     * @param  \Closure  $callback
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
@@ -1488,11 +1202,7 @@ class Builder
     }
 
     /**
-     * Add another query builder as a nested where to the query builder.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
@@ -1535,12 +1245,7 @@ class Builder
     }
 
     /**
-     * Add an exists clause to the query.
-     *
-     * @param  \Closure  $callback
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
@@ -1555,11 +1260,7 @@ class Builder
     }
 
     /**
-     * Add an or exists clause to the query.
-     *
-     * @param  \Closure  $callback
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereExists(Closure $callback, $not = false)
     {
@@ -1567,11 +1268,7 @@ class Builder
     }
 
     /**
-     * Add a where not exists clause to the query.
-     *
-     * @param  \Closure  $callback
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereNotExists(Closure $callback, $boolean = 'and')
     {
@@ -1579,10 +1276,7 @@ class Builder
     }
 
     /**
-     * Add a where not exists clause to the query.
-     *
-     * @param  \Closure  $callback
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereNotExists(Closure $callback)
     {
@@ -1609,15 +1303,7 @@ class Builder
     }
 
     /**
-     * Adds a where condition using row values.
-     *
-     * @param  array  $columns
-     * @param  string  $operator
-     * @param  array  $values
-     * @param  string  $boolean
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and')
     {
@@ -1635,12 +1321,7 @@ class Builder
     }
 
     /**
-     * Adds an or where condition using row values.
-     *
-     * @param  array  $columns
-     * @param  string  $operator
-     * @param  array  $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereRowValues($columns, $operator, $values)
     {
@@ -1648,13 +1329,7 @@ class Builder
     }
 
     /**
-     * Add a "where JSON contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
     {
@@ -1670,11 +1345,7 @@ class Builder
     }
 
     /**
-     * Add an "or where JSON contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereJsonContains($column, $value)
     {
@@ -1682,12 +1353,7 @@ class Builder
     }
 
     /**
-     * Add a "where JSON not contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereJsonDoesntContain($column, $value, $boolean = 'and')
     {
@@ -1695,11 +1361,7 @@ class Builder
     }
 
     /**
-     * Add an "or where JSON not contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereJsonDoesntContain($column, $value)
     {
@@ -1707,13 +1369,7 @@ class Builder
     }
 
     /**
-     * Add a "where JSON length" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
     {
@@ -1733,12 +1389,7 @@ class Builder
     }
 
     /**
-     * Add an "or where JSON length" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orWhereJsonLength($column, $operator, $value = null)
     {
@@ -1812,10 +1463,7 @@ class Builder
     }
 
     /**
-     * Add a "group by" clause to the query.
-     *
-     * @param  array|string  ...$groups
-     * @return $this
+     * {@inheritdoc}
      */
     public function groupBy(...$groups)
     {
@@ -1830,11 +1478,7 @@ class Builder
     }
 
     /**
-     * Add a raw groupBy clause to the query.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @return $this
+     * {@inheritdoc}
      */
     public function groupByRaw($sql, array $bindings = [])
     {
@@ -1846,13 +1490,7 @@ class Builder
     }
 
     /**
-     * Add a "having" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string|null  $operator
-     * @param  string|null  $value
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function having($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -1882,12 +1520,7 @@ class Builder
     }
 
     /**
-     * Add an "or having" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string|null  $operator
-     * @param  string|null  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function orHaving($column, $operator = null, $value = null)
     {
@@ -1899,13 +1532,45 @@ class Builder
     }
 
     /**
-     * Add a "having between " clause to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * {@inheritdoc}
+     */
+    public function havingNull($columns, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotNull' : 'Null';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->havings[] = compact('type', 'column', 'boolean');
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function orHavingNull($column)
+    {
+        return $this->havingNull($column, 'or');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function havingNotNull($columns, $boolean = 'and')
+    {
+        return $this->havingNull($columns, $boolean, true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function orHavingNotNull($column)
+    {
+        return $this->havingNotNull($column, 'or');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function havingBetween($column, array $values, $boolean = 'and', $not = false)
     {
@@ -1919,12 +1584,7 @@ class Builder
     }
 
     /**
-     * Add a raw having clause to the query.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  string  $boolean
-     * @return $this
+     * {@inheritdoc}
      */
     public function havingRaw($sql, array $bindings = [], $boolean = 'and')
     {
@@ -1938,11 +1598,7 @@ class Builder
     }
 
     /**
-     * Add a raw or having clause to the query.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @return $this
+     * {@inheritdoc}
      */
     public function orHavingRaw($sql, array $bindings = [])
     {
@@ -1950,13 +1606,7 @@ class Builder
     }
 
     /**
-     * Add an "order by" clause to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
-     * @param  string  $direction
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function orderBy($column, $direction = 'asc')
     {
@@ -1983,10 +1633,7 @@ class Builder
     }
 
     /**
-     * Add a descending "order by" clause to the query.
-     *
-     * @param  string  $column
-     * @return $this
+     * {@inheritdoc}
      */
     public function orderByDesc($column)
     {
@@ -1994,10 +1641,7 @@ class Builder
     }
 
     /**
-     * Add an "order by" clause for a timestamp to the query.
-     *
-     * @param  string  $column
-     * @return $this
+     * {@inheritdoc}
      */
     public function latest($column = 'created_at')
     {
@@ -2005,10 +1649,7 @@ class Builder
     }
 
     /**
-     * Add an "order by" clause for a timestamp to the query.
-     *
-     * @param  string  $column
-     * @return $this
+     * {@inheritdoc}
      */
     public function oldest($column = 'created_at')
     {
@@ -2016,10 +1657,7 @@ class Builder
     }
 
     /**
-     * Put the query's results in random order.
-     *
-     * @param  string  $seed
-     * @return $this
+     * {@inheritdoc}
      */
     public function inRandomOrder($seed = '')
     {
@@ -2027,11 +1665,7 @@ class Builder
     }
 
     /**
-     * Add a raw "order by" clause to the query.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @return $this
+     * {@inheritdoc}
      */
     public function orderByRaw($sql, $bindings = [])
     {
@@ -2045,10 +1679,7 @@ class Builder
     }
 
     /**
-     * Alias to set the "offset" value of the query.
-     *
-     * @param  int  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function skip($value)
     {
@@ -2056,25 +1687,19 @@ class Builder
     }
 
     /**
-     * Set the "offset" value of the query.
-     *
-     * @param  int  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function offset($value)
     {
         $property = $this->unions ? 'unionOffset' : 'offset';
 
-        $this->$property = max(0, $value);
+        $this->$property = max(0, (int) $value);
 
         return $this;
     }
 
     /**
-     * Alias to set the "limit" value of the query.
-     *
-     * @param  int  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function take($value)
     {
@@ -2082,28 +1707,21 @@ class Builder
     }
 
     /**
-     * Set the "limit" value of the query.
-     *
-     * @param  int  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function limit($value)
     {
         $property = $this->unions ? 'unionLimit' : 'limit';
 
         if ($value >= 0) {
-            $this->$property = $value;
+            $this->$property = ! is_null($value) ? (int) $value : null;
         }
 
         return $this;
     }
 
     /**
-     * Set the limit and offset for a given page.
-     *
-     * @param  int  $page
-     * @param  int  $perPage
-     * @return $this
+     * @inheritdoc
      */
     public function forPage($page, $perPage = 15)
     {
@@ -2111,12 +1729,7 @@ class Builder
     }
 
     /**
-     * Constrain the query to the previous "page" of results before a given ID.
-     *
-     * @param  int  $perPage
-     * @param  int|null  $lastId
-     * @param  string  $column
-     * @return $this
+     * @inheritdoc
      */
     public function forPageBeforeId($perPage = 15, $lastId = 0, $column = 'id')
     {
@@ -2131,12 +1744,7 @@ class Builder
     }
 
     /**
-     * Constrain the query to the next "page" of results after a given ID.
-     *
-     * @param  int  $perPage
-     * @param  int|null  $lastId
-     * @param  string  $column
-     * @return $this
+     * @inheritdoc
      */
     public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
     {
@@ -2151,11 +1759,7 @@ class Builder
     }
 
     /**
-     * Remove all existing orders and optionally add a new order.
-     *
-     * @param  string|null  $column
-     * @param  string  $direction
-     * @return $this
+     * @inheritdoc
      */
     public function reorder($column = null, $direction = 'asc')
     {
@@ -2187,11 +1791,7 @@ class Builder
     }
 
     /**
-     * Add a union statement to the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
-     * @param  bool  $all
-     * @return $this
+     * @inheritdoc
      */
     public function union($query, $all = false)
     {
@@ -2207,10 +1807,7 @@ class Builder
     }
 
     /**
-     * Add a union all statement to the query.
-     *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
-     * @return $this
+     * @inheritdoc
      */
     public function unionAll($query)
     {
@@ -2218,10 +1815,7 @@ class Builder
     }
 
     /**
-     * Lock the selected rows in the table.
-     *
-     * @param  string|bool  $value
-     * @return $this
+     * @inheritdoc
      */
     public function lock($value = true)
     {
@@ -2235,9 +1829,7 @@ class Builder
     }
 
     /**
-     * Lock the selected rows in the table for updating.
-     *
-     * @return \Illuminate\Database\Query\Builder
+     * @inheritdoc
      */
     public function lockForUpdate()
     {
@@ -2245,13 +1837,38 @@ class Builder
     }
 
     /**
-     * Share lock the selected rows in the table.
-     *
-     * @return \Illuminate\Database\Query\Builder
+     * @inheritdoc
      */
     public function sharedLock()
     {
         return $this->lock(false);
+    }
+
+    /**
+     * Register a closure to be invoked before the query is executed.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function beforeQuery(callable $callback)
+    {
+        $this->beforeQueryCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Invoke the "before query" modification callbacks.
+     *
+     * @return void
+     */
+    public function applyBeforeQueryCallbacks()
+    {
+        foreach ($this->beforeQueryCallbacks as $callback) {
+            $callback($this);
+        }
+
+        $this->beforeQueryCallbacks = [];
     }
 
     /**
@@ -2261,6 +1878,8 @@ class Builder
      */
     public function toSql()
     {
+        $this->applyBeforeQueryCallbacks();
+
         return $this->grammar->compileSelect($this);
     }
 
@@ -2358,6 +1977,43 @@ class Builder
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+    }
+
+    /**
+     * Get a paginator only supporting simple next and previous links.
+     *
+     * This is more efficient on larger data-sets, etc.
+     *
+     * @param  int|null  $perPage
+     * @param  array  $columns
+     * @param  string  $cursorName
+     * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
+     * @return \Illuminate\Contracts\Pagination\CursorPaginator
+     */
+    public function cursorPaginate($perPage = 15, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    {
+        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
+    }
+
+    /**
+     * Ensure the proper order by required for cursor pagination.
+     *
+     * @param  bool  $shouldReverse
+     * @return \Illuminate\Support\Collection
+     */
+    protected function ensureOrderForCursorPagination($shouldReverse = false)
+    {
+        $this->enforceOrderBy();
+
+        if ($shouldReverse) {
+            $this->orders = collect($this->orders)->map(function ($order) {
+                $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
+
+                return $order;
+            })->toArray();
+        }
+
+        return collect($this->orders);
     }
 
     /**
@@ -2470,7 +2126,7 @@ class Builder
     }
 
     /**
-     * Get an array with the values of a given column.
+     * Get a collection instance containing the values of a given column.
      *
      * @param  string  $column
      * @param  string|null  $key
@@ -2592,6 +2248,8 @@ class Builder
      */
     public function exists()
     {
+        $this->applyBeforeQueryCallbacks();
+
         $results = $this->connection->select(
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
@@ -2717,8 +2375,8 @@ class Builder
      */
     public function aggregate($function, $columns = ['*'])
     {
-        $results = $this->cloneWithout($this->unions ? [] : ['columns'])
-                        ->cloneWithoutBindings($this->unions ? [] : ['select'])
+        $results = $this->cloneWithout($this->unions || $this->havings ? [] : ['columns'])
+                        ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
                         ->setAggregate($function, $columns)
                         ->get($columns);
 
@@ -2830,6 +2488,8 @@ class Builder
             }
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
@@ -2860,6 +2520,8 @@ class Builder
             }
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         return $this->connection->affectingStatement(
             $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(Arr::flatten($values, 1))
@@ -2875,6 +2537,8 @@ class Builder
      */
     public function insertGetId(array $values, $sequence = null)
     {
+        $this->applyBeforeQueryCallbacks();
+
         $sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
         $values = $this->cleanBindings($values);
@@ -2891,6 +2555,8 @@ class Builder
      */
     public function insertUsing(array $columns, $query)
     {
+        $this->applyBeforeQueryCallbacks();
+
         [$sql, $bindings] = $this->createSub($query);
 
         return $this->connection->affectingStatement(
@@ -2907,10 +2573,33 @@ class Builder
      */
     public function update(array $values)
     {
+        $this->applyBeforeQueryCallbacks();
+
         $sql = $this->grammar->compileUpdate($this, $values);
 
         return $this->connection->update($sql, $this->cleanBindings(
             $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+        ));
+    }
+
+    /**
+     * Update records in a PostgreSQL database using the update from syntax.
+     *
+     * @param  array  $values
+     * @return int
+     */
+    public function updateFrom(array $values)
+    {
+        if (! method_exists($this->grammar, 'compileUpdateFrom')) {
+            throw new LogicException('This database engine does not support the updateFrom method.');
+        }
+
+        $this->applyBeforeQueryCallbacks();
+
+        $sql = $this->grammar->compileUpdateFrom($this, $values);
+
+        return $this->connection->update($sql, $this->cleanBindings(
+            $this->grammar->prepareBindingsForUpdateFrom($this->bindings, $values)
         ));
     }
 
@@ -2963,6 +2652,8 @@ class Builder
         if (is_null($update)) {
             $update = array_keys(reset($values));
         }
+
+        $this->applyBeforeQueryCallbacks();
 
         $bindings = $this->cleanBindings(array_merge(
             Arr::flatten($values, 1),
@@ -3038,6 +2729,8 @@ class Builder
             $this->where($this->from.'.id', '=', $id);
         }
 
+        $this->applyBeforeQueryCallbacks();
+
         return $this->connection->delete(
             $this->grammar->compileDelete($this), $this->cleanBindings(
                 $this->grammar->prepareBindingsForDelete($this->bindings)
@@ -3052,15 +2745,15 @@ class Builder
      */
     public function truncate()
     {
+        $this->applyBeforeQueryCallbacks();
+
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
             $this->connection->statement($sql, $bindings);
         }
     }
 
     /**
-     * Get a new instance of the query builder.
-     *
-     * @return \Illuminate\Database\Query\Builder
+     * @inheritdoc
      */
     public function newQuery()
     {
@@ -3078,10 +2771,7 @@ class Builder
     }
 
     /**
-     * Create a raw database expression.
-     *
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Expression
+     * @inheritdoc
      */
     public function raw($value)
     {
@@ -3089,9 +2779,7 @@ class Builder
     }
 
     /**
-     * Get the current query value bindings in a flattened array.
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getBindings()
     {
@@ -3099,9 +2787,7 @@ class Builder
     }
 
     /**
-     * Get the raw array of bindings.
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getRawBindings()
     {
@@ -3109,13 +2795,7 @@ class Builder
     }
 
     /**
-     * Set the bindings on the query builder.
-     *
-     * @param  array  $bindings
-     * @param  string  $type
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
     public function setBindings(array $bindings, $type = 'where')
     {
@@ -3129,13 +2809,7 @@ class Builder
     }
 
     /**
-     * Add a binding to the query.
-     *
-     * @param  mixed  $value
-     * @param  string  $type
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
     public function addBinding($value, $type = 'where')
     {
@@ -3144,38 +2818,54 @@ class Builder
         }
 
         if (is_array($value)) {
-            $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+            $this->bindings[$type] = array_values(array_map(
+                [$this, 'castBinding'],
+                array_merge($this->bindings[$type], $value),
+            ));
         } else {
-            $this->bindings[$type][] = $value;
+            $this->bindings[$type][] = $this->castBinding($value);
         }
 
         return $this;
     }
 
     /**
-     * Merge an array of bindings into our bindings.
+     * Cast the given binding value.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return $this
+     * @param  mixed  $value
+     * @return mixed
      */
-    public function mergeBindings(self $query)
+    public function castBinding($value)
     {
-        $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
+        if (function_exists('enum_exists') && $value instanceof BackedEnum) {
+            return $value->value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function mergeBindings(BuilderContract $query)
+    {
+        $this->bindings = array_merge_recursive($this->bindings, $query->getRawBindings());
 
         return $this;
     }
 
     /**
-     * Remove all of the expressions from a list of bindings.
-     *
-     * @param  array  $bindings
-     * @return array
+     * @inheritdoc
      */
     public function cleanBindings(array $bindings)
     {
-        return array_values(array_filter($bindings, function ($binding) {
-            return ! $binding instanceof Expression;
-        }));
+        return collect($bindings)
+                    ->reject(function ($binding) {
+                        return $binding instanceof Expression;
+                    })
+                    ->map([$this, 'castBinding'])
+                    ->values()
+                    ->all();
     }
 
     /**
@@ -3200,9 +2890,7 @@ class Builder
     }
 
     /**
-     * Get the database connection instance.
-     *
-     * @return \Illuminate\Database\ConnectionInterface
+     * @inheritdoc
      */
     public function getConnection()
     {
@@ -3210,9 +2898,7 @@ class Builder
     }
 
     /**
-     * Get the database query processor instance.
-     *
-     * @return \Illuminate\Database\Query\Processors\Processor
+     * @inheritdoc
      */
     public function getProcessor()
     {
@@ -3220,9 +2906,7 @@ class Builder
     }
 
     /**
-     * Get the query grammar instance.
-     *
-     * @return \Illuminate\Database\Query\Grammars\Grammar
+     * @inheritdoc
      */
     public function getGrammar()
     {
@@ -3230,9 +2914,7 @@ class Builder
     }
 
     /**
-     * Use the write pdo for query.
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function useWritePdo()
     {
@@ -3256,9 +2938,7 @@ class Builder
     }
 
     /**
-     * Clone the query.
-     *
-     * @return static
+     * @inheritdoc
      */
     public function clone()
     {
@@ -3266,10 +2946,7 @@ class Builder
     }
 
     /**
-     * Clone the query without the given properties.
-     *
-     * @param  array  $properties
-     * @return static
+     * @inheritdoc
      */
     public function cloneWithout(array $properties)
     {
@@ -3281,10 +2958,7 @@ class Builder
     }
 
     /**
-     * Clone the query without the given bindings.
-     *
-     * @param  array  $except
-     * @return static
+     * @inheritdoc
      */
     public function cloneWithoutBindings(array $except)
     {
@@ -3310,7 +2984,7 @@ class Builder
     /**
      * Die and dump the current SQL and bindings.
      *
-     * @return void
+     * @return never
      */
     public function dd()
     {

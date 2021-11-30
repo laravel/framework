@@ -3,8 +3,10 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
@@ -13,13 +15,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
-abstract class Relation
+abstract class Relation implements BuilderContract
 {
-    use ForwardsCalls, Macroable {
-        __call as macroCall;
+    use DecoratesQueryBuilder, ForwardsCalls, Macroable {
+        Macroable::__call as macroCall;
     }
 
     /**
@@ -56,6 +55,13 @@ abstract class Relation
      * @var array
      */
     public static $morphMap = [];
+
+    /**
+     * Prevents morph relationships without a morph map.
+     *
+     * @var bool
+     */
+    protected static $requireMorphMap = false;
 
     /**
      * The count of self joins.
@@ -272,6 +278,16 @@ abstract class Relation
     }
 
     /**
+     * Get the query builder that will contain the relationship constraints.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getRelationQuery()
+    {
+        return $this->query;
+    }
+
+    /**
      * Get the underlying query for the relation.
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -284,9 +300,21 @@ abstract class Relation
     /**
      * Get the base query builder driving the Eloquent builder.
      *
+     * @deprecated Use toBase() instead
+     *
      * @return \Illuminate\Database\Query\Builder
      */
     public function getBaseQuery()
+    {
+        return $this->toBase();
+    }
+
+    /**
+     * Get a base query builder instance.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function toBase()
     {
         return $this->query->getQuery();
     }
@@ -367,6 +395,41 @@ abstract class Relation
     }
 
     /**
+     * Prevent polymorphic relationships from being used without model mappings.
+     *
+     * @param  bool  $requireMorphMap
+     * @return void
+     */
+    public static function requireMorphMap($requireMorphMap = true)
+    {
+        static::$requireMorphMap = $requireMorphMap;
+    }
+
+    /**
+     * Determine if polymorphic relationships require explicit model mapping.
+     *
+     * @return bool
+     */
+    public static function requiresMorphMap()
+    {
+        return static::$requireMorphMap;
+    }
+
+    /**
+     * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
+     *
+     * @param  array  $map
+     * @param  bool  $merge
+     * @return array
+     */
+    public static function enforceMorphMap(array $map, $merge = true)
+    {
+        static::requireMorphMap();
+
+        return static::morphMap($map, $merge);
+    }
+
+    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map
@@ -426,13 +489,7 @@ abstract class Relation
             return $this->macroCall($method, $parameters);
         }
 
-        $result = $this->forwardCallTo($this->query, $method, $parameters);
-
-        if ($result === $this->query) {
-            return $this;
-        }
-
-        return $result;
+        return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
     }
 
     /**

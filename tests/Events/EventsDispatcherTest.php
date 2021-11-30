@@ -388,8 +388,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
 
-        unset($_SERVER['__event.test1']);
-        unset($_SERVER['__event.test2']);
+        unset($_SERVER['__event.test1'], $_SERVER['__event.test2']);
     }
 
     public function testNestedEvent()

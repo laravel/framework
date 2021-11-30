@@ -19,7 +19,7 @@ class FilesystemTest extends TestCase
      */
     public static function setUpTempDir()
     {
-        self::$tempDir = __DIR__.'/tmp';
+        self::$tempDir = sys_get_temp_dir().'/tmp';
         mkdir(self::$tempDir);
     }
 
@@ -86,12 +86,22 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($tempFile, 'Hello World');
     }
 
+    public function testReplaceInFileCorrectlyReplaces()
+    {
+        $tempFile = self::$tempDir.'/file.txt';
+
+        $filesystem = new Filesystem;
+
+        $filesystem->put($tempFile, 'Hello World');
+        $filesystem->replaceInFile('Hello World', 'Hello Taylor', $tempFile);
+        $this->assertStringEqualsFile($tempFile, 'Hello Taylor');
+    }
+
+    /**
+     * @requires OS Linux|Darwin
+     */
     public function testReplaceWhenUnixSymlinkExists()
     {
-        if (windows_os()) {
-            $this->markTestSkipped('The operating system is Windows');
-        }
-
         $tempFile = self::$tempDir.'/file.txt';
         $symlinkDir = self::$tempDir.'/symlink_dir';
         $symlink = "{$symlinkDir}/symlink.txt";
@@ -135,7 +145,7 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->chmod(self::$tempDir.'/file.txt', 0755);
         $filePermission = substr(sprintf('%o', fileperms(self::$tempDir.'/file.txt')), -4);
-        $expectedPermissions = DIRECTORY_SEPARATOR == '\\' ? '0666' : '0755';
+        $expectedPermissions = DIRECTORY_SEPARATOR === '\\' ? '0666' : '0755';
         $this->assertEquals($expectedPermissions, $filePermission);
     }
 
@@ -146,7 +156,7 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
         $filePermission = $files->chmod(self::$tempDir.'/file.txt');
-        $expectedPermissions = DIRECTORY_SEPARATOR == '\\' ? '0666' : '0755';
+        $expectedPermissions = DIRECTORY_SEPARATOR === '\\' ? '0666' : '0755';
         $this->assertEquals($expectedPermissions, $filePermission);
     }
 
@@ -482,14 +492,10 @@ class FilesystemTest extends TestCase
 
     /**
      * @requires extension pcntl
-     * @requires function pcntl_fork
+     * @requires OS Linux|Darwin
      */
     public function testSharedGet()
     {
-        if (PHP_OS == 'Darwin') {
-            $this->markTestSkipped('The operating system is MacOS.');
-        }
-
         $content = str_repeat('123456', 1000000);
         $result = 1;
 

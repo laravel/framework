@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
@@ -43,7 +44,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
      *
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      */
-    public function get(string $name)
+    public function get(string $name): Command
     {
         if (! $this->has($name)) {
             throw new CommandNotFoundException(sprintf('Command "%s" does not exist.', $name));
@@ -58,7 +59,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
      * @param  string  $name
      * @return bool
      */
-    public function has(string $name)
+    public function has(string $name): bool
     {
         return $name && isset($this->commandMap[$name]);
     }
@@ -68,7 +69,7 @@ class ContainerCommandLoader implements CommandLoaderInterface
      *
      * @return string[]
      */
-    public function getNames()
+    public function getNames(): array
     {
         return array_keys($this->commandMap);
     }

@@ -6,9 +6,12 @@ use BadMethodCallException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
 class MorphTo extends BelongsTo
 {
+    use InteractsWithDictionary;
+
     /**
      * The type of the polymorphic relation.
      *
@@ -77,6 +80,46 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function select($columns = ['*'])
+    {
+        $this->macroBuffer[] = ['method' => 'select', 'parameters' => [$columns]];
+
+        return parent::select($columns);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectRaw($expression, array $bindings = [])
+    {
+        $this->macroBuffer[] = ['method' => 'selectRaw', 'parameters' => [$expression, $bindings]];
+
+        return parent::selectRaw($expression, $bindings);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function selectSub($query, $as)
+    {
+        $this->macroBuffer[] = ['method' => 'selectSub', 'parameters' => [$query, $as]];
+
+        return parent::selectSub($query, $as);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addSelect($column)
+    {
+        $this->macroBuffer[] = ['method' => 'addSelect', 'parameters' => [$column]];
+
+        return parent::addSelect($column);
+    }
+
+    /**
      * Set the constraints for an eager load of the relation.
      *
      * @param  array  $models
@@ -97,7 +140,10 @@ class MorphTo extends BelongsTo
     {
         foreach ($models as $model) {
             if ($model->{$this->morphType}) {
-                $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
+                $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
+                $foreignKeyKey = $this->getDictionaryKey($model->{$this->foreignKey});
+
+                $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
             }
         }
     }
@@ -207,7 +253,7 @@ class MorphTo extends BelongsTo
     protected function matchToMorphParents($type, Collection $results)
     {
         foreach ($results as $result) {
-            $ownerKey = ! is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey();
+            $ownerKey = ! is_null($this->ownerKey) ? $this->getDictionaryKey($result->{$this->ownerKey}) : $result->getKey();
 
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
@@ -225,8 +271,14 @@ class MorphTo extends BelongsTo
      */
     public function associate($model)
     {
+        if ($model instanceof Model) {
+            $foreignKey = $this->ownerKey && $model->{$this->ownerKey}
+                            ? $this->ownerKey
+                            : $model->getKeyName();
+        }
+
         $this->parent->setAttribute(
-            $this->foreignKey, $model instanceof Model ? $model->getKey() : null
+            $this->foreignKey, $model instanceof Model ? $model->{$foreignKey} : null
         );
 
         $this->parent->setAttribute(
@@ -365,7 +417,7 @@ class MorphTo extends BelongsTo
         try {
             $result = parent::__call($method, $parameters);
 
-            if (in_array($method, ['select', 'selectRaw', 'selectSub', 'addSelect', 'withoutGlobalScopes'])) {
+            if ($method === 'withoutGlobalScopes') {
                 $this->macroBuffer[] = compact('method', 'parameters');
             }
 

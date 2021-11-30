@@ -7,7 +7,7 @@ class PostgresBuilder extends Builder
     /**
      * Create a database in the schema.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function createDatabase($name)
@@ -20,7 +20,7 @@ class PostgresBuilder extends Builder
     /**
      * Drop a database from the schema if the database exists.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      */
     public function dropDatabaseIfExists($name)
@@ -134,7 +134,9 @@ class PostgresBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables(
-                $this->parseSearchPath($this->connection->getConfig('search_path'))
+                $this->parseSearchPath(
+                    $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema')
+                )
             )
         );
     }
@@ -148,7 +150,9 @@ class PostgresBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllViews(
-                $this->parseSearchPath($this->connection->getConfig('search_path'))
+                $this->parseSearchPath(
+                    $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema')
+                )
             )
         );
     }
@@ -236,6 +240,8 @@ class PostgresBuilder extends Builder
 
             $searchPath = $matches[0];
         }
+
+        $searchPath = $searchPath ?? [];
 
         array_walk($searchPath, function (&$schema) {
             $schema = trim($schema, '\'"');

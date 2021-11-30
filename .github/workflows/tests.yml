@@ -8,7 +8,7 @@ on:
 
 jobs:
   linux_tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     services:
       memcached:
@@ -28,10 +28,15 @@ jobs:
         ports:
           - 6379:6379
         options: --entrypoint redis-server
+      dynamodb:
+        image: amazon/dynamodb-local:latest
+        ports:
+          - 8888:8000
+
     strategy:
       fail-fast: true
       matrix:
-        php: ['7.4', '8.0']
+        php: ['8.0', '8.1']
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
@@ -48,7 +53,7 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Minimum Guzzle Version
+      - name: Set Minimum PHP 8.0 Versions
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 5
@@ -68,14 +73,26 @@ jobs:
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_USERNAME: root
+          DYNAMODB_CACHE_TABLE: laravel_dynamodb_test
+          DYNAMODB_ENDPOINT: "http://localhost:8888"
+          AWS_ACCESS_KEY_ID: random_key
+          AWS_SECRET_ACCESS_KEY: random_secret
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: |
+            vendor/orchestra/testbench-core/laravel/storage/logs
+            !vendor/**/.gitignore
 
   windows_tests:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     strategy:
       fail-fast: true
       matrix:
-        php: ['7.4', '8.0']
+        php: ['8.0', '8.1']
         stability: [prefer-lowest, prefer-stable]
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
@@ -97,7 +114,7 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Set Minimum Guzzle Version
+      - name: Set Minimum PHP 8.0 Versions
         uses: nick-invision/retry@v1
         with:
           timeout_minutes: 5
@@ -114,3 +131,11 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: |
+            vendor/orchestra/testbench-core/laravel/storage/logs
+            !vendor/**/.gitignore

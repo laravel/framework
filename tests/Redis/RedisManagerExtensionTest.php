@@ -19,7 +19,7 @@ class RedisManagerExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $this->redis = new RedisManager(new Application(), 'my_custom_driver', [
+        $this->redis = new RedisManager(new Application, 'my_custom_driver', [
             'default' => [
                 'host' => 'some-host',
                 'port' => 'some-port',
@@ -39,7 +39,7 @@ class RedisManagerExtensionTest extends TestCase
         ]);
 
         $this->redis->extend('my_custom_driver', function () {
-            return new FakeRedisConnector();
+            return new FakeRedisConnector;
         });
     }
 
@@ -72,7 +72,7 @@ class RedisManagerExtensionTest extends TestCase
                 'url3',
             ],
         ];
-        $redis = new RedisManager(new Application(), 'my_custom_driver', [
+        $redis = new RedisManager(new Application, 'my_custom_driver', [
             'clusters' => [
                 $name => $config,
             ],

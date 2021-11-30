@@ -83,7 +83,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
         $events = m::mock(Dispatcher::class);
         $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
-            return $event->connection == 'sync';
+            return $event->connection === 'sync';
         }));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);

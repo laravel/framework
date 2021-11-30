@@ -9,9 +9,6 @@ use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-/**
- * @group redislimiters
- */
 class ConcurrentLimiterTest extends TestCase
 {
     use InteractsWithRedis;
@@ -149,7 +146,7 @@ class ConcurrentLimiterTest extends TestCase
 
         try {
             $lock->block(1, function () {
-                throw new Error();
+                throw new Error;
             });
         } catch (Error $e) {
         }

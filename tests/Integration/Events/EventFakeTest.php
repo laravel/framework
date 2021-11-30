@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Events;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
@@ -10,31 +11,6 @@ use Orchestra\Testbench\TestCase;
 
 class EventFakeTest extends TestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-
-        // Database configuration
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,11 +23,6 @@ class EventFakeTest extends TestCase
         });
     }
 
-    /**
-     * Clean up the testing environment before the next test.
-     *
-     * @return void
-     */
     protected function tearDown(): void
     {
         Schema::dropIfExists('posts');
@@ -126,6 +97,47 @@ class EventFakeTest extends TestCase
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
+
+    public function testFakeExceptAllowsGivenEventToBeDispatched()
+    {
+        Event::fakeExcept(NonImportantEvent::class);
+
+        Event::dispatch(NonImportantEvent::class);
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testFakeExceptAllowsGivenEventsToBeDispatched()
+    {
+        Event::fakeExcept([
+            NonImportantEvent::class,
+            'non-fake-event',
+        ]);
+
+        Event::dispatch(NonImportantEvent::class);
+        Event::dispatch('non-fake-event');
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+        Event::assertNotDispatched('non-fake-event');
+    }
+
+    public function testAssertListening()
+    {
+        Event::fake();
+        Event::listen('event', 'listener');
+        Event::listen('event', PostEventSubscriber::class);
+        Event::listen('event', [PostEventSubscriber::class, 'foo']);
+        Event::subscribe(PostEventSubscriber::class);
+        Event::listen(function (NonImportantEvent $event) {
+            // do something
+        });
+
+        Event::assertListening('event', 'listener');
+        Event::assertListening('event', PostEventSubscriber::class);
+        Event::assertListening('event', [PostEventSubscriber::class, 'foo']);
+        Event::assertListening('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
+        Event::assertListening(NonImportantEvent::class, Closure::class);
+    }
 }
 
 class Post extends Model
@@ -136,6 +148,21 @@ class Post extends Model
 class NonImportantEvent
 {
     //
+}
+
+class PostEventSubscriber
+{
+    public function handlePostCreated($event)
+    {
+    }
+
+    public function subscribe($events)
+    {
+        $events->listen(
+            'post-created',
+            [PostEventSubscriber::class, 'handlePostCreated']
+        );
+    }
 }
 
 class PostObserver

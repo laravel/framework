@@ -17,15 +17,6 @@ class ScheduleListCommand extends Command
     protected $signature = 'schedule:list {--timezone= : The timezone that times should be displayed in}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'schedule:list';
-
-    /**
      * The console command description.
      *
      * @var string
@@ -37,6 +28,7 @@ class ScheduleListCommand extends Command
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
+     *
      * @throws \Exception
      */
     public function handle(Schedule $schedule)
@@ -47,10 +39,9 @@ class ScheduleListCommand extends Command
                 $event->expression,
                 $event->description,
                 (new CronExpression($event->expression))
-                            ->getNextRunDate(Carbon::now())
-                            ->setTimezone(
-                                new DateTimeZone($this->option('timezone') ?? config('app.timezone'))
-                            ),
+                            ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
+                            ->setTimezone(new DateTimeZone($this->option('timezone', config('app.timezone'))))
+                            ->format('Y-m-d H:i:s P'),
             ];
         }
 

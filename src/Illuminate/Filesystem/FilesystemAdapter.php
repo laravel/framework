@@ -8,6 +8,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
@@ -35,6 +36,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class FilesystemAdapter implements CloudFilesystemContract
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The Flysystem filesystem implementation.
      *
@@ -240,7 +245,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Write the contents of a file.
      *
      * @param  string  $path
-     * @param  string|resource  $contents
+     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
      * @return bool
      */
@@ -599,6 +604,23 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Replace the scheme, host and port of the given UriInterface with values from the given URL.
+     *
+     * @param  \Psr\Http\Message\UriInterface  $uri
+     * @param  string  $url
+     * @return \Psr\Http\Message\UriInterface
+     */
+    protected function replaceBaseUrl($uri, $url)
+    {
+        $parsed = parse_url($url);
+
+        return $uri
+            ->withScheme($parsed['scheme'])
+            ->withHost($parsed['host'])
+            ->withPort($parsed['port'] ?? null);
+    }
+
+    /**
      * Get an array of all files in a directory.
      *
      * @param  string|null  $directory
@@ -607,7 +629,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function files($directory = null, $recursive = false)
     {
-        return $this->driver->listContents($directory, $recursive)
+        return $this->driver->listContents($directory ?? '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isFile();
             })
@@ -637,7 +659,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directories($directory = null, $recursive = false)
     {
-        return $this->driver->listContents($directory, $recursive)
+        return $this->driver->listContents($directory ?? '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isDir();
             })
@@ -736,14 +758,11 @@ class FilesystemAdapter implements CloudFilesystemContract
             return;
         }
 
-        switch ($visibility) {
-            case FilesystemContract::VISIBILITY_PUBLIC:
-                return Visibility::PUBLIC;
-            case FilesystemContract::VISIBILITY_PRIVATE:
-                return Visibility::PRIVATE;
-        }
-
-        throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
+        return match ($visibility) {
+            FilesystemContract::VISIBILITY_PUBLIC => Visibility::PUBLIC,
+            FilesystemContract::VISIBILITY_PRIVATE => Visibility::PRIVATE,
+            default => throw new InvalidArgumentException("Unknown visibility: {$visibility}."),
+        };
     }
 
     /**
@@ -757,6 +776,10 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function __call($method, array $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->driver->{$method}(...array_values($parameters));
     }
 }

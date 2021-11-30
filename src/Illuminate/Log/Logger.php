@@ -27,6 +27,13 @@ class Logger implements LoggerInterface
     protected $dispatcher;
 
     /**
+     * Any context to be added to logs.
+     *
+     * @var array
+     */
+    protected $context = [];
+
+    /**
      * Create a new log writer instance.
      *
      * @param  \Psr\Log\LoggerInterface  $logger
@@ -46,7 +53,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function emergency($message, array $context = [])
+    public function emergency($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -58,7 +65,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function alert($message, array $context = [])
+    public function alert($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -70,7 +77,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function critical($message, array $context = [])
+    public function critical($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -82,7 +89,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function error($message, array $context = [])
+    public function error($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -94,7 +101,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function warning($message, array $context = [])
+    public function warning($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -106,7 +113,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function notice($message, array $context = [])
+    public function notice($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -118,7 +125,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function info($message, array $context = [])
+    public function info($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -130,7 +137,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function debug($message, array $context = [])
+    public function debug($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -143,7 +150,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         $this->writeLog($level, $message, $context);
     }
@@ -156,7 +163,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function write($level, $message, array $context = [])
+    public function write($level, $message, array $context = []): void
     {
         $this->writeLog($level, $message, $context);
     }
@@ -171,9 +178,37 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context)
     {
-        $this->logger->{$level}($message = $this->formatMessage($message), $context);
+        $this->logger->{$level}(
+            $message = $this->formatMessage($message),
+            $context = array_merge($this->context, $context)
+        );
 
         $this->fireLogEvent($level, $message, $context);
+    }
+
+    /**
+     * Add context to all future logs.
+     *
+     * @param  array  $context
+     * @return $this
+     */
+    public function withContext(array $context = [])
+    {
+        $this->context = array_merge($this->context, $context);
+
+        return $this;
+    }
+
+    /**
+     * Flush the existing context array.
+     *
+     * @return $this
+     */
+    public function withoutContext()
+    {
+        $this->context = [];
+
+        return $this;
     }
 
     /**

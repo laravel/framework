@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Http\Middleware;
+namespace Illuminate\Tests\Foundation\Bootstrap\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ class ConvertEmptyStringsToNullTest extends TestCase
 {
     public function testConvertsEmptyStringsToNull()
     {
-        $middleware = new ConvertEmptyStringsToNull();
+        $middleware = new ConvertEmptyStringsToNull;
         $symfonyRequest = new SymfonyRequest([
             'foo' => 'bar',
             'baz' => '',

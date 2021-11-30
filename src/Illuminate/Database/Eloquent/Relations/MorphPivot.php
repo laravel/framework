@@ -75,6 +75,16 @@ class MorphPivot extends Pivot
     }
 
     /**
+     * Get the morph type for the pivot.
+     *
+     * @return string
+     */
+    public function getMorphType()
+    {
+        return $this->morphType;
+    }
+
+    /**
      * Set the morph type for the pivot.
      *
      * @param  string  $morphType

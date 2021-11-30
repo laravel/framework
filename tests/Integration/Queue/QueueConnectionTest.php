@@ -9,15 +9,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
-/**
- * @group integration
- */
 class QueueConnectionTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
         $app['config']->set('queue.default', 'sqs');
         $app['config']->set('queue.connections.sqs.after_commit', true);
     }
@@ -52,7 +49,7 @@ class QueueConnectionTest extends TestCase
 
         try {
             Bus::dispatch((new QueueConnectionTestJob)->beforeCommit());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // This job was dispatched
         }
     }

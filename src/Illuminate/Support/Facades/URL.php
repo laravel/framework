@@ -10,6 +10,8 @@ namespace Illuminate\Support\Facades;
  * @method static string secureAsset(string $path)
  * @method static string current()
  * @method static string full()
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void mixin(object $mixin, bool $replace = true)
  * @method static string previous($fallback = false)
  * @method static string route(string $name, $parameters = [], bool $absolute = true)
  * @method static string secure(string $path, array $parameters = [])

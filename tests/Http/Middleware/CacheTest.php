@@ -63,6 +63,15 @@ class CacheTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
     }
 
+    public function testDoesNotOverrideEtag()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return (new Response('some content'))->setEtag('XYZ');
+        }, 'etag');
+
+        $this->assertSame('"XYZ"', $response->getEtag());
+    }
+
     public function testIsNotModified()
     {
         $request = new Request;
@@ -103,5 +112,16 @@ class CacheTest extends TestCase
         }, "last_modified=$birthdate");
 
         $this->assertSame(Carbon::parse($birthdate)->timestamp, $response->getLastModified()->getTimestamp());
+    }
+
+    public function testTrailingDelimiterIgnored()
+    {
+        $time = time();
+
+        $response = (new Cache)->handle(new Request, function () {
+            return new Response('some content');
+        }, "last_modified=$time;");
+
+        $this->assertSame($time, $response->getLastModified()->getTimestamp());
     }
 }

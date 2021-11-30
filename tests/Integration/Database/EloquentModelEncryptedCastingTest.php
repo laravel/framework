@@ -8,10 +8,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Schema;
+use stdClass;
 
-/**
- * @group integration
- */
 class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 {
     protected $encrypter;
@@ -23,6 +21,11 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         $this->encrypter = $this->mock(Encrypter::class);
         Crypt::swap($this->encrypter);
 
+        Model::$encrypter = null;
+    }
+
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         Schema::create('encrypted_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('secret', 1000)->nullable();
@@ -31,8 +34,6 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             $table->text('secret_object')->nullable();
             $table->text('secret_collection')->nullable();
         });
-
-        Model::$encrypter = null;
     }
 
     public function testStringsAreCastable()
@@ -130,7 +131,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
 
     public function testObjectIsCastable()
     {
-        $object = new \stdClass();
+        $object = new stdClass;
         $object->key1 = 'value1';
 
         $this->encrypter->expects('encrypt')
@@ -146,7 +147,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             'secret_object' => $object,
         ]);
 
-        $this->assertInstanceOf(\stdClass::class, $object->secret_object);
+        $this->assertInstanceOf(stdClass::class, $object->secret_object);
         $this->assertSame('value1', $object->secret_object->key1);
         $this->assertDatabaseHas('encrypted_casts', [
             'id' => $object->id,

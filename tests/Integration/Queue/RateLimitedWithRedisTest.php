@@ -16,9 +16,6 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
@@ -124,7 +121,7 @@ class RateLimitedWithRedisTest extends TestCase
         })->bindTo($restoredRateLimited, RateLimitedWithRedis::class);
 
         $this->assertFalse($restoredRateLimited->shouldRelease);
-        $this->assertEquals('limiterName', $fetch('limiterName'));
+        $this->assertSame('limiterName', $fetch('limiterName'));
         $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
         $this->assertInstanceOf(Redis::class, $fetch('redis'));
     }

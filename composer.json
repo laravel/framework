@@ -15,33 +15,34 @@
         }
     ],
     "require": {
-        "php": "^7.4|^8.0",
-        "ext-json": "*",
+        "php": "^8.0.2",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "doctrine/inflector": "^2.0",
         "dragonmantank/cron-expression": "^3.1",
-        "egulias/email-validator": "^2.1.10",
-        "league/commonmark": "^1.3",
+        "egulias/email-validator": "^3.1",
+        "laravel/serializable-closure": "^1.0",
+        "league/commonmark": "^2.0.2",
         "league/flysystem": "^2.0",
         "monolog/monolog": "^2.0",
-        "nesbot/carbon": "^2.31",
+        "nesbot/carbon": "^2.53.1",
         "opis/closure": "^3.6",
-        "psr/container": "^1.0",
+        "psr/container": "^1.1.1|^2.0.1",
+        "psr/log": "^1.0|^2.0",
         "psr/simple-cache": "^1.0",
-        "ramsey/uuid": "^4.0",
-        "swiftmailer/swiftmailer": "^6.0",
-        "symfony/console": "^5.2",
-        "symfony/error-handler": "^5.2",
-        "symfony/finder": "^5.2",
-        "symfony/http-foundation": "^5.2",
-        "symfony/http-kernel": "^5.2",
-        "symfony/mime": "^5.2",
-        "symfony/process": "^5.2",
-        "symfony/routing": "^5.2",
-        "symfony/var-dumper": "^5.2",
+        "ramsey/uuid": "^4.2.2",
+        "symfony/console": "^6.0",
+        "symfony/error-handler": "^6.0",
+        "symfony/finder": "^6.0",
+        "symfony/http-foundation": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "symfony/mailer": "^6.0",
+        "symfony/mime": "^6.0",
+        "symfony/process": "^6.0",
+        "symfony/routing": "^6.0",
+        "symfony/var-dumper": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
-        "vlucas/phpdotenv": "^5.2",
+        "vlucas/phpdotenv": "^5.3",
         "voku/portable-ascii": "^1.4.8"
     },
     "replace": {
@@ -50,6 +51,7 @@
         "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
         "illuminate/collections": "self.version",
+        "illuminate/conditionable": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
         "illuminate/container": "self.version",
@@ -78,22 +80,24 @@
         "illuminate/view": "self.version"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "^3.155",
-        "doctrine/dbal": "^2.12|^3.0",
-        "filp/whoops": "^2.8",
+        "aws/aws-sdk-php": "^3.198.1",
+        "doctrine/dbal": "^2.13.3|^3.1.4",
+        "fakerphp/faker": "^1.9.2",
         "guzzlehttp/guzzle": "^7.2",
         "league/flysystem-aws-s3-v3": "^2.0",
         "league/flysystem-ftp": "^2.0",
         "league/flysystem-sftp": "^2.0",
-        "mockery/mockery": "^1.4.2",
+        "mockery/mockery": "^1.4.4",
         "orchestra/testbench-core": "^7.0",
         "pda/pheanstalk": "^4.0",
-        "phpunit/phpunit": "^9.4",
-        "predis/predis": "^1.1.1",
-        "symfony/cache": "^5.2"
+        "phpstan/phpstan": "^1.0",
+        "predis/predis": "^1.1.9",
+        "phpunit/phpunit": "^9.5.8",
+        "symfony/cache": "^6.0"
     },
     "provide": {
-        "psr/container-implementation": "1.0"
+        "psr/container-implementation": "1.0",
+        "psr/simple-cache-implementation": "1.0"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
@@ -107,7 +111,11 @@
         ],
         "psr-4": {
             "Illuminate\\": "src/Illuminate/",
-            "Illuminate\\Support\\": ["src/Illuminate/Macroable/", "src/Illuminate/Collections/"]
+            "Illuminate\\Support\\": [
+                "src/Illuminate/Macroable/",
+                "src/Illuminate/Collections/",
+                "src/Illuminate/Conditionable/"
+            ]
         }
     },
     "autoload-dev": {
@@ -124,33 +132,37 @@
         }
     },
     "suggest": {
+        "ext-bcmath": "Required to use the multiple_of validation rule.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
         "ext-memcached": "Required to use the memcache cache driver.",
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
-        "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage and SES mail driver (^3.155).",
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.198.1).",
         "brianium/paratest": "Required to run tests in parallel (^6.0).",
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.12|^3.0).",
-        "filp/whoops": "Required for friendly error pages in development (^2.8).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3|^3.1.4).",
+        "filp/whoops": "Required for friendly error pages in development (^2.14.3).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",
-        "guzzlehttp/guzzle": "Required to use the HTTP Client, Mailgun mail driver and the ping methods on schedules (^7.2).",
+        "guzzlehttp/guzzle": "Required to use the HTTP Client and the ping methods on schedules (^7.2).",
         "laravel/tinker": "Required to use the tinker console command (^2.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^2.0).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^2.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^2.0).",
-        "mockery/mockery": "Required to use mocking (^1.4.2).",
+        "mockery/mockery": "Required to use mocking (^1.4.4).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
-        "phpunit/phpunit": "Required to use assertions and run tests (^9.4).",
-        "predis/predis": "Required to use the predis connector (^1.1.2).",
+        "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8).",
+        "predis/predis": "Required to use the predis connector (^1.1.9).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^4.0).",
-        "symfony/cache": "Required to PSR-6 cache bridge (^5.2).",
-        "symfony/filesystem": "Required to enable support for relative symbolic links (^5.2).",
-        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0).",
-        "wildbit/swiftmailer-postmark": "Required to use Postmark mail driver (^3.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0|^7.0).",
+        "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
+        "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
+        "symfony/http-client": "Required to enable support for the Symfony API mail transports (^6.0).",
+        "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
+        "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0).",
+        "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
     },
     "config": {
         "sort-packages": true

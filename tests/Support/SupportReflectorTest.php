@@ -49,7 +49,7 @@ class SupportReflectorTest extends TestCase
     }
 
     /**
-     * @requires PHP 8
+     * @requires PHP >= 8
      */
     public function testUnionTypeName()
     {
@@ -81,6 +81,7 @@ class B extends A
 {
     public function f(parent $x)
     {
+        //
     }
 }
 
@@ -92,6 +93,7 @@ class C
 {
     public function f(A|Model $x)
     {
+        //
     }
 }'
     );
@@ -101,6 +103,7 @@ class TestClassWithCall
 {
     public function __call($method, $parameters)
     {
+        //
     }
 }
 
@@ -108,5 +111,6 @@ class TestClassWithCallStatic
 {
     public static function __callStatic($method, $parameters)
     {
+        //
     }
 }

@@ -36,6 +36,7 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
+        $this->call('event:clear');
         $this->call('view:clear');
         $this->call('cache:clear');
         $this->call('route:clear');

@@ -10,7 +10,7 @@ class ParallelConsoleOutputTest extends TestCase
 {
     public function testWrite()
     {
-        $original = new BufferedOutput();
+        $original = new BufferedOutput;
         $output = new ParallelConsoleOutput($original);
 
         $output->write('Running phpunit in 12 processes with laravel/laravel.');

@@ -15,10 +15,11 @@ class AsArrayObject implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes {
+        return new class implements CastsAttributes
+        {
             public function get($model, $key, $value, $attributes)
             {
-                return new ArrayObject(json_decode($attributes[$key], true));
+                return isset($attributes[$key]) ? new ArrayObject(json_decode($attributes[$key], true)) : null;
             }
 
             public function set($model, $key, $value, $attributes)

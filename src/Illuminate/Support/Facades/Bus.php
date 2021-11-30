@@ -16,6 +16,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static bool|mixed getCommandHandler($command)
  * @method static mixed dispatch($command)
  * @method static mixed dispatchNow($command, $handler = null)
+ * @method static mixed dispatchSync($command, $handler = null)
  * @method static void assertDispatched(string|\Closure $command, callable|int $callback = null)
  * @method static void assertDispatchedTimes(string $command, int $times = 1)
  * @method static void assertNotDispatched(string|\Closure $command, callable|int $callback = null)
@@ -23,6 +24,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void assertDispatchedAfterResponseTimes(string $command, int $times = 1)
  * @method static void assertNotDispatchedAfterResponse(string|\Closure $command, callable $callback = null)
  * @method static void assertBatched(callable $callback)
+ * @method static void assertChained(array $expectedChain)
  *
  * @see \Illuminate\Contracts\Bus\Dispatcher
  */

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Mockery as m;
@@ -200,5 +200,14 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4, 5], $data);
         $this->assertSame([1, 2, 3, 4, 5], $tapped);
+    }
+
+    public function testUniqueDoubleEnumeration()
+    {
+        $data = LazyCollection::times(2)->unique();
+
+        $data->all();
+
+        $this->assertSame([1, 2], $data->all());
     }
 }

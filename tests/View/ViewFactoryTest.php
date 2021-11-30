@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\LazyCollection;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
@@ -355,7 +356,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent('component', ['name' => 'Taylor']);
         $factory->slot('title');
-        $factory->slot('website', 'laravel.com');
+        $factory->slot('website', 'laravel.com', []);
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
@@ -371,7 +372,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent($factory->make('component'), ['name' => 'Taylor']);
         $factory->slot('title');
-        $factory->slot('website', 'laravel.com');
+        $factory->slot('website', 'laravel.com', []);
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
@@ -392,7 +393,7 @@ class ViewFactoryTest extends TestCase
             return $factory->make('component');
         }, ['name' => 'Taylor']);
         $factory->slot('title');
-        $factory->slot('website', 'laravel.com');
+        $factory->slot('website', 'laravel.com', []);
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
@@ -440,6 +441,27 @@ class ViewFactoryTest extends TestCase
         $factory->startPush('foo');
         echo ', Hello!';
         $factory->stopPush();
+        $this->assertSame('hi, Hello!', $factory->yieldPushContent('foo'));
+    }
+
+    public function testSingleStackPrepend()
+    {
+        $factory = $this->getFactory();
+        $factory->startPrepend('foo');
+        echo 'hi';
+        $factory->stopPrepend();
+        $this->assertSame('hi', $factory->yieldPushContent('foo'));
+    }
+
+    public function testMultipleStackPrepend()
+    {
+        $factory = $this->getFactory();
+        $factory->startPrepend('foo');
+        echo ', Hello!';
+        $factory->stopPrepend();
+        $factory->startPrepend('foo');
+        echo 'hi';
+        $factory->stopPrepend();
         $this->assertSame('hi, Hello!', $factory->yieldPushContent('foo'));
     }
 
@@ -642,7 +664,8 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
 
-        $data = (new class {
+        $data = (new class
+        {
             public function generate()
             {
                 for ($count = 0; $count < 3; $count++) {
@@ -663,6 +686,30 @@ class ViewFactoryTest extends TestCase
         $factory = $this->getFactory();
 
         $factory->addLoop('');
+
+        $expectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'remaining' => null,
+            'count' => null,
+            'first' => true,
+            'last' => null,
+            'odd' => false,
+            'even' => true,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+    }
+
+    public function testAddingLazyCollection()
+    {
+        $factory = $this->getFactory();
+
+        $factory->addLoop(new LazyCollection(function () {
+            $this->fail('LazyCollection\'s generator should not have been called');
+        }));
 
         $expectedLoop = [
             'iteration' => 0,

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -41,8 +42,10 @@ class Response extends SymfonyResponse
      *
      * @param  mixed  $content
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function setContent($content)
+    public function setContent(mixed $content): static
     {
         $this->original = $content;
 
@@ -53,6 +56,10 @@ class Response extends SymfonyResponse
             $this->header('Content-Type', 'application/json');
 
             $content = $this->morphToJson($content);
+
+            if ($content === false) {
+                throw new InvalidArgumentException(json_last_error_msg());
+            }
         }
 
         // If this content implements the "Renderable" interface then we will call the

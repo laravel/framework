@@ -16,11 +16,10 @@ class InteractsWithAuthenticationTest extends TestCase
     {
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
 
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
+        $app['config']->set('auth.guards.api', [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
         ]);
     }
 

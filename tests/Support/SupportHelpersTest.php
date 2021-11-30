@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
+use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use IteratorAggregate;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +42,9 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('foo', value(function () {
             return 'foo';
         }));
+        $this->assertSame('foo', value(function ($arg) {
+            return $arg;
+        }, 'foo'));
     }
 
     public function testObjectGet()
@@ -84,9 +89,17 @@ class SupportHelpersTest extends TestCase
             ['name' => 'abigail'],
             ['name' => 'dayle'],
         ];
+        $arrayIterable = new SupportTestArrayIterable([
+            ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['name' => 'abigail'],
+            ['name' => 'dayle'],
+        ]);
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
 
         $array = [
             'users' => [
@@ -439,7 +452,8 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class {
+        $this->assertEquals(10, optional(new class
+        {
             public function something()
             {
                 return 10;
@@ -517,10 +531,12 @@ class SupportHelpersTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertSame('$10.00', optional(new class {
+        $this->assertSame('$10.00', optional(new class
+        {
             public function present()
             {
-                return new class {
+                return new class
+                {
                     public function something()
                     {
                         return '$10.00';
@@ -547,6 +563,27 @@ class SupportHelpersTest extends TestCase
 
         // Make sure we waited 100ms for the first attempt
         $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
+    }
+
+    public function testRetryWithPassingSleepCallback()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(3, function ($attempts) {
+            if ($attempts > 2) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, function ($attempt) {
+            return $attempt * 100;
+        });
+
+        // Make sure we made three attempts
+        $this->assertEquals(3, $attempts);
+
+        // Make sure we waited 300ms for the first two attempts
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.02);
     }
 
     public function testRetryWithPassingWhenCallback()
@@ -717,7 +754,9 @@ class SupportHelpersTest extends TestCase
         ];
     }
 
-    /** @dataProvider providesPregReplaceArrayData */
+    /**
+     * @dataProvider providesPregReplaceArrayData
+     */
     public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
     {
         $this->assertSame(
@@ -784,5 +823,20 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestArrayIterable implements IteratorAggregate
+{
+    protected $items = [];
+
+    public function __construct($items = [])
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->items);
     }
 }

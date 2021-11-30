@@ -13,8 +13,8 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ]);
 
         $db->bootEloquent();
@@ -90,7 +90,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         });
 
         $user->articles->each(function (BelongsToManySyncTestTestArticle $article) {
-            $this->assertSame('0', $article->pivot->visible);
+            $this->assertEquals('0', $article->pivot->visible);
         });
     }
 
@@ -108,7 +108,7 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         });
 
         $user->articles->each(function (BelongsToManySyncTestTestArticle $article) {
-            $this->assertSame('1', $article->pivot->visible);
+            $this->assertEquals('1', $article->pivot->visible);
         });
     }
 

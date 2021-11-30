@@ -69,6 +69,22 @@ class SupportTestingMailFakeTest extends TestCase
         }
     }
 
+    public function testAssertNotSentWithClosure()
+    {
+        $callback = function (MailableStub $mail) {
+            return $mail->hasTo('taylor@laravel.com');
+        };
+
+        $this->fake->assertNotSent($callback);
+
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessageMatches('/The unexpected \['.preg_quote(MailableStub::class, '/').'\] mailable was sent./m');
+
+        $this->fake->assertNotSent($callback);
+    }
+
     public function testAssertSentTimes()
     {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);

@@ -30,9 +30,12 @@ class BusPendingBatchTest extends TestCase
 
         $container->instance(Dispatcher::class, $eventDispatcher);
 
-        $pendingBatch = new PendingBatch($container, new Collection([$job = new class {
+        $job = new class
+        {
             use Batchable;
-        }]));
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
 
         $pendingBatch = $pendingBatch->then(function () {
             //
@@ -60,8 +63,11 @@ class BusPendingBatchTest extends TestCase
 
         $container = new Container;
 
-        $pendingBatch = new PendingBatch($container, new Collection([new class {
-        }]));
+        $job = new class
+        {
+        };
+
+        $pendingBatch = new PendingBatch($container, new Collection([$job]));
 
         $repository = m::mock(BatchRepository::class);
 

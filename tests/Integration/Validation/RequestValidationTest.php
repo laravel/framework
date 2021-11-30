@@ -6,9 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RequestValidationTest extends TestCase
 {
     public function testValidateMacro()

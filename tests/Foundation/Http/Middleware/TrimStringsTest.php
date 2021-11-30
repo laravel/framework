@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Http\Middleware;
+namespace Illuminate\Tests\Foundation\Bootstrap\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ class TrimStringsTest extends TestCase
 {
     public function testTrimStringsIgnoringExceptAttribute()
     {
-        $middleware = new TrimStringsWithExceptAttribute();
+        $middleware = new TrimStringsWithExceptAttribute;
         $symfonyRequest = new SymfonyRequest([
             'abc' => '  123  ',
             'xyz' => '  456  ',
@@ -26,6 +26,21 @@ class TrimStringsTest extends TestCase
             $this->assertSame('456', $request->get('xyz'));
             $this->assertSame('  789  ', $request->get('foo'));
             $this->assertSame('  010  ', $request->get('bar'));
+        });
+    }
+
+    public function testTrimStringsNBSP()
+    {
+        $middleware = new TrimStrings;
+        $symfonyRequest = new SymfonyRequest([
+            // Here has some NBSP, but it still display to space.
+            'abc' => '   123    ',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertSame('123', $request->get('abc'));
         });
     }
 }

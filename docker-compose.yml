@@ -1,16 +1,22 @@
 version: '3'
 services:
+  dynamodb:
+    image:  amazon/dynamodb-local
+    ports:
+      - "8000:8000"
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
   memcached:
     image: memcached:1.6-alpine
     ports:
       - "11211:11211"
     restart: always
   mysql:
-    image: mysql:5.7
+    image: mysql/mysql-server:5.7
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
       MYSQL_ROOT_PASSWORD: ""
       MYSQL_DATABASE: "forge"
+      MYSQL_ROOT_HOST: "%"
     ports:
       - "3306:3306"
     restart: always

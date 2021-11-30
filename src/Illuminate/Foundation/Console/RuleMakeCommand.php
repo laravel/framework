@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class RuleMakeCommand extends GeneratorCommand
 {
@@ -37,6 +38,23 @@ class RuleMakeCommand extends GeneratorCommand
     protected $type = 'Rule';
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function buildClass($name)
+    {
+        return str_replace(
+            '{{ ruleType }}',
+            $this->option('implicit') ? 'ImplicitRule' : 'Rule',
+            parent::buildClass($name)
+        );
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -59,5 +77,17 @@ class RuleMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Rules';
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule.'],
+        ];
     }
 }
