@@ -1003,7 +1003,7 @@ class Blueprint
      * @param  string|array  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, string|array $allowed)
+    public function enum($column, $allowed)
     {
         if (is_string($allowed)) {
             $allowed = collect($allowed::cases())->map(function ($case) {
