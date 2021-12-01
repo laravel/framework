@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
-use Illuminate\Bus\Queueable;
+use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Contracts\Events\Dispatcher;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class CallbackSchedulingTest extends TestCase
 {
@@ -32,6 +31,51 @@ class CallbackSchedulingTest extends TestCase
         $this->artisan('schedule:run');
 
         $this->assertLogged('before 1', 'before 2', 'call', 'after 1', 'after 2');
+    }
+
+    public function testExceptionHandlingInCallback()
+    {
+        $event = $this->app->make(Schedule::class)
+            ->call($this->logger('call'))
+            ->name('test-event')
+            ->withoutOverlapping();
+
+        // Set up "before" and "after" hooks to ensure they're called
+        $event->before($this->logger('before'))->after($this->logger('after'));
+
+        // Register a hook to validate that the mutex was initially created
+        $mutexWasCreated = false;
+        $event->before(function () use (&$mutexWasCreated, $event) {
+            $mutexWasCreated = $event->mutex->exists($event);
+        });
+
+        // We'll trigger an exception in an "after" hook to test exception handling
+        $event->after(function () {
+            throw new RuntimeException;
+        });
+
+        // Because exceptions are caught by the ScheduleRunCommand, we need to listen for
+        // the "failed" event to check whether our exception was actually thrown
+        $failed = false;
+        $this->app->make(Dispatcher::class)
+            ->listen(ScheduledTaskFailed::class, function (ScheduledTaskFailed $failure) use (&$failed, $event) {
+                if ($failure->task === $event) {
+                    $failed = true;
+                }
+            });
+
+        $this->artisan('schedule:run');
+
+        // Hooks and execution should happn in correct order
+        $this->assertLogged('before', 'call', 'after');
+
+        // Our exception should have resulted in a failure event
+        $this->assertTrue($failed);
+
+        // Validate that the mutex was originally created, but that it's since
+        // been removed (even though an exception was thrown)
+        $this->assertTrue($mutexWasCreated);
+        $this->assertFalse($event->mutex->exists($event));
     }
 
     public function executionProvider()
