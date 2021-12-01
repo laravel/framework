@@ -118,6 +118,48 @@ class Gate implements GateContract
     }
 
     /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is false.
+     *
+     * @param  \Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function allowIf($condition, $message = null, $code = null)
+    {
+        $response = value($condition, $this->resolveUser());
+
+        if (! $response instanceof Response) {
+            $response = new Response((bool) $response === true, $message, $code);
+        }
+
+        return $response->authorize();
+    }
+
+    /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
+     *
+     * @param  \Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function denyIf($condition, $message = null, $code = null)
+    {
+        $response = value($condition, $this->resolveUser());
+
+        if (! $response instanceof Response) {
+            $response = new Response((bool) $response === false, $message, $code);
+        }
+
+        return $response->authorize();
+    }
+
+    /**
      * Define a new ability.
      *
      * @param  string  $ability
@@ -769,43 +811,6 @@ class Gate implements GateContract
             $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
             $this->guessPolicyNamesUsingCallback
         );
-    }
-
-    /**
-     * Throws an authorization exception if the condition or callback is falsy.
-     *
-     * @param  \Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
-     * @param  bool  $allow
-     * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function permit($condition, $message = null, $code = null, $allow = true)
-    {
-        $response = value($condition, $this->resolveUser());
-
-        if (! $response instanceof Response) {
-            $response = new Response($allow === (bool) $response, $message, $code);
-        }
-
-        return $response->authorize();
-    }
-
-    /**
-     * Throws an authorization exception if the condition or callback is truthy.
-     *
-     * @param  \Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
-     * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function forbid($condition, $message = null, $code = null)
-    {
-        return $this->permit($condition, $message, $code, false);
     }
 
     /**
