@@ -30,7 +30,7 @@ class AsEncryptedCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                if ($value !== null) {
+                if (! is_null($value)) {
                     return [$key => Crypt::encryptString(json_encode($value))];
                 }
 

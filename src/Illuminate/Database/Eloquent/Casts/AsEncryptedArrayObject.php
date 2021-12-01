@@ -29,7 +29,7 @@ class AsEncryptedArrayObject implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                if ($value !== null) {
+                if (! is_null($value)) {
                     return [$key => Crypt::encryptString(json_encode($value))];
                 }
 
@@ -38,7 +38,7 @@ class AsEncryptedArrayObject implements Castable
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                return $value !== null ? $value->getArrayCopy() : null;
+                return ! is_null($value) ? $value->getArrayCopy() : null;
             }
         };
     }
