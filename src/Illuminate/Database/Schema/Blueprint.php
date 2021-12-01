@@ -91,7 +91,7 @@ class Blueprint
         $this->table = $table;
         $this->prefix = $prefix;
 
-        if (!is_null($callback)) {
+        if (! is_null($callback)) {
             $callback($this);
         }
     }
@@ -129,10 +129,10 @@ class Blueprint
         $this->ensureCommandsAreValid($connection);
 
         foreach ($this->commands as $command) {
-            $method = 'compile' . ucfirst($command->name);
+            $method = 'compile'.ucfirst($command->name);
 
             if (method_exists($grammar, $method) || $grammar::hasMacro($method)) {
-                if (!is_null($sql = $grammar->$method($this, $command, $connection))) {
+                if (! is_null($sql = $grammar->$method($this, $command, $connection))) {
                     $statements = array_merge($statements, (array) $sql);
                 }
             }
@@ -187,11 +187,11 @@ class Blueprint
      */
     protected function addImpliedCommands(Grammar $grammar)
     {
-        if (count($this->getAddedColumns()) > 0 && !$this->creating()) {
+        if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
         }
 
-        if (count($this->getChangedColumns()) > 0 && !$this->creating()) {
+        if (count($this->getChangedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('change'));
         }
 
@@ -244,15 +244,14 @@ class Blueprint
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $attributeName = lcfirst($commandName);
 
-                if (!isset($column->{$attributeName})) {
+                if (! isset($column->{$attributeName})) {
                     continue;
                 }
 
                 $value = $column->{$attributeName};
 
                 $this->addCommand(
-                    $commandName,
-                    compact('value', 'column')
+                    $commandName, compact('value', 'column')
                 );
             }
         }
@@ -901,8 +900,8 @@ class Blueprint
         }
 
         return $model->getKeyType() === 'int' && $model->getIncrementing()
-            ? $this->foreignId($column ?: $model->getForeignKey())
-            : $this->foreignUuid($column ?: $model->getForeignKey());
+                    ? $this->foreignId($column ?: $model->getForeignKey())
+                    : $this->foreignUuid($column ?: $model->getForeignKey());
     }
 
     /**
@@ -1004,7 +1003,7 @@ class Blueprint
      * @param  string|array  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, $allowed)
+    public function enum($column, string|array $allowed)
     {
         if (is_string($allowed)) {
             $allowed = collect($allowed::cases())->map(function ($case) {
@@ -1501,8 +1500,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type,
-            compact('index', 'columns', 'algorithm')
+            $type, compact('index', 'columns', 'algorithm')
         );
     }
 
@@ -1537,7 +1535,7 @@ class Blueprint
      */
     protected function createIndexName($type, array $columns)
     {
-        $index = strtolower($this->prefix . $this->table . '_' . implode('_', $columns) . '_' . $type);
+        $index = strtolower($this->prefix.$this->table.'_'.implode('_', $columns).'_'.$type);
 
         return str_replace(['-', '.'], '_', $index);
     }
@@ -1671,7 +1669,7 @@ class Blueprint
     public function getAddedColumns()
     {
         return array_filter($this->columns, function ($column) {
-            return !$column->change;
+            return ! $column->change;
         });
     }
 
@@ -1694,7 +1692,7 @@ class Blueprint
      */
     public function hasAutoIncrementColumn()
     {
-        return !is_null(collect($this->getAddedColumns())->first(function ($column) {
+        return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
             return $column->autoIncrement === true;
         }));
     }
@@ -1706,14 +1704,14 @@ class Blueprint
      */
     public function autoIncrementingStartingValues()
     {
-        if (!$this->hasAutoIncrementColumn()) {
+        if (! $this->hasAutoIncrementColumn()) {
             return [];
         }
 
         return collect($this->getAddedColumns())->mapWithKeys(function ($column) {
             return $column->autoIncrement === true
-                ? [$column->name => $column->get('startingValue', $column->get('from'))]
-                : [$column->name => null];
+                        ? [$column->name => $column->get('startingValue', $column->get('from'))]
+                        : [$column->name => null];
         })->filter()->all();
     }
 }
