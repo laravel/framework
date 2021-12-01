@@ -703,6 +703,13 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($response->allowed());
     }
 
+    public function testAllowIfAuthorizesIfGuest()
+    {
+        $response = $this->getBasicGate()->forUser(null)->allowIf(true);
+
+        $this->assertTrue($response->allowed());
+    }
+
     public function testAllowIfAuthorizesCallbackTrue()
     {
         $response = $this->getBasicGate()->allowIf(function ($user) {
@@ -794,6 +801,19 @@ class AuthAccessGateTest extends TestCase
         }, 'foo', 'bar');
     }
 
+    public function testAllowIfThrowsExceptionIfUnauthenticated()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $gate = $this->getBasicGate()->forUser(null);
+
+        $gate->allowIf(function () {
+            return true;
+        }, 'foo', 'bar');
+    }
+
     public function testAllowIfThrowsExceptionIfAuthUserExpectedWhenGuest()
     {
         $this->expectException(AuthorizationException::class);
@@ -817,6 +837,13 @@ class AuthAccessGateTest extends TestCase
     public function testDenyIfAuthorizesFalsy()
     {
         $response = $this->getBasicGate()->denyIf(0);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testDenyIfAuthorizesIfGuest()
+    {
+        $response = $this->getBasicGate()->forUser(null)->denyIf(false);
 
         $this->assertTrue($response->allowed());
     }
@@ -909,6 +936,19 @@ class AuthAccessGateTest extends TestCase
 
         $this->getBasicGate()->denyIf(function () {
             return Response::deny('quz', 'qux');
+        }, 'foo', 'bar');
+    }
+
+    public function testDenyIfThrowsExceptionIfUnauthenticated()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $gate = $this->getBasicGate()->forUser(null);
+
+        $gate->denyIf(function () {
+            return false;
         }, 'foo', 'bar');
     }
 
