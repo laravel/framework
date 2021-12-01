@@ -208,13 +208,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $path = $this->decodedPath();
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $path)) {
-                return true;
-            }
-        }
-
-        return false;
+        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $path));
     }
 
     /**
@@ -238,13 +232,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $url = $this->fullUrl();
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $url)) {
-                return true;
-            }
-        }
-
-        return false;
+        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $url));
     }
 
     /**
