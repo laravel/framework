@@ -14,8 +14,7 @@ use IteratorAggregate;
 
 class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
 {
-    use Macroable;
-    use Conditionable;
+    use Conditionable, Macroable;
 
     /**
      * The raw array of attributes.
