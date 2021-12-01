@@ -135,7 +135,7 @@ class Gate implements GateContract
 
         // When the developer issues a callback that expects the authenticated user, we
         // will preemptively fail this check if there is none. This is accomplished by
-        // just negating the flag for authorization and respecting this fail message.
+        // just negating the authorization flag, and reuse the same message and code.
         if (! $user && $condition instanceof Closure && ! $this->callbackAllowsGuests($condition)) {
             $condition = ! $allow;
         }
