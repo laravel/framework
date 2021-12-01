@@ -584,7 +584,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isLocal()
     {
-        return $this['env'] === 'local';
+        return $this->environment('local');
     }
 
     /**
@@ -594,7 +594,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isProduction()
     {
-        return $this['env'] === 'production';
+        return $this->environment('production');
     }
 
     /**
@@ -605,9 +605,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = $_SERVER['argv'] ?? null;
-
-        return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
+        return $this['env'] = (new EnvironmentDetector)->detect($callback, $_SERVER['argv'] ?? null);
     }
 
     /**
@@ -631,7 +629,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function runningUnitTests()
     {
-        return $this->bound('env') && $this['env'] === 'testing';
+        return $this->bound('env') && $this->environment('testing');
     }
 
     /**
