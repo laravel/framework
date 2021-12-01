@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use Closure;
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
@@ -123,16 +124,26 @@ class Gate implements GateContract
      * @param  \Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
+     * @param  bool  $allow
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function allowIf($condition, $message = null, $code = null)
+    public function allowIf($condition, $message = null, $code = null, $allow = true)
     {
-        $response = value($condition, $this->resolveUser());
+        $user = $this->resolveUser();
+
+        // When the developer issues a callback that expects the authenticated user, we
+        // will preemptively fail this check if there is none. This is accomplished by
+        // just negating the flag for authorization and respecting this fail message.
+        if (! $user && $condition instanceof Closure && ! $this->callbackAllowsGuests($condition)) {
+            $condition = ! $allow;
+        }
+
+        $response = value($condition, $user);
 
         if (! $response instanceof Response) {
-            $response = new Response((bool) $response === true, $message, $code);
+            $response = new Response((bool) $response === $allow, $message, $code);
         }
 
         return $response->authorize();
@@ -150,13 +161,7 @@ class Gate implements GateContract
      */
     public function denyIf($condition, $message = null, $code = null)
     {
-        $response = value($condition, $this->resolveUser());
-
-        if (! $response instanceof Response) {
-            $response = new Response((bool) $response === false, $message, $code);
-        }
-
-        return $response->authorize();
+        return $this->allowIf($condition, $message, $code, false);
     }
 
     /**

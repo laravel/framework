@@ -689,21 +689,21 @@ class AuthAccessGateTest extends TestCase
         $this->assertNull($response->message());
     }
 
-    public function testPermitAuthorizesTrue()
+    public function testAllowIfAuthorizesTrue()
     {
         $response = $this->getBasicGate()->allowIf(true);
 
         $this->assertTrue($response->allowed());
     }
 
-    public function testPermitAuthorizesTruthy()
+    public function testAllowIfAuthorizesTruthy()
     {
         $response = $this->getBasicGate()->allowIf('truthy');
 
         $this->assertTrue($response->allowed());
     }
 
-    public function testPermitAuthorizesCallbackTrue()
+    public function testAllowIfAuthorizesCallbackTrue()
     {
         $response = $this->getBasicGate()->allowIf(function ($user) {
             $this->assertSame(1, $user->id);
@@ -716,7 +716,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('bar', $response->code());
     }
 
-    public function testPermitAuthorizesResponseAllowed()
+    public function testAllowIfAuthorizesResponseAllowed()
     {
         $response = $this->getBasicGate()->allowIf(Response::allow('foo', 'bar'));
 
@@ -725,7 +725,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('bar', $response->code());
     }
 
-    public function testPermitAuthorizesCallbackResponseAllowed()
+    public function testAllowIfAuthorizesCallbackResponseAllowed()
     {
         $response = $this->getBasicGate()->allowIf(function () {
             return Response::allow('quz', 'qux');
@@ -736,14 +736,34 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('qux', $response->code());
     }
 
-    public function testPermitThrowsExceptionWhenFalse()
+    public function testAllowsIfCallbackAcceptsGuestsWhenAuthenticated()
+    {
+        $response = $this->getBasicGate()->allowIf(function (stdClass $user = null) {
+            return $user !== null;
+        });
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testAllowIfCallbackAcceptsGuestsWhenUnauthenticated()
+    {
+        $gate = $this->getBasicGate()->forUser(null);
+
+        $response = $gate->allowIf(function (stdClass $user = null) {
+            return $user === null;
+        });
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testAllowIfThrowsExceptionWhenFalse()
     {
         $this->expectException(AuthorizationException::class);
 
         $this->getBasicGate()->allowIf(false);
     }
 
-    public function testPermitThrowsExceptionWhenCallbackFalse()
+    public function testAllowIfThrowsExceptionWhenCallbackFalse()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('foo');
@@ -754,7 +774,7 @@ class AuthAccessGateTest extends TestCase
         }, 'foo', 'bar');
     }
 
-    public function testPermitThrowsExceptionWhenResponseDenied()
+    public function testAllowIfThrowsExceptionWhenResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('foo');
@@ -763,7 +783,7 @@ class AuthAccessGateTest extends TestCase
         $this->getBasicGate()->allowIf(Response::deny('foo', 'bar'));
     }
 
-    public function testPermitThrowsExceptionWhenCallbackResponseDenied()
+    public function testAllowIfThrowsExceptionWhenCallbackResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('quz');
@@ -774,21 +794,34 @@ class AuthAccessGateTest extends TestCase
         }, 'foo', 'bar');
     }
 
-    public function testForbidAuthorizesFalse()
+    public function testAllowIfThrowsExceptionIfAuthUserExpectedWhenGuest()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $gate = $this->getBasicGate()->forUser(null);
+
+        $gate->allowIf(function (stdClass $user) {
+            return true;
+        }, 'foo', 'bar');
+    }
+
+    public function testDenyIfAuthorizesFalse()
     {
         $response = $this->getBasicGate()->denyIf(false);
 
         $this->assertTrue($response->allowed());
     }
 
-    public function testForbidAuthorizesFalsy()
+    public function testDenyIfAuthorizesFalsy()
     {
         $response = $this->getBasicGate()->denyIf(0);
 
         $this->assertTrue($response->allowed());
     }
 
-    public function testForbidAuthorizesCallbackFalse()
+    public function testDenyIfAuthorizesCallbackFalse()
     {
         $response = $this->getBasicGate()->denyIf(function ($user) {
             $this->assertSame(1, $user->id);
@@ -801,7 +834,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('bar', $response->code());
     }
 
-    public function testForbidAuthorizesResponseAllowed()
+    public function testDenyIfAuthorizesResponseAllowed()
     {
         $response = $this->getBasicGate()->denyIf(Response::allow('foo', 'bar'));
 
@@ -810,7 +843,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('bar', $response->code());
     }
 
-    public function testForbidAuthorizesCallbackResponseAllowed()
+    public function testDenyIfAuthorizesCallbackResponseAllowed()
     {
         $response = $this->getBasicGate()->denyIf(function () {
             return Response::allow('quz', 'qux');
@@ -821,14 +854,34 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('qux', $response->code());
     }
 
-    public function testForbidThrowsExceptionWhenTrue()
+    public function testDenyIfCallbackAcceptsGuestsWhenAuthenticated()
+    {
+        $response = $this->getBasicGate()->denyIf(function (stdClass $user = null) {
+            return $user === null;
+        });
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testDenyIfCallbackAcceptsGuestsWhenUnauthenticated()
+    {
+        $gate = $this->getBasicGate()->forUser(null);
+
+        $response = $gate->denyIf(function (stdClass $user = null) {
+            return $user !== null;
+        });
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function testDenyIfThrowsExceptionWhenTrue()
     {
         $this->expectException(AuthorizationException::class);
 
         $this->getBasicGate()->denyIf(true);
     }
 
-    public function testForbidThrowsExceptionWhenCallbackTrue()
+    public function testDenyIfThrowsExceptionWhenCallbackTrue()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('foo');
@@ -839,7 +892,7 @@ class AuthAccessGateTest extends TestCase
         }, 'foo', 'bar');
     }
 
-    public function testForbidThrowsExceptionWhenResponseDenied()
+    public function testDenyIfThrowsExceptionWhenResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('foo');
@@ -848,7 +901,7 @@ class AuthAccessGateTest extends TestCase
         $this->getBasicGate()->denyIf(Response::deny('foo', 'bar'));
     }
 
-    public function testForbidThrowsExceptionWhenCallbackResponseDenied()
+    public function testDenyIfThrowsExceptionWhenCallbackResponseDenied()
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('quz');
@@ -856,6 +909,19 @@ class AuthAccessGateTest extends TestCase
 
         $this->getBasicGate()->denyIf(function () {
             return Response::deny('quz', 'qux');
+        }, 'foo', 'bar');
+    }
+
+    public function testDenyIfThrowsExceptionIfAuthUserExpectedWhenGuest()
+    {
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('foo');
+        $this->expectExceptionCode('bar');
+
+        $gate = $this->getBasicGate()->forUser(null);
+
+        $gate->denyIf(function (stdClass $user) {
+            return false;
         }, 'foo', 'bar');
     }
 
