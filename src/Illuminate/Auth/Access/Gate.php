@@ -121,7 +121,7 @@ class Gate implements GateContract
     /**
      * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is false.
      *
-     * @param  \Closure|bool  $condition
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
      * @return \Illuminate\Auth\Access\Response
@@ -136,7 +136,7 @@ class Gate implements GateContract
     /**
      * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
      *
-     * @param  \Closure|bool  $condition
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
      * @return \Illuminate\Auth\Access\Response
@@ -166,7 +166,9 @@ class Gate implements GateContract
         // will preemptively fail this check if there is none. This is accomplished by
         // just negating the authorization flag, and reuse the same message and code.
         if ($condition instanceof Closure) {
-            $condition = $this->canBeCalledWithUser($user, $condition) ? $condition($user) : ! $allow;
+            $condition = $this->canBeCalledWithUser($user, $condition)
+                ? $condition($user)
+                : ! $allow;
         }
 
         if (! $condition instanceof Response) {
