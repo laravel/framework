@@ -151,7 +151,7 @@ class Gate implements GateContract
     /**
      * Authorize a given condition or callback.
      *
-     * @param  \Closure|bool  $condition
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
      * @param  bool $allow
@@ -165,17 +165,15 @@ class Gate implements GateContract
         // When the developer issues a callback that expects the authenticated user, we
         // will preemptively fail this check if there is none. This is accomplished by
         // just negating the authorization flag, and reuse the same message and code.
-        if ($condition instanceof Closure && ! $this->canBeCalledWithUser($user, $condition)) {
-            $condition = ! $allow;
+        if ($condition instanceof Closure) {
+            $condition = $this->canBeCalledWithUser($user, $condition) ? $condition($user) : ! $allow;
         }
 
-        $response = value($condition, $user);
-
-        if (! $response instanceof Response) {
-            $response = new Response((bool) $response === $allow, $message, $code);
+        if (! $condition instanceof Response) {
+            $condition = new Response((bool) $condition === $allow, $message, $code);
         }
 
-        return $response->authorize();
+        return $condition->authorize();
     }
 
     /**
