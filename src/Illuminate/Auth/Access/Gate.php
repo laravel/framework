@@ -154,8 +154,9 @@ class Gate implements GateContract
      * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
-     * @param  bool $allow
+     * @param  bool  $allow
      * @return \Illuminate\Auth\Access\Response
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     protected function onDemand($condition, $message, $code, $allow)
