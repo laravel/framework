@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth\Access;
 
+use Closure;
 use Exception;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
@@ -115,6 +116,64 @@ class Gate implements GateContract
         }
 
         return true;
+    }
+
+    /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is false.
+     *
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function allowIf($condition, $message = null, $code = null)
+    {
+        return $this->authorizeOnDemand($condition, $message, $code, true);
+    }
+
+    /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
+     *
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function denyIf($condition, $message = null, $code = null)
+    {
+        return $this->authorizeOnDemand($condition, $message, $code, false);
+    }
+
+    /**
+     * Authorize a given condition or callback.
+     *
+     * @param  \Illuminate\Auth\Access\Response|\Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @param  bool  $allowWhenResponseIs
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function authorizeOnDemand($condition, $message, $code, $allowWhenResponseIs)
+    {
+        $user = $this->resolveUser();
+
+        if ($condition instanceof Closure) {
+            $response = $this->canBeCalledWithUser($user, $condition)
+                            ? $condition($user)
+                            : new Response(false, $message, $code);
+        } else {
+            $response = $condition;
+        }
+
+        return with($response instanceof Response ? $response : new Response(
+            (bool) $response === $allowWhenResponseIs, $message, $code
+        ))->authorize();
     }
 
     /**
