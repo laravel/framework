@@ -124,12 +124,41 @@ class Gate implements GateContract
      * @param  \Closure|bool  $condition
      * @param  string|null  $message
      * @param  string|null  $code
-     * @param  bool  $allow
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function allowIf($condition, $message = null, $code = null, $allow = true)
+    public function allowIf($condition, $message = null, $code = null)
+    {
+        return $this->onDemand($condition, $message, $code, true);
+    }
+
+    /**
+     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
+     *
+     * @param  \Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @return \Illuminate\Auth\Access\Response
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function denyIf($condition, $message = null, $code = null)
+    {
+        return $this->onDemand($condition, $message, $code, false);
+    }
+
+    /**
+     * Authorize a given condition or callback.
+     *
+     * @param  \Closure|bool  $condition
+     * @param  string|null  $message
+     * @param  string|null  $code
+     * @param  bool $allow
+     * @return \Illuminate\Auth\Access\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    protected function onDemand($condition, $message, $code, $allow)
     {
         $user = $this->resolveUser();
 
@@ -147,21 +176,6 @@ class Gate implements GateContract
         }
 
         return $response->authorize();
-    }
-
-    /**
-     * Perform an on-demand authorization check. Throw an authorization exception if the condition or callback is true.
-     *
-     * @param  \Closure|bool  $condition
-     * @param  string|null  $message
-     * @param  string|null  $code
-     * @return \Illuminate\Auth\Access\Response
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function denyIf($condition, $message = null, $code = null)
-    {
-        return $this->allowIf($condition, $message, $code, false);
     }
 
     /**
