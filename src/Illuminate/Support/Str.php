@@ -845,6 +845,31 @@ class Str
     }
 
     /**
+     * Convert boolean-like strings to actual boolean.
+     *
+     * @param  string|bool  $exp
+     * @return bool
+     */
+    public static function toBool($exp)
+    {
+        if (is_bool($exp)) {
+            return $exp;
+        }
+
+        $exp = strtolower($exp);
+
+        if ($exp === 'true') {
+            return true;
+        }
+
+        if ($exp === 'false') {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the portion of the string specified by the start and length parameters.
      *
      * @param  string  $string

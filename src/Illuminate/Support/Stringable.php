@@ -611,6 +611,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert boolean-like strings to actual boolean.
+     *
+     *
+     * @return bool
+     */
+    public function toBool()
+    {
+        return Str::toBool($this->value);
+    }
+
+    /**
      * Convert the given string to title case.
      *
      * @return static

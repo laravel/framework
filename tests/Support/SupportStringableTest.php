@@ -489,6 +489,15 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(['?1', '?2', '?3', '?4'], ['foo', 'bar', 'baz', 'bam']));
     }
 
+    public function testToBool()
+    {
+        $this->assertSame(false, $this->stringable((string) true)->toBool());
+        $this->assertSame(true, $this->stringable('True')->toBool());
+        $this->assertSame(false, $this->stringable('FaLsE')->toBool());
+        $this->assertSame(false, $this->stringable('false')->toBool());
+        $this->assertSame(false, $this->stringable('Taylor')->toBool());
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', (string) $this->stringable('?/?/?')->replaceArray('?', ['foo', 'bar', 'baz']));

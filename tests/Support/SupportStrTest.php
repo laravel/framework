@@ -425,6 +425,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤MultiByte☆', Str::reverse('☆etyBitluM❤'));
     }
 
+    public function testToBool()
+    {
+        $this->assertSame(true, Str::toBool(true));
+        $this->assertSame(true, Str::toBool('True'));
+        $this->assertSame(false, Str::toBool('FaLsE'));
+        $this->assertSame(false, Str::toBool('false'));
+        $this->assertSame(false, Str::toBool('Taylor'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
