@@ -2,8 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Console\Events\ScheduledTaskFailed;
+use Illuminate\Console\Scheduling\CacheEventMutex;
+use Illuminate\Console\Scheduling\CacheSchedulingMutex;
+use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Console\Scheduling\SchedulingMutex;
+use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
@@ -11,6 +18,28 @@ use RuntimeException;
 class CallbackSchedulingTest extends TestCase
 {
     protected $log = [];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $cache = new class implements Factory {
+            public $store;
+
+            public function __construct()
+            {
+                $this->store = new Repository(new ArrayStore());
+            }
+
+            public function store($name = null)
+            {
+                return $this->store;
+            }
+        };
+
+        $this->app->instance(EventMutex::class, new CacheEventMutex($cache));
+        $this->app->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
+    }
 
     /**
      * @dataProvider executionProvider
