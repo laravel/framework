@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Reflector;
 use InvalidArgumentException;
 use LogicException;
+use RuntimeException;
 use Throwable;
 
 class CallbackEvent extends Event
@@ -61,6 +62,15 @@ class CallbackEvent extends Event
         $this->callback = $callback;
         $this->parameters = $parameters;
         $this->timezone = $timezone;
+    }
+
+    /**
+     * @return void
+     * @throws \RuntimeException
+     */
+    public function runInBackground()
+    {
+        throw new RuntimeException('Callbacks can not be scheduled to run in the background.');
     }
 
     /**
