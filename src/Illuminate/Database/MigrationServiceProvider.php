@@ -44,6 +44,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     {
         $this->registerRepository();
 
+        $this->registerSchemaBuilder();
+
         $this->registerMigrator();
 
         $this->registerCreator();
@@ -62,6 +64,19 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
             $table = $app['config']['database.migrations'];
 
             return new DatabaseMigrationRepository($app['db'], $table);
+        });
+    }
+
+
+    /**
+     * Register the schema builder service.
+     *
+     * @return void
+     */
+    protected function registerSchemaBuilder()
+    {
+        $this->app->bind('db.schema', function ($app) {
+            return $app['db']->connection()->getSchemaBuilder();
         });
     }
 
@@ -216,7 +231,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     public function provides()
     {
         return array_merge([
-            'migrator', 'migration.repository', 'migration.creator',
+            'db.schema', 'migrator', 'migration.repository', 'migration.creator',
         ], array_values($this->commands));
     }
 }
