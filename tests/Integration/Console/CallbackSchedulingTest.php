@@ -45,6 +45,13 @@ class CallbackSchedulingTest extends TestCase
         $container->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
     }
 
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+        
+        parent::tearDown();
+    }
+
     /**
      * @dataProvider executionProvider
      */
