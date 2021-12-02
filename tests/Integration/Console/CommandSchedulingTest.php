@@ -22,14 +22,7 @@ class CommandSchedulingTest extends TestCase
      *
      * @var string
      */
-    protected $logFile;
-
-    /**
-     * The path to the custom command that will be written for this test.
-     *
-     * @var string
-     */
-    protected $commandFile;
+    protected $logfile;
 
     /**
      * The Filesystem instance for writing stubs and logs.
@@ -45,22 +38,15 @@ class CommandSchedulingTest extends TestCase
         $this->fs = new Filesystem;
 
         $this->id = Str::random();
-        $this->logFile = storage_path("logs/command_scheduling_test_{$this->id}.log");
-        $this->commandFile = app_path("Console/Commands/CommandSchedulingTestCommand_{$this->id}.php");
+        $this->logfile = storage_path("logs/command_scheduling_test_{$this->id}.log");
 
-        // We always need to clean this up in case of an Exception in a previous run,
-        // since Test Bench will automatically include it when we execute a command.
-        $this->fs->delete($this->app->basePath('routes/console.php'));
-
-        $this->writeTestStubs();
+        $this->writeArtisanScript();
     }
 
     protected function tearDown(): void
     {
-        $this->fs->delete($this->logFile);
+        $this->fs->delete($this->logfile);
         $this->fs->delete(base_path('artisan'));
-        $this->fs->delete(base_path('routes/console.php'));
-        $this->fs->delete($this->commandFile);
 
         parent::tearDown();
     }
@@ -74,10 +60,10 @@ class CommandSchedulingTest extends TestCase
             ->command("test:{$this->id}")
             ->onOneServer()
             ->after(function () {
-                $this->fs->append($this->logFile, "after\n");
+                $this->fs->append($this->logfile, "after\n");
             })
             ->before(function () {
-                $this->fs->append($this->logFile, "before\n");
+                $this->fs->append($this->logfile, "before\n");
             });
 
         if ($background) {
@@ -113,7 +99,7 @@ class CommandSchedulingTest extends TestCase
         $limit = 50; // 0.1s * 50 = 5 second wait limit
 
         do {
-            $log = $this->fs->get($this->logFile);
+            $log = $this->fs->get($this->logfile);
 
             if (Str::containsAll($log, $messages)) {
                 return;
@@ -126,26 +112,27 @@ class CommandSchedulingTest extends TestCase
 
     protected function assertLogged(...$messages)
     {
-        $log = trim($this->fs->get($this->logFile));
+        $log = trim($this->fs->get($this->logfile));
 
         $this->assertEquals(implode("\n", $messages), $log);
     }
 
-    protected function writeTestStubs()
+    protected function writeArtisanScript()
     {
-        // Make sure our target directories exist
-        $this->fs->ensureDirectoryExists(app_path('Console/Commands'));
-        $this->fs->ensureDirectoryExists(base_path('routes'));
+        $thisFile = __FILE__;
+        $logFile = var_export($this->logfile, true);
 
-        // Get PHP-ready representation of our paths
-        $logFile = var_export($this->logFile, true);
-        $commandFile = var_export($this->commandFile, true);
-
-        // Testbench doesn't ship with an artisan script, so we need to add one to the project
-        // so that we can execute commands in a separate process
-        $artisan = <<<PHP
+        $script = <<<PHP
 #!/usr/bin/env php
 <?php
+
+// This is a custom artisan script made specifically for:
+//
+// {$thisFile}
+//
+// It should be automatically cleaned up when the tests have finished executing.
+// If you are seeing this file, an unexpected error must have occurred. Please
+// manually remove it.
 
 define('LARAVEL_START', microtime(true));
 
@@ -154,49 +141,21 @@ require __DIR__.'/../../../autoload.php';
 \$app = require_once __DIR__.'/bootstrap/app.php';
 \$kernel = \$app->make(Illuminate\Contracts\Console\Kernel::class);
 
-\$status = \$kernel->handle(
-    \$input = new Symfony\Component\Console\Input\ArgvInput,
-    new Symfony\Component\Console\Output\ConsoleOutput
-);
-
-\$kernel->terminate(\$input, \$status);
-
-exit(\$status);
-
-PHP;
-
-        // Each time we run the test we need to write to a unique log file to ensure that separate
-        // test runs don't pollute the results of each other
-        $command = <<<PHP
-<?php
-
-namespace App\Console\Commands;
-
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-
-class CommandSchedulingTestCommand_{$this->id} extends Command
+// Here is our custom command for the test
+class CommandSchedulingTestCommand_{$this->id} extends Illuminate\Console\Command
 {
     protected \$signature = 'test:{$this->id}';
 
     public function handle()
     {
         \$logfile = {$logFile};
-        (new Filesystem)->append(\$logfile, "handled\\n");
+        (new Illuminate\Filesystem\Filesystem)->append(\$logfile, "handled\\n");
     }
 }
-PHP;
-
-        // Testbench automatically loads `routes/console.php` on initialization of the console
-        // Kernel, so this is a convenient place to register out command and set up the scheduler
-        $route = <<<PHP
-<?php
-
-require_once {$commandFile};
 
 // Register command with Kernel
 Illuminate\Console\Application::starting(function (\$artisan) {
-    \$artisan->add(new App\Console\Commands\CommandSchedulingTestCommand_{$this->id});
+    \$artisan->add(new CommandSchedulingTestCommand_{$this->id});
 });
 
 // Add command to scheduler so that the after() callback is trigger in our spawned process
@@ -216,10 +175,17 @@ Illuminate\Foundation\Application::getInstance()
         });
     });
 
+\$status = \$kernel->handle(
+    \$input = new Symfony\Component\Console\Input\ArgvInput,
+    new Symfony\Component\Console\Output\ConsoleOutput
+);
+
+\$kernel->terminate(\$input, \$status);
+
+exit(\$status);
+
 PHP;
 
-        $this->fs->put($this->commandFile, $command);
-        $this->fs->put(base_path('routes/console.php'), $route);
-        $this->fs->put(base_path('artisan'), $artisan);
+        $this->fs->put(base_path('artisan'), $script);
     }
 }
