@@ -24,7 +24,8 @@ class CallbackSchedulingTest extends TestCase
     {
         parent::setUp();
 
-        $cache = new class implements Factory {
+        $cache = new class implements Factory
+        {
             public $store;
 
             public function __construct()
