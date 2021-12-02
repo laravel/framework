@@ -66,7 +66,7 @@ class CallbackEvent extends Event
 
     /**
      * @return void
-     * 
+     *
      * @throws \RuntimeException
      */
     public function runInBackground()
