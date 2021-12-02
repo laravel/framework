@@ -262,6 +262,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body', null, null, 'english');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[0]);
+    }
+
     public function testAddingSpatialIndex()
     {
         $blueprint = new Blueprint('geo');
