@@ -37,8 +37,8 @@ class SqlServerGrammar extends Grammar
 
         // For order by queries we can paginate, to avoid sorting issues.
         $components = $this->compileComponents($query);
-        if (!empty($components['orders'])) {
-            return parent::compileSelect($query) . " OFFSET {$query->offset} ROWS FETCH NEXT {$query->limit} ROWS ONLY";
+        if (! empty($components['orders'])) {
+            return parent::compileSelect($query)." OFFSET {$query->offset} ROWS FETCH NEXT {$query->limit} ROWS ONLY";
         }
 
         // If an offset is present on the query, we will need to wrap the query in
