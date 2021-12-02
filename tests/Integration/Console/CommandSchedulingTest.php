@@ -25,6 +25,13 @@ class CommandSchedulingTest extends TestCase
     protected $logfile;
 
     /**
+     * Just in case Testbench starts to ship an `artisan` script, we'll check and save a backup.
+     *
+     * @var string|null
+     */
+    protected $originalArtisan;
+
+    /**
      * The Filesystem instance for writing stubs and logs.
      *
      * @var \Illuminate\Filesystem\Filesystem
@@ -47,6 +54,10 @@ class CommandSchedulingTest extends TestCase
     {
         $this->fs->delete($this->logfile);
         $this->fs->delete(base_path('artisan'));
+
+        if (! is_null($this->originalArtisan)) {
+            $this->fs->put(base_path('artisan'), $this->originalArtisan);
+        }
 
         parent::tearDown();
     }
@@ -119,8 +130,15 @@ class CommandSchedulingTest extends TestCase
 
     protected function writeArtisanScript()
     {
+        $path = base_path('artisan');
+
+        // Save existing artisan script if there is one
+        if ($this->fs->exists($path)) {
+            $this->originalArtisan = $this->fs->get($path);
+        }
+
         $thisFile = __FILE__;
-        $logFile = var_export($this->logfile, true);
+        $logfile = var_export($this->logfile, true);
 
         $script = <<<PHP
 #!/usr/bin/env php
@@ -148,7 +166,7 @@ class CommandSchedulingTestCommand_{$this->id} extends Illuminate\Console\Comman
 
     public function handle()
     {
-        \$logfile = {$logFile};
+        \$logfile = {$logfile};
         (new Illuminate\Filesystem\Filesystem)->append(\$logfile, "handled\\n");
     }
 }
@@ -165,11 +183,11 @@ Illuminate\Foundation\Application::getInstance()
             \$fs = new Illuminate\Filesystem\Filesystem;
             \$schedule->command("test:{$this->id}")
                 ->after(function() use (\$fs) {
-                    \$logfile = {$logFile};
+                    \$logfile = {$logfile};
                     \$fs->append(\$logfile, "after\\n");
                 })
                 ->before(function() use (\$fs) {
-                    \$logfile = {$logFile};
+                    \$logfile = {$logfile};
                     \$fs->append(\$logfile, "before\\n");
                 });
         });
@@ -186,6 +204,6 @@ exit(\$status);
 
 PHP;
 
-        $this->fs->put(base_path('artisan'), $script);
+        $this->fs->put($path, $script);
     }
 }
