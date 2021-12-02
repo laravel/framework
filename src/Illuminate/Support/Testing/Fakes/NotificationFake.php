@@ -161,11 +161,11 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
     /**
      * Assert the total amount of times a notification was sent.
      *
-     * @param  int  $expectedCount
      * @param  string  $notification
+     * @param  int  $expectedCount
      * @return void
      */
-    public function assertTimesSent($expectedCount, $notification)
+    public function assertSentTimes($notification, $expectedCount)
     {
         $actualCount = collect($this->notifications)
             ->flatten(1)
@@ -177,6 +177,20 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             $expectedCount, $actualCount,
             "Expected [{$notification}] to be sent {$expectedCount} times, but was sent {$actualCount} times."
         );
+    }
+
+    /**
+     * Assert the total amount of times a notification was sent.
+     *
+     * @param  int  $expectedCount
+     * @param  string  $notification
+     * @return void
+     *
+     * @deprecated Use the assertSentTimes method instead
+     */
+    public function assertTimesSent($expectedCount, $notification)
+    {
+        $this->assertSentTimes($notification, $expectedCount);
     }
 
     /**

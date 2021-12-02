@@ -31,6 +31,7 @@
         "psr/log": "^1.0|^2.0",
         "psr/simple-cache": "^1.0",
         "ramsey/uuid": "^4.2.2",
+<<<<<<< HEAD
         "symfony/console": "^6.0",
         "symfony/error-handler": "^6.0",
         "symfony/finder": "^6.0",
@@ -41,6 +42,18 @@
         "symfony/process": "^6.0",
         "symfony/routing": "^6.0",
         "symfony/var-dumper": "^6.0",
+=======
+        "swiftmailer/swiftmailer": "^6.3",
+        "symfony/console": "^5.4",
+        "symfony/error-handler": "^5.4",
+        "symfony/finder": "^5.4",
+        "symfony/http-foundation": "^5.4",
+        "symfony/http-kernel": "^5.4",
+        "symfony/mime": "^5.4",
+        "symfony/process": "^5.4",
+        "symfony/routing": "^5.4",
+        "symfony/var-dumper": "^5.4",
+>>>>>>> 8.x
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
         "vlucas/phpdotenv": "^5.3",
         "voku/portable-ascii": "^1.4.8"
