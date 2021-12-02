@@ -1,13 +1,13 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\ClassMorphViolationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\TestCase;
 
-class EloquentStrictMorphsTest extends TestCase
+class DatabaseEloquentStrictMorphsTest extends TestCase
 {
     protected function setUp(): void
     {

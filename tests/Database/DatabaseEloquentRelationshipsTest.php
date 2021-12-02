@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentRelationshipsTest;
+namespace Illuminate\Tests\Database\EloquentRelationshipsTest;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -14,9 +14,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\TestCase;
 
-class EloquentRelationshipsTest extends TestCase
+class DatabaseEloquentRelationshipsTest extends TestCase
 {
     public function testStandardRelationships()
     {
