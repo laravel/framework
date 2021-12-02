@@ -67,7 +67,6 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         });
     }
 
-
     /**
      * Register the schema builder service.
      *
