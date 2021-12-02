@@ -207,7 +207,7 @@ class ControllerMakeCommand extends GeneratorCommand
         ];
 
         if ($this->option('requests')) {
-            $namespace = 'App\\Http\\Requests';
+            $namespace = 'App\\Http\\Requests\\'.class_basename($modelClass);
 
             [$storeRequestClass, $updateRequestClass] = $this->generateFormRequests(
                 $modelClass, $storeRequestClass, $updateRequestClass
@@ -244,16 +244,16 @@ class ControllerMakeCommand extends GeneratorCommand
      */
     protected function generateFormRequests($modelClass, $storeRequestClass, $updateRequestClass)
     {
-        $storeRequestClass = 'Store'.class_basename($modelClass).'Request';
+        $storeRequestClass = 'StoreRequest';
 
         $this->call('make:request', [
-            'name' => $storeRequestClass,
+            'name' => class_basename($modelClass).'/'.$storeRequestClass,
         ]);
 
-        $updateRequestClass = 'Update'.class_basename($modelClass).'Request';
+        $updateRequestClass = 'UpdateRequest';
 
         $this->call('make:request', [
-            'name' => $updateRequestClass,
+            'name' => class_basename($modelClass).'/'.$updateRequestClass,
         ]);
 
         return [$storeRequestClass, $updateRequestClass];
