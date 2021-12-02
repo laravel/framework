@@ -10,6 +10,7 @@ use Illuminate\Console\Scheduling\CacheSchedulingMutex;
 use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\SchedulingMutex;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Orchestra\Testbench\TestCase;
@@ -28,7 +29,7 @@ class CallbackSchedulingTest extends TestCase
 
             public function __construct()
             {
-                $this->store = new Repository(new ArrayStore());
+                $this->store = new Repository(new ArrayStore(true));
             }
 
             public function store($name = null)
@@ -37,8 +38,10 @@ class CallbackSchedulingTest extends TestCase
             }
         };
 
-        $this->app->instance(EventMutex::class, new CacheEventMutex($cache));
-        $this->app->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
+        $container = Container::getInstance();
+
+        $container->instance(EventMutex::class, new CacheEventMutex($cache));
+        $container->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
     }
 
     /**
