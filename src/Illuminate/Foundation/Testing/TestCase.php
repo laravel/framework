@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Testing\InitializeTraits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Facade;
@@ -94,6 +95,10 @@ abstract class TestCase extends BaseTestCase
             $callback();
         }
 
+        if ($this instanceof InitializeTraits) {
+            $this->initializeFirstLevelTraits();
+        }
+
         Model::setEventDispatcher($this->app['events']);
 
         $this->setUpHasRun = true;
@@ -143,6 +148,24 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $uses;
+    }
+
+    /**
+     * Initialize first-level testing traits and register their tear-down callbacks.
+     *
+     * @return void
+     */
+    protected function initializeFirstLevelTraits()
+    {
+        foreach (class_uses($this) as $trait) {
+            if (method_exists($this, $setUpMethod = 'setUp'.class_basename($trait))) {
+                $this->{$setUpMethod}();
+            }
+
+            if (method_exists($this, $tearDownMethod = 'tearDown'.class_basename($trait))) {
+                $this->beforeApplicationDestroyed([$this, $tearDownMethod]);
+            }
+        }
     }
 
     /**
