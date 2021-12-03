@@ -14,6 +14,7 @@ use RuntimeException;
  * @method static \Illuminate\Contracts\Auth\UserProvider|null createUserProvider(string $provider = null)
  * @method static \Symfony\Component\HttpFoundation\Response|null onceBasic(string $field = 'email',array $extraConditions = [])
  * @method static bool attempt(array $credentials = [], bool $remember = false)
+ * @method static bool hasUser()
  * @method static bool check()
  * @method static bool guest()
  * @method static bool once(array $credentials = [])
