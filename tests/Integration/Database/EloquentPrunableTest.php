@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Mockery as m;
@@ -16,19 +17,6 @@ use Mockery as m;
 /** @group SkipMSSQL */
 class EloquentPrunableTest extends DatabaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Container::setInstance($container = new Container);
-
-        $container->singleton(Dispatcher::class, function () {
-            return m::mock(Dispatcher::class);
-        });
-
-        $container->alias(Dispatcher::class, 'events');
-    }
-
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         collect([
@@ -58,10 +46,7 @@ class EloquentPrunableTest extends DatabaseTestCase
 
     public function testPrunesRecords()
     {
-        app('events')
-            ->shouldReceive('dispatch')
-            ->times(2)
-            ->with(m::type(ModelsPruned::class));
+        Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
@@ -73,14 +58,13 @@ class EloquentPrunableTest extends DatabaseTestCase
 
         $this->assertEquals(1500, $count);
         $this->assertEquals(3500, PrunableTestModel::count());
+
+        Event::assertDispatched(ModelsPruned::class, 2);
     }
 
     public function testPrunesSoftDeletedRecords()
     {
-        app('events')
-            ->shouldReceive('dispatch')
-            ->times(3)
-            ->with(m::type(ModelsPruned::class));
+        Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id, 'deleted_at' => now()];
@@ -93,14 +77,13 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertEquals(3000, $count);
         $this->assertEquals(0, PrunableSoftDeleteTestModel::count());
         $this->assertEquals(2000, PrunableSoftDeleteTestModel::withTrashed()->count());
+
+        Event::assertDispatched(ModelsPruned::class, 3);
     }
 
     public function testPruneWithCustomPruneMethod()
     {
-        app('events')
-            ->shouldReceive('dispatch')
-            ->times(1)
-            ->with(m::type(ModelsPruned::class));
+        Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
             return ['id' => $id];
@@ -114,6 +97,8 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertTrue((bool) PrunableWithCustomPruneMethodTestModel::first()->pruned);
         $this->assertFalse((bool) PrunableWithCustomPruneMethodTestModel::orderBy('id', 'desc')->first()->pruned);
         $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
+
+        Event::assertDispatched(ModelsPruned::class, 1);
     }
 }
 
