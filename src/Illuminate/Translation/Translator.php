@@ -205,7 +205,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Make the place-holder replacements on a line.
      *
-     * @param  string  $line
+     * @param  string|array  $line
      * @param  array  $replace
      * @return string
      */
@@ -223,7 +223,25 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             $shouldReplace[':'.$key] = $value;
         }
 
-        return strtr($line, $shouldReplace);
+        return $this->replace($line, $shouldReplace);
+    }
+
+    /**
+     * Replaces recursively the line.
+     *
+     * @param  string|array  $line
+     * @param  array  $shouldReplace
+     * @return string|array
+     */
+    protected function replace($line, array $shouldReplace)
+    {
+        if (is_string($line)) {
+            return strtr($line, $shouldReplace);
+        }
+        foreach($line as $key => $newLine) {
+            $line[$key] = $this->replace($newLine, $shouldReplace);
+        }
+        return $line;
     }
 
     /**
