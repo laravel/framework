@@ -222,7 +222,6 @@ trait GuardsAttributes
                         ->getColumnListing($this->getTable());
 
             if (empty($columns)) {
-                // Column list is unavailable, do not cache it
                 return true;
             }
             static::$guardableColumns[get_class($this)] = $columns;
