@@ -757,29 +757,41 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, $data);
     }
 
-    public function testPrefers()
+    public function getPrefersCases()
     {
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json'])->prefers(['json']));
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json'])->prefers(['html', 'json']));
-        $this->assertSame('application/foo+json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json'])->prefers('application/foo+json'));
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/foo+json'])->prefers('json'));
-        $this->assertSame('html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.5, text/html;q=1.0'])->prefers(['json', 'html']));
-        $this->assertSame('txt', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.5, text/plain;q=1.0, text/html;q=1.0'])->prefers(['json', 'txt', 'html']));
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('json'));
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8'])->prefers('json'));
-        $this->assertNull(Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/xml; charset=utf-8'])->prefers(['html', 'json']));
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json, text/html'])->prefers(['html', 'json']));
-        $this->assertSame('html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.4, text/html;q=0.6'])->prefers(['html', 'json']));
+        return [
+            ['application/json', ['json'], 'json'],
+            ['application/json', ['html', 'json'], 'json'],
+            ['application/foo+json', 'application/foo+json', 'application/foo+json'],
+            ['application/foo+json', 'json', 'json'],
+            ['application/json;q=0.5, text/html;q=1.0', ['json', 'html'], 'html'],
+            ['application/json;q=0.5, text/plain;q=1.0, text/html;q=1.0', ['json', 'txt', 'html'], 'txt'],
+            ['application/*', 'json', 'json'],
+            ['application/json; charset=utf-8', 'json', 'json'],
+            ['application/xml; charset=utf-8', ['html', 'json'], null],
+            ['application/json, text/html', ['html', 'json'], 'json'],
+            ['application/json;q=0.4, text/html;q=0.6', ['html', 'json'], 'html'],
 
-        $this->assertSame('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json; charset=utf-8'])->prefers('application/json'));
-        $this->assertSame('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json, text/html'])->prefers(['text/html', 'application/json']));
-        $this->assertSame('text/html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.4, text/html;q=0.6'])->prefers(['text/html', 'application/json']));
-        $this->assertSame('text/html', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json;q=0.4, text/html;q=0.6'])->prefers(['application/json', 'text/html']));
+            ['application/json; charset=utf-8', 'application/json', 'application/json'],
+            ['application/json, text/html', ['text/html', 'application/json'], 'application/json'],
+            ['application/json;q=0.4, text/html;q=0.6', ['text/html', 'application/json'], 'text/html'],
+            ['application/json;q=0.4, text/html;q=0.6', ['application/json', 'text/html'], 'text/html'],
 
-        $this->assertSame('json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*; charset=utf-8'])->prefers('json'));
-        $this->assertSame('application/json', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('application/json'));
-        $this->assertSame('application/xml', Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('application/xml'));
-        $this->assertNull(Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('text/html'));
+            ['*/*; charset=utf-8', 'json', 'json'],
+            ['application/*', 'application/json', 'application/json'],
+            ['application/*', 'application/xml', 'application/xml'],
+            ['application/*', 'text/html', null],
+        ];
+    }
+
+    /**
+     * @dataProvider getPrefersCases
+     */
+    public function testPrefersMethod($accept, $prefers, $expected)
+    {
+        $this->assertSame(
+            $expected, Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => $accept])->prefers($prefers)
+        );
     }
 
     public function testAllInputReturnsInputAndFiles()
