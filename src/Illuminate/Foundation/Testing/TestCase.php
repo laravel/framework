@@ -157,7 +157,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function initializeFirstLevelTraits()
     {
-        foreach (class_uses($this) as $trait) {
+        foreach (class_uses(static::class) as $trait) {
             if (method_exists($this, $setUpMethod = 'setUp'.class_basename($trait))) {
                 $this->{$setUpMethod}();
             }
