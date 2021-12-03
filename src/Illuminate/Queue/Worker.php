@@ -159,14 +159,14 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            if ($supportsAsyncSignals) {
-                $this->registerTimeoutHandler($job, $options);
-            }
-
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
             if ($job) {
+                if ($supportsAsyncSignals) {
+                    $this->registerTimeoutHandler($job, $options);
+                }
+
                 $jobsProcessed++;
 
                 $this->runJob($job, $connectionName, $options);
@@ -174,12 +174,12 @@ class Worker
                 if ($options->rest > 0) {
                     $this->sleep($options->rest);
                 }
+
+                if ($supportsAsyncSignals) {
+                    $this->resetTimeoutHandler();
+                }
             } else {
                 $this->sleep($options->sleep);
-            }
-
-            if ($supportsAsyncSignals) {
-                $this->resetTimeoutHandler();
             }
 
             // Finally, we will check to see if we have exceeded our memory limits or if
