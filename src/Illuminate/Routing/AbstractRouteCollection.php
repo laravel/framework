@@ -40,7 +40,12 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             return $this->getRouteForMethods($request, $others);
         }
 
-        throw new NotFoundHttpException;
+        throw new NotFoundHttpException(
+            sprintf(
+                'The requested URL %s was not found on this server.',
+                $request->getPathInfo()
+            )
+        );
     }
 
     /**
