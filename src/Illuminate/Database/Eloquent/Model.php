@@ -1895,7 +1895,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Retrieve the model for a bound value.
      *
-     * @param Model|Relation $query
+     * @param  Model|Relation $query
      * @param  mixed  $value
      * @param  string|null  $field
      * @return Model|Illuminate\Database\Eloquent\Relations\Relation
@@ -1947,11 +1947,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         if ($relationship instanceof HasManyThrough ||
             $relationship instanceof BelongsToMany) {
-            return $relationship->getRelated()->resolveRouteBindingQuery(
-                $relationship, $value, $relationship->getRelated()->getTable().'.'.$field);
+            $field = $relationship->getRelated()->getTable().'.'.$field;
         }
 
-        return $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
+        if ($relationship instanceof Model) {
+            return $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
+        }
+
+        return $relationship->where($field, $value);
     }
 
     /**
