@@ -184,7 +184,6 @@ trait ManagesLayouts
         return static::$parentPlaceholder[$section];
     }
 
-
     /**
      * Get the parent placeholder salt.
      *
