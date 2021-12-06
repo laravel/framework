@@ -13,14 +13,11 @@ if (PHP_VERSION_ID >= 80100) {
 
 /**
  * @requires PHP 8.1
- * @group integration
  */
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('enum_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('string_status', 100)->nullable();
@@ -110,6 +107,21 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'string_status' => null,
             'integer_status' => null,
         ], DB::table('enum_casts')->where('id', $model->id)->first());
+    }
+
+    public function testEnumsAcceptBackedValueOnSave()
+    {
+        $model = new EloquentModelEnumCastingTestModel([
+            'string_status' => 'pending',
+            'integer_status' => 1,
+        ]);
+
+        $model->save();
+
+        $model = EloquentModelEnumCastingTestModel::first();
+
+        $this->assertEquals(StringStatus::pending, $model->string_status);
+        $this->assertEquals(IntegerStatus::pending, $model->integer_status);
     }
 
     public function testFirstOrNew()

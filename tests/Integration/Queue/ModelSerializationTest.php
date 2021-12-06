@@ -15,16 +15,6 @@ class ModelSerializationTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         $app['config']->set('database.connections.custom', [
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -84,16 +74,16 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertSame('testbench', $unSerialized->user->getConnectionName());
+        $this->assertSame('testing', $unSerialized->user->getConnectionName());
         $this->assertSame('mohamed@laravel.com', $unSerialized->user->email);
 
-        $serialized = serialize(new CollectionSerializationTestClass(ModelSerializationTestUser::on('testbench')->get()));
+        $serialized = serialize(new CollectionSerializationTestClass(ModelSerializationTestUser::on('testing')->get()));
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertSame('testbench', $unSerialized->users[0]->getConnectionName());
+        $this->assertSame('testing', $unSerialized->users[0]->getConnectionName());
         $this->assertSame('mohamed@laravel.com', $unSerialized->users[0]->email);
-        $this->assertSame('testbench', $unSerialized->users[1]->getConnectionName());
+        $this->assertSame('testing', $unSerialized->users[1]->getConnectionName());
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
     }
 
@@ -303,18 +293,18 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertSame('testbench', $unSerialized->user->getConnectionName());
+        $this->assertSame('testing', $unSerialized->user->getConnectionName());
         $this->assertSame('mohamed@laravel.com', $unSerialized->user->email);
         $this->assertSame(5, $unSerialized->getId());
         $this->assertSame(['James', 'Taylor', 'Mohamed'], $unSerialized->getNames());
 
-        $serialized = serialize(new TypedPropertyCollectionTestClass(ModelSerializationTestUser::on('testbench')->get()));
+        $serialized = serialize(new TypedPropertyCollectionTestClass(ModelSerializationTestUser::on('testing')->get()));
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertSame('testbench', $unSerialized->users[0]->getConnectionName());
+        $this->assertSame('testing', $unSerialized->users[0]->getConnectionName());
         $this->assertSame('mohamed@laravel.com', $unSerialized->users[0]->email);
-        $this->assertSame('testbench', $unSerialized->users[1]->getConnectionName());
+        $this->assertSame('testing', $unSerialized->users[1]->getConnectionName());
         $this->assertSame('taylor@laravel.com', $unSerialized->users[1]->email);
     }
 
@@ -327,7 +317,7 @@ class ModelSerializationTest extends TestCase
         $serialized = serialize(new ModelSerializationParentAccessibleTestClass($user, $user, $user));
 
         $this->assertSame(
-            'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:9:"testbench";}}', $serialized
+            'O:78:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationParentAccessibleTestClass":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";}s:8:"'."\0".'*'."\0".'user2";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":4:{s:5:"class";s:61:"Illuminate\\Tests\\Integration\\Queue\\ModelSerializationTestUser";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";}}', $serialized
         );
     }
 }

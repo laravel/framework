@@ -61,6 +61,15 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
     }
 
+    public function testNullNamespaceIsRespected()
+    {
+        $this->router->middleware(['one'])->namespace(null)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertNull($this->getRoute()->getAction()['namespace']);
+    }
+
     public function testMiddlewareAsStringableObject()
     {
         $one = new class implements Stringable
@@ -243,6 +252,18 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->seeMiddleware('group-middleware');
+    }
+
+    public function testCanRegisterGroupWithoutMiddleware()
+    {
+        $this->router->withoutMiddleware('one')->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            })->middleware(['one', 'two']);
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
     public function testCanRegisterGroupWithStringableMiddleware()

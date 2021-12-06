@@ -2645,6 +2645,14 @@ class SupportCollectionTest extends TestCase
         $cut = $data->splice(1, 1, 'bar');
         $this->assertEquals(['foo', 'bar'], $data->all());
         $this->assertEquals(['baz'], $cut->all());
+
+        $data = new Collection(['foo', 'baz']);
+        $data->splice(1, 0, ['bar']);
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
+
+        $data = new Collection(['foo', 'baz']);
+        $data->splice(1, 0, new Collection(['bar']));
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
     }
 
     /**
@@ -4899,6 +4907,42 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUndot($collection)
+    {
+        $data = $collection::make([
+            'name' => 'Taylor',
+            'meta.foo' => 'bar',
+            'meta.baz' => 'boom',
+            'meta.bam.boom' => 'bip',
+        ])->undot();
+        $this->assertSame([
+            'name' => 'Taylor',
+            'meta' => [
+                'foo' => 'bar',
+                'baz' => 'boom',
+                'bam' => [
+                    'boom' => 'bip',
+                ],
+            ],
+        ], $data->all());
+
+        $data = $collection::make([
+            'foo.0' => 'bar',
+            'foo.1' => 'baz',
+            'foo.baz' => 'boom',
+        ])->undot();
+        $this->assertSame([
+            'foo' => [
+                'bar',
+                'baz',
+                'baz' => 'boom',
+            ],
+        ], $data->all());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
@@ -4977,21 +5021,25 @@ class TestArrayAccessImplementation implements ArrayAccess
         $this->arr = $arr;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->arr[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->arr[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->arr[$offset] = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->arr[$offset]);

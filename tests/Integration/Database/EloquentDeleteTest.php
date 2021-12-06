@@ -7,27 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
-use Orchestra\Testbench\TestCase;
 
-class EloquentDeleteTest extends TestCase
+class EloquentDeleteTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -48,7 +32,8 @@ class EloquentDeleteTest extends TestCase
         });
     }
 
-    public function testOnlyDeleteWhatGiven()
+    /** @group SkipMSSQL */
+    public function testDeleteWithLimit()
     {
         for ($i = 1; $i <= 10; $i++) {
             Comment::create([
@@ -59,7 +44,11 @@ class EloquentDeleteTest extends TestCase
         Post::latest('id')->limit(1)->delete();
         $this->assertCount(9, Post::all());
 
-        Post::join('comments', 'comments.post_id', '=', 'posts.id')->where('posts.id', '>', 1)->orderBy('posts.id')->limit(1)->delete();
+        Post::join('comments', 'comments.post_id', '=', 'posts.id')
+            ->where('posts.id', '>', 8)
+            ->orderBy('posts.id')
+            ->limit(1)
+            ->delete();
         $this->assertCount(8, Post::all());
     }
 

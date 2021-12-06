@@ -31,15 +31,21 @@ class SqlServerGrammar extends Grammar
             return parent::compileSelect($query);
         }
 
-        // If an offset is present on the query, we will need to wrap the query in
-        // a big "ANSI" offset syntax block. This is very nasty compared to the
-        // other database systems but is necessary for implementing features.
         if (is_null($query->columns)) {
             $query->columns = ['*'];
         }
 
+        $components = $this->compileComponents($query);
+
+        if (! empty($components['orders'])) {
+            return parent::compileSelect($query)." offset {$query->offset} rows fetch next {$query->limit} rows only";
+        }
+
+        // If an offset is present on the query, we will need to wrap the query in
+        // a big "ANSI" offset syntax block. This is very nasty compared to the
+        // other database systems but is necessary for implementing features.
         return $this->compileAnsiOffset(
-            $query, $this->compileComponents($query)
+            $query, $components
         );
     }
 

@@ -9,10 +9,8 @@ use Illuminate\Tests\Integration\Database\Fixtures\User;
 
 class EloquentCollectionFreshTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');

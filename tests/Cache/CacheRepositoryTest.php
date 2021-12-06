@@ -113,6 +113,19 @@ class CacheRepositoryTest extends TestCase
             return 'qux';
         });
         $this->assertSame('qux', $result);
+
+        /*
+         * Use a callable...
+         */
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+        $result = $repo->remember('foo', function () {
+            return 10;
+        }, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()

@@ -9,11 +9,6 @@ use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-    }
-
     protected function tearDown(): void
     {
         Job::$ran = false;

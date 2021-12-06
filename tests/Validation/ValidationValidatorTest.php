@@ -1415,6 +1415,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibits:emails,email_address']);
         $this->assertFalse($v->passes());
         $this->assertSame('The email field prohibits emails / email address being present.', $v->messages()->first('email'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'foo' => [
+                ['email' => 'foo', 'emails' => 'foo'],
+                ['emails' => 'foo'],
+            ],
+        ], ['foo.*.email' => 'prohibits:foo.*.emails']);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.email'));
+        $this->assertFalse($v->messages()->has('foo.1.email'));
     }
 
     public function testFailedFileUploads()
@@ -1712,6 +1723,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'off'], ['foo' => 'Accepted']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => null], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
@@ -1719,6 +1733,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 0], ['foo' => 'Accepted']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => false], ['foo' => 'Accepted']);
@@ -1752,10 +1769,16 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'off', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => null, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 0, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => false, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
@@ -1812,6 +1835,126 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
+    }
+
+    public function testValidateDeclined()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'off'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => false], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateDeclinedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'off', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => false, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        // declined_if:bar,aaa
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is aaa.', $v->messages()->first('foo'));
+
+        // declined_if:bar,aaa,...
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'abc'], ['foo' => 'declined_if:bar,aaa,bbb,abc']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is abc.', $v->messages()->first('foo'));
+
+        // declined_if:bar,boolean
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => false], ['foo' => 'declined_if:bar,false']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is false.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => true], ['foo' => 'declined_if:bar,true']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is true.', $v->messages()->first('foo'));
     }
 
     public function testValidateEndsWith()

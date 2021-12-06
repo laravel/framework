@@ -245,7 +245,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Write the contents of a file.
      *
      * @param  string  $path
-     * @param  string|resource  $contents
+     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
      * @return bool
      */
@@ -758,14 +758,11 @@ class FilesystemAdapter implements CloudFilesystemContract
             return;
         }
 
-        switch ($visibility) {
-            case FilesystemContract::VISIBILITY_PUBLIC:
-                return Visibility::PUBLIC;
-            case FilesystemContract::VISIBILITY_PRIVATE:
-                return Visibility::PRIVATE;
-        }
-
-        throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
+        return match ($visibility) {
+            FilesystemContract::VISIBILITY_PUBLIC => Visibility::PUBLIC,
+            FilesystemContract::VISIBILITY_PRIVATE => Visibility::PRIVATE,
+            default => throw new InvalidArgumentException("Unknown visibility: {$visibility}."),
+        };
     }
 
     /**

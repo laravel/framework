@@ -43,11 +43,9 @@ trait RoutesNotifications
             return $this->{$method}($notification);
         }
 
-        switch ($driver) {
-            case 'database':
-                return $this->notifications();
-            case 'mail':
-                return $this->email;
-        }
+        return match ($driver) {
+            'database' => $this->notifications(),
+            'mail' => $this->email,
+        };
     }
 }

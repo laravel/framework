@@ -1,29 +1,19 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
 /**
- * @group MySQL
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */
-class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
+class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::getEnvironmentSetUp($app);
-
-        $app['config']->set('database.default', 'mysql');
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
@@ -32,11 +22,9 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
         });
     }
 
-    protected function tearDown(): void
+    protected function destroyDatabaseMigrations()
     {
         Schema::drop('users');
-
-        parent::tearDown();
     }
 
     public function testRenameColumnOnTableWithEnum()
@@ -61,10 +49,13 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
     {
         $tables = Schema::getAllTables();
 
-        $this->assertCount(1, $tables);
-        $this->assertInstanceOf(stdClass::class, $tables[0]);
-
+        $this->assertCount(2, $tables);
         $tableProperties = array_values((array) $tables[0]);
+        $this->assertEquals(['migrations', 'BASE TABLE'], $tableProperties);
+
+        $this->assertInstanceOf(stdClass::class, $tables[1]);
+
+        $tableProperties = array_values((array) $tables[1]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
 
         $columns = Schema::getColumnListing('users');
@@ -78,7 +69,7 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends DatabaseTestCase
             $table->string('title');
         });
         $tables = Schema::getAllTables();
-        $this->assertCount(2, $tables);
+        $this->assertCount(3, $tables);
         Schema::drop('posts');
     }
 }
