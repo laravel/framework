@@ -1062,7 +1062,7 @@ trait DecoratesQueryBuilder
     /**
      * @inheritdoc
      */
-    public function delete($id = null)
+    public function delete()
     {
         return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
     }
