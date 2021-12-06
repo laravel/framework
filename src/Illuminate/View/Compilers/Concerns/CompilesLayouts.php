@@ -2,8 +2,6 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
-use Illuminate\View\Factory as ViewFactory;
-
 trait CompilesLayouts
 {
     /**
