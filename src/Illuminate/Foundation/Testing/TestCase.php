@@ -76,9 +76,10 @@ abstract class TestCase extends BaseTestCase
     /**
      * Setup the test environment.
      *
+     * @before
      * @return void
      */
-    protected function setUp(): void
+    protected function setUpLaravelApplication(): void
     {
         Facade::clearResolvedInstances();
 
@@ -148,11 +149,12 @@ abstract class TestCase extends BaseTestCase
     /**
      * Clean up the testing environment before the next test.
      *
+     * @after
      * @return void
      *
      * @throws \Mockery\Exception\InvalidCountException
      */
-    protected function tearDown(): void
+    protected function tearDownLaravelApplication(): void
     {
         if ($this->app) {
             $this->callBeforeApplicationDestroyedCallbacks();
