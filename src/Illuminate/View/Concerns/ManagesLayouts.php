@@ -2,8 +2,8 @@
 
 namespace Illuminate\View\Concerns;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait ManagesLayouts
@@ -28,6 +28,13 @@ trait ManagesLayouts
      * @var mixed
      */
     protected static $parentPlaceholder = [];
+
+    /**
+     * The parent placeholder salt for the request.
+     *
+     * @var string
+     */
+    protected static $parentPlaceholderSalt;
 
     /**
      * Start injecting content into a section.
@@ -184,9 +191,11 @@ trait ManagesLayouts
      */
     protected static function parentPlaceholderSalt()
     {
-        $container = Container::getInstance();
+        if (! static::$parentPlaceholderSalt) {
+            return static::$parentPlaceholderSalt = Str::random(40);
+        }
 
-        return $container->bound('config') ? $container->make('config')->get('app.key', '') : '';
+        return static::$parentPlaceholderSalt;
     }
 
     /**
