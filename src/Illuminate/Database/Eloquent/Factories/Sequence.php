@@ -40,6 +40,16 @@ class Sequence implements Countable
     }
 
     /**
+     * Get the current count of the sequence items.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return $this->count;
+    }
+
+    /**
      * Get the next value in the sequence.
      *
      * @return mixed
@@ -49,15 +59,5 @@ class Sequence implements Countable
         return tap(value($this->sequence[$this->index % $this->count], $this), function () {
             $this->index = $this->index + 1;
         });
-    }
-
-    /**
-     * The count of the sequence items.
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return $this->count;
     }
 }
