@@ -349,4 +349,38 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "posts" add "note" nvarchar(255) null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
+
+    public function testNullableClosure()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->nullable(function($table) {
+                $table->string('note');
+            });
+
+            $table->string('description');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `posts` add `note` varchar(255) null, add `description` varchar(255) not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "note" varchar',
+            'alter table "posts" add column "description" varchar not null'
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add column "note" varchar(255) null, add column "description" varchar(255) not null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "posts" add "note" nvarchar(255) null, "description" nvarchar(255) not null',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
 }

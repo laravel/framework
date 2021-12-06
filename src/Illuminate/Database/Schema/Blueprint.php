@@ -79,6 +79,13 @@ class Blueprint
     public $after;
 
     /**
+     * Whether to make the column is null.
+     *
+     * @var bool
+     */
+    public $nullable = false;
+
+    /**
      * Create a new schema blueprint.
      *
      * @param  string  $table
@@ -1565,6 +1572,10 @@ class Blueprint
             $this->after = $definition->name;
         }
 
+        if($this->nullable) {
+            $definition->nullable();
+        }
+
         return $definition;
     }
 
@@ -1582,6 +1593,21 @@ class Blueprint
         $callback($this);
 
         $this->after = null;
+    }
+
+    /**
+     * Add nullable columns from the callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function nullable(Closure $callback) 
+    {
+        $this->nullable = true;
+        
+        $callback($this);
+
+        $this->nullable = false;
     }
 
     /**
