@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Concerns;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 
@@ -168,10 +169,24 @@ trait ManagesLayouts
     public static function parentPlaceholder($section = '')
     {
         if (! isset(static::$parentPlaceholder[$section])) {
-            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($section).'##';
+            $salt = static::parentPlaceholderSalt();
+
+            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($salt.$section).'##';
         }
 
         return static::$parentPlaceholder[$section];
+    }
+
+    /**
+     * Get the parent placeholder salt.
+     *
+     * @return string
+     */
+    protected static function parentPlaceholderSalt()
+    {
+        $container = Container::getInstance();
+
+        return $container->bound('config') ? $container->make('config')->get('app.key', '') : '';
     }
 
     /**
