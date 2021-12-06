@@ -77,6 +77,7 @@ abstract class TestCase extends BaseTestCase
      * Setup the test environment.
      *
      * @before
+     *
      * @return void
      */
     protected function setUpLaravelApplication(): void
@@ -150,6 +151,7 @@ abstract class TestCase extends BaseTestCase
      * Clean up the testing environment before the next test.
      *
      * @after
+     *
      * @return void
      *
      * @throws \Mockery\Exception\InvalidCountException
