@@ -44,6 +44,7 @@ class Sequence implements Countable
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return $this->count;
