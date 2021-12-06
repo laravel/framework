@@ -65,7 +65,7 @@ trait CompilesLayouts
      */
     protected function compileParent()
     {
-        $escapedLastSection = str_replace("'", "\\'", $this->lastSection);
+        $escapedLastSection = strtr($this->lastSection, ['\\' => '\\\\', "'" => "\\'"]);
 
         return "<?php echo \Illuminate\View\Factory::parentPlaceholder('{$escapedLastSection}'); ?>";
     }
