@@ -18,7 +18,7 @@ class ViewBladeCompilerTest extends TestCase
     public function testIsExpiredReturnsTrueIfCompiledFileDoesntExist()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('foo').'.php')->andReturn(false);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(false);
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
@@ -33,23 +33,23 @@ class ViewBladeCompilerTest extends TestCase
     public function testIsExpiredReturnsTrueWhenModificationTimesWarrant()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
-        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('foo').'.php')->andReturn(true);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(true);
         $files->shouldReceive('lastModified')->once()->with('foo')->andReturn(100);
-        $files->shouldReceive('lastModified')->once()->with(__DIR__.'/'.sha1('foo').'.php')->andReturn(0);
+        $files->shouldReceive('lastModified')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(0);
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
     public function testCompilePathIsProperlyCreated()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals(__DIR__.'/'.sha1('foo').'.php', $compiler->getCompiledPath('foo'));
+        $this->assertEquals(__DIR__.'/'.sha1('v2foo').'.php', $compiler->getCompiledPath('foo'));
     }
 
     public function testCompileCompilesFileAndReturnsContents()
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
     }
 
@@ -57,7 +57,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         $compiler->compile('foo');
         $this->assertSame('foo', $compiler->getPath());
     }
@@ -73,7 +73,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('v2foo').'.php', 'Hello World<?php /**PATH foo ENDPATH**/ ?>');
         // set path before compilation
         $compiler->setPath('foo');
         // trigger compilation with $path
@@ -103,7 +103,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn($content);
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('foo').'.php', $compiled);
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('v2foo').'.php', $compiled);
 
         $compiler->compile('foo');
     }
@@ -157,7 +157,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('')->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('').'.php', 'Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('v2').'.php', 'Hello World');
         $compiler->setPath('');
         $compiler->compile();
     }
@@ -166,7 +166,7 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with(null)->andReturn('Hello World');
-        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1(null).'.php', 'Hello World');
+        $files->shouldReceive('put')->once()->with(__DIR__.'/'.sha1('v2').'.php', 'Hello World');
         $compiler->setPath(null);
         $compiler->compile();
     }
