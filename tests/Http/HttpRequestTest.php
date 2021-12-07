@@ -506,10 +506,10 @@ class HttpRequestTest extends TestCase
     public function testExplodeMethod()
     {
         $request = Request::create('/', 'GET', ['tags' => 'Taylor,Laravel,Framework']);
-        $this->assertSame(['Taylor','Laravel','Framework'], $request->explode('tags'));
+        $this->assertSame(['Taylor', 'Laravel', 'Framework'], $request->explode('tags'));
 
         $request = Request::create('/', 'POST', ['tags' => 'Taylor/Laravel/Framework']);
-        $this->assertSame(['Taylor','Laravel','Framework'], $request->explode('tags', '/'));
+        $this->assertSame(['Taylor', 'Laravel', 'Framework'], $request->explode('tags', '/'));
 
         $request = Request::create('/', 'GET', []);
         $this->assertEmpty($request->explode('tags'));
