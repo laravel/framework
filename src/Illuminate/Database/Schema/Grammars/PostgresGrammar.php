@@ -188,17 +188,16 @@ class PostgresGrammar extends Grammar
      */
     public function compileFulltext(Blueprint $blueprint, Fluent $command)
     {
-        if (is_null($command->language)) {
-            throw new RuntimeException('The PostgreSQL driver requires a language for fulltext index creation.');
-        }
+        $language = $command->language ?: 'english';
+
         if (count($command->columns) > 1) {
-            throw new RuntimeException('The PostgreSQL driver does not support fulltext index creation with multiple columns. Please create the index by yourself.');
+            throw new RuntimeException('The PostgreSQL driver does not support fulltext index creation using multiple columns.');
         }
 
         return sprintf('create index %s on %s using gin (to_tsvector(%s, %s))',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            $this->quoteString($command->language),
+            $this->quoteString($language),
             $this->wrap($command->columns[0])
         );
     }

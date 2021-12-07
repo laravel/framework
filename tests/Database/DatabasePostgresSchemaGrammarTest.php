@@ -265,11 +265,31 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddingFulltextIndex()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->fulltext('body', null, null, 'english');
+        $blueprint->fulltext('body');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexWithLanguage()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body')->language('spanish');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'spanish\', "body"))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexWithFluency()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('body')->fulltext();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[1]);
     }
 
     public function testAddingSpatialIndex()

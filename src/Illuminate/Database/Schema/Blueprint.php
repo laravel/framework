@@ -547,12 +547,11 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
-     * @param  string|null  $language
      * @return \Illuminate\Support\Fluent
      */
-    public function fulltext($columns, $name = null, $algorithm = null, $language = null)
+    public function fulltext($columns, $name = null, $algorithm = null)
     {
-        return $this->indexCommand('fulltext', $columns, $name, $algorithm, $language);
+        return $this->indexCommand('fulltext', $columns, $name, $algorithm);
     }
 
     /**
@@ -1483,10 +1482,9 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $index
      * @param  string|null  $algorithm
-     * @param  string|null  $language
      * @return \Illuminate\Support\Fluent
      */
-    protected function indexCommand($type, $columns, $index, $algorithm = null, $language = null)
+    protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
         $columns = (array) $columns;
 
@@ -1496,7 +1494,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm', 'language')
+            $type, compact('index', 'columns', 'algorithm')
         );
     }
 
