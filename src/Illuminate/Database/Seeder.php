@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
+use Illuminate\Database\Console\Seeds\WithoutEvents;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -170,8 +171,16 @@ abstract class Seeder
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        return isset($this->container)
-                    ? $this->container->call([$this, 'run'], $parameters)
-                    : $this->run(...$parameters);
+        $callback = fn () => isset($this->container)
+            ? $this->container->call([$this, 'run'], $parameters)
+            : $this->run(...$parameters);
+
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[WithoutEvents::class])) {
+            $callback = $this->withoutEvents($callback);
+        }
+
+        return $callback();
     }
 }
