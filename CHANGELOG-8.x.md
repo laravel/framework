@@ -1,6 +1,29 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.74.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.75.0...8.x)
+
+
+## [v8.75.0 (2021-12-07)](https://github.com/laravel/framework/compare/v8.74.0...v8.75.0)
+
+### Added
+- Added `Illuminate/Support/Testing/Fakes/NotificationFake::assertSentTimes()` ([667cca8](https://github.com/laravel/framework/commit/667cca8db300f55cd8fccd575eaa46f5156b0408))
+- Added Conditionable trait to ComponentAttributeBag ([#39861](https://github.com/laravel/framework/pull/39861))
+- Added scheduler integration tests ([#39862](https://github.com/laravel/framework/pull/39862))
+- Added on-demand gate authorization ([#39789](https://github.com/laravel/framework/pull/39789))
+- Added countable interface to eloquent factory sequence ([#39907](https://github.com/laravel/framework/pull/39907), [1638472a](https://github.com/laravel/framework/commit/1638472a7a5ee02dc9e808bc203b733785ac1468), [#39915](https://github.com/laravel/framework/pull/39915))
+- Added Fulltext index for PostgreSQL ([#39875](https://github.com/laravel/framework/pull/39875))
+- Added method filterNulls() to Arr ([#39921](https://github.com/laravel/framework/pull/39921))
+
+### Fixed
+- Fixes AsEncrypted traits not respecting nullable columns ([#39848](https://github.com/laravel/framework/pull/39848), [4c32bf8](https://github.com/laravel/framework/commit/4c32bf815c93fe6fb6f78f1f9771e6baac379bd6))
+- Fixed http client factory class exists bugfix ([#39851](https://github.com/laravel/framework/pull/39851))
+- Fixed calls to Connection::rollBack() with incorrect case ([#39874](https://github.com/laravel/framework/pull/39874))
+- Fixed bug where columns would be guarded while filling Eloquent models during unit tests ([#39880](https://github.com/laravel/framework/pull/39880))
+- Fixed for dropping columns when using MSSQL as database ([#39905](https://github.com/laravel/framework/pull/39905))
+
+### Changed
+- Add proper paging offset when possible to sql server ([#39863](https://github.com/laravel/framework/pull/39863))
+- Correct pagination message in src/Illuminate/Pagination/resources/views/tailwind.blade.php ([#39894](https://github.com/laravel/framework/pull/39894))
 
 
 ## [v8.74.0 (2021-11-30)](https://github.com/laravel/framework/compare/v8.73.2...v8.74.0)
