@@ -181,7 +181,7 @@ class Arr
     public static function filterNulls($array)
     {
         return array_filter($array, function ($value) {
-            return !is_null($value);
+            return ! is_null($value);
         });
     }
 
