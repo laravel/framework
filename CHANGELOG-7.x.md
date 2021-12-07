@@ -1,6 +1,13 @@
 # Release Notes for 7.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v7.30.5...7.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v7.30.6...7.x)
+
+
+## [v7.30.6 (2021-12-07)](https://github.com/laravel/framework/compare/v7.30.5...v7.30.6)
+
+### Fixed
+- Added phar to list to the shouldBlockPhpUpload in Validator ([f647a24](https://github.com/laravel/framework/commit/f647a24b918648c2b8a17c122b855bc0b2bf5b86))
+- Fixed parent call in View ([#39909](https://github.com/laravel/framework/pull/39909))
 
 
 ## [v7.30.5 (2021-11-17)](https://github.com/laravel/framework/compare/v7.30.4...v7.30.5)
