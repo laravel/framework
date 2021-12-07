@@ -165,7 +165,7 @@ class SupportArrTest extends TestCase
 
     public function testFilterNulls()
     {
-        $array = Arr::filterNulls([null, 0, false, '', null, []]);
+        $array = array_values(Arr::filterNulls([null, 0, false, '', null, []]));
         $this->assertEquals([0, false, '', []], $array);
     }
 
