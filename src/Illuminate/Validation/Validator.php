@@ -215,6 +215,7 @@ class Validator implements ValidatorContract
         'RequiredWithAll',
         'RequiredWithout',
         'RequiredWithoutAll',
+        'UnixTimestamp'
     ];
 
     /**

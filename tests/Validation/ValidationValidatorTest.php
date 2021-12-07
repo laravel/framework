@@ -2907,6 +2907,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateUnixTimestamp()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => '1638884440', 'y' => '1638873440'], ['*' => 'unix_timestamp']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 1638884440, 'y' => ''], ['x' => 'unix_timestamp']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2021-12-07'], ['x' => 'unix_timestamp']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '2021-12-07 10:37:20'], ['x' => 'unix_timestamp']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();

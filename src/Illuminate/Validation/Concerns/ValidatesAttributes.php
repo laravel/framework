@@ -827,6 +827,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute matches a unix timestamp format.
+     * @param  string  $attribute
+     * @param  string  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateUnixTimestamp($attribute, $value, $parameters)
+    {
+        return ($date = DateTime::createFromFormat('!U', $value)) && $date->format('U') == $value;
+    }
+
+    /**
      * Get the excluded ID column and value for the unique rule.
      *
      * @param  string|null  $idColumn
