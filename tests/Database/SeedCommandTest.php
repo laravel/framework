@@ -7,7 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Console\Seeds\SeedCommand;
-use Illuminate\Database\Console\Seeds\WithoutEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Events\NullDispatcher;
@@ -51,16 +51,16 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
-    public function testWithoutEvents()
+    public function testWithoutModelEvents()
     {
         $input = new ArrayInput([
             '--force' => true,
             '--database' => 'sqlite',
-            '--class' => UserWithoutEventsSeeder::class,
+            '--class' => UserWithoutModelEventsSeeder::class,
         ]);
         $output = new NullOutput;
 
-        $instance = new UserWithoutEventsSeeder();
+        $instance = new UserWithoutModelEventsSeeder();
 
         $seeder = m::mock($instance);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
@@ -73,7 +73,7 @@ class SeedCommandTest extends TestCase
         $container = m::mock(Container::class);
         $container->shouldReceive('call');
         $container->shouldReceive('environment')->once()->andReturn('testing');
-        $container->shouldReceive('make')->with(UserWithoutEventsSeeder::class)->andReturn($seeder);
+        $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($seeder);
         $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
             new OutputStyle($input, $output)
         );
@@ -100,9 +100,9 @@ class SeedCommandTest extends TestCase
     }
 }
 
-class UserWithoutEventsSeeder extends Seeder
+class UserWithoutModelEventsSeeder extends Seeder
 {
-    use WithoutEvents;
+    use WithoutModelEvents;
 
     public function run()
     {

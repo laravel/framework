@@ -4,15 +4,15 @@ namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Database\Eloquent\Model;
 
-trait WithoutEvents
+trait WithoutModelEvents
 {
     /**
-     * Prevent all event handles from being executed by the given callback.
+     * Prevent model event handles from being executed by the given callback.
      *
      * @param  callable  $callback
      * @return callable
      */
-    public function withoutEvents(callable $callback)
+    public function withoutModelEvents(callable $callback)
     {
         return fn () => Model::withoutEvents($callback);
     }
