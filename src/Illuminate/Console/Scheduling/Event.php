@@ -205,13 +205,13 @@ class Event
     }
 
     /**
-     * Get the mutex name for the scheduled command.
+     * Determine if the event should skip because another process is overlapping.
      *
-     * @return string
+     * @return bool
      */
-    public function mutexName()
+    public function shouldSkipDueToOverlapping()
     {
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
+        return $this->withoutOverlapping && ! $this->mutex->create($this);
     }
 
     /**
@@ -376,16 +376,6 @@ class Event
         }
 
         return true;
-    }
-
-    /**
-     * Determine if the event should skip because another process is overlapping.
-     *
-     * @return bool
-     */
-    public function shouldSkipDueToOverlapping()
-    {
-        return $this->withoutOverlapping && ! $this->mutex->create($this);
     }
 
     /**
@@ -936,6 +926,16 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
+    }
+
+    /**
+     * Get the mutex name for the scheduled command.
+     *
+     * @return string
+     */
+    public function mutexName()
+    {
+        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
     }
 
     /**

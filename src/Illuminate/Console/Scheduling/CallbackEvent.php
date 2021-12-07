@@ -26,14 +26,14 @@ class CallbackEvent extends Event
     protected $parameters;
 
     /**
-     * The result of the callback execution.
+     * The result of the callback's execution.
      *
      * @var mixed
      */
     protected $result;
 
     /**
-     * The exception that was thrown when calling the callback.
+     * The exception that was thrown when calling the callback, if any.
      *
      * @var \Throwable|null
      */
@@ -65,16 +65,6 @@ class CallbackEvent extends Event
     }
 
     /**
-     * @return void
-     *
-     * @throws \RuntimeException
-     */
-    public function runInBackground()
-    {
-        throw new RuntimeException('Callbacks can not be scheduled to run in the background.');
-    }
-
-    /**
      * Run the callback event.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -91,6 +81,28 @@ class CallbackEvent extends Event
         }
 
         return $this->result;
+    }
+
+    /**
+     * Determine if the event should skip because another process is overlapping.
+     *
+     * @return bool
+     */
+    public function shouldSkipDueToOverlapping()
+    {
+        return $this->description && parent::shouldSkipDueToOverlapping();
+    }
+
+    /**
+     * Indicate that the callback should run in the background.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function runInBackground()
+    {
+        throw new RuntimeException('Scheduled closures can not be run in the background.');
     }
 
     /**
@@ -111,18 +123,6 @@ class CallbackEvent extends Event
             $this->exception = $e;
 
             return 1;
-        }
-    }
-
-    /**
-     * Clear the mutex for the event.
-     *
-     * @return void
-     */
-    protected function removeMutex()
-    {
-        if ($this->description) {
-            parent::removeMutex();
         }
     }
 
@@ -164,16 +164,6 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Get the mutex name for the scheduled command.
-     *
-     * @return string
-     */
-    public function mutexName()
-    {
-        return 'framework/schedule-'.sha1($this->description);
-    }
-
-    /**
      * Get the summary of the event for display.
      *
      * @return string
@@ -188,12 +178,24 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Determine if the event should skip because another process is overlapping.
+     * Get the mutex name for the scheduled command.
      *
-     * @return bool
+     * @return string
      */
-    public function shouldSkipDueToOverlapping()
+    public function mutexName()
     {
-        return $this->description && parent::shouldSkipDueToOverlapping();
+        return 'framework/schedule-'.sha1($this->description);
+    }
+
+    /**
+     * Clear the mutex for the event.
+     *
+     * @return void
+     */
+    protected function removeMutex()
+    {
+        if ($this->description) {
+            parent::removeMutex();
+        }
     }
 }
