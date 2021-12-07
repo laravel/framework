@@ -304,7 +304,7 @@ trait InteractsWithInput
      * @param  mixed  $default
      * @return mixed
      */
-    public function explode($key = null, $delimiter = ',', $default = null)
+    public function explode($key = null, $delimiter = ',', $default = [])
     {
         $input = $this->input($key);
 
