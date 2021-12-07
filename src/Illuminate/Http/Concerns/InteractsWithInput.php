@@ -297,6 +297,21 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve an exploded input from the request.
+     *
+     * @param  string|null  $key
+     * @param  string  $delimiter
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function explode($key = null, $delimiter = ',', $default = null)
+    {
+        $input = $this->input($key);
+
+        return empty($input) ? $default : explode($delimiter, $input);
+    }
+
+    /**
      * Retrieve input from the request as a collection.
      *
      * @param  array|string|null  $key
