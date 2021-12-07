@@ -725,7 +725,9 @@ class Arr
      */
     public static function whereNotNull($array)
     {
-        return static::where($array, fn ($x) => ! is_null($x));
+        return static::where($array, function ($value) {
+            return ! is_null($value);
+        });
     }
 
     /**
