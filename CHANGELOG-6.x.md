@@ -1,6 +1,13 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.41...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.42...6.x)
+
+
+## [v6.20.42 (2021-12-07)](https://github.com/laravel/framework/compare/v6.20.41...v6.20.42)
+
+### Fixed
+- Fixed for dropping columns when using MSSQL as  ([#39905](https://github.com/laravel/framework/pull/39905))
+- Fixed parent call in View ([#39908](https://github.com/laravel/framework/pull/39908))
 
 
 ## [v6.20.41 (2021-11-23)](https://github.com/laravel/framework/compare/v6.20.40...v6.20.41)
