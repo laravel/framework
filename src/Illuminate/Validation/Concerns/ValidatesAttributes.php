@@ -828,6 +828,7 @@ trait ValidatesAttributes
 
     /**
      * Validate that an attribute matches a unix timestamp format.
+     *
      * @param  string  $attribute
      * @param  string  $value
      * @param  array  $parameters
