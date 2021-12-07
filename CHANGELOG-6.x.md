@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.40...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.41...6.x)
+
+
+## [v6.20.41 (2021-11-23)](https://github.com/laravel/framework/compare/v6.20.40...v6.20.41)
+
+### Added
+- Added phar to list of shouldBlockPhpUpload() in validator ([2d1f76a](https://github.com/laravel/framework/commit/2d1f76ab752ced011da05cf139799eab2a36ef90))
 
 
 ## [v6.20.40 (2021-11-17)](https://github.com/laravel/framework/compare/v6.20.39...v6.20.40)
