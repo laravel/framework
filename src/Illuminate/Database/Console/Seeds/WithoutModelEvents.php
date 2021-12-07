@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 trait WithoutModelEvents
 {
     /**
-     * Prevent model event handles from being executed by the given callback.
+     * Prevent model events from being dispatched by the given callback.
      *
      * @param  callable  $callback
      * @return callable
