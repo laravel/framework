@@ -173,19 +173,6 @@ class Arr
     }
 
     /**
-     * Filter the array for nulls.
-     *
-     * @param  array  $array
-     * @return array
-     */
-    public static function filterNulls($array)
-    {
-        return array_filter($array, function ($value) {
-            return ! is_null($value);
-        });
-    }
-
-    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  iterable  $array
@@ -728,6 +715,17 @@ class Arr
     public static function where($array, callable $callback)
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * Filter items where the value is not null.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function whereNotNull($array)
+    {
+        return static::where($array, fn ($x) => ! is_null($x));
     }
 
     /**
