@@ -467,21 +467,31 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
-        $blueprint->foreignId('company_id')->constrained();
-        $blueprint->foreignId('laravel_idea_id')->constrained();
-        $blueprint->foreignId('team_id')->references('id')->on('teams');
-        $blueprint->foreignId('team_column_id')->constrained('teams');
+        $blueprint->foreignId('company_id', 'integer')->constrained();
+        $blueprint->foreignId('laravel_idea_id', 'mediumInteger')->constrained();
+        $blueprint->foreignId('team_id', 'smallInteger')->references('id')->on('teams');
+        $blueprint->foreignId('team_column_id', 'tinyInteger')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertInstanceOf(ForeignIdColumnDefinition::class, $foreignId);
         $this->assertSame([
-            'alter table `users` add `foo` bigint unsigned not null, add `company_id` bigint unsigned not null, add `laravel_idea_id` bigint unsigned not null, add `team_id` bigint unsigned not null, add `team_column_id` bigint unsigned not null',
+            'alter table `users` add `foo` bigint unsigned not null, add `company_id` int unsigned not null, add `laravel_idea_id` mediumint unsigned not null, add `team_id` smallint unsigned not null, add `team_column_id` tinyint unsigned not null',
             'alter table `users` add constraint `users_company_id_foreign` foreign key (`company_id`) references `companies` (`id`)',
             'alter table `users` add constraint `users_laravel_idea_id_foreign` foreign key (`laravel_idea_id`) references `laravel_ideas` (`id`)',
             'alter table `users` add constraint `users_team_id_foreign` foreign key (`team_id`) references `teams` (`id`)',
             'alter table `users` add constraint `users_team_column_id_foreign` foreign key (`team_column_id`) references `teams` (`id`)',
         ], $statements);
+    }
+
+    public function testAddingInvalidForeignIDType()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->foreignId('foreign_id', 'invalid');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals('alter table `users` add `foreign_id` bigint unsigned not null', $statements[0]);
     }
 
     public function testAddingBigIncrementingID()

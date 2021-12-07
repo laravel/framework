@@ -304,10 +304,10 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $foreignId = $blueprint->foreignId('foo');
-        $blueprint->foreignId('company_id')->constrained();
-        $blueprint->foreignId('laravel_idea_id')->constrained();
-        $blueprint->foreignId('team_id')->references('id')->on('teams');
-        $blueprint->foreignId('team_column_id')->constrained('teams');
+        $blueprint->foreignId('company_id', 'integer')->constrained();
+        $blueprint->foreignId('laravel_idea_id', 'mediumInteger')->constrained();
+        $blueprint->foreignId('team_id', 'smallInteger')->references('id')->on('teams');
+        $blueprint->foreignId('team_column_id', 'tinyInteger')->constrained('teams');
 
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
