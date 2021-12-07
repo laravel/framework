@@ -163,6 +163,12 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
+    public function testFilterNulls()
+    {
+        $array = Arr::filterNulls([null, 0, false, '', null, []]);
+        $this->assertEquals([0, false, '', []], $array);
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];
