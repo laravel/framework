@@ -173,6 +173,19 @@ class Arr
     }
 
     /**
+     * Filter the array for nulls.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function filterNulls($array)
+    {
+        return array_filter($array, function ($value) {
+            return !is_null($value);
+        });
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  iterable  $array
