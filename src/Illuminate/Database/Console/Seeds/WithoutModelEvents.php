@@ -3,17 +3,26 @@
 namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\NullDispatcher;
+use Illuminate\Support\Hooks\Hook;
 
 trait WithoutModelEvents
 {
     /**
-     * Prevent model events from being dispatched by the given callback.
+     * Prevent model events from being dispatched when the seeder is invoked.
      *
-     * @param  callable  $callback
-     * @return callable
+     * @return Hook
      */
-    public function withoutModelEvents(callable $callback)
+    public static function withoutModelEvents(): Hook
     {
-        return fn () => Model::withoutEvents($callback);
+        return Hook::make('invoke', static function () {
+            if (! $dispatcher = Model::getEventDispatcher()) {
+                return null;
+            }
+
+            Model::setEventDispatcher(new NullDispatcher($dispatcher));
+
+            return static fn() => Model::setEventDispatcher($dispatcher);
+        });
     }
 }

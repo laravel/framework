@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Hooks;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
@@ -10,10 +11,19 @@ use ReflectionNamedType;
 
 class HookCollection extends Collection
 {
+    /**
+     * Cache of hooks that have already been loaded.
+     *
+     * @var static[]
+     */
     protected static array $cache = [];
 
-    protected static array $registrars = [];
-
+    /**
+     * Get a collection of hooks for a class or an object.
+     *
+     * @param  object|string  $class
+     * @return static
+     */
     public static function for($class)
     {
         if (is_object($class)) {
@@ -23,41 +33,38 @@ class HookCollection extends Collection
         return static::$cache[$class] ??= new static(static::loadHooks($class));
     }
 
+    /**
+     * Clear the hook cache.
+     *
+     * @return void
+     */
     public static function clearCache()
     {
         static::$cache = [];
     }
 
-    //public static function register($className, Closure $callback)
-    //{
-    //    static::$registrars[$className][] = $callback;
-    //}
-    //
-    //public static function registerTraitPrefix($className, $prefix)
-    //{
-    //    static::register($className, function($hooks, $class) use ($prefix) {
-    //        foreach (class_uses_recursive($class) as $trait) {
-    //            $method = $prefix.class_basename($trait);
-    //
-    //            if (method_exists($class, $method)) {
-    //                $hooks->push(new Hook($prefix, Closure::fromCallable([$class, $method])));
-    //            }
-    //        }
-    //    });
-    //}
-
+    /**
+     * Load the hooks for a class.
+     *
+     * @param  string  $class
+     * @return \Illuminate\Support\Collection
+     *
+     * @throws \ReflectionException
+     */
     protected static function loadHooks($class)
     {
-        $classNames = array_values(array_merge(
-            [$class], class_parents($class), class_implements($class)
-        ));
-
         return collect((new ReflectionClass($class))->getMethods())
-            ->map(fn($method) => static::hookForMethod($method, $classNames))
+            ->map(fn($method) => static::hookForMethod($method))
             ->filter();
     }
 
-    protected static function hookForMethod(ReflectionMethod $method, array $classNames): ?PendingHook
+    /**
+     * Load a hook for a given method based on its return type.
+     *
+     * @param  \ReflectionMethod  $method
+     * @return \Illuminate\Support\Hooks\PendingHook|null
+     */
+    protected static function hookForMethod(ReflectionMethod $method): ?PendingHook
     {
         if (static::methodReturnsHook($method)) {
             return new PendingHook(static function($instance = null) use ($method) {
@@ -65,24 +72,76 @@ class HookCollection extends Collection
             }, $method->isStatic());
         }
 
-        // FIXME: Allow for registered hooks by name
-
         return null;
     }
 
+    /**
+     * Determine if a class method returns a Hook instance.
+     *
+     * @param  \ReflectionMethod  $method
+     * @return bool
+     */
     protected static function methodReturnsHook(ReflectionMethod $method): bool
     {
         return $method->getReturnType() instanceof ReflectionNamedType
-            && $method->getReturnType()->getName() === Hook::class;
+            && is_a($method->getReturnType()->getName(), Hook::class, true);
     }
 
-    public function run($name, $instance = null, $arguments = [])
+    /**
+     * Run all the hooks that match the given name and instance.
+     *
+     * @param  string  $name
+     * @param  object|string  $instance
+     * @param  array  $arguments
+     * @param  \Closure|null  $callback
+     * @return mixed
+     */
+    public function run($name, $instance, $arguments = [], Closure $callback = null)
     {
-        $hooks = $this->where('isStatic', is_null($instance))
-            ->map(fn(PendingHook $pending) => $pending->resolve($instance));
+        $arguments = Arr::wrap($arguments);
 
-        $hooks->where('name', $name)
-            ->sortBy('priority')
-            ->each(fn(Hook $hook) => $hook->run($instance, $arguments));
+        $hooks = $this->onlyStatic(! is_object($instance))
+            ->resolve($instance)
+            ->where('name', $name)
+            ->sortBy('priority');
+
+        $hooks->each(fn(Hook $hook) => $hook->run($instance, $arguments));
+
+        try {
+            return $callback ? $callback() : null;
+        }
+        finally {
+            $hooks->reverse()->each(fn(Hook $hook) => $hook->cleanup($instance, $arguments));
+        }
+    }
+
+    /**
+     * Filter collection to only static hooks.
+     *
+     * @param  bool  $onlyStatic
+     * @return $this
+     */
+    public function onlyStatic($onlyStatic = true): self
+    {
+        if ($onlyStatic) {
+            return $this->where('isStatic');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Map collection to resolved Hook instances.
+     *
+     * @param  object|string  $instance
+     * @return $this
+     */
+    public function resolve($instance): self
+    {
+        return $this->map(function ($hook) use ($instance) {
+            return $hook instanceof PendingHook
+                ? $hook->resolve($instance)
+                : $hook;
+        });
     }
 }

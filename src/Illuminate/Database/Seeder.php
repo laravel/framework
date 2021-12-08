@@ -6,10 +6,13 @@ use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Hookable;
 use InvalidArgumentException;
 
 abstract class Seeder
 {
+    use Hookable;
+
     /**
      * The container instance.
      *
@@ -171,16 +174,10 @@ abstract class Seeder
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        $callback = fn () => isset($this->container)
-            ? $this->container->call([$this, 'run'], $parameters)
-            : $this->run(...$parameters);
-
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[WithoutModelEvents::class])) {
-            $callback = $this->withoutModelEvents($callback);
-        }
-
-        return $callback();
+        return $this->runHooks('invoke', $this, function() use ($parameters) {
+            return isset($this->container)
+                ? $this->container->call([$this, 'run'], $parameters)
+                : $this->run(...$parameters);
+        });
     }
 }

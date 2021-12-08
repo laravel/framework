@@ -3,38 +3,105 @@
 namespace Illuminate\Support\Hooks;
 
 use Closure;
+use Illuminate\Contracts\Support\Hook as HookContract;
 
-class Hook
+class Hook implements HookContract
 {
-    public const PRIORITY_HIGH = 100;
-    public const PRIORITY_NORMAL = 200;
-    public const PRIORITY_LOW = 300;
+    /**
+     * A cleanup function that should be run after the hooks are run.
+     *
+     * @var \Closure|null
+     */
+    protected ?Closure $cleanup = null;
 
+    /**
+     * Instantiate a new high-priority hook.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return \Illuminate\Support\Hooks\Hook
+     */
     public static function highPriority(string $name, Closure $callback): Hook
     {
-        return new static($name, $callback, self::PRIORITY_HIGH);
+        return new static($name, $callback, HookContract::PRIORITY_HIGH);
     }
 
+    /**
+     * Instantiate a new hook.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return \Illuminate\Support\Hooks\Hook
+     */
     public static function make(string $name, Closure $callback): Hook
     {
-        return new static($name, $callback, self::PRIORITY_NORMAL);
+        return new static($name, $callback, HookContract::PRIORITY_NORMAL);
     }
 
+    /**
+     * Instantiate a new low-priority hook.
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @return \Illuminate\Support\Hooks\Hook
+     */
     public static function lowPriority(string $name, Closure $callback): Hook
     {
-        return new static($name, $callback, self::PRIORITY_LOW);
+        return new static($name, $callback, HookContract::PRIORITY_LOW);
     }
 
+    /**
+     * Constructor
+     *
+     * @param  string  $name
+     * @param  \Closure  $callback
+     * @param  int  $priority
+     * @return void
+     */
     public function __construct(
         public string $name,
         public Closure $callback,
-        public int $priority = self::PRIORITY_NORMAL
+        public int $priority = HookContract::PRIORITY_NORMAL
     ) { }
 
-    public function run($instance = null, array $arguments = [])
+    /**
+     * @inheritdoc
+     */
+    public function run($instance, array $arguments = [])
     {
-        return $instance
-            ? $this->callback->call($instance, ...$arguments)
-            : call_user_func_array($this->callback, $arguments);
+        $this->cleanup = null;
+
+        $result = $this->runCallback($this->callback, $instance, $arguments);
+
+        if ($result instanceof Closure) {
+            $this->cleanup = $result;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function cleanup($instance, array $arguments = [])
+    {
+        if (is_null($this->cleanup)) {
+            return;
+        }
+
+        $this->runCallback($this->cleanup, $instance, $arguments);
+    }
+
+    /**
+     * Run a callback that may or may not be static.
+     *
+     * @param  Closure  $callback
+     * @param  object|string  $instance
+     * @param  array  $arguments
+     * @return mixed
+     */
+    protected function runCallback($callback, $instance, $arguments = [])
+    {
+        return is_object($instance)
+            ? $callback->call($instance, $arguments)
+            : $callback(...$arguments);
     }
 }
