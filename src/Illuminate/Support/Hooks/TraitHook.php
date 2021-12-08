@@ -7,7 +7,7 @@ use Illuminate\Contracts\Support\Hook as HookContract;
 class TraitHook implements HookContract
 {
     /**
-     * Constructor
+     * Constructor.
      *
      * @param  string  $prefix
      * @param  int  $priority

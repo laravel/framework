@@ -4,7 +4,6 @@ namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Hookable;
 use InvalidArgumentException;
@@ -174,7 +173,7 @@ abstract class Seeder
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        return $this->runHooks('invoke', $this, function() use ($parameters) {
+        return $this->runHooks('invoke', $this, function () use ($parameters) {
             return isset($this->container)
                 ? $this->container->call([$this, 'run'], $parameters)
                 : $this->run(...$parameters);

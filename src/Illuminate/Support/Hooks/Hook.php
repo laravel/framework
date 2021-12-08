@@ -51,7 +51,7 @@ class Hook implements HookContract
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param  string  $name
      * @param  \Closure  $callback
@@ -62,7 +62,8 @@ class Hook implements HookContract
         public string $name,
         public Closure $callback,
         public int $priority = HookContract::PRIORITY_NORMAL
-    ) { }
+    ) {
+    }
 
     /**
      * @inheritdoc

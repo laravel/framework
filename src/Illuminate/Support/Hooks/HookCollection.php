@@ -54,7 +54,7 @@ class HookCollection extends Collection
     protected static function loadHooks($class)
     {
         return collect((new ReflectionClass($class))->getMethods())
-            ->map(fn($method) => static::hookForMethod($method))
+            ->map(fn ($method) => static::hookForMethod($method))
             ->filter();
     }
 
@@ -67,7 +67,7 @@ class HookCollection extends Collection
     protected static function hookForMethod(ReflectionMethod $method): ?PendingHook
     {
         if (static::methodReturnsHook($method)) {
-            return new PendingHook(static function($instance = null) use ($method) {
+            return new PendingHook(static function ($instance = null) use ($method) {
                 return $method->invoke($instance);
             }, $method->isStatic());
         }
@@ -105,13 +105,12 @@ class HookCollection extends Collection
             ->where('name', $name)
             ->sortBy('priority');
 
-        $hooks->each(fn(Hook $hook) => $hook->run($instance, $arguments));
+        $hooks->each(fn (Hook $hook) => $hook->run($instance, $arguments));
 
         try {
             return $callback ? $callback() : null;
-        }
-        finally {
-            $hooks->reverse()->each(fn(Hook $hook) => $hook->cleanup($instance, $arguments));
+        } finally {
+            $hooks->reverse()->each(fn (Hook $hook) => $hook->cleanup($instance, $arguments));
         }
     }
 

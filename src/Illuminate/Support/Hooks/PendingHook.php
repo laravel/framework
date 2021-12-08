@@ -24,7 +24,8 @@ class PendingHook
     public function __construct(
         public Closure $callback,
         public bool $isStatic
-    ) { }
+    ) {
+    }
 
     /**
      * Resolve the pending hook into a Hook instance.

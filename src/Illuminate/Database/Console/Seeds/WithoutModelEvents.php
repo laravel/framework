@@ -22,7 +22,7 @@ trait WithoutModelEvents
 
             Model::setEventDispatcher(new NullDispatcher($dispatcher));
 
-            return static fn() => Model::setEventDispatcher($dispatcher);
+            return static fn () => Model::setEventDispatcher($dispatcher);
         });
     }
 }
