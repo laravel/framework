@@ -4,7 +4,6 @@ namespace Illuminate\Validation\Rules;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 trait DatabaseRule
 {
@@ -47,34 +46,7 @@ trait DatabaseRule
     {
         $this->column = $column;
 
-        $this->table = $this->resolveTableName($table);
-    }
-
-    /**
-     * Resolves the name of the table from the given string.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    public function resolveTableName($table)
-    {
-        if (! Str::contains($table, '\\') || ! class_exists($table)) {
-            return $table;
-        }
-
-        if (is_subclass_of($table, Model::class)) {
-            $model = new $table;
-
-            if (Str::contains($model->getTable(), '.')) {
-                return $table;
-            }
-
-            return implode('.', array_map(function (string $part) {
-                return trim($part, '.');
-            }, array_filter([$model->getConnectionName(), $model->getTable()])));
-        }
-
-        return $table;
+        $this->table = $table;
     }
 
     /**
