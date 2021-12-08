@@ -28,7 +28,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 0, 'path' => null]);
 
         $this->runCommand($command);
     }
@@ -44,7 +44,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => 2, 'path' => null]);
 
         $this->runCommand($command, ['--step' => 2]);
     }
@@ -76,9 +76,46 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
             return $callback();
         });
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2, 'path' => null]);
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
+    }
+
+    public function testRollbackCommandCallsMigratorWithPathOption()
+    {
+        $migration = 'database/migrations/2014_10_12_000000_create_users_table.php';
+        $command = new RollbackCommand($migrator = m::mock(Migrator::class));
+        $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('rollback')->once()->with(["/$migration"], ['path' => $migration, 'pretend' => false, 'step' => 0]);
+
+        $this->runCommand($command, ['--path' => $migration]);
+    }
+
+    public function testRollbackCommandCallsMigratorWithMultiplePathOption()
+    {
+        $migrations = [
+            'database/migrations/2014_10_12_000000_create_users_table.php',
+            'database/migrations/2014_10_12_100000_create_password_resets_table.php',
+        ];
+        $command = new RollbackCommand($migrator = m::mock(Migrator::class));
+        $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('rollback')->once()->with(collect($migrations)->map(function ($migration) {
+            return '/'.$migration;
+        })->toArray(), ['path' => $migrations, 'pretend' => false, 'step' => 0]);
+
+        $this->runCommand($command, ['--path' => $migrations]);
     }
 
     protected function runCommand($command, $input = [])
