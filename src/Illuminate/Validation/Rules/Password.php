@@ -87,6 +87,13 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $messages = [];
 
     /**
+     * The default message that should be used when validation fails.
+     *
+     * @var string
+     */
+    protected $defaultMessage;
+
+    /**
      * The callback that will generate the "default" version of the password rule.
      *
      * @var string|array|callable|null
@@ -259,6 +266,13 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         return $this;
     }
 
+    public function withDefaultMessage($message)
+    {
+        $this->defaultMessage = $message;
+
+        return $this;
+    }
+
     /**
      * Determine if the validation rule passes.
      *
@@ -319,6 +333,10 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public function message()
     {
+        if ($this->defaultMessage) {
+            return [$this->defaultMessage];
+        }
+
         return $this->messages;
     }
 

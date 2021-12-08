@@ -134,6 +134,13 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
     }
 
+    public function testWithDefaultMessage()
+    {
+        $this->fails(Password::min(8)->withDefaultMessage('This is the default message.'), ['ab', '1v'], [
+            'This is the default message.',
+        ]);
+    }
+
     public function testMessagesOrder()
     {
         $makeRules = function () {
