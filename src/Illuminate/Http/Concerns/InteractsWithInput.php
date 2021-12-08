@@ -310,7 +310,7 @@ trait InteractsWithInput
 
     /**
      * Retrieve input from the request as a Carbon instance.
-     * 
+     *
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz

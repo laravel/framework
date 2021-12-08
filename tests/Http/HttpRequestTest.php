@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -538,21 +539,20 @@ class HttpRequestTest extends TestCase
             'as_date' => '2020-01-01',
             'as_datetime' => '20-01-01 16:30:25',
             'as_time' => '16:30:25',
-            'as_timestamp' => '1577907000',
+            'as_format' => '1577896225',
             'as_null' => null,
-            'as_format' => '20200101163025',
-            'as_timezone' => '20200101173025',
+            'as_timezone' => '20-01-01 13:30:25',
         ]);
 
+        $current = Carbon::create(2020, 1, 1,16,30,25,'UTC');
+
         $this->assertNull($request->datetime('as_null'));
-        $this->assertTrue($request->datetime('as_date')->equalTo('2020-01-01'));
-        $this->assertTrue($request->datetime('as_datetime')->equalTo('2020-01-01'));
-        $this->assertTrue($request->datetime('as_time')->equalTo('16:30:25'));
-        $this->assertTrue($request->datetime('as_timestamp')->equalTo('2020-01-01 16:30:25'));
-        $this->assertTrue($request->datetime('as_format', 'YmdHis')->equalTo('2020-01-01 16:30:25'));
-        $this->assertTrue(
-            $request->datetime('as_format', 'YmdHis', 'Europe/Stockholm')->equalTo('2020-01-01 16:30:25')
-        );
+        $this->assertNull($request->datetime('doesnt_exists'));
+        $this->assertTrue($request->datetime('as_date')->isSameDay($current));
+        $this->assertEquals($current, $request->datetime('as_datetime'));
+        $this->assertTrue($request->datetime('as_time')->isSameSecond('16:30:25'));
+        $this->assertEquals($current, $request->datetime('as_format', 'U'));
+        $this->assertEquals($current,  $request->datetime('as_timezone', null, 'America/Santiago'));
     }
 
     public function testArrayAccess()
