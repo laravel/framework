@@ -116,6 +116,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
+        // TODO: Switch to Hookable
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[RefreshDatabase::class])) {

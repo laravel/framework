@@ -109,6 +109,7 @@ abstract class GeneratorCommand extends Command
     {
         parent::__construct();
 
+        // TODO: Switch to Hookable
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->addTestOptions();
         }
@@ -165,6 +166,7 @@ abstract class GeneratorCommand extends Command
 
         $this->info($this->type.' created successfully.');
 
+        // TODO: Switch to Hookable
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->handleTestCreation($path);
         }

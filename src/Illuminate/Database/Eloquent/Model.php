@@ -265,6 +265,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::$traitInitializers[$class] = [];
 
+        // TODO: Switch to Hookable
         foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 

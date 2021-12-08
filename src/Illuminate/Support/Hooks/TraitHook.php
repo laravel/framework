@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Hooks;
 
-use Closure;
 use Illuminate\Contracts\Support\Hook as HookContract;
 
 class TraitHook implements HookContract
@@ -11,10 +10,13 @@ class TraitHook implements HookContract
      * Constructor
      *
      * @param  string  $prefix
+     * @param  int  $priority
      * @return void
      */
-    public function __construct(public string $prefix)
-    {
+    public function __construct(
+        public string $prefix,
+        public int $priority = HookContract::PRIORITY_NORMAL
+    ) {
         //
     }
 
