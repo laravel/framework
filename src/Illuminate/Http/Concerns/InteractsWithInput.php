@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Date;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
@@ -305,6 +306,29 @@ trait InteractsWithInput
     public function collect($key = null)
     {
         return collect(is_array($key) ? $this->only($key) : $this->input($key));
+    }
+
+    /**
+     * Retrieve input from the request as a Carbon instance.
+     * 
+     * @param  string  $key
+     * @param  string|null  $format
+     * @param  string|null  $tz
+     * @return \DateTimeInterface|\Illuminate\Support\Carbon|null
+     */
+    public function datetime($key, $format = null, $tz = null)
+    {
+        $date = $this->input($key);
+
+        if (is_null($date)) {
+            return null;
+        }
+
+        if ($format) {
+            return Date::createFromFormat($format, $date, $tz);
+        }
+
+        return Date::parse($date, $tz);
     }
 
     /**

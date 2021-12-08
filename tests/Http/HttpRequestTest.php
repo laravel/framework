@@ -532,6 +532,29 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
     }
 
+    public function testDatetimeMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_date' => '2020-01-01',
+            'as_datetime' => '20-01-01 16:30:25',
+            'as_time' => '16:30:25',
+            'as_timestamp' => '1577907000',
+            'as_null' => null,
+            'as_format' => '20200101163025',
+            'as_timezone' => '20200101173025',
+        ]);
+
+        $this->assertNull($request->datetime('as_null'));
+        $this->assertTrue($request->datetime('as_date')->equalTo('2020-01-01'));
+        $this->assertTrue($request->datetime('as_datetime')->equalTo('2020-01-01'));
+        $this->assertTrue($request->datetime('as_time')->equalTo('16:30:25'));
+        $this->assertTrue($request->datetime('as_timestamp')->equalTo('2020-01-01 16:30:25'));
+        $this->assertTrue($request->datetime('as_format', 'YmdHis')->equalTo('2020-01-01 16:30:25'));
+        $this->assertTrue(
+            $request->datetime('as_format', 'YmdHis', 'Europe/Stockholm')->equalTo('2020-01-01 16:30:25')
+        );
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
