@@ -575,12 +575,12 @@ class Validator implements ValidatorContract
         // First we will get the correct keys for the given attribute in case the field is nested in
         // an array. Then we determine if the given rule accepts other field names as parameters.
         // If so, we will replace any asterisks found in the parameters with the correct keys.
-    if($this->dependsOnOtherFields($rule)){
-        $parameters = $this->replaceDotInParameters($parameters);
-        if ($keys = $this->getExplicitKeys($attribute)) {
-            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+        if($this->dependsOnOtherFields($rule)){
+            $parameters = $this->replaceDotInParameters($parameters);
+            if ($keys = $this->getExplicitKeys($attribute)) {
+                $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+            }
         }
-    }
 
         $value = $this->getValue($attribute);
 
