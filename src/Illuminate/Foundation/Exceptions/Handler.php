@@ -344,6 +344,41 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Prepare exception for rendering.
+     *
+     * @param  \Throwable  $e
+     * @return \Throwable
+     */
+    protected function prepareException(Throwable $e)
+    {
+        return match (true) {
+            $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
+            $e instanceof AuthorizationException => new AccessDeniedHttpException($e->getMessage(), $e),
+            $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
+            $e instanceof SuspiciousOperationException => new NotFoundHttpException('Bad hostname provided.', $e),
+            $e instanceof RecordsNotFoundException => new NotFoundHttpException('Not found.', $e),
+            default => $e,
+        };
+    }
+
+    /**
+     * Map the exception using a registered mapper if possible.
+     *
+     * @param  \Throwable  $e
+     * @return \Throwable
+     */
+    protected function mapException(Throwable $e)
+    {
+        foreach ($this->exceptionMap as $class => $mapper) {
+            if (is_a($e, $class)) {
+                return $mapper($e);
+            }
+        }
+
+        return $e;
+    }
+
+    /**
      * Try to render a response from request and exception via render callbacks.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -379,41 +414,6 @@ class Handler implements ExceptionHandlerContract
         return $this->shouldReturnJson($request, $e)
                     ? $this->prepareJsonResponse($request, $e)
                     : $this->prepareResponse($request, $e);
-    }
-
-    /**
-     * Map the exception using a registered mapper if possible.
-     *
-     * @param  \Throwable  $e
-     * @return \Throwable
-     */
-    protected function mapException(Throwable $e)
-    {
-        foreach ($this->exceptionMap as $class => $mapper) {
-            if (is_a($e, $class)) {
-                return $mapper($e);
-            }
-        }
-
-        return $e;
-    }
-
-    /**
-     * Prepare exception for rendering.
-     *
-     * @param  \Throwable  $e
-     * @return \Throwable
-     */
-    protected function prepareException(Throwable $e)
-    {
-        return match (true) {
-            $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
-            $e instanceof AuthorizationException => new AccessDeniedHttpException($e->getMessage(), $e),
-            $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
-            $e instanceof SuspiciousOperationException => new NotFoundHttpException('Bad hostname provided.', $e),
-            $e instanceof RecordsNotFoundException => new NotFoundHttpException('Not found.', $e),
-            default => $e,
-        };
     }
 
     /**
