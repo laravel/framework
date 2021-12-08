@@ -255,10 +255,11 @@ class UrlGenerator implements UrlGeneratorContract
     protected function assetWithVersion($path, $url)
     {
         $fullPath = public_path($path);
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             return $url;
         }
-        return $url . '?id=' . filemtime($fullPath);
+
+        return $url.'?id='.filemtime($fullPath);
     }
 
     /**
