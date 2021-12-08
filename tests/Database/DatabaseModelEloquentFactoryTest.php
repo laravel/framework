@@ -124,7 +124,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                 return 'taylor';
             },
             'options' => function ($attributes) {
-                return $attributes['name'].'-options';
+                return $attributes['name'] . '-options';
             },
         ]);
 
@@ -406,7 +406,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         }));
 
         $users = FactoryTestUserFactory::times(2)->sequence(function ($sequence) {
-            return ['name' => 'index: '.$sequence->index];
+            return ['name' => 'index: ' . $sequence->index];
         })->create();
 
         $this->assertSame('index: 0', $users[0]->name);
@@ -451,7 +451,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_model_has_factory()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model.'Factory';
+            return $model . 'Factory';
         });
 
         $this->assertInstanceOf(FactoryTestUserFactory::class, FactoryTestUser::factory());
@@ -460,7 +460,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_dynamic_has_and_for_methods()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model.'Factory';
+            return $model . 'Factory';
         });
 
         $user = FactoryTestUserFactory::new()->hasPosts(3)->create();
@@ -502,6 +502,14 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->unless(true, function () {
                 $this->fail('Unreachable code that has somehow been reached.');
             });
+    }
+
+    public function test_factory_can_be_defined_on_eloquent_model()
+    {
+        $factory = 'Illuminate\Tests\Database\FactoryTestCustomFactoryModelFactory';
+        $model = 'Illuminate\Tests\Database\FactoryTestCustomFactoryModel';
+
+        $this->assertEquals($factory, Factory::resolveFactoryName($model));
     }
 
     /**
@@ -642,4 +650,22 @@ class FactoryTestRole extends Eloquent
     {
         return $this->belongsToMany(FactoryTestUser::class, 'role_user', 'role_id', 'user_id')->withPivot('admin');
     }
+}
+
+class FactoryTestCustomFactoryModelFactory extends Factory
+{
+    protected $model = FactoryTestCustomFactoryModel::class;
+
+    public function definition()
+    {
+        return [];
+    }
+}
+
+class FactoryTestCustomFactoryModel extends Eloquent
+{
+    use HasFactory;
+
+    public static $factory = FactoryTestCustomFactoryModelFactory::class;
+
 }
