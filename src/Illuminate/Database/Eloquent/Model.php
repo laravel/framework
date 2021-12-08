@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Hookable;
+use Illuminate\Support\Hooks\TraitHook;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -32,7 +34,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
-        ForwardsCalls;
+        ForwardsCalls,
+        Hookable;
 
     /**
      * The connection name for the model.
@@ -253,36 +256,33 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Register hook for `bootX` trait methods.
+     *
+     * @return \Illuminate\Support\Hooks\TraitHook
+     */
+    public static function registerBootHook(): TraitHook
+    {
+        return new TraitHook('boot');
+    }
+
+    /**
+     * Register hook for `initializeX` trait methods.
+     *
+     * @return \Illuminate\Support\Hooks\TraitHook
+     */
+    public static function registerInitializeHook(): TraitHook
+    {
+        return new TraitHook('initialize');
+    }
+
+    /**
      * Boot all of the bootable traits on the model.
      *
      * @return void
      */
     protected static function bootTraits()
     {
-        $class = static::class;
-
-        $booted = [];
-
-        static::$traitInitializers[$class] = [];
-
-        // TODO: Switch to Hookable
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot'.class_basename($trait);
-
-            if (method_exists($class, $method) && ! in_array($method, $booted)) {
-                forward_static_call([$class, $method]);
-
-                $booted[] = $method;
-            }
-
-            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
-                static::$traitInitializers[$class][] = $method;
-
-                static::$traitInitializers[$class] = array_unique(
-                    static::$traitInitializers[$class]
-                );
-            }
-        }
+        static::runStaticHooks('boot');
     }
 
     /**
@@ -292,9 +292,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function initializeTraits()
     {
-        foreach (static::$traitInitializers[static::class] as $method) {
-            $this->{$method}();
-        }
+        $this->runHooks('initialize');
     }
 
     /**

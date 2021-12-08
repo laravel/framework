@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Hooks;
 
 use Closure;
+use Illuminate\Contracts\Support\Hook;
 use RuntimeException;
 
 class PendingHook

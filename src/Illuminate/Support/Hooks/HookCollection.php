@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Hooks;
 
 use Closure;
+use Illuminate\Contracts\Support\Hook;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use ReflectionClass;
@@ -102,8 +103,8 @@ class HookCollection extends Collection
 
         $hooks = $this->onlyStatic(! is_object($instance))
             ->resolve($instance)
-            ->where('name', $name)
-            ->sortBy('priority');
+            ->filter(fn(Hook $hook) => $hook->getName() === $name)
+            ->sortBy(fn(Hook $hook) => $hook->getPriority());
 
         $hooks->each(fn (Hook $hook) => $hook->run($instance, $arguments));
 

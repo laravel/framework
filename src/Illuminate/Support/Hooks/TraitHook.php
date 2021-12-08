@@ -45,4 +45,20 @@ class TraitHook implements HookContract
     {
         // No cleanup is necessary
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName()
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
 }

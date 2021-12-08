@@ -92,6 +92,22 @@ class Hook implements HookContract
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
      * Run a callback that may or may not be static.
      *
      * @param  Closure  $callback

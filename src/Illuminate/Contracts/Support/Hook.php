@@ -40,4 +40,18 @@ interface Hook
      * @param  array  $arguments
      */
     public function cleanup($instance, array $arguments = []);
+
+    /**
+     * Get the name of the hook.
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Get the priority of the hook.
+     *
+     * @return int
+     */
+    public function getPriority();
 }
