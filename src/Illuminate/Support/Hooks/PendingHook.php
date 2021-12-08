@@ -4,6 +4,8 @@ namespace Illuminate\Support\Hooks;
 
 use Closure;
 use Illuminate\Contracts\Support\Hook;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\MockObject\BadMethodCallException;
 use RuntimeException;
 
 class PendingHook
@@ -52,9 +54,33 @@ class PendingHook
     protected function getHook($instance = null): Hook
     {
         if (is_null($this->hook)) {
-            $this->hook = $this->isStatic
-                ? call_user_func($this->callback)
-                : $this->callback->call($instance);
+            try {
+                $this->hook = $this->isStatic
+                    ? call_user_func($this->callback)
+                    : $this->callback->call($instance);
+            } catch (BadMethodCallException $exception) {
+                $this->hook = new class implements Hook {
+                    public function run($instance, array $arguments = [])
+                    {
+                        throw new RuntimeException('Unexpected hook call from mock object');
+                    }
+
+                    public function cleanup($instance, array $arguments = [])
+                    {
+                        throw new RuntimeException('Unexpected hook call from mock object');
+                    }
+
+                    public function getName()
+                    {
+                        return Str::random();
+                    }
+
+                    public function getPriority()
+                    {
+                        return PHP_INT_MAX;
+                    }
+                };
+            }
         }
 
         return $this->hook;
