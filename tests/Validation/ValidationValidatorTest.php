@@ -4874,7 +4874,7 @@ class ValidationValidatorTest extends TestCase
     }
 
     public function testParsingArrayKeysWithDotWhenTestingExistence()
-	{
+    {
         $trans = $this->getIlluminateArrayTranslator();
         // RequiredWith using escaped dot in a nested array
         $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_with:bar.foo\.bar']);
@@ -4894,7 +4894,7 @@ class ValidationValidatorTest extends TestCase
         // RequiredUnless using escaped dot in a nested array
         $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_unless:bar.foo\.bar,valid']);
         $this->assertTrue($v->passes());
-	}
+    }
 
     public function testPassingSlashVulnerability()
     {
