@@ -267,10 +267,8 @@ class Response implements ArrayAccess
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throw()
+    public function throw($callback = null)
     {
-        $callback = func_get_args()[0] ?? null;
-
         if ($this->failed()) {
             throw tap($this->toException(), function ($exception) use ($callback) {
                 if ($callback && is_callable($callback)) {
