@@ -230,7 +230,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function asset($path, $secure = null)
+    public function asset($path, $secure = null, $version = false)
     {
         if ($this->isValidUrl($path)) {
             return $path;
@@ -241,7 +241,24 @@ class UrlGenerator implements UrlGeneratorContract
         // for asset paths, but only for routes to endpoints in the application.
         $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
 
-        return $this->removeIndex($root).'/'.trim($path, '/');
+        $url = $this->removeIndex($root).'/'.trim($path, '/');
+
+        return $version ? $this->assetWithVersion($path, $url) : $url;
+    }
+
+    /**
+     * Get asset url with last modification time as version.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function assetWithVersion($path, $url)
+    {
+        $fullPath = public_path($path);
+        if (!file_exists($fullPath)) {
+            return $url;
+        }
+        return $url . '?id=' . filemtime($fullPath);
     }
 
     /**

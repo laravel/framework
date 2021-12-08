@@ -141,9 +141,9 @@ if (! function_exists('asset')) {
      * @param  bool|null  $secure
      * @return string
      */
-    function asset($path, $secure = null)
+    function asset($path, $secure = null, $version = false)
     {
-        return app('url')->asset($path, $secure);
+        return app('url')->asset($path, $secure, $version);
     }
 }
 
