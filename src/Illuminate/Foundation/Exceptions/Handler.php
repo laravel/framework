@@ -372,8 +372,6 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $e
-     * @return mixed
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderExceptionResponse($request, Throwable $e)
