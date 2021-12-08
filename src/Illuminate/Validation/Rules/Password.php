@@ -269,7 +269,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Sets default failure message, this will override all the failure message.
      *
-     * @param string $message
+     * @param  string  $message
      * @return $this
      */
     public function withDefaultMessage($message)
