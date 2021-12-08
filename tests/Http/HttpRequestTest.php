@@ -14,8 +14,6 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-use function now;
-
 class HttpRequestTest extends TestCase
 {
     protected function tearDown(): void
@@ -546,7 +544,7 @@ class HttpRequestTest extends TestCase
             'as_timezone' => '20-01-01 13:30:25',
         ]);
 
-        $current = Carbon::create(2020, 1, 1,16,30,25,'UTC');
+        $current = Carbon::create(2020, 1, 1, 16, 30, 25, 'UTC');
 
         $this->assertNull($request->datetime('as_null'));
         $this->assertNull($request->datetime('doesnt_exists'));
@@ -554,7 +552,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($current, $request->datetime('as_datetime'));
         $this->assertTrue($request->datetime('as_time')->isSameSecond('16:30:25'));
         $this->assertEquals($current, $request->datetime('as_format', 'U'));
-        $this->assertEquals($current,  $request->datetime('as_timezone', null, 'America/Santiago'));
+        $this->assertEquals($current, $request->datetime('as_timezone', null, 'America/Santiago'));
 
         Carbon::setTestNow($current);
 

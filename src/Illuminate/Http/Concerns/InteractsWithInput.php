@@ -9,8 +9,6 @@ use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 
-use function is_null;
-
 trait InteractsWithInput
 {
     /**
