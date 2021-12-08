@@ -9,6 +9,8 @@ use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 
+use function is_null;
+
 trait InteractsWithInput
 {
     /**
@@ -314,11 +316,12 @@ trait InteractsWithInput
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
+     * @param  \Closure|string|null  $default
      * @return \DateTimeInterface|\Illuminate\Support\Carbon|null
      */
-    public function datetime($key, $format = null, $tz = null)
+    public function datetime($key, $format = null, $tz = null, $default = null)
     {
-        $date = $this->input($key);
+        $date = $this->input($key) ?? value($default, $this);
 
         if (is_null($date)) {
             return null;
