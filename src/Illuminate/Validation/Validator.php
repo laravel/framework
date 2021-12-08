@@ -577,6 +577,7 @@ class Validator implements ValidatorContract
         // If so, we will replace any asterisks found in the parameters with the correct keys.
         if ($this->dependsOnOtherFields($rule)) {
             $parameters = $this->replaceDotInParameters($parameters);
+
             if ($keys = $this->getExplicitKeys($attribute)) {
                 $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
             }
@@ -663,6 +664,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Replace each field parameter which has an escaped dot with the dot placeholder.
+     *
+     * @param  array  $parameters
+     * @param  array  $keys
+     * @return array
+     */
+    protected function replaceDotInParameters(array $parameters)
+    {
+        return array_map(function ($field) {
+            return str_replace('\.', $this->dotPlaceholder, $field);
+        }, $parameters);
+    }
+
+    /**
      * Replace each field parameter which has asterisks with the given keys.
      *
      * @param  array  $parameters
@@ -673,20 +688,6 @@ class Validator implements ValidatorContract
     {
         return array_map(function ($field) use ($keys) {
             return vsprintf(str_replace('*', '%s', $field), $keys);
-        }, $parameters);
-    }
-
-    /**
-     * Replace each field parameter which has escaped dot with the dot placeholder.
-     *
-     * @param  array  $parameters
-     * @param  array  $keys
-     * @return array
-     */
-    protected function replaceDotInParameters(array $parameters)
-    {
-        return array_map(function ($field) {
-            return str_replace('\.', $this->dotPlaceholder, $field);
         }, $parameters);
     }
 
