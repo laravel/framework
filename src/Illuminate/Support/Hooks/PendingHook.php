@@ -59,7 +59,8 @@ class PendingHook
                     ? call_user_func($this->callback)
                     : $this->callback->call($instance);
             } catch (BadMethodCallException $exception) {
-                $this->hook = new class implements Hook {
+                $this->hook = new class implements Hook
+                {
                     public function run($instance, array $arguments = [])
                     {
                         throw new RuntimeException('Unexpected hook call from mock object');
