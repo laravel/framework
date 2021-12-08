@@ -248,8 +248,8 @@ class Migrator
             return $this->repository->getMigrations($steps);
         }
 
-        if ($path = $options['path'] ?? []) {
-            return collect($path)->map(function ($m) {
+        if ($migrations = $options['migration'] ?? []) {
+            return collect($migrations)->map(function ($m) {
                 return (object) ['migration' => (string) Str::of($m)->basename('.php')];
             })->all();
         }
