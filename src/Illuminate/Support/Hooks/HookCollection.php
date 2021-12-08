@@ -103,8 +103,8 @@ class HookCollection extends Collection
 
         $hooks = $this->onlyStatic(! is_object($instance))
             ->resolve($instance)
-            ->filter(fn(Hook $hook) => $hook->getName() === $name)
-            ->sortBy(fn(Hook $hook) => $hook->getPriority());
+            ->filter(fn (Hook $hook) => $hook->getName() === $name)
+            ->sortBy(fn (Hook $hook) => $hook->getPriority());
 
         $hooks->each(fn (Hook $hook) => $hook->run($instance, $arguments));
 
