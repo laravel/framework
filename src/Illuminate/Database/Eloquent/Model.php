@@ -1893,19 +1893,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Retrieve the model for a bound value.
-     *
-     * @param  Model|Illuminate\Database\Eloquent\Relations\Relation  $query
-     * @param  mixed  $value
-     * @param  string|null  $field
-     * @return Model|Illuminate\Database\Eloquent\Relations\Relation
-     */
-    public function resolveRouteBindingQuery($query, $value, $field = null)
-    {
-        return $query->where($field ?? $this->getRouteKeyName(), $value);
-    }
-
-    /**
      * Retrieve the child model for a bound value.
      *
      * @param  string  $childType
@@ -1950,11 +1937,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $field = $relationship->getRelated()->getTable().'.'.$field;
         }
 
-        if ($relationship instanceof Model) {
-            return $relationship->resolveRouteBindingQuery($relationship, $value, $field);
-        }
+        return $relationship instanceof Model
+                ? $relationship->resolveRouteBindingQuery($relationship, $value, $field)
+                : $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
+    }
 
-        return $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function resolveRouteBindingQuery($query, $value, $field = null)
+    {
+        return $query->where($field ?? $this->getRouteKeyName(), $value);
     }
 
     /**
