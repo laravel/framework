@@ -28,53 +28,61 @@ class HookCollection extends Collection
         static::$cache = [];
     }
 
-    public static function register($className, Closure $callback)
-    {
-        static::$registrars[$className][] = $callback;
-    }
-
-    public static function registerTraitPrefix($className, $prefix)
-    {
-        static::register($className, function($hooks, $class) use ($prefix) {
-            foreach (class_uses_recursive($class) as $trait) {
-                $method = $prefix.class_basename($trait);
-
-                if (method_exists($class, $method)) {
-                    $hooks->push(new Hook($prefix, Closure::fromCallable([$class, $method])));
-                }
-            }
-        });
-    }
+    //public static function register($className, Closure $callback)
+    //{
+    //    static::$registrars[$className][] = $callback;
+    //}
+    //
+    //public static function registerTraitPrefix($className, $prefix)
+    //{
+    //    static::register($className, function($hooks, $class) use ($prefix) {
+    //        foreach (class_uses_recursive($class) as $trait) {
+    //            $method = $prefix.class_basename($trait);
+    //
+    //            if (method_exists($class, $method)) {
+    //                $hooks->push(new Hook($prefix, Closure::fromCallable([$class, $method])));
+    //            }
+    //        }
+    //    });
+    //}
 
     protected static function loadHooks($class)
     {
-        $classNames = array_merge([$class => $class], class_parents($class), class_implements($class));
+        $classNames = array_values(array_merge(
+            [$class], class_parents($class), class_implements($class)
+        ));
 
         return collect((new ReflectionClass($class))->getMethods())
             ->map(fn($method) => static::hookForMethod($method, $classNames))
             ->filter();
     }
 
-    protected static function hookForMethod(ReflectionMethod $method, array $classNames): ?Hook
+    protected static function hookForMethod(ReflectionMethod $method, array $classNames): ?PendingHook
     {
         if (static::methodReturnsHook($method)) {
-            return $method->invoke(null);
+            return new PendingHook(static function($instance = null) use ($method) {
+                return $method->invoke($instance);
+            }, $method->isStatic());
         }
+
+        // FIXME: Allow for registered hooks by name
 
         return null;
     }
 
     protected static function methodReturnsHook(ReflectionMethod $method): bool
     {
-        return $method->isStatic()
-            && $method->getReturnType() instanceof ReflectionNamedType
+        return $method->getReturnType() instanceof ReflectionNamedType
             && $method->getReturnType()->getName() === Hook::class;
     }
 
-    public function run($name, ...$arguments)
+    public function run($name, $instance = null, $arguments = [])
     {
-        $this->where('name', $name)
-            ->sortBy('weight')
-            ->each(fn($hook) => $hook->run($arguments));
+        $hooks = $this->where('isStatic', is_null($instance))
+            ->map(fn(PendingHook $pending) => $pending->resolve($instance));
+
+        $hooks->where('name', $name)
+            ->sortBy('priority')
+            ->each(fn(Hook $hook) => $hook->run($instance, $arguments));
     }
 }
