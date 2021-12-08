@@ -155,7 +155,7 @@
         "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8).",
         "predis/predis": "Required to use the predis connector (^1.1.9).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0|^7.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0).",
         "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",
         "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
