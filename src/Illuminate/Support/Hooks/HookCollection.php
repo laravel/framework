@@ -67,7 +67,7 @@ class HookCollection extends Collection
     protected static function hookForMethod(ReflectionMethod $method): ?PendingHook
     {
         if (static::methodReturnsHook($method)) {
-            return new PendingHook(static function ($instance = null) use ($method) {
+            return new PendingHook(function ($instance = null) use ($method) {
                 return $method->invoke($instance);
             }, $method->isStatic());
         }

@@ -15,14 +15,14 @@ trait WithoutModelEvents
      */
     public static function withoutModelEvents(): Hook
     {
-        return Hook::make('invoke', static function () {
+        return Hook::make('run', function () {
             if (! $dispatcher = Model::getEventDispatcher()) {
                 return null;
             }
 
             Model::setEventDispatcher(new NullDispatcher($dispatcher));
 
-            return static fn () => Model::setEventDispatcher($dispatcher);
+            return fn () => Model::setEventDispatcher($dispatcher);
         });
     }
 }
