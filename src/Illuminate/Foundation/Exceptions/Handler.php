@@ -335,7 +335,7 @@ class Handler implements ExceptionHandlerContract
             return $response;
         }
 
-        return match(true) {
+        return match (true) {
             $e instanceof HttpResponseException => $e->getResponse(),
             $e instanceof AuthenticationException => $this->unauthenticated($request, $e),
             $e instanceof ValidationException => $this->convertValidationExceptionToResponse($e, $request),
@@ -408,7 +408,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareException(Throwable $e)
     {
-        return match(true) {
+        return match (true) {
             $e instanceof ModelNotFoundException => new NotFoundHttpException($e->getMessage(), $e),
             $e instanceof AuthorizationException => new AccessDeniedHttpException($e->getMessage(), $e),
             $e instanceof TokenMismatchException => new HttpException(419, $e->getMessage(), $e),
