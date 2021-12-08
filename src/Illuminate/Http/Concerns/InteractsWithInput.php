@@ -491,7 +491,7 @@ trait InteractsWithInput
     /**
      * Dump the request items and end the script.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return void
      */
     public function dd(...$keys)
@@ -504,7 +504,7 @@ trait InteractsWithInput
     /**
      * Dump the items.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return $this
      */
     public function dump($keys = [])
