@@ -15,7 +15,7 @@ trait CreatesMatchingTest
      */
     public function addTestOptionsHook(): Hook
     {
-        return Hook::make('initialize', function() {
+        return Hook::make('initialize', function () {
             foreach (['test' => 'PHPUnit', 'pest' => 'Pest'] as $option => $name) {
                 $this->getDefinition()->addOption(new InputOption(
                     $option,
@@ -35,13 +35,13 @@ trait CreatesMatchingTest
      */
     public function addTestCreationHook($path): Hook
     {
-        return Hook::make('generate', function() use ($path) {
+        return Hook::make('generate', function () use ($path) {
             if (! $this->option('test') && ! $this->option('pest')) {
                 return;
             }
 
             // Run make:test after the "generate" hook has finished
-            return function() use ($path) {
+            return function () use ($path) {
                 $this->call('make:test', [
                     'name'   => Str::of($path)
                         ->after($this->laravel['path'])

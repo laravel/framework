@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Hookable;
 use Illuminate\Support\Str;
