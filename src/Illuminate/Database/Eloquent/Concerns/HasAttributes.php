@@ -8,6 +8,7 @@ use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Casts\AsAttribute;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\InvalidCastException;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
+use ReflectionClass;
+use ReflectionMethod;
 
 trait HasAttributes
 {
@@ -59,6 +62,13 @@ trait HasAttributes
      * @var array
      */
     protected $classCastCache = [];
+
+    /**
+     * The attributes that have been cast using PHP attribute marked mutators.
+     *
+     * @var array
+     */
+    protected $attributeCastCache = [];
 
     /**
      * The built-in, primitive cast types supported by Eloquent.
@@ -129,6 +139,20 @@ trait HasAttributes
      * @var array
      */
     protected static $mutatorCache = [];
+
+    /**
+     * The cache of the PHP attribute marked mutated attributes for each class.
+     *
+     * @var array
+     */
+    protected static $attributeMutatorCache = [];
+
+    /**
+     * The cache of the PHP attribute marked mutated, settable attributes for each class.
+     *
+     * @var array
+     */
+    protected static $setAttributeMutatorCache = [];
 
     /**
      * The encrypter instance that is used to encrypt attributes.
@@ -393,6 +417,7 @@ trait HasAttributes
         if (array_key_exists($key, $this->attributes) ||
             array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
+            $this->hasAttributeGetMutator($key) ||
             $this->isClassCastable($key)) {
             return $this->getAttributeValue($key);
         }
@@ -526,6 +551,33 @@ trait HasAttributes
     }
 
     /**
+     * Determine if a PHP attribute marked get mutator exists for an attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttributeGetMutator($key)
+    {
+        if (isset(static::$attributeMutatorCache[get_class($this)][$key])) {
+            return static::$attributeMutatorCache[get_class($this)][$key];
+        }
+
+        if (! method_exists($this, $method = Str::camel($key)) ||
+            PHP_MAJOR_VERSION < 8) {
+            return static::$attributeMutatorCache[get_class($this)][$key] = false;
+        }
+
+        foreach ((new ReflectionMethod($this, $method))->getAttributes() as $attribute) {
+            if ($attribute->getName() === AsAttribute::class &&
+                is_callable($this->{$method}()->get)) {
+                return static::$attributeMutatorCache[get_class($this)][$key] = true;
+            }
+        }
+
+        return static::$attributeMutatorCache[get_class($this)][$key] = false;
+    }
+
+    /**
      * Get the value of an attribute using its mutator.
      *
      * @param  string  $key
@@ -538,6 +590,32 @@ trait HasAttributes
     }
 
     /**
+     * Get the value of a PHP attribute marked attribute using its mutator.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function mutateAttributeMarkedAttribute($key, $value)
+    {
+        if (isset($this->attributeCastCache[$key])) {
+            return $this->attributeCastCache[$key];
+        }
+
+        $value = call_user_func($this->{Str::camel($key)}()->get ?: function ($value) {
+            return $value;
+        }, $value, $this->attributes);
+
+        if (! is_object($value)) {
+            unset($this->attributeCastCache[$key]);
+        } else {
+            $this->attributeCastCache[$key] = $value;
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the value of an attribute using its mutator for array conversion.
      *
      * @param  string  $key
@@ -546,9 +624,14 @@ trait HasAttributes
      */
     protected function mutateAttributeForArray($key, $value)
     {
-        $value = $this->isClassCastable($key)
-            ? $this->getClassCastableAttributeValue($key, $value)
-            : $this->mutateAttribute($key, $value);
+        if ($this->isClassCastable($key)) {
+            $value = $this->getClassCastableAttributeValue($key, $value);
+        } elseif (isset(static::$attributeMutatorCache[get_class($this)][$key]) &&
+                  static::$attributeMutatorCache[get_class($this)][$key] === true) {
+            $value = $this->mutateAttributeMarkedAttribute($key, $value);
+        } else {
+            $value = $this->mutateAttribute($key, $value);
+        }
 
         return $value instanceof Arrayable ? $value->toArray() : $value;
     }
@@ -788,6 +871,8 @@ trait HasAttributes
         // this model, such as "json_encoding" a listing of data for storage.
         if ($this->hasSetMutator($key)) {
             return $this->setMutatedAttributeValue($key, $value);
+        } elseif ($this->hasAttributeSetMutator($key)) {
+            return $this->setAttributeMarkedMutatedAttributeValue($key, $value);
         }
 
         // If an attribute is listed as a "date", we'll convert it from a DateTime
@@ -841,6 +926,35 @@ trait HasAttributes
     }
 
     /**
+     * Determine if a PHP attribute marked set mutator exists for an attribute.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttributeSetMutator($key)
+    {
+        $class = get_class($this);
+
+        if (isset(static::$setAttributeMutatorCache[$class][$key])) {
+            return static::$setAttributeMutatorCache[$class][$key];
+        }
+
+        if (! method_exists($this, $method = Str::camel($key)) ||
+            PHP_MAJOR_VERSION < 8) {
+            return static::$setAttributeMutatorCache[$class][$key] = false;
+        }
+
+        foreach ((new ReflectionMethod($this, $method))->getAttributes() as $attribute) {
+            if ($attribute->getName() === AsAttribute::class &&
+                is_callable($this->{$method}()->set)) {
+                return static::$setAttributeMutatorCache[$class][$key] = true;
+            }
+        }
+
+        return static::$setAttributeMutatorCache[$class][$key] = false;
+    }
+
+    /**
      * Set the value of an attribute using its mutator.
      *
      * @param  string  $key
@@ -849,7 +963,34 @@ trait HasAttributes
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        return $this->{'set'.Str::studly($key).'Attribute'}($value);
+        return $this->{'set'.Str::camel($key).'Attribute'}($value);
+    }
+
+    /**
+     * Set the value of a PHP attribute marked attribute using its mutator.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function setAttributeMarkedMutatedAttributeValue($key, $value)
+    {
+        $callback = $this->{Str::camel($key)}()->set ?: function ($value) use ($key) {
+            $this->attributes[$key] = $value;
+        };
+
+        $this->attributes = array_merge(
+            $this->attributes,
+            $this->normalizeCastClassResponse(
+                $key, call_user_func($callback, $value, $this->attributes)
+            )
+        );
+
+        if (! is_object($value)) {
+            unset($this->attributeCastCache[$key]);
+        } else {
+            $this->attributeCastCache[$key] = $value;
+        }
     }
 
     /**
@@ -1435,6 +1576,17 @@ trait HasAttributes
     }
 
     /**
+     * Merge the cast class and attribute cast attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromCachedCasts()
+    {
+        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromAttributeCasts();
+    }
+
+    /**
      * Merge the cast class attributes back into the model.
      *
      * @return void
@@ -1449,6 +1601,27 @@ trait HasAttributes
                 $caster instanceof CastsInboundAttributes
                     ? [$key => $value]
                     : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
+            );
+        }
+    }
+
+    /**
+     * Merge the cast class attributes back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributesFromAttributeCasts()
+    {
+        foreach ($this->attributeCastCache as $key => $value) {
+            $callback = $this->{Str::camel($key)}()->set ?: function ($value) use ($key) {
+                $this->attributes[$key] = $value;
+            };
+
+            $this->attributes = array_merge(
+                $this->attributes,
+                $this->normalizeCastClassResponse(
+                    $key, call_user_func($callback, $value, $this->attributes)
+                )
             );
         }
     }
@@ -1472,7 +1645,7 @@ trait HasAttributes
      */
     public function getAttributes()
     {
-        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromCachedCasts();
 
         return $this->attributes;
     }
@@ -1503,6 +1676,7 @@ trait HasAttributes
         }
 
         $this->classCastCache = [];
+        $this->attributeCastCache = [];
 
         return $this;
     }
@@ -1773,6 +1947,8 @@ trait HasAttributes
         // retrieval from the model to a form that is more useful for usage.
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
+        } elseif ($this->hasAttributeGetMutator($key)) {
+            return $this->mutateAttributeMarkedAttribute($key, $value);
         }
 
         // If the attribute exists within the cast array, we will convert it to
@@ -1856,9 +2032,17 @@ trait HasAttributes
      */
     public static function cacheMutatedAttributes($class)
     {
-        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
-            return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-        })->all();
+        static::$attributeMutatorCache[$class] =
+            collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($class))
+                    ->mapWithKeys(function ($match) {
+                        return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
+                    })->all();
+
+        static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
+                ->merge($attributeMutatorMethods)
+                ->map(function ($match) {
+                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+                })->all();
     }
 
     /**
@@ -1872,5 +2056,34 @@ trait HasAttributes
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
         return $matches[1];
+    }
+
+    /**
+     * Get all of the PHP attribute marked attribute mutator methods.
+     *
+     * @param  mixed  $class
+     * @return array
+     */
+    protected static function getAttributeMarkedMutatorMethods($class)
+    {
+        if (PHP_MAJOR_VERSION < 8) {
+            return [];
+        }
+
+        $instance = is_object($class) ? $class : new $class;
+
+        return collect((new ReflectionClass($instance))->getMethods())->filter(function ($method) use ($instance) {
+            foreach ($method->getAttributes() as $attribute) {
+                if ($attribute->getName() === AsAttribute::class) {
+                    $method->setAccessible(true);
+
+                    if (is_callable($method->invoke($instance)->get)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        })->map->name->values()->all();
     }
 }

@@ -968,7 +968,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function save(array $options = [])
     {
-        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromCachedCasts();
 
         $query = $this->newModelQuery();
 
@@ -1237,7 +1237,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function delete()
     {
-        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromCachedCasts();
 
         if (is_null($this->getKeyName())) {
             throw new LogicException('No primary key defined on model.');
@@ -2176,9 +2176,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function __sleep()
     {
-        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromCachedCasts();
 
         $this->classCastCache = [];
+        $this->attributeCastCache = [];
 
         return array_keys(get_object_vars($this));
     }
