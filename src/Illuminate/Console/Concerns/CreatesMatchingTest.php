@@ -2,43 +2,55 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Support\Hooks\Hook;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 trait CreatesMatchingTest
 {
     /**
-     * Add the standard command options for generating matching tests.
+     * Hook to add the standard command options for generating matching tests.
      *
      * @return void
      */
-    protected function addTestOptions()
+    public function addTestOptionsHook(): Hook
     {
-        foreach (['test' => 'PHPUnit', 'pest' => 'Pest'] as $option => $name) {
-            $this->getDefinition()->addOption(new InputOption(
-                $option,
-                null,
-                InputOption::VALUE_NONE,
-                "Generate an accompanying {$name} test for the {$this->type}"
-            ));
-        }
+        return Hook::make('initialize', function() {
+            foreach (['test' => 'PHPUnit', 'pest' => 'Pest'] as $option => $name) {
+                $this->getDefinition()->addOption(new InputOption(
+                    $option,
+                    null,
+                    InputOption::VALUE_NONE,
+                    "Generate an accompanying {$name} test for the {$this->type}"
+                ));
+            }
+        });
     }
 
     /**
-     * Create the matching test case if requested.
+     * Hook tocreate the matching test case if requested.
      *
      * @param  string  $path
      * @return void
      */
-    protected function handleTestCreation($path)
+    public function addTestCreationHook($path): Hook
     {
-        if (! $this->option('test') && ! $this->option('pest')) {
-            return;
-        }
+        return Hook::make('generate', function() use ($path) {
+            if (! $this->option('test') && ! $this->option('pest')) {
+                return;
+            }
 
-        $this->call('make:test', [
-            'name' => Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test')->replace('\\', '/'),
-            '--pest' => $this->option('pest'),
-        ]);
+            // Run make:test after the "generate" hook has finished
+            return function() use ($path) {
+                $this->call('make:test', [
+                    'name'   => Str::of($path)
+                        ->after($this->laravel['path'])
+                        ->beforeLast('.php')
+                        ->append('Test')
+                        ->replace('\\', '/'),
+                    '--pest' => $this->option('pest'),
+                ]);
+            };
+        });
     }
 }

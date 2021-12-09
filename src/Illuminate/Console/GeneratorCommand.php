@@ -4,11 +4,14 @@ namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Hookable;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
 {
+    use Hookable;
+
     /**
      * The filesystem instance.
      *
@@ -109,10 +112,7 @@ abstract class GeneratorCommand extends Command
     {
         parent::__construct();
 
-        // TODO: Switch to Hookable
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            $this->addTestOptions();
-        }
+        $this->runHooks('initialize');
 
         $this->files = $files;
     }
@@ -157,19 +157,16 @@ abstract class GeneratorCommand extends Command
             return false;
         }
 
-        // Next, we will generate the path to the location where this class' file should get
+        // Finally, we will generate the path to the location where this class' file should get
         // written. Then, we will build the class and make the proper replacements on the
         // stub files so that it gets the correctly formatted namespace and class name.
-        $this->makeDirectory($path);
+        $this->runHooks('generate', [$name, $path], function () use ($name, $path) {
+            $this->makeDirectory($path);
 
-        $this->files->put($path, $this->sortImports($this->buildClass($name)));
+            $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        $this->info($this->type.' created successfully.');
-
-        // TODO: Switch to Hookable
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            $this->handleTestCreation($path);
-        }
+            $this->info($this->type.' created successfully.');
+        });
     }
 
     /**
