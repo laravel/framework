@@ -27,7 +27,7 @@ trait CreatesMatchingTest
     {
         return Hook::make('generate', function ($name, $path) {
             // We want to run test creation after generation, so we'll return a callback to execute at the end
-            return fn() => $this->handleTestCreation($path);
+            return fn () => $this->handleTestCreation($path);
         });
     }
 
