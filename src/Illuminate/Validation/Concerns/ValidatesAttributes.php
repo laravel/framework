@@ -266,7 +266,8 @@ trait ValidatesAttributes
 
         if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
             $second = $this->getValue($second);
-            $secondDate = $second === null ? null : $this->getDateTimeWithOptionalFormat($format, $second);
+
+            $secondDate = is_null($second) ? null : $this->getDateTimeWithOptionalFormat($format, $second);
         }
 
         return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
