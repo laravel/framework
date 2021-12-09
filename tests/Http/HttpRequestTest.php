@@ -537,7 +537,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', [
             'as_null' => null,
-            'as_invalid' => 'invalid'
+            'as_invalid' => 'invalid',
             'as_date' => '2020-01-01',
             'as_datetime' => '20-01-01 16:30:25',
             'as_time' => '16:30:25',
@@ -545,11 +545,11 @@ class HttpRequestTest extends TestCase
             'as_timezone' => '20-01-01 13:30:25',
         ]);
 
-        $current = Carbon::create(2020, 1, 1, 16, 30, 25, 'UTC');
+        $current = Carbon::create(2020, 1, 1, 16, 30, 25);
 
         $this->assertNull($request->datetime('as_null'));
         $this->assertNull($request->datetime('doesnt_exists'));
-        $this->assertFalse($request->datetime('as_invalid'))
+        $this->assertNull($request->datetime('as_invalid'));
         $this->assertTrue($request->datetime('as_date')->isSameDay($current));
         $this->assertEquals($current, $request->datetime('as_datetime'));
         $this->assertTrue($request->datetime('as_time')->isSameSecond('16:30:25'));

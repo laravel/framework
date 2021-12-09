@@ -5,6 +5,7 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
+use InvalidArgumentException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
@@ -314,25 +315,23 @@ trait InteractsWithInput
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
-     * @return \Illuminate\Support\Carbon|bool|null
+     * @return \Illuminate\Support\Carbon|null
      */
     public function datetime($key, $format = null, $tz = null)
     {
-        $date = $this->input($key);
-
-        if (is_null($date)) {
+        if ($this->isNotFilled($key)) {
             return null;
         }
 
-        if ($format) {
-            try {
-                return Date::createFromFormat($format, $date, $tz);
-            } catch (InvalidArgumentException $e) {
-                return false;
+        try {
+            if (is_null($format)) {
+                return Date::parse($this->input($key), $tz);
+            } else {
+                return Date::createFromFormat($format, $this->input($key), $tz);
             }
+        } catch (InvalidArgumentException $e) {
+            return null;
         }
-
-        return Date::parse($date, $tz);
     }
 
     /**
