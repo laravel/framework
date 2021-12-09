@@ -9,48 +9,64 @@ use Symfony\Component\Console\Input\InputOption;
 trait CreatesMatchingTest
 {
     /**
-     * Hook to add the standard command options for generating matching tests.
+     * Register "initialize" hook
      *
-     * @return void
+     * @return \Illuminate\Support\Hooks\Hook
      */
-    public function addTestOptionsHook(): Hook
+    public function registerCreatesMatchingTestInitializeHook(): Hook
     {
-        return Hook::make('initialize', function () {
-            foreach (['test' => 'PHPUnit', 'pest' => 'Pest'] as $option => $name) {
-                $this->getDefinition()->addOption(new InputOption(
-                    $option,
-                    null,
-                    InputOption::VALUE_NONE,
-                    "Generate an accompanying {$name} test for the {$this->type}"
-                ));
-            }
+        return Hook::make('initialize', fn () => $this->addTestOptions());
+    }
+
+    /**
+     * Register "generate" hook
+     *
+     * @return \Illuminate\Support\Hooks\Hook
+     */
+    public function registerCreatesMatchingTestGenerateHook(): Hook
+    {
+        return Hook::make('generate', function ($name, $path) {
+            // We want to run test creation after generation, so we'll return a callback to execute at the end
+            return fn() => $this->handleTestCreation($path);
         });
     }
 
     /**
-     * Hook tocreate the matching test case if requested.
+     * Add the standard command options for generating matching tests.
+     *
+     * @return void
+     */
+    protected function addTestOptions()
+    {
+        foreach (['test' => 'PHPUnit', 'pest' => 'Pest'] as $option => $name) {
+            $this->getDefinition()->addOption(new InputOption(
+                $option,
+                null,
+                InputOption::VALUE_NONE,
+                "Generate an accompanying {$name} test for the {$this->type}"
+            ));
+        }
+    }
+
+    /**
+     * Create the matching test case if requested.
      *
      * @param  string  $path
      * @return void
      */
-    public function addTestCreationHook($path): Hook
+    protected function handleTestCreation($path)
     {
-        return Hook::make('generate', function () use ($path) {
-            if (! $this->option('test') && ! $this->option('pest')) {
-                return;
-            }
+        if (! $this->option('test') && ! $this->option('pest')) {
+            return;
+        }
 
-            // Run make:test after the "generate" hook has finished
-            return function () use ($path) {
-                $this->call('make:test', [
-                    'name'   => Str::of($path)
-                        ->after($this->laravel['path'])
-                        ->beforeLast('.php')
-                        ->append('Test')
-                        ->replace('\\', '/'),
-                    '--pest' => $this->option('pest'),
-                ]);
-            };
-        });
+        $this->call('make:test', [
+            'name'   => Str::of($path)
+                ->after($this->laravel['path'])
+                ->beforeLast('.php')
+                ->append('Test')
+                ->replace('\\', '/'),
+            '--pest' => $this->option('pest'),
+        ]);
     }
 }
