@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 trait CreatesMatchingTest
 {
     /**
-     * Register "initialize" hook
+     * Register "initialize" hook.
      *
      * @return \Illuminate\Support\Hooks\Hook
      */
@@ -19,7 +19,7 @@ trait CreatesMatchingTest
     }
 
     /**
-     * Register "generate" hook
+     * Register "generate" hook.
      *
      * @return \Illuminate\Support\Hooks\Hook
      */
