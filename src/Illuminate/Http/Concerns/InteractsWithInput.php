@@ -314,19 +314,22 @@ trait InteractsWithInput
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
-     * @param  \Closure|string|null  $default
-     * @return \DateTimeInterface|\Illuminate\Support\Carbon|null
+     * @return \Illuminate\Support\Carbon|bool|null
      */
-    public function datetime($key, $format = null, $tz = null, $default = null)
+    public function datetime($key, $format = null, $tz = null)
     {
-        $date = $this->input($key) ?? value($default, $this);
+        $date = $this->input($key);
 
         if (is_null($date)) {
             return null;
         }
 
         if ($format) {
-            return Date::createFromFormat($format, $date, $tz);
+            try {
+                return Date::createFromFormat($format, $date, $tz);
+            } catch (InvalidArgumentException $e) {
+                return false;
+            }
         }
 
         return Date::parse($date, $tz);
