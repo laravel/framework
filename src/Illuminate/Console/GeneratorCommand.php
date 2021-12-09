@@ -111,9 +111,9 @@ abstract class GeneratorCommand extends Command
     {
         parent::__construct();
 
-        $this->runHooks('initialize');
-
         $this->files = $files;
+
+        $this->runHooks('initialize');
     }
 
     /**
