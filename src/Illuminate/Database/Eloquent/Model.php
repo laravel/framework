@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Hookable;
-use Illuminate\Support\Hooks\TraitHook;
+use Illuminate\Support\Hooks\ConventionalHook;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
@@ -256,23 +256,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Register hook for `bootX` trait methods.
+     * Register a conventions-based hook for boot[trait name] methods.
      *
-     * @return \Illuminate\Support\Hooks\TraitHook
+     * @return \Illuminate\Support\Hooks\ConventionalHook
      */
-    public static function registerBootHook(): TraitHook
+    public static function registerBootHook(): ConventionalHook
     {
-        return new TraitHook('boot');
+        return new ConventionalHook('boot');
     }
 
     /**
-     * Register hook for `initializeX` trait methods.
+     * Register a conventions-based hook for initialize[trait name] methods.
      *
-     * @return \Illuminate\Support\Hooks\TraitHook
+     * @return \Illuminate\Support\Hooks\ConventionalHook
      */
-    public static function registerInitializeHook(): TraitHook
+    public static function registerInitializeHook(): ConventionalHook
     {
-        return new TraitHook('initialize');
+        return new ConventionalHook('initialize');
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Illuminate\Support\Hooks;
 
 use Illuminate\Contracts\Support\Hook as HookContract;
 
-class TraitHook implements HookContract
+class ConventionalHook implements HookContract
 {
     /**
      * Constructor.
@@ -25,15 +25,19 @@ class TraitHook implements HookContract
      */
     public function run($instance = null, array $arguments = [])
     {
+        $executed = [];
+
         foreach (class_uses_recursive($instance) as $trait) {
             $method = $this->prefix.class_basename($trait);
 
-            if (method_exists($instance, $method)) {
+            if (! in_array($method, $executed) && method_exists($instance, $method)) {
                 if (is_object($instance)) {
                     $instance->$method(...$arguments);
                 } else {
                     forward_static_call_array([$instance, $method], $arguments);
                 }
+
+                $executed[] = $method;
             }
         }
     }
