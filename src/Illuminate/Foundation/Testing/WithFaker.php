@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing;
 
 use Faker\Factory;
 use Faker\Generator;
+use Illuminate\Support\Hooks\Hook;
 
 trait WithFaker
 {
@@ -13,6 +14,16 @@ trait WithFaker
      * @var \Faker\Generator
      */
     protected $faker;
+
+    /**
+     * Register test case hook.
+     *
+     * @return \Illuminate\Support\Hooks\Hook
+     */
+    public function registerWithFakerHook(): Hook
+    {
+        return new Hook('setUp', fn () => $this->setUpFaker(), 75);
+    }
 
     /**
      * Setup up the Faker instance.

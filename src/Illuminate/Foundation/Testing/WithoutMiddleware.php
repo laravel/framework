@@ -3,9 +3,20 @@
 namespace Illuminate\Foundation\Testing;
 
 use Exception;
+use Illuminate\Support\Hooks\Hook;
 
 trait WithoutMiddleware
 {
+    /**
+     * Register test case hook.
+     *
+     * @return \Illuminate\Support\Hooks\Hook
+     */
+    public function registerWithoutMiddlewareHook(): Hook
+    {
+        return new Hook('setUp', fn () => $this->disableMiddlewareForAllTests(), 65);
+    }
+
     /**
      * Prevent all middleware from being executed for this test class.
      *

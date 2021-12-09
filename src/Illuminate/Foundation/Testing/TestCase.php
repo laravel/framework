@@ -9,6 +9,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Hookable;
 use Illuminate\Support\Str;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
@@ -27,7 +28,8 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
         Concerns\InteractsWithViews,
-        Concerns\MocksApplicationServices;
+        Concerns\MocksApplicationServices,
+        Hookable;
 
     /**
      * The Illuminate application instance.
@@ -88,7 +90,7 @@ abstract class TestCase extends BaseTestCase
             ParallelTesting::callSetUpTestCaseCallbacks($this);
         }
 
-        $this->setUpTraits();
+        $this->runHooks('setUp');
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             $callback();
@@ -107,43 +109,6 @@ abstract class TestCase extends BaseTestCase
     protected function refreshApplication()
     {
         $this->app = $this->createApplication();
-    }
-
-    /**
-     * Boot the testing helper traits.
-     *
-     * @return array
-     */
-    protected function setUpTraits()
-    {
-        // TODO: Switch to Hookable
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[RefreshDatabase::class])) {
-            $this->refreshDatabase();
-        }
-
-        if (isset($uses[DatabaseMigrations::class])) {
-            $this->runDatabaseMigrations();
-        }
-
-        if (isset($uses[DatabaseTransactions::class])) {
-            $this->beginDatabaseTransaction();
-        }
-
-        if (isset($uses[WithoutMiddleware::class])) {
-            $this->disableMiddlewareForAllTests();
-        }
-
-        if (isset($uses[WithoutEvents::class])) {
-            $this->disableEventsForAllTests();
-        }
-
-        if (isset($uses[WithFaker::class])) {
-            $this->setUpFaker();
-        }
-
-        return $uses;
     }
 
     /**

@@ -2,8 +2,20 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Illuminate\Support\Hooks\Hook;
+
 trait DatabaseTransactions
 {
+    /**
+     * Register test case hook.
+     *
+     * @return \Illuminate\Support\Hooks\Hook
+     */
+    public function registerDatabaseTransactionsHook(): Hook
+    {
+        return new Hook('setUp', fn () => $this->beginDatabaseTransaction(), 60);
+    }
+
     /**
      * Handle database transactions on the specified connections.
      *

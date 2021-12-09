@@ -4,10 +4,21 @@ namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
+use Illuminate\Support\Hooks\Hook;
 
 trait RefreshDatabase
 {
     use CanConfigureMigrationCommands;
+
+    /**
+     * Register test case hook.
+     *
+     * @return \Illuminate\Support\Hooks\Hook
+     */
+    public function registerRefreshDatabaseHook(): Hook
+    {
+        return new Hook('setUp', fn () => $this->refreshDatabase(), 50);
+    }
 
     /**
      * Define hooks to migrate the database before and after each test.

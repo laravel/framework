@@ -3,9 +3,20 @@
 namespace Illuminate\Foundation\Testing;
 
 use Exception;
+use Illuminate\Support\Hooks\Hook;
 
 trait WithoutEvents
 {
+    /**
+     * Register test case hook.
+     *
+     * @return \Illuminate\Support\Hooks\Hook
+     */
+    public function registerWithoutEventsHook(): Hook
+    {
+        return new Hook('setUp', fn () => $this->disableEventsForAllTests(), 70);
+    }
+
     /**
      * Prevent all event handles from being executed.
      *
