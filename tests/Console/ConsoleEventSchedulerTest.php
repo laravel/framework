@@ -101,9 +101,10 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $events = $schedule->events();
         $binary = $escape.PHP_BINARY.$escape;
-        $this->assertEquals($binary.' artisan queue:listen', $events[0]->command);
-        $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[1]->command);
-        $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[2]->command);
+        $artisan = $escape.'artisan'.$escape;
+        $this->assertEquals($binary.' '.$artisan.' queue:listen', $events[0]->command);
+        $this->assertEquals($binary.' '.$artisan.' queue:listen --tries=3', $events[1]->command);
+        $this->assertEquals($binary.' '.$artisan.' queue:listen --tries=3', $events[2]->command);
     }
 
     public function testCreateNewArtisanCommandUsingCommandClass()
@@ -115,7 +116,8 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $events = $schedule->events();
         $binary = $escape.PHP_BINARY.$escape;
-        $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
+        $artisan = $escape.'artisan'.$escape;
+        $this->assertEquals($binary.' '.$artisan.' foo:bar --force', $events[0]->command);
     }
 
     public function testCallCreatesNewJobWithTimezone()
