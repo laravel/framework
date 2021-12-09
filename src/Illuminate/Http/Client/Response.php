@@ -248,35 +248,37 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Create an exception if a server or client error occurred.
+     * Create an exception based on the response.
      *
-     * @return \Illuminate\Http\Client\RequestException|null
+     * @return \Illuminate\Http\Client\RequestException
      */
-    public function toException()
+    public function toException(): \Throwable
     {
-        if ($this->failed()) {
-            return new RequestException($this);
-        }
+        return new RequestException($this);
     }
 
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @param  \Closure|null  $callback
+     * @param  \Closure|null $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throw()
+    public function throw($callback = null)
     {
-        $callback = func_get_args()[0] ?? null;
-
         if ($this->failed()) {
-            throw tap($this->toException(), function ($exception) use ($callback) {
-                if ($callback && is_callable($callback)) {
-                    $callback($this, $exception);
+            if($callback === null) {
+                throw $this->toException();
+            }
+            if(is_callable($callback)) {
+                $exception = $callback($this);
+                if(!($exception instanceof \Throwable)) {
+                    throw new \InvalidArgumentException('$callback method must return a Throwable.');
                 }
-            });
+                throw $exception;
+            }
+            throw new \InvalidArgumentException('$callback method must be a callable.');
         }
 
         return $this;
