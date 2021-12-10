@@ -183,6 +183,10 @@ class DatabaseManager implements ConnectionResolverInterface
         // the connection, which will allow us to reconnect from the connections.
         $connection->setReconnector($this->reconnector);
 
+        foreach ($this->app['config']->get('database.dbal.types', []) as $name => $class) {
+            $connection->registerCustomDoctrineType($class, $name, $name);
+        }
+
         return $connection;
     }
 
