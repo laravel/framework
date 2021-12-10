@@ -406,12 +406,12 @@ class Builder
 
         if (! Type::hasType($name)) {
             Type::addType($name, $class);
-
-            $this->connection
-                ->getDoctrineSchemaManager()
-                ->getDatabasePlatform()
-                ->registerDoctrineTypeMapping($type, $name);
         }
+
+        $this->connection
+            ->getDoctrineSchemaManager()
+            ->getDatabasePlatform()
+            ->registerDoctrineTypeMapping($type, $name);
     }
 
     /**
