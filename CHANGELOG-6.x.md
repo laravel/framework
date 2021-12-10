@@ -1,6 +1,18 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.39...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.41...6.x)
+
+
+## [v6.20.41 (2021-11-23)](https://github.com/laravel/framework/compare/v6.20.40...v6.20.41)
+
+### Added
+- Added phar to list of shouldBlockPhpUpload() in validator ([2d1f76a](https://github.com/laravel/framework/commit/2d1f76ab752ced011da05cf139799eab2a36ef90))
+
+
+## [v6.20.40 (2021-11-17)](https://github.com/laravel/framework/compare/v6.20.39...v6.20.40)
+
+### Fixed
+- Fixes `Illuminate/Database/Query/Builder::limit()` to only cast integer when given other than null ([#39644](https://github.com/laravel/framework/pull/39644))
 
 
 ## [v6.20.39 (2021-11-16)](https://github.com/laravel/framework/compare/v6.20.38...v6.20.39)

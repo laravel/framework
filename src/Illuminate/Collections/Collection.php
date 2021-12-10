@@ -1436,6 +1436,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot()
+    {
+        return new static(Arr::undot($this->all()));
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param  string|callable|null  $key
@@ -1444,6 +1454,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function unique($key = null, $strict = false)
     {
+        if (is_null($key) && $strict === false) {
+            return new static(array_unique($this->items, SORT_REGULAR));
+        }
+
         $callback = $this->valueRetriever($key);
 
         $exists = [];

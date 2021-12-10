@@ -20,6 +20,7 @@ use Illuminate\Support\Fluent;
  * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
  * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
  * @method $this primary() Add a primary index
+ * @method $this fulltext() Add a fulltext index
  * @method $this spatialIndex() Add a spatial index
  * @method $this startingValue(int $startingValue) Set the starting value of an auto-incrementing field (MySQL/PostgreSQL)
  * @method $this storedAs(string $expression) Create a stored generated column (MySQL/PostgreSQL/SQLite)

@@ -27,7 +27,7 @@
         "laravel/serializable-closure": "^1.0",
         "opis/closure": "^3.6",
         "ramsey/uuid": "^4.2.2",
-        "symfony/process": "^5.1.4"
+        "symfony/process": "^5.4"
     },
     "autoload": {
         "psr-4": {

@@ -1509,6 +1509,17 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibits:emails,email_address']);
         $this->assertFalse($v->passes());
         $this->assertSame('The email field prohibits emails / email address being present.', $v->messages()->first('email'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'foo' => [
+                ['email' => 'foo', 'emails' => 'foo'],
+                ['emails' => 'foo'],
+            ],
+        ], ['foo.*.email' => 'prohibits:foo.*.emails']);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.email'));
+        $this->assertFalse($v->messages()->has('foo.1.email'));
     }
 
     public function testFailedFileUploads()
@@ -4159,6 +4170,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['start' => 'invalid', 'ends' => 'invalid'], ['start' => 'date_format:d/m/Y|before:ends', 'ends' => 'date_format:d/m/Y|after:start']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['start' => '31/12/2012', 'ends' => null], ['start' => 'date_format:d/m/Y|before:ends', 'ends' => 'date_format:d/m/Y|after:start']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['x' => date('d/m/Y')], ['x' => 'date_format:d/m/Y|after:yesterday|before:tomorrow']);
         $this->assertTrue($v->passes());
 
@@ -4845,21 +4859,44 @@ class ValidationValidatorTest extends TestCase
     public function testParsingArrayKeysWithDot()
     {
         $trans = $this->getIlluminateArrayTranslator();
-
+        // Interpreted dot fails on empty value
         $v = new Validator($trans, ['foo' => ['bar' => ''], 'foo.bar' => 'valid'], ['foo.bar' => 'required']);
         $this->assertTrue($v->fails());
-
+        // Escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => ['bar' => 'valid'], 'foo.bar' => ''], ['foo\.bar' => 'required']);
         $this->assertTrue($v->fails());
-
+        // Interpreted dot succeeds
         $v = new Validator($trans, ['foo' => ['bar' => 'valid'], 'foo.bar' => 'zxc'], ['foo\.bar' => 'required']);
         $this->assertFalse($v->fails());
-
+        // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo.bar\.baz' => 'required']);
         $this->assertTrue($v->fails());
-
+        // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
         $this->assertTrue($v->fails());
+    }
+
+    public function testParsingArrayKeysWithDotWhenTestingExistence()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        // RequiredWith using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_with:bar.foo\.bar']);
+        $this->assertFalse($v->passes());
+        // RequiredWithAll using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_with_all:bar.foo\.bar']);
+        $this->assertFalse($v->passes());
+        // RequiredWithout using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => 'valid', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_without:bar.foo\.bar']);
+        $this->assertTrue($v->passes());
+        // RequiredWithoutAll using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => 'valid', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_without_all:bar.foo\.bar']);
+        $this->assertTrue($v->passes());
+        // Same using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => 'valid', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'same:bar.foo\.bar']);
+        $this->assertTrue($v->passes());
+        // RequiredUnless using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_unless:bar.foo\.bar,valid']);
+        $this->assertTrue($v->passes());
     }
 
     public function testPassingSlashVulnerability()

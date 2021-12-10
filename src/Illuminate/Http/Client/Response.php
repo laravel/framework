@@ -121,6 +121,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get the reason phrase of the response.
+     *
+     * @return string
+     */
+    public function reason()
+    {
+        return $this->response->getReasonPhrase();
+    }
+
+    /**
      * Get the effective URI of the response.
      *
      * @return \Psr\Http\Message\UriInterface|null

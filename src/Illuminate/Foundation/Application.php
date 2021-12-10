@@ -33,7 +33,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '8.72.0';
+    const VERSION = '8.75.0';
 
     /**
      * The base path for the Laravel installation.
@@ -629,6 +629,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function runningUnitTests()
     {
         return $this->bound('env') && $this['env'] === 'testing';
+    }
+
+    /**
+     * Determine if the application is running with debug mode enabled.
+     *
+     * @return bool
+     */
+    public function hasDebugModeEnabled()
+    {
+        return (bool) $this['config']->get('app.debug');
     }
 
     /**

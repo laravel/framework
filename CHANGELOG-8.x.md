@@ -1,6 +1,91 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.71.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.75.0...8.x)
+
+
+## [v8.75.0 (2021-12-07)](https://github.com/laravel/framework/compare/v8.74.0...v8.75.0)
+
+### Added
+- Added `Illuminate/Support/Testing/Fakes/NotificationFake::assertSentTimes()` ([667cca8](https://github.com/laravel/framework/commit/667cca8db300f55cd8fccd575eaa46f5156b0408))
+- Added Conditionable trait to ComponentAttributeBag ([#39861](https://github.com/laravel/framework/pull/39861))
+- Added scheduler integration tests ([#39862](https://github.com/laravel/framework/pull/39862))
+- Added on-demand gate authorization ([#39789](https://github.com/laravel/framework/pull/39789))
+- Added countable interface to eloquent factory sequence ([#39907](https://github.com/laravel/framework/pull/39907), [1638472a](https://github.com/laravel/framework/commit/1638472a7a5ee02dc9e808bc203b733785ac1468), [#39915](https://github.com/laravel/framework/pull/39915))
+- Added Fulltext index for PostgreSQL ([#39875](https://github.com/laravel/framework/pull/39875))
+- Added method filterNulls() to Arr ([#39921](https://github.com/laravel/framework/pull/39921))
+
+### Fixed
+- Fixes AsEncrypted traits not respecting nullable columns ([#39848](https://github.com/laravel/framework/pull/39848), [4c32bf8](https://github.com/laravel/framework/commit/4c32bf815c93fe6fb6f78f1f9771e6baac379bd6))
+- Fixed http client factory class exists bugfix ([#39851](https://github.com/laravel/framework/pull/39851))
+- Fixed calls to Connection::rollBack() with incorrect case ([#39874](https://github.com/laravel/framework/pull/39874))
+- Fixed bug where columns would be guarded while filling Eloquent models during unit tests ([#39880](https://github.com/laravel/framework/pull/39880))
+- Fixed for dropping columns when using MSSQL as database ([#39905](https://github.com/laravel/framework/pull/39905))
+
+### Changed
+- Add proper paging offset when possible to sql server ([#39863](https://github.com/laravel/framework/pull/39863))
+- Correct pagination message in src/Illuminate/Pagination/resources/views/tailwind.blade.php ([#39894](https://github.com/laravel/framework/pull/39894))
+
+
+## [v8.74.0 (2021-11-30)](https://github.com/laravel/framework/compare/v8.73.2...v8.74.0)
+
+### Added
+- Added optional `except` parameter to the PruneCommand ([#39749](https://github.com/laravel/framework/pull/39749), [be4afcc](https://github.com/laravel/framework/commit/be4afcc6c2a42402d4404263c6a5ca901d067dd2))
+- Added `Illuminate/Foundation/Application::hasDebugModeEnabled()` ([#39755](https://github.com/laravel/framework/pull/39755))
+- Added `Illuminate/Support/Facades/Event::fakeExcept()` and `Illuminate/Support/Facades/Event::fakeExceptFor()` ([#39752](https://github.com/laravel/framework/pull/39752))
+- Added aggregate method to Eloquent passthru ([#39772](https://github.com/laravel/framework/pull/39772))
+- Added `undot()` method to Arr helpers and Collections ([#39729](https://github.com/laravel/framework/pull/39729))
+- Added `reverse` method to `Str` ([#39816](https://github.com/laravel/framework/pull/39816))
+- Added possibility to customize type column in database notifications using databaseType method ([#39811](https://github.com/laravel/framework/pull/39811))
+- Added Fulltext Index ([#39821](https://github.com/laravel/framework/pull/39821))
+
+### Fixed
+- Fixed bus service provider when loaded outside of the framework ([#39740](https://github.com/laravel/framework/pull/39740))
+- Fixes logging deprecations when null driver do not exist ([#39809](https://github.com/laravel/framework/pull/39809))
+
+### Changed
+- Validate connection name before resolve queue connection ([#39751](https://github.com/laravel/framework/pull/39751))
+- Bump Symfony to 5.4 ([#39827](https://github.com/laravel/framework/pull/39827))
+- Optimize the execution time of the unique method ([#39822](https://github.com/laravel/framework/pull/39822))
+
+
+## [v8.73.2 (2021-11-23)](https://github.com/laravel/framework/compare/v8.73.1...v8.73.2)
+
+### Added
+- Added `Illuminate/Foundation/Testing/Concerns/InteractsWithContainer::forgetMock()` ([#39713](https://github.com/laravel/framework/pull/39713))
+- Added custom pagination information in resource ([#39600](https://github.com/laravel/framework/pull/39600))
+
+
+## [v8.73.1 (2021-11-20)](https://github.com/laravel/framework/compare/v8.73.0...v8.73.1)
+
+### Revert
+- Revert of [Use parents to resolve middleware priority in `SortedMiddleware`](https://github.com/laravel/framework/pull/39647) ([#39706](https://github.com/laravel/framework/pull/39706))
+
+
+## [v8.73.0 (2021-11-19)](https://github.com/laravel/framework/compare/v8.72.0...v8.73.0)
+
+### Added
+- Added .phar to blocked PHP extensions in validator ([#39666](https://github.com/laravel/framework/pull/39666))
+- Allow a Closure to be passed as a ttl in Cache remember() method ([#39678](https://github.com/laravel/framework/pull/39678))
+- Added Prohibits validation rule to dependentRules property ([#39677](https://github.com/laravel/framework/pull/39677))
+- Implement lazyById in descending order ([#39646](https://github.com/laravel/framework/pull/39646))
+
+### Fixed
+- Fixed `Illuminate/Auth/Notifications/ResetPassword::toMail()` ([969f101](https://github.com/laravel/framework/commit/969f1014ec07efba803f887a33fde29e305c9cb1))
+- Fixed assertSoftDeleted & assertNotSoftDeleted ([#39673](https://github.com/laravel/framework/pull/39673))
+
+
+## [v8.72.0 (2021-11-17)](https://github.com/laravel/framework/compare/v8.71.0...v8.72.0)
+
+### Added
+- Added extra method in PasswortReset for reset URL to match the structure of VerifyEmail ([#39652](https://github.com/laravel/framework/pull/39652))
+- Added support for countables to the `Illuminate/Support/Pluralizer::plural()` ([#39641](https://github.com/laravel/framework/pull/39641))
+- Allow users to specify options for migrate:fresh for DatabaseMigration trait ([#39637](https://github.com/laravel/framework/pull/39637))
+
+### Fixed
+- Casts $value to the int only when not null in `Illuminate/Database/Query/Builder::limit()` ([#39644](https://github.com/laravel/framework/pull/39644))
+
+### Changed
+- Use parents to resolve middleware priority in `SortedMiddleware` ([#39647](https://github.com/laravel/framework/pull/39647))
 
 
 ## [v8.71.0 (2021-11-16)](https://github.com/laravel/framework/compare/v8.70.2...v8.71.0)
