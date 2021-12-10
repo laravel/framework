@@ -16,6 +16,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Foundation\CustomException;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
@@ -513,7 +514,7 @@ class HttpClientTest extends TestCase
     {
         $resp = new Response(new Psr7Response());
 
-        $this->assertNull($resp->toException());
+        $this->assertInstanceOf(RequestException::class, $resp->toException());
     }
 
     public function testExceptionAccessorOnFailure()
@@ -570,6 +571,33 @@ class HttpClientTest extends TestCase
         $response = new Psr7Response(403);
 
         throw new RequestException(new Response($response));
+    }
+
+    public function testThrowThrowsOnServerErrorFailure()
+    {
+        $this->expectException(RequestException::class);
+        $response = new Response(new Psr7Response(500));
+        $response->throw();
+    }
+
+    public function testDoNotThrowOnRedirect()
+    {
+        $response = new Response(new Psr7Response(302));
+        $this->assertSame($response, $response->throw());
+    }
+
+    public function testCanThrowCustomExceptionByUsingThrowCallback()
+    {
+        $this->expectException(CustomException::class);
+        $response = new Response(new Psr7Response(500));
+        $response->throw(fn() => throw new CustomException());
+    }
+
+    public function testThrowCallbackIsNotCalledOnSuccesfulResult()
+    {
+        $this->expectNotToPerformAssertions();
+        $response = new Response(new Psr7Response(200));
+        $response->throw(fn() => $this->fail('Callback should not be called'));
     }
 
     public function testOnErrorDoesntCallClosureOnInformational()

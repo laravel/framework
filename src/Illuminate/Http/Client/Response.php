@@ -260,7 +260,7 @@ class Response implements ArrayAccess
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @param \Closure|null $callback called when response is not successful. Throw inside this callback if you want to return your custom excpetion.
+     * @param \Closure|null $callback called when response is not successful. Throw inside this callback if you want to return your custom Exception.
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
@@ -284,13 +284,15 @@ class Response implements ArrayAccess
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
      * @param  bool  $condition
+     * @param \Closure|null $callback called when condigtion fails and response is not successful. Throw inside this callback if you want to return your custom Exception.
+     *
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throwIf($condition)
+    public function throwIf($condition, $callback = null)
     {
-        return $condition ? $this->throw() : $this;
+        return $condition ? $this->throw($callback) : $this;
     }
 
     /**
