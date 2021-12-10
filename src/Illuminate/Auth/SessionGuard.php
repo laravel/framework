@@ -147,7 +147,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return $this->user;
         }
 
-        // Indicate the we already attempted to retrieve the user 
+        // Indicate the we already attempted to retrieve the user
         $this->retrievalAttempted = true;
 
         $id = $this->session->get($this->getName());
