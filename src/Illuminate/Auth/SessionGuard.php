@@ -172,12 +172,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             }
         }
 
-        // If the user is still null though there is a stored user id we clear the
-        // user data from storage to prevent any further attempts to retrieve the user.
-        if (! is_null($id) && is_null($this->user)) {
-            $this->clearUserDataFromStorage();
-        }
-
         return $this->user;
     }
 
