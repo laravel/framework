@@ -15,10 +15,13 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
     {
         parent::resolveApplicationConfiguration($app);
 
-        $app['config']['database.dbal.types'] = ['xml' => XmlType::class];
+        $app['config']['database.dbal.types'] = [
+            'xml' => PostgresXmlType::class,
+            'bit' => MySQLBitType::class,
+        ];
     }
 
-    public function test_rename_column_with_custom_doctrine_type_listed_in_config()
+    public function test_rename_column_in_postgres_with_custom_doctrine_type_listed_in_config()
     {
         if ($this->driver !== 'pgsql') {
             $this->markTestSkipped('Test requires a Postgres connection.');
@@ -39,9 +42,31 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         $this->assertFalse(Schema::hasColumn('test', 'test_column'));
         $this->assertTrue(Schema::hasColumn('test', 'renamed_column'));
     }
+
+    public function test_rename_column_in_mysql_with_custom_doctrine_type_listed_in_config()
+    {
+        if ($this->driver !== 'mysql') {
+            $this->markTestSkipped('Test requires a MySQL connection.');
+        }
+
+        Grammar::macro('typeBit', function () {
+            return 'bit';
+        });
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->addColumn('bit', 'test_column');
+        });
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->renameColumn('test_column', 'renamed_column');
+        });
+
+        $this->assertFalse(Schema::hasColumn('test', 'test_column'));
+        $this->assertTrue(Schema::hasColumn('test', 'renamed_column'));
+    }
 }
 
-class XmlType extends Type
+class PostgresXmlType extends Type
 {
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
@@ -51,5 +76,18 @@ class XmlType extends Type
     public function getName()
     {
         return 'xml';
+    }
+}
+
+class MySQLBitType extends Type
+{
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    {
+        return 'bit';
+    }
+
+    public function getName()
+    {
+        return 'bit';
     }
 }
