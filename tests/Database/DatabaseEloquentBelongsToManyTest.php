@@ -61,8 +61,8 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testCreateWithDesiredAttributesUsingUpdateOrCreate()
     {
-        /** @var BelongsToManySyncTestTestUser $user */
-        $user = BelongsToManySyncTestTestUser::create();
+        /** @var FakeUpdateOrCreateUser $user */
+        $user = FakeUpdateOrCreateUser::create();
 
         $user->articles()->updateOrCreate(
             ['title' => 'Fixing UpdateOrCreate'],
@@ -76,8 +76,8 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
 
     public function testUpdateWithDesiredAttributesUsingUpdateOrCreate()
     {
-        /** @var BelongsToManySyncTestTestUser $user */
-        $user = BelongsToManySyncTestTestUser::create();
+        /** @var FakeUpdateOrCreateUser $user */
+        $user = FakeUpdateOrCreateUser::create();
         $user->articles()->create([
             'title' => $title = 'Fixing UpdateOrCreate',
             'description' => 'Not fixed',
@@ -114,7 +114,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
     }
 }
 
-class BelongsToManySyncTestTestUser extends Model
+class FakeUpdateOrCreateUser extends Model
 {
     protected $table = 'users';
 
@@ -124,11 +124,11 @@ class BelongsToManySyncTestTestUser extends Model
 
     public function articles()
     {
-        return $this->belongsToMany(BelongsToManySyncTestTestArticle::class, 'article_user', 'user_id', 'article_id');
+        return $this->belongsToMany(FakeUpdateOrCreateArticle::class, 'article_user', 'user_id', 'article_id');
     }
 }
 
-class BelongsToManySyncTestTestArticle extends Model
+class FakeUpdateOrCreateArticle extends Model
 {
     protected $table = 'articles';
 
