@@ -1509,9 +1509,9 @@ class Builder implements BuilderContract
      * @param  array|\Illuminate\Database\Query\Expression  $columns
      * @return array
      */
-    public function qualifyColumns($columns)
+    public function qualifyColumns(...$columns)
     {
-        return $this->model->qualifyColumns($columns);
+        return $this->model->qualifyColumns(...$columns);
     }
 
     /**
