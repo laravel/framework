@@ -15,10 +15,57 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
     {
         parent::resolveApplicationConfiguration($app);
 
+        $app['config']['database.connections.sqlite.database'] = ':memory:';
         $app['config']['database.dbal.types'] = [
             'xml' => PostgresXmlType::class,
             'bit' => MySQLBitType::class,
         ];
+    }
+
+    public function test_register_custom_doctrine_types_on_multiple_database_connections_with_postgres()
+    {
+        if ($this->driver !== 'pgsql') {
+            $this->markTestSkipped('Test requires a Postgres connection.');
+        }
+
+        $this->assertTrue(
+            $this->app['db']->connection('pgsql')
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->hasDoctrineTypeMappingFor('xml')
+        );
+
+        // Custom type mappings are registered for a connection when it's created,
+        // this is not the default connection but it has the custom type mappings
+        $this->assertTrue(
+            $this->app['db']->connection('sqlite')
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->hasDoctrineTypeMappingFor('xml')
+        );
+    }
+
+    public function test_register_custom_doctrine_types_on_multiple_database_connections_with_mysql()
+    {
+        if ($this->driver !== 'mysql') {
+            $this->markTestSkipped('Test requires a MySQL connection.');
+        }
+
+        $this->assertTrue(
+            $this->app['db']->connection('mysql')
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->hasDoctrineTypeMappingFor('xml')
+        );
+
+        // Custom type mappings are registered for a connection when it's created,
+        // this is not the default connection but it has the custom type mappings
+        $this->assertTrue(
+            $this->app['db']->connection('sqlite')
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->hasDoctrineTypeMappingFor('xml')
+        );
     }
 
     public function test_rename_column_with_postgres_and_custom_doctrine_type_in_config()
