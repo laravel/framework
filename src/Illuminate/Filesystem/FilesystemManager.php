@@ -3,9 +3,11 @@
 namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
+use Aws\Sts\StsClient;
 use Closure;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
@@ -218,6 +220,33 @@ class FilesystemManager implements FactoryContract
     public function createS3Driver(array $config)
     {
         $s3Config = $this->formatS3Config($config);
+
+        if (! empty($config['role_arn'])) {
+
+            if (! empty($config['source_profile'])) {
+                if ($sourceProfile = $this->getConfig($config['source_profile'])) {
+                    $stsClient = new StsClient($this->formatS3Config($sourceProfile));
+                } else {
+                    throw new InvalidArgumentException(
+                        "source_profile [{$config['source_profile']}] does not exist");
+                }
+            } else {
+                $stsClient = new StsClient($s3Config);
+            }
+
+            if (empty($config['role_session_name'])) {
+                //$config['role_session_name'] = preg_replace('/[^\w+=,.@-]/','',$this->app['config']['app.name']);
+                throw new InvalidArgumentException('[role_session_name] is missing and is a required parameter');
+            }
+
+            $params = [];
+            foreach(['role_arn','role_session_name','external_id'] as $k) {
+                if (! empty($config[$k])) $params[Str::studly($k)] = $config[$k];
+            }
+
+            $result = $stsClient->AssumeRole($params);
+            $s3Config['credentials'] = $stsClient->createCredentials($result);
+        }
 
         $root = $s3Config['root'] ?? null;
 
