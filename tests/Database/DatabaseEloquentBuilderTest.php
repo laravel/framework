@@ -882,6 +882,12 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "table" where "one" = ? or ("two" = ?)', $query->toSql());
     }
 
+    public function testFromGetterReturnsBaseQueryValue()
+    {
+        $builder = $this->getBuilder();
+        $this->assertEquals($builder->from, $builder->getQuery()->from);
+    }
+
     public function testRealQueryChainedHigherOrderOrWhereScopes()
     {
         $model = new EloquentBuilderTestHigherOrderWhereScopeStub;

@@ -21,6 +21,7 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
+ * @property-read string from
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
@@ -1598,6 +1599,10 @@ class Builder
     {
         if ($key === 'orWhere') {
             return new HigherOrderBuilderProxy($this, $key);
+        }
+
+        if ($key === 'from') {
+            return $this->query->from;
         }
 
         throw new Exception("Property [{$key}] does not exist on the Eloquent builder instance.");
