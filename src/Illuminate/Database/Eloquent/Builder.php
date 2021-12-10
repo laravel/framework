@@ -21,7 +21,7 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
- * @property-read string from
+ * @property-read string $from
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
