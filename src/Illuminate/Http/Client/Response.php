@@ -260,28 +260,24 @@ class Response implements ArrayAccess
     /**
      * Throw an exception if a server or client error occurred.
      *
-     * @param  \Closure|null $callback
+     * @param \Closure|null $callback called when response is not successful. Throw inside this callback if you want to return your custom excpetion.
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
+     * @throws \InvalidArgumentException when $callback is not callable.
      */
     public function throw($callback = null)
     {
-        if ($this->failed()) {
-            if($callback === null) {
-                throw $this->toException();
-            }
-            if(is_callable($callback)) {
-                $exception = $callback($this);
-                if(!($exception instanceof \Throwable)) {
-                    throw new \InvalidArgumentException('$callback method must return a Throwable.');
-                }
-                throw $exception;
-            }
+        if($callback !== null && !is_callable($callback)) {
             throw new \InvalidArgumentException('$callback method must be a callable.');
         }
-
-        return $this;
+        if(!$this->failed()){
+            return $this;
+        }
+        if($callback !== null) {
+            $callback($this);
+        }
+        throw $this->toException();
     }
 
     /**
