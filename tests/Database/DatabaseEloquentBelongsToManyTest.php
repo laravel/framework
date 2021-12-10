@@ -4,8 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Tests\Database\EloquentRelationshipsTest\FakeRelationship;
-use Illuminate\Tests\Database\EloquentRelationshipsTest\Post;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyTest extends TestCase
