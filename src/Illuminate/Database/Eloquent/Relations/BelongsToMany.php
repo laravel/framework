@@ -634,7 +634,7 @@ class BelongsToMany extends Relation
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            return $this->create($values, $joining, $touch);
+            return $this->create(array_merge($attributes, $values), $joining, $touch);
         }
 
         $instance->fill($values);
