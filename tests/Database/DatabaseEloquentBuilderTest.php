@@ -1803,6 +1803,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $query = m::mock(BaseBuilder::class);
         $query->shouldReceive('from')->with('foo_table');
+        $query->shouldReceive('getSourceTable')->withNoArgs();
 
         return $query;
     }
