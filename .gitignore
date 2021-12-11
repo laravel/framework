@@ -1,4 +1,5 @@
 /vendor
+/vendor.nosync
 composer.phar
 composer.lock
 .DS_Store
