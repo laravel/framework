@@ -168,6 +168,8 @@ abstract class GeneratorCommand extends Command
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->handleTestCreation($path);
         }
+
+        $this->openWithIde($path);
     }
 
     /**
@@ -409,6 +411,79 @@ abstract class GeneratorCommand extends Command
         $views = $this->laravel['config']['view.paths'][0] ?? resource_path('views');
 
         return $views.($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+
+    /**
+     * Get the editor file opener URL by its name.
+     *
+     * @param string $ide
+     * @return string
+     */
+    protected function getEditorUrl($ide)
+    {
+        switch ($ide) {
+            case ('sublime'):
+                return 'subl://open?url=file://%path';
+            case ('textmate'):
+                return 'txmt://open?url=file://%path';
+            case ('emacs'):
+                return 'emacs://open?url=file://%path';
+            case ('macvim'):
+                return 'mvim://open/?url=file://%path';
+            case ('phpstorm'):
+                return 'phpstorm://open?file=%path';
+            case ('idea'):
+                return 'idea://open?file=%path';
+            case ('vscode'):
+                return 'vscode://file/%path';
+            case ('vscode-insiders'):
+                return 'vscode-insiders://file/%path';
+            case ('vscode-remote'):
+                return 'vscode://vscode-remote/%path';
+            case ('vscode-insiders-remote'):
+                return 'vscode-insiders://vscode-remote/%path';
+            case ('atom'):
+                return 'atom://core/open/file?filename=%path';
+            case ('nova'):
+                return 'nova://core/open/file?filename=%path';
+            case ('netbeans'):
+                return 'netbeans://open/?f=%path';
+            case ('xdebug'):
+                return 'xdebug://%path';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Open resulted file path with the configured IDE.
+     *
+     * @param string $path
+     * @return string|false|void
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     */
+    protected function openWithIde($path)
+    {
+        $openEditorUrl = $this->getEditorUrl(config('app.ide'));
+
+        if (!$openEditorUrl) {
+            return;
+        }
+
+        if (windows_os()) {
+            return exec('explorer ' . str_replace('%path', $path, $openEditorUrl));
+        }
+
+        if (PHP_OS_FAMILY === 'Linux') {
+            return exec('xdg-open ' . str_replace('%path', $path, $openEditorUrl));
+        }
+
+        if (PHP_OS_FAMILY === 'Darwin') {
+            return exec('open ' . str_replace('%path', $path, $openEditorUrl));
+        }
     }
 
     /**
