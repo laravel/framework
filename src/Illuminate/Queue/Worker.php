@@ -159,14 +159,14 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            if ($supportsAsyncSignals) {
-                $this->registerTimeoutHandler($job, $options);
-            }
-
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
             if ($job) {
+                if ($supportsAsyncSignals) {
+                    $this->registerTimeoutHandler($job, $options);
+                }
+
                 $jobsProcessed++;
 
                 $this->runJob($job, $connectionName, $options);
@@ -174,12 +174,12 @@ class Worker
                 if ($options->rest > 0) {
                     $this->sleep($options->rest);
                 }
+
+                if ($supportsAsyncSignals) {
+                    $this->resetTimeoutHandler();
+                }
             } else {
                 $this->sleep($options->sleep);
-            }
-
-            if ($supportsAsyncSignals) {
-                $this->resetTimeoutHandler();
             }
 
             // Finally, we will check to see if we have exceeded our memory limits or if
@@ -198,7 +198,7 @@ class Worker
     /**
      * Register the worker timeout handler.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
@@ -208,19 +208,17 @@ class Worker
         // process if it is running too long because it has frozen. This uses the async
         // signals supported in recent versions of PHP to accomplish it conveniently.
         pcntl_signal(SIGALRM, function () use ($job, $options) {
-            if ($job) {
-                $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->maxAttemptsExceededException($job)
-                );
+            $this->markJobAsFailedIfWillExceedMaxAttempts(
+                $job->getConnectionName(), $job, (int) $options->maxTries, $e = $this->maxAttemptsExceededException($job)
+            );
 
-                $this->markJobAsFailedIfWillExceedMaxExceptions(
-                    $job->getConnectionName(), $job, $e
-                );
+            $this->markJobAsFailedIfWillExceedMaxExceptions(
+                $job->getConnectionName(), $job, $e
+            );
 
-                $this->markJobAsFailedIfItShouldFailOnTimeout(
-                    $job->getConnectionName(), $job, $e
-                );
-            }
+            $this->markJobAsFailedIfItShouldFailOnTimeout(
+                $job->getConnectionName(), $job, $e
+            );
 
             $this->kill(static::EXIT_ERROR);
         });
@@ -243,13 +241,13 @@ class Worker
     /**
      * Get the appropriate timeout for the given job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return int
      */
     protected function timeoutForJob($job, WorkerOptions $options)
     {
-        return $job && ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
+        return ! is_null($job->timeout()) ? $job->timeout() : $options->timeout;
     }
 
     /**

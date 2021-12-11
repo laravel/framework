@@ -133,6 +133,15 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals(5, $worker->sleptFor);
     }
 
+    public function testWorkerAvoidTimoutWhenSleeping()
+    {
+        $worker = new killedproofWorker(
+            ...$this->workerDependencies('default', ['queue' => []])
+        );
+        $worker->daemon('default', 'queue', $this->workerOptions(['sleep' => 1.1, 'timeout' => 1]));
+        $this->assertFalse($worker->killed);
+    }
+
     public function testJobIsReleasedOnException()
     {
         $e = new RuntimeException;
@@ -419,6 +428,30 @@ class InsomniacWorker extends Worker
     public function memoryExceeded($memoryLimit)
     {
         return $this->stopOnMemoryExceeded;
+    }
+}
+
+/**
+ * Fakes.
+ */
+class killedproofWorker extends Worker
+{
+    public $killed = false;
+    public $shouldQuit = true;
+
+    public function stop($status = 0)
+    {
+        return $status;
+    }
+
+    public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
+    {
+        return ! ($this->isDownForMaintenance)();
+    }
+
+    public function kill($status = 0)
+    {
+        $this->killed = true;
     }
 }
 
