@@ -1537,6 +1537,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
     }
 
+    public function testGetSourceTable()
+    {
+        $builder = $this->getBuilder();
+        $this->assertEquals($builder->from, $builder->getSourceTable());
+    }
+
     public function testWhereExists()
     {
         $builder = $this->getBuilder();

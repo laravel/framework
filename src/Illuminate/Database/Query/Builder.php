@@ -372,9 +372,10 @@ class Builder
         if ($query->getConnection()->getDatabaseName() !==
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
+            $tableName = $query->getSourceTable();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
-                $query->from($databaseName.'.'.$query->from);
+            if (strpos($tableName, $databaseName) !== 0 && strpos($tableName, '.') === false) {
+                $query->from($databaseName.'.'.$tableName);
             }
         }
 
@@ -3364,6 +3365,16 @@ class Builder
     public function getGrammar()
     {
         return $this->grammar;
+    }
+
+    /**
+     * Get the table which the query is targeting.
+     *
+     * @return string
+     */
+    public function getSourceTable()
+    {
+        return $this->from;
     }
 
     /**

@@ -1588,6 +1588,16 @@ class Builder
     }
 
     /**
+     * Get the table which the query is targeting.
+     *
+     * @return string
+     */
+    public function getSourceTable()
+    {
+        return $this->query->getSourceTable();
+    }
+
+    /**
      * Dynamically access builder proxies.
      *
      * @param  string  $key
