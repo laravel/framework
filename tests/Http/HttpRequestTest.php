@@ -533,7 +533,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
     }
 
-    public function testDatetimeMethod()
+    public function testDateMethod()
     {
         $request = Request::create('/', 'GET', [
             'as_null' => null,
@@ -549,16 +549,16 @@ class HttpRequestTest extends TestCase
 
         $current = Carbon::create(2020, 1, 1, 16, 30, 25);
 
-        $this->assertNull($request->datetime('as_null'));
-        $this->assertNull($request->datetime('doesnt_exists'));
-        $this->assertNull($request->datetime('as_invalid'));
+        $this->assertNull($request->date('as_null'));
+        $this->assertNull($request->date('doesnt_exists'));
+        $this->assertNull($request->date('as_invalid'));
 
-        $this->assertEquals($current, $request->datetime('as_datetime'));
-        $this->assertEquals($current, $request->datetime('as_format', 'U'));
-        $this->assertEquals($current, $request->datetime('as_timezone', null, 'America/Santiago'));
+        $this->assertEquals($current, $request->date('as_datetime'));
+        $this->assertEquals($current, $request->date('as_format', 'U'));
+        $this->assertEquals($current, $request->date('as_timezone', null, 'America/Santiago'));
 
-        $this->assertTrue($request->datetime('as_date')->isSameDay($current));
-        $this->assertTrue($request->datetime('as_time')->isSameSecond('16:30:25'));
+        $this->assertTrue($request->date('as_date')->isSameDay($current));
+        $this->assertTrue($request->date('as_time')->isSameSecond('16:30:25'));
     }
 
     public function testArrayAccess()

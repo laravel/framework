@@ -317,7 +317,7 @@ trait InteractsWithInput
      * @param  string|null  $tz
      * @return \Illuminate\Support\Carbon|null
      */
-    public function datetime($key, $format = null, $tz = null)
+    public function date($key, $format = null, $tz = null)
     {
         if ($this->isNotFilled($key)) {
             return null;
