@@ -717,9 +717,9 @@ class Stringable implements JsonSerializable
      * @param  array|int|null  $length
      * @return string|array
      */
-    public function substrReplace($string, $replace, $offset = 0, $length = null)
+    public function substrReplace($replace, $offset = 0, $length = null)
     {
-        return Str::substrReplace($this->value, $replace, $offset, $length);
+        return new static(Str::substrReplace($this->value, $replace, $offset, $length));
     }
 
     /**
