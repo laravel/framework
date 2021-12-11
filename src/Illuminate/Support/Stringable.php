@@ -710,7 +710,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Replace text within a portion of a string
+     * Replace text within a portion of a string.
      *
      * @param  string|array  $replace
      * @param  array|int  $offset

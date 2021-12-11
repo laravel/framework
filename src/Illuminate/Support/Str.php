@@ -876,7 +876,7 @@ class Str
     }
 
     /**
-     * Replace text within a portion of a string
+     * Replace text within a portion of a string.
      *
      * @param  string|array  $string
      * @param  string|array  $replace
