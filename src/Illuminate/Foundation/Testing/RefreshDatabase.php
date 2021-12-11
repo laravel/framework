@@ -120,11 +120,12 @@ trait RefreshDatabase
     }
 
     /**
-     * Perform any work that should take place once the database has finished migrating.
+     * Perform any work that should take place once the database has finished refreshing.
      *
      * @return void
      */
     protected function afterRefreshingDatabase()
     {
+        // ...
     }
 }
