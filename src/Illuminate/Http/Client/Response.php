@@ -151,7 +151,17 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Determine if the response code was "Unauthorized".
+     * Determine if the response was a redirect.
+     *
+     * @return bool
+     */
+    public function redirect()
+    {
+        return $this->status() >= 300 && $this->status() < 400;
+    }
+
+    /**
+     * Determine if the response was a 401 "Unauthorized" response.
      *
      * @return bool
      */
@@ -161,23 +171,13 @@ class Response implements ArrayAccess
     }
 
     /**
-     * Determine if the response code was "Forbidden".
+     * Determine if the response was a 403 "Forbidden" response.
      *
      * @return bool
      */
     public function forbidden()
     {
         return $this->status() === 403;
-    }
-
-    /**
-     * Determine if the response was a redirect.
-     *
-     * @return bool
-     */
-    public function redirect()
-    {
-        return $this->status() >= 300 && $this->status() < 400;
     }
 
     /**
