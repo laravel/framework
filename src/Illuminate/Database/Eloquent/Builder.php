@@ -384,6 +384,10 @@ class Builder
      */
     public function find($id, $columns = ['*'])
     {
+        if (is_null($id)) {
+            return null;
+        }
+
         if (is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
@@ -483,6 +487,24 @@ class Builder
         }
 
         return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
+            $instance->save();
+        });
+    }
+
+    /**
+     * Find a model by its primary key. If not found, creates a new record.
+     *
+     * @param  mixed  $id
+     * @param  array  $values
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function findOrCreate($id, array $values = [])
+    {
+        if (! is_null($instance = $this->find($id))) {
+            return $instance;
+        }
+
+        return tap($this->newModelInstance($values), function ($instance) {
             $instance->save();
         });
     }
