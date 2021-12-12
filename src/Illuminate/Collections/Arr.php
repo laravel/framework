@@ -744,4 +744,44 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Returns true if $array1 and $array2 have the same key/value pairs.
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @return bool
+     */
+    public function equal(array $array1, array $array2)
+    {
+        return count($array1) === count($array2) && $array1 == $array2;
+    }
+
+    /**
+     * Returns true if $array1 and $array2 have the same key/value pairs in the same order and of the same types.
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @return bool
+     */
+    public function identical(array $array1, array $array2)
+    {
+        return count($array1) === count($array2) && $array1 === $array2;
+    }
+
+    /**
+     * Returns true if $array1 and $array2 have the same values. If $strict = true then values should be of the same types.
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @param  bool  $strict
+     * @return bool
+     */
+    public function same(array $array1, array $array2, bool $strict = false)
+    {
+        $array1 = array_values($array1);
+        $array2 = array_values($array2);
+
+        return $strict ? self::identical($array1, $array2) : self::equal($array1, $array2);
+    }
 }
