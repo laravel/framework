@@ -1775,11 +1775,11 @@ class Builder
      * User::whereIf(!$check,'name', fn($q)=>$q->where('name','laravel', fn($q)=>$q->where('name','lumen');
      *      # select * from users name = 'lumen' and deleted_at is null
      *
-     * @param  bool  $condition
+     * @param  mixed  $condition
      * @param  mixed  $arguments
      * @return $this
      */
-    public function whereIf(bool $condition, ...$arguments)
+    public function whereIf($condition, ...$arguments)
     {
         if ($condition) {
             return $arguments[0] instanceof \Closure ? $arguments[0]($this, $condition) : $this->where(...$arguments);
