@@ -556,7 +556,7 @@ class Worker
         $totalExceptions = $this->cache->get($jobExceptionsKey);
         if (is_null($totalExceptions)) {
             $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
-            
+
             return 0;
         }
 
