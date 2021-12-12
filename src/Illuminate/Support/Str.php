@@ -769,6 +769,9 @@ class Str
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
 
+        // Convert a '+' to a 'plus'
+        $title = strtr($title, '+', 'plus');
+
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
         // Replace @ with the word 'at'
