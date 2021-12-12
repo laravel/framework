@@ -529,6 +529,40 @@ class Worker
     }
 
     /**
+     * Get the stored key for job's total number of exceptions
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return string
+     */
+    private function getJobTotalExceptionsKey($job)
+    {
+        return 'job-exceptions:' . $job->uuid();
+    }
+
+    /**
+     * Get the job's total number of exceptions
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return int|null
+     */
+    private function getJobTotalExceptions($job)
+    {
+        if (! $this->cache || is_null($job->uuid())) {
+            return;
+        }
+
+        $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
+
+        $totalExceptions = $this->cache->get($jobExceptionsKey);
+        if (is_null($totalExceptions)) {
+            $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
+            return 0;
+        }
+
+        return $totalExceptions;
+    }
+
+    /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
      * @param  string  $connectionName
@@ -538,19 +572,23 @@ class Worker
      */
     protected function markJobAsFailedIfWillExceedMaxExceptions($connectionName, $job, Throwable $e)
     {
-        if (! $this->cache || is_null($uuid = $job->uuid()) ||
+        if (! $this->cache || is_null($job->uuid()) ||
             is_null($maxExceptions = $job->maxExceptions())) {
             return;
         }
 
-        if (! $this->cache->get('job-exceptions:'.$uuid)) {
-            $this->cache->put('job-exceptions:'.$uuid, 0, Carbon::now()->addDay());
-        }
+        $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
 
-        if ($maxExceptions <= $this->cache->increment('job-exceptions:'.$uuid)) {
-            $this->cache->forget('job-exceptions:'.$uuid);
+        $totalExceptions = $this->getJobTotalExceptions($job);
 
-            $this->failJob($job, $e);
+        if (! is_null($totalExceptions)) {
+            if ($maxExceptions <= $totalExceptions + 1) {
+                $this->cache->forget($jobExceptionsKey);
+
+                $this->failJob($job, $e);
+            } else {
+                $this->cache->increment($jobExceptionsKey);
+            }
         }
     }
 
@@ -597,7 +635,19 @@ class Worker
                         : $options->backoff
         );
 
-        return (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
+        // Determine the the backoff value based on total of exceptions
+        $totalExceptions = $this->getJobTotalExceptions($job);
+        if (! is_null($totalExceptions)) {
+            $calculatedBackoff = (int) ($backoff[$totalExceptions - 1] ?? last($backoff));
+        }
+
+        // If the value is not available, we fallback to the total of attempts
+        else {
+            $calculatedBackoff = (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
+        }
+
+
+        return $calculatedBackoff;
     }
 
     /**
