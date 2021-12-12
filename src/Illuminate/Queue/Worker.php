@@ -529,18 +529,18 @@ class Worker
     }
 
     /**
-     * Get the stored key for job's total number of exceptions
+     * Get the stored key for job's total number of exceptions.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return string
      */
     private function getJobTotalExceptionsKey($job)
     {
-        return 'job-exceptions:' . $job->uuid();
+        return 'job-exceptions:'.$job->uuid();
     }
 
     /**
-     * Get the job's total number of exceptions
+     * Get the job's total number of exceptions.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return int|null
