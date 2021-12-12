@@ -116,7 +116,7 @@ class TrustProxies
             case 'HEADER_X_FORWARDED_PROTO':
             case Request::HEADER_X_FORWARDED_PROTO:
                 return Request::HEADER_X_FORWARDED_PROTO;
-            
+
             case 'HEADER_X_FORWARDED_PREFIX':
             case Request::HEADER_X_FORWARDED_PREFIX:
                 return Request::HEADER_X_FORWARDED_PREFIX;
