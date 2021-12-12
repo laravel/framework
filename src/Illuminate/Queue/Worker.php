@@ -556,6 +556,7 @@ class Worker
         $totalExceptions = $this->cache->get($jobExceptionsKey);
         if (is_null($totalExceptions)) {
             $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
+            
             return 0;
         }
 
@@ -645,7 +646,6 @@ class Worker
         else {
             $calculatedBackoff = (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
         }
-
 
         return $calculatedBackoff;
     }
