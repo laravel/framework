@@ -18,9 +18,8 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
 
         $app['config']['database.connections.sqlite.database'] = ':memory:';
         $app['config']['database.dbal.types'] = [
-            'xml' => PostgresXmlType::class,
             'bit' => MySQLBitType::class,
-
+            'xml' => PostgresXmlType::class,
         ];
     }
 
