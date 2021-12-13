@@ -629,6 +629,10 @@ trait HasAttributes
         } elseif (isset(static::$attributeMutatorCache[get_class($this)][$key]) &&
                   static::$attributeMutatorCache[get_class($this)][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
+
+            $value = $value instanceof DateTimeInterface
+                        ? $this->serializeDate($value)
+                        : $value;
         } else {
             $value = $this->mutateAttribute($key, $value);
         }
