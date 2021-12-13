@@ -2,13 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Eloquent\Casts\AsAttribute;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\Fixtures\AttributeCastAddress;
+use Illuminate\Tests\Integration\Database\Fixtures\TestEloquentModelWithAttributeCast;
 
+if (PHP_MAJOR_VERSION >= 8) {
+    include 'Fixtures/AttributeCasting.php';
+}
+
+/**
+ * @requires PHP 8.0
+ */
 class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -21,7 +26,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
     public function testBasicCustomCasting()
     {
-        $model = new testEloquentModelWithAttributeCast;
+        $model = new TestEloquentModelWithAttributeCast;
         $model->uppercase = 'taylor';
 
         $this->assertSame('TAYLOR', $model->uppercase);
@@ -38,7 +43,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $model->uppercase = 'dries';
         $this->assertSame('TAYLOR', $model->getOriginal('uppercase'));
 
-        $model = new testEloquentModelWithAttributeCast;
+        $model = new TestEloquentModelWithAttributeCast;
         $model->uppercase = 'taylor';
         $model->syncOriginal();
         $model->uppercase = 'dries';
@@ -46,13 +51,13 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $this->assertSame('DRIES', $model->uppercase);
 
-        $model = new testEloquentModelWithAttributeCast;
+        $model = new TestEloquentModelWithAttributeCast;
 
         $model->address = $address = new AttributeCastAddress('110 Kingsbrook St.', 'My Childhood House');
         $address->lineOne = '117 Spencer St.';
         $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
 
-        $model = new testEloquentModelWithAttributeCast;
+        $model = new TestEloquentModelWithAttributeCast;
 
         $model->setRawAttributes([
             'address_line_one' => '110 Kingsbrook St.',
@@ -89,12 +94,12 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $this->assertSame(json_encode(['foo' => 'bar']), $model->getAttributes()['options']);
 
-        $model = new testEloquentModelWithAttributeCast(['options' => []]);
+        $model = new TestEloquentModelWithAttributeCast(['options' => []]);
         $model->syncOriginal();
         $model->options = ['foo' => 'bar'];
         $this->assertTrue($model->isDirty('options'));
 
-        $model = new testEloquentModelWithAttributeCast;
+        $model = new TestEloquentModelWithAttributeCast;
         $model->birthday_at = now();
         $this->assertIsString($model->toArray()['birthday_at']);
     }
@@ -175,86 +180,5 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
-    }
-}
-
-class testEloquentModelWithAttributeCast extends Model
-{
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var string[]
-     */
-    protected $guarded = [];
-
-    #[AsAttribute]
-    public function uppercase()
-    {
-        return new Attribute(
-            get: fn ($value) => strtoupper($value),
-            set: fn ($value) => strtoupper($value),
-        );
-    }
-
-    #[AsAttribute]
-    public function address()
-    {
-        return new Attribute(
-            get: function ($value, $attributes) {
-                if (is_null($attributes['address_line_one'])) {
-                    return;
-                }
-
-                return new AttributeCastAddress($attributes['address_line_one'], $attributes['address_line_two']);
-            },
-            set: function ($value) {
-                if (is_null($value)) {
-                    return [
-                        'address_line_one' => null,
-                        'address_line_two' => null,
-                    ];
-                }
-
-                return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
-            },
-        );
-    }
-
-    #[AsAttribute]
-    public function options()
-    {
-        return new Attribute(
-            get: fn ($value) => json_decode($value, true),
-            set: fn ($value) => json_encode($value),
-        );
-    }
-
-    #[AsAttribute]
-    public function birthdayAt()
-    {
-        return new Attribute(
-            get: fn ($value) => Carbon::parse($value),
-            set: fn ($value) => $value->format('Y-m-d'),
-        );
-    }
-
-    #[AsAttribute]
-    public function password()
-    {
-        return new Attribute(
-            set: fn ($value) => hash('sha256', $value)
-        );
-    }
-}
-
-class AttributeCastAddress
-{
-    public $lineOne;
-    public $lineTwo;
-
-    public function __construct($lineOne, $lineTwo)
-    {
-        $this->lineOne = $lineOne;
-        $this->lineTwo = $lineTwo;
     }
 }
