@@ -876,6 +876,24 @@ class Str
     }
 
     /**
+     * Replace text within a portion of a string.
+     *
+     * @param  string|array  $string
+     * @param  string|array  $replace
+     * @param  array|int  $offset
+     * @param  array|int|null  $length
+     * @return string|array
+     */
+    public static function substrReplace($string, $replace, $offset = 0, $length = null)
+    {
+        if ($length === null) {
+            $length = strlen($string);
+        }
+
+        return substr_replace($string, $replace, $offset, $length);
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
