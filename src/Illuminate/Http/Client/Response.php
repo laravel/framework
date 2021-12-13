@@ -121,6 +121,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Get the reason phrase of the response.
+     *
+     * @return string
+     */
+    public function reason()
+    {
+        return $this->response->getReasonPhrase();
+    }
+
+    /**
      * Get the effective URI of the response.
      *
      * @return \Psr\Http\Message\UriInterface|null
@@ -158,6 +168,26 @@ class Response implements ArrayAccess
     public function redirect()
     {
         return $this->status() >= 300 && $this->status() < 400;
+    }
+
+    /**
+     * Determine if the response was a 401 "Unauthorized" response.
+     *
+     * @return bool
+     */
+    public function unauthorized()
+    {
+        return $this->status() === 401;
+    }
+
+    /**
+     * Determine if the response was a 403 "Forbidden" response.
+     *
+     * @return bool
+     */
+    public function forbidden()
+    {
+        return $this->status() === 403;
     }
 
     /**

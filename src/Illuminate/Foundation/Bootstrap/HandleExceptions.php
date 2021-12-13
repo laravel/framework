@@ -86,6 +86,10 @@ class HandleExceptions
      */
     public function handleDeprecation($message, $file, $line)
     {
+        if (! class_exists(LogManager::class)) {
+            return;
+        }
+
         try {
             $logger = $this->app->make(LogManager::class);
         } catch (Exception $e) {

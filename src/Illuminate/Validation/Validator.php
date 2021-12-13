@@ -575,9 +575,12 @@ class Validator implements ValidatorContract
         // First we will get the correct keys for the given attribute in case the field is nested in
         // an array. Then we determine if the given rule accepts other field names as parameters.
         // If so, we will replace any asterisks found in the parameters with the correct keys.
-        if (($keys = $this->getExplicitKeys($attribute)) &&
-            $this->dependsOnOtherFields($rule)) {
-            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+        if ($this->dependsOnOtherFields($rule)) {
+            $parameters = $this->replaceDotInParameters($parameters);
+
+            if ($keys = $this->getExplicitKeys($attribute)) {
+                $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+            }
         }
 
         $value = $this->getValue($attribute);
@@ -658,6 +661,20 @@ class Validator implements ValidatorContract
         }
 
         return $attribute;
+    }
+
+    /**
+     * Replace each field parameter which has an escaped dot with the dot placeholder.
+     *
+     * @param  array  $parameters
+     * @param  array  $keys
+     * @return array
+     */
+    protected function replaceDotInParameters(array $parameters)
+    {
+        return array_map(function ($field) {
+            return str_replace('\.', $this->dotPlaceholder, $field);
+        }, $parameters);
     }
 
     /**
