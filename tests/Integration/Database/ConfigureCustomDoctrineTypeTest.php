@@ -22,7 +22,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         ];
     }
 
-    public function test_register_custom_doctrine_types_on_multiple_database_connections_with_postgres()
+    public function testRegisterCustomDoctrineTypesOnMultipleDatabaseConnectionsWithPostgres()
     {
         if ($this->driver !== 'pgsql') {
             $this->markTestSkipped('Test requires a Postgres connection.');
@@ -45,7 +45,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         );
     }
 
-    public function test_register_custom_doctrine_types_on_multiple_database_connections_with_mysql()
+    public function testRegisterCustomDoctrineTypesOnMultipleDatabaseConnectionsWithMysql()
     {
         if ($this->driver !== 'mysql') {
             $this->markTestSkipped('Test requires a MySQL connection.');
@@ -68,7 +68,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         );
     }
 
-    public function test_rename_column_with_postgres_and_custom_doctrine_type_in_config()
+    public function testRenameColumnWithPostgresAndCustomDoctrineTypeInConfig()
     {
         if ($this->driver !== 'pgsql') {
             $this->markTestSkipped('Test requires a Postgres connection.');
@@ -90,7 +90,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasColumn('test', 'renamed_column'));
     }
 
-    public function test_rename_column_with_mysql_and_custom_doctrine_type_in_config()
+    public function testRenameColumnWithMysqlAndCustomDoctrineTypeInConfig()
     {
         if ($this->driver !== 'mysql') {
             $this->markTestSkipped('Test requires a MySQL connection.');
