@@ -6,30 +6,28 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Grammar;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
 {
-    protected function resolveApplicationConfiguration($app)
+    protected function defineEnvironment($app)
     {
-        parent::resolveApplicationConfiguration($app);
-
         $app['config']['database.connections.sqlite.database'] = ':memory:';
         $app['config']['database.dbal.types'] = [
-            'xml' => PostgresXmlType::class,
             'bit' => MySQLBitType::class,
+            'xml' => PostgresXmlType::class,
         ];
     }
 
-    public function testRegisterCustomDoctrineTypesOnMultipleDatabaseConnectionsWithPostgres()
+    public function testRegisterCustomDoctrineTypesWithNonDefaultDatabaseConnections()
     {
-        if ($this->driver !== 'pgsql') {
-            $this->markTestSkipped('Test requires a Postgres connection.');
-        }
+        // Remove existing connections so that config above will be picked up
+        DB::purge();
 
         $this->assertTrue(
-            $this->app['db']->connection('pgsql')
+            DB::connection()
                 ->getDoctrineSchemaManager()
                 ->getDatabasePlatform()
                 ->hasDoctrineTypeMappingFor('xml')
@@ -38,37 +36,14 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         // Custom type mappings are registered for a connection when it's created,
         // this is not the default connection but it has the custom type mappings
         $this->assertTrue(
-            $this->app['db']->connection('sqlite')
+            DB::connection('sqlite')
                 ->getDoctrineSchemaManager()
                 ->getDatabasePlatform()
                 ->hasDoctrineTypeMappingFor('xml')
         );
     }
 
-    public function testRegisterCustomDoctrineTypesOnMultipleDatabaseConnectionsWithMysql()
-    {
-        if ($this->driver !== 'mysql') {
-            $this->markTestSkipped('Test requires a MySQL connection.');
-        }
-
-        $this->assertTrue(
-            $this->app['db']->connection('mysql')
-                ->getDoctrineSchemaManager()
-                ->getDatabasePlatform()
-                ->hasDoctrineTypeMappingFor('xml')
-        );
-
-        // Custom type mappings are registered for a connection when it's created,
-        // this is not the default connection but it has the custom type mappings
-        $this->assertTrue(
-            $this->app['db']->connection('sqlite')
-                ->getDoctrineSchemaManager()
-                ->getDatabasePlatform()
-                ->hasDoctrineTypeMappingFor('xml')
-        );
-    }
-
-    public function testRenameColumnWithPostgresAndCustomDoctrineTypeInConfig()
+    public function testRenameConfiguredCustomDoctrineColumnTypeWithPostgres()
     {
         if ($this->driver !== 'pgsql') {
             $this->markTestSkipped('Test requires a Postgres connection.');
@@ -90,7 +65,7 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         $this->assertTrue(Schema::hasColumn('test', 'renamed_column'));
     }
 
-    public function testRenameColumnWithMysqlAndCustomDoctrineTypeInConfig()
+    public function testRenameConfiguredCustomDoctrineColumnTypeWithMysql()
     {
         if ($this->driver !== 'mysql') {
             $this->markTestSkipped('Test requires a MySQL connection.');
