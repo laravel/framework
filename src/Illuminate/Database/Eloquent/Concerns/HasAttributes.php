@@ -967,7 +967,7 @@ trait HasAttributes
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        return $this->{'set'.Str::camel($key).'Attribute'}($value);
+        return $this->{'set'.Str::studly($key).'Attribute'}($value);
     }
 
     /**
