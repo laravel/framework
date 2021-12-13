@@ -1761,19 +1761,6 @@ class Builder
 
     /**
      * Apply the where condition if the given $condition is truthy.
-     * If the rest of the $arguments are closures then whereIf() exactly act like when() method.
-     *
-     * @example assume $check = true then
-     * User::whereIf($check,'name','like','%laravel%');
-     *      # select * from users name like '%laravel%' and deleted_at is null
-     * User::whereIf($check,'name','laravel');
-     *      # select * from users name = 'laravel' and deleted_at is null
-     * User::whereIf(!$check,'name','like','%laravel%');
-     *      # select * from users  and deleted_at is null
-     * User::whereIf($check,'name', fn($q)=>$q->where('name','laravel');
-     *      # select * from users name = 'laravel' and deleted_at is null
-     * User::whereIf(!$check,'name', fn($q)=>$q->where('name','laravel', fn($q)=>$q->where('name','lumen');
-     *      # select * from users name = 'lumen' and deleted_at is null
      *
      * @param  mixed  $condition
      * @param  mixed  $arguments
