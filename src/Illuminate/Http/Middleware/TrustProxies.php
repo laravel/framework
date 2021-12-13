@@ -19,7 +19,7 @@ class TrustProxies
      *
      * @var int
      */
-    protected $headers = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_AWS_ELB;
+    protected $headers = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PREFIX | Request::HEADER_X_FORWARDED_AWS_ELB;
 
     /**
      * Handle an incoming request.
@@ -117,8 +117,12 @@ class TrustProxies
             case Request::HEADER_X_FORWARDED_PROTO:
                 return Request::HEADER_X_FORWARDED_PROTO;
 
+            case 'HEADER_X_FORWARDED_PREFIX':
+            case Request::HEADER_X_FORWARDED_PREFIX:
+                return Request::HEADER_X_FORWARDED_PREFIX;
+
             default:
-                return Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_AWS_ELB;
+                return Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PREFIX | Request::HEADER_X_FORWARDED_AWS_ELB;
         }
 
         return $this->headers;
