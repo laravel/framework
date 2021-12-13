@@ -384,6 +384,10 @@ class Builder
      */
     public function find($id, $columns = ['*'])
     {
+        if (is_null($id)) {
+            return null;
+        }
+
         if (is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
