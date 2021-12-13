@@ -1770,7 +1770,7 @@ class Builder
     {
         if ($condition) {
             return $arguments[0] instanceof \Closure ? $arguments[0]($this, $condition) : $this->where(...$arguments);
-        } elseif ($arguments[1] instanceof \Closure) {
+        } elseif (isset($arguments[1]) && $arguments[1] instanceof \Closure) {
             return $arguments[1]($this, $condition);
         }
 
