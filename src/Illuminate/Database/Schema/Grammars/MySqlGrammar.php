@@ -15,7 +15,7 @@ class MySqlGrammar extends Grammar
      * @var string[]
      */
     protected $modifiers = [
-        'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable',
+        'Unsigned', 'Charset', 'Collate', 'VirtualAs', 'StoredAs', 'Nullable', 'Invisible',
         'Srid', 'Default', 'Increment', 'Comment', 'After', 'First',
     ];
 
@@ -1054,6 +1054,20 @@ class MySqlGrammar extends Grammar
 
         if ($column->nullable === false) {
             return ' not null';
+        }
+    }
+
+    /**
+     * Get the SQL for an invisible column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifyInvisible(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->invisible)) {
+            return ' invisible';
         }
     }
 

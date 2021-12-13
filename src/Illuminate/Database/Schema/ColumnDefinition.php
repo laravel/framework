@@ -17,6 +17,7 @@ use Illuminate\Support\Fluent;
  * @method $this from(int $startingValue) Set the starting value of an auto-incrementing field (MySQL / PostgreSQL)
  * @method $this generatedAs(string|Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
  * @method $this index(string $indexName = null) Add an index
+ * @method $this invisible() Specify that the column should be invisible to "SELECT *" (MySQL)
  * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
  * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
  * @method $this primary() Add a primary index
