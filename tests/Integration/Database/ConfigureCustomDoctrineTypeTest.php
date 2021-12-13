@@ -12,10 +12,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
 {
-    protected function resolveApplicationConfiguration($app)
+    protected function defineEnvironment($app)
     {
-        parent::resolveApplicationConfiguration($app);
-
         $app['config']['database.connections.sqlite.database'] = ':memory:';
         $app['config']['database.dbal.types'] = [
             'bit' => MySQLBitType::class,
@@ -23,20 +21,8 @@ class ConfigureCustomDoctrineTypeTest extends DatabaseTestCase
         ];
     }
 
-    // protected function defineEnvironment($app)
-    // {
-    //     $app['config']['database.connections.sqlite.database'] = ':memory:';
-    //     $app['config']['database.dbal.types'] = [
-    //         'bit' => MySQLBitType::class,
-    //         'xml' => PostgresXmlType::class,
-    //     ];
-    // }
-
     public function testRegisterCustomDoctrineTypesWithNonDefaultDatabaseConnections()
     {
-        // Remove existing connections so that config above will be picked up
-        DB::purge();
-
         $this->assertTrue(
             DB::connection()
                 ->getDoctrineSchemaManager()
