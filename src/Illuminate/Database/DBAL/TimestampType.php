@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\DBAL;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\PhpDateTimeMappingType;
 use Doctrine\DBAL\Types\Type;
+use RuntimeException;
 
 class TimestampType extends Type implements PhpDateTimeMappingType
 {
@@ -36,7 +36,7 @@ class TimestampType extends Type implements PhpDateTimeMappingType
                 return $this->getSQLitePlatformSQLDeclaration($fieldDeclaration);
 
             default:
-                throw new DBALException('Invalid platform: '.$name);
+                throw new RuntimeException('Invalid platform: '.$name);
         }
     }
 
@@ -83,8 +83,8 @@ class TimestampType extends Type implements PhpDateTimeMappingType
     protected function getSqlServerPlatformSQLDeclaration(array $fieldDeclaration)
     {
         return $fieldDeclaration['precision'] ?? false
-                    ? 'DATETIME2('.$fieldDeclaration['precision'].')'
-                    : 'DATETIME';
+                ? 'DATETIME2('.$fieldDeclaration['precision'].')'
+                : 'DATETIME';
     }
 
     /**
