@@ -132,7 +132,7 @@ class ServeCommand extends Command
     {
         $server = file_exists(base_path('server.php'))
             ? base_path('server.php')
-            : __DIR__ . '/../resources/server.php';
+            : __DIR__.'/../resources/server.php';
 
         return [
             (new PhpExecutableFinder)->find(false),
