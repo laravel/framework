@@ -9,6 +9,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Casts\AsAttribute;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\InvalidCastException;
@@ -25,6 +26,7 @@ use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 trait HasAttributes
 {
@@ -64,7 +66,7 @@ trait HasAttributes
     protected $classCastCache = [];
 
     /**
-     * The attributes that have been cast using PHP attribute marked mutators.
+     * The attributes that have been cast using "Attribute" return type mutators.
      *
      * @var array
      */
@@ -141,14 +143,14 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
-     * The cache of the PHP attribute marked mutated attributes for each class.
+     * The cache of the "Attribute" return type marked mutated attributes for each class.
      *
      * @var array
      */
     protected static $attributeMutatorCache = [];
 
     /**
-     * The cache of the PHP attribute marked mutated, settable attributes for each class.
+     * The cache of the "Attribute" return type marked mutated, settable attributes for each class.
      *
      * @var array
      */
@@ -551,7 +553,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if a PHP attribute marked get mutator exists for an attribute.
+     * Determine if a "Attribute" return type marked get mutator exists for an attribute.
      *
      * @param  string  $key
      * @return bool
@@ -562,19 +564,16 @@ trait HasAttributes
             return static::$attributeMutatorCache[get_class($this)][$key];
         }
 
-        if (! method_exists($this, $method = Str::camel($key)) ||
-            PHP_MAJOR_VERSION < 8) {
+        if (! method_exists($this, $method = Str::camel($key))) {
             return static::$attributeMutatorCache[get_class($this)][$key] = false;
         }
 
-        foreach ((new ReflectionMethod($this, $method))->getAttributes() as $attribute) {
-            if ($attribute->getName() === AsAttribute::class &&
-                is_callable($this->{$method}()->get)) {
-                return static::$attributeMutatorCache[get_class($this)][$key] = true;
-            }
-        }
+        $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$attributeMutatorCache[get_class($this)][$key] = false;
+        return static::$attributeMutatorCache[get_class($this)][$key] = $returnType &&
+                    $returnType instanceof ReflectionNamedType &&
+                    $returnType->getName() === Attribute::class &&
+                    is_callable($this->{$method}()->get);
     }
 
     /**
@@ -590,7 +589,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the value of a PHP attribute marked attribute using its mutator.
+     * Get the value of an "Attribute" return type marked attribute using its mutator.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -930,7 +929,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if a PHP attribute marked set mutator exists for an attribute.
+     * Determine if an "Attribute" return type marked set mutator exists for an attribute.
      *
      * @param  string  $key
      * @return bool
@@ -943,19 +942,16 @@ trait HasAttributes
             return static::$setAttributeMutatorCache[$class][$key];
         }
 
-        if (! method_exists($this, $method = Str::camel($key)) ||
-            PHP_MAJOR_VERSION < 8) {
+        if (! method_exists($this, $method = Str::camel($key))) {
             return static::$setAttributeMutatorCache[$class][$key] = false;
         }
 
-        foreach ((new ReflectionMethod($this, $method))->getAttributes() as $attribute) {
-            if ($attribute->getName() === AsAttribute::class &&
-                is_callable($this->{$method}()->set)) {
-                return static::$setAttributeMutatorCache[$class][$key] = true;
-            }
-        }
+        $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$setAttributeMutatorCache[$class][$key] = false;
+        return static::$setAttributeMutatorCache[$class][$key] = $returnType &&
+                    $returnType instanceof ReflectionNamedType &&
+                    $returnType->getName() === Attribute::class &&
+                    is_callable($this->{$method}()->set);
     }
 
     /**
@@ -971,7 +967,7 @@ trait HasAttributes
     }
 
     /**
-     * Set the value of a PHP attribute marked attribute using its mutator.
+     * Set the value of a "Attribute" return type marked attribute using its mutator.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -2063,27 +2059,25 @@ trait HasAttributes
     }
 
     /**
-     * Get all of the PHP attribute marked attribute mutator methods.
+     * Get all of the "Attribute" return typed attribute mutator methods.
      *
      * @param  mixed  $class
      * @return array
      */
     protected static function getAttributeMarkedMutatorMethods($class)
     {
-        if (PHP_MAJOR_VERSION < 8) {
-            return [];
-        }
-
         $instance = is_object($class) ? $class : new $class;
 
         return collect((new ReflectionClass($instance))->getMethods())->filter(function ($method) use ($instance) {
-            foreach ($method->getAttributes() as $attribute) {
-                if ($attribute->getName() === AsAttribute::class) {
-                    $method->setAccessible(true);
+            $returnType = $method->getReturnType();
 
-                    if (is_callable($method->invoke($instance)->get)) {
-                        return true;
-                    }
+            if ($returnType &&
+                $returnType instanceof ReflectionNamedType &&
+                $returnType->getName() === Attribute::class) {
+                $method->setAccessible(true);
+
+                if (is_callable($method->invoke($instance)->get)) {
+                    return true;
                 }
             }
 
