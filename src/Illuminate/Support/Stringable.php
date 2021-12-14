@@ -240,9 +240,9 @@ class Stringable implements JsonSerializable
     /**
      * Conditionally apply a callback to the stringable, based on the stringable value itself.
      *
-     * @param callable $condition
-     * @param callable|null $true
-     * @param callable|null $false
+     * @param  callable  $condition
+     * @param  callable|null  $true
+     * @param  callable|null  $false
      * @return static
      */
     public function if($condition, $true, $false = null)
