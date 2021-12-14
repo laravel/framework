@@ -65,6 +65,7 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/scope.stub' => $stubsPath.'/scope.stub',
             __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',
             __DIR__.'/stubs/test.unit.stub' => $stubsPath.'/test.unit.stub',
+            __DIR__.'/stubs/view-component.stub' => $stubsPath.'/view-component.stub',
             realpath(__DIR__.'/../../Database/Console/Factories/stubs/factory.stub') => $stubsPath.'/factory.stub',
             realpath(__DIR__.'/../../Database/Console/Seeds/stubs/seeder.stub') => $stubsPath.'/seeder.stub',
             realpath(__DIR__.'/../../Database/Migrations/stubs/migration.create.stub') => $stubsPath.'/migration.create.stub',

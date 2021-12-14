@@ -64,9 +64,9 @@ trait SoftDeletes
     protected function performDeleteOnModel()
     {
         if ($this->forceDeleting) {
-            $this->exists = false;
-
-            return $this->setKeysForSaveQuery($this->newModelQuery())->forceDelete();
+            return tap($this->setKeysForSaveQuery($this->newModelQuery())->forceDelete(), function () {
+                $this->exists = false;
+            });
         }
 
         return $this->runSoftDelete();
