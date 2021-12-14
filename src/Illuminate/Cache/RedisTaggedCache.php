@@ -178,19 +178,13 @@ class RedisTaggedCache extends TaggedCache
      */
     protected function deleteValues($referenceKey)
     {
-        $cursor = $defaultCursorValue = '0';
+        $values = array_unique($this->store->connection()->smembers($referenceKey));
 
-        do {
-            [$cursor, $valuesChunk] = $this->store->connection()->sscan(
-                $referenceKey, $cursor, ['MATCH' => '*', 'COUNT' => 1000]
-            );
-
-            $valuesChunk = array_unique($valuesChunk);
-
-            if (count($valuesChunk) > 0) {
+        if (count($values) > 0) {
+            foreach (array_chunk($values, 1000) as $valuesChunk) {
                 $this->store->connection()->del(...$valuesChunk);
             }
-        } while ($cursor !== $defaultCursorValue);
+        }
     }
 
     /**
