@@ -360,6 +360,16 @@ trait HasEvents
     }
 
     /**
+     * Get the event map array.
+     *
+     * @return array
+     */
+    public function getEventMap()
+    {
+        return $this->dispatchesEvents;
+    }
+
+    /**
      * Get the event dispatcher instance.
      *
      * @return \Illuminate\Contracts\Events\Dispatcher
