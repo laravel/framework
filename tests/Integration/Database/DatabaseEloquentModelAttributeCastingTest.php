@@ -189,22 +189,26 @@ class TestEloquentModelWithAttributeCast extends Model
     public function uppercase(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => strtoupper($value),
-            set: fn ($value) => strtoupper($value),
+            function ($value) {
+                return strtoupper($value);
+            },
+            function ($value) {
+                return strtoupper($value);
+            }
         );
     }
 
     public function address(): Attribute
     {
         return new Attribute(
-            get: function ($value, $attributes) {
+            function ($value, $attributes) {
                 if (is_null($attributes['address_line_one'])) {
                     return;
                 }
 
                 return new AttributeCastAddress($attributes['address_line_one'], $attributes['address_line_two']);
             },
-            set: function ($value) {
+            function ($value) {
                 if (is_null($value)) {
                     return [
                         'address_line_one' => null,
@@ -213,31 +217,39 @@ class TestEloquentModelWithAttributeCast extends Model
                 }
 
                 return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
-            },
+            }
         );
     }
 
     public function options(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => json_decode($value, true),
-            set: fn ($value) => json_encode($value),
+            function ($value) {
+                return json_decode($value, true);
+            },
+            function ($value) {
+                return json_encode($value);
+            }
         );
     }
 
     public function birthdayAt(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => Carbon::parse($value),
-            set: fn ($value) => $value->format('Y-m-d'),
+            function ($value) {
+                return Carbon::parse($value);
+            },
+            function ($value) {
+                return $value->format('Y-m-d');
+            }
         );
     }
 
     public function password(): Attribute
     {
-        return new Attribute(
-            set: fn ($value) => hash('sha256', $value)
-        );
+        return new Attribute(null, function ($value) {
+            return hash('sha256', $value);
+        });
     }
 }
 
