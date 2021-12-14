@@ -275,7 +275,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         ], $this->validator->customMessages, $this->validator->customAttributes);
 
         if ($validator->fails()) {
-            return $this->fail($validator->messages()->all());
+            $this->fail($validator->messages()->all());
         }
 
         $value = (string) $value;
