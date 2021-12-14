@@ -306,6 +306,17 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $mock->getUser());
     }
 
+    public function testUserIsRetrievedOnlyOnce()
+    {
+        $mock = $this->getGuard();
+        $mock->getSession()->shouldReceive('get')->once()->andReturn(1);
+        $user = null;
+        $mock->getProvider()->shouldReceive('retrieveById')->once()->with(1)->andReturn($user);
+        $this->assertSame($user, $mock->user());
+        $mock->getProvider()->shouldReceive('retrieveById')->never();
+        $this->assertSame($user, $mock->user());
+    }
+
     public function testLogoutRemovesSessionTokenAndRememberMeCookie()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();

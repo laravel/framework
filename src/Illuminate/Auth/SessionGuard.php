@@ -103,6 +103,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $recallAttempted = false;
 
     /**
+     * Indicates if a user retrieval has been attempted.
+     *
+     * @var bool
+     */
+    protected $retrievalAttempted = false;
+
+    /**
      * Create a new authentication guard.
      *
      * @param  string  $name
@@ -133,12 +140,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             return;
         }
 
-        // If we've already retrieved the user for the current request we can just
-        // return it back immediately. We do not want to fetch the user data on
-        // every call to this method because that would be tremendously slow.
-        if (! is_null($this->user)) {
+        // If we've already attempted to retrieve the user for the current request we
+        // can just return it back immediately. We do not want to fetch the user data
+        // on every call to this method because that would be tremendously slow.
+        if ($this->retrievalAttempted) {
             return $this->user;
         }
+
+        // Indicate the we already attempted to retrieve the user
+        $this->retrievalAttempted = true;
 
         $id = $this->session->get($this->getName());
 
