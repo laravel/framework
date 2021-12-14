@@ -1,6 +1,9 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.75.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.76.0...8.x)
+
+
+## [v8.76.0 (2021-12-14)](https://github.com/laravel/framework/compare/v8.75.0...v8.76.0)
 
 ### Added
 - Added possibility to customize child model route binding resolution ([#39929](https://github.com/laravel/framework/pull/39929))
@@ -19,6 +22,7 @@
 - Fixes model:prune --pretend command for models with SoftDeletes ([#39991](https://github.com/laravel/framework/pull/39991))
 - Fixed SoftDeletes force deletion sets "exists" property to false only when deletion succeeded ([#39987](https://github.com/laravel/framework/pull/39987))
 - Fixed possible out of memory error when deleting values by reference key from cache in Redis driver ([#39939](https://github.com/laravel/framework/pull/39939))
+- Fixed Password validation failure to allow errors after min rule ([#40030](https://github.com/laravel/framework/pull/40030))
 
 ### Changed
 - Fail enum validation with pure enums ([#39926](https://github.com/laravel/framework/pull/39926))
