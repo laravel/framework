@@ -178,13 +178,26 @@ class RedisTaggedCache extends TaggedCache
      */
     protected function deleteValues($referenceKey)
     {
-        $values = array_unique($this->store->connection()->smembers($referenceKey));
+        $cursor = $defaultCursorValue = '0';
 
-        if (count($values) > 0) {
-            foreach (array_chunk($values, 1000) as $valuesChunk) {
+        do {
+            [$cursor, $valuesChunk] = $this->store->connection()->sscan(
+                $referenceKey, $cursor, ['match' => '*', 'count' => 1000]
+            );
+
+            // PhpRedis client returns false if set does not exist or empty. Destruction on false stores null
+            // in each variable. If valuesChunk is null, it means that there is no results from sscan command.
+            // Iteration over set could be finished.
+            if ($valuesChunk === null) {
+                break;
+            }
+
+            $valuesChunk = array_unique($valuesChunk);
+
+            if (count($valuesChunk) > 0) {
                 $this->store->connection()->del(...$valuesChunk);
             }
-        }
+        } while (((string) $cursor) !== $defaultCursorValue);
     }
 
     /**
