@@ -186,7 +186,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function missing($key, $operator = null, $value = null)
     {
-        return !$this->contains($key, $operator, $value);
+        return ! $this->contains($key, $operator, $value);
     }
 
     /**
