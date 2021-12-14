@@ -144,8 +144,15 @@ class ValidationPasswordRuleTest extends TestCase
             'validation.required',
         ]);
 
-        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
+            'The my password must contain at least one uppercase and one lowercase letter.',
+            'The my password must contain at least one number.',
+        ]);
+
+        $this->fails($makeRules(), ['1231231'], [
+            'validation.min.string',
+            'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
         $this->fails($makeRules(), ['4564654564564'], [
@@ -165,8 +172,15 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->passes($makeRules(), [null]);
 
-        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
+            'The my password must contain at least one symbol.',
+        ]);
+
+        $this->fails($makeRules(), ['1231231'], [
+            'validation.min.string',
+            'The my password must contain at least one letter.',
+            'The my password must contain at least one symbol.',
         ]);
 
         $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
