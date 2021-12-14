@@ -404,6 +404,49 @@ class SupportStringableTest extends TestCase
         $this->assertSame('abcbbc', (string) $this->stringable('abcbbcbc')->finish('bc'));
     }
 
+    public function testIf()
+    {
+        $this->assertSame('200 is numeric',
+            (string) $this->stringable(' 200')
+                ->if(function($stringable) {
+                    return is_numeric((string) $stringable);
+                }, function($stringable) {
+                    return $stringable->append(' is numeric');
+                }, function ($stringable) {
+                    return $stringable->append(' is not numeric');
+                })->trim());
+
+        $this->assertSame('Laravel is not numeric',
+            (string) $this->stringable(' Laravel')
+                ->if(function($stringable) {
+                    return is_numeric((string) $stringable);
+                }, function($stringable) {
+                    return $stringable->append(' is numeric');
+                }, function ($stringable) {
+                    return $stringable->append(' is not numeric');
+                })->trim());
+
+        $this->assertSame(
+            'It keeps a string the same if $true = null',
+            (string) $this->stringable('It keeps a string the same if $true = null ')
+                ->if(function($stringable) {
+                    return true;
+                }, null, function($stringable) {
+                    return $stringable->replace('keeps', 'doesn\'t keep');
+                })->trim()
+        );
+
+        $this->assertSame(
+            'It keeps a string the same if $false = null',
+            (string) $this->stringable('It keeps a string the same if $false = null ')
+                ->if(function($stringable) {
+                    return false;
+                }, function($stringable) {
+                    return $stringable->replace('keeps', 'doesn\'t keep');
+                }, null)->trim()
+        );
+    }
+
     public function testIs()
     {
         $this->assertTrue($this->stringable('/')->is('/'));

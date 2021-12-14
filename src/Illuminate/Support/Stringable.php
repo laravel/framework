@@ -238,6 +238,23 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Conditionally apply a callback to the stringable, based on the stringable value itself.
+     *
+     * @param callable $condition
+     * @param callable|null $true
+     * @param callable|null $false
+     * @return static
+     */
+    public function if($condition, $true, $false)
+    {
+        if ($condition($this)) {
+            return new static($true ? $true($this) : $this);
+        } else {
+            return new static($false ? $false($this) : $this);
+        }
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|array  $pattern
