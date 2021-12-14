@@ -245,7 +245,7 @@ class Stringable implements JsonSerializable
      * @param callable|null $false
      * @return static
      */
-    public function if($condition, $true, $false)
+    public function if($condition, $true, $false = null)
     {
         if ($condition($this)) {
             return new static($true ? $true($this) : $this);

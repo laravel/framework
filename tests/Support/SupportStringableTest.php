@@ -429,7 +429,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame(
             'It keeps a string the same if $true = null',
             (string) $this->stringable('It keeps a string the same if $true = null ')
-                ->if(function($stringable) {
+                ->if(function() {
                     return true;
                 }, null, function($stringable) {
                     return $stringable->replace('keeps', 'doesn\'t keep');
@@ -439,11 +439,21 @@ class SupportStringableTest extends TestCase
         $this->assertSame(
             'It keeps a string the same if $false = null',
             (string) $this->stringable('It keeps a string the same if $false = null ')
-                ->if(function($stringable) {
+                ->if(function() {
                     return false;
                 }, function($stringable) {
                     return $stringable->replace('keeps', 'doesn\'t keep');
                 }, null)->trim()
+        );
+
+        $this->assertSame(
+            'It keeps a string the same if $false = null and third parameter omitted',
+            (string) $this->stringable('It keeps a string the same if $false = null and third parameter omitted ')
+                ->if(function() {
+                    return false;
+                }, function($stringable) {
+                    return $stringable->replace('keeps', 'doesn\'t keep');
+                })->trim()
         );
     }
 
