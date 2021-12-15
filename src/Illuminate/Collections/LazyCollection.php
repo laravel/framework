@@ -206,14 +206,14 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Determine if an item is missing in the enumerable.
+     * Determine if an item is not contained in the enumerable.
      *
      * @param  mixed  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
      */
-    public function missing($key, $operator = null, $value = null)
+    public function doesntContain($key, $operator = null, $value = null)
     {
         return ! $this->contains($key, $operator, $value);
     }

@@ -177,14 +177,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Determine if an item is missing in the collection.
+     * Determine if an item is not contained in the collection.
      *
      * @param  mixed  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
      */
-    public function missing($key, $operator = null, $value = null)
+    public function doesntContain($key, $operator = null, $value = null)
     {
         return ! $this->contains($key, $operator, $value);
     }
