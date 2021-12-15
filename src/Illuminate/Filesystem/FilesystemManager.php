@@ -314,19 +314,6 @@ class FilesystemManager implements FactoryContract
     }
     
     /**
-     * Set the application instance used by the manager.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return $this
-     */
-    public function setApplication($app)
-    {
-        $this->app = $app;
-
-        return $this;
-    }
-
-    /**
      * Get the filesystem connection configuration.
      *
      * @param  string  $name
@@ -395,6 +382,19 @@ class FilesystemManager implements FactoryContract
     public function extend($driver, Closure $callback)
     {
         $this->customCreators[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
 
         return $this;
     }
