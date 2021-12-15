@@ -538,6 +538,19 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Replace part of a string between two given substrings.
+     *
+     * @param  string  $start
+     * @param  string  $end
+     * @param  string  $replace
+     * @return static
+     */
+    public function replaceBetween($start, $end, $replace)
+    {
+        return new static(Str::replaceBetween($start, $end, $replace, $this->value));
+    }
+
+    /**
      * Replace the first occurrence of a given value in the string.
      *
      * @param  string  $search

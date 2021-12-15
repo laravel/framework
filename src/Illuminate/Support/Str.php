@@ -600,6 +600,28 @@ class Str
     }
 
     /**
+     * Replace part of a string between two given substrings.
+     *
+     * @param  string  $start
+     * @param  string  $end
+     * @param  string  $replace
+     * @param  string  $subject
+     * @return string
+     */
+    public static function replaceBetween($start, $end, $replace, $subject)
+    {
+        if (! Str::containsAll($subject, [$start, $end])) {
+           return $subject;
+        }
+
+        return Str::replace(
+            (new Stringable($subject))->after($start)->before($end),
+            $replace,
+            $subject
+        );
+    }
+
+    /**
      * Replace the given value in the given string.
      *
      * @param  string|string[]  $search

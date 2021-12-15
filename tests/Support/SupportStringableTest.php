@@ -500,6 +500,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', ['x' => 'foo', 'y' => 'bar']));
     }
 
+    public function testReplaceBetween()
+    {
+        $this->assertSame('namespace Support\Models\User;', (string) $this->stringable('namespace App\Models\User;')->replaceBetween('namespace ', ';', 'Support\Models\User'));
+        $this->assertSame('foo\new\baz', (string) $this->stringable('foo\bar\baz')->replaceBetween('foo', 'baz', '\new\\'));
+        $this->assertSame('it keeps the string the same if nothing found', (string) $this->stringable('it keeps the string the same if nothing found')->replaceBetween('foo', 'found', 'ooops'));
+    }
+
     public function testReplaceFirst()
     {
         $this->assertSame('fooqux foobar', (string) $this->stringable('foobar foobar')->replaceFirst('bar', 'qux'));
