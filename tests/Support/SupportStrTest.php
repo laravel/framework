@@ -380,6 +380,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar', Str::replaceArray('?', ['x' => 'foo', 'y' => 'bar'], '?/?'));
     }
 
+    public function testReplaceBetween()
+    {
+        $this->assertSame('namespace Support\Models\User;', Str::replaceBetween('namespace ', ';', 'Support\Models\User', 'namespace App\Models\User;'));
+        $this->assertSame('foo\new\baz', Str::replaceBetween('foo', 'baz', '\new\\', 'foo\bar\baz'));
+        $this->assertSame('it keeps the string the same if nothing found', Str::replaceBetween('foo', 'found', 'ooops', 'it keeps the string the same if nothing found'));
+    }
+
     public function testReplaceFirst()
     {
         $this->assertSame('fooqux foobar', Str::replaceFirst('bar', 'qux', 'foobar foobar'));
