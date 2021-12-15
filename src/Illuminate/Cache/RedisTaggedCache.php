@@ -185,10 +185,10 @@ class RedisTaggedCache extends TaggedCache
                 $referenceKey, $cursor, ['match' => '*', 'count' => 1000]
             );
 
-            // PhpRedis client returns false if set does not exist or empty. Destruction on false stores null
-            // in each variable. If valuesChunk is null, it means that there is no results from sscan command.
-            // Iteration over set could be finished.
-            if ($valuesChunk === null) {
+            // PhpRedis client returns false if set does not exist or empty. Array destruction
+            // on false stores null in each variable. If valuesChunk is null, it means that
+            // there were not results from the previously executed "sscan" Redis command.
+            if (is_null($valuesChunk)) {
                 break;
             }
 
