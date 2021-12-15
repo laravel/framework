@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
+use Illuminate\Maintenance\MaintenanceMode;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PreventRequestsDuringMaintenance
@@ -24,14 +25,20 @@ class PreventRequestsDuringMaintenance
     protected $except = [];
 
     /**
+     * @var MaintenanceMode
+     */
+    private $maintenanceMode;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, MaintenanceMode $maintenanceMode)
     {
         $this->app = $app;
+        $this->maintenanceMode = $maintenanceMode;
     }
 
     /**
@@ -45,8 +52,8 @@ class PreventRequestsDuringMaintenance
      */
     public function handle($request, Closure $next)
     {
-        if ($this->app->isDownForMaintenance()) {
-            $data = json_decode(file_get_contents($this->app->storagePath().'/framework/down'), true);
+        if ($this->maintenanceMode->isDown()) {
+            $data = $this->maintenanceMode->getPayload();
 
             if (isset($data['secret']) && $request->path() === $data['secret']) {
                 return $this->bypassResponse($data['secret']);

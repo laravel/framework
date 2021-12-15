@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Maintenance\MaintenanceMode;
 use Throwable;
 
 class DownCommand extends Command
@@ -44,19 +45,16 @@ class DownCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(MaintenanceMode $maintenanceMode)
     {
         try {
-            if (is_file(storage_path('framework/down'))) {
+            if ($maintenanceMode->isDown()) {
                 $this->comment('Application is already down.');
 
                 return 0;
             }
 
-            file_put_contents(
-                storage_path('framework/down'),
-                json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
-            );
+            $maintenanceMode->down($this->getDownFilePayload());
 
             file_put_contents(
                 storage_path('framework/maintenance.php'),
