@@ -507,6 +507,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('it keeps the string the same if nothing found', (string) $this->stringable('it keeps the string the same if nothing found')->replaceBetween('foo', 'found', 'ooops'));
 
         $this->assertSame('foo\new\baz\baz', (string) $this->stringable('foo\bar\baz\baz')->replaceBetween('foo', 'baz', '\new\\'));
+        $this->assertSame('foo\new\baz', (string) $this->stringable('foo\foo\bar\baz')->replaceBetween('foo', 'baz', '\new\\'));
         $this->assertSame('foo\new\baz\baz', (string) $this->stringable('foo\foo\bar\baz\baz')->replaceBetween('foo', 'baz', '\new\\'));
     }
 

@@ -387,6 +387,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('it keeps the string the same if nothing found', Str::replaceBetween('foo', 'found', 'ooops', 'it keeps the string the same if nothing found'));
 
         $this->assertSame('foo\new\baz\baz', Str::replaceBetween('foo', 'baz', '\new\\', 'foo\bar\baz\baz'));
+        $this->assertSame('foo\new\baz', Str::replaceBetween('foo', 'baz', '\new\\', 'foo\foo\bar\baz'));
         $this->assertSame('foo\new\baz\baz', Str::replaceBetween('foo', 'baz', '\new\\', 'foo\foo\bar\baz\baz'));
     }
 
