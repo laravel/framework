@@ -231,4 +231,24 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     {
         return $this->resolve(Container::getInstance()->make('request'));
     }
+
+    /**
+     * Get a subset of the resource's attributes.
+     *
+     * @param array|mixed $attributes
+     * @return array
+     */
+    public function only($attributes)
+    {
+        $resourceAttributes = $this->resolve();
+        $attributes = is_array($attributes) ? $attributes : func_get_args();
+
+        return array_filter(
+            $resourceAttributes,
+            static function ($attribute) use ($attributes) {
+                return in_array($attribute, $attributes, true);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+    }
 }
