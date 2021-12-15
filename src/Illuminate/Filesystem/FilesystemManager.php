@@ -312,6 +312,19 @@ class FilesystemManager implements FactoryContract
 
         return $this;
     }
+    
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
 
     /**
      * Get the filesystem connection configuration.
