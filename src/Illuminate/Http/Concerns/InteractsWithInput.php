@@ -323,15 +323,11 @@ trait InteractsWithInput
             return null;
         }
 
-        try {
-            if (is_null($format)) {
-                return Date::parse($this->input($key), $tz);
-            } else {
-                return Date::createFromFormat($format, $this->input($key), $tz);
-            }
-        } catch (InvalidArgumentException $e) {
-            return null;
+        if (is_null($format)) {
+            return Date::parse($this->input($key), $tz);
         }
+        
+        return Date::createFromFormat($format, $this->input($key), $tz);
     }
 
     /**

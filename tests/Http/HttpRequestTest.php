@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use InvalidArgumentException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
@@ -551,7 +552,6 @@ class HttpRequestTest extends TestCase
 
         $this->assertNull($request->date('as_null'));
         $this->assertNull($request->date('doesnt_exists'));
-        $this->assertNull($request->date('as_invalid'));
 
         $this->assertEquals($current, $request->date('as_datetime'));
         $this->assertEquals($current, $request->date('as_format', 'U'));
@@ -559,6 +559,28 @@ class HttpRequestTest extends TestCase
 
         $this->assertTrue($request->date('as_date')->isSameDay($current));
         $this->assertTrue($request->date('as_time')->isSameSecond('16:30:25'));
+    }
+
+    public function testDateMethodExceptionWhenValueInvalid()
+    {
+        $this->expectsException(InvalidArgumentException::class);
+        
+        $request = Request::create('/', 'GET', [
+            'date' => 'invalid',
+        ]);
+
+        $request->date('date');
+    }
+
+    public function testDateMethodExceptionWhenFormatInvalid()
+    {
+        $this->expectsException(InvalidArgumentException::class);
+
+        $request = Request::create('/', 'GET', [
+            'date' => '20-01-01 16:30:25',
+        ]);
+
+        $request->date('date', 'invalid_format');
     }
 
     public function testArrayAccess()
