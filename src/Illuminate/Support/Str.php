@@ -615,7 +615,7 @@ class Str
         }
 
         return self::replace(
-            (new Stringable($subject))->after($start)->before($end),
+            self::of($subject)->after($start)->before($end),
             $replace,
             $subject
         );
