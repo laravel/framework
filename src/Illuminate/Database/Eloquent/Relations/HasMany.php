@@ -51,8 +51,8 @@ class HasMany extends HasOneOrMany
      *  Insert new records or update the existing ones.
      *
      * @param  array  $values
-     * @param $uniqueBy
-     * @param $update
+     * @param  array|string  $uniqueBy
+     * @param  array|null  $update
      * @return int
      */
     public function upsert(array $values, $uniqueBy, $update = null)
