@@ -184,7 +184,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
-    public function testUpsertMethodCorrectlySetsParentModeley()
+    public function testUpsertMethodCorrectlySetsParentModelKey()
     {
         $relation = $this->getRelation();
 
