@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
+use Illuminate\Maintenance\MaintenanceMode;
 
 class UpCommand extends Command
 {
@@ -27,16 +28,16 @@ class UpCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(MaintenanceMode $maintenanceMode)
     {
         try {
-            if (! is_file(storage_path('framework/down'))) {
+            if ($maintenanceMode->isDown() === false) {
                 $this->comment('Application is already up.');
 
                 return 0;
             }
 
-            unlink(storage_path('framework/down'));
+            $maintenanceMode->up();
 
             if (is_file(storage_path('framework/maintenance.php'))) {
                 unlink(storage_path('framework/maintenance.php'));
