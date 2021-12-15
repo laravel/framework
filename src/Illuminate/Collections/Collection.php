@@ -163,7 +163,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1) {
+        if ($operator === null && $value === null) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
 
