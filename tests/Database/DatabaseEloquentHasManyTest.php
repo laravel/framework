@@ -184,6 +184,17 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
+    public function testUpsertMethodCorrectlySetsParentModeley()
+    {
+        $relation = $this->getRelation();
+
+        $relation->getQuery()->shouldReceive('getForeignKeyName')->andReturn('table.foreign_key');
+        $relation->getQuery()->shouldReceive('getParentKey')->andReturn(1);
+        $relation->getQuery()->shouldReceive('upsert')->once()->andReturn(1);
+
+        $relation->upsert([['name' => 'taylor']], ['name']);
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
