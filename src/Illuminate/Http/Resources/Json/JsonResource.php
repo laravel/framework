@@ -235,7 +235,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Get a subset of the resource's attributes.
      *
-     * @param array|mixed $attributes
+     * @param mixed $attributes
      * @return array
      */
     public function only($attributes)
