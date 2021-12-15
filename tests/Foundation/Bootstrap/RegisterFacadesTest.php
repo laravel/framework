@@ -105,7 +105,7 @@ class RegisterFacadesTest extends TestCase
             $this->assertSame($abstract, $reflection->getName());
         }
 
-        $this->assertCount(39, AliasLoader::getInstance()->getAliases());
+        $this->assertCount(38, AliasLoader::getInstance()->getAliases());
     }
 
     protected function getDefaultAliases()
@@ -139,7 +139,6 @@ class RegisterFacadesTest extends TestCase
             'Queue' => Facades\Queue::class,
             'RateLimiter' => Facades\RateLimiter::class,
             'Redirect' => Facades\Redirect::class,
-            'Redis' => Facades\Redis::class,
             'Request' => Facades\Request::class,
             'Response' => Facades\Response::class,
             'Route' => Facades\Route::class,

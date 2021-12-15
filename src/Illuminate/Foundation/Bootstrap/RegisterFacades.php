@@ -55,7 +55,6 @@ class RegisterFacades
                 'Queue' => Facades\Queue::class,
                 'RateLimiter' => Facades\RateLimiter::class,
                 'Redirect' => Facades\Redirect::class,
-                'Redis' => Facades\Redis::class,
                 'Request' => Facades\Request::class,
                 'Response' => Facades\Response::class,
                 'Route' => Facades\Route::class,
