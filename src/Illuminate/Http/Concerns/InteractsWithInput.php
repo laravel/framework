@@ -5,7 +5,6 @@ namespace Illuminate\Http\Concerns;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
-use InvalidArgumentException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
@@ -326,7 +325,7 @@ trait InteractsWithInput
         if (is_null($format)) {
             return Date::parse($this->input($key), $tz);
         }
-        
+
         return Date::createFromFormat($format, $this->input($key), $tz);
     }
 

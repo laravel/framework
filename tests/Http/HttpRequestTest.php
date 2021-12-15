@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Http;
 
-use InvalidArgumentException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -563,7 +563,7 @@ class HttpRequestTest extends TestCase
 
     public function testDateMethodExceptionWhenValueInvalid()
     {
-        $this->expectsException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         
         $request = Request::create('/', 'GET', [
             'date' => 'invalid',
@@ -574,7 +574,7 @@ class HttpRequestTest extends TestCase
 
     public function testDateMethodExceptionWhenFormatInvalid()
     {
-        $this->expectsException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $request = Request::create('/', 'GET', [
             'date' => '20-01-01 16:30:25',
