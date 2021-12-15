@@ -47,49 +47,7 @@ class RegisterFacadesTest extends TestCase
         });
     }
 
-    public function testCustomAliases()
-    {
-        $this->config->set('app.aliases', [
-            'MyApp' => Facades\App::class,
-        ]);
-
-        $this->packageManifest->shouldReceive('aliases')
-            ->once()
-            ->andReturn([]);
-
-        (new RegisterFacades())->bootstrap($this->app);
-
-        $this->assertTrue(class_exists('MyApp'));
-        $reflection = new ReflectionClass('MyApp');
-
-        $this->assertSame(Facades\App::class, $reflection->getName());
-
-        $this->assertFalse(class_exists('App'));
-        $this->assertCount(1, AliasLoader::getInstance()->getAliases());
-    }
-
-    public function testPackageManifestAliases()
-    {
-        $this->config->set('app.aliases', []);
-
-        $this->packageManifest->shouldReceive('aliases')
-            ->once()
-            ->andReturn([
-                'MyPackageApp' => Facades\App::class,
-            ]);
-
-        (new RegisterFacades())->bootstrap($this->app);
-
-        $this->assertTrue(class_exists('MyPackageApp'));
-        $reflection = new ReflectionClass('MyPackageApp');
-
-        $this->assertSame(Facades\App::class, $reflection->getName());
-
-        $this->assertFalse(class_exists('App'));
-        $this->assertCount(1, AliasLoader::getInstance()->getAliases());
-    }
-
-    public function testDefaultAliases()
+    public function testDefaultAliasesAreAdded()
     {
         $this->packageManifest->shouldReceive('aliases')
             ->once()
@@ -106,6 +64,44 @@ class RegisterFacadesTest extends TestCase
         }
 
         $this->assertCount(38, AliasLoader::getInstance()->getAliases());
+    }
+
+    public function testCustomAliasesCanBeAdded()
+    {
+        $this->config->set('app.aliases', [
+            'MyApp' => Facades\App::class,
+        ]);
+
+        $this->packageManifest->shouldReceive('aliases')
+            ->once()
+            ->andReturn([]);
+
+        (new RegisterFacades())->bootstrap($this->app);
+
+        $this->assertTrue(class_exists('MyApp'));
+        $reflection = new ReflectionClass('MyApp');
+
+        $this->assertSame(Facades\App::class, $reflection->getName());
+
+        $this->assertCount(39, AliasLoader::getInstance()->getAliases());
+    }
+
+    public function testPackageManifestAliasesCanBeAdded()
+    {
+        $this->packageManifest->shouldReceive('aliases')
+            ->once()
+            ->andReturn([
+                'MyPackageApp' => Facades\App::class,
+            ]);
+
+        (new RegisterFacades())->bootstrap($this->app);
+
+        $this->assertTrue(class_exists('MyPackageApp'));
+        $reflection = new ReflectionClass('MyPackageApp');
+
+        $this->assertSame(Facades\App::class, $reflection->getName());
+
+        $this->assertCount(39, AliasLoader::getInstance()->getAliases());
     }
 
     protected function getDefaultAliases()
