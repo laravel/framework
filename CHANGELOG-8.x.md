@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.76.1...8.x)
 
 
-## [v8.76.0 (2021-12-14)](https://github.com/laravel/framework/compare/v8.76.0...v8.76.1)
+## [v8.76.1 (2021-12-14)](https://github.com/laravel/framework/compare/v8.76.0...v8.76.1)
 
 ### Reverted
 - Reverted ["Fixed possible out of memory error when deleting values by reference key from cache in Redis driver"](https://github.com/laravel/framework/pull/39939) ([#40040](https://github.com/laravel/framework/pull/40040))
