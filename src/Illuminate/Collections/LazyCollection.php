@@ -184,13 +184,13 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() === 1 && $this->useAsCallable($key)) {
+        if ($operator === null && $value === null && $this->useAsCallable($key)) {
             $placeholder = new stdClass;
 
             return $this->first($key, $placeholder) !== $placeholder;
         }
 
-        if (func_num_args() === 1) {
+        if ($operator === null && $value === null) {
             $needle = $key;
 
             foreach ($this as $value) {
