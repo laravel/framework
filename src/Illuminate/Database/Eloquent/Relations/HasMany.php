@@ -46,4 +46,22 @@ class HasMany extends HasOneOrMany
     {
         return $this->matchMany($models, $results, $relation);
     }
+
+    /**
+     *  Insert new records or update the existing ones.
+     *
+     * @param array $values
+     * @param $uniqueBy
+     * @param $update
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy, $update = null)
+    {
+        $values = collect($values)
+            ->map(function ($value) {
+                return array_merge($value, [$this->getForeignKeyName() => $this->getParentKey()]);
+            })->toArray();
+
+        return parent::upsert($values, $uniqueBy, $update);
+    }
 }
