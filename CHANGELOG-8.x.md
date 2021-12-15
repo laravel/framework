@@ -1,6 +1,17 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.76.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.76.2...8.x)
+
+
+
+## [v8.76.2 (2021-12-15)](https://github.com/laravel/framework/compare/v8.76.1...v8.76.2)
+
+### Added
+- Added doesntContain method to Collection and LazyCollection ([#40044](https://github.com/laravel/framework/pull/40044))
+
+### Reverted
+- Reverted ["Revert "[8.x] Remove redundant description & localize template"](https://github.com/laravel/framework/pull/39928) ([#40054](https://github.com/laravel/framework/pull/40054))
+
 
 
 ## [v8.76.1 (2021-12-14)](https://github.com/laravel/framework/compare/v8.76.0...v8.76.1)
