@@ -312,6 +312,7 @@ class FilesystemManager implements FactoryContract
 
         return $this;
     }
+
     /**
      * Get the filesystem connection configuration.
      *
