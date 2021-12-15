@@ -177,6 +177,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if an item is not contained in the collection.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContain($key, $operator = null, $value = null)
+    {
+        return ! $this->contains($key, $operator, $value);
+    }
+
+    /**
      * Cross join with the given lists, returning all possible permutations.
      *
      * @param  mixed  ...$lists
