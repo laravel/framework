@@ -663,15 +663,15 @@ class PendingRequest
      */
     public function delete(string $url = null, $data = [])
     {
-        return $this->send('DELETE', $url ?? $this->url, $this->sendOptions($data));
+        return $this->send('DELETE', $url ?? $this->url, $this->sendOptions(empty($data) ? null : $data));
     }
 
     /**
      * Construct sending options containing query and bodyFormat when available.
      *
-     * @param  array  $data
+     * @param  array|null  $data
      */
-    protected function sendOptions($data = [])
+    protected function sendOptions($data)
     {
         $options = [];
 
@@ -681,6 +681,10 @@ class PendingRequest
 
         if (! empty($data)) {
             $options[$this->bodyFormat] = $data;
+        } elseif (isset($this->pendingBody)) {
+            $options[$this->bodyFormat] = $this->pendingBody;
+        } elseif (count($this->pendingFiles) !== 0 || ! is_null($data)) {
+            $options[$this->bodyFormat] = [];
         }
 
         return $options;
