@@ -1070,7 +1070,6 @@ class HttpClientTest extends TestCase
                 && $request->data()['test'] === 'phpunit';
         });
 
-
         $this->factory->fake();
         $this->factory->url($url)->query(['foo' => 'bar'])->withData(['test' => 'phpunit'])->post();
         $this->factory->assertSent(function (Request $request) {
