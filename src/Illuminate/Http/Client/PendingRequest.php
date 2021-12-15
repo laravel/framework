@@ -43,6 +43,20 @@ class PendingRequest
     protected $baseUrl = '';
 
     /**
+     * The URL for the request.
+     *
+     * @var string
+     */
+    protected $url = '';
+
+    /**
+     * The query for the request.
+     *
+     * @var array|string|null
+     */
+    protected $query;
+
+    /**
      * The request body format.
      *
      * @var string
@@ -199,6 +213,21 @@ class PendingRequest
         $this->pendingBody = $content;
 
         $this->contentType($contentType);
+
+        return $this;
+    }
+
+    /**
+     * Attach a json body to the request.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function withData(array $content)
+    {
+        $this->asJson();
+
+        $this->pendingBody = $content;
 
         return $this;
     }
@@ -536,16 +565,42 @@ class PendingRequest
     }
 
     /**
+     * Specify the url for the request.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function url(string $url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Specify the query for the request.
+     *
+     * @param  array|string|null  $query
+     * @return $this
+     */
+    public function query($query)
+    {
+        $this->query = $query;
+
+        return $this;
+    }
+
+    /**
      * Issue a GET request to the given URL.
      *
      * @param  string  $url
      * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      */
-    public function get(string $url, $query = null)
+    public function get(string $url = null, $query = null)
     {
-        return $this->send('GET', $url, [
-            'query' => $query,
+        return $this->send('GET', $url ?? $this->url, [
+            'query' => $query ?? $this->query,
         ]);
     }
 
@@ -556,10 +611,10 @@ class PendingRequest
      * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      */
-    public function head(string $url, $query = null)
+    public function head(string $url = null, $query = null)
     {
-        return $this->send('HEAD', $url, [
-            'query' => $query,
+        return $this->send('HEAD', $url ?? $this->url, [
+            'query' => $query ?? $this->query,
         ]);
     }
 
@@ -570,11 +625,9 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      */
-    public function post(string $url, array $data = [])
+    public function post(string $url = null, array $data = [])
     {
-        return $this->send('POST', $url, [
-            $this->bodyFormat => $data,
-        ]);
+        return $this->send('POST', $url ?? $this->url, $this->sendOptions($data));
     }
 
     /**
@@ -584,11 +637,9 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      */
-    public function patch($url, $data = [])
+    public function patch(string $url = null, $data = [])
     {
-        return $this->send('PATCH', $url, [
-            $this->bodyFormat => $data,
-        ]);
+        return $this->send('PATCH', $url ?? $this->url, $this->sendOptions($data));
     }
 
     /**
@@ -598,11 +649,9 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      */
-    public function put($url, $data = [])
+    public function put(string $url = null, $data = [])
     {
-        return $this->send('PUT', $url, [
-            $this->bodyFormat => $data,
-        ]);
+        return $this->send('PUT', $url ?? $this->url, $this->sendOptions($data));
     }
 
     /**
@@ -612,11 +661,29 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      */
-    public function delete($url, $data = [])
+    public function delete(string $url = null, $data = [])
     {
-        return $this->send('DELETE', $url, empty($data) ? [] : [
-            $this->bodyFormat => $data,
-        ]);
+        return $this->send('DELETE', $url ?? $this->url, $this->sendOptions($data));
+    }
+
+    /**
+     * Construct sending options containing query and bodyFormat when available.
+     *
+     * @param  array  $data
+     */
+    protected function sendOptions($data = [])
+    {
+        $options = [];
+
+        if (isset($this->query)) {
+            $options['query'] = $this->query;
+        }
+
+        if (! empty($data)) {
+            $options[$this->bodyFormat] = $data;
+        }
+
+        return $options;
     }
 
     /**

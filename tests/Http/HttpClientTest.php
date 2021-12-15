@@ -1050,4 +1050,34 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('https://example.com');
     }
+
+    public function testSendWithoutParameters()
+    {
+        $url = 'http://foo.com/api';
+
+        $this->factory->fake();
+        $this->factory->url($url)->query(['foo' => 'bar'])->get();
+        $this->factory->assertSent(function (Request $request) {
+            return $request->method() === 'GET'
+                && $request->url() === 'http://foo.com/api?foo=bar';
+        });
+
+        $this->factory->fake();
+        $this->factory->url($url)->withData(['test' => 'phpunit'])->delete();
+        $this->factory->assertSent(function (Request $request) {
+            return $request->method() === 'DELETE'
+                && isset($request->data()['test'])
+                && $request->data()['test'] === 'phpunit';
+        });
+
+
+        $this->factory->fake();
+        $this->factory->url($url)->query(['foo' => 'bar'])->withData(['test' => 'phpunit'])->post();
+        $this->factory->assertSent(function (Request $request) {
+            return $request->method() === 'POST'
+                && $request->url() === 'http://foo.com/api?foo=bar'
+                && isset($request->data()['test'])
+                && $request->data()['test'] === 'phpunit';
+        });
+    }
 }
