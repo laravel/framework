@@ -611,7 +611,7 @@ class Str
     public static function replaceBetween($start, $end, $replace, $subject)
     {
         if (! self::containsAll($subject, [$start, $end])) {
-           return $subject;
+            return $subject;
         }
 
         return self::replace(
