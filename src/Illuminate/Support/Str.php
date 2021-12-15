@@ -610,11 +610,11 @@ class Str
      */
     public static function replaceBetween($start, $end, $replace, $subject)
     {
-        if (! Str::containsAll($subject, [$start, $end])) {
+        if (! self::containsAll($subject, [$start, $end])) {
            return $subject;
         }
 
-        return Str::replace(
+        return self::replace(
             (new Stringable($subject))->after($start)->before($end),
             $replace,
             $subject
