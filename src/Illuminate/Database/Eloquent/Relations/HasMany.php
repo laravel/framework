@@ -50,7 +50,7 @@ class HasMany extends HasOneOrMany
     /**
      *  Insert new records or update the existing ones.
      *
-     * @param array $values
+     * @param  array  $values
      * @param $uniqueBy
      * @param $update
      * @return int
