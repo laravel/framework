@@ -35,7 +35,7 @@ class UpCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Foundation\MaintenanceMode $maintenanceMode
+     * @param  \Illuminate\Foundation\MaintenanceMode  $maintenanceMode
      *
      * @return int
      */
