@@ -22,6 +22,10 @@ class PredisConnector implements Connector
         $formattedOptions = array_merge(
             ['timeout' => 10.0], $options, Arr::pull($config, 'options', [])
         );
+        
+        if (! empty($config['prefix'])) {
+            $formattedOptions['prefix'] = $config['prefix'];
+        }
 
         return new PredisConnection(new Client($config, $formattedOptions));
     }
