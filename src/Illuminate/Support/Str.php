@@ -440,7 +440,7 @@ class Str
      * @param  string  $encoding
      * @return string
      */
-    public function maskBetween($string, $character, $start, $end, $encoding = 'UTF-8')
+    public static function maskBetween($string, $character, $start, $end, $encoding = 'UTF-8')
     {
         $startIndex = mb_strpos($string, $start, 0, $encoding);
 
