@@ -25,8 +25,7 @@ class PreventRequestsDuringMaintenance
     protected $except = [];
 
     /**
-     * The maintenance mode implementation. Can be used to check
-     * if the application is under maintenance.
+     * The MaintenanceMode instance.
      *
      * @var \Illuminate\Foundation\MaintenanceMode
      */
