@@ -25,15 +25,18 @@ class PreventRequestsDuringMaintenance
     protected $except = [];
 
     /**
-     * @var MaintenanceMode
+     * The maintenance mode implementation. Can be used to check
+     * if the application is under maintenance.
+     *
+     * @var \Illuminate\Maintenance\MaintenanceMode
      */
-    private $maintenanceMode;
+    protected $maintenanceMode;
 
     /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Maintenance\MaintenanceMode      $maintenanceMode
      */
     public function __construct(Application $app, MaintenanceMode $maintenanceMode)
     {
