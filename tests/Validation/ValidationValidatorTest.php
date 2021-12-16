@@ -611,7 +611,7 @@ class ValidationValidatorTest extends TestCase
                         'file' => 'Custom message for image files.',
                         'string' => 'Custom message for image filenames.',
                     ],
-                ]
+                ],
             ],
         ]);
 

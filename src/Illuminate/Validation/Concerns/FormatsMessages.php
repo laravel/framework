@@ -31,9 +31,10 @@ trait FormatsMessages
 
         $lowerRule = Str::snake($rule);
 
-        $customKey = in_array($rule, $this->sizeRules)
-            ? "validation.custom.{$attribute}.{$lowerRule}.{$this->getAttributeType($attribute)}"
-            : "validation.custom.{$attribute}.{$lowerRule}";
+//        $customKey = in_array($rule, $this->sizeRules)
+//            ? "validation.custom.{$attribute}.{$lowerRule}.{$this->getAttributeType($attribute)}"
+//            : "validation.custom.{$attribute}.{$lowerRule}";
+            $customKey = "validation.custom.{$attribute}.{$lowerRule}";
 
         $customMessage = $this->getCustomMessageFromTranslator($customKey);
 
