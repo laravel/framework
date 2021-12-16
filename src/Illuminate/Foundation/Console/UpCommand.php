@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
-use Illuminate\Foundation\MaintenanceMode;
 
 class UpCommand extends Command
 {
@@ -35,19 +34,18 @@ class UpCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Foundation\MaintenanceMode  $maintenanceMode
      * @return int
      */
-    public function handle(MaintenanceMode $maintenanceMode)
+    public function handle()
     {
         try {
-            if ($maintenanceMode->isUp()) {
+            if ($this->laravel->maintenanceMode()->isUp()) {
                 $this->comment('Application is already up.');
 
                 return 0;
             }
 
-            $maintenanceMode->up();
+            $this->laravel->maintenanceMode()->up();
 
             if (is_file(storage_path('framework/maintenance.php'))) {
                 unlink(storage_path('framework/maintenance.php'));

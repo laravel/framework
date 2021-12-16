@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
-use Illuminate\Foundation\MaintenanceMode;
 use Throwable;
 
 class DownCommand extends Command
@@ -43,19 +42,18 @@ class DownCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Foundation\MaintenanceMode  $maintenanceMode
      * @return int
      */
-    public function handle(MaintenanceMode $maintenanceMode)
+    public function handle()
     {
         try {
-            if ($maintenanceMode->isDown()) {
+            if ($this->laravel->maintenanceMode()->isDown()) {
                 $this->comment('Application is already down.');
 
                 return 0;
             }
 
-            $maintenanceMode->down($this->getDownFilePayload());
+            $this->laravel->maintenanceMode()->down($this->getDownFilePayload());
 
             file_put_contents(
                 storage_path('framework/maintenance.php'),
