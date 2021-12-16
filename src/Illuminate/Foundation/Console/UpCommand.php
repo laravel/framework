@@ -40,7 +40,7 @@ class UpCommand extends Command
     public function handle(MaintenanceMode $maintenanceMode)
     {
         try {
-            if ($maintenanceMode->isUp() === false) {
+            if ($maintenanceMode->isUp()) {
                 $this->comment('Application is already up.');
 
                 return 0;
