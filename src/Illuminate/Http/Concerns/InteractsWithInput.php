@@ -298,17 +298,6 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve input from the request as a collection.
-     *
-     * @param  array|string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    public function collect($key = null)
-    {
-        return collect(is_array($key) ? $this->only($key) : $this->input($key));
-    }
-
-    /**
      * Retrieve input from the request as a Carbon instance.
      *
      * @param  string  $key
@@ -327,6 +316,17 @@ trait InteractsWithInput
         }
 
         return Date::createFromFormat($format, $this->input($key), $tz);
+    }
+
+    /**
+     * Retrieve input from the request as a collection.
+     *
+     * @param  array|string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
