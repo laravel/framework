@@ -1054,7 +1054,7 @@ class HttpClientTest extends TestCase
     public function testRequestExceptionIsThrownWhenRetriesExhausted()
     {
         $this->expectException(RequestException::class);
-        
+
         $this->factory->fake([
             '*' => $this->factory->response(['error'], 403),
         ]);
@@ -1075,5 +1075,5 @@ class HttpClientTest extends TestCase
             ->get('http://foo.com/get');
 
         $this->assertTrue($response->failed());
-    }    
+    }
 }
