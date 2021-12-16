@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
-        "psr/log": "^1.0",
+        "psr/log": "^1.0|^2.0",
         "illuminate/bus": "^8.0",
         "illuminate/collections": "^8.0",
         "illuminate/contracts": "^8.0",
