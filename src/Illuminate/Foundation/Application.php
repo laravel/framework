@@ -1113,7 +1113,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isDownForMaintenance()
     {
-        return app(MaintenanceMode::class)->isDown();
+        return $this->make(MaintenanceMode::class)->isDown();
     }
 
     /**
