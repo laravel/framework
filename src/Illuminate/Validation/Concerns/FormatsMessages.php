@@ -31,8 +31,12 @@ trait FormatsMessages
 
         $lowerRule = Str::snake($rule);
 
+        $customKey = "validation.custom.{$attribute}.{$lowerRule}";
+
         $customMessage = $this->getCustomMessageFromTranslator(
-            $customKey = "validation.custom.{$attribute}.{$lowerRule}"
+                in_array($rule, $this->sizeRules)
+                    ? [$customKey.".{$this->getAttributeType($attribute)}", $customKey]
+                    : $customKey
         );
 
         // First we check for a custom defined validation message for the attribute
@@ -118,25 +122,33 @@ trait FormatsMessages
     /**
      * Get the custom error message from the translator.
      *
-     * @param  string  $key
+     * @param  array|string  $keys
      * @return string
      */
-    protected function getCustomMessageFromTranslator($key)
+    protected function getCustomMessageFromTranslator($keys)
     {
-        if (($message = $this->translator->get($key)) !== $key) {
-            return $message;
+        foreach (Arr::wrap($keys) as $key) {
+            if (($message = $this->translator->get($key)) !== $key) {
+                return $message;
+            }
+
+            // If an exact match was not found for the key, we will collapse all of these
+            // messages and loop through them and try to find a wildcard match for the
+            // given key. Otherwise, we will simply return the key's value back out.
+            $shortKey = preg_replace(
+                '/^validation\.custom\./', '', $key
+            );
+
+            $message = $this->getWildcardCustomMessages(Arr::dot(
+                (array) $this->translator->get('validation.custom')
+            ), $shortKey, $key);
+
+            if ($message !== $key) {
+                return $message;
+            }
         }
 
-        // If an exact match was not found for the key, we will collapse all of these
-        // messages and loop through them and try to find a wildcard match for the
-        // given key. Otherwise, we will simply return the key's value back out.
-        $shortKey = preg_replace(
-            '/^validation\.custom\./', '', $key
-        );
-
-        return $this->getWildcardCustomMessages(Arr::dot(
-            (array) $this->translator->get('validation.custom')
-        ), $shortKey, $key);
+        return Arr::last(Arr::wrap($keys));
     }
 
     /**

@@ -600,6 +600,31 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('really required!', $v->messages()->first('name'));
     }
 
+    public function testCustomValidationLinesForSizeRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'image' => [
+                    'gte' => [
+                        'file' => 'Custom message for image files.',
+                        'string' => 'Custom message for image filenames.',
+                    ],
+                ],
+            ],
+        ]);
+
+        $v = new Validator($trans, ['image' => 'image.png'], ['image' => 'gte:50']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Custom message for image filenames.', $v->messages()->first('image'));
+
+        $file = new UploadedFile(__FILE__, '', null, null, true);
+        $v = new Validator($trans, ['image' => $file], ['image' => 'gte:50']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Custom message for image files.', $v->messages()->first('image'));
+    }
+
     public function testCustomValidationLinesAreRespectedWithAsterisks()
     {
         $trans = $this->getIlluminateArrayTranslator();
