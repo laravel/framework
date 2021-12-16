@@ -215,7 +215,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function doesntContain($key, $operator = null, $value = null)
     {
-        return ! $this->contains($key, $operator, $value);
+        return ! $this->contains(...func_get_args());
     }
 
     /**
