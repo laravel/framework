@@ -35,7 +35,11 @@ class UpCommand extends Command
     /**
      * Execute the console command.
      *
+     * @param \Illuminate\Maintenance\MaintenanceMode $maintenanceMode
+     *
      * @return int
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function handle(MaintenanceMode $maintenanceMode)
     {
