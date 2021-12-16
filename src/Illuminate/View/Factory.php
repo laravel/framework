@@ -200,11 +200,7 @@ class Factory implements FactoryContract
      */
     public function renderUnless($condition, $view, $data = [], $mergeData = [])
     {
-        if ($condition) {
-            return '';
-        }
-
-        return $this->make($view, $this->parseData($data), $mergeData)->render();
+        return $this->renderWhen(! $condition, $view, $data, $mergeData);
     }
 
     /**
