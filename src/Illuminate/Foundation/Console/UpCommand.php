@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
-use Illuminate\Maintenance\MaintenanceMode;
+use Illuminate\Foundation\MaintenanceMode;
 
 class UpCommand extends Command
 {
@@ -35,7 +35,8 @@ class UpCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Maintenance\MaintenanceMode  $maintenanceMode
+     * @param  \Illuminate\Foundation\MaintenanceMode $maintenanceMode
+     *
      * @return int
      */
     public function handle(MaintenanceMode $maintenanceMode)

@@ -1,6 +1,8 @@
 <?php
 
-namespace Illuminate\Maintenance;
+namespace Illuminate\Foundation;
+
+use function storage_path;
 
 class MaintenanceMode
 {

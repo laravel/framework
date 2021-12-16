@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
-use Illuminate\Maintenance\MaintenanceMode;
+use Illuminate\Foundation\MaintenanceMode;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PreventRequestsDuringMaintenance
@@ -28,15 +28,15 @@ class PreventRequestsDuringMaintenance
      * The maintenance mode implementation. Can be used to check
      * if the application is under maintenance.
      *
-     * @var \Illuminate\Maintenance\MaintenanceMode
+     * @var \Illuminate\Foundation\MaintenanceMode
      */
     protected $maintenanceMode;
 
     /**
      * Create a new middleware instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Maintenance\MaintenanceMode  $maintenanceMode
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Foundation\MaintenanceMode       $maintenanceMode
      */
     public function __construct(Application $app, MaintenanceMode $maintenanceMode)
     {

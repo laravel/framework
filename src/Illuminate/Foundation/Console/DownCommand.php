@@ -7,7 +7,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
-use Illuminate\Maintenance\MaintenanceMode;
+use Illuminate\Foundation\MaintenanceMode;
 use Throwable;
 
 class DownCommand extends Command
@@ -43,7 +43,8 @@ class DownCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Maintenance\MaintenanceMode  $maintenanceMode
+     * @param  \Illuminate\Foundation\MaintenanceMode $maintenanceMode
+     *
      * @return int
      */
     public function handle(MaintenanceMode $maintenanceMode)
