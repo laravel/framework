@@ -103,8 +103,8 @@ class PendingRequest
      *
      * @var bool
      */
-    protected $retryThrow = true;    
-    
+    protected $retryThrow = true;
+
     /**
      * The callback that will determine if the request should be retried.
      *
