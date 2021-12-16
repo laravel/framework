@@ -9,6 +9,11 @@ class MaintenanceMode
         return file_exists($this->getDownFilePath());
     }
 
+    public function isUp(): bool
+    {
+        return $this->isDown() === false;
+    }
+
     public function down(array $payload): void
     {
         file_put_contents(
