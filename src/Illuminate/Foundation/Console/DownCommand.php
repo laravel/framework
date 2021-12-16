@@ -46,8 +46,6 @@ class DownCommand extends Command
      * @param \Illuminate\Maintenance\MaintenanceMode $maintenanceMode
      *
      * @return int
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function handle(MaintenanceMode $maintenanceMode)
     {
