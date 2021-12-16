@@ -22,7 +22,6 @@ interface MaintenanceMode
      * Take the application down for maintenance.
      *
      * @param  array  $payload
-     *
      * @return void
      */
     public function down(array $payload): void;
