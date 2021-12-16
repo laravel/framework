@@ -367,7 +367,7 @@ class Stringable implements JsonSerializable
      */
     public function maskBetween($character, $start, $end, $encoding = 'UTF-8')
     {
-        return new static(Str::maskBetween($this->value, $start, $end, $character, $encoding));
+        return new static(Str::maskBetween($this->value, $character, $start, $end, $encoding));
     }
 
     /**
