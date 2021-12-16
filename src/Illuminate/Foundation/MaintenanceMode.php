@@ -47,7 +47,7 @@ class MaintenanceMode
      */
     public function up(): void
     {
-        if ($this->isDown() !== false) {
+        if ($this->isDown()) {
             unlink($this->getDownFilePath());
         }
     }
