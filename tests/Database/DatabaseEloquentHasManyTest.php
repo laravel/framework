@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\MySqlConnection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -190,7 +191,7 @@ class DatabaseEloquentHasManyTest extends TestCase
 
         $relation->getQuery()->shouldReceive('getForeignKeyName')->andReturn('table.foreign_key');
         $relation->getQuery()->shouldReceive('getParentKey')->andReturn(1);
-        $relation->getQuery()->shouldReceive('upsert')->once()->andReturn(1);
+        $relation->getQuery()->shouldReceive('upsert')->once()->with([['name' => 'taylor', 'foreign_key' => 1]], ['name'], null)->andReturn(1);
 
         $relation->upsert([['name' => 'taylor']], ['name']);
     }
