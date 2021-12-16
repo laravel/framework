@@ -30,4 +30,26 @@ class Attribute
         $this->get = $get;
         $this->set = $set;
     }
+
+    /**
+     * Create a new attribute accessor.
+     *
+     * @param  callable  $get
+     * @return static
+     */
+    public static function get(callable $get)
+    {
+        return new static($get);
+    }
+
+    /**
+     * Create a new attribute mutator.
+     *
+     * @param  callable  $set
+     * @return static
+     */
+    public static function set(callable $set)
+    {
+        return new static(null, $set);
+    }
 }
