@@ -69,7 +69,7 @@ class MaintenanceMode
      *
      * @return string
      */
-    private function getDownFilePath(): string
+    protected function getDownFilePath(): string
     {
         return storage_path('framework/down');
     }
