@@ -357,6 +357,20 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Masks a portion of a string between two given strings.
+     *
+     * @param  string  $character
+     * @param  string  $start
+     * @param  string  $end
+     * @param  string  $encoding
+     * @return static
+     */
+    public function maskBetween($character, $start, $end, $encoding = 'UTF-8')
+    {
+        return new static(Str::maskBetween($this->value, $start, $end, $character, $encoding));
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern

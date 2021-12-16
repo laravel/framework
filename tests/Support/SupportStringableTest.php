@@ -710,6 +710,22 @@ class SupportStringableTest extends TestCase
         $this->assertEquals('**一段中文', $this->stringable('这是一段中文')->mask('*', 0, 2));
     }
 
+    public function testMaskBetween()
+    {
+        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->maskBetween('*', 'tay', 'not_found'));
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->maskBetween('*', 'not_found', '@email.com'));
+        $this->assertEquals('tay***@email.com', $this->stringable('taylor@email.com')->maskBetween('*', 'tay', '@email.com'));
+
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->maskBetween('*', 'not_found', 'not_found'));
+
+        $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->maskBetween('s', 'tay', 'not_found'));
+        $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->maskBetween(Str::of('something'), 'tay', 'not_found'));
+
+        $this->assertEquals('这是一***', $this->stringable('这是一段中文')->maskBetween('*', '这是一', 'not_found'));
+        $this->assertEquals('这是一段中文', $this->stringable('这是一段中文')->maskBetween('*', 'not_found', '段中文'));
+        $this->assertEquals('这***中文', $this->stringable('这是一段中文')->maskBetween('*', '这', '中文'));
+    }
+
     public function testRepeat()
     {
         $this->assertSame('aaaaa', (string) $this->stringable('a')->repeat(5));

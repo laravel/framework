@@ -480,6 +480,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('**一段中文', Str::mask('这是一段中文', '*', 0, 2));
     }
 
+    public function testMaskBetween()
+    {
+        $this->assertSame('tay*************', Str::maskBetween('taylor@email.com', '*', 'tay', 'not_found'));
+        $this->assertSame('taylor@email.com', Str::maskBetween('taylor@email.com', '*', 'not_found', '@email.com'));
+        $this->assertSame('tay***@email.com', Str::maskBetween('taylor@email.com', '*', 'tay', '@email.com'));
+
+        $this->assertSame('taylor@email.com', Str::maskBetween('taylor@email.com', '*', 'not_found', 'not_found'));
+
+        $this->assertSame('taysssssssssssss', Str::maskBetween('taylor@email.com', 's', 'tay', 'not_found'));
+        $this->assertSame('taysssssssssssss', Str::maskBetween('taylor@email.com', Str::of('something'), 'tay', 'not_found'));
+
+        $this->assertSame('这是一***', Str::maskBetween('这是一段中文', '*', '这是一', 'not_found'));
+        $this->assertSame('这是一段中文', Str::maskBetween('这是一段中文', '*', 'not_found', '段中文'));
+        $this->assertSame('这***中文', Str::maskBetween('这是一段中文', '*', '这', '中文'));
+    }
+
     public function testMatch()
     {
         $this->assertSame('bar', Str::match('/bar/', 'foo bar'));

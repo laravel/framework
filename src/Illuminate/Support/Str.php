@@ -431,6 +431,29 @@ class Str
     }
 
     /**
+     * Masks a portion of a string between two given strings.
+     *
+     * @param  string  $string
+     * @param  string  $character
+     * @param  string  $start
+     * @param  string  $end
+     * @param  string  $encoding
+     * @return string
+     */
+    public function maskBetween($string, $character, $start, $end, $encoding = 'UTF-8')
+    {
+        $startIndex = mb_strpos($string, $start, 0, $encoding);
+
+        if ($startIndex === false) {
+            return $string;
+        }
+
+        $endIndex = mb_strpos($string, $end, $startIndex, $encoding) ?: mb_strlen($string, $encoding);
+
+        return static::mask($string, $character, $startIndex, $endIndex, $encoding);
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
