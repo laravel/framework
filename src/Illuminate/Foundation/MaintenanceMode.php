@@ -2,9 +2,10 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use function storage_path;
 
-class MaintenanceMode
+class MaintenanceMode implements MaintenanceModeContract
 {
     /**
      * Determine if the application is currently down for maintenance.

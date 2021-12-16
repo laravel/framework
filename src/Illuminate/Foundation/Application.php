@@ -1108,7 +1108,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the instance of the MaintenanceMode.
      *
-     * @return \Illuminate\Foundation\MaintenanceMode
+     * @return \Illuminate\Contracts\Foundation\MaintenanceMode
      */
     public function maintenanceMode()
     {
