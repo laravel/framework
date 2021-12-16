@@ -36,6 +36,7 @@ class PreventRequestsDuringMaintenance
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Foundation\MaintenanceMode  $maintenanceMode
+     * @return void
      */
     public function __construct(Application $app, MaintenanceMode $maintenanceMode)
     {
