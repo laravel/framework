@@ -3,6 +3,7 @@
 namespace Illuminate\Contracts\Foundation;
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Foundation\MaintenanceMode;
 
 interface Application extends Container
 {
@@ -82,6 +83,13 @@ interface Application extends Container
      * @return bool
      */
     public function runningUnitTests();
+
+    /**
+     * Get the instance of the MaintenanceMode.
+     *
+     * @return \Illuminate\Foundation\MaintenanceMode
+     */
+    public function maintenanceMode();
 
     /**
      * Determine if the application is currently down for maintenance.
