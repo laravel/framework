@@ -31,9 +31,11 @@ trait FormatsMessages
 
         $lowerRule = Str::snake($rule);
 
-        $customMessage = $this->getCustomMessageFromTranslator(
-            $customKey = "validation.custom.{$attribute}.{$lowerRule}"
-        );
+        $customKey = in_array($rule, $this->sizeRules)
+            ? "validation.custom.{$attribute}.{$lowerRule}.{$this->getAttributeType($attribute)}"
+            : "validation.custom.{$attribute}.{$lowerRule}";
+
+        $customMessage = $this->getCustomMessageFromTranslator($customKey);
 
         // First we check for a custom defined validation message for the attribute
         // and rule. This allows the developer to specify specific messages for
