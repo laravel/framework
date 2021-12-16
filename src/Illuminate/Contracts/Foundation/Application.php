@@ -3,7 +3,6 @@
 namespace Illuminate\Contracts\Foundation;
 
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Foundation\MaintenanceMode;
 
 interface Application extends Container
 {
