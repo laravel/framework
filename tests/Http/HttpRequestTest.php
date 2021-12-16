@@ -564,7 +564,7 @@ class HttpRequestTest extends TestCase
     public function testDateMethodExceptionWhenValueInvalid()
     {
         $this->expectException(InvalidArgumentException::class);
-        
+
         $request = Request::create('/', 'GET', [
             'date' => 'invalid',
         ]);
