@@ -83,6 +83,13 @@ interface Application extends Container
     public function runningUnitTests();
 
     /**
+     * Get the instance of the MaintenanceMode.
+     *
+     * @return \Illuminate\Foundation\MaintenanceMode
+     */
+    public function maintenanceMode();
+
+    /**
      * Determine if the application is currently down for maintenance.
      *
      * @return bool

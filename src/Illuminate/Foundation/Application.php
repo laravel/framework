@@ -1103,13 +1103,23 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get the instance of the MaintenanceMode.
+     *
+     * @return \Illuminate\Foundation\MaintenanceMode
+     */
+    public function maintenanceMode()
+    {
+        return $this->make(MaintenanceMode::class);
+    }
+
+    /**
      * Determine if the application is currently down for maintenance.
      *
      * @return bool
      */
     public function isDownForMaintenance()
     {
-        return file_exists($this->storagePath().'/framework/down');
+        return $this->maintenanceMode()->isDown();
     }
 
     /**
