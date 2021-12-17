@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\DBAL;
 
+use Illuminate\Database\DBAL\TimestampType;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
-use Illuminate\Database\DBAL\TimestampType;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class TimestampTypeTest extends DatabaseTestCase
@@ -38,6 +37,10 @@ class TimestampTypeTest extends DatabaseTestCase
         });
 
         $this->assertTrue(Schema::hasColumn('test', 'datetime_to_timestamp'));
+        // Only Postgres and MySQL actually have a timestamp type
+        in_array($this->driver, ['pgsql', 'mysql'])
+            ? $this->assertSame('timestamp', Schema::getColumnType('test', 'datetime_to_timestamp'))
+            : $this->assertSame('datetime', Schema::getColumnType('test', 'datetime_to_timestamp'));
     }
 
     public function testChangeTimestampColumnToDatetimeColumn()
@@ -51,5 +54,9 @@ class TimestampTypeTest extends DatabaseTestCase
         });
 
         $this->assertTrue(Schema::hasColumn('test', 'timestamp_to_datetime'));
+        // Postgres only has a timestamp type
+        $this->driver === 'pgsql'
+            ? $this->assertSame('timestamp', Schema::getColumnType('test', 'timestamp_to_datetime'))
+            : $this->assertSame('datetime', Schema::getColumnType('test', 'timestamp_to_datetime'));
     }
 }
