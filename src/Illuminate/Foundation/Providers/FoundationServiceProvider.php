@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Foundation\FileBasedMaintenanceMode;
-use Illuminate\Foundation\MaintenanceMode;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\AggregateServiceProvider;
