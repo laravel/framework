@@ -23,7 +23,7 @@ class PredisConnector implements Connector
             ['timeout' => 10.0], $options, Arr::pull($config, 'options', [])
         );
 
-        if (! empty($config['prefix'])) {
+        if (isset($config['prefix'])) {
             $formattedOptions['prefix'] = $config['prefix'];
         }
 
@@ -42,7 +42,7 @@ class PredisConnector implements Connector
     {
         $clusterSpecificOptions = Arr::pull($config, 'options', []);
 
-        if (! empty($config['prefix'])) {
+        if (isset($config['prefix'])) {
             $clusterSpecificOptions['prefix'] = $config['prefix'];
         }
 
