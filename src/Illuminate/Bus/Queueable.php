@@ -52,7 +52,7 @@ trait Queueable
     public $delay;
 
     /**
-     * The number of seconds the job can run
+     * The number of seconds the job can run.
      *
      * @var int|null
      */
