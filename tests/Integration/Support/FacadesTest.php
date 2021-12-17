@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
 use ReflectionClass;
 

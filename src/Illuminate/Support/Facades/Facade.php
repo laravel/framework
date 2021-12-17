@@ -3,13 +3,13 @@
 namespace Illuminate\Support\Facades;
 
 use Closure;
-use Mockery;
-use Mockery\LegacyMockInterface;
-use RuntimeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
+use Mockery;
+use Mockery\LegacyMockInterface;
+use RuntimeException;
 
 abstract class Facade
 {
