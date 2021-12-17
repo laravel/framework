@@ -53,7 +53,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function emergency(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function emergency($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -65,7 +65,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function alert(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function alert($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -77,7 +77,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function critical(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function critical($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -89,7 +89,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function error(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function error($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -101,7 +101,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function warning(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function warning($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -113,7 +113,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function notice(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function notice($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -125,7 +125,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function info(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function info($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -137,7 +137,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function debug(Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function debug($message, array $context = []): void
     {
         $this->writeLog(__FUNCTION__, $message, $context);
     }
@@ -150,7 +150,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function log($level, Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function log($level, $message, array $context = []): void
     {
         $this->writeLog($level, $message, $context);
     }
@@ -163,7 +163,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    public function write($level, Arrayable|Jsonable|\Stringable|array|string $message, array $context = []): void
+    public function write($level, $message, array $context = []): void
     {
         $this->writeLog($level, $message, $context);
     }
@@ -176,7 +176,7 @@ class Logger implements LoggerInterface
      * @param  array  $context
      * @return void
      */
-    protected function writeLog($level, Arrayable|Jsonable|\Stringable|array|string $message, $context): void
+    protected function writeLog($level, $message, $context): void
     {
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
