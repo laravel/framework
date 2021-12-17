@@ -2,6 +2,8 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Foundation\MaintenanceMode;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\AggregateServiceProvider;
@@ -48,6 +50,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
+        $this->registerMaintenanceMode();
     }
 
     /**
@@ -92,6 +95,16 @@ class FoundationServiceProvider extends AggregateServiceProvider
         Request::macro('hasValidSignatureWhileIgnoring', function ($ignoreQuery = [], $absolute = true) {
             return URL::hasValidSignature($this, $absolute, $ignoreQuery);
         });
+    }
+
+    /**
+     * Register de MaintenanceMode service through a contract
+     *
+     * @return void
+     */
+    public function registerMaintenanceMode()
+    {
+        $this->app->bind(MaintenanceModeContract::class, MaintenanceMode::class);
     }
 
     /**
