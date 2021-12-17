@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Prunable;
@@ -13,6 +14,8 @@ use Symfony\Component\Finder\Finder;
 
 class PruneCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
      * The console command name.
      *
@@ -39,6 +42,10 @@ class PruneCommand extends Command
      */
     public function handle(Dispatcher $events)
     {
+        if (! $this->confirmToProceed()) {
+            return Command::SUCCESS;
+        }
+
         $models = $this->models();
 
         if ($models->isEmpty()) {
