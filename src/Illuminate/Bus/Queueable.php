@@ -52,6 +52,13 @@ trait Queueable
     public $delay;
 
     /**
+     * The number of seconds the job can run
+     *
+     * @var int|null
+     */
+    public $timeout;
+
+    /**
      * Indicates whether the job should be dispatched after all database transactions have committed.
      *
      * @var bool|null
@@ -135,6 +142,19 @@ trait Queueable
     public function delay($delay)
     {
         $this->delay = $delay;
+
+        return $this;
+    }
+
+    /**
+     * The number of seconds the job can run.
+     *
+     * @param  int  $timeout
+     * @return $this
+     */
+    public function setTimeout(int $timeout = null)
+    {
+        $this->timeout = $timeout;
 
         return $this;
     }
