@@ -47,13 +47,13 @@ class DownCommand extends Command
     public function handle()
     {
         try {
-            if ($this->laravel->maintenanceMode()->isDown()) {
+            if ($this->laravel->maintenanceMode()->active()) {
                 $this->comment('Application is already down.');
 
                 return 0;
             }
 
-            $this->laravel->maintenanceMode()->down($this->getDownFilePayload());
+            $this->laravel->maintenanceMode()->activate($this->getDownFilePayload());
 
             file_put_contents(
                 storage_path('framework/maintenance.php'),

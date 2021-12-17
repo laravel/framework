@@ -1107,7 +1107,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Get the instance of the MaintenanceMode.
+     * Get an instance of the maintenance mode manager implementation.
      *
      * @return \Illuminate\Contracts\Foundation\MaintenanceMode
      */
@@ -1123,7 +1123,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function isDownForMaintenance()
     {
-        return $this->maintenanceMode()->isDown();
+        return $this->maintenanceMode()->active();
     }
 
     /**

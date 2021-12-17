@@ -39,13 +39,13 @@ class UpCommand extends Command
     public function handle()
     {
         try {
-            if ($this->laravel->maintenanceMode()->isUp()) {
+            if (! $this->laravel->maintenanceMode()->active()) {
                 $this->comment('Application is already up.');
 
                 return 0;
             }
 
-            $this->laravel->maintenanceMode()->up();
+            $this->laravel->maintenanceMode()->deactivate();
 
             if (is_file(storage_path('framework/maintenance.php'))) {
                 unlink(storage_path('framework/maintenance.php'));

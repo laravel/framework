@@ -45,8 +45,8 @@ class PreventRequestsDuringMaintenance
      */
     public function handle($request, Closure $next)
     {
-        if ($this->app->maintenanceMode()->isDown()) {
-            $data = $this->app->maintenanceMode()->getPayload();
+        if ($this->app->maintenanceMode()->active()) {
+            $data = $this->app->maintenanceMode()->data();
 
             if (isset($data['secret']) && $request->path() === $data['secret']) {
                 return $this->bypassResponse($data['secret']);

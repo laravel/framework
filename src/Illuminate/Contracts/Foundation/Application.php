@@ -84,7 +84,7 @@ interface Application extends Container
     public function runningUnitTests();
 
     /**
-     * Get the instance of the MaintenanceMode.
+     * Get an instance of the maintenance mode manager implementation.
      *
      * @return \Illuminate\Contracts\Foundation\MaintenanceMode
      */
