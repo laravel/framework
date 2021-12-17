@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Filesystem\Filesystem;
@@ -1106,13 +1107,23 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Get an instance of the maintenance mode manager implementation.
+     *
+     * @return \Illuminate\Contracts\Foundation\MaintenanceMode
+     */
+    public function maintenanceMode()
+    {
+        return $this->make(MaintenanceModeContract::class);
+    }
+
+    /**
      * Determine if the application is currently down for maintenance.
      *
      * @return bool
      */
     public function isDownForMaintenance()
     {
-        return file_exists($this->storagePath().'/framework/down');
+        return $this->maintenanceMode()->active();
     }
 
     /**
