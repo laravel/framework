@@ -267,16 +267,16 @@ class CacheTaggedCacheTest extends TestCase
         $store->shouldReceive('connection')->andReturn($conn = m::mock(stdClass::class));
 
         // Forever tag keys
-        $conn->shouldReceive('smembers')->once()->with('prefix:foo:forever_ref')->andReturn(['key1', 'key2']);
-        $conn->shouldReceive('smembers')->once()->with('prefix:bar:forever_ref')->andReturn(['key3']);
+        $conn->shouldReceive('sscan')->once()->with('prefix:foo:forever_ref', '0', ['match' => '*', 'count' => 1000])->andReturn(['0', ['key1', 'key2']]);
+        $conn->shouldReceive('sscan')->once()->with('prefix:bar:forever_ref', '0', ['match' => '*', 'count' => 1000])->andReturn(['0', ['key3']]);
         $conn->shouldReceive('del')->once()->with('key1', 'key2');
         $conn->shouldReceive('del')->once()->with('key3');
         $conn->shouldReceive('del')->once()->with('prefix:foo:forever_ref');
         $conn->shouldReceive('del')->once()->with('prefix:bar:forever_ref');
 
         // Standard tag keys
-        $conn->shouldReceive('smembers')->once()->with('prefix:foo:standard_ref')->andReturn(['key4', 'key5']);
-        $conn->shouldReceive('smembers')->once()->with('prefix:bar:standard_ref')->andReturn(['key6']);
+        $conn->shouldReceive('sscan')->once()->with('prefix:foo:standard_ref', '0', ['match' => '*', 'count' => 1000])->andReturn(['0', ['key4', 'key5']]);
+        $conn->shouldReceive('sscan')->once()->with('prefix:bar:standard_ref', '0', ['match' => '*', 'count' => 1000])->andReturn(['0', ['key6']]);
         $conn->shouldReceive('del')->once()->with('key4', 'key5');
         $conn->shouldReceive('del')->once()->with('key6');
         $conn->shouldReceive('del')->once()->with('prefix:foo:standard_ref');
