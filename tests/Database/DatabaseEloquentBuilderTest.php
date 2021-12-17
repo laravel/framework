@@ -339,6 +339,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testSearch()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'LIKE', '%bar%');
+        $result = $builder->search('foo','bar');
+        $this->assertEquals($result, $builder);
+    }
+
     public function testChunkWithCountZero()
     {
         $builder = m::mock(Builder::class.'[forPage,get]', [$this->getMockQueryBuilder()]);
