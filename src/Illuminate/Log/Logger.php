@@ -9,7 +9,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Log\Events\MessageLogged;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Stringable;
 
 class Logger implements LoggerInterface
 {
