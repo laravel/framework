@@ -42,6 +42,10 @@ class PredisConnector implements Connector
     {
         $clusterSpecificOptions = Arr::pull($config, 'options', []);
 
+        if (! empty($config['prefix'])) {
+            $clusterSpecificOptions['prefix'] = $config['prefix'];
+        }
+
         return new PredisClusterConnection(new Client(array_values($config), array_merge(
             $options, $clusterOptions, $clusterSpecificOptions
         )));
