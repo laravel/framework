@@ -393,7 +393,7 @@ class Builder
      */
     public function registerCustomDoctrineType($class, $name, $type)
     {
-        $this->connection->registerCustomDoctrineType($class, $name, $type);
+        $this->connection->registerDoctrineType($class, $name, $type);
     }
 
     /**

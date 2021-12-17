@@ -1023,7 +1023,7 @@ class Connection implements ConnectionInterface
      * @throws \Doctrine\DBAL\DBALException
      * @throws \RuntimeException
      */
-    public function registerCustomDoctrineType(string $class, string $name, string $type): void
+    public function registerDoctrineType(string $class, string $name, string $type): void
     {
         if (! $this->isDoctrineAvailable()) {
             throw new RuntimeException(
