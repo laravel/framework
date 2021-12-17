@@ -98,7 +98,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Register de MaintenanceMode service through a contract
+     * Register de MaintenanceMode service through a contract.
      *
      * @return void
      */
