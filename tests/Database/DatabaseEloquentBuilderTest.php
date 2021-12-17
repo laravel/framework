@@ -343,7 +343,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'LIKE', '%bar%');
-        $result = $builder->search('foo','bar');
+        $result = $builder->search('foo', 'bar');
         $this->assertEquals($result, $builder);
     }
 
