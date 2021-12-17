@@ -248,6 +248,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic like clause to the query.
+     *
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function search($column, $value)
+    {
+        $this->where($column, 'LIKE', "%{$value}%");
+
+        return $this;
+    }
+
+    /**
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
