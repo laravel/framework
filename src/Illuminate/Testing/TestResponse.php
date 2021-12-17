@@ -92,32 +92,35 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response has a 200 status code.
      *
+     * @param string|null $message
      * @return $this
      */
-    public function assertOk()
+    public function assertOk(string $message = null)
     {
-        return $this->assertStatus(200);
+        return $this->assertStatus(200, $message);
     }
 
     /**
      * Assert that the response has a 201 status code.
      *
+     * @param string|null $message
      * @return $this
      */
-    public function assertCreated()
+    public function assertCreated(string $message = null)
     {
-        return $this->assertStatus(201);
+        return $this->assertStatus(201, $message);
     }
 
     /**
      * Assert that the response has the given status code and no content.
      *
      * @param  int  $status
+     * @param string|null $message
      * @return $this
      */
-    public function assertNoContent($status = 204)
+    public function assertNoContent($status = 204, string $message = null)
     {
-        $this->assertStatus($status);
+        $this->assertStatus($status, $message);
 
         PHPUnit::assertEmpty($this->getContent(), 'Response content is not empty.');
 
@@ -127,41 +130,45 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response has a not found status code.
      *
+     * @param string|null $message
      * @return $this
      */
-    public function assertNotFound()
+    public function assertNotFound(string $message = null)
     {
-        return $this->assertStatus(404);
+        return $this->assertStatus(404, $message);
     }
 
     /**
      * Assert that the response has a forbidden status code.
      *
+     * @param string|null $message
      * @return $this
      */
-    public function assertForbidden()
+    public function assertForbidden(string $message = null)
     {
-        return $this->assertStatus(403);
+        return $this->assertStatus(403, $message);
     }
 
     /**
      * Assert that the response has an unauthorized status code.
      *
+     * @param string|null $message
      * @return $this
      */
-    public function assertUnauthorized()
+    public function assertUnauthorized(string $message = null)
     {
-        return $this->assertStatus(401);
+        return $this->assertStatus(401, $message);
     }
 
     /**
      * Assert that the response has a 422 status code.
      *
+     * @param string|null $message
      * @return $this
      */
-    public function assertUnprocessable()
+    public function assertUnprocessable(string $message = null)
     {
-        return $this->assertStatus(422);
+        return $this->assertStatus(422, $message);
     }
 
     /**
@@ -170,9 +177,11 @@ class TestResponse implements ArrayAccess
      * @param  int  $status
      * @return $this
      */
-    public function assertStatus($status)
+    public function assertStatus($status, string $message = null)
     {
-        $message = $this->statusMessageWithDetails($status, $actual = $this->getStatusCode());
+        if (!$message) {
+            $message = $this->statusMessageWithDetails($status, $actual = $this->getStatusCode());
+        }
 
         PHPUnit::assertSame($actual, $status, $message);
 
