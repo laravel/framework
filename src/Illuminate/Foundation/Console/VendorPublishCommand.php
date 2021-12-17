@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\MountManager;
@@ -259,8 +260,10 @@ class VendorPublishCommand extends Command
     protected function moveManagedFiles($manager)
     {
         foreach ($manager->listContents('from://', true) as $file) {
-            if ($file['type'] === 'file' && (! $manager->fileExists('to://'.$file['path']) || $this->option('force'))) {
-                $manager->write('to://'.$file['path'], $manager->read('from://'.$file['path']));
+            $path = Str::after($file['path'], 'from://');
+
+            if ($file['type'] === 'file' && (! $manager->fileExists('to://'.$path) || $this->option('force'))) {
+                $manager->write('to://'.$path, $manager->read($file['path']));
             }
         }
     }
