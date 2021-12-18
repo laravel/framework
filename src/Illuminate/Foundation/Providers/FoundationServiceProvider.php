@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
+use Illuminate\Foundation\CacheBasedMaintenanceMode;
 use Illuminate\Foundation\FileBasedMaintenanceMode;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
@@ -128,6 +129,16 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerMaintenanceModeManager()
     {
-        $this->app->bind(MaintenanceModeContract::class, FileBasedMaintenanceMode::class);
+        $this->app->bind(MaintenanceModeContract::class, function () {
+            $driver = config('app.maintenance_mode', 'filesystem');
+
+            if ($driver === 'cache') {
+                return new CacheBasedMaintenanceMode(
+                    $this->app->make('cache'), config('cache.default'), 'illuminate:foundation:down',
+                );
+            }
+
+            return new FileBasedMaintenanceMode();
+        });
     }
 }
