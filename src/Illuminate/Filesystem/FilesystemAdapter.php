@@ -574,8 +574,8 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif (static::hasMacro('getTemporaryUrl')) {
-            return $this->macroCall('getTemporaryUrl', [$path, $expiration, $options]);
+        } elseif (static::hasMacro($this->getTemporaryUrlMacroName())) {
+            return $this->macroCall($this->getTemporaryUrlMacroName(), [$path, $expiration, $options]);
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
         } else {
@@ -613,6 +613,17 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         return (string) $uri;
+    }
+
+    /**
+     * Define any custom logic that should be used for building temporary URLs
+     * for a given filesystem.
+     *
+     * @param Closure $closure
+     */
+    public function buildTemporaryUrlUsing($closure)
+    {
+        self::macro($this->getTemporaryUrlMacroName(), $closure);
     }
 
     /**
@@ -778,6 +789,17 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
+    }
+
+    /**
+     * Build and return a name that can be used to define and fetch macros
+     * for the 'temporaryUrl' method for a specific filesystem driver.
+     *
+     * @return string
+     */
+    protected function getTemporaryUrlMacroName()
+    {
+        return get_class($this->driver->getAdapter()).'_temporaryUrl';
     }
 
     /**

@@ -337,7 +337,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
 
-        $filesystemAdapter->macro('getTemporaryUrl', function ($path, Carbon $expiration, $options) {
+        $filesystemAdapter->buildTemporaryUrlUsing(function ($path, Carbon $expiration, $options) {
             return $path.$expiration->toString().implode('', $options);
         });
 
