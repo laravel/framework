@@ -528,7 +528,7 @@ class Worker
         }
     }
 
-     /**
+    /**
      * Get the stored key for job's total number of exceptions.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
