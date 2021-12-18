@@ -619,7 +619,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Define any custom logic that should be used for building temporary URLs
      * for a given filesystem.
      *
-     * @param Closure $closure
+     * @param  Closure  $closure
      */
     public function buildTemporaryUrlUsing($closure)
     {
