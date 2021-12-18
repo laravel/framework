@@ -574,6 +574,8 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
+        } elseif (static::hasMacro('getTemporaryUrl')) {
+            return $this->macroCall('getTemporaryUrl', [$path, $expiration, $options]);
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
         } else {
