@@ -40,6 +40,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string|false mimeType(string $path)
  * @method static string|false putFile(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, mixed $options = [])
  * @method static string|false putFileAs(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, string $name, mixed $options = [])
+ * @method static void macro(string $name, object|callable $macro)
  *
  * @see \Illuminate\Filesystem\FilesystemManager
  */
