@@ -32,9 +32,9 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
     /**
      * Create a new cache-based maintenance mode manager.
      *
-     * @param  \Illuminate\Contracts\Cache\Factory $cache
-     * @param  string $store
-     * @param  string $key
+     * @param  \Illuminate\Contracts\Cache\Factory  $cache
+     * @param  string  $store
+     * @param  string  $key
      * @return void
      */
     public function __construct(Factory $cache, string $store, string $key)
@@ -47,7 +47,7 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
     /**
      * Take the application down for maintenance.
      *
-     * @param  array $payload
+     * @param  array  $payload
      * @return void
      */
     public function activate(array $payload): void

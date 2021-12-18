@@ -20,6 +20,7 @@ class MaintenanceModeManager extends Manager
      * Create an instance of the cache maintenance driver.
      *
      * @return \Illuminate\Foundation\CacheBasedMaintenanceMode
+     *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function createCacheDriver(): CacheBasedMaintenanceMode
