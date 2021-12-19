@@ -772,7 +772,7 @@ trait HasRelationships
      */
     public function getRelation($relation)
     {
-        return $this->relations[$relation];
+        return $this->relations[$relation] ?? null;
     }
 
     /**
