@@ -45,6 +45,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $driver;
 
     /**
+     * Custom logic that should be used for building temporary URLs
+     * for different file systems.
+     *
+     * @param  array<class-string, Closure>
+     */
+    protected static $temporaryUrlBuilders = [];
+
+    /**
      * Create a new filesystem adapter instance.
      *
      * @param  \League\Flysystem\FilesystemInterface  $driver
@@ -574,13 +582,17 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif (static::hasMacro($this->getTemporaryUrlMacroName())) {
-            return $this->macroCall($this->getTemporaryUrlMacroName(), [$path, $expiration, $options]);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
-        } else {
-            throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
+
+        if ($builder = Arr::get(static::$temporaryUrlBuilders, get_class($this->driver->getAdapter()))) {
+            return $builder->bindTo($this, static::class)($path, $expiration, $options);
+        }
+
+        if ($adapter instanceof AwsS3Adapter) {
+            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
+        }
+
+        throw new RuntimeException('This driver does not support creating temporary URLs.');
     }
 
     /**
@@ -623,7 +635,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function buildTemporaryUrlUsing($closure)
     {
-        self::macro($this->getTemporaryUrlMacroName(), $closure);
+        static::$temporaryUrlBuilders[get_class($this->driver->getAdapter())] = $closure;
     }
 
     /**
@@ -789,17 +801,6 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
-    }
-
-    /**
-     * Build and return a name that can be used to define and fetch macros
-     * for the 'temporaryUrl' method for a specific filesystem driver.
-     *
-     * @return string
-     */
-    protected function getTemporaryUrlMacroName()
-    {
-        return get_class($this->driver->getAdapter()).'_temporaryUrl';
     }
 
     /**
