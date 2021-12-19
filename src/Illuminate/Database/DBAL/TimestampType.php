@@ -83,8 +83,8 @@ class TimestampType extends Type implements PhpDateTimeMappingType
     protected function getSqlServerPlatformSQLDeclaration(array $fieldDeclaration)
     {
         return $fieldDeclaration['precision'] ?? false
-                ? 'DATETIME2('.$fieldDeclaration['precision'].')'
-                : 'DATETIME';
+                    ? 'DATETIME2('.$fieldDeclaration['precision'].')'
+                    : 'DATETIME';
     }
 
     /**
