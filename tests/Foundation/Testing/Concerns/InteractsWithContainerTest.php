@@ -44,10 +44,10 @@ class InteractsWithContainerTest extends TestCase
     public function testPartialMockSimple()
     {
         $this->partialMock(IntanceStub::class)
-            ->shouldReceive('sayHi')
-            ->andReturn('Hi');
+            ->shouldReceive('execute')
+            ->andReturn('bar');
 
-        $this->assertSame('Hi', $this->app->make(IntanceStub::class)->sayHi());
+        $this->assertSame('bar', $this->app->make(IntanceStub::class)->execute());
     }
 
     public function testPartialMockConstructor()
@@ -56,7 +56,7 @@ class InteractsWithContainerTest extends TestCase
             ->shouldReceive('execute')
             ->andReturn('bar');
 
-        $this->partialMock([PartialMockStub::class, [$this->app->make(IntanceStub::class)]], function ($mock) {
+        $this->partialMock([PartialMockStub::class, ['bar']], function ($mock) {
             $mock
                 ->shouldReceive('getGreeting')
                 ->andReturn('Hi');
@@ -76,16 +76,16 @@ class IntanceStub
 
 class PartialMockStub
 {
-    private $intanceStub;
+    private $name;
 
-    public function __construct(IntanceStub $intanceStub)
+    public function __construct($name)
     {
-        $this->intanceStub = $intanceStub;
+        $this->name = $name;
     }
 
     public function greet()
     {
-        return $this->getGreeting() . ' ' . $this->intanceStub->execute();
+        return $this->getGreeting() . ' ' . $this->name;
     }
 
     public function getGreeting()

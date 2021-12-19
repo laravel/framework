@@ -63,7 +63,7 @@ trait InteractsWithContainer
     protected function partialMock($abstract, Closure $mock = null)
     {
         $abstractClass = $abstract;
-        $args = func_get_args();
+        $args = array_filter(func_get_args());
 
         if (is_array($abstract)) {
             $abstractClass = $abstract[0];
