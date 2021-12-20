@@ -87,7 +87,7 @@ EOF, str_replace("\r", '', $output->fetch()));
         $output = $this->artisan(['--model' => NonPrunableTestModel::class]);
 
         $this->assertEquals(<<<'EOF'
-No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
+No prunable models found.
 
 EOF, str_replace("\r", '', $output->fetch()));
     }
@@ -157,6 +157,39 @@ EOF, str_replace("\r", '', $output->fetch()));
 EOF, str_replace("\r", '', $output->fetch()));
 
         $this->assertEquals(4, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+    }
+
+    public function testCombinationOfModelAndExceptParameter()
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+        $db->bootEloquent();
+        $db->setAsGlobal();
+        DB::connection('default')->getSchemaBuilder()->create('prunables', function ($table) {
+            $table->string('value')->nullable();
+            $table->datetime('deleted_at')->nullable();
+        });
+        DB::connection('default')->table('prunables')->insert([
+            ['value' => 1, 'deleted_at' => null],
+            ['value' => 2, 'deleted_at' => '2021-12-01 00:00:00'],
+            ['value' => 3, 'deleted_at' => null],
+            ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
+        ]);
+
+        $output = $this->artisan([
+            '--model' => [PrunableTestModelWithPrunableRecords::class, PrunableTestSoftDeletedModelWithPrunableRecords::class],
+            '--except' => PrunableTestModelWithPrunableRecords::class,
+        ]);
+
+        $this->assertEquals(<<<'EOF'
+Using a combination of the --except and --model parameters can result into unexpected behavior.
+2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records have been pruned.
+
+EOF, str_replace("\r", '', $output->fetch()));
+
     }
 
     protected function artisan($arguments)
