@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Support\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\DiscoverEvents;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,13 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [];
 
     /**
+     * The observers mapping for the application models.
+     *
+     * @var array
+     */
+    protected $observers = [];
+
+    /**
      * Register the application's event listeners.
      *
      * @return void
@@ -41,6 +49,8 @@ class EventServiceProvider extends ServiceProvider
             foreach ($this->subscribe as $subscriber) {
                 Event::subscribe($subscriber);
             }
+
+            $this->registerObservers();
         });
     }
 
@@ -144,5 +154,27 @@ class EventServiceProvider extends ServiceProvider
     protected function eventDiscoveryBasePath()
     {
         return base_path();
+    }
+
+    /**
+     * Get the observers defined on the provider.
+     *
+     * @return array
+     */
+    public function observers()
+    {
+        return $this->observers;
+    }
+
+    /**
+     * Register the application model's observers.
+     *
+     * @return void
+     */
+    public function registerObservers()
+    {
+        foreach ($this->observers() as $model => $observers) {
+            $model::observe($observers);
+        }
     }
 }
