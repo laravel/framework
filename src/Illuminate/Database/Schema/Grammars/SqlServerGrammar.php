@@ -2,11 +2,14 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 
 class SqlServerGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *
@@ -27,6 +30,24 @@ class SqlServerGrammar extends Grammar
      * @var string[]
      */
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new SqlServer grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Compile a create database command.

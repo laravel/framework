@@ -2,12 +2,15 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class PostgresGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * All of the available clause operators.
      *
@@ -20,6 +23,24 @@ class PostgresGrammar extends Grammar
         '&&', '@>', '<@', '?', '?|', '?&', '||', '-', '@?', '@@', '#-',
         'is distinct from', 'is not distinct from',
     ];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new Postgres grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * {@inheritdoc}

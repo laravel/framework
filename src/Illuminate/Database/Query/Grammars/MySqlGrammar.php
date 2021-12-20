@@ -2,17 +2,38 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * The grammar specific operators.
      *
      * @var string[]
      */
     protected $operators = ['sounds like'];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new MySql grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Add a "where null" clause to the query.

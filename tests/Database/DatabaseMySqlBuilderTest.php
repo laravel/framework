@@ -17,9 +17,9 @@ class DatabaseMySqlBuilderTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new MySqlGrammar;
-
         $connection = m::mock(Connection::class);
+        $grammar = new MySqlGrammar($connection);
+
         $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8mb4');
         $connection->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8mb4_unicode_ci');
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
@@ -33,9 +33,9 @@ class DatabaseMySqlBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new MySqlGrammar;
-
         $connection = m::mock(Connection::class);
+        $grammar = new MySqlGrammar($connection);
+
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
             'drop database if exists `my_database_a`'

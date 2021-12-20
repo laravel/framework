@@ -537,9 +537,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testAddingEnum()
     {
+        $connection = $this->getConnection();
+        $grammar = new SqlServerGrammar($connection);
+
+        $connection->shouldReceive('quoteString')->andReturnUsing(fn ($value) => "N'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->enum('role', ['member', 'admin']);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
@@ -967,6 +972,6 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new SqlServerGrammar;
+        return new SqlServerGrammar($this->getConnection());
     }
 }

@@ -17,7 +17,13 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new class extends Grammar {};
+        $grammar = new class extends Grammar
+        {
+            protected function quoteValue($value)
+            {
+                return "'{$value}'";
+            }
+        };
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('This database driver does not support creating databases.');
@@ -27,7 +33,13 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new class extends Grammar {};
+        $grammar = new class extends Grammar
+        {
+            protected function quoteValue($value)
+            {
+                return "'{$value}'";
+            }
+        };
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('This database driver does not support dropping databases.');

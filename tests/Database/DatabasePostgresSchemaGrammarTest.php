@@ -224,9 +224,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddingPrimaryKey()
     {
+        $connection = $this->getConnection();
+        $grammar = new PostgresGrammar($connection);
+
+        $connection->shouldReceive('quoteValue')->andReturnUsing(fn ($value) => "'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->primary('foo');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add primary key ("foo")', $statements[0]);
@@ -264,9 +269,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddingFulltextIndex()
     {
+        $connection = $this->getConnection();
+        $grammar = new PostgresGrammar($connection);
+        $connection->shouldReceive('quoteString')->andReturnUsing(fn ($value) => "'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->fulltext('body');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[0]);
@@ -274,9 +283,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddingFulltextIndexWithLanguage()
     {
+        $connection = $this->getConnection();
+        $grammar = new PostgresGrammar($connection);
+        $connection->shouldReceive('quoteString')->andReturnUsing(fn ($value) => "'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->fulltext('body')->language('spanish');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'spanish\', "body"))', $statements[0]);
@@ -284,9 +297,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddingFulltextIndexWithFluency()
     {
+        $connection = $this->getConnection();
+        $grammar = new PostgresGrammar($connection);
+        $connection->shouldReceive('quoteString')->andReturnUsing(fn ($value) => "'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->string('body')->fulltext();
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(2, $statements);
         $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[1]);
@@ -561,9 +578,14 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function testAddingEnum()
     {
+        $connection = $this->getConnection();
+        $grammar = new PostgresGrammar($connection);
+
+        $connection->shouldReceive('quoteString')->andReturnUsing(fn ($value) => "'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->enum('role', ['member', 'admin']);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "role" varchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
@@ -1117,7 +1139,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new PostgresGrammar;
+        return new PostgresGrammar($this->getConnection());
     }
 
     public function testGrammarsAreMacroable()

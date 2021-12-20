@@ -492,9 +492,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testAddingEnum()
     {
+        $connection = $this->getConnection();
+        $grammar = new SQLiteGrammar($connection);
+
+        $connection->shouldReceive('quoteString')->andReturnUsing(fn ($value) => "'{$value}'");
+
         $blueprint = new Blueprint('users');
         $blueprint->enum('role', ['member', 'admin']);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $statements = $blueprint->toSql($connection, $grammar);
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
@@ -963,6 +968,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new SQLiteGrammar;
+        return new SQLiteGrammar($this->getConnection());
     }
 }

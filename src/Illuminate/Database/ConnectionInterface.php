@@ -167,4 +167,12 @@ interface ConnectionInterface
      * @return string
      */
     public function getDatabaseName();
+
+    /**
+     * Quote the given string literal.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function quoteString($value);
 }

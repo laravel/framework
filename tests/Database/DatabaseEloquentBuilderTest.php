@@ -806,7 +806,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('foo', $builder->raw('bar'));
 
         $builder = $this->getBuilder();
-        $grammar = new Grammar;
+        $grammar = $this->getGrammar();
         $builder->getQuery()->shouldReceive('getGrammar')->once()->andReturn($grammar);
         $this->assertSame($grammar, $builder->getGrammar());
     }
@@ -1655,7 +1655,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), $this->getGrammar(), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -1671,7 +1671,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithTimestampValue()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), $this->getGrammar(), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -1685,7 +1685,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testUpdateWithoutTimestamp()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), $this->getGrammar(), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStubWithoutTimestamp;
         $this->mockConnectionForModel($model, '');
@@ -1701,7 +1701,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         Carbon::setTestNow($now = '2017-10-10 10:10:10');
 
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), $this->getGrammar(), m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
@@ -1752,7 +1752,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testClone()
     {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), $this->getGrammar(), m::mock(Processor::class));
         $builder = new Builder($query);
         $builder->select('*')->from('users');
         $clone = $builder->clone()->where('email', 'foo');
@@ -1766,7 +1766,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
-        $grammar = new $grammarClass;
+        $grammar = match ($grammarClass) {
+            'Illuminate\Database\Query\Grammars\Grammar' => $this->getGrammar(),
+            default => new $grammarClass(m::mock(ConnectionInterface::class)),
+        };
         $processor = new $processorClass;
         $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
@@ -1781,6 +1784,17 @@ class DatabaseEloquentBuilderTest extends TestCase
     protected function getBuilder()
     {
         return new Builder($this->getMockQueryBuilder());
+    }
+
+    protected function getGrammar()
+    {
+        return new class extends Grammar
+        {
+            protected function quoteValue($value)
+            {
+                return "'{$value}'";
+            }
+        };
     }
 
     protected function getMockModel()

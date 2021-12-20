@@ -2,12 +2,15 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SQLiteGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * All of the available clause operators.
      *
@@ -18,6 +21,24 @@ class SQLiteGrammar extends Grammar
         'like', 'not like', 'ilike',
         '&', '|', '<<', '>>',
     ];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new SQLite grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Compile the lock into SQL.

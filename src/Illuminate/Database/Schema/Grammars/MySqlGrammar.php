@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
@@ -9,6 +10,8 @@ use RuntimeException;
 
 class MySqlGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * The possible column modifiers.
      *
@@ -25,6 +28,24 @@ class MySqlGrammar extends Grammar
      * @var string[]
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new MySql grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Compile a create database command.

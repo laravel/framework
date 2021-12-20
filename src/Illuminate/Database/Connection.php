@@ -15,7 +15,6 @@ use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
@@ -24,7 +23,7 @@ use PDO;
 use PDOStatement;
 use RuntimeException;
 
-class Connection implements ConnectionInterface
+abstract class Connection implements ConnectionInterface
 {
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
@@ -229,10 +228,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Query\Grammars\Grammar
      */
-    protected function getDefaultQueryGrammar()
-    {
-        return new QueryGrammar;
-    }
+    abstract protected function getDefaultQueryGrammar();
 
     /**
      * Set the schema grammar to the default implementation.
@@ -249,10 +245,7 @@ class Connection implements ConnectionInterface
      *
      * @return \Illuminate\Database\Schema\Grammars\Grammar
      */
-    protected function getDefaultSchemaGrammar()
-    {
-        //
-    }
+    abstract protected function getDefaultSchemaGrammar();
 
     /**
      * Set the query post processor to the default implementation.
@@ -1456,5 +1449,31 @@ class Connection implements ConnectionInterface
     public static function getResolver($driver)
     {
         return static::$resolvers[$driver] ?? null;
+    }
+
+    /**
+     * Quote the given string literal.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function quoteString($value)
+    {
+        $this->reconnectIfMissingConnection();
+
+        // Here we will run this query. If an exception occurs we'll determine if it was
+        // caused by a connection that has been lost. If that is the cause, we'll try
+        // to re-establish connection and re-run the query with a fresh connection.
+        try {
+            return $this->getPdo()->quote($value);
+        } catch (QueryException $e) {
+            if ($this->causedByLostConnection($e->getPrevious())) {
+                $this->reconnect();
+
+                return $this->getPdo()->quote($value);
+            }
+
+            throw $e;
+        }
     }
 }

@@ -2,12 +2,15 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SqlServerGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * All of the available clause operators.
      *
@@ -18,6 +21,24 @@ class SqlServerGrammar extends Grammar
         'like', 'not like', 'ilike',
         '&', '&=', '|', '|=', '^', '^=',
     ];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new SqlServer grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Compile a select query into SQL.

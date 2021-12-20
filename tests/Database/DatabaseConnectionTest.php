@@ -12,10 +12,11 @@ use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\Grammars\Grammar as SchemaGrammar;
 use Mockery as m;
 use PDO;
 use PDOException;
@@ -180,7 +181,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->expects($this->once())->method('beginTransaction');
         $pdo->expects($this->once())->method('exec')->will($this->throwException(new Exception));
         $connection = $this->getMockConnection(['reconnect'], $pdo);
-        $queryGrammar = $this->createMock(Grammar::class);
+        $queryGrammar = $this->createMock(QueryGrammar::class);
         $queryGrammar->expects($this->once())->method('compileSavepoint')->willReturn('trans1');
         $queryGrammar->expects($this->once())->method('supportsSavepoints')->willReturn(true);
         $connection->setQueryGrammar($queryGrammar);
@@ -313,7 +314,7 @@ class DatabaseConnectionTest extends TestCase
         $pdo->shouldReceive('prepare')->once()->andReturn($statement);
         $statement->shouldReceive('execute')->once()->andThrow(new PDOException('server has gone away'));
 
-        $connection = new Connection($pdo);
+        $connection = $this->getConnection($pdo);
         $connection->beginTransaction();
         $connection->statement('foo');
     }
@@ -328,7 +329,7 @@ class DatabaseConnectionTest extends TestCase
 
         $pdo->shouldReceive('prepare')->twice()->andReturn($statement);
 
-        $connection = new Connection($pdo);
+        $connection = $this->getConnection($pdo);
 
         $called = false;
 
@@ -377,7 +378,7 @@ class DatabaseConnectionTest extends TestCase
     public function testFromCreatesNewQueryBuilder()
     {
         $conn = $this->getMockConnection();
-        $conn->setQueryGrammar(m::mock(Grammar::class));
+        $conn->setQueryGrammar(m::mock(QueryGrammar::class));
         $conn->setPostProcessor(m::mock(Processor::class));
         $builder = $conn->table('users');
         $this->assertInstanceOf(BaseBuilder::class, $builder);
@@ -390,7 +391,7 @@ class DatabaseConnectionTest extends TestCase
         $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
-        $grammar = m::mock(Grammar::class);
+        $grammar = m::mock(QueryGrammar::class);
         $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
@@ -444,6 +445,34 @@ class DatabaseConnectionTest extends TestCase
         $connection->enableQueryLog();
 
         return $connection;
+    }
+
+    protected function getConnection($pdo)
+    {
+        return new class($pdo) extends Connection
+        {
+            protected function getDefaultQueryGrammar()
+            {
+                return new class extends QueryGrammar
+                {
+                    protected function quoteValue($value)
+                    {
+                        return "'{$value}'";
+                    }
+                };
+            }
+
+            protected function getDefaultSchemaGrammar()
+            {
+                return new class extends SchemaGrammar
+                {
+                    protected function quoteValue($value)
+                    {
+                        return "'{$value}'";
+                    }
+                };
+            }
+        };
     }
 }
 

@@ -113,16 +113,16 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = m::mock(Connection::class);
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table `users` add `created` datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['alter table `users` add `created` datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar($connection)));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new PostgresGrammar));
+        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new PostgresGrammar($connection)));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));
+        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar($connection)));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
+        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar($connection)));
     }
 
     public function testDefaultCurrentTimestamp()
@@ -134,16 +134,16 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = m::mock(Connection::class);
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar($connection)));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new PostgresGrammar));
+        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new PostgresGrammar($connection)));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));
+        $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar($connection)));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
+        $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar($connection)));
     }
 
     public function testUnsignedDecimalTable()
@@ -155,7 +155,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $connection = m::mock(Connection::class);
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testRemoveColumn()
@@ -170,7 +170,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
 
-        $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['alter table `users` add `foo` varchar(255) not null'], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testMacroable()
@@ -189,7 +189,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $connection = m::mock(Connection::class);
 
-        $this->assertEquals(['bar'], $blueprint->toSql($connection, new MySqlGrammar));
+        $this->assertEquals(['bar'], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testDefaultUsingIdMorph()
@@ -205,7 +205,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` bigint unsigned not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testDefaultUsingNullableIdMorph()
@@ -221,7 +221,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` bigint unsigned null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testDefaultUsingUuidMorph()
@@ -239,7 +239,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(36) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testDefaultUsingNullableUuidMorph()
@@ -257,7 +257,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `comments` add `commentable_type` varchar(255) null, add `commentable_id` char(36) null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testGenerateRelationshipColumnWithIncrementalModel()
@@ -272,7 +272,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `user_id` bigint unsigned not null',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testGenerateRelationshipColumnWithUuidModel()
@@ -289,7 +289,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
     }
 
     public function testTinyTextColumn()
@@ -303,22 +303,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table `posts` add `note` tinytext not null',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add column "note" text not null',
-        ], $blueprint->toSql($connection, new SQLiteGrammar));
+        ], $blueprint->toSql($connection, new SQLiteGrammar($connection)));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add column "note" varchar(255) not null',
-        ], $blueprint->toSql($connection, new PostgresGrammar));
+        ], $blueprint->toSql($connection, new PostgresGrammar($connection)));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add "note" nvarchar(255) not null',
-        ], $blueprint->toSql($connection, new SqlServerGrammar));
+        ], $blueprint->toSql($connection, new SqlServerGrammar($connection)));
     }
 
     public function testTinyTextNullableColumn()
@@ -332,21 +332,21 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table `posts` add `note` tinytext null',
-        ], $blueprint->toSql($connection, new MySqlGrammar));
+        ], $blueprint->toSql($connection, new MySqlGrammar($connection)));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add column "note" text',
-        ], $blueprint->toSql($connection, new SQLiteGrammar));
+        ], $blueprint->toSql($connection, new SQLiteGrammar($connection)));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add column "note" varchar(255) null',
-        ], $blueprint->toSql($connection, new PostgresGrammar));
+        ], $blueprint->toSql($connection, new PostgresGrammar($connection)));
 
         $blueprint = clone $base;
         $this->assertEquals([
             'alter table "posts" add "note" nvarchar(255) null',
-        ], $blueprint->toSql($connection, new SqlServerGrammar));
+        ], $blueprint->toSql($connection, new SqlServerGrammar($connection)));
     }
 }

@@ -194,7 +194,7 @@ abstract class Grammar
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 
-        return "'$value'";
+        return $this->quoteValue($value);
     }
 
     /**
@@ -256,4 +256,12 @@ abstract class Grammar
 
         return $this;
     }
+
+    /**
+     * Quote the given string literal.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    abstract protected function quoteValue($value);
 }

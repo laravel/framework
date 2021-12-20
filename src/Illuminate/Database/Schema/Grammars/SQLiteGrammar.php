@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\Index;
+use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
@@ -11,6 +12,8 @@ use RuntimeException;
 
 class SQLiteGrammar extends Grammar
 {
+    use QuotesValue;
+
     /**
      * The possible column modifiers.
      *
@@ -24,6 +27,24 @@ class SQLiteGrammar extends Grammar
      * @var string[]
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
+
+    /**
+     * The connection the grammar is operating for.
+     *
+     * @var \Illuminate\Database\Connection
+     */
+    protected $connection;
+
+    /**
+     * Create a new SQLite grammar instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Compile the query to determine if a table exists.

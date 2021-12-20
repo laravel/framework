@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class Grammar extends BaseGrammar
+abstract class Grammar extends BaseGrammar
 {
     /**
      * The grammar specific operators.
