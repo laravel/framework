@@ -185,7 +185,7 @@ EOF, str_replace("\r", '', $output->fetch()));
         ]);
 
         $this->assertEquals(<<<'EOF'
-Using a combination of the --except and --model parameters can result into unexpected behavior.
+Using a combination of the --except and --model options can result into unexpected behavior.
 2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records have been pruned.
 
 EOF, str_replace("\r", '', $output->fetch()));
