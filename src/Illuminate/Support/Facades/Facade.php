@@ -3,6 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Js;
+use Illuminate\Support\Str;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use RuntimeException;
@@ -241,6 +245,55 @@ abstract class Facade
     public static function clearResolvedInstances()
     {
         static::$resolvedInstance = [];
+    }
+
+    /**
+     * Get the application default aliases.
+     *
+     * @return array
+     */
+    public static function defaultAliases()
+    {
+        return [
+            'App' => App::class,
+            'Arr' => Arr::class,
+            'Artisan' => Artisan::class,
+            'Auth' => Auth::class,
+            'Blade' => Blade::class,
+            'Broadcast' => Broadcast::class,
+            'Bus' => Bus::class,
+            'Cache' => Cache::class,
+            'Config' => Config::class,
+            'Cookie' => Cookie::class,
+            'Crypt' => Crypt::class,
+            'Date' => Date::class,
+            'DB' => DB::class,
+            'Eloquent' => Model::class,
+            'Event' => Event::class,
+            'File' => File::class,
+            'Gate' => Gate::class,
+            'Hash' => Hash::class,
+            'Http' => Http::class,
+            'Js' => Js::class,
+            'Lang' => Lang::class,
+            'Log' => Log::class,
+            'Mail' => Mail::class,
+            'Notification' => Notification::class,
+            'Password' => Password::class,
+            'Queue' => Queue::class,
+            'RateLimiter' => RateLimiter::class,
+            'Redirect' => Redirect::class,
+            'Request' => Request::class,
+            'Response' => Response::class,
+            'Route' => Route::class,
+            'Schema' => Schema::class,
+            'Session' => Session::class,
+            'Storage' => Storage::class,
+            'Str' => Str::class,
+            'URL' => URL::class,
+            'Validator' => Validator::class,
+            'View' => View::class,
+        ];
     }
 
     /**
