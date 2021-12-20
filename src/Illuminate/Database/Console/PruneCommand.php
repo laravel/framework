@@ -85,24 +85,29 @@ class PruneCommand extends Command
      */
     protected function models()
     {
-        if (! empty($models = $this->option('model'))) {
-            return collect($models);
+        $models = collect($this->option('model'));
+        $except = collect($this->option('except'));
+
+        if ($models->isNotEmpty() && $except->isNotEmpty()) {
+            $this->warn('Using a combination of the --except and --model options can result into unexpected behavior.');
         }
 
-        $except = $this->option('except');
+        if ($models->isEmpty()) {
+            collect((new Finder)->in(app_path('Models'))->files()->name('*.php'))
+                ->map(function ($model) {
+                    $namespace = $this->laravel->getNamespace();
 
-        return collect((new Finder)->in(app_path('Models'))->files()->name('*.php'))
-            ->map(function ($model) {
-                $namespace = $this->laravel->getNamespace();
+                    return $namespace.str_replace(
+                            ['/', '.php'],
+                            ['\\', ''],
+                            Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
+                        );
+                });
+        }
 
-                return $namespace.str_replace(
-                    ['/', '.php'],
-                    ['\\', ''],
-                    Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
-                );
-            })->when(! empty($except), function ($models) use ($except) {
+        return $models->when($except->isNotEmpty(), function ($models) use ($except) {
                 return $models->reject(function ($model) use ($except) {
-                    return in_array($model, $except);
+                    return $except->contains($model);
                 });
             })->filter(function ($model) {
                 return $this->isPrunable($model);
