@@ -96,6 +96,19 @@ class EloquentPaginateTest extends DatabaseTestCase
         $this->assertEquals(5, $query->count());
         $this->assertEquals(5, $query->paginate()->total());
     }
+
+    public function testPaginationWithSpecificCountFields()
+    {
+        for ($i = 1; $i <= 50; $i++) {
+            Post::create(['title' => 'Hello world ' . $i]);
+        }
+
+        $this->assertEquals(50, Post::query()->paginate(10, ['*'], 'page', null, ['id'])->total());
+        $this->assertEquals(
+            Post::query()->paginate(10, ['*'], 'page', null, ['id'])->total(),
+            Post::query()->paginate()->total()
+        );
+    }
 }
 
 class Post extends Model
