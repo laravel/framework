@@ -16,14 +16,14 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [];
 
     /**
-     * The subscriber classes to register.
+     * The subscribers to register.
      *
      * @var array
      */
     protected $subscribe = [];
 
     /**
-     * The observers mapping for the application models.
+     * The model observers to register.
      *
      * @var array
      */
@@ -49,7 +49,9 @@ class EventServiceProvider extends ServiceProvider
                 Event::subscribe($subscriber);
             }
 
-            $this->registerObservers();
+            foreach ($this->observers as $model => $observers) {
+                $model::observe($observers);
+            }
         });
     }
 
@@ -153,27 +155,5 @@ class EventServiceProvider extends ServiceProvider
     protected function eventDiscoveryBasePath()
     {
         return base_path();
-    }
-
-    /**
-     * Get the observers defined on the provider.
-     *
-     * @return array
-     */
-    public function observers()
-    {
-        return $this->observers;
-    }
-
-    /**
-     * Register the application model's observers.
-     *
-     * @return void
-     */
-    public function registerObservers()
-    {
-        foreach ($this->observers() as $model => $observers) {
-            $model::observe($observers);
-        }
     }
 }
