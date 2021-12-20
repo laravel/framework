@@ -799,13 +799,13 @@ class Builder
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $count = ['*'])
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = ($total = $this->toBase()->getCountForPagination())
+        $results = ($total = $this->toBase()->getCountForPagination($count))
                                     ? $this->forPage($page, $perPage)->get($columns)
                                     : $this->model->newCollection();
 
