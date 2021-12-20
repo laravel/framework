@@ -91,7 +91,7 @@ class PruneCommand extends Command
         }
 
         if (! empty($models) && ! empty($except = $this->option('except'))) {
-            throw new InvalidArgumentException("The --models and --except options cannot be combined.");
+            throw new InvalidArgumentException('The --models and --except options cannot be combined.');
         }
 
         return collect((new Finder)->in(app_path('Models'))->files()->name('*.php'))
