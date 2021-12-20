@@ -106,12 +106,12 @@ class PruneCommand extends Command
         }
 
         return $models->when($except->isNotEmpty(), function ($models) use ($except) {
-                return $models->reject(function ($model) use ($except) {
-                    return $except->contains($model);
-                });
-            })->filter(function ($model) {
-                return $this->isPrunable($model);
-            })->values();
+            return $models->reject(function ($model) use ($except) {
+                return $except->contains($model);
+            });
+        })->filter(function ($model) {
+            return $this->isPrunable($model);
+        })->values();
     }
 
     /**

@@ -189,7 +189,6 @@ Using a combination of the --except and --model options can result into unexpect
 2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records have been pruned.
 
 EOF, str_replace("\r", '', $output->fetch()));
-
     }
 
     protected function artisan($arguments)
