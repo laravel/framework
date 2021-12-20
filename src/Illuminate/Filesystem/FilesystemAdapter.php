@@ -48,7 +48,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * The temporary URL builder callback.
      *
-     * @var \Closure
+     * @var \Closure|null
      */
     protected $temporaryUrlCallback;
 
