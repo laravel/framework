@@ -752,6 +752,21 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Dayle', $request->input('buddy'));
     }
 
+    public function testMergeIfMissingMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $merge = ['boolean_setting' => 0];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(0, $request->input('boolean_setting'));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'boolean_setting' => 1]);
+        $merge = ['boolean_setting' => 0];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(1, $request->input('boolean_setting'));
+    }
+
     public function testReplaceMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
