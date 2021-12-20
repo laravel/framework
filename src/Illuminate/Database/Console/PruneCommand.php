@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 
 class PruneCommand extends Command
@@ -89,7 +90,7 @@ class PruneCommand extends Command
         $except = collect($this->option('except'));
 
         if ($models->isNotEmpty() && $except->isNotEmpty()) {
-            $this->warn('Using a combination of the --except and --model options can result into unexpected behavior.');
+            throw new InvalidArgumentException("Combining the --except and --model options is not supported.");
         }
 
         if ($models->isEmpty()) {

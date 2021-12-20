@@ -161,6 +161,8 @@ EOF, str_replace("\r", '', $output->fetch()));
 
     public function testCombinationOfModelAndExceptParameter()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $db = new DB;
         $db->addConnection([
             'driver' => 'sqlite',
@@ -183,12 +185,6 @@ EOF, str_replace("\r", '', $output->fetch()));
             '--model' => [PrunableTestModelWithPrunableRecords::class, PrunableTestSoftDeletedModelWithPrunableRecords::class],
             '--except' => PrunableTestModelWithPrunableRecords::class,
         ]);
-
-        $this->assertEquals(<<<'EOF'
-Using a combination of the --except and --model options can result into unexpected behavior.
-2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records have been pruned.
-
-EOF, str_replace("\r", '', $output->fetch()));
     }
 
     protected function artisan($arguments)
