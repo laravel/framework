@@ -368,30 +368,58 @@ class Repository implements ArrayAccess, CacheContract
 
         return $result;
     }
-
-    /**
-     * Get an item from the cache, or execute the given Closure and store the result.
-     *
-     * @param  string  $key
-     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
-     * @param  \Closure  $callback
-     * @return mixed
-     */
-    public function remember($key, $ttl, Closure $callback)
-    {
-        $value = $this->get($key);
-
-        // If the item exists in the cache we will just return this immediately and if
-        // not we will execute the given Closure and cache the result of that for a
-        // given number of seconds so it's available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
-        }
-
-        $this->put($key, $value = $callback(), value($ttl));
-
-        return $value;
-    }
+	
+	/**
+	 * Get an item from the cache, or execute the given Closure and store the result.
+	 *
+	 * @param  string  $key
+	 * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+	 * @param  \Closure  $callback
+	 * @return mixed
+	 */
+	public function remember($key, $ttl, Closure $callback)
+	{
+		$value = $this->get($key);
+		
+		// If the item exists in the cache we will just return this immediately and if
+		// not we will execute the given Closure and cache the result of that for a
+		// given number of seconds so it's available for all subsequent requests.
+		if (! is_null($value)) {
+			return $value;
+		}
+		
+		$this->put($key, $value = $callback(), value($ttl));
+		
+		return $value;
+	}
+	
+	/**
+	 * Get an item from the cache, or execute the given
+	 * Closure and store the result with json_encode and
+	 * json_decode for more performance
+	 *
+	 * @param string                                             $key
+	 * @param \Closure|\DateTimeInterface|\DateInterval|int|null $ttl
+	 * @param \Closure                                           $callback
+	 * @return mixed
+	 * @throws \JsonException
+	 */
+	public function rememberJson($key, $ttl, Closure $callback)
+	{
+		$value = $this->get($key);
+		
+		// this function basically is like remember but it
+		// added json_encode and json_decode to use lower
+		// memory and cpu time, it was tested in benchmark
+		// and had better performance than remember
+		
+		if ( is_null($value)) {
+			$this->put($key, $value = json_encode($callback() , JSON_THROW_ON_ERROR) , value($ttl));
+		}
+		
+		
+		return json_decode($value);
+	}
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
