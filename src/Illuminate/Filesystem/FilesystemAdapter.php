@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Closure;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\FileExistsException as ContractFileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
@@ -45,12 +46,11 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $driver;
 
     /**
-     * Custom logic that should be used for building temporary URLs
-     * for different file systems.
+     * The temporary URL builder callback.
      *
-     * @param  array<class-string, Closure>
+     * @var \Closure
      */
-    protected static $temporaryUrlBuilders = [];
+    protected $temporaryUrlCallback;
 
     /**
      * Create a new filesystem adapter instance.
@@ -584,8 +584,10 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $adapter->getTemporaryUrl($path, $expiration, $options);
         }
 
-        if ($builder = Arr::get(static::$temporaryUrlBuilders, get_class($this->driver->getAdapter()))) {
-            return $builder->bindTo($this, static::class)($path, $expiration, $options);
+        if ($this->temporaryUrlCallback) {
+            return $this->temporaryUrlCallback->bindTo($this, static::class)(
+                $path, $expiration, $options
+            );
         }
 
         if ($adapter instanceof AwsS3Adapter) {
@@ -625,17 +627,6 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         return (string) $uri;
-    }
-
-    /**
-     * Define any custom logic that should be used for building temporary URLs
-     * for a given filesystem.
-     *
-     * @param  Closure  $closure
-     */
-    public function buildTemporaryUrlUsing($closure)
-    {
-        static::$temporaryUrlBuilders[get_class($this->driver->getAdapter())] = $closure;
     }
 
     /**
@@ -801,6 +792,17 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
+    }
+
+    /**
+     * Define a custom temporary URL builder callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function buildTemporaryUrlsUsing(Closure $callback)
+    {
+        $this->temporaryUrlCallback = $callback;
     }
 
     /**

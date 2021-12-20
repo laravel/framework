@@ -333,11 +333,11 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('Hello World', $filesystemAdapter->getFoo());
     }
 
-    public function testTemporaryUrlWithMacro()
+    public function testTemporaryUrlWithCustomCallback()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
 
-        $filesystemAdapter->buildTemporaryUrlUsing(function ($path, Carbon $expiration, $options) {
+        $filesystemAdapter->buildTemporaryUrlsUsing(function ($path, Carbon $expiration, $options) {
             return $path.$expiration->toString().implode('', $options);
         });
 
