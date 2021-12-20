@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\Index;
+use Illuminate\Database\Concerns\ExposesDatabase;
 use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,6 +13,7 @@ use RuntimeException;
 
 class SQLiteGrammar extends Grammar
 {
+    use ExposesDatabase;
     use QuotesValue;
 
     /**

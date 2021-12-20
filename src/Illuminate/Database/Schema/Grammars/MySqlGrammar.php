@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Concerns\ExposesDatabase;
 use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,6 +11,7 @@ use RuntimeException;
 
 class MySqlGrammar extends Grammar
 {
+    use ExposesDatabase;
     use QuotesValue;
 
     /**

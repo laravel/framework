@@ -459,6 +459,16 @@ class DatabaseConnectionTest extends TestCase
                     {
                         return "'{$value}'";
                     }
+
+                    public function getDatabaseDriver()
+                    {
+                        return 'tests';
+                    }
+
+                    public function getDatabaseVersion()
+                    {
+                        return '0.0.0';
+                    }
                 };
             }
 
@@ -469,6 +479,16 @@ class DatabaseConnectionTest extends TestCase
                     protected function quoteValue($value)
                     {
                         return "'{$value}'";
+                    }
+
+                    public function getDatabaseDriver()
+                    {
+                        return 'tests';
+                    }
+
+                    public function getDatabaseVersion()
+                    {
+                        return '0.0.0';
                     }
                 };
             }

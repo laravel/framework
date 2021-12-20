@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Concerns\ExposesDatabase;
 use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
@@ -9,6 +10,7 @@ use Illuminate\Support\Str;
 
 class SQLiteGrammar extends Grammar
 {
+    use ExposesDatabase;
     use QuotesValue;
 
     /**

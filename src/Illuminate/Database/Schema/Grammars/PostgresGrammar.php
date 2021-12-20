@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Concerns\ExposesDatabase;
 use Illuminate\Database\Concerns\QuotesValue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
@@ -9,6 +10,7 @@ use RuntimeException;
 
 class PostgresGrammar extends Grammar
 {
+    use ExposesDatabase;
     use QuotesValue;
 
     /**

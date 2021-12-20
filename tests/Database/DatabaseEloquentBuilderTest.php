@@ -1794,6 +1794,16 @@ class DatabaseEloquentBuilderTest extends TestCase
             {
                 return "'{$value}'";
             }
+
+            public function getDatabaseDriver()
+            {
+                return 'tests';
+            }
+
+            public function getDatabaseVersion()
+            {
+                return '0.0.0';
+            }
         };
     }
 

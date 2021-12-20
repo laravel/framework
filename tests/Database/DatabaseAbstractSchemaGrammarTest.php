@@ -23,6 +23,16 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
             {
                 return "'{$value}'";
             }
+
+            public function getDatabaseDriver()
+            {
+                return 'tests';
+            }
+
+            public function getDatabaseVersion()
+            {
+                return '0.0.0';
+            }
         };
 
         $this->expectException(LogicException::class);
@@ -38,6 +48,16 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase
             protected function quoteValue($value)
             {
                 return "'{$value}'";
+            }
+
+            public function getDatabaseDriver()
+            {
+                return 'tests';
+            }
+
+            public function getDatabaseVersion()
+            {
+                return '0.0.0';
             }
         };
 

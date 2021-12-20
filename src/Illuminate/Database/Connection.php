@@ -1476,4 +1476,29 @@ abstract class Connection implements ConnectionInterface
             throw $e;
         }
     }
+
+    /**
+     * Get the version of the connected database.
+     *
+     * @return string
+     */
+    public function getDatabaseVersion()
+    {
+        $this->reconnectIfMissingConnection();
+
+        // Here we will run this query. If an exception occurs we'll determine if it was
+        // caused by a connection that has been lost. If that is the cause, we'll try
+        // to re-establish connection and re-run the query with a fresh connection.
+        try {
+            return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+        } catch (QueryException $e) {
+            if ($this->causedByLostConnection($e->getPrevious())) {
+                $this->reconnect();
+
+                return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+            }
+
+            throw $e;
+        }
+    }
 }

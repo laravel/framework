@@ -264,4 +264,18 @@ abstract class Grammar
      * @return string
      */
     abstract protected function quoteValue($value);
+
+    /**
+     * Get the grammar's database driver name.
+     *
+     * @return string
+     */
+    abstract public function getDatabaseDriver();
+
+    /**
+     * Get the grammar's database version.
+     *
+     * @return string
+     */
+    abstract public function getDatabaseVersion();
 }

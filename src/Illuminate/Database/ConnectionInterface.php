@@ -169,6 +169,13 @@ interface ConnectionInterface
     public function getDatabaseName();
 
     /**
+     * Get the version of the connected database.
+     *
+     * @return string
+     */
+    public function getDatabaseVersion();
+
+    /**
      * Quote the given string literal.
      *
      * @param  string  $value
