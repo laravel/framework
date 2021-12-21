@@ -209,14 +209,13 @@ abstract class Grammar
     }
 
     /**
-     * Get the value of a raw expression.
+     * Get the value for the parameter.
      *
-     * @param  \Illuminate\Database\Query\Expression  $expression
+     * @param  mixed  $value
      * @return mixed
      */
-    public function getValue($expression)
+    public function getValue($value)
     {
-        $value = $expression;
         while ($this->isExpression($value)) {
             $value = $value->getValue($this);
         }
