@@ -55,7 +55,6 @@ class ViewCreateCommand extends Command
 
         // If the file exists, and the user wants to overwrite it, it will be overwritten.
         if (file_exists($viewPath) && ! $force) {
-
             $this->error('View already exists!');
 
             return Command::FAILURE;
