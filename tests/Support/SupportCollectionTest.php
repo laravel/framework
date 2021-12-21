@@ -1095,8 +1095,8 @@ class SupportCollectionTest extends TestCase
         $this->assertCount(3, $c->whereContains('name', 'B'));
         $this->assertCount(1, $c->whereContains('name', 'C'));
         $this->assertCount(1, $c->whereContains('name', 'BC'));
-        $this->assertCount(1,$c->whereContains('name', 'ABC'));
-        $this->assertCount(0,$c->whereContains('name', 'D'));
+        $this->assertCount(1, $c->whereContains('name', 'ABC'));
+        $this->assertCount(0, $c->whereContains('name', 'D'));
     }
 
     /**
