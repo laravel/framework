@@ -41,8 +41,8 @@ class ViewCreateCommand extends Command
     public function handle()
     {
 
-        // Here, we look at whether there is a view file to be created, then the relevant  
-        // answers are returned to those who use the command, and at the end, the view file is  
+        // Here, we look at whether there is a view file to be created, then the relevant
+        // answers are returned to those who use the command, and at the end, the view file is
         // created.
 
         $force = $this->option('force');
@@ -66,14 +66,15 @@ class ViewCreateCommand extends Command
         if (! is_dir(dirname($viewPath)) && $path) {
             mkdir(dirname($viewPath), 0755, true);
         } elseif (! is_dir(dirname($viewPath)) && ! $path) {
-            $this->error("Directory does not exist!");
+            $this->error('Directory does not exist!');
             $this->info('If you want to create the directory as well add the -p flag');
 
             return Command::FAILURE;
         }
 
         $this->info('Creating view:'.$viewName.'.blade.php');
-        file_put_contents($viewPath, '@extends(\'layouts.app\')' . "\n\n" . '@section(\'content\')' . "\n\n" . '@endsection');
+        file_put_contents($viewPath, '@extends(\'layouts.app\')'."\n\n".'@section(\'content\')'."\n\n".'@endsection');
+
         return Command::SUCCESS;
     }
 }
