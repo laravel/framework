@@ -704,12 +704,14 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  boolean $casesensitive
      * @return static
      */
-    public function whereStartsWith($key, $value)
+    public function whereStartsWith($key, $value, $casesensitive = true)
     {
-        return $this->filter(function ($item) use ($key, $value) {
-            return strncmp(data_get($item, $key), $value, strlen($value)) === 0;
+        return $this->filter(function ($item) use ($key, $value, $casesensitive) {
+            $comparer = ($casesensitive) ? 'strncmp' : 'strncasecmp';
+            return $comparer(data_get($item, $key), $value, strlen($value)) === 0;
         });
     }
 
@@ -718,12 +720,14 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  boolean $casesensitive
      * @return static
      */
-    public function whereEndsWith($key, $value)
+    public function whereEndsWith($key, $value, $casesensitive = true)
     {
-        return $this->filter(function ($item) use ($key, $value) {
-            return strncmp(strrev(data_get($item, $key)), strrev($value), strlen($value)) === 0;
+        return $this->filter(function ($item) use ($key, $value, $casesensitive) {
+            $comparer = ($casesensitive) ? 'strncmp' : 'strncasecmp';
+            return $comparer(strrev(data_get($item, $key)), strrev($value), strlen($value)) === 0;
         });
     }
 
@@ -732,12 +736,16 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  boolean $casesensitive
      * @return static
      */
-    public function whereContains($key, $value)
+    public function whereContains($key, $value, $casesensitive = true)
     {
-        return $this->filter(function ($item) use ($key, $value) {
-            return str_contains(data_get($item, $key), $value);
+        return $this->filter(function ($item) use ($key, $value, $casesensitive) {
+            $haystack = data_get($item, $key);
+            $haystack = ($casesensitive) ? $haystack : strtolower($haystack);
+            $needle = ($casesensitive) ? $value : strtolower($value) ;
+            return str_contains($haystack, $needle);
         });
     }
 

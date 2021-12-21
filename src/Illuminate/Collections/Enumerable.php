@@ -427,27 +427,30 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  boolean $casesensitive
      * @return static
      */
-    public function whereStartsWith($key, $value);
+    public function whereStartsWith($key, $value, $casesensitive = true);
 
     /**
      * Filter items that end with the given string.
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  boolean $casesensitive
      * @return static
      */
-    public function whereEndsWith($key, $value);
+    public function whereEndsWith($key, $value, $casesensitive = true);
 
     /**
      * Filter items that contain the given string.
      *
      * @param  string  $key
      * @param  mixed  $value
+     * @param  boolean $casesensitive
      * @return static
      */
-    public function whereContains($key, $value);
+    public function whereContains($key, $value, $casesensitive = true);
 
     /**
      * Get the first item from the enumerable passing the given truth test.
