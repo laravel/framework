@@ -711,6 +711,7 @@ trait EnumeratesValues
     {
         return $this->filter(function ($item) use ($key, $value, $casesensitive) {
             $comparer = ($casesensitive) ? 'strncmp' : 'strncasecmp';
+
             return $comparer(data_get($item, $key), $value, strlen($value)) === 0;
         });
     }
@@ -727,6 +728,7 @@ trait EnumeratesValues
     {
         return $this->filter(function ($item) use ($key, $value, $casesensitive) {
             $comparer = ($casesensitive) ? 'strncmp' : 'strncasecmp';
+
             return $comparer(strrev(data_get($item, $key)), strrev($value), strlen($value)) === 0;
         });
     }
@@ -744,7 +746,7 @@ trait EnumeratesValues
         return $this->filter(function ($item) use ($key, $value, $casesensitive) {
             $haystack = data_get($item, $key);
             $haystack = ($casesensitive) ? $haystack : strtolower($haystack);
-            $needle = ($casesensitive) ? $value : strtolower($value) ;
+            $needle = ($casesensitive) ? $value : strtolower($value);
             return str_contains($haystack, $needle);
         });
     }
