@@ -7,17 +7,17 @@ use Illuminate\Support\Manager;
 class MaintenanceModeManager extends Manager
 {
     /**
-     * Get the default driver name.
+     * Create an instance of the file based maintenance driver.
      *
-     * @return string
+     * @return \Illuminate\Foundation\FileBasedMaintenanceMode
      */
-    public function getDefaultDriver(): string
+    protected function createFileDriver(): FileBasedMaintenanceMode
     {
-        return $this->config->get('app.maintenance.driver', 'file');
+        return new FileBasedMaintenanceMode();
     }
 
     /**
-     * Create an instance of the cache maintenance driver.
+     * Create an instance of the cache based maintenance driver.
      *
      * @return \Illuminate\Foundation\CacheBasedMaintenanceMode
      *
@@ -25,20 +25,20 @@ class MaintenanceModeManager extends Manager
      */
     protected function createCacheDriver(): CacheBasedMaintenanceMode
     {
-        $cache = $this->container->make('cache');
-        $store = $this->config->get('app.maintenance.store') ?: $this->config->get('cache.default');
-        $key = 'illuminate:foundation:down';
-
-        return new CacheBasedMaintenanceMode($cache, $store, $key);
+        return new CacheBasedMaintenanceMode(
+            $this->container->make('cache'),
+            $this->config->get('app.maintenance.store') ?: $this->config->get('cache.default'),
+            'illuminate:foundation:down'
+        );
     }
 
     /**
-     * Create an instance of the file maintenance driver.
+     * Get the default driver name.
      *
-     * @return \Illuminate\Foundation\FileBasedMaintenanceMode
+     * @return string
      */
-    protected function createFileDriver(): FileBasedMaintenanceMode
+    public function getDefaultDriver(): string
     {
-        return new FileBasedMaintenanceMode();
+        return $this->config->get('app.maintenance.driver', 'file');
     }
 }

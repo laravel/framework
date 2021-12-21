@@ -16,21 +16,21 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
     protected $cache;
 
     /**
-     * The cache store to use.
+     * The cache store that should be utilized.
      *
      * @var string
      */
     protected $store;
 
     /**
-     * The cache key to use.
+     * The cache key to use when storing maintenance mode information.
      *
      * @var string
      */
     protected $key;
 
     /**
-     * Create a new cache-based maintenance mode manager.
+     * Create a new cache based maintenance mode implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @param  string  $store
