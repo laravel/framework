@@ -57,7 +57,7 @@ class ViewCreateCommand extends Command
         if (file_exists($viewPath) && ! $force) {
 
             $this->error('View already exists!');
-            
+
             return Command::FAILURE;
         } elseif (file_exists($viewPath) && $force) {
             unlink($viewPath);
