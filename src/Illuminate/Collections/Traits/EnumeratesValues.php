@@ -747,7 +747,7 @@ trait EnumeratesValues
             $haystack = data_get($item, $key);
             $haystack = ($casesensitive) ? $haystack : strtolower($haystack);
             $needle = ($casesensitive) ? $value : strtolower($value);
-            
+
             return str_contains($haystack, $needle);
         });
     }
