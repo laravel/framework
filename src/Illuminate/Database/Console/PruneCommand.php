@@ -91,6 +91,7 @@ class PruneCommand extends Command
         }
 
         $except = $this->option('except');
+
         if (! empty($models) && ! empty($except)) {
             throw new InvalidArgumentException('The --models and --except options cannot be combined.');
         }
