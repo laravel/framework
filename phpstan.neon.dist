@@ -1,4 +1,4 @@
 parameters:
   paths:
     - types
-  level: max
+  level: 8
