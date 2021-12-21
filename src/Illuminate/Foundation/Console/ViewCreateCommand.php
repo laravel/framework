@@ -12,7 +12,7 @@ class ViewCreateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'view:create {name} 
+    protected $signature = 'make:view {name} 
                 {--p|path : If the specified directory does not exist, it creates a directory.}
                 {--f|force : Overwrite existing view if any}';
 
