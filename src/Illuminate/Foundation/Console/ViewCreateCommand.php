@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Console;
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -51,10 +51,11 @@ class ViewCreateCommand extends Command
         // If it specifies directory and file as dots, it converts dots to slash(/)
         $viewName = Str::of($this->argument('name'))->replace('.', DIRECTORY_SEPARATOR)->replace('//', '/');
 
-        $viewPath = resource_path('views/' . $viewName . '.blade.php');
+        $viewPath = resource_path('views/'.$viewName.'.blade.php');
 
         // If the file exists, and the user wants to overwrite it, it will be overwritten.
-        if (file_exists($viewPath) && !$force) {
+        if (file_exists($viewPath) && ! $force) {
+
             $this->error('View already exists!');
             return Command::FAILURE;
         } elseif (file_exists($viewPath) && $force) {
@@ -62,16 +63,16 @@ class ViewCreateCommand extends Command
         }
 
         // If the directory exists, and the user wants to overwrite it, it will be overwritten.
-        if (!is_dir(dirname($viewPath)) && $path) {
+        if (! is_dir(dirname($viewPath)) && $path) {
             mkdir(dirname($viewPath), 0755, true);
-        } elseif (!is_dir(dirname($viewPath)) && !$path) {
+        } elseif (! is_dir(dirname($viewPath)) && ! $path) {
             $this->error("Directory does not exist!");
             $this->info('If you want to create the directory as well add the -p flag');
 
             return Command::FAILURE;
         }
-        
-        $this->info('Creating view: ' . $viewName . '.blade.php');
+
+        $this->info('Creating view:'.$viewName.'.blade.php');
         file_put_contents($viewPath, '@extends(\'layouts.app\')' . "\n\n" . '@section(\'content\')' . "\n\n" . '@endsection');
         return Command::SUCCESS;
     }
