@@ -1058,18 +1058,18 @@ class SupportCollectionTest extends TestCase
 
         $this->assertCount(4, $c->whereInstanceOf([stdClass::class, Str::class]));
     }
-    
+
     /**
      * @dataProvider collectionClassProvider
      */
     public function testWhereStartsWith($collection)
     {
-        $c = new $collection([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B'], ['id' => 3 , 'name' => 'AB'], ['id' => 4 , 'name' => 'ABC']]);
-        $this->assertCount(3,$c->whereStartsWith('name', 'A'));
-        $this->assertCount(1,$c->whereStartsWith('name', 'B'));
-        $this->assertCount(0,$c->whereStartsWith('name', 'C'));
-        $this->assertCount(2,$c->whereStartsWith('name', 'AB'));
-        $this->assertCount(1,$c->whereStartsWith('name', 'ABC'));
+        $c = new $collection([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B'], ['id' => 3, 'name' => 'AB'], ['id' => 4, 'name' => 'ABC']]);
+        $this->assertCount(3, $c->whereStartsWith('name', 'A'));
+        $this->assertCount(1, $c->whereStartsWith('name', 'B'));
+        $this->assertCount(0, $c->whereStartsWith('name', 'C'));
+        $this->assertCount(2, $c->whereStartsWith('name', 'AB'));
+        $this->assertCount(1, $c->whereStartsWith('name', 'ABC'));
     }
 
     /**
@@ -1077,12 +1077,12 @@ class SupportCollectionTest extends TestCase
      */
     public function testWhereEndsWith($collection)
     {
-        $c = new $collection([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B'], ['id' => 3 , 'name' => 'AB'], ['id' => 4 , 'name' => 'ABC']]);
-        $this->assertCount(1,$c->whereEndsWith('name', 'A'));
-        $this->assertCount(2,$c->whereEndsWith('name', 'B'));
-        $this->assertCount(1,$c->whereEndsWith('name', 'C'));
-        $this->assertCount(1,$c->whereEndsWith('name', 'BC'));
-        $this->assertCount(1,$c->whereEndsWith('name', 'ABC'));
+        $c = new $collection([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B'], ['id' => 3, 'name' => 'AB'], ['id' => 4, 'name' => 'ABC']]);
+        $this->assertCount(1, $c->whereEndsWith('name', 'A'));
+        $this->assertCount(2, $c->whereEndsWith('name', 'B'));
+        $this->assertCount(1, $c->whereEndsWith('name', 'C'));
+        $this->assertCount(1, $c->whereEndsWith('name', 'BC'));
+        $this->assertCount(1, $c->whereEndsWith('name', 'ABC'));
     }
 
     /**
@@ -1090,11 +1090,11 @@ class SupportCollectionTest extends TestCase
      */
     public function testWhereContains($collection)
     {
-        $c = new $collection([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B'], ['id' => 3 , 'name' => 'AB'], ['id' => 4 , 'name' => 'ABC']]);
-        $this->assertCount(3,$c->whereContains('name', 'A'));
-        $this->assertCount(3,$c->whereContains('name', 'B'));
-        $this->assertCount(1,$c->whereContains('name', 'C'));
-        $this->assertCount(1,$c->whereContains('name', 'BC'));
+        $c = new $collection([['id' => 1, 'name' => 'A'], ['id' => 2, 'name' => 'B'], ['id' => 3, 'name' => 'AB'], ['id' => 4, 'name' => 'ABC']]);
+        $this->assertCount(3, $c->whereContains('name', 'A'));
+        $this->assertCount(3, $c->whereContains('name', 'B'));
+        $this->assertCount(1, $c->whereContains('name', 'C'));
+        $this->assertCount(1, $c->whereContains('name', 'BC'));
         $this->assertCount(1,$c->whereContains('name', 'ABC'));
         $this->assertCount(0,$c->whereContains('name', 'D'));
     }
