@@ -90,7 +90,9 @@ class PruneCommand extends Command
             return collect($models);
         }
 
-        if (! empty($models) && ! empty($except = $this->option('except'))) {
+        $except = $this->option('except');
+
+        if (! empty($models) && ! empty($except)) {
             throw new InvalidArgumentException('The --models and --except options cannot be combined.');
         }
 
