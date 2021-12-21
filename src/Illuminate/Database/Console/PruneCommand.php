@@ -63,9 +63,7 @@ class PruneCommand extends Command
         $models->each(function ($model) {
             $instance = new $model;
 
-            $chunkSize = property_exists($instance, 'prunableChunkSize')
-                            ? $instance->prunableChunkSize
-                            : $this->option('chunk');
+            $chunkSize = $instance->prunableChunkSize ?? $this->option('chunk');
 
             $total = $this->isPrunable($model)
                         ? $instance->pruneAll($chunkSize)

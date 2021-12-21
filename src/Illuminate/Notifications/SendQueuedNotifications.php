@@ -70,9 +70,9 @@ class SendQueuedNotifications implements ShouldQueue
         $this->channels = $channels;
         $this->notification = $notification;
         $this->notifiables = $this->wrapNotifiables($notifiables);
-        $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
-        $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
-        $this->afterCommit = property_exists($notification, 'afterCommit') ? $notification->afterCommit : null;
+        $this->tries = $notification->tries ?? null;
+        $this->timeout = $notification->timeout ?? null;
+        $this->afterCommit = $notification->afterCommit ?? null;
         $this->shouldBeEncrypted = $notification instanceof ShouldBeEncrypted;
     }
 

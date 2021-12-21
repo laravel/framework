@@ -29,7 +29,7 @@ trait CanConfigureMigrationCommands
      */
     protected function shouldDropViews()
     {
-        return property_exists($this, 'dropViews') ? $this->dropViews : false;
+        return $this->dropViews ?? false;
     }
 
     /**
@@ -39,7 +39,7 @@ trait CanConfigureMigrationCommands
      */
     protected function shouldDropTypes()
     {
-        return property_exists($this, 'dropTypes') ? $this->dropTypes : false;
+        return $this->dropTypes ?? false;
     }
 
     /**
@@ -49,7 +49,7 @@ trait CanConfigureMigrationCommands
      */
     protected function shouldSeed()
     {
-        return property_exists($this, 'seed') ? $this->seed : false;
+        return $this->seed ?? false;
     }
 
     /**
@@ -59,6 +59,6 @@ trait CanConfigureMigrationCommands
      */
     protected function seeder()
     {
-        return property_exists($this, 'seeder') ? $this->seeder : false;
+        return $this->seeder ?? false;
     }
 }

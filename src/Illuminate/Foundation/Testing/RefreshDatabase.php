@@ -115,8 +115,7 @@ trait RefreshDatabase
      */
     protected function connectionsToTransact()
     {
-        return property_exists($this, 'connectionsToTransact')
-                            ? $this->connectionsToTransact : [null];
+        return $this->connectionsToTransact ?? [null];
     }
 
     /**

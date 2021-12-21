@@ -93,7 +93,7 @@ class MailChannel
             return $message->view;
         }
 
-        if (property_exists($message, 'theme') && ! is_null($message->theme)) {
+        if ($message->theme ?? null) {
             $this->markdown->theme($message->theme);
         }
 

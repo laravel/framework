@@ -44,9 +44,9 @@ class BroadcastEvent implements ShouldQueue
     public function __construct($event)
     {
         $this->event = $event;
-        $this->tries = property_exists($event, 'tries') ? $event->tries : null;
-        $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
-        $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
+        $this->tries = $event->tries ?? null;
+        $this->timeout = $event->timeout ?? null;
+        $this->afterCommit = $event->afterCommit ?? null;
     }
 
     /**
