@@ -858,6 +858,44 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testMatchAgainst()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainst('body', 'Hello World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainst('body', 'Hello World', 'and', true);
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainstExpanded('body', 'Hello World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainst('body', '+Hello -World', 'and', false, 'boolean');
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainstBoolean('body', '+Hello -World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainst('body', '+Hello -World', 'and', true, 'boolean');
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->matchAgainst(['body', 'title'], ['Car', 'Plane']);
+        $this->assertSame('select * from `users` where match (`body`, `title`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Car,Plane'], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();

@@ -630,6 +630,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where match against" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $match
+     * @return string
+     */
+    public function whereMatchAgainst(Builder $query, $match)
+    {
+        throw new RuntimeException('This database engine does not support MATCH AGAINST operations.');
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

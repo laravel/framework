@@ -1822,6 +1822,65 @@ class Builder
     }
 
     /**
+     * Add a "match against" clause to the query.
+     *
+     * @param  string|string[]  $column
+     * @param  string|string[]  $values
+     * @param  string  $boolean
+     * @param  bool  $expanded
+     * @param  string  $mode
+     * @return $this
+     */
+    public function matchAgainst($columns, $values, $boolean = 'and', bool $expanded = false, string $mode = '')
+    {
+        $type = 'MatchAgainst';
+
+        // Next, if the value is Arrayable we need to cast it to its raw array form so we
+        // have the underlying array value instead of an Arrayable object which is not
+        // able to be added as a binding, etc. We will then add to the wheres array.
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $columns = (array) $columns;
+        $value = collect($this->cleanBindings((array) $values))->implode(',');
+
+        $this->wheres[] = compact('type', 'columns', 'value', 'expanded', 'mode', 'boolean');
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * Add a "match against in boolean mode" clause to the query.
+     *
+     * @param  string|string[]  $column
+     * @param  string|string[]  $values
+     * @param  string  $boolean
+     * @param  bool  $expanded
+     * @return $this
+     */
+    public function matchAgainstBoolean($columns, $values, $boolean = 'and', bool $expanded = false)
+    {
+        return $this->matchAgainst($columns, $values, $boolean, $expanded, 'boolean');
+    }
+
+    /**
+     * Add a "match against with expanded query" clause to the query.
+     *
+     * @param  string|string[]  $column
+     * @param  string|string[]  $values
+     * @param  string  $boolean
+     * @param  string  $mode
+     * @return $this
+     */
+    public function matchAgainstExpanded($columns, $values, $boolean = 'and', string $mode = '')
+    {
+        return $this->matchAgainst($columns, $values, $boolean, true, $mode);
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|string  ...$groups

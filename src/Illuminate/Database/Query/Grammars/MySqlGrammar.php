@@ -51,6 +51,26 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "where match against" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $match
+     * @return string
+     */
+    public function whereMatchAgainst(Builder $query, $match)
+    {
+        $columns = $this->columnize($match['columns']);
+
+        $value = $this->parameter($match['value']);
+
+        $mode = $match['mode'] === 'boolean' ? 'in boolean mode' : 'in natural language mode';
+
+        $expand = $match['expanded'] && $match['mode'] !== 'boolean' ? ' with query expansion' : '';
+
+        return "match ({$columns}) against (".$value." {$mode}{$expand})";
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
