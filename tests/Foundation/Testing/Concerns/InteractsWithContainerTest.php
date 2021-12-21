@@ -85,7 +85,7 @@ class PartialMockStub
 
     public function greet()
     {
-        return $this->getGreeting() . ' ' . $this->name;
+        return $this->getGreeting().' '.$this->name;
     }
 
     public function getGreeting()
