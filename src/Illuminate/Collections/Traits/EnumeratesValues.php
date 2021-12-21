@@ -704,7 +704,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  boolean $casesensitive
+     * @param  bool  $casesensitive
      * @return static
      */
     public function whereStartsWith($key, $value, $casesensitive = true)
@@ -720,7 +720,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  boolean $casesensitive
+     * @param  bool  $casesensitive
      * @return static
      */
     public function whereEndsWith($key, $value, $casesensitive = true)
@@ -736,7 +736,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  boolean $casesensitive
+     * @param  bool  $casesensitive
      * @return static
      */
     public function whereContains($key, $value, $casesensitive = true)
