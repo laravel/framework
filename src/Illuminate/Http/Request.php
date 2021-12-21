@@ -344,9 +344,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->getInputSource()->has($key);
         })->toArray();
 
-        $this->getInputSource()->add($input);
-
-        return $this;
+        return $this->merge($input);
     }
 
     /**
