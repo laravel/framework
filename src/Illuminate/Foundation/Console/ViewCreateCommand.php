@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\Command;
+use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 
-class ViewCreateCommand extends Command
+class ViewCreateCommand extends GeneratorCommand
 {
     /**
      * The name and signature of the console command.
@@ -28,10 +28,6 @@ class ViewCreateCommand extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.
@@ -41,23 +37,22 @@ class ViewCreateCommand extends Command
     public function handle()
     {
 
-        // Here, we look at whether there is a view file to be created, then the relevant
-        // answers are returned to those who use the command, and at the end, the view file is
+        // Here, we look at whether there is a view file to be created, then the relevant  
+        // answers are returned to those who use the command, and at the end, the view file is  
         // created.
 
         $force = $this->option('force');
         $path = $this->option('path');
 
         // If it specifies directory and file as dots, it converts dots to slash(/)
-        $viewName = Str::of($this->argument('name'))->replace('.', DIRECTORY_SEPARATOR)->replace('//', '/');
+        $viewName = $this->getView();
 
         $viewPath = resource_path('views/'.$viewName.'.blade.php');
 
         // If the file exists, and the user wants to overwrite it, it will be overwritten.
         if (file_exists($viewPath) && ! $force) {
             $this->error('View already exists!');
-
-            return Command::FAILURE;
+            return GeneratorCommand::FAILURE;
         } elseif (file_exists($viewPath) && $force) {
             unlink($viewPath);
         }
@@ -66,15 +61,26 @@ class ViewCreateCommand extends Command
         if (! is_dir(dirname($viewPath)) && $path) {
             mkdir(dirname($viewPath), 0755, true);
         } elseif (! is_dir(dirname($viewPath)) && ! $path) {
-            $this->error('Directory does not exist!');
+            $this->error("Directory does not exist!");
             $this->info('If you want to create the directory as well add the -p flag');
 
-            return Command::FAILURE;
+            return GeneratorCommand::FAILURE;
         }
 
         $this->info('Creating view:'.$viewName.'.blade.php');
-        file_put_contents($viewPath, '@extends(\'layouts.app\')'."\n\n".'@section(\'content\')'."\n\n".'@endsection');
 
-        return Command::SUCCESS;
+        copy($this->getStub(), $viewPath);
+    
+        return GeneratorCommand::SUCCESS;
+    }
+
+    protected function getStub()
+    {
+        return __DIR__ .'/stubs/view-make.stub';
+    }
+
+    protected function getView()
+    {
+        return Str::of($this->argument('name'))->replace('.', DIRECTORY_SEPARATOR)->replace('//', '/');
     }
 }
