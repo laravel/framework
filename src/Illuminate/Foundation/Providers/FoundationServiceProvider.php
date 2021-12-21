@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
-use Illuminate\Foundation\FileBasedMaintenanceMode;
+use Illuminate\Foundation\MaintenanceModeManager;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\AggregateServiceProvider;
@@ -128,6 +128,11 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerMaintenanceModeManager()
     {
-        $this->app->bind(MaintenanceModeContract::class, FileBasedMaintenanceMode::class);
+        $this->app->singleton(MaintenanceModeManager::class);
+
+        $this->app->bind(
+            MaintenanceModeContract::class,
+            fn () => $this->app->make(MaintenanceModeManager::class)->driver()
+        );
     }
 }
