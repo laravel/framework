@@ -100,7 +100,7 @@ class EloquentPaginateTest extends DatabaseTestCase
     public function testPaginationWithSpecificCountFields()
     {
         for ($i = 1; $i <= 50; $i++) {
-            Post::create(['title' => 'Hello world ' . $i]);
+            Post::create(['title' => 'Hello world '.$i]);
         }
 
         $this->assertEquals(50, Post::query()->paginate(10, ['*'], 'page', null, ['id'])->total());
