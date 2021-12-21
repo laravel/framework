@@ -700,6 +700,48 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items that begin with the given string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereStartsWith($key, $value)
+    {
+        return $this->filter(function ($item) use ($key, $value) {
+            return strncmp(data_get($item, $key), $value, strlen($value)) === 0;
+        });
+    }
+
+    /**
+     * Filter items that end with the given string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereEndsWith($key, $value)
+    {
+        return $this->filter(function ($item) use ($key, $value) {
+            return strncmp(strrev(data_get($item, $key)), strrev($value), strlen($value)) === 0;
+        });
+    }
+
+    /**
+     * Filter items that contain the given string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereContains($key, $value)
+    {
+        return $this->filter(function ($item) use ($key, $value) {
+            return str_contains(data_get($item, $key), $value);
+        });
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @param  callable  $callback

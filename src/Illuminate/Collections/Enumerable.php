@@ -423,6 +423,33 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whereInstanceOf($type);
 
     /**
+     * Filter items that begin with the given string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereStartsWith($key, $value);
+
+    /**
+     * Filter items that end with the given string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereEndsWith($key, $value);
+
+    /**
+     * Filter items that contain the given string.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function whereContains($key, $value);
+
+    /**
      * Get the first item from the enumerable passing the given truth test.
      *
      * @param  callable|null  $callback
