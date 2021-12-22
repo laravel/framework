@@ -975,6 +975,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      *
      * @return void
      */
+    protected function registerScheduleClearCacheCommand()
+    {
+        $this->app->singleton(ScheduleClearCacheCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerScheduleFinishCommand()
     {
         $this->app->singleton(ScheduleFinishCommand::class);
@@ -998,16 +1008,6 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerScheduleRunCommand()
     {
         $this->app->singleton(ScheduleRunCommand::class);
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerScheduleClearCacheCommand()
-    {
-        $this->app->singleton(ScheduleClearCacheCommand::class);
     }
 
     /**
