@@ -189,19 +189,6 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Register custom Doctrine types from the config with the connection.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return void
-     */
-    protected function registerConfiguredDoctrineTypes(Connection $connection): void
-    {
-        foreach ($this->app['config']->get('database.dbal.types', []) as $name => $class) {
-            $connection->registerDoctrineType($class, $name, $name);
-        }
-    }
-
-    /**
      * Prepare the read / write mode for database connection instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -217,6 +204,19 @@ class DatabaseManager implements ConnectionResolverInterface
         }
 
         return $connection;
+    }
+
+    /**
+     * Register custom Doctrine types from the configuration with the connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    protected function registerConfiguredDoctrineTypes(Connection $connection): void
+    {
+        foreach ($this->app['config']->get('database.dbal.types', []) as $name => $class) {
+            $connection->registerDoctrineType($class, $name, $name);
+        }
     }
 
     /**
