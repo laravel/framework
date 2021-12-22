@@ -6,7 +6,6 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -297,11 +296,11 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::min(2)->rules([$closureRule, $ruleObject]), ['aa']);
 
         $this->fails(Password::min(2)->rules($closureRule), ['ab'], [
-            'Custom rule closure failed'
+            'Custom rule closure failed',
         ]);
 
         $this->fails(Password::min(2)->rules($ruleObject), ['ab'], [
-            'Custom rule object failed'
+            'Custom rule object failed',
         ]);
     }
 
