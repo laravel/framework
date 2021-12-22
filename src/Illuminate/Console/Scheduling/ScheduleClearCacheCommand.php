@@ -4,21 +4,21 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 
-class ScheduleClearMutexCommand extends Command
+class ScheduleClearCacheCommand extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'schedule:clear-mutex';
+    protected $name = 'schedule:clear-cache';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Clear all the mutex files created by withoutOverlap()';
+    protected $description = 'Delete the cached mutex files created by scheduler';
 
     /**
      * Execute the console command.
@@ -29,17 +29,19 @@ class ScheduleClearMutexCommand extends Command
     public function handle(Schedule $schedule)
     {
         $mutexCleared = false;
+
         foreach ($schedule->events($this->laravel) as $event) {
-            $command = explode(' ', $event->command)[2];
             if ($event->mutex->exists($event)) {
-                $this->line('<info>Clearing mutex for:</info> '.$command);
+                $this->line('<info>Deleting mutex for:</info> '.$event->command);
+
                 $event->mutex->forget($event);
+
                 $mutexCleared = true;
             }
         }
 
         if (! $mutexCleared) {
-            $this->info('No mutex to clear.');
+            $this->info('No mutex files were found.');
         }
     }
 }
