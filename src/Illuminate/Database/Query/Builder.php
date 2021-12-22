@@ -1825,23 +1825,15 @@ class Builder
      * Add a "where fulltext" clause to the query.
      *
      * @param  string|string[]  $column
-     * @param  string|string[]  $values
+     * @param  string  $value
      * @param  string  $boolean
      * @return $this
      */
-    public function whereFulltext($columns, $values, array $options = [], $boolean = 'and')
+    public function whereFulltext($columns, $value, array $options = [], $boolean = 'and')
     {
         $type = 'Fulltext';
 
-        // Next, if the value is Arrayable we need to cast it to its raw array form so we
-        // have the underlying array value instead of an Arrayable object which is not
-        // able to be added as a binding, etc. We will then add to the wheres array.
-        if ($values instanceof Arrayable) {
-            $values = $values->toArray();
-        }
-
         $columns = (array) $columns;
-        $value = collect($this->cleanBindings((array) $values))->implode(',');
 
         $this->wheres[] = compact('type', 'columns', 'value', 'options', 'boolean');
 
