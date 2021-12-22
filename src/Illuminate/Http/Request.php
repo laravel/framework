@@ -340,8 +340,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function mergeIfMissing(array $input)
     {
-        $input = collect($input)->reject(function ($value, $key) {
-            return $this->getInputSource()->has($key);
+        $input = collect($input)->filter(function ($value, $key) {
+            return $this->missing($key);
         })->toArray();
 
         return $this->merge($input);
