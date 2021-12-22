@@ -1,6 +1,28 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.76.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.77.0...8.x)
+
+
+## [v8.77.0 (2021-12-21)](https://github.com/laravel/framework/compare/v8.76.2...v8.77.0)
+
+### Added
+- Attribute Cast / Accessor Improvements ([#40022](https://github.com/laravel/framework/pull/40022))
+- Added `Illuminate/View/Factory::renderUnless()` ([#40077](https://github.com/laravel/framework/pull/40077))
+- Added datetime parsing to Request instance ([#39945](https://github.com/laravel/framework/pull/39945))
+- Make it possible to use prefixes on Predis per Connection ([#40083](https://github.com/laravel/framework/pull/40083))
+- Added rule to validate MAC address ([#40098](https://github.com/laravel/framework/pull/40098))
+- Added ability to define temporary URL macro for storage ([#40100](https://github.com/laravel/framework/pull/40100))
+
+### Fixed
+- Fixed possible out of memory error when deleting values by reference key from cache in Redis driver ([#40039](https://github.com/laravel/framework/pull/40039))
+- Added `Illuminate/Filesystem/FilesystemManager::setApplication()` ([#40058](https://github.com/laravel/framework/pull/40058))
+- Fixed arg passing in doesntContain ([739d847](https://github.com/laravel/framework/commit/739d8472eb2c97c4a8d8f86eb699c526e42f57fa))
+- Translate Enum rule message ([#40089](https://github.com/laravel/framework/pull/40089))
+- Fixed date validation ([#40088](https://github.com/laravel/framework/pull/40088))
+- Dont allow models and except together in PruneCommand.php ([f62fe66](https://github.com/laravel/framework/commit/f62fe66216ee11bc864e0877d4fd4be4655db4aa))
+
+### Changed
+- Passthru Eloquent\Query::explain function to Query\Builder:explain for the ability to use database-specific explain commands ([#40075](https://github.com/laravel/framework/pull/40075))
 
 
 ## [v8.76.2 (2021-12-15)](https://github.com/laravel/framework/compare/v8.76.1...v8.76.2)
