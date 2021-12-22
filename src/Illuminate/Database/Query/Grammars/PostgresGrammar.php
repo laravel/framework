@@ -277,6 +277,7 @@ class PostgresGrammar extends Grammar
         $columns = $this->compileUpdateColumns($query, $values);
 
         $from = '';
+        $joinFrom = '';
 
         if (isset($query->joins)) {
             // When using Postgres, updates with joins list the joined tables in the from
@@ -289,11 +290,17 @@ class PostgresGrammar extends Grammar
             if (count($froms) > 0) {
                 $from = ' from '.implode(', ', $froms);
             }
+            
+            $joinFrom = collect($query->joins)->map(function ($join) {
+                return (count($join->joins) > 0)
+                    ? $this->compileJoins($join, $join->joins)
+                    : null;
+            })->implode(' ');
         }
 
         $where = $this->compileUpdateWheres($query);
 
-        return trim("update {$table} set {$columns}{$from} {$where}");
+        return trim("update {$table} set {$columns}{$from} {$joinFrom} {$where}");
     }
 
     /**
