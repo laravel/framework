@@ -80,7 +80,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $compromisedThreshold = 0;
 
     /**
-     * Custom validation rules that should be used.
+     * Additional validation rules that should be merged into the default rules during validation.
      *
      * @var array
      */
@@ -267,10 +267,10 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Define custom validation rules that should be used.
+     * Specify additional validation rules that should be merged with the default rules during validation.
      *
-     * @param $rules
-     * @return Password
+     * @param  string|array  $rules
+     * @return $this
      */
     public function rules($rules)
     {
