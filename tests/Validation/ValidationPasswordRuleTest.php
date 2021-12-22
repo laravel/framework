@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -267,6 +268,41 @@ class ValidationPasswordRuleTest extends TestCase
         );
 
         $this->assertTrue($v1->passes());
+    }
+
+    public function testPassesWithCustomRules()
+    {
+        $closureRule = function ($attribute, $value, $fail) {
+            if ($value !== 'aa') {
+                $fail('Custom rule closure failed');
+            }
+        };
+
+        $ruleObject = new class implements \Illuminate\Contracts\Validation\Rule
+        {
+            public function passes($attribute, $value)
+            {
+                return $value === 'aa';
+            }
+
+            public function message()
+            {
+                return 'Custom rule object failed';
+            }
+        };
+
+        $this->passes(Password::min(2)->rules($closureRule), ['aa']);
+        $this->passes(Password::min(2)->rules([$closureRule]), ['aa']);
+        $this->passes(Password::min(2)->rules($ruleObject), ['aa']);
+        $this->passes(Password::min(2)->rules([$closureRule, $ruleObject]), ['aa']);
+
+        $this->fails(Password::min(2)->rules($closureRule), ['ab'], [
+            'Custom rule closure failed'
+        ]);
+
+        $this->fails(Password::min(2)->rules($ruleObject), ['ab'], [
+            'Custom rule object failed'
+        ]);
     }
 
     protected function passes($rule, $values)
