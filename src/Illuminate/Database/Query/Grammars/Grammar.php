@@ -630,15 +630,15 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a "where match against" clause.
+     * Compile a "where fulltext" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $match
+     * @param  array  $where
      * @return string
      */
-    public function whereMatchAgainst(Builder $query, $match)
+    public function whereFulltext(Builder $query, $where)
     {
-        throw new RuntimeException('This database engine does not support MATCH AGAINST operations.');
+        throw new RuntimeException('This database engine does not support fulltext search operations.');
     }
 
     /**

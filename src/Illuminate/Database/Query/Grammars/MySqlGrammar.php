@@ -51,23 +51,27 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile a "where match against" clause.
+     * Compile a "where fulltext" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $match
+     * @param  array  $where
      * @return string
      */
-    public function whereMatchAgainst(Builder $query, $match)
+    public function whereFulltext(Builder $query, $where)
     {
-        $columns = $this->columnize($match['columns']);
+        $columns = $this->columnize($where['columns']);
 
-        $value = $this->parameter($match['value']);
+        $value = $this->parameter($where['value']);
 
-        $mode = $match['mode'] === 'boolean' ? 'in boolean mode' : 'in natural language mode';
+        $mode = ($where['options']['mode'] ?? []) === 'boolean'
+            ? ' in boolean mode'
+            : ' in natural language mode';
 
-        $expand = $match['expanded'] && $match['mode'] !== 'boolean' ? ' with query expansion' : '';
+        $expanded = ($where['options']['expanded'] ?? []) && ($where['options']['mode'] ?? []) !== 'boolean'
+            ? ' with query expansion'
+            : '';
 
-        return "match ({$columns}) against (".$value." {$mode}{$expand})";
+        return "match ({$columns}) against (".$value."{$mode}{$expanded})";
     }
 
     /**

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
  * @requires extension pdo_mysql
  * @requires OS Linux|Darwin
  */
-class MatchAgainstTest extends MySqlTestCase
+class FulltextTest extends MySqlTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
@@ -42,9 +42,9 @@ class MatchAgainstTest extends MySqlTestCase
     }
 
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-natural-language.html */
-    public function testMatchAgainst()
+    public function testWhereFulltext()
     {
-        $articles = DB::table('articles')->matchAgainst(['title', 'body'], 'database')->get();
+        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database')->get();
 
         $this->assertCount(2, $articles);
         $this->assertSame('MySQL Tutorial', $articles[0]->title);
@@ -52,17 +52,17 @@ class MatchAgainstTest extends MySqlTestCase
     }
 
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-boolean.html */
-    public function testMatchAgainstBoolean()
+    public function testWhereFulltextWithBooleanMode()
     {
-        $articles = DB::table('articles')->matchAgainstBoolean(['title', 'body'], '+MySQL -YourSQL')->get();
+        $articles = DB::table('articles')->whereFulltext(['title', 'body'], '+MySQL -YourSQL', ['mode' => 'boolean'])->get();
 
         $this->assertCount(5, $articles);
     }
 
     /** @link https://dev.mysql.com/doc/refman/8.0/en/fulltext-query-expansion.html */
-    public function testMatchAgainstExpanded()
+    public function testWhereFulltextWithExpandedQuery()
     {
-        $articles = DB::table('articles')->matchAgainstExpanded(['title', 'body'], 'database')->get();
+        $articles = DB::table('articles')->whereFulltext(['title', 'body'], 'database', ['expanded' => true])->get();
 
         $this->assertCount(6, $articles);
     }
