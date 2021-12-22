@@ -64,13 +64,13 @@ class ViewCreateCommand extends GeneratorCommand
         $this->info('Creating view:'.$viewName.'.blade.php');
 
         copy($this->getStub(), $viewPath);
-    
+
         return GeneratorCommand::SUCCESS;
     }
 
     protected function getStub()
     {
-        return __DIR__ .'/stubs/view-make.stub';
+        return __DIR__.'/stubs/view-make.stub';
     }
 
     protected function getView()
