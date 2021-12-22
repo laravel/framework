@@ -210,7 +210,7 @@ class Application extends SymfonyApplication implements ApplicationContract
             $input = new ArrayInput($parameters);
         }
 
-        return [$command, $input ?? null];
+        return [$command, $input];
     }
 
     /**
