@@ -290,7 +290,7 @@ class PostgresGrammar extends Grammar
             if (count($froms) > 0) {
                 $from = ' from '.implode(', ', $froms);
             }
-            
+
             $joinFrom = collect($query->joins)->map(function ($join) {
                 return (count($join->joins) > 0)
                     ? $this->compileJoins($join, $join->joins)
