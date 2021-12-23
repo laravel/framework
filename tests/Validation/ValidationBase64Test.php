@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Base64;
 use PHPUnit\Framework\TestCase;
 
