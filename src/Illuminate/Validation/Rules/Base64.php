@@ -16,13 +16,7 @@ class Base64 implements Rule
      */
     public function passes($attribute, $value)
     {
-        $result = base64_decode($value, true);
-
-        if ($result === false) {
-            return $result;
-        }
-
-        return true;
+        return base64_decode($value, true) !== false;
     }
 
     /**
