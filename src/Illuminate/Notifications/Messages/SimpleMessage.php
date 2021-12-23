@@ -163,7 +163,8 @@ class SimpleMessage
      * @param  mixed  $line
      * @return $this
      */
-    public function lines($lines) {
+    public function lines($lines)
+    {
         foreach ($lines as $line) {
             $this->line($line);
         }
