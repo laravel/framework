@@ -28,7 +28,7 @@ class Base64 implements Rule
         $message = trans('validation.base64');
 
         return $message === 'validation.base64'
-            ? ['The selected :attribute is not Invalid.']
+            ? ['The selected :attribute is not Valid.']
             : $message;
     }
 }
