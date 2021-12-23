@@ -25,6 +25,4 @@ class ValidationBase64Test extends TestCase
 
         $this->assertFalse($rule->passes('', $string));
     }
-
-
 }
