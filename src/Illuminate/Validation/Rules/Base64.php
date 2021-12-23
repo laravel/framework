@@ -18,7 +18,7 @@ class Base64 implements Rule
     {
         $result = base64_decode($value, true);
 
-        if($result === false) {
+        if ($result === false) {
             return $result;
         }
 
@@ -37,5 +37,6 @@ class Base64 implements Rule
         return $message === 'validation.base64'
             ? ['The selected :attribute is not Invalid.']
             : $message;
+
     }
 }
