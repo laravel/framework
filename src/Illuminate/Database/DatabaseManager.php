@@ -183,6 +183,8 @@ class DatabaseManager implements ConnectionResolverInterface
         // the connection, which will allow us to reconnect from the connections.
         $connection->setReconnector($this->reconnector);
 
+        $this->registerConfiguredDoctrineTypes($connection);
+
         return $connection;
     }
 
@@ -202,6 +204,19 @@ class DatabaseManager implements ConnectionResolverInterface
         }
 
         return $connection;
+    }
+
+    /**
+     * Register custom Doctrine types from the configuration with the connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return void
+     */
+    protected function registerConfiguredDoctrineTypes(Connection $connection): void
+    {
+        foreach ($this->app['config']->get('database.dbal.types', []) as $name => $class) {
+            $connection->registerDoctrineType($class, $name, $name);
+        }
     }
 
     /**
