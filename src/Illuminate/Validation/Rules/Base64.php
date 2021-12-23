@@ -32,5 +32,4 @@ class Base64 implements Rule
             ? ['The selected :attribute is not Invalid.']
             : $message;
     }
-
 }
