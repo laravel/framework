@@ -32,4 +32,5 @@ class Base64 implements Rule
             : $message;
     }
 
+
 }
