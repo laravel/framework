@@ -40,6 +40,7 @@ class In
             if ($value instanceof \UnitEnum) {
                 $value = $value->value;
             }
+            
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
 
