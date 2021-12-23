@@ -163,6 +163,20 @@ class SimpleMessage
      * @param  mixed  $line
      * @return $this
      */
+    public function lines($lines) {
+        foreach ($lines as $line) {
+            $this->line($line);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a line of text to the notification.
+     *
+     * @param  mixed  $line
+     * @return $this
+     */
     public function with($line)
     {
         if ($line instanceof Action) {
