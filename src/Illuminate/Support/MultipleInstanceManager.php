@@ -1,9 +1,10 @@
 <?php
 
-namespace Illuminate\Cache;
+namespace Illuminate\Support;
 
 use Closure;
 use InvalidArgumentException;
+use RuntimeException;
 
 abstract class MultipleInstanceManager
 {
@@ -100,6 +101,10 @@ abstract class MultipleInstanceManager
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Instance [{$name}] is not defined.");
+        }
+
+        if (! array_key_exists('driver', $config)) {
+            throw new RuntimeException("Instance [{$name}] does not specify a driver.");
         }
 
         if (isset($this->customCreators[$config['driver']])) {
