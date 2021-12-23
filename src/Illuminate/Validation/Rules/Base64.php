@@ -1,0 +1,39 @@
+<?php
+
+namespace Illuminate\Validation\Rules;
+
+use Illuminate\Contracts\Validation\Rule;
+
+class Base64 implements Rule
+{
+
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function passes($attribute, $value) {
+        $result = base64_decode($value, true);
+
+        if($result === false) {
+            return $result;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return array
+     */
+    public function message() {
+        $message = trans('validation.base64');
+
+        return $message === 'validation.base64'
+            ? ['The selected :attribute is invalid.']
+            : $message;
+    }
+}
