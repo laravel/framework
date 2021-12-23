@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation\Rules;
 
+use \UnitEnum;
+
 class In
 {
     /**
@@ -37,7 +39,7 @@ class In
     public function __toString()
     {
         $values = array_map(function ($value) {
-            if ($value instanceof \UnitEnum) {
+            if ($value instanceof UnitEnum) {
                 $value = $value->value;
             }
 
