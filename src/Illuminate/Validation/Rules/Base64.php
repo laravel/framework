@@ -37,6 +37,6 @@ class Base64 implements Rule
         return $message === 'validation.base64'
             ? ['The selected :attribute is not Invalid.']
             : $message;
-
     }
+
 }
