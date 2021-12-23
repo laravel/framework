@@ -160,7 +160,7 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  mixed  $line
+     * @param  mixed  $lines
      * @return $this
      */
     public function lines($lines)
