@@ -10,7 +10,7 @@ class ValidationBase64Test extends TestCase
 {
     public function testBase64StringPassValidation()
     {
-        $string = base64_encode(Str::random());
+        $string = base64_encode('Hello world');
 
         $rule = new Base64();
 
@@ -19,7 +19,7 @@ class ValidationBase64Test extends TestCase
 
     public function testNonBase64StringDoNotPassValidation()
     {
-        $string = Str::random().'-';
+        $string = base64_encode('Hello world').'-';
 
         $rule = new Base64();
 
