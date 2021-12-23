@@ -10,7 +10,8 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
 
     protected function createFooDriver(array $config)
     {
-        return new class($config) {
+        return new class($config)
+        {
             public $config;
 
             public function __construct($config)
@@ -22,7 +23,8 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
 
     protected function createBarDriver(array $config)
     {
-        return new class($config) {
+        return new class($config)
+        {
             public $config;
 
             public function __construct($config)
@@ -65,12 +67,12 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
             case 'foo':
                 return [
                     'driver' => 'foo',
-                    'foo-option' => 'option-value'
+                    'foo-option' => 'option-value',
                 ];
             case 'bar':
                 return [
                     'driver' => 'bar',
-                    'bar-option' => 'option-value'
+                    'bar-option' => 'option-value',
                 ];
             default:
                 return [];
