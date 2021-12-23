@@ -8,7 +8,8 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationBase64Test extends TestCase
 {
-    public function testBase64StringPassValidation() {
+    public function testBase64StringPassValidation()
+    {
         $string = base64_encode(Str::random());
 
         $rule = new Base64();
@@ -16,7 +17,8 @@ class ValidationBase64Test extends TestCase
         $this->assertTrue($rule->passes('', $string));
     }
 
-    public function testNonBase64StringDoNotPassValidation() {
+    public function testNonBase64StringDoNotPassValidation()
+    {
         $string = Str::random().'-';
 
         $rule = new Base64();

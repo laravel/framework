@@ -14,7 +14,8 @@ class Base64 implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value) {
+    public function passes($attribute, $value)
+    {
         $result = base64_decode($value, true);
 
         if($result === false) {
@@ -29,7 +30,8 @@ class Base64 implements Rule
      *
      * @return array
      */
-    public function message() {
+    public function message()
+    {
         $message = trans('validation.base64');
 
         return $message === 'validation.base64'
