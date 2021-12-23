@@ -43,7 +43,7 @@ class ViewCreateCommand extends GeneratorCommand
         $force = $this->option('force');
 
         // If it specifies directory and file as dots, it converts dots to slash(/)
-        $viewName = $this->getView();
+        $viewName = Str::of($this->argument('name'))->replace('.', DIRECTORY_SEPARATOR)->replace('//', '/');
 
         $viewPath = resource_path('views/'.$viewName.'.blade.php');
 
@@ -56,12 +56,12 @@ class ViewCreateCommand extends GeneratorCommand
             unlink($viewPath);
         }
 
-        // If the directory exists, and the user wants to overwrite it, it will be overwritten.
+        // If the folder does not exist, it creates a new folder.
         if (! is_dir(dirname($viewPath))) {
             mkdir(dirname($viewPath), 0755, true);
         }
 
-        $this->info('Creating view:'.$viewName.'.blade.php');
+        $this->info('Creating view: '.$viewName.'.blade.php');
 
         copy($this->getStub(), $viewPath);
 
@@ -71,10 +71,5 @@ class ViewCreateCommand extends GeneratorCommand
     protected function getStub()
     {
         return __DIR__.'/stubs/view-make.stub';
-    }
-
-    protected function getView()
-    {
-        return Str::of($this->argument('name'))->replace('.', DIRECTORY_SEPARATOR)->replace('//', '/');
     }
 }
