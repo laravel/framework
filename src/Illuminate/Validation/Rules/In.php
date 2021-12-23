@@ -2,7 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
-use \UnitEnum;
+use UnitEnum;
 
 class In
 {
