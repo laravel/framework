@@ -18,7 +18,7 @@ trait ManagesLoops
     /**
      * Add new loop to the stack.
      *
-     * @param  \Countable|array  $data
+     * @param  \Countable|AbstractPaginator|array  $data
      * @return void
      */
     public function addLoop($data)
