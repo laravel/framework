@@ -3,9 +3,12 @@
 namespace Illuminate\Database\Migrations;
 
 use Closure;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use ReflectionClass;
+use ReflectionMethod;
 
 class MigrationCreator
 {
@@ -50,11 +53,12 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  MigrationLine[]  $columns
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $columns = [])
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -68,7 +72,7 @@ class MigrationCreator
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put(
-            $path, $this->populateStub($name, $stub, $table)
+            $path, $this->populateStub($name, $stub, $table, $columns)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
@@ -137,7 +141,7 @@ class MigrationCreator
      * @param  string|null  $table
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($name, $stub, $table, $columns)
     {
         $stub = str_replace(
             ['DummyClass', '{{ class }}', '{{class}}'],
@@ -153,6 +157,33 @@ class MigrationCreator
                 $table, $stub
             );
         }
+
+        $stub = $this->fillColumns($stub, $columns);
+
+        return $stub;
+    }
+
+    /**
+     * Populate stub with columns
+     *
+     * @param  string  $stub
+     * @param  MigrationLine[]  $columns
+     * @return string
+     */
+    protected function fillColumns($stub, $columns = [])
+    {
+        $upReplacement = '';
+        $downReplacement = '';
+        $indentation = str_repeat(' ', $this->spacesBehindWord($stub, '{{ columns }}'));
+
+        foreach ($columns as $column) {
+            $upReplacement .= $column->resolve($indentation);
+            $downReplacement .= $column->dropColumn($indentation);
+        }
+
+        // replace the placeholders along with their indentations and linefeed
+        $stub = preg_replace("(\ +{{ columns }}\n?)", $upReplacement, $stub);
+        $stub = preg_replace("(\ +{{ revert_columns }}\n?)", $downReplacement, $stub);
 
         return $stub;
     }
@@ -232,5 +263,31 @@ class MigrationCreator
     public function getFilesystem()
     {
         return $this->files;
+    }
+
+    /**
+     * Get the number of spaces behind a word in a given string until we reach the previous word, if word is not found then 0 is returned
+     * 
+     * @param  string $string
+     * @param  string $word
+     * @return int
+     */
+    protected function spacesBehindWord($string, $word)
+    {
+        $wordIndex = strpos($string, $word);
+        if (!$wordIndex) {
+            return 0;
+        }
+
+        $spaces = 0;
+        for ($i = $wordIndex - 1; $i >= 0; $i--) {
+            if ($string[$i] !== ' ') {
+                break;
+            }
+
+            $spaces++;
+        }
+
+        return $spaces;
     }
 }

@@ -14,7 +14,7 @@ class {{ class }} extends Migration
     public function up()
     {
         Schema::table('{{ table }}', function (Blueprint $table) {
-            //
+            {{ columns }}
         });
     }
 
@@ -26,7 +26,7 @@ class {{ class }} extends Migration
     public function down()
     {
         Schema::table('{{ table }}', function (Blueprint $table) {
-            //
+            {{ revert_columns }}
         });
     }
 }

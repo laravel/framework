@@ -3,8 +3,11 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Database\Migrations\MigrationLine;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class MigrateMakeCommand extends BaseCommand
 {
@@ -18,7 +21,8 @@ class MigrateMakeCommand extends BaseCommand
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration}';
+        {--fullpath : Output the full path of the migration}
+        {--c|columns=* : Predefine columns in the migration, format is name:type}';
 
     /**
      * The console command description.
@@ -107,7 +111,7 @@ class MigrateMakeCommand extends BaseCommand
     protected function writeMigration($name, $table, $create)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $this->getColumns()
         );
 
         if (! $this->option('fullpath')) {
@@ -131,5 +135,27 @@ class MigrateMakeCommand extends BaseCommand
         }
 
         return parent::getMigrationPath();
+    }
+
+    /**
+     * Get the columns from the columns option and format them
+     *
+     * @return array
+     */
+    protected function getColumns()
+    {
+        $columns = [];
+        foreach ($this->input->getOption('columns') ?? [] as $column) {
+            $values = explode(':', $column);
+            if (count($values) < 2) {
+                $this->error("$column is invalid, the format is type:name");
+                abort(0);
+            }
+
+
+            $columns[] = new MigrationLine($values[0], $values[1], array_slice($values, 2));
+        }
+
+        return $columns;
     }
 }
