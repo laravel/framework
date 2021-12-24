@@ -4,6 +4,7 @@ namespace Illuminate\View\Concerns;
 
 use Countable;
 use Illuminate\Support\Arr;
+use Illuminate\Pagination\AbstractPaginator;
 
 trait ManagesLoops
 {
@@ -24,11 +25,14 @@ trait ManagesLoops
     {
         $length = is_array($data) || $data instanceof Countable ? count($data) : null;
 
+        $serial = ($data instanceof AbstractPaginator) ? $data->perPage() * ($data->currentPage() - 1) : 0;
+
         $parent = Arr::last($this->loopsStack);
 
         $this->loopsStack[] = [
             'iteration' => 0,
             'index' => 0,
+            'serial' => $serial,
             'remaining' => $length ?? null,
             'count' => $length,
             'first' => true,
@@ -52,6 +56,7 @@ trait ManagesLoops
         $this->loopsStack[$index] = array_merge($this->loopsStack[$index], [
             'iteration' => $loop['iteration'] + 1,
             'index' => $loop['iteration'],
+            'serial' => $loop['serial'] + 1,
             'first' => $loop['iteration'] == 0,
             'odd' => ! $loop['odd'],
             'even' => ! $loop['even'],
