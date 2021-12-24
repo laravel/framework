@@ -37,6 +37,6 @@ class {{ class }} extends Command
      */
     public function handle()
     {
-        return Command::SUCCESS;
+        return 0;
     }
 }

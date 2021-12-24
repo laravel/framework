@@ -332,6 +332,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Merge new input into the request's input, but only when that key is missing from the request.
+     *
+     * @param  array  $input
+     * @return $this
+     */
+    public function mergeIfMissing(array $input)
+    {
+        return $this->merge(collect($input)->filter(function ($value, $key) {
+            return $this->missing($key);
+        })->toArray());
+    }
+
+    /**
      * Replace the input for the current request.
      *
      * @param  array  $input

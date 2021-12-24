@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,6 +12,10 @@ class EloquentModelConnectionsTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
+        if (getenv('DB_CONNECTION') !== 'testing') {
+            $this->markTestSkipped('Test requires a Sqlite connection.');
+        }
+
         $app['config']->set('database.default', 'conn1');
 
         $app['config']->set('database.connections.conn1', [

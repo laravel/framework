@@ -239,7 +239,7 @@ class SqlServerGrammar extends Grammar
 
         $sql = "DECLARE @sql NVARCHAR(MAX) = '';";
         $sql .= "SELECT @sql += 'ALTER TABLE [dbo].[{$tableName}] DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' ";
-        $sql .= 'FROM SYS.COLUMNS ';
+        $sql .= 'FROM sys.columns ';
         $sql .= "WHERE [object_id] = OBJECT_ID('[dbo].[{$tableName}]') AND [name] in ({$columns}) AND [default_object_id] <> 0;";
         $sql .= 'EXEC(@sql)';
 

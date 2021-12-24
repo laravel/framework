@@ -2,53 +2,22 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Facades\Schema;
 use stdClass;
 
-class EloquentModelStringCastingTest extends TestCase
+class EloquentModelStringCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        $db = new DB;
-
-        $db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
-
-        $db->bootEloquent();
-        $db->setAsGlobal();
-
-        $this->createSchema();
-    }
-
-    /**
-     * Setup the database schema.
-     *
-     * @return void
-     */
-    public function createSchema()
-    {
-        $this->schema()->create('casting_table', function (Blueprint $table) {
+        Schema::create('casting_table', function (Blueprint $table) {
             $table->increments('id');
             $table->string('array_attributes');
             $table->string('json_attributes');
             $table->string('object_attributes');
             $table->timestamps();
         });
-    }
-
-    /**
-     * Tear down the database schema.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('casting_table');
     }
 
     /**
@@ -90,26 +59,6 @@ class EloquentModelStringCastingTest extends TestCase
 
         $this->assertSame([], $model->getOriginal('object_attributes'));
         $this->assertSame([], $model->getAttribute('object_attributes'));
-    }
-
-    /**
-     * Get a database connection instance.
-     *
-     * @return \Illuminate\Database\Connection
-     */
-    protected function connection()
-    {
-        return Eloquent::getConnectionResolver()->connection();
-    }
-
-    /**
-     * Get a schema builder instance.
-     *
-     * @return \Illuminate\Database\Schema\Builder
-     */
-    protected function schema()
-    {
-        return $this->connection()->getSchemaBuilder();
     }
 }
 

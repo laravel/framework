@@ -26,7 +26,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool missing(string $path)
  * @method static bool move(string $from, string $to)
  * @method static bool prepend(string $path, string $data)
- * @method static bool put(string $path, string|resource $contents, mixed $options = [])
+ * @method static bool put(string $path, \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource $contents, mixed $options = [])
  * @method static bool setVisibility(string $path, string $visibility)
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
  * @method static int lastModified(string $path)
@@ -40,6 +40,8 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string|false mimeType(string $path)
  * @method static string|false putFile(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, mixed $options = [])
  * @method static string|false putFileAs(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, string $name, mixed $options = [])
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static void buildTemporaryUrlsUsing(\Closure $callback)
  *
  * @see \Illuminate\Filesystem\FilesystemManager
  */

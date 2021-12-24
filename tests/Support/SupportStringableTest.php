@@ -538,6 +538,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
     }
 
+    public function testReverse()
+    {
+        $this->assertSame('FooBar', (string) $this->stringable('raBooF')->reverse());
+        $this->assertSame('Teniszütő', (string) $this->stringable('őtüzsineT')->reverse());
+        $this->assertSame('❤MultiByte☆', (string) $this->stringable('☆etyBitluM❤')->reverse());
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', (string) $this->stringable('LaravelPHPFramework')->snake());
@@ -612,6 +619,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', 1, 2));
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a', 1, -2));
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
+    }
+
+    public function testSubstrReplace()
+    {
+        $this->assertSame('12:00', (string) $this->stringable('1200')->substrReplace(':', 2, 0));
+        $this->assertSame('The Laravel Framework', (string) $this->stringable('The Framework')->substrReplace('Laravel ', 4, 0));
+        $this->assertSame('Laravel – The PHP Framework for Web Artisans', (string) $this->stringable('Laravel Framework')->substrReplace('– The PHP Framework for Web Artisans', 8));
     }
 
     public function testPadBoth()

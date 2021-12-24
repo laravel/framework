@@ -265,7 +265,11 @@ trait ValidatesAttributes
         $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
 
         if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
-            $secondDate = $this->getDateTimeWithOptionalFormat($format, $this->getValue($second));
+            if (is_null($second = $this->getValue($second))) {
+                return true;
+            }
+
+            $secondDate = $this->getDateTimeWithOptionalFormat($format, $second);
         }
 
         return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
@@ -1227,6 +1231,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a valid MAC address.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateMacAddress($attribute, $value)
+    {
+        return filter_var($value, FILTER_VALIDATE_MAC) !== false;
+    }
+
+    /**
      * Validate the attribute is a valid JSON string.
      *
      * @param  string  $attribute
@@ -1329,7 +1345,7 @@ trait ValidatesAttributes
         }
 
         $phpExtensions = [
-            'php', 'php3', 'php4', 'php5', 'phtml',
+            'php', 'php3', 'php4', 'php5', 'phtml', 'phar',
         ];
 
         return ($value instanceof UploadedFile)

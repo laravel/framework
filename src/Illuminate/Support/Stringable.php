@@ -493,6 +493,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Reverse the string.
+     *
+     * @return static
+     */
+    public function reverse()
+    {
+        return new static(Str::reverse($this->value));
+    }
+
+    /**
      * Repeat the string.
      *
      * @param  int  $times
@@ -697,6 +707,19 @@ class Stringable implements JsonSerializable
     public function substrCount($needle, $offset = null, $length = null)
     {
         return Str::substrCount($this->value, $needle, $offset ?? 0, $length);
+    }
+
+    /**
+     * Replace text within a portion of a string.
+     *
+     * @param  string|array  $replace
+     * @param  array|int  $offset
+     * @param  array|int|null  $length
+     * @return string|array
+     */
+    public function substrReplace($replace, $offset = 0, $length = null)
+    {
+        return new static(Str::substrReplace($this->value, $replace, $offset, $length));
     }
 
     /**

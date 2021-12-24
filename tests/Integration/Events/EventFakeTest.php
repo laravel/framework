@@ -98,6 +98,29 @@ class EventFakeTest extends TestCase
         Event::assertNotDispatched(NonImportantEvent::class);
     }
 
+    public function testFakeExceptAllowsGivenEventToBeDispatched()
+    {
+        Event::fakeExcept(NonImportantEvent::class);
+
+        Event::dispatch(NonImportantEvent::class);
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+    }
+
+    public function testFakeExceptAllowsGivenEventsToBeDispatched()
+    {
+        Event::fakeExcept([
+            NonImportantEvent::class,
+            'non-fake-event',
+        ]);
+
+        Event::dispatch(NonImportantEvent::class);
+        Event::dispatch('non-fake-event');
+
+        Event::assertNotDispatched(NonImportantEvent::class);
+        Event::assertNotDispatched('non-fake-event');
+    }
+
     public function testAssertListening()
     {
         Event::fake();

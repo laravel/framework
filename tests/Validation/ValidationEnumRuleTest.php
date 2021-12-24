@@ -116,6 +116,21 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
+    public function testValidationFailsOnPureEnum()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'one',
+            ],
+            [
+                'status' => ['required', new Enum(PureEnum::class)],
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();

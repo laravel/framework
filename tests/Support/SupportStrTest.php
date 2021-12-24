@@ -418,6 +418,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
     }
 
+    public function testReverse()
+    {
+        $this->assertSame('FooBar', Str::reverse('raBooF'));
+        $this->assertSame('Teniszütő', Str::reverse('őtüzsineT'));
+        $this->assertSame('❤MultiByte☆', Str::reverse('☆etyBitluM❤'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));
@@ -526,6 +533,13 @@ class SupportStrTest extends TestCase
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', 1, 2));
         $this->assertSame(3, Str::substrCount('laravelPHPFramework', 'a', 1, -2));
         $this->assertSame(1, Str::substrCount('laravelPHPFramework', 'a', -10, -3));
+    }
+
+    public function testSubstrReplace()
+    {
+        $this->assertSame('12:00', Str::substrReplace('1200', ':', 2, 0));
+        $this->assertSame('The Laravel Framework', Str::substrReplace('The Framework', 'Laravel ', 4, 0));
+        $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
     public function testUcfirst()

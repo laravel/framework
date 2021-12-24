@@ -1242,7 +1242,7 @@ class Builder
     /**
      * Add a "where date" statement to the query.
      *
-     * @param  string  $column
+     * @param  \Illuminate\Database\Query\Expression|string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @param  string  $boolean
@@ -2102,7 +2102,7 @@ class Builder
         $property = $this->unions ? 'unionLimit' : 'limit';
 
         if ($value >= 0) {
-            $this->$property = (int) $value;
+            $this->$property = ! is_null($value) ? (int) $value : null;
         }
 
         return $this;

@@ -63,16 +63,7 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        if (static::$createUrlCallback) {
-            $url = call_user_func(static::$createUrlCallback, $notifiable, $this->token);
-        } else {
-            $url = url(route('password.reset', [
-                'token' => $this->token,
-                'email' => $notifiable->getEmailForPasswordReset(),
-            ], false));
-        }
-
-        return $this->buildMailMessage($url);
+        return $this->buildMailMessage($this->resetUrl($notifiable));
     }
 
     /**
@@ -89,6 +80,24 @@ class ResetPassword extends Notification
             ->action(Lang::get('Reset Password'), $url)
             ->line(Lang::get('This password reset link will expire in :count minutes.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line(Lang::get('If you did not request a password reset, no further action is required.'));
+    }
+
+    /**
+     * Get the reset URL for the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @return string
+     */
+    protected function resetUrl($notifiable)
+    {
+        if (static::$createUrlCallback) {
+            return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
+        }
+
+        return url(route('password.reset', [
+            'token' => $this->token,
+            'email' => $notifiable->getEmailForPasswordReset(),
+        ], false));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
+use RuntimeException;
 
 class PostgresGrammar extends Grammar
 {
@@ -173,6 +174,31 @@ class PostgresGrammar extends Grammar
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
             $this->columnize($command->columns)
+        );
+    }
+
+    /**
+     * Compile a fulltext index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileFulltext(Blueprint $blueprint, Fluent $command)
+    {
+        $language = $command->language ?: 'english';
+
+        if (count($command->columns) > 1) {
+            throw new RuntimeException('The PostgreSQL driver does not support fulltext index creation using multiple columns.');
+        }
+
+        return sprintf('create index %s on %s using gin (to_tsvector(%s, %s))',
+            $this->wrap($command->index),
+            $this->wrapTable($blueprint),
+            $this->quoteString($language),
+            $this->wrap($command->columns[0])
         );
     }
 
@@ -357,6 +383,18 @@ class PostgresGrammar extends Grammar
     public function compileDropIndex(Blueprint $blueprint, Fluent $command)
     {
         return "drop index {$this->wrap($command->index)}";
+    }
+
+    /**
+     * Compile a drop fulltext index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropFulltext(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileDropIndex($blueprint, $command);
     }
 
     /**
