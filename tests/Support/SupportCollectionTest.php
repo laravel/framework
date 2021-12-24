@@ -2141,6 +2141,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'shawn', 'dayle'], $data->all());
     }
 
+    public function testSet()
+    {
+        $data = new Collection(['user' => ['name' => 'taylor', 'email' => 'foo']]);
+        $data = $data->set('user.name', 'dayle');
+        $this->assertEquals(['user' => ['name' => 'dayle', 'email' => 'foo']], $data->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */

@@ -920,6 +920,20 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Set a value recursively in the collection by key.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function set($key, $value)
+    {
+        Arr::set($this->items, $key, $value);
+
+        return $this;
+    }
+
+    /**
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
