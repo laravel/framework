@@ -25,7 +25,7 @@ trait ManagesLoops
     {
         $length = is_array($data) || $data instanceof Countable ? count($data) : null;
 
-        $serial = ($data instanceof AbstractPaginator) ? $data->perPage() * ($data->currentPage() - 1) : 0;
+        $serial = $data instanceof AbstractPaginator ? ($data->perPage() * ($data->currentPage() - 1)) : 0;
 
         $parent = Arr::last($this->loopsStack);
 

@@ -626,6 +626,7 @@ class ViewFactoryTest extends TestCase
         $expectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'serial' => 0,
             'remaining' => 3,
             'count' => 3,
             'first' => true,
@@ -643,6 +644,7 @@ class ViewFactoryTest extends TestCase
         $secondExpectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'serial' => 0,
             'remaining' => 4,
             'count' => 4,
             'first' => true,
@@ -689,6 +691,7 @@ class ViewFactoryTest extends TestCase
         $expectedLoop = [
             'iteration' => 0,
             'index' => 0,
+            'serial' => 0,
             'remaining' => null,
             'count' => null,
             'first' => true,
@@ -712,6 +715,7 @@ class ViewFactoryTest extends TestCase
 
         $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
         $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['serial']);
         $this->assertEquals(3, $factory->getLoopStack()[0]['remaining']);
         $this->assertTrue($factory->getLoopStack()[0]['odd']);
         $this->assertFalse($factory->getLoopStack()[0]['even']);
@@ -720,6 +724,7 @@ class ViewFactoryTest extends TestCase
 
         $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
         $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['serial']);
         $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
         $this->assertFalse($factory->getLoopStack()[0]['odd']);
         $this->assertTrue($factory->getLoopStack()[0]['even']);
@@ -750,6 +755,7 @@ class ViewFactoryTest extends TestCase
 
         $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
         $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['serial']);
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);
