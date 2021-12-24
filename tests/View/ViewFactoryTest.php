@@ -10,6 +10,8 @@ use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
@@ -759,6 +761,164 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->getLoopStack()[0]['first']);
         $this->assertNull($factory->getLoopStack()[0]['remaining']);
         $this->assertNull($factory->getLoopStack()[0]['last']);
+    }
+
+    public function testAddingPaginatorLoop()
+    {
+        $factory = $this->getFactory();
+
+        $p = new Paginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 3, 1);
+
+        $factory->addLoop($p);
+
+        $expectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'serial' => 0,
+            'remaining' => 3,
+            'count' => 3,
+            'first' => true,
+            'last' => false,
+            'odd' => false,
+            'even' => true,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+    }
+
+    public function testIncrementingFirstPageLoopIndicesOfPaginatorLoop()
+    {
+        $factory = $this->getFactory();
+
+        $p = new Paginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 3, 1);
+
+        $factory->addLoop($p);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['remaining']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
+    }
+
+    public function testIncrementingSecondPageLoopIndicesOfPaginatorLoop()
+    {
+        $factory = $this->getFactory();
+
+        $p = new Paginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 3, 2);
+
+        $factory->addLoop($p);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(4, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(5, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['remaining']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
+    }
+
+    public function testAddingLengthAwarePaginatorPaginatorLoop()
+    {
+        $factory = $this->getFactory();
+
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 5, 3, 1);
+
+        $factory->addLoop($p);
+
+        $expectedLoop = [
+            'iteration' => 0,
+            'index' => 0,
+            'serial' => 0,
+            'remaining' => 5,
+            'count' => 5,
+            'first' => true,
+            'last' => false,
+            'odd' => false,
+            'even' => true,
+            'depth' => 1,
+            'parent' => null,
+        ];
+
+        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
+    }
+
+    public function testIncrementingFirstPageLoopIndicesOfLengthAwarePaginatorLoop()
+    {
+        $factory = $this->getFactory();
+
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 5, 3, 1);
+
+        $factory->addLoop($p);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(4, $factory->getLoopStack()[0]['remaining']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(2, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(3, $factory->getLoopStack()[0]['remaining']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
+    }
+
+    public function testIncrementingSecondPageLoopIndicesOfLengthAwarePaginatorLoop()
+    {
+        $factory = $this->getFactory();
+
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4', 'item5'], 5, 3, 2);
+
+        $factory->addLoop($p);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(1, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(0, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(4, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(4, $factory->getLoopStack()[0]['remaining']);
+        $this->assertTrue($factory->getLoopStack()[0]['odd']);
+        $this->assertFalse($factory->getLoopStack()[0]['even']);
+
+        $factory->incrementLoopIndices();
+
+        $this->assertEquals(2, $factory->getLoopStack()[0]['iteration']);
+        $this->assertEquals(1, $factory->getLoopStack()[0]['index']);
+        $this->assertEquals(5, $factory->getLoopStack()[0]['serial']);
+        $this->assertEquals(3, $factory->getLoopStack()[0]['remaining']);
+        $this->assertFalse($factory->getLoopStack()[0]['odd']);
+        $this->assertTrue($factory->getLoopStack()[0]['even']);
     }
 
     public function testMacro()
