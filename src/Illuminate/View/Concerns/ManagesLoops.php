@@ -3,8 +3,8 @@
 namespace Illuminate\View\Concerns;
 
 use Countable;
-use Illuminate\Support\Arr;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Arr;
 
 trait ManagesLoops
 {
