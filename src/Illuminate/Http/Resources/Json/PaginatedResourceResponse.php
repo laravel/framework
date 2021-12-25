@@ -48,7 +48,6 @@ class PaginatedResourceResponse extends ResourceResponse
         if (! $this->isHidden('links')) {
             $default['links'] = $this->paginationLinks($paginated);
         }
-            
 
         if (! $this->isHidden('meta')) {
             $default['meta'] = $this->meta($paginated);
