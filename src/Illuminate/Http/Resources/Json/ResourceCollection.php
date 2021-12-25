@@ -42,7 +42,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
 
     /**
      * The hidden pagination fields.
-     * 
+     *
      * @var array
      */
     public $hidden = [];
