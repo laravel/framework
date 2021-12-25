@@ -670,6 +670,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "foo" varbinary(max) not null', $statements[0]);
     }
 
+    public function testAddingVarbinary()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->varbinary('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" varbinary(max) not null', $statements[0]);
+    }
+
     public function testAddingUuid()
     {
         $blueprint = new Blueprint('users');
