@@ -58,7 +58,7 @@ class Bus extends Facade
         $jobs = is_array($jobs) ? $jobs : func_get_args();
 
         return (new PendingChain(array_shift($jobs), $jobs))
-                ->dispatch();
+                    ->dispatch();
     }
 
     /**
