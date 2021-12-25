@@ -14,6 +14,12 @@ class MigrationLine
     protected $chainedMethods;
     protected static $blueprintClassReflection;
 
+    /**
+     * @param string  $name
+     * @param string  $method
+     * @param array  $chainedMethods
+     * @param string  $caller
+     */
     public function __construct($name, $method, $chainedMethods = [], $caller = '$table')
     {
         $this->name = $name;
@@ -59,10 +65,11 @@ class MigrationLine
     /**
      * Convert the object to string
      *
-     * @param  string $prependWhitespace
-     * @param  boolean $appendLineFeed
-     * @throws InvalidArgumentException
+     * @param  string  $prependWhitespace
+     * @param  boolean  $appendLineFeed
      * @return string
+     * 
+     * @throws InvalidArgumentException
      */
     public function resolve($prependWhitespace = '', $appendLineFeed = true)
     {
@@ -91,8 +98,8 @@ class MigrationLine
     /**
      * convert line to a dropColumn statement using the objects name and caller
      *
-     * @param  string $prependWhitespace
-     * @param  boolean $appendLineFeed
+     * @param  string  $prependWhitespace
+     * @param  boolean  $appendLineFeed
      * @return string
      */
     public function dropColumn($prependWhitespace = '', $appendLineFeed = true)
@@ -103,17 +110,6 @@ class MigrationLine
         }
 
         return $line;
-    }
-
-    /**
-     * Format the parameters of a function call correctly
-     *
-     * @param  array $parameters
-     * @return string
-     */
-    protected function resolveParameters($parameters)
-    {
-        return collect($parameters)->map(fn ($parameter) => "'$parameter'")->implode(',');
     }
 
     public function __toString()

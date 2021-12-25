@@ -22,7 +22,7 @@ class MigrateMakeCommand extends BaseCommand
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration}
-        {--c|columns=* : Predefine columns in the migration, format is name:type}';
+        {--c|columns=* : Add column definitions in the migration, the format is name:type:chain; eg: col:integer:index}';
 
     /**
      * The console command description.
