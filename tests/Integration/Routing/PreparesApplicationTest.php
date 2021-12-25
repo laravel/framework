@@ -25,11 +25,28 @@ class PreparesApplicationTest extends TestCase
         $this->get('/foo')->assertSee('central');
     }
 
+    public function testRequestStateIsAccessible()
+    {
+        RouteFacade::get('/foo', PreparesApplicationController::class)->middleware(PreparesApplicationMiddleware::class);
+
+        $this->get('/foo?context=bar')->assertSee('bar');
+    }
+
     public function testWithDifferentServiceDependencies()
     {
         RouteFacade::domain('foo.localhost')->get('/bar', PreparesApplicationController::class)->middleware(PreparesApplicationMiddleware::class);
 
         $this->withoutExceptionHandling()->get('http://foo.localhost/bar')->assertSee('tenant_foo');
+    }
+
+    public function testRouteRegistrationHasNoSideEffects()
+    {
+        // Ensure that the logic is executed when the route is being *used* by a request, rather than when it's being *registered*
+
+        RouteFacade::domain('foo.localhost')->get('/bar', PreparesApplicationController::class)->middleware(PreparesApplicationMiddleware::class);
+        RouteFacade::get('/baz', PreparesApplicationController::class);
+
+        $this->get('/baz')->assertSee('central');
     }
 }
 
@@ -63,6 +80,12 @@ class PreparesApplicationMiddleware implements PreparesApplication
 
     public function prepareApplication(Route $route)
     {
+        if ($context = request()->query('context')) {
+            $this->app->instance('prepares_application.context', $context);
+
+            return;
+        }
+
         if ($domain = $route->getDomain()) {
             $this->app->instance('prepares_application.context', 'tenant_' . $domain);
         }

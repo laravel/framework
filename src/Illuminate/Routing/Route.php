@@ -1008,8 +1008,19 @@ class Route
 
         $this->computedMiddleware = [];
 
+        $routeMiddleware = $this->middleware();
+
+        foreach ($routeMiddleware as $middleware) {
+            // If the middleware is an instance of PreparesApplication, we let it affect the application
+            // state before resolving the route action. We're using reflection to avoid resolving middleware
+            // dependencies this early in the request lifecycle, as that could lead to incorrect container state.
+            if (class_exists($middleware) && (new ReflectionClass($middleware))->implementsInterface(PreparesApplication::class)) {
+                $this->container->make($middleware)->prepareApplication($this);
+            }
+        }
+
         return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
-            $this->middleware(), $this->controllerMiddleware()
+            $routeMiddleware, $this->controllerMiddleware()
         ));
     }
 
@@ -1031,13 +1042,6 @@ class Route
 
         foreach ($middleware as $index => $value) {
             $middleware[$index] = (string) $value;
-
-            // If the middleware is an instance of PreparesApplication, we let it affect the application
-            // state before resolving the route action. We're using reflection to avoid resolving middleware
-            // dependencies this early in the request lifecycle, as that could lead to incorrect container state.
-            if (class_exists($value) && (new ReflectionClass($value))->implementsInterface(PreparesApplication::class)) {
-                $this->container->make($value)->prepareApplication($this);
-            }
         }
 
         $this->action['middleware'] = array_merge(
