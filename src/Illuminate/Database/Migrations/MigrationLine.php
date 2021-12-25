@@ -89,7 +89,7 @@ class MigrationLine
 
         $line .= ';';
         if ($appendLineFeed) {
-            $line .= PHP_EOL;
+            $line .= "\n";
         }
 
         return $line;
@@ -106,7 +106,7 @@ class MigrationLine
     {
         $line = sprintf('%s%s->dropColumn(\'%s\');', $prependWhitespace, $this->caller, $this->name);
         if ($appendLineFeed) {
-            $line .= PHP_EOL;
+            $line .= "\n";
         }
 
         return $line;
