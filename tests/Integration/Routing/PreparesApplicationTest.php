@@ -86,7 +86,8 @@ class PreparesApplicationMiddleware implements PreparesApplication
 {
     public function __construct(
         public Container $app
-    ) {}
+    ) {
+    }
 
     public function prepareApplication(Route $route)
     {
