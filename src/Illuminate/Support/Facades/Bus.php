@@ -25,6 +25,10 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static void assertNotDispatchedAfterResponse(string|\Closure $command, callable $callback = null)
  * @method static void assertBatched(callable $callback)
  * @method static void assertChained(array $expectedChain)
+ * @method static void assertDispatchedSync(string|\Closure $command, callable $callback = null)
+ * @method static void assertDispatchedSyncTimes(string $command, int $times = 1)
+ * @method static void assertNotDispatchedSync(string|\Closure $command, callable $callback = null)
+ * @method static void assertDispatchedWithoutChain(string|\Closure $command, callable $callback = null)
  *
  * @see \Illuminate\Contracts\Bus\Dispatcher
  */
@@ -54,7 +58,7 @@ class Bus extends Facade
         $jobs = is_array($jobs) ? $jobs : func_get_args();
 
         return (new PendingChain(array_shift($jobs), $jobs))
-                    ->dispatch();
+            ->dispatch();
     }
 
     /**
