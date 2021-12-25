@@ -62,7 +62,7 @@ class PaginatedResourceResponse extends ResourceResponse
 
     /**
      * Indicates whether the given key is hidden.
-     * 
+     *
      * @param  string  $key
      * @return bool
      */
