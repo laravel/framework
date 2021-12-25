@@ -170,6 +170,24 @@ class Str
 
         return static::$camelCache[$value] = lcfirst(static::studly($value));
     }
+    
+    /**
+     * Concatenate an array of strings together with an optional seperator.
+     *
+     * @param  array  $strings
+     * @param  string|null  $separator
+     * @return string
+     */
+    public static function concat(array $strings, $separator = ' ')
+    {
+        $output = '';
+        
+        foreach ($strings as $string) {
+            $output .= $string . $separator;
+        }
+
+        return trim($output, $separator);
+    }
 
     /**
      * Determine if a given string contains a given substring.
