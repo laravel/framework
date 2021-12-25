@@ -152,7 +152,6 @@ class MigrateMakeCommand extends BaseCommand
                 abort(0);
             }
 
-
             $columns[] = new MigrationLine($values[0], $values[1], array_slice($values, 2));
         }
 
