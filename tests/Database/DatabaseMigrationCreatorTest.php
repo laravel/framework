@@ -101,7 +101,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     {
         $columns = [new MigrationLine('fake_string', 'string')];
         $fakeStub = 'DummyClass DummyTable {{ columns }}';
-        $populatedFakeStub = 'CreateBar baz $table->string(\'fake_string\');' . PHP_EOL;
+        $populatedFakeStub = "CreateBar baz \$table->string('fake_string');\n";
 
         $creator = $this->getCreator();
         $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
@@ -118,7 +118,7 @@ class DatabaseMigrationCreatorTest extends TestCase
     {
         $columns = [new MigrationLine('fake_int', 'integer', ['index', 'primary'])];
         $fakeStub = 'DummyClass DummyTable {{ columns }}';
-        $populatedFakeStub = 'CreateBar baz $table->integer(\'fake_int\')->index()->primary();' . PHP_EOL;
+        $populatedFakeStub = "CreateBar baz \$table->integer('fake_int')->index()->primary();\n";
 
         $creator = $this->getCreator();
         $creator->expects($this->any())->method('getDatePrefix')->willReturn('foo');
