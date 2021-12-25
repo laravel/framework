@@ -77,14 +77,14 @@ class MigrationLine
             throw new InvalidArgumentException("The method {$this->getMethod()} for column {$this->getName()} is invalid");
         }
 
-        $line = sprintf('%s%s->%s(\'%s\')', $prependWhitespace, $this->caller, $this->method, $this->name);
+        $line = sprintf('%s%s->%s(\'%s\')', $prependWhitespace, $this->caller, $this->method, addslashes($this->name));
 
         collect($this->chainedMethods)->each(function ($method) use (&$line) {
             if (!self::$blueprintClassReflection->hasMethod($method)) {
                 throw new InvalidArgumentException("The chained method {$method} for column {$this->getName()} is invalid");
             }
 
-            $line .= sprintf('->%s()', $method);
+            $line .= sprintf('->%s()', addslashes($method));
         });
 
         $line .= ';';
