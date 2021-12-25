@@ -158,7 +158,7 @@ class SimpleMessage
     }
 
     /**
-     * Add a line of text to the notification.
+     * Add lines of text to the notification.
      *
      * @param  array  $lines
      * @return $this
