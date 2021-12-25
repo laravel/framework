@@ -203,6 +203,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo', Str::afterLast('----foo', '---'));
     }
 
+    public function testStrConcat()
+    {
+        $this->assertSame(Str::concat(['Hello', 'world.']), 'Hello world.');
+        $this->assertSame(Str::concat(['foo', 'bar', 'baz'], '_'), 'foo_bar_baz');
+      
+        $title = 'Example Title';
+        $this->assertSame(Str::concat(['Your post titled:', $title, 'has been successfully saved.']), 'Your post titled: Example Title has been successfully saved.');
+    }
+    
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
