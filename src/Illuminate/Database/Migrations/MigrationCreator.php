@@ -169,6 +169,8 @@ class MigrationCreator
      * @param  string  $stub
      * @param  MigrationLine[]  $columns
      * @return string
+     * 
+     * @throws InvalidArgumentException thrown from MigrationLine class
      */
     protected function fillColumns($stub, $columns = [])
     {
@@ -268,8 +270,8 @@ class MigrationCreator
     /**
      * Get the number of spaces behind a word in a given string until we reach the previous word, if word is not found then 0 is returned
      * 
-     * @param  string $string
-     * @param  string $word
+     * @param  string  $string
+     * @param  string  $word
      * @return int
      */
     protected function spacesBehindWord($string, $word)
