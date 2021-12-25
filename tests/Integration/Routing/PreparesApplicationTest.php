@@ -63,7 +63,8 @@ class PreparesApplicationController
 {
     public function __construct(
         public PreparesApplicationService $service,
-    ) {}
+    ) {
+    }
 
     public function __invoke()
     {
@@ -96,7 +97,7 @@ class PreparesApplicationMiddleware implements PreparesApplication
         }
 
         if ($domain = $route->getDomain()) {
-            $this->app->instance('prepares_application.context', 'tenant_' . $domain);
+            $this->app->instance('prepares_application.context', 'tenant_'.$domain);
         }
     }
 

@@ -9,7 +9,7 @@ interface PreparesApplication
     /**
      * Prepare the application state for the provided route.
      *
-     * @param \Illuminate\Routing\Route $route
+     * @param  \Illuminate\Routing\Route $route
      * @return void
      */
     public function prepareApplication(Route $route);
