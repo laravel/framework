@@ -148,7 +148,7 @@ class MigrateMakeCommand extends BaseCommand
         foreach ($this->input->getOption('columns') ?? [] as $column) {
             $values = explode(':', $column);
             if (count($values) < 2) {
-                $this->error("$column is invalid, the format is type:name");
+                $this->error("$column is invalid, the format is name:type");
                 abort(0);
             }
 
