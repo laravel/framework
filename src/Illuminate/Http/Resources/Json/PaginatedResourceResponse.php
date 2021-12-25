@@ -67,7 +67,7 @@ class PaginatedResourceResponse extends ResourceResponse
      * @return bool
      */
     protected function isHidden($key)
-    {   
+    {
         return in_array($key, $this->resource->hidden) ||
                 ! is_array($this->resource->hidden[$key] ?? []);
     }
