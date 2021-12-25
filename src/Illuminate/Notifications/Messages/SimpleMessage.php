@@ -160,7 +160,7 @@ class SimpleMessage
     /**
      * Add lines of text to the notification.
      *
-     * @param  array  $lines
+     * @param  iterable  $lines
      * @return $this
      */
     public function lines($lines)
