@@ -43,16 +43,34 @@ class PaginatedResourceResponse extends ResourceResponse
     {
         $paginated = $this->resource->resource->toArray();
 
-        $default = [
-            'links' => $this->paginationLinks($paginated),
-            'meta' => $this->meta($paginated),
-        ];
+        $default = [];
+
+        if (! $this->isHidden('links')) {
+            $default['links'] = $this->paginationLinks($paginated);
+        }
+            
+
+        if (! $this->isHidden('meta')) {
+            $default['meta'] = $this->meta($paginated);
+        }
 
         if (method_exists($this->resource, 'paginationInformation')) {
             return $this->resource->paginationInformation($request, $paginated, $default);
         }
 
         return $default;
+    }
+
+    /**
+     * Indicates whether the given key is hidden.
+     * 
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isHidden($key)
+    {   
+        return in_array($key, $this->resource->hidden) || 
+                ! is_array($this->resource->hidden[$key] ?? []);
     }
 
     /**
@@ -63,12 +81,12 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function paginationLinks($paginated)
     {
-        return [
+        return Arr::except([
             'first' => $paginated['first_page_url'] ?? null,
             'last' => $paginated['last_page_url'] ?? null,
             'prev' => $paginated['prev_page_url'] ?? null,
             'next' => $paginated['next_page_url'] ?? null,
-        ];
+        ], $this->resource->hidden['links'] ?? []);
     }
 
     /**
@@ -79,12 +97,17 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function meta($paginated)
     {
-        return Arr::except($paginated, [
+        $default = [
             'data',
             'first_page_url',
             'last_page_url',
             'prev_page_url',
             'next_page_url',
-        ]);
+        ];
+
+        $exceptions = array_merge($default, $this->resource->hidden['meta'] ?? []);
+        $exceptions = array_unique($exceptions);
+
+        return Arr::except($paginated, $exceptions);
     }
 }
