@@ -41,6 +41,13 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     protected $queryParameters;
 
     /**
+     * The hidden pagination fields.
+     * 
+     * @var array
+     */
+    public $hidden = [];
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
