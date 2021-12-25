@@ -1211,6 +1211,17 @@ class Blueprint
     }
 
     /**
+     * Create a new varbinary column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function varbinary($column)
+    {
+        return $this->addColumn('varbinary', $column);
+    }
+
+    /**
      * Create a new uuid column on the table.
      *
      * @param  string  $column
