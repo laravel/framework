@@ -48,6 +48,15 @@ class PreparesApplicationTest extends TestCase
 
         $this->get('/baz')->assertSee('central');
     }
+
+    public function testRouteGroupsAreSupported()
+    {
+        RouteFacade::middleware(PreparesApplicationMiddleware::class)->group(function () {
+            RouteFacade::get('/foo', PreparesApplicationController::class);
+        });
+
+        $this->get('/foo?context=bar')->assertSee('bar');
+    }
 }
 
 class PreparesApplicationController
