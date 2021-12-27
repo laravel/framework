@@ -242,51 +242,12 @@ class Dispatcher implements DispatcherContract
             $event, $payload
         );
 
-        if ($this->isTrackableEvent($event)) {
-            $this->dispatch(
-                new EventDispatching(
-                    $event,
-                    $payload,
-                    $halt
-                )
-            );
-        }
+        $this->trackEventDispatching($event, $payload, $halt);
 
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
 
-        $response = $this->dispatchListeners(
-            $event,
-            $payload,
-            $halt
-        );
-
-        if ($this->isTrackableEvent($event)) {
-            $this->dispatch(
-                new EventDispatched(
-                    $event,
-                    $payload,
-                    $halt
-                )
-            );
-        }
-
-        if (!is_array($response))
-        {
-            return $response;
-        }
-
-        return $halt ? null : $response;
-    }
-
-    private function isTrackableEvent($event): bool
-    {
-        return $event instanceof TrackableEvent;
-    }
-
-    private function dispatchListeners($event, array $payload, bool $halt)
-    {
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
@@ -295,7 +256,9 @@ class Dispatcher implements DispatcherContract
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if ($halt && !is_null($response)) {
+            if ($halt && ! is_null($response)) {
+                $this->trackEventDispatched($event, $payload, $halt);
+
                 return $response;
             }
 
@@ -308,7 +271,47 @@ class Dispatcher implements DispatcherContract
 
             $responses[] = $response;
         }
-        return $responses;
+
+        $this->trackEventDispatched($event, $payload, $halt);
+
+        return $halt ? null : $responses;
+    }
+
+    private function trackEventDispatching($event, array $payload, bool $halt)
+    {
+        if (!$this->isTrackableEvent($event))
+        {
+            return;
+        }
+
+        $this->dispatch(
+            new EventDispatching(
+                $event,
+                $payload,
+                $halt
+            )
+        );
+    }
+
+    private function trackEventDispatched($event, array $payload, bool $halt)
+    {
+        if (!$this->isTrackableEvent($event))
+        {
+            return;
+        }
+
+        $this->dispatch(
+            new EventDispatched(
+                $event,
+                $payload,
+                $halt
+            )
+        );
+    }
+
+    private function isTrackableEvent($event): bool
+    {
+        return $event instanceof TrackableEvent;
     }
 
     /**
