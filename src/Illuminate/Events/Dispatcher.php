@@ -11,6 +11,9 @@ use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Events\EventDispatched;
+use Illuminate\Events\Events\EventDispatching;
+use Illuminate\Events\Interfaces\TrackableEvent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -239,10 +242,46 @@ class Dispatcher implements DispatcherContract
             $event, $payload
         );
 
+        if ($this->isTrackableEvent($event)) {
+            $this->dispatch(
+                new EventDispatching(
+                    $event,
+                    $payload,
+                    $halt
+                )
+            );
+        }
+
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
 
+        $responses = $this->dispatchListeners(
+            $event,
+            $payload,
+            $halt
+        );
+
+        if ($this->isTrackableEvent($event)) {
+            $this->dispatch(
+                new EventDispatched(
+                    $event,
+                    $payload,
+                    $halt
+                )
+            );
+        }
+
+        return $halt ? null : $responses;
+    }
+
+    private function isTrackableEvent($event): bool
+    {
+        return $event instanceof TrackableEvent;
+    }
+
+    private function dispatchListeners($event, array $payload, bool $halt)
+    {
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
@@ -251,7 +290,7 @@ class Dispatcher implements DispatcherContract
             // If a response is returned from the listener and event halting is enabled
             // we will just return this response, and not call the rest of the event
             // listeners. Otherwise we will add the response on the response list.
-            if ($halt && ! is_null($response)) {
+            if ($halt && !is_null($response)) {
                 return $response;
             }
 
@@ -264,8 +303,7 @@ class Dispatcher implements DispatcherContract
 
             $responses[] = $response;
         }
-
-        return $halt ? null : $responses;
+        return $responses;
     }
 
     /**
