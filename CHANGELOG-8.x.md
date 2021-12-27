@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.77.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.77.1...8.x)
+
+
+## [v8.77.1 (2021-12-21)](https://github.com/laravel/framework/compare/v8.77.0...v8.77.1)
+
+### Fixed
+- Fixed prune command with default options ([#40127](https://github.com/laravel/framework/pull/40127))
 
 
 ## [v8.77.0 (2021-12-21)](https://github.com/laravel/framework/compare/v8.76.2...v8.77.0)
