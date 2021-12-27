@@ -2,6 +2,17 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.77.1...8.x)
 
+### Added
+- Added `schedule:clear-mutex` command ([#40135](https://github.com/laravel/framework/pull/40135))
+- Added ability to define extra default password rules ([#40137](https://github.com/laravel/framework/pull/40137))
+- Added a `mergeIfMissing` method to the Illuminate Http Request class ([#40116](https://github.com/laravel/framework/pull/40116))
+- Added `Illuminate/Support/MultipleInstanceManager` ([40913ac](https://github.com/laravel/framework/commit/40913ac8f8d07cca08c10ea7b4adc6c45b700b10))
+- Added `SimpleMessage::lines()` ([#40147](https://github.com/laravel/framework/pull/40147))
+
+### Changed
+- Improve support for custom Doctrine column types ([#40119](https://github.com/laravel/framework/pull/40119))
+- Remove an useless check in Console Application class ([#40145](https://github.com/laravel/framework/pull/40145))
+
 
 ## [v8.77.1 (2021-12-21)](https://github.com/laravel/framework/compare/v8.77.0...v8.77.1)
 
