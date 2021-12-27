@@ -162,7 +162,7 @@ class PendingRequest
 
         $this->options = [
             'http_errors' => false,
-            'timeout' => 10
+            'timeout' => 10,
         ];
 
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
