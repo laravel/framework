@@ -8,9 +8,12 @@ class EventDispatching
 
     public $payload;
 
-    public function __construct($event, array $payload)
+    public $halt;
+
+    public function __construct($event, array $payload, bool $halt)
     {
         $this->event = $event;
         $this->payload = $payload;
+        $this->halt = $halt;
     }
 }
