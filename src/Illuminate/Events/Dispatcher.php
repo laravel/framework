@@ -256,7 +256,7 @@ class Dispatcher implements DispatcherContract
             $this->broadcastEvent($payload[0]);
         }
 
-        $responses = $this->dispatchListeners(
+        $response = $this->dispatchListeners(
             $event,
             $payload,
             $halt
@@ -272,7 +272,12 @@ class Dispatcher implements DispatcherContract
             );
         }
 
-        return $halt ? null : $responses;
+        if (!is_array($response))
+        {
+            return $response;
+        }
+
+        return $halt ? null : $response;
     }
 
     private function isTrackableEvent($event): bool
