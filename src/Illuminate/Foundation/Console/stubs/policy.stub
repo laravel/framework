@@ -79,6 +79,18 @@ class {{ class }}
     {
         //
     }
+    
+    /**
+     * Determine whether the user can replicate the model.
+     *
+     * @param  \{{ namespacedUserModel }}  $user
+     * @param  \{{ namespacedModel }}  ${{ modelVariable }}
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function replicate({{ user }} $user, {{ model }} ${{ modelVariable }})
+    {
+        //
+    }
 
     /**
      * Determine whether the user can permanently delete the model.
