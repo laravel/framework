@@ -9,6 +9,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Events\EventDispatched;
+use Illuminate\Events\Events\EventDispatching;
+use Illuminate\Events\Interfaces\TrackableEvent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -201,6 +204,13 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
+        if ($this->isTrackableEvent($event))
+        {
+            $this->dispatch(
+                new EventDispatching($event, $payload)
+            );
+        }
+
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
@@ -212,6 +222,25 @@ class Dispatcher implements DispatcherContract
             $this->broadcastEvent($payload[0]);
         }
 
+        $responses = $this->dispatchListeners($event, $payload, $halt);
+
+        if ($this->isTrackableEvent($event))
+        {
+            $this->dispatch(
+                new EventDispatched($event, $payload)
+            );
+        }
+
+        return $halt ? null : $responses;
+    }
+
+    private function isTrackableEvent($event): bool
+    {
+        return $event instanceof TrackableEvent;
+    }
+
+    private function dispatchListeners($event, $payload, $halt)
+    {
         $responses = [];
 
         foreach ($this->getListeners($event) as $listener) {
@@ -233,8 +262,7 @@ class Dispatcher implements DispatcherContract
 
             $responses[] = $response;
         }
-
-        return $halt ? null : $responses;
+        return $responses;
     }
 
     /**
