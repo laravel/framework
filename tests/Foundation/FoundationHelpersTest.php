@@ -7,6 +7,7 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -243,5 +244,23 @@ class FoundationHelpersTest extends TestCase
         });
 
         $this->assertSame('expected', mix('asset.png'));
+    }
+
+    public function testPackageViewHelper()
+    {
+        $mockedViewFactory = m::mock(ViewFactory::class);
+
+        app()->instance(ViewFactory::class, $mockedViewFactory);
+
+        $mockedViewFactory->shouldReceive('make')
+            ->once()
+            ->with('test_package::test_path', [], []);
+        package_view('test_package', 'test_path');
+
+        $mockedViewFactory->shouldReceive('make')
+            ->once()
+            ->with('test_package::test_path', ['data'], ['merge_data']);
+
+        package_view('test_package', 'test_path', ['data'], ['merge_data']);
     }
 }

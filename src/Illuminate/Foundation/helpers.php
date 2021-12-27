@@ -932,3 +932,18 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('package_view')) {
+    /**
+     * Get the evaluated package view contents for the given view.
+     *
+     * @param  array  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+     */
+    function package_view($packageNameSpace, $path, $data = [], $mergeData = [])
+    {
+        return view($packageNameSpace . '::' . $path, $data, $mergeData);
+    }
+}
