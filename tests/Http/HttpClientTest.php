@@ -15,6 +15,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 use Mockery as m;
 use OutOfBoundsException;
@@ -172,6 +173,22 @@ class HttpClientTest extends TestCase
             'name' => 'Taylor',
             'title' => 'Laravel Developer',
         ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                   $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testCanSendArrayableFormData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://foo.com/form', new Fluent([
+            'name' => 'Taylor',
+            'title' => 'Laravel Developer',
+        ]));
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/form' &&
@@ -428,6 +445,18 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar'
+                && $request['foo'] === 'bar';
+        });
+    }
+
+    public function testGetWithArrayableQueryParam()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', new Fluent(['foo' => 'bar']));
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar'

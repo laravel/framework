@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Message\MessageInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Support\Arrayable;
 
 class PendingRequest
 {
@@ -570,7 +571,7 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      */
-    public function post(string $url, array $data = [])
+    public function post(string $url, $data = [])
     {
         return $this->send('POST', $url, [
             $this->bodyFormat => $data,
@@ -650,23 +651,9 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
+        $options = $this->parseHttpOptions($options);
+
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
-
-        if (isset($options[$this->bodyFormat])) {
-            if ($this->bodyFormat === 'multipart') {
-                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
-            } elseif ($this->bodyFormat === 'body') {
-                $options[$this->bodyFormat] = $this->pendingBody;
-            }
-
-            if (is_array($options[$this->bodyFormat])) {
-                $options[$this->bodyFormat] = array_merge(
-                    $options[$this->bodyFormat], $this->pendingFiles
-                );
-            }
-        } else {
-            $options[$this->bodyFormat] = $this->pendingBody;
-        }
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
@@ -691,6 +678,33 @@ class PendingRequest
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
         }, $this->retryDelay ?? 100, $this->retryWhenCallback);
+    }
+
+    /**
+     * Parse the HTTP options.
+     *
+     * @param  array  $options
+     * @return array|array[]
+     */
+    protected function parseHttpOptions(array $options)
+    {
+        if (isset($options[$this->bodyFormat])) {
+            if ($this->bodyFormat === 'multipart') {
+                $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
+            } elseif ($this->bodyFormat === 'body') {
+                $options[$this->bodyFormat] = $this->pendingBody;
+            }
+
+            if (is_array($options[$this->bodyFormat])) {
+                $options[$this->bodyFormat] = array_merge(
+                    $options[$this->bodyFormat], $this->pendingFiles
+                );
+            }
+        } else {
+            $options[$this->bodyFormat] = $this->pendingBody;
+        }
+
+        return collect($options)->toArray();
     }
 
     /**
