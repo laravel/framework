@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Message\MessageInterface;
 use Symfony\Component\VarDumper\VarDumper;
-use Illuminate\Contracts\Support\Arrayable;
 
 class PendingRequest
 {
