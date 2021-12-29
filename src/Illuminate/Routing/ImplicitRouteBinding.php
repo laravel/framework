@@ -23,40 +23,36 @@ class ImplicitRouteBinding
     {
         $parameters = $route->parameters();
 
-        foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
-            if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
-                continue;
-            }
-
-            $parameterValue = $parameters[$parameterName];
+        foreach (static::parametersAsClassmap($route) as $parameter => $classname) {
+            $parameterValue = $parameters[$parameter];
 
             if ($parameterValue instanceof UrlRoutable) {
                 continue;
             }
 
-            $instance = $container->make(Reflector::getParameterClassName($parameter));
+            $instance = $container->make($classname);
 
-            $parent = $route->parentOfParameter($parameterName);
+            $parent = $route->parentOfParameter($parameter);
 
             $routeBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
                         ? 'resolveSoftDeletableRouteBinding'
                         : 'resolveRouteBinding';
 
-            if ($parent instanceof UrlRoutable && ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
+            if ($parent instanceof UrlRoutable && ($route->enforcesScopedBindings() || array_key_exists($parameter, $route->bindingFields()))) {
                 $childRouteBindingMethod = $route->allowsTrashedBindings()
                             ? 'resolveSoftDeletableChildRouteBinding'
                             : 'resolveChildRouteBinding';
 
                 if (! $model = $parent->{$childRouteBindingMethod}(
-                    $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
+                    $parameter, $parameterValue, $route->bindingFieldFor($parameter)
                 )) {
                     throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
                 }
-            } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameterName))) {
+            } elseif (! $model = $instance->{$routeBindingMethod}($parameterValue, $route->bindingFieldFor($parameter))) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance), [$parameterValue]);
             }
 
-            $route->setParameter($parameterName, $model);
+            $route->setParameter($parameter, $model);
         }
     }
 
@@ -77,4 +73,77 @@ class ImplicitRouteBinding
             return $snakedName;
         }
     }
+
+    /**
+     * Guess the class from the parameter name.
+     *
+     * @param  string $name
+     * @return string|null
+     */
+    protected static function guessClass($name)
+    {
+        $namespace = app()->getNamespace();
+        $classname = Str::studly($name);
+
+        if (class_exists($namespace . $classname)) {
+            return $classname;
+        }
+
+        if (class_exists($namespace . 'Models\\' . $classname)) {
+            return $namespace . 'Models\\' . $classname;
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine the class for the route parameters.
+     *
+     * @param  \Illuminate\Routing\Route $route
+     * @return array
+     */
+    protected static function parametersAsClassmap($route)
+    {
+        return $route->parameter('view') ? static::viewParameters($route) : static::signatureParameters($route);
+    }
+
+    /**
+     * Determine the class name for the route parameters
+     * specified in the view's URI.
+     *
+     * @param  \Illuminate\Routing\Route $route
+     * @return array
+     */
+    protected static function viewParameters($route)
+    {
+        return collect($route->parameters())
+            ->diffKeys($route->defaults)
+            ->map(function ($value, $key) {
+                return static::guessClass($key);
+            })
+            ->filter()
+            ->all();
+    }
+
+    /**
+     * Determine the class name for the route parameters
+     * based on the signature of the route action.
+     *
+     * @param  \Illuminate\Routing\Route $route
+     * @return array
+     */
+    protected static function signatureParameters($route)
+    {
+        return collect($route->signatureParameters(UrlRoutable::class))
+            ->mapWithKeys(function ($parameter) use ($route) {
+                $name = static::getParameterName($parameter->getName(), $route->parameters());
+                if (is_null($name)) {
+                    return [];
+                }
+                return [$name => Reflector::getParameterClassName($parameter)];
+            })
+            ->filter()
+            ->all();
+    }
+
 }

@@ -36,4 +36,14 @@ class ViewController extends Controller
 
         return $this->response->view($view, $data, $status, $headers);
     }
+
+    public function callAction($method, $parameters)
+    {
+        $data = collect($parameters)
+            ->except('view', 'data', 'status', 'headers')
+            ->merge($parameters['data'])
+            ->all();
+
+        return parent::callAction($method, [$parameters['view'], $data, $parameters['status'], $parameters['headers']]);
+    }
 }

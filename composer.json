@@ -119,7 +119,8 @@
     },
     "autoload-dev": {
         "files": [
-            "tests/Database/stubs/MigrationCreatorFakeMigration.php"
+            "tests/Database/stubs/MigrationCreatorFakeMigration.php",
+            "tests/Integration/Routing/Fixtures/User.php"
         ],
         "psr-4": {
             "Illuminate\\Tests\\": "tests/"
