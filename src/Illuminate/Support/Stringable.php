@@ -141,6 +141,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert a camel case to lower case sentence.
+     *
+     * @return static
+     */
+    public function camelToSentence()
+    {
+        return new static(Str::camelToSentence($this->value));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string|array  $needles
@@ -296,6 +306,15 @@ class Stringable implements JsonSerializable
     public function kebab()
     {
         return new static(Str::kebab($this->value));
+    }
+
+    /* Convert a kebab case to lower case.
+     *
+     * @return static
+     */
+    public function kebabToSentence()
+    {
+        return new static(Str::kebabToSentence($this->value));
     }
 
     /**
@@ -664,6 +683,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert a snake case string to lower case sentence
+     *
+     * @param  string  $delimiter
+     * @return static
+     */
+    public function snakeToSentence($delimiter = '_')
+    {
+        return new static(Str::snakeToSentence($this->value, $delimiter));
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param  string|array  $needles
@@ -682,6 +712,16 @@ class Stringable implements JsonSerializable
     public function studly()
     {
         return new static(Str::studly($this->value));
+    }
+
+    /**
+     * Convert a studly caps case to sentence case.
+     *
+     * @return static
+     */
+    public function studlyToSentence()
+    {
+        return new static(Str::studlyToSentence($this->value));
     }
 
     /**

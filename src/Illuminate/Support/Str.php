@@ -172,6 +172,17 @@ class Str
     }
 
     /**
+     * Convert a camel case to lower case sentence.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function camelToSentence($value)
+    {
+        return trim(static::lower(preg_replace('/([A-Z])/', ' $1', $value)));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
@@ -319,6 +330,17 @@ class Str
     public static function kebab($value)
     {
         return static::snake($value, '-');
+    }
+
+    /**
+     * Convert a kebab case to lower case string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function kebabToSentence($value)
+    {
+        return static::snakeToSentence($value, '-');
     }
 
     /**
@@ -808,6 +830,20 @@ class Str
     }
 
     /**
+     * Convert a snake case string to lower case sentence
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     * @return string
+     */
+    public static function snakeToSentence($value, $delimiter = '_')
+    {
+        $pattern = '/\\' . $delimiter . '+/';
+
+        return static::lower(preg_replace($pattern, ' ', $value));
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param  string  $haystack
@@ -842,6 +878,17 @@ class Str
         $value = ucwords(str_replace(['-', '_'], ' ', $value));
 
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
+    }
+
+    /**
+     * Convert a studly caps case to sentence case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function studlyToSentence($value)
+    {
+        return trim(static::lower(preg_replace('/([A-Z])/', ' $1', $value)));
     }
 
     /**

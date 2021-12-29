@@ -446,6 +446,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('laravel-php-framework', (string) $this->stringable('LaravelPhpFramework')->kebab());
     }
 
+    public function testKebabToSentence()
+    {
+        $this->assertSame('foo bar', (string) $this->stringable('foo-bar')->kebabToSentence());
+        $this->assertSame('foo bar', (string) $this->stringable('Foo-Bar')->kebabToSentence());
+    }
+
     public function testLower()
     {
         $this->assertSame('foo bar baz', (string) $this->stringable('FOO BAR BAZ')->lower());
@@ -564,6 +570,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('żółtałódka', (string) $this->stringable('ŻółtaŁódka')->snake());
     }
 
+    public function testSnakeToSentence()
+    {
+        $this->assertSame('laravel php framework', (string) $this->stringable('laravel_php_framework')->snakeToSentence());
+        $this->assertSame('laravel php framework', (string) $this->stringable('laravel/php/framework')->snakeToSentence('/'));
+       
+        $this->assertSame('laravel php framework', (string) $this->stringable('laravel__php__framework')->snakeToSentence('__'));
+        $this->assertSame('laravel php framework ', (string) $this->stringable('laravel_php_framework_')->snakeToSentence('_'));
+        $this->assertSame('laravel php frame work', (string) $this->stringable('laravel_php_frame_work')->snakeToSentence());
+        // prevent breaking changes
+        $this->assertSame('foo-bar', (string) $this->stringable('foo-bar')->snakeToSentence());
+        $this->assertSame('foo- bar', (string) $this->stringable('foo-_bar')->snakeToSentence());
+        $this->assertSame('foo bar', (string) $this->stringable('foo__bar')->snakeToSentence());
+    }
+
     public function testStudly()
     {
         $this->assertSame('LaravelPHPFramework', (string) $this->stringable('laravel_p_h_p_framework')->studly());
@@ -578,6 +598,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('FooBarBaz', (string) $this->stringable('foo-bar_baz')->studly());
     }
 
+    public function testStudlyToSentence()
+    {
+        $this->assertSame('laravel php framework', (string) $this->stringable('LaravelPhpFramework')->studlyToSentence());
+        $this->assertSame('foo bar', (string) $this->stringable('FooBar')->studlyToSentence());
+    }
+
     public function testCamel()
     {
         $this->assertSame('laravelPHPFramework', (string) $this->stringable('Laravel_p_h_p_framework')->camel());
@@ -590,6 +616,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame('fooBar', (string) $this->stringable('foo_bar')->camel()); // test cache
         $this->assertSame('fooBarBaz', (string) $this->stringable('Foo-barBaz')->camel());
         $this->assertSame('fooBarBaz', (string) $this->stringable('foo-bar_baz')->camel());
+    }
+
+    public function testCamelToSentence()
+    {
+        $this->assertSame('laravel php framework', (string) $this->stringable('laravelPhpFramework')->camelToSentence());
+        $this->assertSame('foo bar', (string) $this->stringable('fooBar')->camelToSentence());
+        $this->assertSame('foo bar', (string) $this->stringable('FooBar')->camelToSentence());
+        $this->assertSame('foo bar baz', (string) $this->stringable('fooBarBaz')->camelToSentence());
     }
 
     public function testSubstr()
