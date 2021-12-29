@@ -127,6 +127,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "Array contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileArrayContains($column, $value)
+    {
+        return $value.' = ANY ('.$column.')';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column

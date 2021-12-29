@@ -4147,6 +4147,70 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testWhereArrayContainsMySql()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereArrayContains('languages', 'en')->toSql();
+    }
+
+    public function testWhereArrayContainsPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereArrayContains('languages', 'en');
+        $this->assertSame('select * from "users" where ? = ANY (languages)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+    }
+
+    public function testWhereArrayContainsSqlite()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereArrayContains('languages', 'en')->toSql();
+    }
+
+    public function testWhereArrayContainsSqlServer()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereArrayContains('languages', 'en')->toSql();
+    }
+
+    public function testWhereArrayDoesntContainMySql()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereArrayDoesntContain('languages', 'en')->toSql();
+    }
+
+    public function testWhereArrayDoesntContainPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereArrayDoesntContain('languages', ['en']);
+        $this->assertSame('select * from "users" where not ? = ANY (languages)', $builder->toSql());
+        $this->assertEquals(['en'], $builder->getBindings());
+    }
+
+    public function testWhereArrayDoesntContainSqlite()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereArrayDoesntContain('languages', 'en')->toSql();
+    }
+
+    public function testWhereArrayDoesntContainSqlServer()
+    {
+        $this->expectException(RuntimeException::class);
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereArrayDoesntContain('languages', 'en')->toSql();
+    }
+
     public function testFromSub()
     {
         $builder = $this->getBuilder();

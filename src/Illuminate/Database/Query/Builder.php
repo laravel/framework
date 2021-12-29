@@ -1760,6 +1760,65 @@ class Builder
     }
 
     /**
+     * Add a "where Array contains" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereArrayContains($column, $value, $boolean = 'and', $not = false)
+    {
+        $type = 'ArrayContains';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
+
+        if (! $value instanceof Expression) {
+            $this->addBinding($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where Array contains" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereArrayContains($column, $value)
+    {
+        return $this->whereArrayContains($column, $value, 'or');
+    }
+
+    /**
+     * Add a "where Array not contains" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereArrayDoesntContain($column, $value, $boolean = 'and')
+    {
+        return $this->whereArrayContains($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add an "or where Array not contains" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereArrayDoesntContain($column, $value)
+    {
+        return $this->whereArrayDoesntContain($column, $value, 'or');
+    }
+
+    /**
      * Handles dynamic "where" clauses to the query.
      *
      * @param  string  $method
