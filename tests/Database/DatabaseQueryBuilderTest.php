@@ -2477,6 +2477,17 @@ class DatabaseQueryBuilderTest extends TestCase
             })->where('name', 'baz')
            ->updateFrom(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" left join "order_items" on "order_items"."order_id" = "orders"."id" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 'baz', 1])->andReturn(1);
+        $result = $builder->from('users')
+            ->join('orders', function ($join) {
+                $join->on('users.id', '=', 'orders.user_id')
+                    ->where('users.id', '=', 1)
+                    ->leftJoin('order_items', 'order_items.order_id', '=', 'orders.id');
+            })->where('name', 'baz')
+            ->updateFrom(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
     }
 
     public function testUpdateMethodRespectsRaw()
