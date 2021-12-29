@@ -279,8 +279,7 @@ class Dispatcher implements DispatcherContract
 
     private function trackEventDispatching($event, array $payload, bool $halt)
     {
-        if (!$this->isTrackableEvent($event))
-        {
+        if (!$this->isTrackableEvent($event)) {
             return;
         }
 
@@ -295,8 +294,7 @@ class Dispatcher implements DispatcherContract
 
     private function trackEventDispatched($event, array $payload, bool $halt)
     {
-        if (!$this->isTrackableEvent($event))
-        {
+        if (!$this->isTrackableEvent($event)) {
             return;
         }
 
