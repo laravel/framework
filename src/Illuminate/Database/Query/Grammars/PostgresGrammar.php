@@ -298,7 +298,7 @@ class PostgresGrammar extends Grammar
 			})->all();
 
 			if (count($joinFroms) > 0) {
-				$joinFrom = ' ' . implode(', ', $joinFroms);
+				$joinFrom = ' '.implode(', ', $joinFroms);
 			}
         }
 
