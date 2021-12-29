@@ -283,13 +283,7 @@ class Dispatcher implements DispatcherContract
             return;
         }
 
-        $this->dispatch(
-            new EventDispatching(
-                $event,
-                $payload,
-                $halt
-            )
-        );
+        $this->dispatch(new EventDispatching($event, $payload, $halt));
     }
 
     private function trackEventDispatched($event, array $payload, bool $halt)
@@ -298,13 +292,7 @@ class Dispatcher implements DispatcherContract
             return;
         }
 
-        $this->dispatch(
-            new EventDispatched(
-                $event,
-                $payload,
-                $halt
-            )
-        );
+        $this->dispatch(new EventDispatched($event, $payload, $halt));
     }
 
     private function isTrackableEvent($event): bool
