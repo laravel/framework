@@ -77,7 +77,7 @@ class ImplicitRouteBinding
     /**
      * Guess the class from the parameter name.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return string|null
      */
     protected static function guessClass($name)
@@ -85,12 +85,12 @@ class ImplicitRouteBinding
         $namespace = app()->getNamespace();
         $classname = Str::studly($name);
 
-        if (class_exists($namespace . $classname)) {
+        if (class_exists($namespace.$classname)) {
             return $classname;
         }
 
-        if (class_exists($namespace . 'Models\\' . $classname)) {
-            return $namespace . 'Models\\' . $classname;
+        if (class_exists($namespace.'Models\\'.$classname)) {
+            return $namespace.'Models\\'.$classname;
         }
 
         return null;
@@ -99,7 +99,7 @@ class ImplicitRouteBinding
     /**
      * Determine the class for the route parameters.
      *
-     * @param  \Illuminate\Routing\Route $route
+     * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
     protected static function parametersAsClassmap($route)
@@ -111,7 +111,7 @@ class ImplicitRouteBinding
      * Determine the class name for the route parameters
      * specified in the view's URI.
      *
-     * @param  \Illuminate\Routing\Route $route
+     * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
     protected static function viewParameters($route)
@@ -129,7 +129,7 @@ class ImplicitRouteBinding
      * Determine the class name for the route parameters
      * based on the signature of the route action.
      *
-     * @param  \Illuminate\Routing\Route $route
+     * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
     protected static function signatureParameters($route)
@@ -140,10 +140,10 @@ class ImplicitRouteBinding
                 if (is_null($name)) {
                     return [];
                 }
+
                 return [$name => Reflector::getParameterClassName($parameter)];
             })
             ->filter()
             ->all();
     }
-
 }

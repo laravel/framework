@@ -74,7 +74,7 @@ class RouteViewTest extends TestCase
         config(['app.key' => str_repeat('a', 32)]);
 
         Route::bind('foo', function ($value) {
-            return $value . 'baz';
+            return $value.'baz';
         });
         Route::view('/bindings/{user}/{foo}', 'implicit_bindings')->middleware('web');
 
@@ -82,7 +82,7 @@ class RouteViewTest extends TestCase
 
         $response = $this->get("/bindings/{$user->id}/bar");
 
-        $this->assertEquals("Hello Dries, barbaz!", trim($response->content()));
+        $this->assertEquals('Hello Dries, barbaz!', trim($response->content()));
     }
 
     public function testRouteViewDoesNotOverwriteDataWithParameters()
@@ -92,7 +92,7 @@ class RouteViewTest extends TestCase
         config(['app.key' => str_repeat('a', 32)]);
 
         Route::bind('foo', function ($value) {
-            return $value . 'baz';
+            return $value.'baz';
         });
         Route::view('/bindings/{user}/{foo}', 'implicit_bindings', ['foo' => 'huzzah'])->middleware('web');
 
@@ -100,6 +100,6 @@ class RouteViewTest extends TestCase
 
         $response = $this->get("/bindings/{$user->id}/baz");
 
-        $this->assertEquals("Hello Jane, huzzah!", trim($response->content()));
+        $this->assertEquals('Hello Jane, huzzah!', trim($response->content()));
     }
 }
