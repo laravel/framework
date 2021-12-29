@@ -292,14 +292,14 @@ class PostgresGrammar extends Grammar
             }
 
             $joinFroms = collect($query->joins)->filter(function ($join) {
-				return collect($join->joins)->count();
-			})->map(function ($join) {
-				return $this->compileJoins($join, $join->joins);
-			})->all();
+                return collect($join->joins)->count();
+            })->map(function ($join) {
+                return $this->compileJoins($join, $join->joins);
+            })->all();
 
-			if (count($joinFroms) > 0) {
-				$joinFrom = ' '.implode(', ', $joinFroms);
-			}
+            if (count($joinFroms) > 0) {
+                $joinFrom = ' '.implode(', ', $joinFroms);
+            }
         }
 
         $where = $this->compileUpdateWheres($query);
