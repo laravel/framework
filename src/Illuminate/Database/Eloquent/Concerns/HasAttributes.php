@@ -1746,8 +1746,7 @@ trait HasAttributes
     /**
      * Exclude specific attributes from a model.
      *
-     * @param $attributes
-     *
+     * @param  array|mixed  $attributes
      * @return array
      */
     public function except($attributes)
