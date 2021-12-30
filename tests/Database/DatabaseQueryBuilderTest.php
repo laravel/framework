@@ -2430,26 +2430,26 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateMethodWithJoinsOnPostgres()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" where "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
-        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->updateFrom(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
 
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
-        })->update(['email' => 'foo', 'name' => 'bar']);
+        })->updateFrom(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
 
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "ctid" in (select "users"."ctid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? where "name" = ?)', ['foo', 'bar', 1, 'baz'])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ? and "name" = ?', ['foo', 'bar', 1, 'baz'])->andReturn(1);
         $result = $builder->from('users')
             ->join('orders', function ($join) {
                 $join->on('users.id', '=', 'orders.user_id')
                     ->where('users.id', '=', 1);
             })->where('name', 'baz')
-            ->update(['email' => 'foo', 'name' => 'bar']);
+            ->updateFrom(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -2482,7 +2482,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateFromMethodWithNestedJoinsOnPostgres()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" left join "order_items" on "order_items"."order_id" = "orders"."id" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 'baz', 1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" left join "order_items" on "order_items"."order_id" = "orders"."id" where "users"."id" = "orders"."user_id" and "users"."id" = ? and "name" = ?', ['foo', 'bar', 1, 'baz'])->andReturn(1);
         $result = $builder->from('users')
             ->join('orders', function ($join) {
                 $join->on('users.id', '=', 'orders.user_id')
@@ -2493,7 +2493,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
 
         $builder = $this->getPostgresBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" left join "order_items" on "order_items"."order_id" = "orders"."id" and "t2"."id" = ? where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 2, 'baz', 1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" left join "order_items" on "order_items"."order_id" = "orders"."id" and "order_items"."id" = ? where "users"."id" = "orders"."user_id" and "users"."id" = ? and "name" = ?', ['foo', 'bar', 2, 1, 'baz'])->andReturn(1);
         $result = $builder->from('users')
             ->join('orders', function ($join) {
                 $join->on('users.id', '=', 'orders.user_id')
