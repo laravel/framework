@@ -1744,6 +1744,16 @@ trait HasAttributes
     }
 
     /**
+     * @param $attributes
+     *
+     * @return array
+     */
+    public function except($attributes)
+    {
+        return Arr::except($this->getAttributes(), $attributes);
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
