@@ -30,7 +30,7 @@ class SoundexTest extends MySqlTestCase
         DB::table('users')->insert([
             ['email' => 'taylor@laravel.com', 'first_name' => 'Taylor', 'last_name' => 'Otwell'],
             ['email' => 'tailor@laravel.com', 'first_name' => 'Tailor', 'last_name' => 'Otwel'],
-            ['email' => 'jason@sloff.com', 'first_name' => 'Json', 'last_name' => 'Slooff']
+            ['email' => 'jason@sloff.com', 'first_name' => 'Json', 'last_name' => 'Slooff'],
         ]);
     }
 
