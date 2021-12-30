@@ -337,7 +337,7 @@ class PostgresGrammar extends Grammar
         if (trim($baseWheres) != '') {
             $baseWheres = $this->replaceLeadingWhere($baseWheres, $query->wheres[0]['boolean']);
         }
-        
+
         return $joinWheres.' '.$baseWheres;
     }
 
@@ -374,7 +374,7 @@ class PostgresGrammar extends Grammar
      */
     protected function replaceLeadingWhere($value, $boolean)
     {
-        return preg_replace('/where /i', $boolean . ' ', $value, 1);
+        return preg_replace('/where /i', $boolean.' ', $value, 1);
     }
 
     /**
