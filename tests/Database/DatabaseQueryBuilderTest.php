@@ -437,6 +437,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 5, 1 => 6], $builder->getBindings());
     }
 
+    public function testWhereSoundex()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereSoundex('name', 'Taylor Otwel');
+        $this->assertSame('select * from `users` where SOUNDEX(`name`) = SOUNDEX(?)', $builder->toSql());
+        $this->assertEquals(['Taylor Otwel'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')
+            ->where('email', 'taylor@laravel.com')
+            ->orWhereSoundex('name', 'Taylor Otwel');
+        $this->assertSame('select * from `users` where `email` = ? or SOUNDEX(`name`) = SOUNDEX(?)', $builder->toSql());
+        $this->assertEquals(['taylor@laravel.com', 'Taylor Otwel'], $builder->getBindings());
+    }
+
     public function testWhereYearMySql()
     {
         $builder = $this->getMySqlBuilder();
