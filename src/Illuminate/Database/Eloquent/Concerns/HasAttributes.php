@@ -1744,7 +1744,7 @@ trait HasAttributes
     }
 
     /**
-     * Exclude specific attributes from a model
+     * Exclude specific attributes from a model.
      *
      * @param $attributes
      *
