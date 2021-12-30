@@ -191,6 +191,6 @@ class BoundMethod
      */
     protected static function isCallableWithAtSign($callback)
     {
-        return is_string($callback) && strpos($callback, '@') !== false;
+        return is_string($callback) && str_contains($callback, '@');
     }
 }
