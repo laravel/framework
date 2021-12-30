@@ -51,6 +51,20 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * @param Builder $query
+     * @param $where
+     * @return string
+     */
+    public function whereSoundex(Builder $query, $where)
+    {
+        $columns = $this->columnize($where['columns']);
+
+        $value = $this->parameter($where['value']);
+
+        return "SOUNDEX({$columns}) = SOUNDEX({$value})";
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

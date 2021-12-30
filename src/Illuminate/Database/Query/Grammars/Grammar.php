@@ -488,6 +488,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where soundex" query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereSoundex(Builder $query, $where)
+    {
+        throw new RuntimeException('This database engine does not support soundex search operations.');
+    }
+
+    /**
      * Compile a where condition with a sub-select.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

@@ -1218,6 +1218,27 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Adds a "where soundex" clause to the query.
+     *
+     * @param  string  $columns
+     * @param  string  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereSoundex($columns, $value, $boolean = 'and')
+    {
+        $type = 'Soundex';
+
+        $columns = Arr::wrap($columns);
+
+        $this->wheres[] = compact('type', 'value', 'columns', 'boolean');
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
      * Add a full sub-select to the query.
      *
      * @param  string  $column
@@ -1281,6 +1302,18 @@ class Builder implements BuilderContract
     public function orWhereNotExists(Closure $callback)
     {
         return $this->orWhereExists($callback, true);
+    }
+
+    /**
+     * Adds a "or where soundex" clause to the query.
+     *
+     * @param $columns
+     * @param $value
+     * @return $this
+     */
+    public function orWhereSoundex($columns, $value)
+    {
+        return $this->whereSoundex($columns, $value, 'or');
     }
 
     /**
