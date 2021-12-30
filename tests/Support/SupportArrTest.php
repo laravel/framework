@@ -169,6 +169,12 @@ class SupportArrTest extends TestCase
         $this->assertEquals([0, false, '', []], $array);
     }
 
+    public function testWhereNull()
+    {
+        $array = array_values(Arr::whereNull([null, 0, false, '', null, []]));
+        $this->assertEquals([null, null], $array);
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];
