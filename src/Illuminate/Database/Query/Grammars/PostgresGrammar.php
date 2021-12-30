@@ -291,6 +291,8 @@ class PostgresGrammar extends Grammar
                 $from = ' from '.implode(', ', $froms);
             }
 
+            // Nested joins must be compiled out separately and added in as normal
+            // join clauses.
             $joinFroms = collect($query->joins)->filter(function ($join) {
                 return collect($join->joins)->count();
             })->map(function ($join) {
@@ -322,15 +324,21 @@ class PostgresGrammar extends Grammar
         }
 
         // Once we compile the join constraints, we will either use them as the where
-        // clause or append them to the existing base where clauses. If we need to
-        // strip the leading boolean we will do so when using as the only where.
+        // clause or prepend them to the existing base where clauses.
         $joinWheres = $this->compileUpdateJoinWheres($query);
 
-        if (trim($baseWheres) == '') {
-            return 'where '.$this->removeLeadingBoolean($joinWheres);
+        if (trim($joinWheres) == '') {
+            return $baseWheres;
         }
 
-        return $baseWheres.' '.$joinWheres;
+        // If base where clauses and join where clauses are both present, the base
+        // where clauses leading "where" must be replaced with its original boolean
+        // so it can be appended to the join where clauses.
+        if (trim($baseWheres) != '') {
+            $baseWheres = $this->replaceLeadingWhere($baseWheres, $query->wheres[0]['boolean']);
+        }
+        
+        return $joinWheres.' '.$baseWheres;
     }
 
     /**
@@ -354,7 +362,19 @@ class PostgresGrammar extends Grammar
             }
         }
 
-        return implode(' ', $joinWheres);
+        return $this->removeLeadingBoolean(implode(' ', $joinWheres));
+    }
+
+    /**
+     * Replace a statements leading "where" with a boolean.
+     *
+     * @param  string  $value
+     * @param  string  $boolean
+     * @return string
+     */
+    protected function replaceLeadingWhere($value, $boolean)
+    {
+        return preg_replace('/where /i', $boolean . ' ', $value, 1);
     }
 
     /**
