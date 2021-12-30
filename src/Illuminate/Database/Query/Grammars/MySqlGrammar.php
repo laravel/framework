@@ -51,7 +51,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @param $where
      * @return string
      */
