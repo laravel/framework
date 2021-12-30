@@ -1729,7 +1729,7 @@ trait HasAttributes
     /**
      * Get a subset of the model's attributes.
      *
-     * @param  array|mixed  $attributes
+     * @param  mixed  $attributes
      * @return array
      */
     public function only($attributes)
@@ -1746,7 +1746,7 @@ trait HasAttributes
     /**
      * Exclude specific attributes from a model.
      *
-     * @param  array|mixed  $attributes
+     * @param  mixed  $attributes
      * @return array
      */
     public function except($attributes)
