@@ -24,6 +24,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithPaginat
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptions;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
@@ -493,6 +494,26 @@ class ResourceTest extends TestCase
             'foo' => 'bar',
             'baz' => 'qux',
         ]);
+    }
+
+    public function testResourcesMayCustomizeJsonOptions()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithJsonOptions(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'reading_time' => 3.0,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $this->assertEquals(
+            '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
+            $response->baseResponse->content()
+        );
     }
 
     public function testCustomHeadersMayBeSetOnResponses()
