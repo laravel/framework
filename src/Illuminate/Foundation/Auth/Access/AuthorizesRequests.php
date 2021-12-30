@@ -55,7 +55,7 @@ trait AuthorizesRequests
 
         $method = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)[2]['function'];
 
-        return [$this->normalizeGuessedAbilityName($method), $ability];
+        return [$this->normalizeGuessedAbilityName($method), $arguments];
     }
 
     /**
