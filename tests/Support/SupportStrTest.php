@@ -630,6 +630,19 @@ class SupportStrTest extends TestCase
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
     }
+
+    public function testShuffleWithSeed()
+    {
+        $this->assertEquals(
+            Str::shuffle('Hello123', 1234),
+            Str::shuffle('Hello123', 1234),
+        );
+
+        $this->assertNotEquals(
+            Str::shuffle('Hello123', 1234),
+            Str::shuffle('Hello123', 12345),
+        );
+    }
 }
 
 class StringableObjectStub

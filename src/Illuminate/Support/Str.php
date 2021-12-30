@@ -687,6 +687,26 @@ class Str
     }
 
     /**
+     * Shuffle the given string and return the result.
+     *
+     * @param  string  $value
+     * @param  int|null  $seed
+     * @return string
+     */
+    public static function shuffle(string $value, $seed = null)
+    {
+        if (is_null($seed)) {
+            $value = str_shuffle($value);
+        } else {
+            mt_srand($seed);
+            $value = str_shuffle($value);
+            mt_srand();
+        }
+
+        return $value;
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $value

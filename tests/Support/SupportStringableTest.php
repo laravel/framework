@@ -729,4 +729,17 @@ class SupportStringableTest extends TestCase
         $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
         $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
     }
+
+    public function testShuffleWithSeed()
+    {
+        $this->assertEquals(
+            $this->stringable('Hello, world!')->shuffle(1234),
+            $this->stringable('Hello, world!')->shuffle(1234)
+        );
+
+        $this->assertNotEquals(
+            $this->stringable('Hello, world!')->shuffle(1234),
+            $this->stringable('Hello, world!')->shuffle(12345)
+        );
+    }
 }

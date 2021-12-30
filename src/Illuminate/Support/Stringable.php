@@ -526,6 +526,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Shuffle the given string and return the result.
+     *
+     * @param  int|null  $seed
+     * @return static
+     */
+    public function shuffle($seed = null)
+    {
+        return new static(Str::shuffle($this->value, $seed));
+    }
+
+    /**
      * Replace a given value in the string sequentially with an array.
      *
      * @param  string  $search
