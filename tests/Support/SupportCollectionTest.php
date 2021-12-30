@@ -1838,7 +1838,7 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals([['sort' => 1], ['sort' => 2]], array_values($data->all()));
     }
-    
+
     /**
      * @dataProvider collectionClassProvider
      */
