@@ -414,7 +414,7 @@ class BusFake implements QueueingDispatcher
     }
 
     /**
-     * Assert if a batch was dispatched based on a truth-test callback.
+     * Assert the number of batches that have been dispatched.
      *
      * @param  callable  $callback
      * @return void
