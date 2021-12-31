@@ -416,10 +416,10 @@ class BusFake implements QueueingDispatcher
     /**
      * Assert the number of batches that have been dispatched.
      *
-     * @param  callable  $callback
+     * @param  int  $count
      * @return void
      */
-    public function assertBatchCount(int $count)
+    public function assertBatchCount($count)
     {
         PHPUnit::assertCount(
             $count, $this->batches,
