@@ -160,7 +160,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             __DIR__.'/../../Routing/Console/stubs/controller.nested.stub' => $this->app->basePath('stubs/controller.nested.stub'),
             __DIR__.'/../../Routing/Console/stubs/controller.plain.stub' => $this->app->basePath('stubs/controller.plain.stub'),
             __DIR__.'/../../Routing/Console/stubs/controller.stub' => $this->app->basePath('stubs/controller.stub'),
-            __DIR__.'/../../Routing/Console/stubs/middleware.stub' => $this->app->basePath('stubs/middleware.stub')
+            __DIR__.'/../../Routing/Console/stubs/middleware.stub' => $this->app->basePath('stubs/middleware.stub'),
         ];
     }
 }
