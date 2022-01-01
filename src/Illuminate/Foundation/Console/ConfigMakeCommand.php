@@ -10,7 +10,6 @@ class ConfigMakeCommand extends GeneratorCommand
      * The type of class being generated.
      *
      * @var string
-     *
      */
     protected $type = 'Config';
 
