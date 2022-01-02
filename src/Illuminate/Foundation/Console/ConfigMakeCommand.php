@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Command\Command;
 
 class ConfigMakeCommand extends GeneratorCommand
 {
@@ -38,6 +38,12 @@ class ConfigMakeCommand extends GeneratorCommand
         return Command::SUCCESS;
     }
 
+     /** The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Config';
+
     /**
      * Get the stub file for the generator.
      *
@@ -45,10 +51,19 @@ class ConfigMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/config-make.stub';
+        return $this->resolveStubPath('stubs/config-make.stub');
+    }
 
-        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
+    /**
+     * Resolve the fully-qualified path to the stub.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function resolveStubPath($stub)
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__ . $relativePath;
+            : __DIR__.$stub;
     }
 }
