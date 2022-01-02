@@ -71,6 +71,33 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereFulltext(Builder $query, $where)
+    {
+        $language = $where['options']['language'] ?? 'english';
+
+        $columns = array_map(function ($column) use ($language, $query) {
+            return "to_tsvector({$this->bindParameter($query, $language)}, {$this->wrap($column)})";
+        }, $where['columns']);
+        $columns = implode(' || ', $columns);
+
+        $mode = 'plainto_tsquery';
+        if (($where['options']['mode'] ?? []) === 'phrase') {
+            $mode = 'phraseto_tsquery';
+        }
+        if (($where['options']['mode'] ?? []) === 'websearch') {
+            $mode = 'websearch_to_tsquery';
+        }
+
+        return "({$columns}) @@ {$mode}({$this->bindParameter($query, $language)}, {$this->bindParameter($query, $where['value'])})";
+    }
+
+    /**
      * Compile a date based where clause.
      *
      * @param  string  $type
@@ -516,5 +543,23 @@ class PostgresGrammar extends Grammar
                         ? $attribute
                         : "'$attribute'";
         }, $path);
+    }
+
+    /**
+     * Binds parameter to query.
+     *
+     * @param  Builder  $query
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function bindParameter(Builder $query, $value)
+    {
+        if ($this->isExpression($value)) {
+            return $this->getValue($value);
+        }
+
+        $query->addBinding($value);
+
+        return '?';
     }
 }
