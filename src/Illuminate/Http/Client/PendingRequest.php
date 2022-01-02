@@ -168,8 +168,8 @@ class PendingRequest
         $this->asJson();
 
         $this->options = [
-            'http_errors' => false,
             'connect_timeout' => 10,
+            'http_errors' => false,
             'timeout' => 30,
         ];
 
