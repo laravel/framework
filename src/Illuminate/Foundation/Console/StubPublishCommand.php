@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 
 class StubPublishCommand extends Command
 {

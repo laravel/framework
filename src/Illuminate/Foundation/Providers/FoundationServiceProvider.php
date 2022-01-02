@@ -43,7 +43,6 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 'laravel-stubs'
             );
         }
-
     }
 
     /**
@@ -145,7 +144,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     }
 
     /**
-     * Return array of publishable stubs
+     * Return array of publishable stubs.
      *
      * @return array
      */
