@@ -36,6 +36,14 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 __DIR__.'/../Exceptions/views' => $this->app->resourcePath('views/errors/'),
             ], 'laravel-errors');
         }
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes(
+                $this->stubsToPublish(),
+                'laravel-stubs'
+            );
+        }
+
     }
 
     /**
@@ -134,5 +142,54 @@ class FoundationServiceProvider extends AggregateServiceProvider
             MaintenanceModeContract::class,
             fn () => $this->app->make(MaintenanceModeManager::class)->driver()
         );
+    }
+
+    /**
+     * Return array of publishable stubs
+     *
+     * @return array
+     */
+    private function stubsToPublish()
+    {
+        return [
+            realpath(__DIR__.'/../Console/stubs/cast.stub') => $this->app->basePath('stubs/cast.stub'),
+            realpath(__DIR__.'/../Console/stubs/console.stub') => $this->app->basePath('stubs/console.stub'),
+            realpath(__DIR__.'/../Console/stubs/event.stub') => $this->app->basePath('stubs/event.stub'),
+            realpath(__DIR__.'/../Console/stubs/job.queued.stub') => $this->app->basePath('stubs/job.queued.stub'),
+            realpath(__DIR__.'/../Console/stubs/job.stub') => $this->app->basePath('stubs/job.stub'),
+            realpath(__DIR__.'/../Console/stubs/mail.stub') => $this->app->basePath('stubs/mail.stub'),
+            realpath(__DIR__.'/../Console/stubs/markdown-mail.stub') => $this->app->basePath('stubs/markdown-mail.stub'),
+            realpath(__DIR__.'/../Console/stubs/markdown-notification.stub') => $this->app->basePath('stubs/markdown-notification.stub'),
+            realpath(__DIR__.'/../Console/stubs/model.pivot.stub') => $this->app->basePath('stubs/model.pivot.stub'),
+            realpath(__DIR__.'/../Console/stubs/model.stub') => $this->app->basePath('stubs/model.stub'),
+            realpath(__DIR__.'/../Console/stubs/notification.stub') => $this->app->basePath('stubs/notification.stub'),
+            realpath(__DIR__.'/../Console/stubs/observer.plain.stub') => $this->app->basePath('stubs/observer.plain.stub'),
+            realpath(__DIR__.'/../Console/stubs/observer.stub') => $this->app->basePath('stubs/observer.stub'),
+            realpath(__DIR__.'/../Console/stubs/policy.plain.stub') => $this->app->basePath('stubs/policy.plain.stub'),
+            realpath(__DIR__.'/../Console/stubs/policy.stub') => $this->app->basePath('stubs/policy.stub'),
+            realpath(__DIR__.'/../Console/stubs/provider.stub') => $this->app->basePath('stubs/provider.stub'),
+            realpath(__DIR__.'/../Console/stubs/request.stub') => $this->app->basePath('stubs/request.stub'),
+            realpath(__DIR__.'/../Console/stubs/resource-collection.stub') => $this->app->basePath('stubs/resource-collection.stub'),
+            realpath(__DIR__.'/../Console/stubs/resource.stub') => $this->app->basePath('stubs/resource.stub'),
+            realpath(__DIR__.'/../Console/stubs/rule.stub') => $this->app->basePath('stubs/rule.stub'),
+            realpath(__DIR__.'/../Console/stubs/scope.stub') => $this->app->basePath('stubs/scope.stub'),
+            realpath(__DIR__.'/../Console/stubs/test.stub') => $this->app->basePath('stubs/test.stub'),
+            realpath(__DIR__.'/../Console/stubs/test.unit.stub') => $this->app->basePath('stubs/test.unit.stub'),
+            realpath(__DIR__.'/../Console/stubs/view-component.stub') => $this->app->basePath('stubs/view-component.stub'),
+            realpath(__DIR__.'/../../Database/Console/Factories/stubs/factory.stub') => $this->app->basePath('stubs/factory.stub'),
+            realpath(__DIR__.'/../../Database/Console/Seeds/stubs/seeder.stub') => $this->app->basePath('stubs/seeder.stub'),
+            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.create.stub') => $this->app->basePath('stubs/migration.create.stub'),
+            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.stub') => $this->app->basePath('stubs/migration.stub'),
+            realpath(__DIR__.'/../../Database/Migrations/stubs/migration.update.stub') => $this->app->basePath('stubs/migration.update.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.api.stub') => $this->app->basePath('stubs/controller.api.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.invokable.stub') => $this->app->basePath('stubs/controller.invokable.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.api.stub') => $this->app->basePath('stubs/controller.model.api.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.model.stub') => $this->app->basePath('stubs/controller.model.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.api.stub') => $this->app->basePath('stubs/controller.nested.api.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.nested.stub') => $this->app->basePath('stubs/controller.nested.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.plain.stub') => $this->app->basePath('stubs/controller.plain.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/controller.stub') => $this->app->basePath('stubs/controller.stub'),
+            realpath(__DIR__.'/../../Routing/Console/stubs/middleware.stub') => $this->app->basePath('stubs/middleware.stub'),
+        ];
     }
 }
