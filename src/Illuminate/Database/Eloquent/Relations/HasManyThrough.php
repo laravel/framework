@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HasManyThrough extends Relation
 {
+    use InteractsWithDictionary;
+
     /**
      * The "through" parent model instance.
      *
@@ -52,13 +55,6 @@ class HasManyThrough extends Relation
      * @var string
      */
     protected $secondLocalKey;
-
-    /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
 
     /**
      * Create a new has many through relationship instance.
@@ -200,7 +196,7 @@ class HasManyThrough extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
+            if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );
@@ -509,6 +505,34 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Query lazily, by chunks of the given size.
+     *
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazy($chunkSize = 1000)
+    {
+        return $this->prepareQueryBuilder()->lazy($chunkSize);
+    }
+
+    /**
+     * Query lazily, by chunking the results of a query by comparing IDs.
+     *
+     * @param  int  $count
+     * @param  string|null  $column
+     * @param  string|null  $alias
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyById($chunkSize = 1000, $column = null, $alias = null)
+    {
+        $column = $column ?? $this->getRelated()->getQualifiedKeyName();
+
+        $alias = $alias ?? $this->getRelated()->getKeyName();
+
+        return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias);
+    }
+
+    /**
      * Prepare the query builder for query execution.
      *
      * @param  array  $columns
@@ -594,16 +618,6 @@ class HasManyThrough extends Relation
         return $query->select($columns)->whereColumn(
             $parentQuery->getQuery()->from.'.'.$this->localKey, '=', $hash.'.'.$this->firstKey
         );
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash()
-    {
-        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**

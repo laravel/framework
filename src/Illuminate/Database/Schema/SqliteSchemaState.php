@@ -9,7 +9,7 @@ class SqliteSchemaState extends SchemaState
     /**
      * Dump the database's schema into a file.
      *
-     * @param  \Illuminate\Database\Connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
@@ -34,12 +34,13 @@ class SqliteSchemaState extends SchemaState
     /**
      * Append the migration data to the schema dump.
      *
+     * @param  string  $path
      * @return void
      */
     protected function appendMigrationData(string $path)
     {
         with($process = $this->makeProcess(
-            $this->baseCommand().' ".dump \'migrations\'"'
+            $this->baseCommand().' ".dump \''.$this->migrationTable.'\'"'
         ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
@@ -60,7 +61,7 @@ class SqliteSchemaState extends SchemaState
      */
     public function load($path)
     {
-        $process = $this->makeProcess($this->baseCommand().' < $LARAVEL_LOAD_PATH');
+        $process = $this->makeProcess($this->baseCommand().' < "${:LARAVEL_LOAD_PATH}"');
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
@@ -74,12 +75,13 @@ class SqliteSchemaState extends SchemaState
      */
     protected function baseCommand()
     {
-        return 'sqlite3 $LARAVEL_LOAD_DATABASE';
+        return 'sqlite3 "${:LARAVEL_LOAD_DATABASE}"';
     }
 
     /**
      * Get the base variables for a dump / load command.
      *
+     * @param  array  $config
      * @return array
      */
     protected function baseVariables(array $config)

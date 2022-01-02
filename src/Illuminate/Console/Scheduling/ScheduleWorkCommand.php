@@ -51,7 +51,7 @@ class ScheduleWorkCommand extends Command
 
                 if (! empty($output)) {
                     if ($key !== $keyOfLastExecutionWithOutput) {
-                        $this->info(PHP_EOL.'Execution #'.($key + 1).' output:');
+                        $this->info(PHP_EOL.'['.date('c').'] Execution #'.($key + 1).' output:');
 
                         $keyOfLastExecutionWithOutput = $key;
                     }

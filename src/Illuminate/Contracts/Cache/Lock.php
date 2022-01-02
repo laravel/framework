@@ -17,14 +17,14 @@ interface Lock
      *
      * @param  int  $seconds
      * @param  callable|null  $callback
-     * @return bool
+     * @return mixed
      */
     public function block($seconds, $callback = null);
 
     /**
      * Release the lock.
      *
-     * @return void
+     * @return bool
      */
     public function release();
 

@@ -10,19 +10,12 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JobChainingTest extends TestCase
 {
     public static $catchCallbackRan = false;
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
         $app['config']->set('queue.connections.sync1', [
             'driver' => 'sync',
         ]);
@@ -63,8 +56,8 @@ class JobChainingTest extends TestCase
     public function testJobsCanBeChainedOnSuccessUsingBusFacade()
     {
         Bus::dispatchChain([
-            new JobChainingTestFirstJob(),
-            new JobChainingTestSecondJob(),
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob,
         ]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
@@ -74,8 +67,8 @@ class JobChainingTest extends TestCase
     public function testJobsCanBeChainedOnSuccessUsingBusFacadeAsArguments()
     {
         Bus::dispatchChain(
-            new JobChainingTestFirstJob(),
-            new JobChainingTestSecondJob()
+            new JobChainingTestFirstJob,
+            new JobChainingTestSecondJob
         );
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
@@ -156,9 +149,9 @@ class JobChainingTest extends TestCase
     public function testCatchCallbackIsCalledOnFailure()
     {
         Bus::chain([
-            new JobChainingTestFirstJob(),
-            new JobChainingTestFailingJob(),
-            new JobChainingTestSecondJob(),
+            new JobChainingTestFirstJob,
+            new JobChainingTestFailingJob,
+            new JobChainingTestSecondJob,
         ])->catch(static function () {
             self::$catchCallbackRan = true;
         })->dispatch();

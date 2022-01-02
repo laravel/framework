@@ -185,11 +185,11 @@ class SQLiteGrammar extends Grammar
     /**
      * Compile an "upsert" statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder $query
-     * @param  array $values
-     * @param  array $uniqueBy
-     * @param  array $update
-     * @return  string
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  array  $uniqueBy
+     * @param  array  $update
+     * @return string
      */
     public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
     {

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class SeedCommand extends Command
@@ -81,7 +82,7 @@ class SeedCommand extends Command
      */
     protected function getSeeder()
     {
-        $class = $this->input->getOption('class');
+        $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
         if (strpos($class, '\\') === false) {
             $class = 'Database\\Seeders\\'.$class;
@@ -107,6 +108,18 @@ class SeedCommand extends Command
         $database = $this->input->getOption('database');
 
         return $database ?: $this->laravel['config']['database.default'];
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['class', InputArgument::OPTIONAL, 'The class name of the root seeder', null],
+        ];
     }
 
     /**

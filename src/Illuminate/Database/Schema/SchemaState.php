@@ -23,6 +23,13 @@ abstract class SchemaState
     protected $files;
 
     /**
+     * The name of the application's migration table.
+     *
+     * @var string
+     */
+    protected $migrationTable = 'migrations';
+
+    /**
      * The process factory callback.
      *
      * @var callable
@@ -40,8 +47,8 @@ abstract class SchemaState
      * Create a new dumper instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  callable  $processFactory
+     * @param  \Illuminate\Filesystem\Filesystem|null  $files
+     * @param  callable|null  $processFactory
      * @return void
      */
     public function __construct(Connection $connection, Filesystem $files = null, callable $processFactory = null)
@@ -51,7 +58,7 @@ abstract class SchemaState
         $this->files = $files ?: new Filesystem;
 
         $this->processFactory = $processFactory ?: function (...$arguments) {
-            return Process::fromShellCommandline(...$arguments);
+            return Process::fromShellCommandline(...$arguments)->setTimeout(null);
         };
 
         $this->handleOutputUsing(function () {
@@ -85,6 +92,19 @@ abstract class SchemaState
     public function makeProcess(...$arguments)
     {
         return call_user_func($this->processFactory, ...$arguments);
+    }
+
+    /**
+     * Specify the name of the application's migration table.
+     *
+     * @param  string  $table
+     * @return $this
+     */
+    public function withMigrationTable(string $table)
+    {
+        $this->migrationTable = $table;
+
+        return $this;
     }
 
     /**

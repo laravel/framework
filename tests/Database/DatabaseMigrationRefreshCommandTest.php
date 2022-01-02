@@ -24,7 +24,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     public function testRefreshCommandCallsCommandsWithProperArguments()
     {
-        $command = new RefreshCommand();
+        $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
         $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
@@ -40,7 +40,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
         $dispatcher->shouldReceive('dispatch')->once()->with(m::type(DatabaseRefreshed::class));
 
-        $quote = DIRECTORY_SEPARATOR == '\\' ? '"' : "'";
+        $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
         $resetCommand->shouldReceive('run')->with(new InputMatcher("--force=1 {$quote}migrate:reset{$quote}"), m::any());
         $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 
@@ -49,7 +49,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     public function testRefreshCommandCallsCommandsWithStep()
     {
-        $command = new RefreshCommand();
+        $command = new RefreshCommand;
 
         $app = new ApplicationDatabaseRefreshStub(['path.database' => __DIR__]);
         $dispatcher = $app->instance(Dispatcher::class, $events = m::mock());
@@ -65,7 +65,7 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
         $console->shouldReceive('find')->with('migrate')->andReturn($migrateCommand);
         $dispatcher->shouldReceive('dispatch')->once()->with(m::type(DatabaseRefreshed::class));
 
-        $quote = DIRECTORY_SEPARATOR == '\\' ? '"' : "'";
+        $quote = DIRECTORY_SEPARATOR === '\\' ? '"' : "'";
         $rollbackCommand->shouldReceive('run')->with(new InputMatcher("--step=2 --force=1 {$quote}migrate:rollback{$quote}"), m::any());
         $migrateCommand->shouldReceive('run')->with(new InputMatcher('--force=1 migrate'), m::any());
 

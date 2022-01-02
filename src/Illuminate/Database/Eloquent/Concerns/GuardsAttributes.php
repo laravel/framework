@@ -130,7 +130,7 @@ trait GuardsAttributes
     }
 
     /**
-     * Determine if current state is "unguarded".
+     * Determine if the current state is "unguarded".
      *
      * @return bool
      */
@@ -217,9 +217,14 @@ trait GuardsAttributes
     protected function isGuardableColumn($key)
     {
         if (! isset(static::$guardableColumns[get_class($this)])) {
-            static::$guardableColumns[get_class($this)] = $this->getConnection()
+            $columns = $this->getConnection()
                         ->getSchemaBuilder()
                         ->getColumnListing($this->getTable());
+
+            if (empty($columns)) {
+                return true;
+            }
+            static::$guardableColumns[get_class($this)] = $columns;
         }
 
         return in_array($key, static::$guardableColumns[get_class($this)]);

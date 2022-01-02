@@ -25,7 +25,7 @@ class ValidationAddFailureTest extends TestCase
         $validator = $this->makeValidator();
         $method_name = 'addFailure';
         $this->assertTrue(method_exists($validator, $method_name));
-        $this->assertTrue(is_callable([$validator, $method_name]));
+        $this->assertIsCallable([$validator, $method_name]);
     }
 
     public function testAddFailureIsFunctional()

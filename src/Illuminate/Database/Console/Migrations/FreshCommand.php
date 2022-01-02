@@ -55,14 +55,14 @@ class FreshCommand extends Command
             '--step' => $this->option('step'),
         ]));
 
-        if ($this->needsSeeding()) {
-            $this->runSeeder($database);
-        }
-
         if ($this->laravel->bound(Dispatcher::class)) {
             $this->laravel[Dispatcher::class]->dispatch(
                 new DatabaseRefreshed
             );
+        }
+
+        if ($this->needsSeeding()) {
+            $this->runSeeder($database);
         }
 
         return 0;

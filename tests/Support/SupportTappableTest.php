@@ -16,6 +16,34 @@ class SupportTappableTest extends TestCase
         $this->assertSame('MyName', $name);
     }
 
+    public function testTappableClassWithInvokableClass()
+    {
+        $name = TappableClass::make()->tap(new class
+        {
+            public function __invoke($tappable)
+            {
+                $tappable->setName('MyName');
+            }
+        })->getName();
+
+        $this->assertSame('MyName', $name);
+    }
+
+    public function testTappableClassWithNoneInvokableClass()
+    {
+        $this->expectException('Error');
+
+        $name = TappableClass::make()->tap(new class
+        {
+            public function setName($tappable)
+            {
+                $tappable->setName('MyName');
+            }
+        })->getName();
+
+        $this->assertSame('MyName', $name);
+    }
+
     public function testTappableClassWithoutCallback()
     {
         $name = TappableClass::make()->tap()->setName('MyName')->getName();

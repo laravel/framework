@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Http\Middleware;
+namespace Illuminate\Tests\Foundation\Bootstrap\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ class TrimStringsTest extends TestCase
 {
     public function testTrimStringsIgnoringExceptAttribute()
     {
-        $middleware = new TrimStringsWithExceptAttribute();
+        $middleware = new TrimStringsWithExceptAttribute;
         $symfonyRequest = new SymfonyRequest([
             'abc' => '  123  ',
             'xyz' => '  456  ',

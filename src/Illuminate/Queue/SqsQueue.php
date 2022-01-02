@@ -45,14 +45,20 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $default
      * @param  string  $prefix
      * @param  string  $suffix
+     * @param  bool  $dispatchAfterCommit
      * @return void
      */
-    public function __construct(SqsClient $sqs, $default, $prefix = '', $suffix = '')
+    public function __construct(SqsClient $sqs,
+                                $default,
+                                $prefix = '',
+                                $suffix = '',
+                                $dispatchAfterCommit = false)
     {
         $this->sqs = $sqs;
         $this->prefix = $prefix;
         $this->default = $default;
         $this->suffix = $suffix;
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
     }
 
     /**
@@ -83,7 +89,15 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $queue ?: $this->default, $data), $queue);
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $queue ?: $this->default, $data),
+            $queue,
+            null,
+            function ($payload, $queue) {
+                return $this->pushRaw($payload, $queue);
+            }
+        );
     }
 
     /**
@@ -112,11 +126,19 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $this->createPayload($job, $queue ?: $this->default, $data),
-            'DelaySeconds' => $this->secondsUntil($delay),
-        ])->get('MessageId');
+        return $this->enqueueUsing(
+            $job,
+            $this->createPayload($job, $queue ?: $this->default, $data),
+            $queue,
+            $delay,
+            function ($payload, $queue, $delay) {
+                return $this->sqs->sendMessage([
+                    'QueueUrl' => $this->getQueue($queue),
+                    'MessageBody' => $payload,
+                    'DelaySeconds' => $this->secondsUntil($delay),
+                ])->get('MessageId');
+            }
+        );
     }
 
     /**
@@ -166,8 +188,26 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $queue = $queue ?: $this->default;
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
-            ? rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix)
+            ? $this->suffixQueue($queue, $this->suffix)
             : $queue;
+    }
+
+    /**
+     * Add the given suffix to the given queue name.
+     *
+     * @param  string  $queue
+     * @param  string  $suffix
+     * @return string
+     */
+    protected function suffixQueue($queue, $suffix = '')
+    {
+        if (Str::endsWith($queue, '.fifo')) {
+            $queue = Str::beforeLast($queue, '.fifo');
+
+            return rtrim($this->prefix, '/').'/'.Str::finish($queue, $suffix).'.fifo';
+        }
+
+        return rtrim($this->prefix, '/').'/'.Str::finish($queue, $this->suffix);
     }
 
     /**

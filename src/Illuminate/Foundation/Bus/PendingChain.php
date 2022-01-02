@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Bus;
 use Closure;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Queue\SerializableClosure;
+use Illuminate\Queue\SerializableClosureFactory;
 
 class PendingChain
 {
@@ -112,7 +112,7 @@ class PendingChain
     public function catch($callback)
     {
         $this->catchCallbacks[] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
+                        ? SerializableClosureFactory::make($callback)
                         : $callback;
 
         return $this;
@@ -143,10 +143,21 @@ class PendingChain
             $firstJob = $this->job;
         }
 
-        $firstJob->allOnConnection($this->connection);
-        $firstJob->allOnQueue($this->queue);
+        if ($this->connection) {
+            $firstJob->chainConnection = $this->connection;
+            $firstJob->connection = $firstJob->connection ?: $this->connection;
+        }
+
+        if ($this->queue) {
+            $firstJob->chainQueue = $this->queue;
+            $firstJob->queue = $firstJob->queue ?: $this->queue;
+        }
+
+        if ($this->delay) {
+            $firstJob->delay = ! is_null($firstJob->delay) ? $firstJob->delay : $this->delay;
+        }
+
         $firstJob->chain($this->chain);
-        $firstJob->delay($this->delay);
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
         return app(Dispatcher::class)->dispatch($firstJob);

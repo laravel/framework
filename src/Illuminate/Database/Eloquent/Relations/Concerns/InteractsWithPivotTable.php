@@ -116,11 +116,27 @@ trait InteractsWithPivotTable
         // have done any attaching or detaching, and if we have we will touch these
         // relationships if they are configured to touch on any database updates.
         if (count($changes['attached']) ||
-            count($changes['updated'])) {
+            count($changes['updated']) ||
+            count($changes['detached'])) {
             $this->touchIfTouching();
         }
 
         return $changes;
+    }
+
+    /**
+     * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values.
+     *
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $ids
+     * @param  array  $values
+     * @param  bool  $detaching
+     * @return array
+     */
+    public function syncWithPivotValues($ids, array $values, bool $detaching = true)
+    {
+        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($values) {
+            return [$id => $values];
+        }), $detaching);
     }
 
     /**
@@ -431,7 +447,7 @@ trait InteractsWithPivotTable
                     return 0;
                 }
 
-                $query->whereIn($this->relatedPivotKey, (array) $ids);
+                $query->whereIn($this->getQualifiedRelatedPivotKeyName(), (array) $ids);
             }
 
             // Once we have all of the conditions set on the statement, we are ready
@@ -552,7 +568,7 @@ trait InteractsWithPivotTable
             $query->whereNull(...$arguments);
         }
 
-        return $query->where($this->foreignPivotKey, $this->parent->{$this->parentKey});
+        return $query->where($this->getQualifiedForeignPivotKeyName(), $this->parent->{$this->parentKey});
     }
 
     /**

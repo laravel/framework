@@ -20,7 +20,7 @@ class MailMarkdownTest extends TestCase
         $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
-        $viewFactory->shouldReceive('exists')->with('default')->andReturn(false);
+        $viewFactory->shouldReceive('exists')->with('mail.default')->andReturn(false);
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
         $viewFactory->shouldReceive('make')->with('mail::themes.default', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
@@ -37,9 +37,26 @@ class MailMarkdownTest extends TestCase
         $markdown->theme('yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
-        $viewFactory->shouldReceive('exists')->with('yaz')->andReturn(true);
+        $viewFactory->shouldReceive('exists')->with('mail.yaz')->andReturn(true);
         $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
-        $viewFactory->shouldReceive('make')->with('yaz', [])->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail.yaz', [])->andReturnSelf();
+        $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
+
+        $result = $markdown->render('view', []);
+
+        $this->assertNotFalse(strpos($result, '<html></html>'));
+    }
+
+    public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix()
+    {
+        $viewFactory = m::mock(Factory::class);
+        $markdown = new Markdown($viewFactory);
+        $markdown->theme('mail.yaz');
+        $viewFactory->shouldReceive('flushFinderCache')->once();
+        $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
+        $viewFactory->shouldReceive('exists')->with('mail.yaz')->andReturn(true);
+        $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail.yaz', [])->andReturnSelf();
         $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
 
         $result = $markdown->render('view', []);

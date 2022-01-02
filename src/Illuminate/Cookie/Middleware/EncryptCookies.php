@@ -76,7 +76,7 @@ class EncryptCookies
     protected function decrypt(Request $request)
     {
         foreach ($request->cookies as $key => $cookie) {
-            if ($this->isDisabled($key)) {
+            if ($this->isDisabled($key) || is_array($cookie)) {
                 continue;
             }
 

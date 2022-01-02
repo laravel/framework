@@ -48,7 +48,7 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
-        return $this->cachePath.'/'.sha1($path).'.php';
+        return $this->cachePath.'/'.sha1('v2'.$path).'.php';
     }
 
     /**
@@ -70,5 +70,18 @@ abstract class Compiler
 
         return $this->files->lastModified($path) >=
                $this->files->lastModified($compiled);
+    }
+
+    /**
+     * Create the compiled file directory if necessary.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function ensureCompiledDirectoryExists($path)
+    {
+        if (! $this->files->exists(dirname($path))) {
+            $this->files->makeDirectory(dirname($path), 0777, true, true);
+        }
     }
 }

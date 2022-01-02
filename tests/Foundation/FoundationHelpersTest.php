@@ -48,6 +48,7 @@ class FoundationHelpersTest extends TestCase
         $app = new Application;
         $app['config'] = m::mock(Repository::class);
         $app['config']->shouldReceive('get')->with('app.mix_url');
+        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
 
         $manifest = $this->makeManifest();
 
@@ -63,6 +64,7 @@ class FoundationHelpersTest extends TestCase
         $app = new Application;
         $app['config'] = m::mock(Repository::class);
         $app['config']->shouldReceive('get')->with('app.mix_url');
+        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
 
         $manifest = $this->makeManifest();
         mix('unversioned.css');
@@ -78,6 +80,7 @@ class FoundationHelpersTest extends TestCase
         $app = new Application;
         $app['config'] = m::mock(Repository::class);
         $app['config']->shouldReceive('get')->with('app.mix_url');
+        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
 
         $manifest = $this->makeManifest();
 
@@ -101,6 +104,7 @@ class FoundationHelpersTest extends TestCase
         $app = new Application;
         $app['config'] = m::mock(Repository::class);
         $app['config']->shouldReceive('get')->with('app.mix_url');
+        $app['config']->shouldReceive('get')->with('app.mix_hot_proxy_url');
 
         mkdir($directory = __DIR__.'/mix');
         $manifest = $this->makeManifest('mix');

@@ -19,24 +19,14 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\EventFake;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class AuthenticationTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
-
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
 
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
@@ -211,7 +201,7 @@ class AuthenticationTest extends TestCase
 
         $this->assertEquals(1, $user->id);
 
-        $this->app['auth']->logoutOtherDevices('adifferentpassword');
+        $this->app['auth']->logoutOtherDevices('password');
         $this->assertEquals(1, $user->id);
 
         Event::assertDispatched(OtherDeviceLogout::class, function ($event) {
@@ -220,6 +210,20 @@ class AuthenticationTest extends TestCase
 
             return true;
         });
+    }
+
+    public function testPasswordMustBeValidToLogOutOtherDevices()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('current password');
+
+        $this->app['auth']->loginUsingId(1);
+
+        $user = $this->app['auth']->user();
+
+        $this->assertEquals(1, $user->id);
+
+        $this->app['auth']->logoutOtherDevices('adifferentpassword');
     }
 
     public function testLoggingInOutViaAttemptRemembering()
@@ -298,7 +302,7 @@ class AuthenticationTest extends TestCase
         ];
 
         Auth::extend('myCustomDriver', function () {
-            return new MyCustomGuardStub();
+            return new MyCustomGuardStub;
         });
 
         $this->assertInstanceOf(MyCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
@@ -318,7 +322,7 @@ class AuthenticationTest extends TestCase
         ];
 
         Auth::extend('myCustomDriver', function () {
-            return new MyDispatcherLessCustomGuardStub();
+            return new MyDispatcherLessCustomGuardStub;
         });
 
         $this->assertInstanceOf(MyDispatcherLessCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
@@ -335,7 +339,7 @@ class MyCustomGuardStub
 
     public function __construct()
     {
-        $this->setDispatcher(new Dispatcher());
+        $this->setDispatcher(new Dispatcher);
     }
 
     public function setDispatcher(Dispatcher $events)

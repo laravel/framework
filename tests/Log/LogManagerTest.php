@@ -13,8 +13,10 @@ use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger as Monolog;
+use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
 use ReflectionProperty;
+use RuntimeException;
 
 class LogManagerTest extends TestCase
 {
@@ -203,6 +205,41 @@ class LogManagerTest extends TestCase
         }
     }
 
+    public function testItUtilisesTheNullDriverDuringTestsWhenNullDriverUsed()
+    {
+        $config = $this->app->make('config');
+        $config->set('logging.default', null);
+        $config->set('logging.channels.null', [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ]);
+        $manager = new class($this->app) extends LogManager
+        {
+            protected function createEmergencyLogger()
+            {
+                throw new RuntimeException('Emergency logger was created.');
+            }
+        };
+
+        // In tests, this should not need to create the emergency logger...
+        $manager->info('message');
+
+        // we should also be able to forget the null channel...
+        $this->assertCount(1, $manager->getChannels());
+        $manager->forgetChannel();
+        $this->assertCount(0, $manager->getChannels());
+
+        // However in production we want it to fallback to the emergency logger...
+        $this->app['env'] = 'production';
+        try {
+            $manager->info('message');
+
+            $this->fail('Emergency logger was not created as expected.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Emergency logger was created.', $exception->getMessage());
+        }
+    }
+
     public function testLogManagerCreateSingleDriverWithConfiguredFormatter()
     {
         $config = $this->app['config'];
@@ -327,7 +364,7 @@ class LogManagerTest extends TestCase
         $this->assertSame('Y/m/d--test', $dateFormat->getValue($formatter));
     }
 
-    public function testLogMnagerPurgeResolvedChannels()
+    public function testLogManagerPurgeResolvedChannels()
     {
         $manager = new LogManager($this->app);
 
@@ -340,5 +377,59 @@ class LogManagerTest extends TestCase
         $manager->forgetChannel('single');
 
         $this->assertEmpty($manager->getChannels());
+    }
+
+    public function testLogManagerCanBuildOnDemandChannel()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->build([
+            'driver' => 'single',
+            'path' => storage_path('logs/on-demand.log'),
+        ]);
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+
+        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url->setAccessible(true);
+
+        $this->assertSame(storage_path('logs/on-demand.log'), $url->getValue($handler));
+    }
+
+    public function testLogManagerCanUseOnDemandChannelInOnDemandStack()
+    {
+        $manager = new LogManager($this->app);
+        $this->app['config']->set('logging.channels.test', [
+            'driver' => 'single',
+        ]);
+
+        $factory = new class()
+        {
+            public function __invoke()
+            {
+                return new Monolog(
+                    'uuid',
+                    [new StreamHandler(storage_path('logs/custom.log'))],
+                    [new UidProcessor()]
+                );
+            }
+        };
+        $channel = $manager->build([
+            'driver' => 'custom',
+            'via' => get_class($factory),
+        ]);
+        $logger = $manager->stack(['test', $channel]);
+
+        $handler = $logger->getLogger()->getHandlers()[1];
+        $processor = $logger->getLogger()->getProcessors()[0];
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(UidProcessor::class, $processor);
+
+        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url->setAccessible(true);
+
+        $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
     }
 }

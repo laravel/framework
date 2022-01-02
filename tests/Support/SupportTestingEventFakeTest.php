@@ -118,6 +118,21 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertDispatched('Bar');
         $fake->assertNotDispatched('Baz');
     }
+
+    public function testAssertNothingDispatched()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatch(EventStub::class);
+        $this->fake->dispatch(EventStub::class);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('2 unexpected events were dispatched.'));
+        }
+    }
 }
 
 class EventStub

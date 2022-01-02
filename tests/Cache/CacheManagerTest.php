@@ -39,7 +39,7 @@ class CacheManagerTest extends TestCase
         $cacheManager->shouldReceive('resolve')
             ->withArgs(['array'])
             ->times(4)
-            ->andReturn(new ArrayStore());
+            ->andReturn(new ArrayStore);
 
         $cacheManager->shouldReceive('getDefaultDriver')
             ->once()
@@ -64,7 +64,7 @@ class CacheManagerTest extends TestCase
             ],
         ]);
         $cacheManager->extend('forget', function () {
-            return new ArrayStore();
+            return new ArrayStore;
         });
 
         $cacheManager->store('forget')->forever('foo', 'bar');

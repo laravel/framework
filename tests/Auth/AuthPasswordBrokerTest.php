@@ -145,7 +145,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         return [
             'tokens' => m::mock(TokenRepositoryInterface::class),
-            'users'  => m::mock(UserProvider::class),
+            'users' => m::mock(UserProvider::class),
         ];
     }
 }

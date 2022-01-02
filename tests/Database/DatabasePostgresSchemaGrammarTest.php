@@ -262,6 +262,36 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexWithLanguage()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body')->language('spanish');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'spanish\', "body"))', $statements[0]);
+    }
+
+    public function testAddingFulltextIndexWithFluency()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('body')->fulltext();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "users_body_fulltext" on "users" using gin (to_tsvector(\'english\', "body"))', $statements[1]);
+    }
+
     public function testAddingSpatialIndex()
     {
         $blueprint = new Blueprint('geo');
@@ -975,6 +1005,44 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "geo" add column "coordinates" geography(multipolygon, 4326) not null', $statements[0]);
+    }
+
+    public function testCreateDatabase()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_foo');
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+
+        $this->assertSame(
+            'create database "my_database_a" encoding "utf8_foo"',
+            $statement
+        );
+
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8_bar');
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+
+        $this->assertSame(
+            'create database "my_database_b" encoding "utf8_bar"',
+            $statement
+        );
+    }
+
+    public function testDropDatabaseIfExists()
+    {
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_a');
+
+        $this->assertSame(
+            'drop database if exists "my_database_a"',
+            $statement
+        );
+
+        $statement = $this->getGrammar()->compileDropDatabaseIfExists('my_database_b');
+
+        $this->assertSame(
+            'drop database if exists "my_database_b"',
+            $statement
+        );
     }
 
     public function testDropAllTablesEscapesTableNames()

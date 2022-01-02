@@ -2,21 +2,17 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelLoadCountTest;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentModelLoadCountTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('base_models', function (Blueprint $table) {
             $table->increments('id');
         });
@@ -49,11 +45,11 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
     {
         $model = BaseModel::first();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $model->loadCount('related1');
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals(2, $model->related1_count);
     }
 
@@ -61,11 +57,11 @@ class EloquentModelLoadCountTest extends DatabaseTestCase
     {
         $model = BaseModel::first();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $model->loadCount(['related1', 'related2']);
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
         $this->assertEquals(2, $model->related1_count);
         $this->assertEquals(1, $model->related2_count);
     }

@@ -113,6 +113,30 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'taylor', 'languages.php' => true], $array);
     }
 
+    public function testUndot()
+    {
+        $array = Arr::undot([
+            'user.name' => 'Taylor',
+            'user.age' => 25,
+            'user.languages.0' => 'PHP',
+            'user.languages.1' => 'C#',
+        ]);
+        $this->assertEquals(['user' => ['name' => 'Taylor', 'age' => 25, 'languages' => ['PHP', 'C#']]], $array);
+
+        $array = Arr::undot([
+            'pagination.previous' => '<<',
+            'pagination.next' => '>>',
+        ]);
+        $this->assertEquals(['pagination' => ['previous' => '<<', 'next' => '>>']], $array);
+
+        $array = Arr::undot([
+            'foo',
+            'foo.bar' => 'baz',
+            'foo.baz' => ['a' => 'b'],
+        ]);
+        $this->assertEquals(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]], $array);
+    }
+
     public function testExcept()
     {
         $array = ['name' => 'taylor', 'age' => 26];
@@ -137,6 +161,12 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists([null], 1));
         $this->assertFalse(Arr::exists(['a' => 1], 0));
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
+    }
+
+    public function testWhereNotNull()
+    {
+        $array = array_values(Arr::whereNotNull([null, 0, false, '', null, []]));
+        $this->assertEquals([0, false, '', []], $array);
     }
 
     public function testFirst()
@@ -422,6 +452,22 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
+    }
+
+    public function testIsList()
+    {
+        $this->assertTrue(Arr::isList([]));
+        $this->assertTrue(Arr::isList([1, 2, 3]));
+        $this->assertTrue(Arr::isList(['foo', 2, 3]));
+        $this->assertTrue(Arr::isList(['foo', 'bar']));
+        $this->assertTrue(Arr::isList([0 => 'foo', 'bar']));
+        $this->assertTrue(Arr::isList([0 => 'foo', 1 => 'bar']));
+
+        $this->assertFalse(Arr::isList([1 => 'foo', 'bar']));
+        $this->assertFalse(Arr::isList([1 => 'foo', 0 => 'bar']));
+        $this->assertFalse(Arr::isList([0 => 'foo', 'bar' => 'baz']));
+        $this->assertFalse(Arr::isList([0 => 'foo', 2 => 'bar']));
+        $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
     }
 
     public function testOnly()
@@ -808,6 +854,25 @@ class SupportArrTest extends TestCase
         $this->assertEquals($expect, Arr::sortRecursive($array));
     }
 
+    public function testToCssClasses()
+    {
+        $classes = Arr::toCssClasses([
+            'font-bold',
+            'mt-4',
+        ]);
+
+        $this->assertEquals('font-bold mt-4', $classes);
+
+        $classes = Arr::toCssClasses([
+            'font-bold',
+            'mt-4',
+            'ml-2' => true,
+            'mr-2' => false,
+        ]);
+
+        $this->assertEquals('font-bold mt-4 ml-2', $classes);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];
@@ -902,5 +967,58 @@ class SupportArrTest extends TestCase
         $obj = unserialize(serialize($obj));
         $this->assertEquals([$obj], Arr::wrap($obj));
         $this->assertSame($obj, Arr::wrap($obj)[0]);
+    }
+
+    public function testSortByMany()
+    {
+        $unsorted = [
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+        ];
+
+        // sort using keys
+        $sorted = array_values(Arr::sort($unsorted, [
+            'name',
+            'age',
+            'meta.key',
+        ]));
+        $this->assertEquals([
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+        ], $sorted);
+
+        // sort with order
+        $sortedWithOrder = array_values(Arr::sort($unsorted, [
+            'name',
+            ['age', false],
+            ['meta.key', true],
+        ]));
+        $this->assertEquals([
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+        ], $sortedWithOrder);
+
+        // sort using callable
+        $sortedWithCallable = array_values(Arr::sort($unsorted, [
+            function ($a, $b) {
+                return $a['name'] <=> $b['name'];
+            },
+            function ($a, $b) {
+                return $b['age'] <=> $a['age'];
+            },
+            ['meta.key', true],
+        ]));
+        $this->assertEquals([
+            ['name' => 'Dave', 'age' => 10, 'meta' => ['key' => 3]],
+            ['name' => 'John', 'age' => 10, 'meta' => ['key' => 5]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
+            ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
+        ], $sortedWithCallable);
     }
 }

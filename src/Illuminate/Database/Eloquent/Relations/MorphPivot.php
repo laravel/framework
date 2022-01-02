@@ -38,6 +38,19 @@ class MorphPivot extends Pivot
     }
 
     /**
+     * Set the keys for a select query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function setKeysForSelectQuery($query)
+    {
+        $query->where($this->morphType, $this->morphClass);
+
+        return parent::setKeysForSelectQuery($query);
+    }
+
+    /**
      * Delete the pivot model record from the database.
      *
      * @return int
@@ -59,6 +72,16 @@ class MorphPivot extends Pivot
         return tap($query->delete(), function () {
             $this->fireModelEvent('deleted', false);
         });
+    }
+
+    /**
+     * Get the morph type for the pivot.
+     *
+     * @return string
+     */
+    public function getMorphType()
+    {
+        return $this->morphType;
     }
 
     /**
@@ -138,6 +161,8 @@ class MorphPivot extends Pivot
      */
     protected function newQueryForCollectionRestoration(array $ids)
     {
+        $ids = array_values($ids);
+
         if (! Str::contains($ids[0], ':')) {
             return parent::newQueryForRestoration($ids);
         }

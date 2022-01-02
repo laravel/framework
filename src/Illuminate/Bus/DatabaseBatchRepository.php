@@ -4,11 +4,13 @@ namespace Illuminate\Bus;
 
 use Carbon\CarbonImmutable;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Database\Connection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
 
-class DatabaseBatchRepository implements BatchRepository
+class DatabaseBatchRepository implements PrunableBatchRepository
 {
     /**
      * The batch factory instance.
@@ -101,7 +103,7 @@ class DatabaseBatchRepository implements BatchRepository
             'pending_jobs' => 0,
             'failed_jobs' => 0,
             'failed_job_ids' => '[]',
-            'options' => serialize($batch->options),
+            'options' => $this->serialize($batch->options),
             'created_at' => time(),
             'cancelled_at' => null,
             'finished_at' => null,
@@ -231,6 +233,52 @@ class DatabaseBatchRepository implements BatchRepository
     }
 
     /**
+     * Prune all of the entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function prune(DateTimeInterface $before)
+    {
+        $query = $this->connection->table($this->table)
+            ->whereNotNull('finished_at')
+            ->where('finished_at', '<', $before->getTimestamp());
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
+    }
+
+    /**
+     * Prune all of the unfinished entries older than the given date.
+     *
+     * @param  \DateTimeInterface  $before
+     * @return int
+     */
+    public function pruneUnfinished(DateTimeInterface $before)
+    {
+        $query = $this->connection->table($this->table)
+            ->whereNull('finished_at')
+            ->where('created_at', '<', $before->getTimestamp());
+
+        $totalDeleted = 0;
+
+        do {
+            $deleted = $query->take(1000)->delete();
+
+            $totalDeleted += $deleted;
+        } while ($deleted !== 0);
+
+        return $totalDeleted;
+    }
+
+    /**
      * Execute the given Closure within a storage specific transaction.
      *
      * @param  \Closure  $callback
@@ -241,6 +289,37 @@ class DatabaseBatchRepository implements BatchRepository
         return $this->connection->transaction(function () use ($callback) {
             return $callback();
         });
+    }
+
+    /**
+     * Serialize the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function serialize($value)
+    {
+        $serialized = serialize($value);
+
+        return $this->connection instanceof PostgresConnection
+            ? base64_encode($serialized)
+            : $serialized;
+    }
+
+    /**
+     * Unserialize the given value.
+     *
+     * @param  string  $serialized
+     * @return mixed
+     */
+    protected function unserialize($serialized)
+    {
+        if ($this->connection instanceof PostgresConnection &&
+            ! Str::contains($serialized, [':', ';'])) {
+            $serialized = base64_decode($serialized);
+        }
+
+        return unserialize($serialized);
     }
 
     /**
@@ -259,7 +338,7 @@ class DatabaseBatchRepository implements BatchRepository
             (int) $batch->pending_jobs,
             (int) $batch->failed_jobs,
             json_decode($batch->failed_job_ids, true),
-            unserialize($batch->options),
+            $this->unserialize($batch->options),
             CarbonImmutable::createFromTimestamp($batch->created_at),
             $batch->cancelled_at ? CarbonImmutable::createFromTimestamp($batch->cancelled_at) : $batch->cancelled_at,
             $batch->finished_at ? CarbonImmutable::createFromTimestamp($batch->finished_at) : $batch->finished_at

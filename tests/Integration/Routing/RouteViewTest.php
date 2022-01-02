@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RouteViewTest extends TestCase
 {
     public function testRouteView()

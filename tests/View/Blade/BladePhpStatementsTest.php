@@ -43,4 +43,45 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testStringWithParenthesisCannotBeCompiled()
+    {
+        $string = "@php(\$data = ['test' => ')'])";
+
+        $expected = "<?php (\$data = ['test' => ')']); ?>";
+
+        $actual = "<?php (\$data = ['test' => '); ?>'])";
+
+        $this->assertEquals($actual, $this->compiler->compileString($string));
+    }
+
+    public function testStringWithEmptyStringDataValue()
+    {
+        $string = "@php(\$data = ['test' => ''])";
+
+        $expected = "<?php (\$data = ['test' => '']); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@php(\$data = ['test' => \"\"])";
+
+        $expected = "<?php (\$data = ['test' => \"\"]); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testStringWithEscapingDataValue()
+    {
+        $string = "@php(\$data = ['test' => 'won\\'t break'])";
+
+        $expected = "<?php (\$data = ['test' => 'won\\'t break']); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = "@php(\$data = ['test' => \"\\\"escaped\\\"\"])";
+
+        $expected = "<?php (\$data = ['test' => \"\\\"escaped\\\"\"]); ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }

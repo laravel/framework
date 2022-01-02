@@ -6,9 +6,6 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class ResponsableTest extends TestCase
 {
     public function testResponsableObjectsAreRendered()

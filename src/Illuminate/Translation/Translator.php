@@ -6,7 +6,6 @@ use Countable;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -125,7 +124,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $locale, $item, $replace
                 ))) {
-                    return $line ?? $key;
+                    return $line;
                 }
             }
         }
@@ -216,30 +215,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             return $line;
         }
 
-        $replace = $this->sortReplacements($replace);
+        $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
-            $line = str_replace(
-                [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],
-                [$value, Str::upper($value), Str::ucfirst($value)],
-                $line
-            );
+            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value);
+            $shouldReplace[':'.Str::upper($key)] = Str::upper($value);
+            $shouldReplace[':'.$key] = $value;
         }
 
-        return $line;
-    }
-
-    /**
-     * Sort the replacements array.
-     *
-     * @param  array  $replace
-     * @return array
-     */
-    protected function sortReplacements(array $replace)
-    {
-        return (new Collection($replace))->sortBy(function ($value, $key) {
-            return mb_strlen($key) * -1;
-        })->all();
+        return strtr($line, $shouldReplace);
     }
 
     /**
@@ -405,6 +389,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  string  $locale
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function setLocale($locale)
     {

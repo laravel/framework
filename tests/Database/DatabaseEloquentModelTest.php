@@ -13,6 +13,10 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -25,6 +29,8 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -72,7 +78,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testSetAttributeWithNumericKey()
     {
-        $model = new EloquentDateModelStub();
+        $model = new EloquentDateModelStub;
         $model->setAttribute(0, 'value');
 
         $this->assertEquals([0 => 'value'], $model->getAttributes());
@@ -95,7 +101,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testIntAndNullComparisonWhenDirty()
     {
-        $model = new EloquentModelCastingStub();
+        $model = new EloquentModelCastingStub;
         $model->intAttribute = null;
         $model->syncOriginal();
         $this->assertFalse($model->isDirty('intAttribute'));
@@ -105,7 +111,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFloatAndNullComparisonWhenDirty()
     {
-        $model = new EloquentModelCastingStub();
+        $model = new EloquentModelCastingStub;
         $model->floatAttribute = null;
         $model->syncOriginal();
         $this->assertFalse($model->isDirty('floatAttribute'));
@@ -142,7 +148,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
-            'objectAttribute'     => '["one", "two", "three"]',
+            'objectAttribute' => '["one", "two", "three"]',
             'collectionAttribute' => '["one", "two", "three"]',
         ]);
         $model->syncOriginal();
@@ -153,6 +159,60 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty());
         $this->assertFalse($model->isDirty('objectAttribute'));
         $this->assertFalse($model->isDirty('collectionAttribute'));
+    }
+
+    public function testDirtyOnCastedArrayObject()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asarrayobjectAttribute' => '{"foo": "bar"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(ArrayObject::class, $model->asarrayobjectAttribute);
+        $this->assertFalse($model->isDirty('asarrayobjectAttribute'));
+
+        $model->asarrayobjectAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty('asarrayobjectAttribute'));
+
+        $model->asarrayobjectAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('asarrayobjectAttribute'));
+    }
+
+    public function testDirtyOnCastedCollection()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'ascollectionAttribute' => '{"foo": "bar"}',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(BaseCollection::class, $model->ascollectionAttribute);
+        $this->assertFalse($model->isDirty('ascollectionAttribute'));
+
+        $model->ascollectionAttribute = ['foo' => 'bar'];
+        $this->assertFalse($model->isDirty('ascollectionAttribute'));
+
+        $model->ascollectionAttribute = ['foo' => 'baz'];
+        $this->assertTrue($model->isDirty('ascollectionAttribute'));
+    }
+
+    public function testDirtyOnCastedStringable()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asStringableAttribute' => 'foo bar',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Stringable::class, $model->asStringableAttribute);
+        $this->assertFalse($model->isDirty('asStringableAttribute'));
+
+        $model->asStringableAttribute = Str::of('foo bar');
+        $this->assertFalse($model->isDirty('asStringableAttribute'));
+
+        $model->asStringableAttribute = Str::of('foo baz');
+        $this->assertTrue($model->isDirty('asStringableAttribute'));
     }
 
     public function testCleanAttributes()
@@ -290,7 +350,27 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithCollection()
     {
-        EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
+        EloquentModelDestroyStub::destroy(new BaseCollection([1, 2, 3]));
+    }
+
+    public function testDestroyMethodCallsQueryBuilderCorrectlyWithEloquentCollection()
+    {
+        EloquentModelDestroyStub::destroy(new Collection([
+            new EloquentModelDestroyStub(['id' => 1]),
+            new EloquentModelDestroyStub(['id' => 2]),
+            new EloquentModelDestroyStub(['id' => 3]),
+        ]));
+    }
+
+    public function testDestroyMethodCallsQueryBuilderCorrectlyWithMultipleArgs()
+    {
+        EloquentModelDestroyStub::destroy(1, 2, 3);
+    }
+
+    public function testDestroyMethodCallsQueryBuilderCorrectlyWithEmptyIds()
+    {
+        $count = EloquentModelEmptyDestroyStub::destroy([]);
+        $this->assertSame(0, $count);
     }
 
     public function testWithMethodCallsQueryBuilderCorrectly()
@@ -305,6 +385,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
         $instance = $model->newInstance()->newQuery()->without('foo');
         $this->assertEmpty($instance->getEagerLoads());
+    }
+
+    public function testWithOnlyMethodLoadsRelationshipCorrectly()
+    {
+        $model = new EloquentModelWithoutRelationStub();
+        $this->addMockConnection($model);
+        $instance = $model->newInstance()->newQuery()->withOnly('taylor');
+        $this->assertNotNull($instance->getEagerLoads()['taylor']);
+        $this->assertArrayNotHasKey('foo', $instance->getEagerLoads());
     }
 
     public function testEagerLoadingWithColumns()
@@ -475,7 +564,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testTimestampsAreReturnedAsObjectsOnCreate()
     {
         $timestamps = [
-            'created_at' =>Carbon::now(),
+            'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
         $model = new EloquentDateModelStub;
@@ -1247,6 +1336,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->addMockConnection($model);
 
         // $this->morphTo();
+        $model->setAttribute('morph_to_stub_type', EloquentModelSaveStub::class);
         $relation = $model->morphToStub();
         $this->assertSame('morph_to_stub_id', $relation->getForeignKeyName());
         $this->assertSame('morph_to_stub_type', $relation->getMorphType());
@@ -1968,10 +2058,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
 
+        Carbon::setTestNow();
+
         $scopes = [
             'published',
             'category' => 'Laravel',
             'framework' => ['Laravel', '5.3'],
+            'date' => Carbon::now(),
         ];
 
         $this->assertInstanceOf(Builder::class, $model->scopes($scopes));
@@ -2089,7 +2182,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGetOriginalCastsAttributes()
     {
-        $model = new EloquentModelCastingStub();
+        $model = new EloquentModelCastingStub;
         $model->intAttribute = '1';
         $model->floatAttribute = '0.1234';
         $model->stringAttribute = 432;
@@ -2201,7 +2294,6 @@ class EloquentModelStub extends Model
     public $scopesCalled = [];
     protected $table = 'stub';
     protected $guarded = [];
-    protected $morph_to_stub_type = EloquentModelSaveStub::class;
     protected $casts = ['castedFloat' => 'float'];
 
     public function getListItemsAttribute($value)
@@ -2288,6 +2380,11 @@ class EloquentModelStub extends Model
     {
         $this->scopesCalled['framework'] = [$framework, $version];
     }
+
+    public function scopeDate(Builder $builder, Carbon $date)
+    {
+        $this->scopesCalled['date'] = $date;
+    }
 }
 
 trait FooBarTrait
@@ -2372,12 +2469,27 @@ class EloquentModelFindWithWritePdoStub extends Model
 
 class EloquentModelDestroyStub extends Model
 {
+    protected $fillable = [
+        'id',
+    ];
+
     public function newQuery()
     {
         $mock = m::mock(Builder::class);
         $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
         $mock->shouldReceive('get')->once()->andReturn([$model = m::mock(stdClass::class)]);
         $model->shouldReceive('delete')->once();
+
+        return $mock;
+    }
+}
+
+class EloquentModelEmptyDestroyStub extends Model
+{
+    public function newQuery()
+    {
+        $mock = m::mock(Builder::class);
+        $mock->shouldReceive('whereIn')->never();
 
         return $mock;
     }
@@ -2518,6 +2630,9 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'asarrayobjectAttribute' => AsArrayObject::class,
+        'ascollectionAttribute' => AsCollection::class,
+        'asStringableAttribute' => AsStringable::class,
     ];
 
     public function jsonAttributeValue()

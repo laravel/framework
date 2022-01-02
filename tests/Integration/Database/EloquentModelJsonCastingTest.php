@@ -9,15 +9,10 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use stdClass;
 
-/**
- * @group integration
- */
 class EloquentModelJsonCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('json_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->json('basic_string_as_json_field')->nullable();
@@ -52,7 +47,7 @@ class EloquentModelJsonCastingTest extends DatabaseTestCase
 
     public function testObjectsAreCastable()
     {
-        $object = new stdClass();
+        $object = new stdClass;
         $object->key1 = 'value1';
 
         /** @var \Illuminate\Tests\Integration\Database\EloquentModelJsonCastingTest\JsonCast $user */

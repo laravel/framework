@@ -5,11 +5,17 @@ namespace Illuminate\Queue;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Str;
 use ReflectionClass;
+use RuntimeException;
 
 class CallQueuedHandler
 {
@@ -51,13 +57,21 @@ class CallQueuedHandler
     {
         try {
             $command = $this->setJobInstanceIfNecessary(
-                $job, unserialize($data['command'])
+                $job, $this->getCommand($data)
             );
         } catch (ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
 
+        if ($command instanceof ShouldBeUniqueUntilProcessing) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
+
         $this->dispatchThroughMiddleware($job, $command);
+
+        if (! $job->isReleased() && ! $command instanceof ShouldBeUniqueUntilProcessing) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
@@ -67,6 +81,27 @@ class CallQueuedHandler
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
+    }
+
+    /**
+     * Get the command from the given payload.
+     *
+     * @param  array  $data
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    protected function getCommand(array $data)
+    {
+        if (Str::startsWith($data['command'], 'O:')) {
+            return unserialize($data['command']);
+        }
+
+        if ($this->container->bound(Encrypter::class)) {
+            return unserialize($this->container[Encrypter::class]->decrypt($data['command']));
+        }
+
+        throw new RuntimeException('Unable to extract job payload.');
     }
 
     /**
@@ -154,6 +189,31 @@ class CallQueuedHandler
     }
 
     /**
+     * Ensure the lock for a unique job is released.
+     *
+     * @param  mixed  $command
+     * @return void
+     */
+    protected function ensureUniqueJobLockIsReleased($command)
+    {
+        if (! $command instanceof ShouldBeUnique) {
+            return;
+        }
+
+        $uniqueId = method_exists($command, 'uniqueId')
+                    ? $command->uniqueId()
+                    : ($command->uniqueId ?? '');
+
+        $cache = method_exists($command, 'uniqueVia')
+                    ? $command->uniqueVia()
+                    : $this->container->make(Cache::class);
+
+        $cache->lock(
+            'laravel_unique_job:'.get_class($command).$uniqueId
+        )->forceRelease();
+    }
+
+    /**
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -190,7 +250,11 @@ class CallQueuedHandler
      */
     public function failed(array $data, $e, string $uuid)
     {
-        $command = unserialize($data['command']);
+        $command = $this->getCommand($data);
+
+        if (! $command instanceof ShouldBeUniqueUntilProcessing) {
+            $this->ensureUniqueJobLockIsReleased($command);
+        }
 
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);

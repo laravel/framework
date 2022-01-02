@@ -2,6 +2,8 @@
 
 namespace Illuminate\Broadcasting;
 
+use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
+
 class Channel
 {
     /**
@@ -14,12 +16,12 @@ class Channel
     /**
      * Create a new channel instance.
      *
-     * @param  string  $name
+     * @param  \Illuminate\Contracts\Broadcasting\HasBroadcastChannel|string  $name
      * @return void
      */
     public function __construct($name)
     {
-        $this->name = $name;
+        $this->name = $name instanceof HasBroadcastChannel ? $name->broadcastChannel() : $name;
     }
 
     /**

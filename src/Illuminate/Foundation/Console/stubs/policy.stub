@@ -14,7 +14,7 @@ class {{ class }}
      * Determine whether the user can view any models.
      *
      * @param  \{{ namespacedUserModel }}  $user
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function viewAny({{ user }} $user)
     {
@@ -26,7 +26,7 @@ class {{ class }}
      *
      * @param  \{{ namespacedUserModel }}  $user
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function view({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
@@ -37,7 +37,7 @@ class {{ class }}
      * Determine whether the user can create models.
      *
      * @param  \{{ namespacedUserModel }}  $user
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function create({{ user }} $user)
     {
@@ -49,7 +49,7 @@ class {{ class }}
      *
      * @param  \{{ namespacedUserModel }}  $user
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function update({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
@@ -61,7 +61,7 @@ class {{ class }}
      *
      * @param  \{{ namespacedUserModel }}  $user
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function delete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
@@ -73,7 +73,7 @@ class {{ class }}
      *
      * @param  \{{ namespacedUserModel }}  $user
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function restore({{ user }} $user, {{ model }} ${{ modelVariable }})
     {
@@ -85,7 +85,7 @@ class {{ class }}
      *
      * @param  \{{ namespacedUserModel }}  $user
      * @param  \{{ namespacedModel }}  ${{ modelVariable }}
-     * @return mixed
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function forceDelete({{ user }} $user, {{ model }} ${{ modelVariable }})
     {

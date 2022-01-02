@@ -9,8 +9,9 @@ use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
+use Orchestra\Testbench\TestCase;
 
-class MigratorEventsTest extends DatabaseTestCase
+class MigratorEventsTest extends TestCase
 {
     protected function migrateOptions()
     {
@@ -41,16 +42,16 @@ class MigratorEventsTest extends DatabaseTestCase
         $this->artisan('migrate:rollback', $this->migrateOptions());
 
         Event::assertDispatched(MigrationStarted::class, function ($event) {
-            return $event->method == 'up' && $event->migration instanceof Migration;
+            return $event->method === 'up' && $event->migration instanceof Migration;
         });
         Event::assertDispatched(MigrationStarted::class, function ($event) {
-            return $event->method == 'down' && $event->migration instanceof Migration;
+            return $event->method === 'down' && $event->migration instanceof Migration;
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
-            return $event->method == 'up' && $event->migration instanceof Migration;
+            return $event->method === 'up' && $event->migration instanceof Migration;
         });
         Event::assertDispatched(MigrationEnded::class, function ($event) {
-            return $event->method == 'down' && $event->migration instanceof Migration;
+            return $event->method === 'down' && $event->migration instanceof Migration;
         });
     }
 
@@ -62,10 +63,10 @@ class MigratorEventsTest extends DatabaseTestCase
         $this->artisan('migrate:rollback');
 
         Event::assertDispatched(NoPendingMigrations::class, function ($event) {
-            return $event->method == 'up';
+            return $event->method === 'up';
         });
         Event::assertDispatched(NoPendingMigrations::class, function ($event) {
-            return $event->method == 'down';
+            return $event->method === 'down';
         });
     }
 }

@@ -2,7 +2,11 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class PendingDispatch
 {
@@ -97,6 +101,30 @@ class PendingDispatch
     }
 
     /**
+     * Indicate that the job should be dispatched after all database transactions have committed.
+     *
+     * @return $this
+     */
+    public function afterCommit()
+    {
+        $this->job->afterCommit();
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the job should not wait until database transactions have been committed before dispatching.
+     *
+     * @return $this
+     */
+    public function beforeCommit()
+    {
+        $this->job->beforeCommit();
+
+        return $this;
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain
@@ -122,6 +150,21 @@ class PendingDispatch
     }
 
     /**
+     * Determine if the job should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatch()
+    {
+        if (! $this->job instanceof ShouldBeUnique) {
+            return true;
+        }
+
+        return (new UniqueLock(Container::getInstance()->make(Cache::class)))
+                    ->acquire($this->job);
+    }
+
+    /**
      * Dynamically proxy methods to the underlying job.
      *
      * @param  string  $method
@@ -142,7 +185,9 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        if ($this->afterResponse) {
+        if (! $this->shouldDispatch()) {
+            return;
+        } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
         } else {
             app(Dispatcher::class)->dispatch($this->job);

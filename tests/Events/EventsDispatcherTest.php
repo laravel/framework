@@ -388,8 +388,7 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
 
-        unset($_SERVER['__event.test1']);
-        unset($_SERVER['__event.test2']);
+        unset($_SERVER['__event.test1'], $_SERVER['__event.test2']);
     }
 
     public function testNestedEvent()
@@ -410,6 +409,19 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame([], $_SERVER['__event.test']);
         $d->dispatch('event');
         $this->assertEquals(['fired 1', 'fired 2'], $_SERVER['__event.test']);
+    }
+
+    public function testDuplicateListenersWillFire()
+    {
+        $d = new Dispatcher;
+        $d->listen('event', TestListener::class);
+        $d->listen('event', TestListener::class);
+        $d->listen('event', TestListener::class.'@handle');
+        $d->listen('event', TestListener::class.'@handle');
+        $d->dispatch('event');
+
+        $this->assertEquals(4, TestListener::$counter);
+        TestListener::$counter = 0;
     }
 }
 
@@ -438,5 +450,15 @@ class TestEventListener
     public function onFooEvent($foo, $bar)
     {
         return 'baz';
+    }
+}
+
+class TestListener
+{
+    public static $counter = 0;
+
+    public function handle()
+    {
+        self::$counter++;
     }
 }
