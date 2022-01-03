@@ -557,6 +557,7 @@ class Worker
             $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
         }
     }
+
     /**
      * Get the job's total number of exceptions.
      *
