@@ -55,6 +55,18 @@ trait CollectsResources
     }
 
     /**
+     * Get the JSON serialization options that should be applied to the resource response.
+     *
+     * @return int
+     */
+    public function jsonOptions()
+    {
+        $collects = $this->collects();
+
+        return $collects ? (new $collects([]))->jsonOptions() : 0;
+    }
+
+    /**
      * Get an iterator for the resource collection.
      *
      * @return \ArrayIterator

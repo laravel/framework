@@ -165,6 +165,16 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Get the JSON serialization options that should be applied to the resource response.
+     *
+     * @return int
+     */
+    public function jsonOptions()
+    {
+        return 0;
+    }
+
+    /**
      * Customize the response for a request.
      *
      * @param  \Illuminate\Http\Request  $request

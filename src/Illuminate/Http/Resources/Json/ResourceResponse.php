@@ -40,7 +40,9 @@ class ResourceResponse implements Responsable
                 $this->resource->with($request),
                 $this->resource->additional
             ),
-            $this->calculateStatus()
+            $this->calculateStatus(),
+            [],
+            $this->resource->jsonOptions()
         ), function ($response) use ($request) {
             $response->original = $this->resource->resource;
 
