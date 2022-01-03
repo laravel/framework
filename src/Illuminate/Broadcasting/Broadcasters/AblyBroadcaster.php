@@ -129,13 +129,13 @@ class AblyBroadcaster extends Broadcaster
     }
 
     /**
-     * Build Ably Message object for broadcasting.
+     * Build an Ably message object for broadcasting.
      *
      * @param  string  $event
      * @param  array  $payload
-     * @return AblyMessage
+     * @return \Ably\Models\Message
      */
-    protected function buildAblyMessage($event, array $payload = []): AblyMessage
+    protected function buildAblyMessage($event, array $payload = [])
     {
         return tap(new AblyMessage, function ($message) use ($event, $payload) {
             $message->name = $event;
