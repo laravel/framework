@@ -166,7 +166,7 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $result = Model1::withPaged('twos:id', 'fours', 'allFours:id')->first();
 
         $this->assertNull($result->twos->first()->one_id);
-        $this->assertSame(1, $result->fours->first()->one_id);
+        $this->assertEquals(1, $result->fours->first()->one_id);
         $this->assertNull($result->allFours->first()->one_id);
     }
 
@@ -261,7 +261,7 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $result = Model1::withSimplePaged('twos:id', 'fours', 'allFours:id')->first();
 
         $this->assertNull($result->twos->first()->one_id);
-        $this->assertSame(1, $result->fours->first()->one_id);
+        $this->assertEquals(1, $result->fours->first()->one_id);
         $this->assertNull($result->allFours->first()->one_id);
     }
 
@@ -428,7 +428,7 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $result = Model1::withCursorPaged('twos:id', 'fours', 'allFours:id')->first();
 
         $this->assertNull($result->twos->first()->one_id);
-        $this->assertSame(1, $result->fours->first()->one_id);
+        $this->assertEquals(1, $result->fours->first()->one_id);
         $this->assertNull($result->allFours->first()->one_id);
     }
 
