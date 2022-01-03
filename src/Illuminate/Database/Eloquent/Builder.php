@@ -1462,7 +1462,7 @@ class Builder
         foreach ($relations as $key => $relation) {
             $key = Str::before($key, '.');
 
-            $paginated[$key] = new Pagination($type, Str::finish($key, '_page'));
+            $paginated[$key] = new Pagination($type, (string) Str::of($key)->snake()->finish('_page'));
         }
 
         return $paginated;

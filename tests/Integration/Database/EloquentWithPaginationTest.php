@@ -143,6 +143,10 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $this->assertCount(2, $result->fours);
         $this->assertInstanceOf(LengthAwarePaginator::class, $result->allFours);
         $this->assertCount(3, $result->allFours);
+
+        $this->assertSame('twos_page', $result->twos->getPageName());
+        $this->assertSame('fours_page', $result->fours->getPageName());
+        $this->assertSame('all_fours_page', $result->allFours->getPageName());
     }
 
     public function testPaginatesRelationsWithColumns()
@@ -234,6 +238,10 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $this->assertCount(2, $result->fours);
         $this->assertInstanceOf(Paginator::class, $result->allFours);
         $this->assertCount(3, $result->allFours);
+
+        $this->assertSame('twos_page', $result->twos->getPageName());
+        $this->assertSame('fours_page', $result->fours->getPageName());
+        $this->assertSame('all_fours_page', $result->allFours->getPageName());
     }
 
     public function testSimplePaginatesRelationsWithColumns()
@@ -380,6 +388,10 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $this->assertCount(2, $result->fours);
         $this->assertInstanceOf(CursorPaginator::class, $result->allFours);
         $this->assertCount(3, $result->allFours);
+
+        $this->assertSame('twos_page', $result->twos->getCursorName());
+        $this->assertSame('fours_page', $result->fours->getCursorName());
+        $this->assertSame('all_fours_page', $result->allFours->getCursorName());
     }
 
     public function testCursorPaginatesRelationsWithColumns()
