@@ -1837,8 +1837,6 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'value', 'options', 'boolean');
 
-        $this->addBinding($value);
-
         return $this;
     }
 
