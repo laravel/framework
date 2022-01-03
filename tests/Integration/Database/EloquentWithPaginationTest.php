@@ -353,6 +353,23 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $this->assertSame('foo', $result->twos->getCursorName());
     }
 
+    public function testCursorPaginatesWithShorthandWithCursorArray()
+    {
+        $cursor = ['two.id' => 2];
+
+        $result = Model1::withCursorPaged('twos', 2, $cursor, 'foo')->first();
+
+        $this->assertCount(2, $result->twos);
+        $this->assertEquals(2, $result->twos->cursor()->parameter('two.id'));
+        $this->assertFalse($result->twos->cursor()->pointsToPreviousItems());
+        $this->assertTrue($result->twos->cursor()->pointsToNextItems());
+
+        $this->assertSame(3, $result->twos->first()->getKey());
+        $this->assertSame(4, $result->twos->last()->getKey());
+
+        $this->assertSame('foo', $result->twos->getCursorName());
+    }
+
     public function testCursorPaginatesWithCallback()
     {
         $result = Model1::withCursorPaged('twos', function ($query, $pagination) {

@@ -71,7 +71,11 @@ class Pagination
         $this->perPage = $perPage;
 
         if ($page) {
-            $this->page($page);
+            if ($this->type === 'cursor') {
+                $this->cursor($page);
+            } else {
+                $this->page($page);
+            }
         }
 
         if ($pageName) {
@@ -97,12 +101,15 @@ class Pagination
     /**
      * Sets the cursor for the pagination.
      *
-     * @param  string|int|\Illuminate\Pagination\Cursor  $cursor
+     * @param  array|int|string|\Illuminate\Pagination\Cursor  $cursor
+     * @param  bool  $pointsToNextItems
      * @return $this
      */
-    public function cursor($cursor)
+    public function cursor($cursor, $pointsToNextItems = true)
     {
-        return $this->page($cursor);
+        return $this->page(
+            is_array($cursor) ? new Cursor($cursor, $pointsToNextItems) : $cursor
+        );
     }
 
     /**
