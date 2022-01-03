@@ -87,9 +87,11 @@ class PostgresGrammar extends Grammar
         $columns = implode(' || ', $columns);
 
         $mode = 'plainto_tsquery';
+
         if (($where['options']['mode'] ?? []) === 'phrase') {
             $mode = 'phraseto_tsquery';
         }
+
         if (($where['options']['mode'] ?? []) === 'websearch') {
             $mode = 'websearch_to_tsquery';
         }
