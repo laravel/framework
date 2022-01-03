@@ -540,6 +540,24 @@ class Worker
     }
 
     /**
+     * Init the job's total number of exceptions if it's missing
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return null
+     */
+    private function setupJobTotalExceptionsIfMissing($job)
+    {
+        if (! $this->cache || is_null($job->uuid())) {
+            return;
+        }
+        
+        $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
+
+        if (! is_null($this->cache->get($jobExceptionsKey))) {
+            $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
+        }
+    }
+    /**
      * Get the job's total number of exceptions.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -550,17 +568,12 @@ class Worker
         if (! $this->cache || is_null($job->uuid())) {
             return;
         }
+        
+        $this->setupJobTotalExceptionsIfMissing($job);
 
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
-
-        $totalExceptions = $this->cache->get($jobExceptionsKey);
-        if (is_null($totalExceptions)) {
-            $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
-
-            return 0;
-        }
-
-        return $totalExceptions;
+        
+        return $this->cache->get($jobExceptionsKey);
     }
 
     /**
@@ -580,16 +593,12 @@ class Worker
 
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
 
-        $totalExceptions = $this->getJobTotalExceptions($job);
+        $this->setupJobTotalExceptionsIfMissing($job);
+        
+        if ($maxExceptions <= $this->cache->increment($jobExceptionsKey)) {
+            $this->cache->forget($jobExceptionsKey);
 
-        if (! is_null($totalExceptions)) {
-            if ($maxExceptions <= $totalExceptions + 1) {
-                $this->cache->forget($jobExceptionsKey);
-
-                $this->failJob($job, $e);
-            } else {
-                $this->cache->increment($jobExceptionsKey);
-            }
+            $this->failJob($job, $e);
         }
     }
 
