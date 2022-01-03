@@ -55,8 +55,8 @@ class EloquentWithPaginationTest extends DatabaseTestCase
         $now = now();
 
         Model1::query()->insert([
-            ['id' => 1, 'created_at' => $now->addMinute()],
-            ['id' => 2, 'created_at' => $now->addMinute()],
+            ['created_at' => $now->addMinute()],
+            ['created_at' => $now->addMinute()],
         ]);
 
         Model2::query()->insert([
