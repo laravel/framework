@@ -1824,7 +1824,7 @@ class Builder
     /**
      * Add a "where fulltext" clause to the query.
      *
-     * @param  string|string[]  $column
+     * @param  string|string[]  $columns
      * @param  string  $value
      * @param  string  $boolean
      * @return $this
