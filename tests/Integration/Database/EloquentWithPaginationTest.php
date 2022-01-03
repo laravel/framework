@@ -19,57 +19,70 @@ class EloquentWithPaginationTest extends DatabaseTestCase
     {
         Schema::create('one', function (Blueprint $table) {
             $table->increments('id');
+            $table->timestamps();
         });
 
         Schema::create('two', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
+            $table->timestamps();
         });
 
         Schema::create('three', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('two_id');
+            $table->timestamps();
         });
 
         Schema::create('four', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
+            $table->timestamps();
         });
 
         Schema::create('five', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('one_id');
+            $table->timestamps();
         });
 
         Schema::create('six', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('five_id');
+            $table->timestamps();
         });
 
-        Model1::query()->insert([[], []]);
+        $now = now();
+
+        Model1::query()->insert([
+            ['id' => 1, 'created_at' => $now->addMinute()],
+            ['id' => 2, 'created_at' => $now->addMinute()],
+        ]);
 
         Model2::query()->insert([
-            ['one_id' => 1],
-            ['one_id' => 1],
-            ['one_id' => 1],
-            ['one_id' => 1],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
         ]);
         Model3::query()->insert([
-            ['two_id' => 2],
-            ['two_id' => 2],
-            ['two_id' => 3],
-            ['two_id' => 3],
-            ['two_id' => 3],
+            ['two_id' => 2, 'created_at' => $now->addMinute()],
+            ['two_id' => 2, 'created_at' => $now->addMinute()],
+            ['two_id' => 3, 'created_at' => $now->addMinute()],
+            ['two_id' => 3, 'created_at' => $now->addMinute()],
+            ['two_id' => 3, 'created_at' => $now->addMinute()],
         ]);
         Model4::query()->insert([
-            ['one_id' => 1],
-            ['one_id' => 1],
-            ['one_id' => 1],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
+            ['one_id' => 1, 'created_at' => $now->addMinute()],
         ]);
-        Model5::query()->insert(['one_id' => 2]);
+        Model5::query()->insert(
+            ['one_id' => 2, 'created_at' => $now->addMinute()]
+        );
         Model6::query()->insert([
-            ['five_id' => 1],
-            ['five_id' => 1],
+            ['five_id' => 1, 'created_at' => $now->addMinute()],
+            ['five_id' => 1, 'created_at' => $now->addMinute()],
         ]);
     }
 
