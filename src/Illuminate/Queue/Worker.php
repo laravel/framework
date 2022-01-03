@@ -540,7 +540,7 @@ class Worker
     }
 
     /**
-     * Init the job's total number of exceptions if it's missing
+     * Init the job's total number of exceptions if it's missing.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
      * @return null
@@ -550,7 +550,7 @@ class Worker
         if (! $this->cache || is_null($job->uuid())) {
             return;
         }
-        
+
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
 
         if (! is_null($this->cache->get($jobExceptionsKey))) {
@@ -568,11 +568,11 @@ class Worker
         if (! $this->cache || is_null($job->uuid())) {
             return;
         }
-        
+
         $this->setupJobTotalExceptionsIfMissing($job);
 
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
-        
+
         return $this->cache->get($jobExceptionsKey);
     }
 
@@ -594,7 +594,7 @@ class Worker
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
 
         $this->setupJobTotalExceptionsIfMissing($job);
-        
+
         if ($maxExceptions <= $this->cache->increment($jobExceptionsKey)) {
             $this->cache->forget($jobExceptionsKey);
 
