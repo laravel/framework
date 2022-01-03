@@ -17,9 +17,9 @@ use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Mockery as m;
+use Orchestra\Testbench\TestCase;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
-use Orchestra\Testbench\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
 class HttpClientTest extends TestCase
@@ -318,7 +318,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->post('http://foo.com/json');
 
-        $agent = 'Laravel/' . app()->version() . ' - https://laravel.com';
+        $agent = 'Laravel/'.app()->version().' - https://laravel.com';
 
         $this->factory->assertSent(function (Request $request) use ($agent) {
             return $request->url() === 'http://foo.com/json' &&
