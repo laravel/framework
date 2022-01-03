@@ -442,6 +442,18 @@ class EloquentWithPaginationTest extends DatabaseTestCase
 
     /** General behavior */
 
+    public function testQueryCallbackOnNestedRelation()
+    {
+        $result = Model1::withPaged('twos.threes', function ($query) {
+            $query->where('id', '>', 3);
+        })->first();
+
+        $this->assertCount(4, $result->twos);
+        $this->assertCount(2, $result->twos->get(2)->threes);
+        $this->assertSame(4, $result->twos->get(2)->threes->first()->getKey());
+        $this->assertSame(5, $result->twos->get(2)->threes->last()->getKey());
+    }
+
     public function testPaginationGoneIfEagerLoadIsUnset()
     {
         $result = Model1::withPaged('twos')->without('twos')->first();
