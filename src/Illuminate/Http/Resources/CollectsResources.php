@@ -55,18 +55,7 @@ trait CollectsResources
     }
 
     /**
-     * Get an iterator for the resource collection.
-     *
-     * @return \ArrayIterator
-     */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
-    {
-        return $this->collection->getIterator();
-    }
-
-    /**
-     * Get the serialization options applied to the resource response.
+     * Get the JSON serialization options that should be applied to the resource response.
      *
      * @return int
      */
@@ -75,5 +64,16 @@ trait CollectsResources
         $collects = $this->collects();
 
         return $collects ? (new $collects([]))->jsonOptions() : 0;
+    }
+
+    /**
+     * Get an iterator for the resource collection.
+     *
+     * @return \ArrayIterator
+     */
+    #[\ReturnTypeWillChange]
+    public function getIterator()
+    {
+        return $this->collection->getIterator();
     }
 }

@@ -165,7 +165,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Get the serialization options applied to the resource response.
+     * Get the JSON serialization options that should be applied to the resource response.
      *
      * @return int
      */
