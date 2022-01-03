@@ -26,9 +26,6 @@ class StorageTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @requires OS Linux|Darwin
-     */
     public function testItCanDeleteViaStorage()
     {
         $this->assertTrue(File::exists($this->stubFile));
@@ -44,10 +41,7 @@ class StorageTest extends TestCase
         $this->assertFalse(Storage::disk('public')->exists('StarDewTaylor.png'));
     }
 
-    /**
-     * @requires OS Linux|Darwin
-     */
-    public function testItCanDeleteViaFilesystem()
+    public function testItCanDeleteViaFilesystemShouldUpdatesFileExists()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
@@ -57,7 +51,29 @@ class StorageTest extends TestCase
         File::delete('StarDewTaylor.png');
 
         $this->assertFalse(File::exists($this->stubFile));
+    }
+
+    public function testItCanDeleteViaFilesystemShouldUpdatesIsFile()
+    {
+        $this->assertTrue(File::exists($this->stubFile));
+        $this->assertTrue(File::isFile($this->stubFile));
+        Storage::disk('public')->assertExists('StarDewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
+
+        File::delete('StarDewTaylor.png');
+
         $this->assertFalse(File::isFile($this->stubFile));
+    }
+
+    public function testItCanDeleteViaFilesystemShouldUpdatesStorage()
+    {
+        $this->assertTrue(File::exists($this->stubFile));
+        $this->assertTrue(File::isFile($this->stubFile));
+        Storage::disk('public')->assertExists('StarDewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
+
+        File::delete('StarDewTaylor.png');
+
         Storage::disk('public')->assertMissing('StarDewTaylor.png');
         $this->assertFalse(Storage::disk('public')->exists('StarDewTaylor.png'));
     }
