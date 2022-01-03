@@ -52,6 +52,13 @@ class Builder
     protected $eagerLoad = [];
 
     /**
+     * The relationships that should be eager loaded with pagination.
+     *
+     * @var array|\Illuminate\Database\Eloquent\Pagination[]
+     */
+    protected $paginatedEagerLoad = [];
+
+    /**
      * All of the globally registered builder macros.
      *
      * @var array
@@ -116,7 +123,6 @@ class Builder
      * @var array
      */
     protected $scopes = [];
-
     /**
      * Removed global scopes.
      *
@@ -663,6 +669,13 @@ class Builder
 
         $relation->addEagerConstraints($models);
 
+        // If the relationship should be paginated, we will use the Pagination instance
+        // to build the page and then wrap it into its own Paginator. If that is not
+        // the case, we can proceed to normally get these results and match them.
+        if (isset($this->paginatedEagerLoad[$name])) {
+            return $this->paginateRelation($models, $name, $relation, $constraints);
+        }
+
         $constraints($relation);
 
         // Once we have the results, we just match those back up to their parent models
@@ -672,6 +685,35 @@ class Builder
             $relation->initRelation($models, $name),
             $relation->getEager(), $name
         );
+    }
+
+    /**
+     * Wraps the eager loaded relation into its own pagination.
+     *
+     * @param  array  $models
+     * @param  string  $name
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
+     * @param  \Closure  $constraints
+     * @return array
+     */
+    protected function paginateRelation(array $models, $name, $relation, $constraints)
+    {
+        $pagination = $this->paginatedEagerLoad[$name];
+
+        $constraints($relation, $pagination);
+
+        $result = $pagination->buildPaginatedQuery($relation)->getEager();
+
+        $matched = $relation->match(
+            $relation->initRelation($models, $name),
+            $result, $name
+        );
+
+        foreach($models as $model) {
+            $model->setRelation($name, $pagination->wrapIntoPaginator($relation, $result));
+        }
+
+        return $matched;
     }
 
     /**
@@ -1297,6 +1339,7 @@ class Builder
         }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
+        $this->paginatedEagerLoad = array_diff_key($this->paginatedEagerLoad, $eagerLoad);
 
         return $this;
     }
@@ -1309,9 +1352,10 @@ class Builder
      */
     public function without($relations)
     {
-        $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip(
-            is_string($relations) ? func_get_args() : $relations
-        ));
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip($relations));
+        $this->paginatedEagerLoad = array_diff_key($this->paginatedEagerLoad, array_flip($relations));
 
         return $this;
     }
@@ -1325,8 +1369,103 @@ class Builder
     public function withOnly($relations)
     {
         $this->eagerLoad = [];
+        $this->paginatedEagerLoad = [];
 
         return $this->with($relations);
+    }
+
+    /**
+     * Set the relationships that should be eager loaded with pagination.
+     *
+     * @param  string|array  $relations
+     * @param  string|int|\Closure|null  ...$callback
+     * @return $this
+     */
+    public function withPaged($relations, $callback = null)
+    {
+        return $this->addPaginatedEagerLoad('page', ...func_get_args());
+    }
+
+    /**
+     * Set the relationships that should be eager loaded with simple pagination.
+     *
+     * @param  string|array  $relations
+     * @param  string|int|\Closure|null  ...$callback
+     * @return $this
+     */
+    public function withSimplePaged($relations, $callback = null)
+    {
+        return $this->addPaginatedEagerLoad('simple', ...func_get_args());
+    }
+
+    /**
+     * Set the relationships that should be eager loaded with cursor pagination.
+     *
+     * @param  string|array  $relations
+     * @param  string|int|\Closure|null  ...$callback
+     * @return $this
+     */
+    public function withCursorPaged($relations, $callback = null)
+    {
+        return $this->addPaginatedEagerLoad('cursor', ...func_get_args());
+    }
+
+    /**
+     * Adds data to paginate an eager loaded relationship.
+     *
+     * @param  string  $type
+     * @param  string|array  $relations
+     * @param  string|int|\Closure|null  ...$callback
+     * @return $this
+     */
+    protected function addPaginatedEagerLoad($type, $relations, $callback = null)
+    {
+        $args = array_slice(func_get_args(), 1);
+
+        // If the developer is setting the items per page, we will understand he
+        // also wants to set the page/cursor and the page/cursor name. If not,
+        // we will just parse them like we would normally do using "with()".
+        if (is_int($callback)) {
+            $eagerLoad = $this->parseWithRelations([$relations => function ($query, $pagination) use ($args) {
+                $pagination->perPage(...array_slice($args, 1));
+            }]);
+        } elseif ($callback instanceof Closure) {
+            $eagerLoad = $this->parseWithRelations([$relations => $callback]);
+        } else {
+            $eagerLoad = $this->parseWithRelations(is_string($args[0]) ? $args : $args[0]);
+        }
+
+        $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
+
+        // We will paginate the first-level relation to avoid nesting multiple pages
+        // on nested levels for each related model. Each relation will have its own
+        // Pagination instance, allowing to modify the query behavior before exec.
+        $this->paginatedEagerLoad = array_merge(
+            $this->paginatedEagerLoad,
+            $this->getFirstLevelPaginableRelations($type, $eagerLoad)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Filters the relations by only first-level relationships.
+     *
+     * @param  string  $type
+     * @param  array  $relations
+     * @return array
+     */
+    protected function getFirstLevelPaginableRelations($type, $relations)
+    {
+        $paginated = [];
+
+        foreach ($relations as $key => $relation) {
+            $key = Str::before($key, '.');
+
+            $paginated[$key] = new Pagination($type, Str::finish($key, '_page'));
+        }
+
+        return $paginated;
     }
 
     /**
@@ -1490,6 +1629,29 @@ class Builder
     public function setEagerLoads(array $eagerLoad)
     {
         $this->eagerLoad = $eagerLoad;
+
+        return $this;
+    }
+
+    /**
+     * Get the relationships being eagerly loaded using pagination.
+     *
+     * @return array
+     */
+    public function getPaginatedEagerLoads()
+    {
+        return $this->paginatedEagerLoad;
+    }
+
+    /**
+     * Set the relationships being eagerly loaded using pagination.
+     *
+     * @param  array  $eagerLoad
+     * @return $this
+     */
+    public function setPaginatedEagerLoads(array $eagerLoad)
+    {
+        $this->paginatedEagerLoad = $eagerLoad;
 
         return $this;
     }
