@@ -46,8 +46,7 @@ class EloquentWithPaginationTest extends DatabaseTestCase
             $table->integer('five_id');
         });
 
-        Model1::create();
-        Model1::create();
+        Model1::query()->insert([[], []]);
 
         Model2::query()->insert([
             ['one_id' => 1],
