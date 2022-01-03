@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
 class HttpClientTest extends TestCase
@@ -302,6 +302,27 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                 $request->hasHeader('Authorization', 'Bearer token');
+        });
+    }
+
+    public function testItUsesTheDefaultUserAgent()
+    {
+        $config = $this->app['config'];
+
+        $config->set('app', [
+            'name' => 'Laravel',
+            'url' => 'https://laravel.com',
+        ]);
+
+        $this->factory->fake();
+
+        $this->factory->post('http://foo.com/json');
+
+        $agent = 'Laravel/' . app()->version() . ' - https://laravel.com';
+
+        $this->factory->assertSent(function (Request $request) use ($agent) {
+            return $request->url() === 'http://foo.com/json' &&
+                $request->hasHeader('User-Agent', $agent);
         });
     }
 
