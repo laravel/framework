@@ -199,7 +199,6 @@ class Pagination
 
         if (! is_null($this->location)) {
             $addCursorConditions = function ($query, $previousColumn, $i) use (&$addCursorConditions) {
-
                 if (! is_null($previousColumn)) {
                     $query->where(
                         $this->getOriginalColumnNameForCursorPagination($query, $previousColumn),

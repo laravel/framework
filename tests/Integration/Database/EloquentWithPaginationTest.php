@@ -441,7 +441,6 @@ class EloquentWithPaginationTest extends DatabaseTestCase
     }
 
     /** General behavior */
-
     public function testQueryCallbackOnNestedRelation()
     {
         $result = Model1::withPaged('twos.threes', function ($query) {

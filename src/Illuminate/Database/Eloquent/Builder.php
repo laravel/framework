@@ -709,7 +709,7 @@ class Builder
             $result, $name
         );
 
-        foreach($models as $model) {
+        foreach ($models as $model) {
             $model->setRelation($name, $pagination->wrapIntoPaginator($relation, $result));
         }
 
