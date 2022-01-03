@@ -705,13 +705,23 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function gatherRouteMiddleware(Route $route)
     {
-        $computedMiddleware = $route->gatherMiddleware();
+        return $this->resolveMiddleware($route->gatherMiddleware(), $route->excludedMiddleware());
+    }
 
-        $excluded = collect($route->excludedMiddleware())->map(function ($name) {
+    /**
+     * Resolve a flat array of middleware classes from the provided array.
+     *
+     * @param  array  $middleware
+     * @param  array  $excluded
+     * @return array
+     */
+    public function resolveMiddleware(array $middleware, array $excluded = [])
+    {
+        $excluded = collect($excluded)->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
-        $middleware = collect($computedMiddleware)->map(function ($name) {
+        $middleware = collect($middleware)->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
             if (empty($excluded)) {
