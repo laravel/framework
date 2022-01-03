@@ -307,9 +307,7 @@ class HttpClientTest extends TestCase
 
     public function testItUsesTheDefaultUserAgent()
     {
-        $config = $this->app['config'];
-
-        $config->set('app', [
+        $this->app['config']->set('app', [
             'name' => 'Laravel',
             'url' => 'https://laravel.com',
         ]);
