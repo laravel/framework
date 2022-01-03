@@ -7,7 +7,6 @@ use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
-use Illuminate\Routing\Contracts\PreparesApplication;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
@@ -17,7 +16,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use LogicException;
-use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
@@ -1008,19 +1006,8 @@ class Route
 
         $this->computedMiddleware = [];
 
-        $routeMiddleware = $this->middleware();
-
-        foreach ($routeMiddleware as $middleware) {
-            // If the middleware is an instance of PreparesApplication, we let it affect the application
-            // state before resolving the route action. We're using reflection to avoid resolving middleware
-            // dependencies this early in the request lifecycle, as that could lead to incorrect container state.
-            if (class_exists($middleware) && (new ReflectionClass($middleware))->implementsInterface(PreparesApplication::class)) {
-                $this->container->make($middleware)->prepareApplication($this);
-            }
-        }
-
         return $this->computedMiddleware = Router::uniqueMiddleware(array_merge(
-            $routeMiddleware, $this->controllerMiddleware()
+            $this->middleware(), $this->controllerMiddleware()
         ));
     }
 
