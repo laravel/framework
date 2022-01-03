@@ -173,6 +173,8 @@ class PendingRequest
             'timeout' => 30,
         ];
 
+        $this->withDefaultUserAgent();
+
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
             $pendingRequest->request = $request;
             $pendingRequest->cookies = $options['cookies'];
@@ -386,6 +388,18 @@ class PendingRequest
         return tap($this, function ($request) use ($userAgent) {
             return $this->options['headers']['User-Agent'] = trim($userAgent);
         });
+    }
+
+    /**
+     * Assign the default user agent for the request.
+     *
+     * @return $this
+     */
+    public function withDefaultUserAgent()
+    {
+        $agent = config('app.name') . '/' . app()->version() . ' - ' . config('app.url');
+
+        return $this->withUserAgent($agent);
     }
 
     /**
