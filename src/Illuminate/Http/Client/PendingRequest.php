@@ -397,7 +397,7 @@ class PendingRequest
      */
     public function withDefaultUserAgent()
     {
-        $agent = config('app.name') . '/' . app()->version() . ' - ' . config('app.url');
+        $agent = config('app.name').'/'.app()->version().' - '.config('app.url');
 
         return $this->withUserAgent($agent);
     }
