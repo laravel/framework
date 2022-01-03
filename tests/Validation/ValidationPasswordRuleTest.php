@@ -9,7 +9,7 @@ use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class ValidationPasswordRuleTest extends TestCase
 {
@@ -106,6 +106,11 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testUncompromised()
     {
+        $this->app['config']->set('app', [
+            'name' => 'Laravel',
+            'url' => 'https://laravel.com',
+        ]);
+
         $this->fails(Password::min(2)->uncompromised(), [
             '123456',
             'password',
@@ -299,6 +304,8 @@ class ValidationPasswordRuleTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $container = Container::getInstance();
 
         $container->bind('translator', function () {
