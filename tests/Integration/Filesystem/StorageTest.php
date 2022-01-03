@@ -5,7 +5,11 @@ namespace Illuminate\Tests\Integration\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Process\Process;
 
+/**
+ * @requires OS Linux|Darwin
+ */
 class StorageTest extends TestCase
 {
     protected $stubFile;
@@ -48,7 +52,19 @@ class StorageTest extends TestCase
         Storage::disk('public')->assertExists('StarDewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
 
-        File::delete('StarDewTaylor.png');
+        File::delete($this->stubFile);
+
+        $this->assertFalse(File::exists($this->stubFile));
+    }
+
+    public function testItCanDeleteViaFilesystemShouldUpdatesFileExistsFromDifferentProcess()
+    {
+        $this->assertTrue(File::exists($this->stubFile));
+        $this->assertTrue(File::isFile($this->stubFile));
+        Storage::disk('public')->assertExists('StarDewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
+
+        Process::fromShellCommandline("rm {$this->stubFile}");
 
         $this->assertFalse(File::exists($this->stubFile));
     }
@@ -60,7 +76,19 @@ class StorageTest extends TestCase
         Storage::disk('public')->assertExists('StarDewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
 
-        File::delete('StarDewTaylor.png');
+        File::delete($this->stubFile);
+
+        $this->assertFalse(File::isFile($this->stubFile));
+    }
+
+    public function testItCanDeleteViaFilesystemShouldUpdatesIsFileFromDifferentProcess()
+    {
+        $this->assertTrue(File::exists($this->stubFile));
+        $this->assertTrue(File::isFile($this->stubFile));
+        Storage::disk('public')->assertExists('StarDewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
+
+        Process::fromShellCommandline("rm {$this->stubFile}");
 
         $this->assertFalse(File::isFile($this->stubFile));
     }
@@ -72,7 +100,20 @@ class StorageTest extends TestCase
         Storage::disk('public')->assertExists('StarDewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
 
-        File::delete('StarDewTaylor.png');
+        File::delete($this->stubFile);
+
+        Storage::disk('public')->assertMissing('StarDewTaylor.png');
+        $this->assertFalse(Storage::disk('public')->exists('StarDewTaylor.png'));
+    }
+
+    public function testItCanDeleteViaFilesystemShouldUpdatesStorageFromDifferentProcess()
+    {
+        $this->assertTrue(File::exists($this->stubFile));
+        $this->assertTrue(File::isFile($this->stubFile));
+        Storage::disk('public')->assertExists('StarDewTaylor.png');
+        $this->assertTrue(Storage::disk('public')->exists('StarDewTaylor.png'));
+
+        Process::fromShellCommandline("rm {$this->stubFile}");
 
         Storage::disk('public')->assertMissing('StarDewTaylor.png');
         $this->assertFalse(Storage::disk('public')->exists('StarDewTaylor.png'));
