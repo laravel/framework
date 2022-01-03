@@ -47,6 +47,20 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertNull($model->deleted_at);
     }
 
+    public function testRestoreBeforeSaveInNewInstance()
+    {
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
+        $model->makePartial();
+        $model->exists = false;
+        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
+        $model->shouldNotReceive('save');
+        $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
+
+        $model->restore();
+
+        $this->assertFalse($model->exists);
+    }
+
     public function testRestoreCancel()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
@@ -64,6 +78,7 @@ class DatabaseSoftDeletingTraitStub
     public $deleted_at;
     public $updated_at;
     public $timestamps = true;
+    public $exists = true;
 
     public function newQuery()
     {

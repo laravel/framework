@@ -119,9 +119,11 @@ trait SoftDeletes
         // Once we have saved the model, we will fire the "restored" event so this
         // developer will do anything they need to after a restore operation is
         // totally finished. Then we will return the result of the save call.
-        $this->exists = true;
+        $result = null;
+        if ($this->exists) {
+            $result = $this->save();
+        }
 
-        $result = $this->save();
 
         $this->fireModelEvent('restored', false);
 
