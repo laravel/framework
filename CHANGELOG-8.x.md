@@ -8,10 +8,18 @@
 - Added a `mergeIfMissing` method to the Illuminate Http Request class ([#40116](https://github.com/laravel/framework/pull/40116))
 - Added `Illuminate/Support/MultipleInstanceManager` ([40913ac](https://github.com/laravel/framework/commit/40913ac8f8d07cca08c10ea7b4adc6c45b700b10))
 - Added `SimpleMessage::lines()` ([#40147](https://github.com/laravel/framework/pull/40147))
+- Added `Illuminate/Support/Testing/Fakes/BusFake::assertBatchCount()` ([#40217](https://github.com/laravel/framework/pull/40217))
+- Enable only-to-others functionality when using Ably broadcast driver ([#40234](https://github.com/laravel/framework/pull/40234))
+- Added ability to customize json options on JsonResource response ([#40208](https://github.com/laravel/framework/pull/40208))
 
 ### Changed
 - Improve support for custom Doctrine column types ([#40119](https://github.com/laravel/framework/pull/40119))
 - Remove an useless check in Console Application class ([#40145](https://github.com/laravel/framework/pull/40145))
+- Sort collections by key when first element of sort operation is string (even if callable) ([#40212](https://github.com/laravel/framework/pull/40212))
+- Use first host if multiple in `Illuminate/Database/Console/DbCommand::getConnection()` ([#40226](https://github.com/laravel/framework/pull/40226))
+
+### Fixed
+- Clear recorded calls when calling Http::fake() ([#40194](https://github.com/laravel/framework/pull/40194))
 
 
 ## [v8.77.1 (2021-12-21)](https://github.com/laravel/framework/compare/v8.77.0...v8.77.1)
