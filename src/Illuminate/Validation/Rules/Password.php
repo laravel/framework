@@ -386,12 +386,12 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
 
 
     /**
-     * @param  string       $key
-     * @param  string|null  $default
+     * @param  string $key
+     * @param  string|null $default
      *
      * @return bool|string
      */
-    protected function getMessage(string $key, ?string $default = null) {
+    protected function getMessage($key, $default = null) {
 
         $key = "validation.custom.{$key}";
 
