@@ -57,15 +57,16 @@ class StorageTest extends TestCase
         $this->assertFalse(File::exists($this->stubFile));
     }
 
-    public function testItCanDeleteViaFilesystemShouldUpdatesFileExistsFromDifferentProcess()
+    public function testItCanDeleteViaFilesystemButShouldntUpdatesFileExistsFromDifferentProcess()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
         Storage::disk('public')->assertExists('StardewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
 
-        Process::fromShellCommandline("rm {$this->stubFile}");
+        Process::fromShellCommandline("rm {$this->stubFile}")->run();
 
+        clearstatcache(true, $this->stubFile);
         $this->assertFalse(File::exists($this->stubFile));
     }
 
@@ -81,15 +82,16 @@ class StorageTest extends TestCase
         $this->assertFalse(File::isFile($this->stubFile));
     }
 
-    public function testItCanDeleteViaFilesystemShouldUpdatesIsFileFromDifferentProcess()
+    public function testItCanDeleteViaFilesystemButShouldntUpdatesIsFileFromDifferentProcess()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
         Storage::disk('public')->assertExists('StardewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
 
-        Process::fromShellCommandline("rm {$this->stubFile}");
+        Process::fromShellCommandline("rm {$this->stubFile}")->run();
 
+        clearstatcache(true, $this->stubFile);
         $this->assertFalse(File::isFile($this->stubFile));
     }
 
@@ -106,15 +108,16 @@ class StorageTest extends TestCase
         $this->assertFalse(Storage::disk('public')->exists('StardewTaylor.png'));
     }
 
-    public function testItCanDeleteViaFilesystemShouldUpdatesStorageFromDifferentProcess()
+    public function testItCanDeleteViaFilesystemButShouldntUpdatesStorageFromDifferentProcess()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
         Storage::disk('public')->assertExists('StardewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
 
-        Process::fromShellCommandline("rm {$this->stubFile}");
+        Process::fromShellCommandline("rm {$this->stubFile}")->run();
 
+        clearstatcache(true, $this->stubFile);
         Storage::disk('public')->assertMissing('StardewTaylor.png');
         $this->assertFalse(Storage::disk('public')->exists('StardewTaylor.png'));
     }
