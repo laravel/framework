@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
@@ -22,6 +23,13 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * @var \Illuminate\Contracts\Validation\Validator
      */
     protected $validator;
+
+    /**
+     * The Translator implementation.
+     *
+     * @var \Illuminate\Contracts\Translation\Translator
+     */
+    protected $translator;
 
     /**
      * The data under validation.
@@ -109,6 +117,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public function __construct($min)
     {
         $this->min = max((int) $min, 1);
+        $this->translator = Container::getInstance()->make(Translator::class);
     }
 
     /**
@@ -303,19 +312,31 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             $value = (string) $value;
 
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one uppercase and one lowercase letter.');
+                $validator->errors()->add($attribute, $this->getMessage(
+                    'password.mixed_case',
+                    'The :attribute must contain at least one uppercase and one lowercase letter.'
+                )));
             }
 
             if ($this->letters && ! preg_match('/\pL/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one letter.');
+                $validator->errors()->add($attribute, $this->getMessage(
+                    'password.letters',
+                    'The :attribute must contain at least one letter.'
+                ));
             }
 
             if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one symbol.');
+                $validator->errors()->add($attribute, $this->getMessage(
+                    'password.symbols',
+                    'The :attribute must contain at least one symbol.'
+                ));
             }
 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one number.');
+                $validator->errors()->add($attribute, $this->getMessage(
+                    'password.numbers',
+                    'The :attribute must contain at least one number.'
+                ));
             }
         });
 
@@ -327,9 +348,10 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'value' => $value,
             'threshold' => $this->compromisedThreshold,
         ])) {
-            return $this->fail(
+            return $this->fail($this->getMessage(
+                'password.compromised',
                 'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
-            );
+            ));
         }
 
         return true;
@@ -360,5 +382,23 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         $this->messages = array_merge($this->messages, $messages);
 
         return false;
+    }
+
+
+    /**
+     * @param  string       $key
+     * @param  string|null  $default
+     *
+     * @return bool|string
+     */
+    protected function getMessage(string $key, ?string $default = null) {
+
+        $key = "validation.custom.{$key}";
+
+        if (($message = $this->translator->get($key)) !== $key) {
+            return $message;
+        }
+
+        return $default ?? $key;
     }
 }
