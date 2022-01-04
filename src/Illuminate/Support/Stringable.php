@@ -824,7 +824,7 @@ class Stringable implements JsonSerializable
     /**
      * Convert the string into a `HtmlString`.
      *
-     * @return HtmlString
+     * @return \Illuminate\Support\HtmlString
      */
     public function html()
     {
