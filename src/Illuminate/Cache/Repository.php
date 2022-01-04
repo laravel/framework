@@ -224,7 +224,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @return bool
      */
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null): bool
     {
         return $this->put($key, $value, $ttl);
     }
