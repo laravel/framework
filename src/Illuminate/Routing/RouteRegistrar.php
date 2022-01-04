@@ -91,6 +91,16 @@ class RouteRegistrar
     }
 
     /**
+     * Get the router instance.
+     *
+     * @return \Illuminate\Routing\Router
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
      * Set the value for a given attribute.
      *
      * @param  string  $key
