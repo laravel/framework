@@ -58,6 +58,7 @@ class SqlServerGrammar extends Grammar
             $this->columnize($command->columns)
         );
     }
+
     /**
      * Compile a drop database if exists command.
      *
