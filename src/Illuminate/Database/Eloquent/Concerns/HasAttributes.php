@@ -571,8 +571,7 @@ trait HasAttributes
 
         return static::$attributeMutatorCache[get_class($this)][$key] = $returnType &&
                     $returnType instanceof ReflectionNamedType &&
-                    $returnType->getName() === Attribute::class &&
-                    is_callable($this->{$method}()->get);
+                    $returnType->getName() === Attribute::class;
     }
 
     /**
@@ -949,8 +948,7 @@ trait HasAttributes
 
         return static::$setAttributeMutatorCache[$class][$key] = $returnType &&
                     $returnType instanceof ReflectionNamedType &&
-                    $returnType->getName() === Attribute::class &&
-                    is_callable($this->{$method}()->set);
+                    $returnType->getName() === Attribute::class;
     }
 
     /**
