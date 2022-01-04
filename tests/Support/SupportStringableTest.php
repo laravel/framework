@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Stringable;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
 class SupportStringableTest extends TestCase
