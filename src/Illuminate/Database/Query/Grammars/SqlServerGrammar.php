@@ -478,7 +478,7 @@ class SqlServerGrammar extends Grammar
      * @param array $where
      * @return string
      */
-    public function whereFulltext(Builder $query, array $where)
+    public function whereFulltext(Builder $query, $where)
     {
         $columns = $this->columnize($where['columns']);
 
