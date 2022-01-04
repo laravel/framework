@@ -2,10 +2,11 @@
 
 namespace Illuminate\Contracts\Container;
 
+use ArrayAccess;
 use Closure;
 use Psr\Container\ContainerInterface;
 
-interface Container extends ContainerInterface
+interface Container extends ContainerInterface, ArrayAccess
 {
     /**
      * Determine if the given abstract type has been bound.
