@@ -44,6 +44,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a fulltext index key command
+     *
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * */
+    public function compileFulltext(Blueprint $blueprint, Fluent $command)
+    {
+        $columns = implode(', ', $this->getColumns($blueprint));
+        return sprintf(
+            'create fulltext index on %s (%s)',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint))
+        );
+    }
+
+    /**
      * Compile a drop database if exists command.
      *
      * @param  string  $name
