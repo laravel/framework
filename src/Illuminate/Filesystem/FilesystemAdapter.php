@@ -72,6 +72,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function assertExists($path, $content = null)
     {
+        clearstatcache();
+
         $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
@@ -101,6 +103,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function assertMissing($path)
     {
+        clearstatcache();
+
         $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
