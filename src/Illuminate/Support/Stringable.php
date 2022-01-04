@@ -826,7 +826,7 @@ class Stringable implements JsonSerializable
      *
      * @return HtmlString
      */
-    public function htmlString()
+    public function html()
     {
         return new HtmlString($this->value);
     }
