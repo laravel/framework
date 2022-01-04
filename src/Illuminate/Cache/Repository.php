@@ -65,7 +65,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  string  $key
      * @return bool
      */
-    public function has($key)
+    public function has($key): bool
     {
         return ! is_null($this->get($key));
     }
@@ -134,7 +134,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @return iterable
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null): iterable
     {
         $defaults = [];
 
@@ -283,7 +283,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @return bool
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         return $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl);
     }
@@ -448,7 +448,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @return bool
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         return $this->forget($key);
     }
@@ -458,7 +458,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @return bool
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         $result = true;
 
@@ -476,7 +476,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @return bool
      */
-    public function clear()
+    public function clear(): bool
     {
         return $this->store->flush();
     }

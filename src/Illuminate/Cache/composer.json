@@ -21,7 +21,7 @@
         "illuminate/support": "^9.0"
     },
     "provide": {
-        "psr/simple-cache-implementation": "1.0"
+        "psr/simple-cache-implementation": "1.0|2.0|3.0"
     },
     "autoload": {
         "psr-4": {
