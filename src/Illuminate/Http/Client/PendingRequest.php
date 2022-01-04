@@ -661,9 +661,9 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        $options = $this->parseHttpOptions($options);
-
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+
+        $options = $this->parseHttpOptions($options);
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
@@ -691,10 +691,10 @@ class PendingRequest
     }
 
     /**
-     * Parse the HTTP options.
+     * Parse the given HTTP options and set the appropriate additional options.
      *
      * @param  array  $options
-     * @return array|array[]
+     * @return array
      */
     protected function parseHttpOptions(array $options)
     {
