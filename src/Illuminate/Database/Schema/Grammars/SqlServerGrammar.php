@@ -55,10 +55,9 @@ class SqlServerGrammar extends Grammar
         return sprintf(
             'create fulltext index on %s (%s)',
             $this->wrapTable($blueprint),
-            implode(', ', $this->getColumns($blueprint))
+            $this->columnize($command->columns)
         );
     }
-
     /**
      * Compile a drop database if exists command.
      *
