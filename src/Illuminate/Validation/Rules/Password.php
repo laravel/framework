@@ -315,7 +315,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
                 $validator->errors()->add($attribute, $this->getMessage(
                     'password.mixed_case',
                     'The :attribute must contain at least one uppercase and one lowercase letter.'
-                )));
+                ));
             }
 
             if ($this->letters && ! preg_match('/\pL/u', $value)) {
