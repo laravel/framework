@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\HtmlString;
 use PHPUnit\Framework\TestCase;
 
 class SupportStringableTest extends TestCase
@@ -720,6 +721,14 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testHtml()
+    {
+        $this->assertEquals(
+            new HtmlString('<h1>Test String</h1>'),
+            $this->stringable('<h1>Test String</h1>')->html()
+        );
     }
 
     public function testStripTags()
