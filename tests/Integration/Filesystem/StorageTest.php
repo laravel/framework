@@ -57,7 +57,7 @@ class StorageTest extends TestCase
         $this->assertFalse(File::exists($this->stubFile));
     }
 
-    public function testItCanDeleteViaFilesystemButShouldntUpdatesFileExistsFromDifferentProcess()
+    public function testItCanDeleteViaFilesystemRequiresManualClearStatCacheOnFileExistsFromDifferentProcess()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
@@ -82,7 +82,7 @@ class StorageTest extends TestCase
         $this->assertFalse(File::isFile($this->stubFile));
     }
 
-    public function testItCanDeleteViaFilesystemButShouldntUpdatesIsFileFromDifferentProcess()
+    public function testItCanDeleteViaFilesystemRequiresManualClearStatCacheOnIsFileFromDifferentProcess()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
@@ -108,7 +108,7 @@ class StorageTest extends TestCase
         $this->assertFalse(Storage::disk('public')->exists('StardewTaylor.png'));
     }
 
-    public function testItCanDeleteViaFilesystemButShouldntUpdatesStorageFromDifferentProcess()
+    public function testItCanDeleteViaFilesystemRequiresManualClearStatCacheOnStorageFromDifferentProcess()
     {
         $this->assertTrue(File::exists($this->stubFile));
         $this->assertTrue(File::isFile($this->stubFile));
