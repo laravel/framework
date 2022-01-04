@@ -172,7 +172,11 @@ class BoundMethod
 
                 unset($parameters[$className]);
             } else {
-                $dependencies[] = $container->make($className);
+                if ($parameter->isVariadic()) {
+                    $dependencies = array_merge($dependencies, $container->make($className));
+                } else {
+                    $dependencies[] = $container->make($className);
+                }
             }
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
