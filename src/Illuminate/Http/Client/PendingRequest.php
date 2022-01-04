@@ -690,7 +690,7 @@ class PendingRequest
         }, $this->retryDelay ?? 100, $this->retryWhenCallback);
     }
 
-     /**
+    /**
      * Parse the HTTP options.
      *
      * @param  array  $options
