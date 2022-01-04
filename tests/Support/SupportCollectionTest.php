@@ -4022,7 +4022,7 @@ class SupportCollectionTest extends TestCase
                 return $data->sum();
             },
         ]);
-    
+
         $this->assertEquals(15, $result);
     }
 
