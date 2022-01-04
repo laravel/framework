@@ -662,7 +662,7 @@ class PendingRequest
     public function send(string $method, string $url, array $options = [])
     {
         $options = $this->parseHttpOptions($options);
-        
+
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
