@@ -1,6 +1,9 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.77.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.78.0...8.x)
+
+
+## [v8.78.0 (2022-01-04)](https://github.com/laravel/framework/compare/v8.77.1...v8.78.0)
 
 ### Added
 - Added `schedule:clear-mutex` command ([#40135](https://github.com/laravel/framework/pull/40135))
@@ -11,15 +14,18 @@
 - Added `Illuminate/Support/Testing/Fakes/BusFake::assertBatchCount()` ([#40217](https://github.com/laravel/framework/pull/40217))
 - Enable only-to-others functionality when using Ably broadcast driver ([#40234](https://github.com/laravel/framework/pull/40234))
 - Added ability to customize json options on JsonResource response ([#40208](https://github.com/laravel/framework/pull/40208))
+- Added `Illuminate/Support/Stringable::toHtmlString()` ([#40247](https://github.com/laravel/framework/pull/40247))
 
 ### Changed
 - Improve support for custom Doctrine column types ([#40119](https://github.com/laravel/framework/pull/40119))
 - Remove an useless check in Console Application class ([#40145](https://github.com/laravel/framework/pull/40145))
 - Sort collections by key when first element of sort operation is string (even if callable) ([#40212](https://github.com/laravel/framework/pull/40212))
 - Use first host if multiple in `Illuminate/Database/Console/DbCommand::getConnection()` ([#40226](https://github.com/laravel/framework/pull/40226))
+- Improvement in the Reflector class ([#40241](https://github.com/laravel/framework/pull/40241))
 
 ### Fixed
 - Clear recorded calls when calling Http::fake() ([#40194](https://github.com/laravel/framework/pull/40194))
+- Fixed attribute casting ([#40245](https://github.com/laravel/framework/pull/40245), [c0d9735](https://github.com/laravel/framework/commit/c0d97352c46ade8cc254b473580b2655ed474ffc))
 
 
 ## [v8.77.1 (2021-12-21)](https://github.com/laravel/framework/compare/v8.77.0...v8.77.1)
