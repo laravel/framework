@@ -822,6 +822,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert the string into a `HtmlString`.
+     *
+     * @return HtmlString
+     */
+    public function htmlString()
+    {
+        return new HtmlString($this->value);
+    }
+
+    /**
      * Dump the string.
      *
      * @return $this
