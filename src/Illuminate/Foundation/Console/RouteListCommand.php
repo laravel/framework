@@ -333,7 +333,7 @@ class RouteListCommand extends Command
 
             $dots = empty($dots) ? $dots : " $dots";
 
-            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$action.$name.$dots) > ($terminalWidth - 4)) {
+            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$action.$name.$dots) > ($terminalWidth - 6)) {
                 $action = substr($action, 0, $terminalWidth - 7 - mb_strlen($method.$spaces.$uri.$name.$dots)).'…';
             }
 
