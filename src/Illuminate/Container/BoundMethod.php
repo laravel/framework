@@ -173,7 +173,11 @@ class BoundMethod
                 unset($parameters[$className]);
             } else {
                 if ($parameter->isVariadic()) {
-                    $dependencies = array_merge($dependencies, $container->make($className));
+                    $variadicDependencies = $container->make($className);
+
+                    $dependencies = array_merge($dependencies, is_array($variadicDependencies)
+                                ? $variadicDependencies
+                                : [$variadicDependencies]);
                 } else {
                     $dependencies[] = $container->make($className);
                 }
