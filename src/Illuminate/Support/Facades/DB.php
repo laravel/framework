@@ -32,6 +32,7 @@ namespace Illuminate\Support\Facades;
  * @method static void listen(\Closure $callback)
  * @method static void rollBack(int $toLevel = null)
  * @method static void setDefaultConnection(string $name)
+ * @method static void purge(string $connection_name)
  *
  * @see \Illuminate\Database\DatabaseManager
  * @see \Illuminate\Database\Connection
