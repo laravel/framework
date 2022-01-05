@@ -57,7 +57,7 @@ class SesTransport extends Transport
                 )
             );
         } catch (AwsException $e) {
-            throw new Swift_TransportException('Failed to make request to AWS SES API', $e->getCode(), $e);
+            throw new Swift_TransportException('Request to AWS SES API failed.', $e->getCode(), $e);
         }
 
         $messageId = $result->get('MessageId');

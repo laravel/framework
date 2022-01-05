@@ -77,7 +77,7 @@ class MailgunTransport extends Transport
                 $this->payload($message, $to)
             );
         } catch (GuzzleException $e) {
-            throw new Swift_TransportException('Failed to make request to Mailgun API', $e->getCode(), $e);
+            throw new Swift_TransportException('Request to Mailgun API failed.', $e->getCode(), $e);
         }
 
         $messageId = $this->getMessageId($response);
