@@ -296,6 +296,15 @@ class RouteListCommand extends Command
      */
     protected function forCli($routes)
     {
+        $routes = $routes->map(
+            fn ($route) => array_merge($route, [
+                'action' => $this->formatAction($route['action']),
+                'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
+                'name' => $this->output->isVerbose() ? $route['name'] : null,
+                'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
+            ]),
+        );
+
         $maxMethod = mb_strlen($routes->max('method'));
 
         $terminalWidth = $this->getTerminalWidth();
@@ -306,6 +315,7 @@ class RouteListCommand extends Command
                 'domain' => $domain,
                 'method' => $method,
                 'middleware' => $middleware,
+                'name' => $name,
                 'uri' => $uri,
             ] = $route;
 
@@ -315,20 +325,15 @@ class RouteListCommand extends Command
                 )
             )->implode("\n");
 
-            $action = $this->formatAction($action);
-            $method = $method == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $method;
-            $name = $this->output->isVerbose() ? $route['name'] : null;
-            $uri = $domain ? "$domain/$uri" : $uri;
-
             $spaces = str_repeat(' ', max($maxMethod + 6 - mb_strlen($method), 0));
 
             $dots = str_repeat('.', max(
-                $terminalWidth - mb_strlen($method.$uri.$action.$name) - mb_strlen($spaces) - 6 - ($action ? 1 : 0), 0
+                $terminalWidth - mb_strlen($method.$spaces.$uri.$action.$name) - 6 - ($action ? 1 : 0), 0
             ));
 
             $dots = empty($dots) ? $dots : " $dots";
 
-            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$name.$dots.$action) > ($terminalWidth - 4)) {
+            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$action.$name.$dots) > ($terminalWidth - 4)) {
                 $action = substr($action, 0, $terminalWidth - 7 - mb_strlen($method.$spaces.$uri.$name.$dots)).'…';
             }
 
