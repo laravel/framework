@@ -54,7 +54,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertFalse($paginator->hasPages());
         $this->assertFalse($paginator->hasMorePages());
         $this->assertEmpty($paginator->items());
-    }    
+    }
 
     public function testLengthAwarePaginatorisOnFirstAndLastPage()
     {
