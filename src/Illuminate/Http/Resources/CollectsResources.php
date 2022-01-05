@@ -71,9 +71,9 @@ trait CollectsResources
             return 0;
         }
 
-        $class = new ReflectionClass($collects);
-
-        return $class->newInstanceWithoutConstructor()->jsonOptions();
+        return (new ReflectionClass($collects))
+                  ->newInstanceWithoutConstructor()
+                  ->jsonOptions();
     }
 
     /**
