@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Filesystem;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\Process;
@@ -43,8 +42,6 @@ class StorageTest extends TestCase
 
     public function testItCanDeleteViaFilesystemShouldUpdatesStorage()
     {
-        $this->assertTrue(File::exists($this->stubFile));
-        $this->assertTrue(File::isFile($this->stubFile));
         Storage::disk('public')->assertExists('StardewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
 
@@ -56,8 +53,6 @@ class StorageTest extends TestCase
 
     public function testItCanDeleteViaFilesystemRequiresManualClearStatCacheOnStorageFromDifferentProcess()
     {
-        $this->assertTrue(File::exists($this->stubFile));
-        $this->assertTrue(File::isFile($this->stubFile));
         Storage::disk('public')->assertExists('StardewTaylor.png');
         $this->assertTrue(Storage::disk('public')->exists('StardewTaylor.png'));
 
