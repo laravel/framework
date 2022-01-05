@@ -76,4 +76,11 @@ interface UrlGenerator
      * @return $this
      */
     public function setRootControllerNamespace($rootNamespace);
+
+    /**
+     * Get the root controller namespace.
+     *
+     * @return string
+     */
+    public function getRootControllerNamespace();
 }
