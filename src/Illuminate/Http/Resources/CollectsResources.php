@@ -6,6 +6,7 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 trait CollectsResources
 {
@@ -63,7 +64,13 @@ trait CollectsResources
     {
         $collects = $this->collects();
 
-        return $collects ? (new $collects([]))->jsonOptions() : 0;
+        if (! $collects) {
+            return 0;
+        }
+
+        return (new ReflectionClass($collects))
+                  ->newInstanceWithoutConstructor()
+                  ->jsonOptions();
     }
 
     /**
