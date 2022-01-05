@@ -6,6 +6,8 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionException;
 
 trait CollectsResources
 {
@@ -58,12 +60,20 @@ trait CollectsResources
      * Get the JSON serialization options that should be applied to the resource response.
      *
      * @return int
+     *
+     * @throws ReflectionException
      */
     public function jsonOptions()
     {
         $collects = $this->collects();
 
-        return $collects ? (new $collects([]))->jsonOptions() : 0;
+        if (! $collects) {
+            return 0;
+        }
+
+        $class = new ReflectionClass($collects);
+
+        return $class->newInstanceWithoutConstructor()->jsonOptions();
     }
 
     /**
