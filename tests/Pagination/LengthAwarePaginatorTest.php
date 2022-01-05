@@ -61,7 +61,7 @@ class LengthAwarePaginatorTest extends TestCase
         $paginator = new LengthAwarePaginator(['1', '2', '3', '4'], 4, 2, 2);
 
         $this->assertTrue($paginator->onLastPage());
-        $this->assertFalse($paginator->onFirstPage());        
+        $this->assertFalse($paginator->onFirstPage());
 
         $paginator = new LengthAwarePaginator(['1', '2', '3', '4'], 4, 2, 1);
 

@@ -385,7 +385,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function onLastPage()
     {
-        return !$this->hasMorePages();
+        return ! $this->hasMorePages();
     }
 
     /**
