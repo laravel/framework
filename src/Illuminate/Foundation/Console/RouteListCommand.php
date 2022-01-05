@@ -323,13 +323,13 @@ class RouteListCommand extends Command
             $spaces = str_repeat(' ', max($maxMethod + 6 - mb_strlen($method), 0));
 
             $dots = str_repeat('.', max(
-                $terminalWidth - mb_strlen($method.$uri.$action.$name) - mb_strlen($spaces) - 14 - ($action ? 1 : 0), 0
+                $terminalWidth - mb_strlen($method.$uri.$action.$name) - mb_strlen($spaces) - 6 - ($action ? 1 : 0), 0
             ));
 
             $dots = empty($dots) ? $dots : " $dots";
 
-            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$name.$dots.$action) > ($terminalWidth - 14)) {
-                $action = substr($action, 0, $terminalWidth - 15 - mb_strlen($method.$spaces.$uri.$name.$dots)).'…';
+            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$name.$dots.$action) > ($terminalWidth - 4)) {
+                $action = substr($action, 0, $terminalWidth - 7 - mb_strlen($method.$spaces.$uri.$name.$dots)).'…';
             }
 
             $method = Str::of($method)->explode('|')->map(

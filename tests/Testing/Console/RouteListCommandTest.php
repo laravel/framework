@@ -50,10 +50,10 @@ class RouteListCommandTest extends TestCase
         $this->artisan(RouteListCommand::class)
             ->assertSuccessful()
             ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD   closure ....................................... ')
-            ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\…')
-            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Test…')
-            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............... ')
+            ->expectsOutput('  GET|HEAD   closure ............................................... ')
+            ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\FooContr…')
+            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\FooC…')
+            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ....................... ')
             ->expectsOutput('');
     }
 
@@ -74,10 +74,10 @@ class RouteListCommandTest extends TestCase
         $this->artisan(RouteListCommand::class, ['-v' => true])
             ->assertSuccessful()
             ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD   closure ....................................... ')
+            ->expectsOutput('  GET|HEAD   closure ............................................... ')
             ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\FooController')
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\FooController@show')
-            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} user.show ...... ')
+            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} user.show .............. ')
             ->expectsOutput('             ⇂ web')
             ->expectsOutput('');
     }
