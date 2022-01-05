@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Filesystem;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Process\Process;
