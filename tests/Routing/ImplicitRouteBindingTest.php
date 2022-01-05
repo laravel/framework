@@ -12,6 +12,8 @@ class ImplicitRouteBindingTest extends TestCase
 {
     public function test_it_can_resolve_the_implicit_route_bindings_for_the_given_route()
     {
+        $this->expectNotToPerformAssertions();
+
         $action = ['uses' => function (ImplicitRouteBindingUser $user) {
             return $user;
         }];
@@ -24,8 +26,6 @@ class ImplicitRouteBindingTest extends TestCase
         $container = Container::getInstance();
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
-
-        $this->assertTrue(true);
     }
 }
 

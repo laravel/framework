@@ -8,9 +8,6 @@ use Illuminate\Events\CallQueuedListener;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
-/**
- * @group integration
- */
 class QueuedListenersTest extends TestCase
 {
     public function testListenersCanBeQueuedOptionally()

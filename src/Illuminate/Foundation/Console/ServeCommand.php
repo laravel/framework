@@ -54,7 +54,7 @@ class ServeCommand extends Command
                             ? filemtime($environmentFile)
                             : now()->addDays(30)->getTimestamp();
 
-        $process = $this->startProcess();
+        $process = $this->startProcess($hasEnvironment);
 
         while ($process->isRunning()) {
             if ($hasEnvironment) {
@@ -70,7 +70,7 @@ class ServeCommand extends Command
 
                 $process->stop(5);
 
-                $process = $this->startProcess();
+                $process = $this->startProcess($hasEnvironment);
             }
 
             usleep(500 * 1000);
@@ -90,18 +90,23 @@ class ServeCommand extends Command
     /**
      * Start a new server process.
      *
+     * @param  bool  $hasEnvironment
      * @return \Symfony\Component\Process\Process
      */
-    protected function startProcess()
+    protected function startProcess($hasEnvironment)
     {
-        $process = new Process($this->serverCommand(), null, collect($_ENV)->mapWithKeys(function ($value, $key) {
-            if ($this->option('no-reload')) {
+        $process = new Process($this->serverCommand(), null, collect($_ENV)->mapWithKeys(function ($value, $key) use ($hasEnvironment) {
+            if ($this->option('no-reload') || ! $hasEnvironment) {
                 return [$key => $value];
             }
 
-            return in_array($key, ['APP_ENV', 'LARAVEL_SAIL'])
-                    ? [$key => $value]
-                    : [$key => false];
+            return in_array($key, [
+                'APP_ENV',
+                'LARAVEL_SAIL',
+                'PHP_CLI_SERVER_WORKERS',
+                'XDEBUG_CONFIG',
+                'XDEBUG_MODE',
+            ]) ? [$key => $value] : [$key => false];
         })->all());
 
         $process->start(function ($type, $buffer) {
@@ -133,7 +138,9 @@ class ServeCommand extends Command
      */
     protected function host()
     {
-        return $this->input->getOption('host');
+        [$host, ] = $this->getHostAndPort();
+
+        return $host;
     }
 
     /**
@@ -143,9 +150,30 @@ class ServeCommand extends Command
      */
     protected function port()
     {
-        $port = $this->input->getOption('port') ?: 8000;
+        $port = $this->input->getOption('port');
+
+        if (is_null($port)) {
+            [, $port] = $this->getHostAndPort();
+        }
+
+        $port = $port ?: 8000;
 
         return $port + $this->portOffset;
+    }
+
+    /**
+     * Get the host and port from the host option string.
+     *
+     * @return array
+     */
+    protected function getHostAndPort()
+    {
+        $hostParts = explode(':', $this->input->getOption('host'));
+
+        return [
+            $hostParts[0],
+            $hostParts[1] ?? null,
+        ];
     }
 
     /**

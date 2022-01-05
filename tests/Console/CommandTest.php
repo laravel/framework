@@ -23,7 +23,8 @@ class CommandTest extends TestCase
 
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             public function handle()
             {
             }
@@ -53,7 +54,8 @@ class CommandTest extends TestCase
 
     public function testGettingCommandArgumentsAndOptionsByClass()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             public function handle()
             {
             }

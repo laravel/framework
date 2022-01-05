@@ -6,7 +6,6 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Environment;
 use League\CommonMark\Extension\Table\TableExtension;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
@@ -104,15 +103,13 @@ class Markdown
      */
     public static function parse($text)
     {
-        $environment = Environment::createCommonMarkEnvironment();
-
-        $environment->addExtension(new TableExtension);
-
         $converter = new CommonMarkConverter([
             'allow_unsafe_links' => false,
-        ], $environment);
+        ]);
 
-        return new HtmlString($converter->convertToHtml($text));
+        $converter->getEnvironment()->addExtension(new TableExtension());
+
+        return new HtmlString((string) $converter->convertToHtml($text));
     }
 
     /**

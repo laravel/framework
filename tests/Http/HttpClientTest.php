@@ -4,6 +4,9 @@ namespace Illuminate\Tests\Http;
 
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Client\Events\RequestSending;
+use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
@@ -13,6 +16,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -32,6 +36,11 @@ class HttpClientTest extends TestCase
         $this->factory = new Factory;
     }
 
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
     public function testStubbedResponsesAreReturnedAfterFaking()
     {
         $this->factory->fake();
@@ -39,6 +48,28 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com/test-missing-page');
 
         $this->assertTrue($response->ok());
+    }
+
+    public function testUnauthorizedRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->unauthorized());
+    }
+
+    public function testForbiddenRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 403),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->forbidden());
     }
 
     public function testResponseBodyCasting()
@@ -74,6 +105,21 @@ class HttpClientTest extends TestCase
         $this->assertEquals(collect(['foo' => 'bar']), $response->collect('result'));
         $this->assertEquals(collect(['bar']), $response->collect('result.foo'));
         $this->assertEquals(collect(), $response->collect('missing_key'));
+    }
+
+    public function testSendRequestBody()
+    {
+        $body = '{"test":"phpunit"}';
+
+        $fakeRequest = function (Request $request) use ($body) {
+            self::assertSame($body, $request->body());
+
+            return ['my' => 'response'];
+        };
+
+        $this->factory->fake($fakeRequest);
+
+        $this->factory->withBody($body, 'application/json')->send('get', 'http://foo.com/api');
     }
 
     public function testUrlsCanBeStubbedByPath()
@@ -132,6 +178,23 @@ class HttpClientTest extends TestCase
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
         });
+    }
+
+    public function testRecordedCallsAreEmptiedWhenFakeIsCalled()
+    {
+        $this->factory->fake([
+            'http://foo.com/*' => ['page' => 'foo'],
+        ]);
+
+        $this->factory->get('http://foo.com/test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/test';
+        });
+
+        $this->factory->fake();
+
+        $this->factory->assertNothingSent();
     }
 
     public function testSpecificRequestIsNotBeingSent()
@@ -268,6 +331,23 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                 $request->hasHeader('User-Agent', 'Laravel');
+        });
+    }
+
+    public function testItOnlySendsOneUserAgentHeader()
+    {
+        $this->factory->fake();
+
+        $this->factory->withUserAgent('Laravel')
+            ->withUserAgent('FooBar')
+            ->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            $userAgent = $request->header('User-Agent');
+
+            return $request->url() === 'http://foo.com/json' &&
+                count($userAgent) === 1 &&
+                $userAgent[0] === 'FooBar';
         });
     }
 
@@ -901,5 +981,90 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $responses['test200']->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
+    }
+
+    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake();
+
+        $factory->get('https://example.com');
+        $factory->head('https://example.com');
+        $factory->post('https://example.com');
+        $factory->patch('https://example.com');
+        $factory->delete('https://example.com');
+    }
+
+    public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSentAsync()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(5)->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake();
+        $factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('https://example.com'),
+                $pool->head('https://example.com'),
+                $pool->post('https://example.com'),
+                $pool->patch('https://example.com'),
+                $pool->delete('https://example.com'),
+            ];
+        });
+    }
+
+    public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
+    {
+        $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);
+        $stats = $this->factory->get('https://example.com')->handlerStats();
+        $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
+
+        $this->assertIsArray($stats);
+        $this->assertEmpty($stats);
+
+        $this->assertNull($effectiveUri);
+    }
+
+    public function testTransferStatsArePresentWhenFakingTheRequestUsingAPromiseResponse()
+    {
+        $this->factory->fake(['https://example.com' => $this->factory->response()]);
+        $effectiveUri = $this->factory->get('https://example.com')->effectiveUri();
+
+        $this->assertSame('https://example.com', (string) $effectiveUri);
+    }
+
+    public function testClonedClientsWorkSuccessfullyWithTheRequestObject()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake(['example.com' => $factory->response('foo', 200)]);
+
+        $client = $factory->timeout(10);
+        $clonedClient = clone $client;
+
+        $clonedClient->get('https://example.com');
+    }
+
+    public function testRequestIsMacroable()
+    {
+        Request::macro('customMethod', function () {
+            return 'yes!';
+        });
+
+        $this->factory->fake(function (Request $request) {
+            $this->assertSame('yes!', $request->customMethod());
+
+            return $this->factory->response();
+        });
+
+        $this->factory->get('https://example.com');
     }
 }

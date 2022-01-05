@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BadMethodCallException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Schema\Blueprint;
@@ -57,20 +58,35 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
 
+        // Expect one of the following two query sequences to be present...
         $expected = [
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE BINARY, age INTEGER NOT NULL)',
-            'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
-            'DROP TABLE __temp__users',
-            'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
-            'DROP TABLE users',
-            'CREATE TABLE users (age VARCHAR(255) NOT NULL COLLATE BINARY, first_name VARCHAR(255) NOT NULL)',
-            'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
-            'DROP TABLE __temp__users',
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE BINARY, age INTEGER NOT NULL)',
+                'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (age VARCHAR(255) NOT NULL COLLATE BINARY, first_name VARCHAR(255) NOT NULL)',
+                'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
+            [
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (name VARCHAR(255) NOT NULL COLLATE BINARY, age INTEGER NOT NULL)',
+                'INSERT INTO users (name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+                'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
+                'DROP TABLE users',
+                'CREATE TABLE users (first_name VARCHAR(255) NOT NULL, age VARCHAR(255) NOT NULL COLLATE BINARY)',
+                'INSERT INTO users (first_name, age) SELECT name, age FROM __temp__users',
+                'DROP TABLE __temp__users',
+            ],
         ];
 
-        $this->assertEquals($expected, $queries);
+        $this->assertTrue(in_array($queries, $expected));
     }
 
     public function testChangingColumnWithCollationWorks()
@@ -311,6 +327,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresDroppingMultipleColumnsIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
@@ -321,6 +338,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresRenamingMultipleColumnsIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
@@ -331,6 +349,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresRenamingAndDroppingMultipleColumnsIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
@@ -341,6 +360,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("SQLite doesn't support dropping foreign keys (you would need to re-create the table).");
 
         $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {

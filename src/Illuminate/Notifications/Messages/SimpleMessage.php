@@ -158,6 +158,21 @@ class SimpleMessage
     }
 
     /**
+     * Add lines of text to the notification.
+     *
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function lines($lines)
+    {
+        foreach ($lines as $line) {
+            $this->line($line);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a line of text to the notification.
      *
      * @param  mixed  $line
@@ -192,7 +207,7 @@ class SimpleMessage
             return implode(' ', array_map('trim', $line));
         }
 
-        return trim(implode(' ', array_map('trim', preg_split('/\\r\\n|\\r|\\n/', $line))));
+        return trim(implode(' ', array_map('trim', preg_split('/\\r\\n|\\r|\\n/', $line ?? ''))));
     }
 
     /**
@@ -239,7 +254,7 @@ class SimpleMessage
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,
             'actionUrl' => $this->actionUrl,
-            'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $this->actionUrl),
+            'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $this->actionUrl ?? ''),
         ];
     }
 }

@@ -442,7 +442,8 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class {
+        $this->assertEquals(10, optional(new class
+        {
             public function something()
             {
                 return 10;
@@ -520,10 +521,12 @@ class SupportHelpersTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertSame('$10.00', optional(new class {
+        $this->assertSame('$10.00', optional(new class
+        {
             public function present()
             {
-                return new class {
+                return new class
+                {
                     public function something()
                     {
                         return '$10.00';
@@ -550,6 +553,27 @@ class SupportHelpersTest extends TestCase
 
         // Make sure we waited 100ms for the first attempt
         $this->assertEqualsWithDelta(0.1, microtime(true) - $startTime, 0.02);
+    }
+
+    public function testRetryWithPassingSleepCallback()
+    {
+        $startTime = microtime(true);
+
+        $attempts = retry(3, function ($attempts) {
+            if ($attempts > 2) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        }, function ($attempt) {
+            return $attempt * 100;
+        });
+
+        // Make sure we made three attempts
+        $this->assertEquals(3, $attempts);
+
+        // Make sure we waited 300ms for the first two attempts
+        $this->assertEqualsWithDelta(0.3, microtime(true) - $startTime, 0.02);
     }
 
     public function testRetryWithPassingWhenCallback()
@@ -720,7 +744,9 @@ class SupportHelpersTest extends TestCase
         ];
     }
 
-    /** @dataProvider providesPregReplaceArrayData */
+    /**
+     * @dataProvider providesPregReplaceArrayData
+     */
     public function testPregReplaceArray($pattern, $replacements, $subject, $expectedOutput)
     {
         $this->assertSame(

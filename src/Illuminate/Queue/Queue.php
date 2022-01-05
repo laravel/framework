@@ -143,6 +143,7 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'maxExceptions' => $job->maxExceptions ?? null,
+            'failOnTimeout' => $job->failOnTimeout ?? false,
             'backoff' => $this->getJobBackoff($job),
             'timeout' => $job->timeout ?? null,
             'retryUntil' => $this->getJobExpiration($job),
@@ -157,10 +158,10 @@ abstract class Queue
                     : serialize(clone $job);
 
         return array_merge($payload, [
-            'data' => [
+            'data' => array_merge($payload['data'], [
                 'commandName' => get_class($job),
                 'command' => $command,
-            ],
+            ]),
         ]);
     }
 
@@ -188,7 +189,11 @@ abstract class Queue
             return;
         }
 
-        return collect(Arr::wrap($job->backoff ?? $job->backoff()))
+        if (is_null($backoff = $job->backoff ?? $job->backoff())) {
+            return;
+        }
+
+        return collect(Arr::wrap($backoff))
             ->map(function ($backoff) {
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
@@ -244,6 +249,7 @@ abstract class Queue
             'job' => $job,
             'maxTries' => null,
             'maxExceptions' => null,
+            'failOnTimeout' => false,
             'backoff' => null,
             'timeout' => null,
             'data' => $data,

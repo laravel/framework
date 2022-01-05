@@ -59,7 +59,13 @@ class ReportableHandler
      */
     public function handles(Throwable $e)
     {
-        return is_a($e, $this->firstClosureParameterType($this->callback));
+        foreach ($this->firstClosureParameterTypes($this->callback) as $type) {
+            if (is_a($e, $type)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

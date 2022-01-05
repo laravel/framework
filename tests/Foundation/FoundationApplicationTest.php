@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
@@ -45,7 +46,8 @@ class FoundationApplicationTest extends TestCase
     public function testClassesAreBoundWhenServiceProviderIsRegistered()
     {
         $app = new Application;
-        $app->register($provider = new class($app) extends ServiceProvider {
+        $app->register($provider = new class($app) extends ServiceProvider
+        {
             public $bindings = [
                 AbstractClass::class => ConcreteClass::class,
             ];
@@ -62,7 +64,8 @@ class FoundationApplicationTest extends TestCase
     public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
     {
         $app = new Application;
-        $app->register($provider = new class($app) extends ServiceProvider {
+        $app->register($provider = new class($app) extends ServiceProvider
+        {
             public $singletons = [
                 AbstractClass::class => ConcreteClass::class,
             ];
@@ -235,6 +238,19 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($testing->runningUnitTests());
         $this->assertFalse($testing->isLocal());
         $this->assertFalse($testing->isProduction());
+    }
+
+    public function testDebugHelper()
+    {
+        $debugOff = new Application;
+        $debugOff['config'] = new Repository(['app' => ['debug' => false]]);
+
+        $this->assertFalse($debugOff->hasDebugModeEnabled());
+
+        $debugOn = new Application;
+        $debugOn['config'] = new Repository(['app' => ['debug' => true]]);
+
+        $this->assertTrue($debugOn->hasDebugModeEnabled());
     }
 
     public function testMethodAfterLoadingEnvironmentAddsClosure()

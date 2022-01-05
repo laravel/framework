@@ -20,6 +20,7 @@ use Illuminate\Queue\CallQueuedClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
 class BusBatchTest extends TestCase
 {
@@ -83,11 +84,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -98,7 +101,7 @@ class BusBatchTest extends TestCase
                         ->with('test-connection')
                         ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($job, $secondJob) {
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($job, $secondJob) {
             return
                 $args[0] == $job &&
                 $args[1] == $secondJob &&
@@ -133,11 +136,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -169,11 +174,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue, $allowFailures = false);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -208,11 +215,13 @@ class BusBatchTest extends TestCase
 
         $batch = $this->createTestBatch($queue, $allowFailures = true);
 
-        $job = new class {
+        $job = new class
+        {
             use Batchable;
         };
 
-        $secondJob = new class {
+        $secondJob = new class
+        {
             use Batchable;
         };
 
@@ -317,7 +326,7 @@ class BusBatchTest extends TestCase
             ->with('test-connection')
             ->andReturn($connection = m::mock(stdClass::class));
 
-        $connection->shouldReceive('bulk')->once()->with(\Mockery::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
+        $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($chainHeadJob, $secondJob, $thirdJob) {
             return
                 $args[0] == $chainHeadJob
                 && serialize($secondJob) == $args[0]->chained[0]
@@ -377,7 +386,7 @@ class BusBatchTest extends TestCase
                 'failed_jobs' => '',
                 'failed_job_ids' => '[]',
                 'options' => $serialize,
-                'created_at' => null,
+                'created_at' => now()->timestamp,
                 'cancelled_at' => null,
                 'finished_at' => null,
             ]);

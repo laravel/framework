@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Redis;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\RedisManager;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class RedisConnectorTest extends TestCase
@@ -23,8 +22,6 @@ class RedisConnectorTest extends TestCase
         parent::tearDown();
 
         $this->tearDownRedis();
-
-        m::close();
     }
 
     public function testDefaultConfiguration()
@@ -183,5 +180,31 @@ class RedisConnectorTest extends TestCase
         $parameters = $predisClient->getConnection()->getParameters();
         $this->assertEquals($username, $parameters->username);
         $this->assertEquals($password, $parameters->password);
+    }
+
+    public function testPredisConfigurationWithSentinel()
+    {
+        $host = env('REDIS_HOST', '127.0.0.1');
+        $port = env('REDIS_PORT', 6379);
+
+        $predis = new RedisManager(new Application, 'predis', [
+            'cluster' => false,
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => 'mymaster',
+                'parameters' => [
+                    'default' => [
+                        'database' => 5,
+                    ],
+                ],
+            ],
+            'default' => [
+                "tcp://{$host}:{$port}",
+            ],
+        ]);
+
+        $predisClient = $predis->connection()->client();
+        $parameters = $predisClient->getConnection()->getSentinelConnection()->getParameters();
+        $this->assertEquals($host, $parameters->host);
     }
 }

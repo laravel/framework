@@ -238,7 +238,7 @@ class ParallelTesting
     }
 
     /**
-     * Get an parallel testing option.
+     * Get a parallel testing option.
      *
      * @param  string  $option
      * @return mixed
@@ -257,7 +257,7 @@ class ParallelTesting
     /**
      * Gets a unique test token.
      *
-     * @return int|false
+     * @return string|false
      */
     public function token()
     {
@@ -269,7 +269,7 @@ class ParallelTesting
     /**
      * Apply the callback if tests are running in parallel.
      *
-     * @param  callable $callback
+     * @param  callable  $callback
      * @return void
      */
     protected function whenRunningInParallel($callback)

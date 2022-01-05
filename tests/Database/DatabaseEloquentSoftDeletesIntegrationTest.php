@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
@@ -21,8 +23,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ]);
 
         $db->bootEloquent();
@@ -136,11 +138,18 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             return 1;
         });
 
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->paginate(2)->all());
 
         $query = SoftDeletesTestUser::query();
         $this->assertCount(1, $query->simplePaginate(2)->all());
+
+        $query = SoftDeletesTestUser::query();
+        $this->assertCount(1, $query->cursorPaginate(2)->all());
 
         $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->increment('id'));
         $this->assertEquals(0, SoftDeletesTestUser::where('email', 'taylorotwell@gmail.com')->decrement('id'));
@@ -179,6 +188,42 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $this->assertCount(1, $users);
         $this->assertEquals(1, $users->first()->id);
+    }
+
+    public function testForceDeleteUpdateExistsProperty()
+    {
+        $this->createUsers();
+        $user = SoftDeletesTestUser::find(2);
+
+        $this->assertTrue($user->exists);
+
+        $user->forceDelete();
+
+        $this->assertFalse($user->exists);
+    }
+
+    public function testForceDeleteDoesntUpdateExistsPropertyIfFailed()
+    {
+        $user = new class() extends SoftDeletesTestUser
+        {
+            public $exists = true;
+
+            public function newModelQuery()
+            {
+                return Mockery::spy(parent::newModelQuery(), function (Mockery\MockInterface $mock) {
+                    $mock->shouldReceive('forceDelete')->andThrow(new \Exception());
+                });
+            }
+        };
+
+        $this->assertTrue($user->exists);
+
+        try {
+            $user->forceDelete();
+        } catch (\Exception $exception) {
+        }
+
+        $this->assertTrue($user->exists);
     }
 
     public function testRestoreRestoresRecords()

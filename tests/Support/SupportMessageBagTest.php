@@ -4,16 +4,10 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class SupportMessageBagTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testUniqueness()
     {
         $container = new MessageBag;

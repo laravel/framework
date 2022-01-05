@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
+use Exception;
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\MultipleItemsFoundException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -466,6 +469,25 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertEnumerates(5, function ($collection) {
             $collection->has(4);
         });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->has('non-existent');
+        });
+    }
+
+    public function testHasAnyIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->hasAny(4);
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasAny([1, 4]);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->hasAny(['non', 'existent']);
+        });
     }
 
     public function testImplodeEnumeratesOnce()
@@ -796,12 +818,37 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
-    public function testReduceEnumeratesOnce()
+    public function testReduceIsLazy()
     {
+        $this->assertEnumerates(1, function ($collection) {
+            $this->rescue(function () use ($collection) {
+                $collection->reduce(function ($total, $value) {
+                    throw new Exception('Short-circuit');
+                }, 0);
+            });
+        });
+
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->reduce(function ($total, $value) {
                 return $total + $value;
             }, 0);
+        });
+    }
+
+    public function testReduceSpreadIsLazy()
+    {
+        $this->assertEnumerates(1, function ($collection) {
+            $this->rescue(function () use ($collection) {
+                $collection->reduceSpread(function ($one, $two, $value) {
+                    throw new Exception('Short-circuit');
+                }, 0, 0);
+            });
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->reduceSpread(function ($total, $max, $value) {
+                return [$total + $value, max($max, $value)];
+            }, 0, 0);
         });
     }
 
@@ -896,6 +943,29 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testSlidingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->sliding();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->sliding()->take(1)->all();
+        });
+
+        $this->assertEnumerates(3, function ($collection) {
+            $collection->sliding()->take(2)->all();
+        });
+
+        $this->assertEnumerates(13, function ($collection) {
+            $collection->sliding(3, 5)->take(3)->all();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sliding()->all();
+        });
+    }
+
     public function testSkipIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -962,6 +1032,35 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testFindFirstOrFailIsLazy()
+    {
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->firstOrFail();
+        });
+
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->firstOrFail(function ($item) {
+                return $item === 1;
+            });
+        });
+
+        $this->assertEnumerates(100, function ($collection) {
+            try {
+                $collection->firstOrFail(function ($item) {
+                    return $item === 101;
+                });
+            } catch (ItemNotFoundException $e) {
+                //
+            }
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->firstOrFail(function ($item) {
+                return $item % 2 === 0;
+            });
+        });
+    }
+
     public function testSomeIsLazy()
     {
         $this->assertEnumerates(5, function ($collection) {
@@ -974,6 +1073,33 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             $collection->some(function ($value) {
                 return false;
             });
+        });
+    }
+
+    public function testSoleIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            try {
+                $collection->sole();
+            } catch (MultipleItemsFoundException $e) {
+                //
+            }
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->sole(function ($item) {
+                return $item === 1;
+            });
+        });
+
+        $this->assertEnumerates(4, function ($collection) {
+            try {
+                $collection->sole(function ($item) {
+                    return $item % 2 === 0;
+                });
+            } catch (MultipleItemsFoundException $e) {
+                //
+            }
         });
     }
 
@@ -1472,5 +1598,14 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     protected function make($source)
     {
         return new LazyCollection($source);
+    }
+
+    protected function rescue($callback)
+    {
+        try {
+            $callback();
+        } catch (Exception $e) {
+            // Silence is golden
+        }
     }
 }

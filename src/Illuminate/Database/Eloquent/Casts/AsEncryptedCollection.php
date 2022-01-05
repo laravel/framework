@@ -17,15 +17,24 @@ class AsEncryptedCollection implements Castable
      */
     public static function castUsing(array $arguments)
     {
-        return new class implements CastsAttributes {
+        return new class implements CastsAttributes
+        {
             public function get($model, $key, $value, $attributes)
             {
-                return new Collection(json_decode(Crypt::decryptString($attributes[$key]), true));
+                if (isset($attributes[$key])) {
+                    return new Collection(json_decode(Crypt::decryptString($attributes[$key]), true));
+                }
+
+                return null;
             }
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => Crypt::encryptString(json_encode($value))];
+                if (! is_null($value)) {
+                    return [$key => Crypt::encryptString(json_encode($value))];
+                }
+
+                return null;
             }
         };
     }

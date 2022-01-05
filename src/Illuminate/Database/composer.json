@@ -22,7 +22,7 @@
         "illuminate/contracts": "^8.0",
         "illuminate/macroable": "^8.0",
         "illuminate/support": "^8.0",
-        "symfony/console": "^5.1.4"
+        "symfony/console": "^5.4"
     },
     "autoload": {
         "psr-4": {
@@ -35,13 +35,13 @@
         }
     },
     "suggest": {
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6|^3.0).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3|^3.1.4).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",
         "illuminate/console": "Required to use the database commands (^8.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^8.0).",
         "illuminate/filesystem": "Required to use the migrations (^8.0).",
         "illuminate/pagination": "Required to paginate the result set (^8.0).",
-        "symfony/finder": "Required to use Eloquent model factories (^5.1.4)."
+        "symfony/finder": "Required to use Eloquent model factories (^5.4)."
     },
     "config": {
         "sort-packages": true

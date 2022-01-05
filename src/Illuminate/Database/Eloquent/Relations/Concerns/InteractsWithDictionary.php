@@ -11,6 +11,8 @@ trait InteractsWithDictionary
      *
      * @param  mixed  $attribute
      * @return mixed
+     *
+     * @throws \Doctrine\Instantiator\Exception\InvalidArgumentException
      */
     protected function getDictionaryKey($attribute)
     {

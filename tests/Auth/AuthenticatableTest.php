@@ -23,7 +23,8 @@ class AuthenticatableTest extends TestCase
 
     public function testItReturnsNullWhenRememberTokenNameWasSetToEmpty()
     {
-        $user = new class extends User {
+        $user = new class extends User
+        {
             public function getRememberTokenName()
             {
                 return '';

@@ -30,6 +30,7 @@ class HttpJsonResponseTest extends TestCase
             'JsonSerializable data' => [new JsonResponseTestJsonSerializeObject],
             'Arrayable data' => [new JsonResponseTestArrayableObject],
             'Array data' => [['foo' => 'bar']],
+            'stdClass data' => [(object) ['foo' => 'bar']],
         ];
     }
 
@@ -104,6 +105,14 @@ class HttpJsonResponseTest extends TestCase
             [$nan],
         ];
     }
+
+    public function testFromJsonString()
+    {
+        $json_string = '{"foo":"bar"}';
+        $response = JsonResponse::fromJsonString($json_string);
+
+        $this->assertSame('bar', $response->getData()->foo);
+    }
 }
 
 class JsonResponseTestJsonableObject implements Jsonable
@@ -116,7 +125,7 @@ class JsonResponseTestJsonableObject implements Jsonable
 
 class JsonResponseTestJsonSerializeObject implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return ['foo' => 'bar'];
     }

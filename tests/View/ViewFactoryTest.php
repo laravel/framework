@@ -355,7 +355,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent('component', ['name' => 'Taylor']);
         $factory->slot('title');
-        $factory->slot('website', 'laravel.com');
+        $factory->slot('website', 'laravel.com', []);
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
@@ -371,7 +371,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent($factory->make('component'), ['name' => 'Taylor']);
         $factory->slot('title');
-        $factory->slot('website', 'laravel.com');
+        $factory->slot('website', 'laravel.com', []);
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
@@ -392,7 +392,7 @@ class ViewFactoryTest extends TestCase
             return $factory->make('component');
         }, ['name' => 'Taylor']);
         $factory->slot('title');
-        $factory->slot('website', 'laravel.com');
+        $factory->slot('website', 'laravel.com', []);
         echo 'title<hr>';
         $factory->endSlot();
         echo 'component';
@@ -663,7 +663,8 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
 
-        $data = (new class {
+        $data = (new class
+        {
             public function generate()
             {
                 for ($count = 0; $count < 3; $count++) {

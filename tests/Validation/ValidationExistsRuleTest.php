@@ -43,6 +43,10 @@ class ValidationExistsRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertSame('exists:users,NULL,foo,"bar"', (string) $rule);
 
+        $rule = new Exists(UserWithPrefixedTable::class);
+        $rule->where('foo', 'bar');
+        $this->assertSame('exists:'.UserWithPrefixedTable::class.',NULL,foo,"bar"', (string) $rule);
+
         $rule = new Exists('table', 'column');
         $rule->where('foo', 'bar');
         $this->assertSame('exists:table,column,foo,"bar"', (string) $rule);
@@ -116,6 +120,35 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testItChoosesValidRecordsUsingConditionalModifiers()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->when(true, function ($rule) {
+            $rule->whereNotIn('type', ['foo', 'bar']);
+        });
+        $rule->unless(true, function ($rule) {
+            $rule->whereNotIn('type', ['baz', 'other']);
+        });
+
+        User::create(['id' => '1', 'type' => 'foo']);
+        User::create(['id' => '2', 'type' => 'bar']);
+        User::create(['id' => '3', 'type' => 'baz']);
+        User::create(['id' => '4', 'type' => 'other']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertFalse($v->passes());
+        $v->setData(['id' => 2]);
+        $this->assertFalse($v->passes());
+        $v->setData(['id' => 3]);
+        $this->assertTrue($v->passes());
+        $v->setData(['id' => 4]);
+        $this->assertTrue($v->passes());
+    }
+
     public function testItChoosesValidRecordsUsingWhereNotInAndWhereNotInRulesTogether()
     {
         $rule = new Exists('users', 'id');
@@ -138,6 +171,17 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertTrue($v->passes());
         $v->setData(['id' => 4]);
         $this->assertFalse($v->passes());
+    }
+
+    public function testItIgnoresSoftDeletes()
+    {
+        $rule = new Exists('table');
+        $rule->withoutTrashed();
+        $this->assertSame('exists:table,NULL,deleted_at,"NULL"', (string) $rule);
+
+        $rule = new Exists('table');
+        $rule->withoutTrashed('softdeleted_at');
+        $this->assertSame('exists:table,NULL,softdeleted_at,"NULL"', (string) $rule);
     }
 
     protected function createSchema()
@@ -202,6 +246,13 @@ class ValidationExistsRuleTest extends TestCase
 class User extends Eloquent
 {
     protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+}
+
+class UserWithPrefixedTable extends Eloquent
+{
+    protected $table = 'public.users';
     protected $guarded = [];
     public $timestamps = false;
 }

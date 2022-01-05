@@ -110,7 +110,8 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $result2 = m::mock(stdClass::class);
         $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
         $result3 = m::mock(stdClass::class);
-        $result3->shouldReceive('getAttribute')->with('id')->andReturn(new class {
+        $result3->shouldReceive('getAttribute')->with('id')->andReturn(new class
+        {
             public function __toString()
             {
                 return '3';
@@ -121,7 +122,8 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $model2 = new EloquentBelongsToModelStub;
         $model2->foreign_key = 2;
         $model3 = new EloquentBelongsToModelStub;
-        $model3->foreign_key = new class {
+        $model3->foreign_key = new class
+        {
             public function __toString()
             {
                 return '3';

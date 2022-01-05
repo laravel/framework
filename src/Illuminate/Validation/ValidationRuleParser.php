@@ -214,7 +214,7 @@ class ValidationRuleParser
      */
     protected static function parseArrayRule(array $rule)
     {
-        return [Str::studly(trim(Arr::get($rule, 0))), array_slice($rule, 1)];
+        return [Str::studly(trim(Arr::get($rule, 0, ''))), array_slice($rule, 1)];
     }
 
     /**
@@ -273,5 +273,36 @@ class ValidationRuleParser
             default:
                 return $rule;
         }
+    }
+
+    /**
+     * Expand and conditional rules in the given array of rules.
+     *
+     * @param  array  $rules
+     * @param  array  $data
+     * @return array
+     */
+    public static function filterConditionalRules($rules, array $data = [])
+    {
+        return collect($rules)->mapWithKeys(function ($attributeRules, $attribute) use ($data) {
+            if (! is_array($attributeRules) &&
+                ! $attributeRules instanceof ConditionalRules) {
+                return [$attribute => $attributeRules];
+            }
+
+            if ($attributeRules instanceof ConditionalRules) {
+                return [$attribute => $attributeRules->passes($data)
+                                ? array_filter($attributeRules->rules())
+                                : array_filter($attributeRules->defaultRules()), ];
+            }
+
+            return [$attribute => collect($attributeRules)->map(function ($rule) use ($data) {
+                if (! $rule instanceof ConditionalRules) {
+                    return [$rule];
+                }
+
+                return $rule->passes($data) ? $rule->rules() : $rule->defaultRules();
+            })->filter()->flatten(1)->values()->all()];
+        })->all();
     }
 }
