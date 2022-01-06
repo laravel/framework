@@ -94,7 +94,7 @@ class PostgresGrammar extends Grammar
      */
     public function whereFullText(Builder $query, $where)
     {
-        $language = Str::slug($where['options']['language'] ?? 'english');
+        $language = $where['options']['language'] ?? 'english';
 
         if (! in_array($language, $this->validFullTextLanguages())) {
             $language = 'english';

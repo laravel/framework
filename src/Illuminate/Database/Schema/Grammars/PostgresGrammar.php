@@ -390,7 +390,7 @@ class PostgresGrammar extends Grammar
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
-    public function compileDropFulltext(Blueprint $blueprint, Fluent $command)
+    public function compileDropFullText(Blueprint $blueprint, Fluent $command)
     {
         return $this->compileDropIndex($blueprint, $command);
     }

@@ -248,7 +248,7 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
-    public function compileFulltext(Blueprint $blueprint, Fluent $command)
+    public function compileFullText(Blueprint $blueprint, Fluent $command)
     {
         return $this->compileKey($blueprint, $command, 'fulltext');
     }
@@ -369,7 +369,7 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
-    public function compileDropFulltext(Blueprint $blueprint, Fluent $command)
+    public function compileDropFullText(Blueprint $blueprint, Fluent $command)
     {
         return $this->compileDropIndex($blueprint, $command);
     }
