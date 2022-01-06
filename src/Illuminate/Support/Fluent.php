@@ -10,6 +10,9 @@ use JsonSerializable;
 /**
  * @template TKey of array-key
  * @template TValue
+ *
+ * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
+ * @implements \ArrayAccess<TKey, TValue>
  */
 class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {
@@ -23,7 +26,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     /**
      * Create a new fluent instance.
      *
-     * @param  array<TKey, TValue>|iterable<TKey, TValue>|object  $attributes
+     * @param  iterable<TKey, TValue>  $attributes
      * @return void
      */
     public function __construct($attributes = [])
