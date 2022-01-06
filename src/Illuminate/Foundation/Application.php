@@ -412,19 +412,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the language files.
      *
+     * @param  string  $path
      * @return string
      */
-    public function langPath()
+    public function langPath($path = '')
     {
         if ($this->langPath) {
-            return $this->langPath;
+            return $this->langPath.($path ? DIRECTORY_SEPARATOR.$path : '');
         }
 
-        if (is_dir($path = $this->resourcePath().DIRECTORY_SEPARATOR.'lang')) {
-            return $path;
+        if (is_dir($directory = $this->resourcePath().DIRECTORY_SEPARATOR.'lang')) {
+            return $directory.($path ? DIRECTORY_SEPARATOR.$path : '');
         }
 
-        return $this->basePath().DIRECTORY_SEPARATOR.'lang';
+        return $this->basePath().DIRECTORY_SEPARATOR.'lang'.($path ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
