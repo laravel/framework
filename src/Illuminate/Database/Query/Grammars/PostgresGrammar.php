@@ -98,7 +98,7 @@ class PostgresGrammar extends Grammar
 
         if (! in_array($language, $this->validFullTextLanguages())) {
             $language = 'english';
-        };
+        }
 
         $columns = collect($where['columns'])->map(function ($column) use ($language) {
             return "to_tsvector('{$language}', {$this->wrap($column)})";
