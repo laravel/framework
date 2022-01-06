@@ -481,13 +481,13 @@ class SqlServerGrammar extends Grammar
     public function whereFulltext(Builder $query, $where)
     {
         $columns = $this->columnize($where['columns']);
-        $value = $this->parameter($where('value'));
+        $value = $this->parameter($where['value']);
 
         if ($mode = $where['options']['mode'] ?? [] === 'freetext') {
-            return "FREETEXT($columns, $value)";
+            return "freetext($columns, $value)";
         }
 
-        return "CONTAINS($columns, $value)";
+        return "contains($columns, $value)";
     }
 
     /**
