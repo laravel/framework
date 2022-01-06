@@ -142,7 +142,7 @@ class Reflector
     }
 
     /**
-     * Determine if the parameter's type is a Backed Enum.
+     * Determine if the parameter's type is a Backed Enum with a string backing type.
      *
      * @param  \ReflectionParameter  $parameter
      * @return bool
