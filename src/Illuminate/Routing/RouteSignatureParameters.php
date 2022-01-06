@@ -16,7 +16,7 @@ class RouteSignatureParameters
      * @param  array  $conditions
      * @return array
      */
-    public static function fromAction(array $action, $conditions = []])
+    public static function fromAction(array $action, $conditions = [])
     {
         $callback = RouteAction::containsSerializedClosure($action)
                         ? unserialize($action['uses'])->getClosure()

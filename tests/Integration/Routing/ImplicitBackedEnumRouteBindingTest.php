@@ -5,10 +5,14 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
+if (PHP_VERSION_ID >= 80100) {
+    include 'Enums.php';
+}
+
 /**
  * @requires PHP 8.1
  */
-class ImplicitEnumRouteBindingTest extends TestCase
+class ImplicitBackedEnumRouteBindingTest extends TestCase
 {
     public function testWithRouteCachingEnabled()
     {
@@ -49,10 +53,4 @@ PHP);
         $response = $this->post('/categories/cars');
         $response->assertNotFound(404);
     }
-}
-
-enum CategoryBackedEnum: string
-{
-    case People = 'people';
-    case Fruits = 'fruits';
 }

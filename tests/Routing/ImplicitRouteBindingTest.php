@@ -9,8 +9,15 @@ use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 
+if (PHP_VERSION_ID >= 80100) {
+    include 'Enums.php';
+}
+
 class ImplicitRouteBindingTest extends TestCase
 {
+    /**
+     * @requires PHP 8.1
+     */
     public function test_it_can_resolve_the_implicit_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryBackedEnum $category) {
@@ -29,6 +36,9 @@ class ImplicitRouteBindingTest extends TestCase
         $this->assertSame('fruits', $route->parameter('category')->value);
     }
 
+    /**
+     * @requires PHP 8.1
+     */
     public function test_it_does_not_resolve_implicit_non_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryEnum $category) {
@@ -48,6 +58,9 @@ class ImplicitRouteBindingTest extends TestCase
         $this->assertSame('fruits', $route->parameter('category'));
     }
 
+    /**
+     * @requires PHP 8.1
+     */
     public function test_implicit_backed_enum_internal_exception()
     {
         $action = ['uses' => function (CategoryBackedEnum $category) {
@@ -93,16 +106,4 @@ class ImplicitRouteBindingTest extends TestCase
 class ImplicitRouteBindingUser extends Model
 {
     //
-}
-
-enum CategoryEnum
-{
-    case People;
-    case Fruits;
-}
-
-enum CategoryBackedEnum: string
-{
-    case People = 'people';
-    case Fruits = 'fruits';
 }
