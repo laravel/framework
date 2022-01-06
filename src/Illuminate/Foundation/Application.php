@@ -313,13 +313,20 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
-        $this->instance('path.lang', $this->langPath());
         $this->instance('path.config', $this->configPath());
         $this->instance('path.public', $this->publicPath());
         $this->instance('path.storage', $this->storagePath());
         $this->instance('path.database', $this->databasePath());
         $this->instance('path.resources', $this->resourcePath());
         $this->instance('path.bootstrap', $this->bootstrapPath());
+
+        $this->useLangPath(value(function () {
+            if (is_dir($directory = $this->resourcePath('lang')) {
+                return $directory;
+            }
+
+            return $this->basePath('lang');
+        });
     }
 
     /**
@@ -417,15 +424,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function langPath($path = '')
     {
-        if ($this->langPath) {
-            return $this->langPath.($path ? DIRECTORY_SEPARATOR.$path : '');
-        }
-
-        if (is_dir($directory = $this->resourcePath().DIRECTORY_SEPARATOR.'lang')) {
-            return $directory.($path ? DIRECTORY_SEPARATOR.$path : '');
-        }
-
-        return $this->basePath().DIRECTORY_SEPARATOR.'lang'.($path ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->langPath.($path ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
