@@ -483,6 +483,10 @@ class SqlServerGrammar extends Grammar
         $columns = $this->columnize($where['columns']);
         $value = $this->parameter($where('value'));
 
+        if ($mode = $where['options']['mode'] ?? [] === 'freetext') {
+            return "FREETEXT($columns, $value)";
+        }
+
         return "CONTAINS($columns, $value)";
     }
 
