@@ -43,13 +43,15 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($array));
     }
 
-    public function testContainsWithSingleDimensionArray() {
+    public function testContainsWithSingleDimensionArray()
+    {
         $data = [1,2,3,4,5];
 
         $this->assertTrue(Arr::contains($data, random_int(1, 5)));
     }
 
-    public function testContainsWithMultiDimensionArray() {
+    public function testContainsWithMultiDimensionArray()
+    {
         $data = [['foo', 'bar'], ['baz', 'foo']];
 
         $this->assertTrue(Arr::contains($data, 'bar'));

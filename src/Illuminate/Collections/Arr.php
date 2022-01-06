@@ -62,7 +62,7 @@ class Arr
     }
 
     /**
-     * Check if given needle is present in Array
+     * Check if given needle is present in Array.
      *
      * @param $array
      * @param $needle
