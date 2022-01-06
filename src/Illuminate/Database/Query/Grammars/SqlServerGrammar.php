@@ -481,8 +481,6 @@ class SqlServerGrammar extends Grammar
     public function whereFulltext(Builder $query, $where)
     {
         $columns = $this->columnize($where['columns']);
-
-        $query->addBinding($where['value']);
         $value = $this->parameter($where('value'));
 
         return "CONTAINS($columns, $value)";
