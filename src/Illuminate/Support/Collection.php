@@ -391,7 +391,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Remove an item from the collection by key.
      *
-     * @param  string|array  $keys
+     * @param  string|int|array  $keys
      * @return $this
      */
     public function forget($keys)
@@ -1381,7 +1381,7 @@ class Collection implements ArrayAccess, Enumerable
     /**
      * Unset the item at a given offset.
      *
-     * @param  string  $key
+     * @param  string|int  $key
      * @return void
      */
     public function offsetUnset($key)
