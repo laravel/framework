@@ -14,8 +14,8 @@ use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter as FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
-use League\Flysystem\PHPSecLibV2\SftpAdapter;
-use League\Flysystem\PHPSecLibV2\SftpConnectionProvider;
+use League\Flysystem\PHPSecLibV3\SftpAdapter;
+use League\Flysystem\PHPSecLibV3\SftpConnectionProvider;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 
