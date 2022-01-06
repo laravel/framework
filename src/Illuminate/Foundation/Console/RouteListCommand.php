@@ -300,7 +300,7 @@ class RouteListCommand extends Command
             fn ($route) => array_merge($route, [
                 'action' => $this->formatAction($route['action']),
                 'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
-                'name' => $this->output->isVerbose() ? $route['name'] : null,
+                'name' => $route['name'] && $this->output->isVerbose() ? (' '.$route['name']) : null,
                 'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
             ]),
         );
@@ -346,7 +346,7 @@ class RouteListCommand extends Command
                 $method,
                 $spaces,
                 preg_replace('#({[^}]+})#', '<fg=yellow>$1</>', $uri),
-                $name ? " $name" : '',
+                $name,
                 $dots,
                 str_replace('   ', ' › ', $action),
             ), $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null];
