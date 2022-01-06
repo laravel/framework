@@ -71,15 +71,34 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a date based where clause.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function dateBasedWhere($type, Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+    }
+
+    /**
      * Compile a "where fulltext" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
-    public function whereFulltext(Builder $query, $where)
+    public function whereFullText(Builder $query, $where)
     {
-        $language = $where['options']['language'] ?? 'english';
+        $language = Str::slug($where['options']['language'] ?? 'english');
+
+        if (! in_array($language, $this->validFullTextLanguages())) {
+            $language = 'english';
+        };
 
         $columns = collect($where['columns'])->map(function ($column) use ($language) {
             return "to_tsvector('{$language}', {$this->wrap($column)})";
@@ -99,18 +118,36 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a date based where clause.
+     * Get an array of valid full text languages.
      *
-     * @param  string  $type
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
+     * @return array
      */
-    protected function dateBasedWhere($type, Builder $query, $where)
+    protected function validFullTextLanguages()
     {
-        $value = $this->parameter($where['value']);
-
-        return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+        return [
+            'simple',
+            'arabic',
+            'danish',
+            'dutch',
+            'english',
+            'finnish',
+            'french',
+            'german',
+            'hungarian',
+            'indonesian',
+            'irish',
+            'italian',
+            'lithuanian',
+            'nepali',
+            'norwegian',
+            'portuguese',
+            'romanian',
+            'russian',
+            'spanish',
+            'swedish',
+            'tamil',
+            'turkish',
+        ];
     }
 
     /**

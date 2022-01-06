@@ -1829,7 +1829,7 @@ class Builder
      * @param  string  $boolean
      * @return $this
      */
-    public function whereFulltext($columns, $value, array $options = [], $boolean = 'and')
+    public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
     {
         $type = 'Fulltext';
 
@@ -1849,7 +1849,7 @@ class Builder
      * @param  string  $value
      * @return $this
      */
-    public function orWhereFulltext($columns, $value, array $options = [])
+    public function orWhereFullText($columns, $value, array $options = [])
     {
         return $this->whereFulltext($columns, $value, $options, 'or');
     }

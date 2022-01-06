@@ -57,7 +57,7 @@ class MySqlGrammar extends Grammar
      * @param  array  $where
      * @return string
      */
-    public function whereFulltext(Builder $query, $where)
+    public function whereFullText(Builder $query, $where)
     {
         $columns = $this->columnize($where['columns']);
 
