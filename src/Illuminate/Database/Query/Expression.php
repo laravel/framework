@@ -2,7 +2,10 @@
 
 namespace Illuminate\Database\Query;
 
-class Expression
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
+use Illuminate\Database\Grammar;
+
+class Expression implements ExpressionContract
 {
     /**
      * The value of the expression.
@@ -25,20 +28,11 @@ class Expression
     /**
      * Get the value of the expression.
      *
+     * @param  \Illuminate\Database\Grammar  $grammar
      * @return mixed
      */
-    public function getValue()
+    public function getValue(Grammar $grammar)
     {
         return $this->value;
-    }
-
-    /**
-     * Get the value of the expression.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->getValue();
     }
 }

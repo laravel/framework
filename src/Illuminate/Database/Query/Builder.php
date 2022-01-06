@@ -6,6 +6,7 @@ use BackedEnum;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -632,7 +633,8 @@ class Builder implements BuilderContract
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
-        if (Str::contains($column, '->') && is_bool($value)) {
+        $columnstr = ($column instanceof ExpressionContract) ? $this->getGrammar()->getValue($column) : $column;
+        if (Str::contains($columnstr, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
 
             if (is_string($column)) {
@@ -647,7 +649,7 @@ class Builder implements BuilderContract
             'type', 'column', 'operator', 'value', 'boolean'
         );
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($this->flattenValue($value), 'where');
         }
 
@@ -1077,7 +1079,7 @@ class Builder implements BuilderContract
             $value = $value->format('d');
         }
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $value = str_pad($value, 2, '0', STR_PAD_LEFT);
         }
 
@@ -1111,7 +1113,7 @@ class Builder implements BuilderContract
             $value = $value->format('m');
         }
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $value = str_pad($value, 2, '0', STR_PAD_LEFT);
         }
 
@@ -1174,7 +1176,7 @@ class Builder implements BuilderContract
     {
         $this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($value, 'where');
         }
 
@@ -1337,7 +1339,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
         }
 
@@ -1381,7 +1383,7 @@ class Builder implements BuilderContract
 
         $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding((int) $this->flattenValue($value));
         }
 
@@ -1512,7 +1514,7 @@ class Builder implements BuilderContract
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (! $value instanceof Expression) {
+        if (! $value instanceof ExpressionContract) {
             $this->addBinding($this->flattenValue($value), 'having');
         }
 
@@ -2861,7 +2863,7 @@ class Builder implements BuilderContract
     {
         return collect($bindings)
                     ->reject(function ($binding) {
-                        return $binding instanceof Expression;
+                        return $binding instanceof ExpressionContract;
                     })
                     ->map([$this, 'castBinding'])
                     ->values()

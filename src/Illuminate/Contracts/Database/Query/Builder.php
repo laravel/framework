@@ -390,7 +390,7 @@ interface Builder
     /**
      * Add a where between statement to the query.
      *
-     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
@@ -819,7 +819,7 @@ interface Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @param  string  $direction
      * @return static
      */
@@ -828,7 +828,7 @@ interface Builder
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @return static
      */
     public function orderByDesc($column);
@@ -836,7 +836,7 @@ interface Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @return static
      */
     public function latest($column = 'created_at');
@@ -844,7 +844,7 @@ interface Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|\Illuminate\Contracts\Database\Query\Builder|string  $column
      * @return static
      */
     public function oldest($column = 'created_at');
@@ -986,7 +986,7 @@ interface Builder
      * Create a raw database expression.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Expression
+     * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value);
 
