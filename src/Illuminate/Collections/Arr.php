@@ -62,6 +62,18 @@ class Arr
     }
 
     /**
+     * Check if given needle is present in Array
+     *
+     * @param $array
+     * @param $needle
+     * @return bool
+     */
+    public static function contains($array, $needle)
+    {
+        return in_array($needle, $array instanceof Collection ? $array->flatten()->toArray() : static::flatten($array));
+    }
+
+    /**
      * Cross join the given arrays, returning all possible permutations.
      *
      * @param  iterable  ...$arrays
