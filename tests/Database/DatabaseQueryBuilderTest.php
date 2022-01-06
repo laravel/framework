@@ -17,6 +17,7 @@ use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -927,7 +928,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereFulltextSqlServer()
     {
-        $builder = $this->getSqlServerBuilder();
+        $builder = $this->getSqlServerBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
         $this->assertSame('select * from [users] where contains([body], ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
@@ -4391,6 +4392,14 @@ SQL;
     {
         $grammar = new PostgresGrammar;
         $processor = new PostgresProcessor;
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    protected function getSqlServerBuilderWithProcessor()
+    {
+        $grammar = new SqlServerGrammar;
+        $processor = new SqlServerProcessor;
 
         return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
