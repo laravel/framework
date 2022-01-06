@@ -721,6 +721,22 @@ trait EnumeratesValues
     }
 
     /**
+     * Pass the collection through a series of callable pipes and return the result.
+     *
+     * @param  array<callable>  $pipes
+     * @return mixed
+     */
+    public function pipeThrough($pipes)
+    {
+        return static::make($pipes)->reduce(
+            function ($carry, $pipe) {
+                return $pipe($carry);
+            },
+            $this,
+        );
+    }
+
+    /**
      * Reduce the collection to a single value.
      *
      * @template TReduceInitial

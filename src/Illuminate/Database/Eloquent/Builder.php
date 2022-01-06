@@ -8,7 +8,6 @@ use Exception;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
-use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -27,7 +26,7 @@ use ReflectionMethod;
  */
 class Builder implements BuilderContract
 {
-    use BuildsQueries, DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships {
+    use BuildsQueries, DecoratesQueryBuilder, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 
@@ -96,6 +95,7 @@ class Builder implements BuilderContract
         'doesntExist',
         'dump',
         'exists',
+        'explain',
         'getBindings',
         'getConnection',
         'getGrammar',

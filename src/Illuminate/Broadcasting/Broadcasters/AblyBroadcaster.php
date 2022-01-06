@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Ably\AblyRest;
 use Ably\Exceptions\AblyException;
+use Ably\Models\Message as AblyMessage;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -126,13 +127,31 @@ class AblyBroadcaster extends Broadcaster
     {
         try {
             foreach ($this->formatChannels($channels) as $channel) {
-                $this->ably->channels->get($channel)->publish($event, $payload);
+                $this->ably->channels->get($channel)->publish(
+                    $this->buildAblyMessage($event, $payload)
+                );
             }
         } catch (AblyException $e) {
             throw new BroadcastException(
                 sprintf('Ably error: %s', $e->getMessage())
             );
         }
+    }
+
+    /**
+     * Build an Ably message object for broadcasting.
+     *
+     * @param  string  $event
+     * @param  array  $payload
+     * @return \Ably\Models\Message
+     */
+    protected function buildAblyMessage($event, array $payload = [])
+    {
+        return tap(new AblyMessage, function ($message) use ($event, $payload) {
+            $message->name = $event;
+            $message->data = $payload;
+            $message->connectionKey = data_get($payload, 'socket');
+        });
     }
 
     /**

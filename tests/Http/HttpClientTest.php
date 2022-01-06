@@ -197,6 +197,23 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testRecordedCallsAreEmptiedWhenFakeIsCalled()
+    {
+        $this->factory->fake([
+            'http://foo.com/*' => ['page' => 'foo'],
+        ]);
+
+        $this->factory->get('http://foo.com/test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/test';
+        });
+
+        $this->factory->fake();
+
+        $this->factory->assertNothingSent();
+    }
+
     public function testSpecificRequestIsNotBeingSent()
     {
         $this->factory->fake();

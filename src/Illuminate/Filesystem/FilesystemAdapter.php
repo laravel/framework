@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Closure;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
@@ -69,6 +70,13 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $prefixer;
 
     /**
+     * The temporary URL builder callback.
+     *
+     * @var \Closure|null
+     */
+    protected $temporaryUrlCallback;
+
+    /**
      * Create a new filesystem adapter instance.
      *
      * @param  \League\Flysystem\FilesystemOperator  $driver
@@ -95,6 +103,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function assertExists($path, $content = null)
     {
+        clearstatcache();
+
         $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
@@ -124,6 +134,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function assertMissing($path)
     {
+        clearstatcache();
+
         $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
@@ -584,11 +596,17 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {
-        if (! method_exists($this->adapter, 'getTemporaryUrl')) {
-            throw new RuntimeException('This driver does not support creating temporary URLs.');
+        if (method_exists($this->adapter, 'getTemporaryUrl')) {
+            return $this->adapter->getTemporaryUrl($path, $expiration, $options);
         }
 
-        return $this->adapter->getTemporaryUrl($path, $expiration, $options);
+        if ($this->temporaryUrlCallback) {
+            return $this->temporaryUrlCallback->bindTo($this, static::class)(
+                $path, $expiration, $options
+            );
+        }
+
+        throw new RuntimeException('This driver does not support creating temporary URLs.');
     }
 
     /**
@@ -763,6 +781,17 @@ class FilesystemAdapter implements CloudFilesystemContract
             FilesystemContract::VISIBILITY_PRIVATE => Visibility::PRIVATE,
             default => throw new InvalidArgumentException("Unknown visibility: {$visibility}."),
         };
+    }
+
+    /**
+     * Define a custom temporary URL builder callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function buildTemporaryUrlsUsing(Closure $callback)
+    {
+        $this->temporaryUrlCallback = $callback;
     }
 
     /**
