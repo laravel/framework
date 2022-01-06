@@ -932,6 +932,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
         $this->assertSame('select * from [users] where contains([body], ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $this->assertSame('select * from [users] where freetext([body], ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
     }
 
     public function testUnions()
