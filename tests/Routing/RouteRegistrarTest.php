@@ -16,7 +16,7 @@ use Stringable;
 class RouteRegistrarTest extends TestCase
 {
     /**
-     * @var Router
+     * @var \Illuminate\Routing\Router
      */
     protected $router;
 
@@ -796,7 +796,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->where($wheres);
 
-        /** @var Route $route */
+        /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -809,7 +809,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->get('/{foo}/{bar}')->whereNumber(['foo', 'bar']);
         $this->router->get('/api/{bar}/{foo}')->whereNumber(['bar', 'foo']);
 
-        /** @var Route $route */
+        /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -822,7 +822,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->get('/{foo}/{bar}')->whereAlpha(['foo', 'bar']);
         $this->router->get('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo']);
 
-        /** @var Route $route */
+        /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -834,7 +834,7 @@ class RouteRegistrarTest extends TestCase
 
         $this->router->get('/{foo}')->whereAlphaNumeric(['1a2b3c']);
 
-        /** @var Route $route */
+        /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -863,7 +863,7 @@ class RouteRegistrarTest extends TestCase
     /**
      * Get the last route registered with the router.
      *
-     * @return Route
+     * @return \Illuminate\Routing\Route
      */
     protected function getRoute()
     {
@@ -885,7 +885,7 @@ class RouteRegistrarTest extends TestCase
      * Assert that the last route has the given content.
      *
      * @param  string  $content
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request $request  $request
      * @return void
      */
     protected function seeResponse($content, Request $request)
