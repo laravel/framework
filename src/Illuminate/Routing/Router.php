@@ -818,6 +818,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @return \Illuminate\Routing\Route
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
     public function substituteBindings($route)
     {
@@ -831,12 +832,13 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
-     * Substitute the implicit Eloquent model bindings for the route.
+     * Substitute the implicit route bindings for the given route.
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
     public function substituteImplicitBindings($route)
     {

@@ -505,12 +505,12 @@ class Route
     /**
      * Get the parameters that are listed in the route / controller signature.
      *
-     * @param  string|null  $subClass
+     * @param  array  $conditions
      * @return array
      */
-    public function signatureParameters($subClass = null)
+    public function signatureParameters($conditions)
     {
-        return RouteSignatureParameters::fromAction($this->action, $subClass);
+        return RouteSignatureParameters::fromAction($this->action, $conditions);
     }
 
     /**

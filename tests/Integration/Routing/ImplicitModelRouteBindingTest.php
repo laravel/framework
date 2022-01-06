@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 use Orchestra\Testbench\TestCase;
 
-class ImplicitRouteBindingTest extends TestCase
+class ImplicitModelRouteBindingTest extends TestCase
 {
     use InteractsWithPublishedFiles;
 
