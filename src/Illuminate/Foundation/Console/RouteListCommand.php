@@ -298,7 +298,7 @@ class RouteListCommand extends Command
     {
         $routes = $routes->map(
             fn ($route) => array_merge($route, [
-                'action' => $this->formatAction($route),
+                'action' => $this->formatActionForCli($route),
                 'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
                 'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
             ]),
@@ -351,12 +351,12 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Get the formatted action for CLI.
+     * Get the formatted action for display on the CLI.
      *
      * @param  array  $route
      * @return string
      */
-    protected function formatAction($route)
+    protected function formatActionForCli($route)
     {
         ['action' => $action, 'name' => $name] = $route;
 
@@ -385,6 +385,29 @@ class RouteListCommand extends Command
     }
 
     /**
+     * Get the terminal width.
+     *
+     * @return int
+     */
+    public static function getTerminalWidth()
+    {
+        return is_null(static::$terminalWidthResolver)
+            ? (new Terminal)->getWidth()
+            : call_user_func(static::$terminalWidthResolver);
+    }
+
+    /**
+     * Set a callback that should be used when resolving the terminal width.
+     *
+     * @param  \Closure|null  $callback
+     * @return void
+     */
+    public static function resolveTerminalWidthUsing($resolver)
+    {
+        static::$terminalWidthResolver = $resolver;
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -400,28 +423,5 @@ class RouteListCommand extends Command
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (precedence, domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
-    }
-
-    /**
-     * Get the terminal width.
-     *
-     * @return int
-     */
-    public static function getTerminalWidth()
-    {
-        return is_null(static::$terminalWidthResolver)
-            ? (new Terminal())->getWidth()
-            : call_user_func(static::$terminalWidthResolver);
-    }
-
-    /**
-     * Set a callback that should be used when resolving the terminal width.
-     *
-     * @param  \Closure|null  $callback
-     * @return void
-     */
-    public static function resolveTerminalWidthUsing($resolver)
-    {
-        static::$terminalWidthResolver = $resolver;
     }
 }
