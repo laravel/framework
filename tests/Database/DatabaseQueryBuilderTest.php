@@ -891,38 +891,38 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body")) @@ plainto_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['english', 'english', 'Hello World'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(english, "body")) @@ plainto_tsquery(english, ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple']);
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body")) @@ plainto_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['simple', 'simple', 'Hello World'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(simple, "body")) @@ plainto_tsquery(simple, ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'plain']);
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body")) @@ plainto_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['english', 'english', 'Hello World'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(english, "body")) @@ plainto_tsquery(english, ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body")) @@ phraseto_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['english', 'english', 'Hello World'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(english, "body")) @@ phraseto_tsquery(english, ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'websearch']);
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body")) @@ websearch_to_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['english', 'english', '+Hello -World'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(english, "body")) @@ websearch_to_tsquery(english, ?)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body")) @@ plainto_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['simple', 'simple', 'Hello World'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(simple, "body")) @@ plainto_tsquery(simple, ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
         $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car Plane');
-        $this->assertSame('select * from "users" where (to_tsvector(?, "body") || to_tsvector(?, "title")) @@ plainto_tsquery(?, ?)', $builder->toSql());
-        $this->assertEquals(['english', 'english', 'english', 'Car Plane'], $builder->getBindings());
+        $this->assertSame('select * from "users" where (to_tsvector(english, "body") || to_tsvector(english, "title")) @@ plainto_tsquery(english, ?)', $builder->toSql());
+        $this->assertEquals(['Car Plane'], $builder->getBindings());
     }
 
     public function testUnions()
