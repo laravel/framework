@@ -45,7 +45,7 @@ class SupportArrTest extends TestCase
 
     public function testContainsWithSingleDimensionArray()
     {
-        $data = [1,2,3,4,5];
+        $data = [1, 2, 3, 4, 5];
 
         $this->assertTrue(Arr::contains($data, random_int(1, 5)));
     }
