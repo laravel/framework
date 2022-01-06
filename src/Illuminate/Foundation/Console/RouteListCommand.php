@@ -298,9 +298,8 @@ class RouteListCommand extends Command
     {
         $routes = $routes->map(
             fn ($route) => array_merge($route, [
-                'action' => $this->formatAction($route['action']),
+                'action' => $this->formatAction($route),
                 'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
-                'name' => $route['name'] && $this->output->isVerbose() ? (' '.$route['name']) : null,
                 'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
             ]),
         );
@@ -315,7 +314,6 @@ class RouteListCommand extends Command
                 'domain' => $domain,
                 'method' => $method,
                 'middleware' => $middleware,
-                'name' => $name,
                 'uri' => $uri,
             ] = $route;
 
@@ -328,13 +326,13 @@ class RouteListCommand extends Command
             $spaces = str_repeat(' ', max($maxMethod + 6 - mb_strlen($method), 0));
 
             $dots = str_repeat('.', max(
-                $terminalWidth - mb_strlen($method.$spaces.$uri.$action.$name) - 6 - ($action ? 1 : 0), 0
+                $terminalWidth - mb_strlen($method.$spaces.$uri.$action) - 6 - ($action ? 1 : 0), 0
             ));
 
             $dots = empty($dots) ? $dots : " $dots";
 
-            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$action.$name.$dots) > ($terminalWidth - 6)) {
-                $action = substr($action, 0, $terminalWidth - 7 - mb_strlen($method.$spaces.$uri.$name.$dots)).'…';
+            if ($action && ! $this->output->isVerbose() && mb_strlen($method.$spaces.$uri.$action.$dots) > ($terminalWidth - 6)) {
+                $action = substr($action, 0, $terminalWidth - 7 - mb_strlen($method.$spaces.$uri.$dots)).'…';
             }
 
             $method = Str::of($method)->explode('|')->map(
@@ -342,11 +340,10 @@ class RouteListCommand extends Command
             )->implode('<fg=#6C7280>|</>');
 
             return [sprintf(
-                '  <fg=white;options=bold>%s</> %s<fg=white>%s</><fg=#6C7280>%s%s %s</>',
+                '  <fg=white;options=bold>%s</> %s<fg=white>%s</><fg=#6C7280>%s %s</>',
                 $method,
                 $spaces,
                 preg_replace('#({[^}]+})#', '<fg=yellow>$1</>', $uri),
-                $name,
                 $dots,
                 str_replace('   ', ' › ', $action),
             ), $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null];
@@ -356,19 +353,24 @@ class RouteListCommand extends Command
     /**
      * Get the formatted action for CLI.
      *
+     * @param  array  $route
      * @return string
      */
-    protected function formatAction($action)
+    protected function formatAction($route)
     {
+        ['action' => $action, 'name' => $name] = $route;
+
         if ($action === 'Closure' || $action === ViewController::class) {
-            return '';
+            return $name;
         }
+
+        $name = $name ? "$name   " : null;
 
         $rootControllerNamespace = $this->laravel[UrlGenerator::class]->getRootControllerNamespace()
             ?? ($this->laravel->getNamespace().'Http\\Controllers');
 
         if (str_starts_with($action, $rootControllerNamespace)) {
-            return substr($action, mb_strlen($rootControllerNamespace) + 1);
+            return $name.substr($action, mb_strlen($rootControllerNamespace) + 1);
         }
 
         $actionClass = explode('@', $action)[0];
@@ -376,10 +378,10 @@ class RouteListCommand extends Command
         if (class_exists($actionClass) && str_starts_with((new ReflectionClass($actionClass))->getFilename(), base_path('vendor'))) {
             $actionCollection = collect(explode('\\', $action));
 
-            return $actionCollection->take(2)->implode('\\').'   '.$actionCollection->last();
+            return $name.$actionCollection->take(2)->implode('\\').'   '.$actionCollection->last();
         }
 
-        return $action;
+        return $name.$action;
     }
 
     /**
