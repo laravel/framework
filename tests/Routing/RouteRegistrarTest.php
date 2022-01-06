@@ -372,6 +372,17 @@ class RouteRegistrarTest extends TestCase
         );
     }
 
+    public function testCanOverrideGroupControllerWithClosureSyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', function () {
+                return 'hello world';
+            });
+        });
+
+        $this->seeResponse('hello world', Request::create('users', 'GET'));
+    }
+
     public function testWillUseTheLatestGroupController()
     {
         $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
@@ -874,7 +885,7 @@ class RouteRegistrarTest extends TestCase
      * Assert that the last route has the given content.
      *
      * @param  string  $content
-     * @param Request $request
+     * @param  Request  $request
      * @return void
      */
     protected function seeResponse($content, Request $request)
