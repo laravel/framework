@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Routing;
 
 use BadMethodCallException;
+use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +16,7 @@ use Stringable;
 class RouteRegistrarTest extends TestCase
 {
     /**
-     * @var \Illuminate\Routing\Router
+     * @var Router
      */
     protected $router;
 
@@ -344,6 +346,56 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertSame('{account}.myapp.com', $this->getRoute()->getDomain());
         $this->assertSame('api.users', $this->getRoute()->getName());
+    }
+
+    public function testCanRegisterGroupWithController()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', 'index');
+        });
+
+        $this->assertSame(
+            RouteRegistrarControllerStub::class.'@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanOverrideGroupControllerWithStringSyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', 'UserController@index');
+        });
+
+        $this->assertSame(
+            'UserController@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testWillUseTheLatestGroupController()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->group(['controller' => FooController::class], function ($router) {
+                $router->get('users', 'index');
+            });
+        });
+
+        $this->assertSame(
+            FooController::class.'@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanOverrideGroupControllerWithArraySyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', [FooController::class, 'index']);
+        });
+
+        $this->assertSame(
+            FooController::class.'@index',
+            $this->getRoute()->getAction()['uses']
+        );
     }
 
     public function testRouteGroupingWithoutPrefix()
@@ -733,7 +785,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->where($wheres);
 
-        /** @var \Illuminate\Routing\Route $route */
+        /** @var Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -746,7 +798,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->get('/{foo}/{bar}')->whereNumber(['foo', 'bar']);
         $this->router->get('/api/{bar}/{foo}')->whereNumber(['bar', 'foo']);
 
-        /** @var \Illuminate\Routing\Route $route */
+        /** @var Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -759,7 +811,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->get('/{foo}/{bar}')->whereAlpha(['foo', 'bar']);
         $this->router->get('/api/{bar}/{foo}')->whereAlpha(['bar', 'foo']);
 
-        /** @var \Illuminate\Routing\Route $route */
+        /** @var Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -771,7 +823,7 @@ class RouteRegistrarTest extends TestCase
 
         $this->router->get('/{foo}')->whereAlphaNumeric(['1a2b3c']);
 
-        /** @var \Illuminate\Routing\Route $route */
+        /** @var Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertEquals($wheres, $route->wheres);
         }
@@ -800,7 +852,7 @@ class RouteRegistrarTest extends TestCase
     /**
      * Get the last route registered with the router.
      *
-     * @return \Illuminate\Routing\Route
+     * @return Route
      */
     protected function getRoute()
     {
@@ -822,7 +874,7 @@ class RouteRegistrarTest extends TestCase
      * Assert that the last route has the given content.
      *
      * @param  string  $content
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return void
      */
     protected function seeResponse($content, Request $request)
