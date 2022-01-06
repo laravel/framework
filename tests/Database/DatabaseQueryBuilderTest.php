@@ -934,7 +934,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Hello World'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'freetext']);
         $this->assertSame('select * from [users] where freetext([body], ?)', $builder->toSql());
         $this->assertEquals(['Hello World'], $builder->getBindings());
     }
