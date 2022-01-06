@@ -492,7 +492,7 @@ if (! function_exists('lang_path')) {
      */
     function lang_path($path = '')
     {
-        return app('path.lang').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->langPath($path);
     }
 }
 
