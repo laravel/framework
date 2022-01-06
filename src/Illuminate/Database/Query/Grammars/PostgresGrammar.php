@@ -81,10 +81,9 @@ class PostgresGrammar extends Grammar
     {
         $language = $where['options']['language'] ?? 'english';
 
-        $columns = array_map(function ($column) use ($language, $query) {
-            return "to_tsvector({$this->bindParameter($query, $language)}, {$this->wrap($column)})";
-        }, $where['columns']);
-        $columns = implode(' || ', $columns);
+        $columns = collect($where['columns'])->map(function ($column) use ($language) {
+            return "to_tsvector({$language}, {$this->wrap($column)})";
+        })->implode(' || ');
 
         $mode = 'plainto_tsquery';
 
@@ -96,7 +95,7 @@ class PostgresGrammar extends Grammar
             $mode = 'websearch_to_tsquery';
         }
 
-        return "({$columns}) @@ {$mode}({$this->bindParameter($query, $language)}, {$this->bindParameter($query, $where['value'])})";
+        return "({$columns}) @@ {$mode}({$language}, {$this->parameter($where['value'])})";
     }
 
     /**
@@ -545,23 +544,5 @@ class PostgresGrammar extends Grammar
                         ? $attribute
                         : "'$attribute'";
         }, $path);
-    }
-
-    /**
-     * Binds parameter to query.
-     *
-     * @param  Builder  $query
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function bindParameter(Builder $query, $value)
-    {
-        if ($this->isExpression($value)) {
-            return $this->getValue($value);
-        }
-
-        $query->addBinding($value);
-
-        return '?';
     }
 }

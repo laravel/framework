@@ -1837,7 +1837,21 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'value', 'options', 'boolean');
 
+        $this->addBinding($value);
+
         return $this;
+    }
+
+    /**
+     * Add a "or where fulltext" clause to the query.
+     *
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @return $this
+     */
+    public function orWhereFulltext($columns, $value, array $options = [])
+    {
+        return $this->whereFulltext($columns, $value, $options, 'or');
     }
 
     /**

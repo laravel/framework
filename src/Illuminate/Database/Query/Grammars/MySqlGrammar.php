@@ -61,7 +61,6 @@ class MySqlGrammar extends Grammar
     {
         $columns = $this->columnize($where['columns']);
 
-        $query->addBinding($where['value']);
         $value = $this->parameter($where['value']);
 
         $mode = ($where['options']['mode'] ?? []) === 'boolean'
