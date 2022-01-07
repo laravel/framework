@@ -633,7 +633,19 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function dispatchToRoute(Request $request)
     {
-        return $this->runRoute($request, $this->findRoute($request));
+        $route = $this->findRoute($request);
+
+        try {
+            return $this->runRoute($request, $route);
+        } finally {
+            if ($route->isControllerAction()) {
+                $controllerClass = $route->getControllerClass();
+
+                if (method_exists($controllerClass, 'clearMiddleware')) {
+                    $controllerClass::clearMiddleware();
+                }
+            }
+        }
     }
 
     /**

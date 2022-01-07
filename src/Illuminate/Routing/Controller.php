@@ -11,7 +11,17 @@ abstract class Controller
      *
      * @var array
      */
-    protected $middleware = [];
+    protected static $middleware = [];
+
+    /**
+     * Clears registered middleware on the controller.
+     *
+     * @return void
+     */
+    public static function clearMiddleware(): void
+    {
+        static::$middleware = [];
+    }
 
     /**
      * Register middleware on the controller.
@@ -20,10 +30,10 @@ abstract class Controller
      * @param  array  $options
      * @return \Illuminate\Routing\ControllerMiddlewareOptions
      */
-    public function middleware($middleware, array $options = [])
+    public static function middleware($middleware, array $options = [])
     {
         foreach ((array) $middleware as $m) {
-            $this->middleware[] = [
+            static::$middleware[] = [
                 'middleware' => $m,
                 'options' => &$options,
             ];
@@ -37,9 +47,9 @@ abstract class Controller
      *
      * @return array
      */
-    public function getMiddleware()
+    public static function getMiddleware()
     {
-        return $this->middleware;
+        return static::$middleware;
     }
 
     /**

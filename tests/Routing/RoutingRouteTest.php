@@ -1960,12 +1960,14 @@ class RoutingRouteTest extends TestCase
 
 class RouteTestControllerStub extends Controller
 {
-    public function __construct()
+    public static function getMiddleware(): array
     {
-        $this->middleware(RouteTestControllerMiddleware::class);
-        $this->middleware(RouteTestControllerParameterizedMiddlewareOne::class.':0');
-        $this->middleware(RouteTestControllerParameterizedMiddlewareTwo::class.':foo,bar');
-        $this->middleware(RouteTestControllerExceptMiddleware::class, ['except' => 'index']);
+        static::middleware(RouteTestControllerMiddleware::class);
+        static::middleware(RouteTestControllerParameterizedMiddlewareOne::class.':0');
+        static::middleware(RouteTestControllerParameterizedMiddlewareTwo::class.':foo,bar');
+        static::middleware(RouteTestControllerExceptMiddleware::class, ['except' => 'index']);
+
+        return parent::getMiddleware();
     }
 
     public function index()
@@ -1984,9 +1986,11 @@ class RouteTestControllerCallableStub extends Controller
 
 class RouteTestControllerMiddlewareGroupStub extends Controller
 {
-    public function __construct()
+    public static function getMiddleware(): array
     {
-        $this->middleware('web');
+        static::middleware('web');
+
+        return parent::getMiddleware();
     }
 
     public function index()
@@ -2046,15 +2050,17 @@ class RouteTestResourceControllerWithModelParameter extends Controller
 
 class RouteTestClosureMiddlewareController extends Controller
 {
-    public function __construct()
+    public static function getMiddleware(): array
     {
-        $this->middleware(function ($request, $next) {
+        static::middleware(function ($request, $next) {
             $response = $next($request);
 
             return $response->setContent(
                 $response->content().'-'.$request['foo-middleware'].'-controller-closure'
             );
         });
+
+        return parent::getMiddleware();
     }
 
     public function index()

@@ -215,7 +215,7 @@ class Route
      *
      * @return bool
      */
-    protected function isControllerAction()
+    public function isControllerAction()
     {
         return is_string($this->action['uses']) && ! $this->isSerializedClosure();
     }
@@ -270,12 +270,22 @@ class Route
     public function getController()
     {
         if (! $this->controller) {
-            $class = $this->parseControllerCallback()[0];
-
-            $this->controller = $this->container->make(ltrim($class, '\\'));
+            $this->controller = $this->container->make($this->getControllerClass());
         }
 
         return $this->controller;
+    }
+
+    /**
+     * Get the controller class for the route.
+     *
+     * @return string
+     */
+    public function getControllerClass(): string
+    {
+        $class = $this->parseControllerCallback()[0];
+
+        return ltrim($class, '\\');
     }
 
     /**
@@ -1068,7 +1078,7 @@ class Route
         }
 
         return $this->controllerDispatcher()->getMiddleware(
-            $this->getController(), $this->getControllerMethod()
+            $this->getControllerClass(), $this->getControllerMethod()
         );
     }
 

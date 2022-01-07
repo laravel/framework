@@ -19,9 +19,9 @@ interface ControllerDispatcher
     /**
      * Get the middleware for the controller instance.
      *
-     * @param  \Illuminate\Routing\Controller  $controller
+     * @param  string  $controllerClass
      * @param  string  $method
      * @return array
      */
-    public function getMiddleware($controller, $method);
+    public function getMiddleware(string $controllerClass, string $method): array;
 }

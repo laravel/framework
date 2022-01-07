@@ -51,17 +51,17 @@ class ControllerDispatcher implements ControllerDispatcherContract
     /**
      * Get the middleware for the controller instance.
      *
-     * @param  \Illuminate\Routing\Controller  $controller
+     * @param  string  $controllerClass
      * @param  string  $method
      * @return array
      */
-    public function getMiddleware($controller, $method)
+    public function getMiddleware(string $controllerClass, string $method): array
     {
-        if (! method_exists($controller, 'getMiddleware')) {
+        if (! method_exists($controllerClass, 'getMiddleware')) {
             return [];
         }
 
-        return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
+        return collect($controllerClass::getMiddleware())->reject(function ($data) use ($method) {
             return static::methodExcludedByOptions($method, $data['options']);
         })->pluck('middleware')->all();
     }
