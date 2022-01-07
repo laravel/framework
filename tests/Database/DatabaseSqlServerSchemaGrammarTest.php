@@ -58,6 +58,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create table "#users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create fulltext index on "users" ("body")', $statements[0]);
+    }
+
     public function testDropTable()
     {
         $blueprint = new Blueprint('users');
