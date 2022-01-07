@@ -49,6 +49,12 @@ trait ParsesLogConfiguration
         throw new InvalidArgumentException('Invalid log level.');
     }
 
+    /**
+     * Parse the action level from the given configuration.
+     *
+     * @param  array  $config
+     * @return int
+     */
     protected function actionLevel(array $config)
     {
         $level = $config['action_level'] ?? 'debug';
