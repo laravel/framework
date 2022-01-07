@@ -53,10 +53,16 @@ class SqlServerGrammar extends Grammar
         $columns = implode(', ', $this->getColumns($blueprint));
 
         return sprintf(
-            'create fulltext index on %s (%s) key index indexKey',
+            'create fulltext catalog %s as default; create fulltext index on %s (%s) key index indexKey',
+            'tableCatalog',
             $this->wrapTable($blueprint),
             $this->columnize($command->columns),
         );
+    }
+
+    public function createCatalog($catalog)
+    {
+        return sprintf("CREATE FULLTEXT CATALOG %s AS DEFAULT", $catalog);
     }
 
     /**
