@@ -25,7 +25,7 @@ class ImplicitRouteBinding
     {
         $parameters = $route->parameters();
 
-        $route = static::resolveBackedEnumsForRoute($route);
+        $route = static::resolveBackedEnumsForRoute($route, $parameters);
 
         foreach ($route->signatureParameters(['subClass' => UrlRoutable::class]) as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
@@ -68,11 +68,12 @@ class ImplicitRouteBinding
      * Resolve the Backed Enums route bindings for the route.
      *
      * @param  \Illuminate\Routing\Route  $route
+     * @param  array  $parameters
      * @return \Illuminate\Routing\Route
      *
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
-    protected static function resolveBackedEnumsForRoute($route)
+    protected static function resolveBackedEnumsForRoute($route, $parameters)
     {
         foreach ($route->signatureParameters(['backedEnum' => true]) as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
