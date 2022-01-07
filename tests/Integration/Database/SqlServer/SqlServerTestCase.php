@@ -9,7 +9,6 @@ abstract class SqlServerTestCase extends DatabaseTestCase
     protected function defineDatabaseMigrations()
     {
         if ($this->driver !== 'sqlsrv') {
-            dd($this->driver);
             $this->markTestSkipped('Test requires an SQL Server Connection');
         }
     }
