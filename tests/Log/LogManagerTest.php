@@ -471,7 +471,13 @@ class LogManagerTest extends TestCase
 
         $this->assertEquals(Monolog::CRITICAL, $actionLevelValue);
 
-        $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
+        if (method_exists($expectedFingersCrossedHandler, 'getHandler')) {
+            $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
+        } else {
+            $handlerProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'handler');
+            $handlerProp->setAccessible(true);
+            $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
+        }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
         $this->assertEquals(Monolog::DEBUG, $expectedStreamHandler->getLevel());
     }
