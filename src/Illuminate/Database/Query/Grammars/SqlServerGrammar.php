@@ -472,6 +472,25 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereFulltext(Builder $query, $where)
+    {
+        $columns = $this->columnize($where['columns']);
+        $value = $this->parameter($where['value']);
+
+        if ($mode = $where['options']['mode'] ?? [] === 'freetext') {
+            return "freetext($columns, $value)";
+        }
+
+        return "contains($columns, $value)";
+    }
+
+    /**
      * Wrap a single string in keyword identifiers.
      *
      * @param  string  $value
