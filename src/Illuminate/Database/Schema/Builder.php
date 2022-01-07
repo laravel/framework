@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use InvalidArgumentException;
 use LogicException;
