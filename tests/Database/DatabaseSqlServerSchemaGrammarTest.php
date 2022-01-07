@@ -65,7 +65,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create fulltext index on "users" ("body")', $statements[0]);
+        $this->assertSame('create fulltext index on "users" ("body") key index indexKey', $statements[0]);
     }
 
     public function testDropTable()
