@@ -49,6 +49,17 @@ trait ParsesLogConfiguration
         throw new InvalidArgumentException('Invalid log level.');
     }
 
+    protected function actionLevel(array $config)
+    {
+        $level = $config['action_level'] ?? 'debug';
+
+        if (isset($this->levels[$level])) {
+            return $this->levels[$level];
+        }
+
+        throw new InvalidArgumentException('Invalid log action level.');
+    }
+
     /**
      * Extract the log channel from the given configuration.
      *
