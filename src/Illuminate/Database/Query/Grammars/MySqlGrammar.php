@@ -51,6 +51,30 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereFullText(Builder $query, $where)
+    {
+        $columns = $this->columnize($where['columns']);
+
+        $value = $this->parameter($where['value']);
+
+        $mode = ($where['options']['mode'] ?? []) === 'boolean'
+            ? ' in boolean mode'
+            : ' in natural language mode';
+
+        $expanded = ($where['options']['expanded'] ?? []) && ($where['options']['mode'] ?? []) !== 'boolean'
+            ? ' with query expansion'
+            : '';
+
+        return "match ({$columns}) against (".$value."{$mode}{$expanded})";
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

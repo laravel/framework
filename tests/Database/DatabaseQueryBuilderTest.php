@@ -15,6 +15,7 @@ use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
+use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -856,6 +857,72 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereColumn($conditions);
         $this->assertSame('select * from "users" where ("first_name" = "last_name" and "updated_at" > "created_at")', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testWhereFulltextMySql()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['expanded' => true]);
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean']);
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car,Plane');
+        $this->assertSame('select * from `users` where match (`body`, `title`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Car,Plane'], $builder->getBindings());
+    }
+
+    public function testWhereFulltextPostgres()
+    {
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'plain']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ phraseto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'websearch']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ websearch_to_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car Plane');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Car Plane'], $builder->getBindings());
     }
 
     public function testUnions()
@@ -4308,6 +4375,14 @@ SQL;
     {
         $grammar = new MySqlGrammar;
         $processor = new MySqlProcessor;
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    protected function getPostgresBuilderWithProcessor()
+    {
+        $grammar = new PostgresGrammar;
+        $processor = new PostgresProcessor;
 
         return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
