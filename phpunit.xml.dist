@@ -3,7 +3,7 @@
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
          colors="true"
-         convertDeprecationsToExceptions="true"
+         convertDeprecationsToExceptions="false"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
