@@ -2,8 +2,8 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use DateTimeZone;
 use Cron\CronExpression;
+use DateTimeZone;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
