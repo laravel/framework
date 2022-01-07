@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use InvalidArgumentException;
 use LogicException;
@@ -393,7 +394,7 @@ class Builder
      */
     public function registerCustomDoctrineType($class, $name, $type)
     {
-        $this->connection->registerDoctrineType($class, $name, $type);
+        Container::getInstance()->make('db')->registerDoctrineType($class, $name);
     }
 
     /**

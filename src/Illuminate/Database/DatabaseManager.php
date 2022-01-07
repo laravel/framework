@@ -2,12 +2,14 @@
 
 namespace Illuminate\Database;
 
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use PDO;
+use RuntimeException;
 
 /**
  * @mixin \Illuminate\Database\Connection
@@ -34,6 +36,13 @@ class DatabaseManager implements ConnectionResolverInterface
      * @var array
      */
     protected $connections = [];
+
+    /**
+     * Custom Doctrine column types.
+     *
+     * @var array
+     */
+    protected $doctrineTypes = [];
 
     /**
      * The custom connection resolvers.
@@ -207,7 +216,7 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Register custom Doctrine types from the configuration with the connection.
+     * Register custom Doctrine types with the connection.
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @return void
@@ -215,8 +224,38 @@ class DatabaseManager implements ConnectionResolverInterface
     protected function registerConfiguredDoctrineTypes(Connection $connection): void
     {
         foreach ($this->app['config']->get('database.dbal.types', []) as $name => $class) {
+            $this->registerDoctrineType($class, $name, $name);
+        }
+
+        foreach ($this->doctrineTypes as $name => $class) {
             $connection->registerDoctrineType($class, $name, $name);
         }
+    }
+
+    /**
+     * Register a custom Doctrine type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \RuntimeException
+     */
+    public function registerDoctrineType(string $class, string $name, string $type): void
+    {
+        if (! class_exists('Doctrine\DBAL\Connection')) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
+        }
+
+        if (! Type::hasType($name)) {
+            Type::addType($name, $class);
+        }
+
+        $this->doctrineTypes[$name] = $class;
     }
 
     /**

@@ -1016,7 +1016,9 @@ class Connection implements ConnectionInterface
             ]), $driver);
 
             foreach ($this->doctrineTypeMappings as $name => $type) {
-                $this->doctrineConnection->getDatabasePlatform()->registerDoctrineTypeMapping($type, $name);
+                $this->doctrineConnection
+                    ->getDatabasePlatform()
+                    ->registerDoctrineTypeMapping($type, $name);
             }
         }
 
