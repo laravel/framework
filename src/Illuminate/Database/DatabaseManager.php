@@ -227,8 +227,8 @@ class DatabaseManager implements ConnectionResolverInterface
             $this->registerDoctrineType($class, $name, $name);
         }
 
-        foreach ($this->doctrineTypes as $name => $class) {
-            $connection->registerDoctrineType($class, $name, $name);
+        foreach ($this->doctrineTypes as $name => [$type, $class]) {
+            $connection->registerDoctrineType($class, $name, $type);
         }
     }
 
@@ -255,7 +255,7 @@ class DatabaseManager implements ConnectionResolverInterface
             Type::addType($name, $class);
         }
 
-        $this->doctrineTypes[$name] = $class;
+        $this->doctrineTypes[$name] = [$type, $class];
     }
 
     /**
