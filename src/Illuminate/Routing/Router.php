@@ -555,8 +555,19 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $group = end($this->groupStack);
 
-        return isset($group['controller']) && strpos($class, '@') === false
-                ? $group['controller'].'@'.$class : $class;
+        if (! isset($group['controller'])) {
+            return $class;
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        if (strpos($class, '@') !== false) {
+            return $class;
+        }
+
+        return $group['controller'].'@'.$class;
     }
 
     /**

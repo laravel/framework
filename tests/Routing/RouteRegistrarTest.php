@@ -383,6 +383,18 @@ class RouteRegistrarTest extends TestCase
         $this->seeResponse('hello world', Request::create('users', 'GET'));
     }
 
+    public function testCanOverrideGroupControllerWithInvokableControllerSyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', InvokableRouteRegistrarControllerStub::class);
+        });
+
+        $this->assertSame(
+            InvokableRouteRegistrarControllerStub::class.'@__invoke',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
     public function testWillUseTheLatestGroupController()
     {
         $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
@@ -908,6 +920,14 @@ class RouteRegistrarControllerStub
     public function destroy()
     {
         return 'deleted';
+    }
+}
+
+class InvokableRouteRegistrarControllerStub
+{
+    public function __invoke()
+    {
+        return 'controller';
     }
 }
 
