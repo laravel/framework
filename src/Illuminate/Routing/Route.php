@@ -508,8 +508,12 @@ class Route
      * @param  array  $conditions
      * @return array
      */
-    public function signatureParameters($conditions)
+    public function signatureParameters($conditions = [])
     {
+        if (is_string($conditions)) {
+            $conditions = ['subClass' => $conditions];
+        }
+
         return RouteSignatureParameters::fromAction($this->action, $conditions);
     }
 

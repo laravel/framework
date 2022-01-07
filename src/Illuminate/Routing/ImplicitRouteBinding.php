@@ -25,23 +25,7 @@ class ImplicitRouteBinding
     {
         $parameters = $route->parameters();
 
-        foreach ($route->signatureParameters(['backedEnum' => true]) as $parameter) {
-            if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
-                continue;
-            }
-
-            $parameterValue = $parameters[$parameterName];
-
-            $backedEnumClass = (string) $parameter->getType();
-
-            $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
-
-            if (is_null($backedEnum)) {
-                throw new BackedEnumCaseNotFoundException($backedEnumClass, $parameterValue);
-            }
-
-            $route->setParameter($parameterName, $backedEnum);
-        }
+        $route = static::resolveBackedEnumsForRoute($route);
 
         foreach ($route->signatureParameters(['subClass' => UrlRoutable::class]) as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
@@ -78,6 +62,37 @@ class ImplicitRouteBinding
 
             $route->setParameter($parameterName, $model);
         }
+    }
+
+    /**
+     * Resolve the Backed Enums route bindings for the route.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return \Illuminate\Routing\Route
+     *
+     * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
+     */
+    protected static function resolveBackedEnumsForRoute($route)
+    {
+        foreach ($route->signatureParameters(['backedEnum' => true]) as $parameter) {
+            if (! $parameterName = static::getParameterName($parameter->getName(), $parameters)) {
+                continue;
+            }
+
+            $parameterValue = $parameters[$parameterName];
+
+            $backedEnumClass = (string) $parameter->getType();
+
+            $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
+
+            if (is_null($backedEnum)) {
+                throw new BackedEnumCaseNotFoundException($backedEnumClass, $parameterValue);
+            }
+
+            $route->setParameter($parameterName, $backedEnum);
+        }
+
+        return $route;
     }
 
     /**
