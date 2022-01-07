@@ -53,9 +53,9 @@ class SqlServerGrammar extends Grammar
         $columns = implode(', ', $this->getColumns($blueprint));
 
         return sprintf(
-            'create fulltext index on %s (%s)',
+            'create fulltext index on %s (%s) key index indexKey',
             $this->wrapTable($blueprint),
-            $this->columnize($command->columns)
+            $this->columnize($command->columns),
         );
     }
 
