@@ -394,7 +394,7 @@ class Builder
      */
     public function registerCustomDoctrineType($class, $name, $type)
     {
-        Container::getInstance()->make('db')->registerDoctrineType($class, $name);
+        Container::getInstance()->make('db')->registerDoctrineType($class, $name, $type);
     }
 
     /**
