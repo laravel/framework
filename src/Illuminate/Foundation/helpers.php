@@ -228,7 +228,7 @@ if (! function_exists('cache')) {
      * @param  dynamic  key|key,default|data,expiration|null
      * @return mixed|\Illuminate\Cache\CacheManager
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     function cache()
     {
@@ -243,7 +243,7 @@ if (! function_exists('cache')) {
         }
 
         if (! is_array($arguments[0])) {
-            throw new Exception(
+            throw new InvalidArgumentException(
                 'When setting a value in the cache, you must pass an array of key / value pairs.'
             );
         }
