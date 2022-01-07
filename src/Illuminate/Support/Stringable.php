@@ -766,6 +766,52 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Execute the given callback if the string contains a given substring.
+     *
+     * @param  string|array  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenContains($needles, $callback, $default = null)
+    {
+        if ($this->contains($needles)) {
+            $result = $callback($this);
+
+            return $result ?? $this;
+        } elseif ($default) {
+            $result = $default($this);
+
+            return $result ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the given callback if the string contains all array values.
+     *
+     * @param  array  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenContainsAll(array $needles, $callback, $default = null)
+    {
+        if ($this->containsAll($needles)) {
+            $result = $callback($this);
+
+            return $result ?? $this;
+        } elseif ($default) {
+            $result = $default($this);
+
+            return $result ?? $this;
+        }
+
+        return $this;
+    }
+
+    /**
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback
