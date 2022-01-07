@@ -65,4 +65,26 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
         $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
     }
+
+    public function testRegisterCustomDoctrineTypeASecondTime()
+    {
+        if ($this->driver !== 'sqlite') {
+            $this->markTestSkipped('Test requires a SQLite connection.');
+        }
+
+        Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->string('test_column');
+        });
+
+        $blueprint = new Blueprint('test', function (Blueprint $table) {
+            $table->tinyInteger('test_column')->change();
+        });
+
+        $blueprint->build($this->getConnection(), new SQLiteGrammar);
+
+        $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
+        $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
+    }
 }

@@ -636,7 +636,7 @@ class Grammar extends BaseGrammar
      * @param  array  $where
      * @return string
      */
-    public function whereFulltext(Builder $query, $where)
+    public function whereFullText(Builder $query, $where)
     {
         throw new RuntimeException('This database engine does not support fulltext search operations.');
     }

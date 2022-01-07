@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -532,6 +534,55 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['users' => [1, 2, 3], 'roles' => [4, 5, 6], 'foo' => ['bar', 'baz'], 'email' => 'test@example.com'], $request->collect()->all());
     }
 
+    public function testDateMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_null' => null,
+            'as_invalid' => 'invalid',
+
+            'as_datetime' => '20-01-01 16:30:25',
+            'as_format' => '1577896225',
+            'as_timezone' => '20-01-01 13:30:25',
+
+            'as_date' => '2020-01-01',
+            'as_time' => '16:30:25',
+        ]);
+
+        $current = Carbon::create(2020, 1, 1, 16, 30, 25);
+
+        $this->assertNull($request->date('as_null'));
+        $this->assertNull($request->date('doesnt_exists'));
+
+        $this->assertEquals($current, $request->date('as_datetime'));
+        $this->assertEquals($current, $request->date('as_format', 'U'));
+        $this->assertEquals($current, $request->date('as_timezone', null, 'America/Santiago'));
+
+        $this->assertTrue($request->date('as_date')->isSameDay($current));
+        $this->assertTrue($request->date('as_time')->isSameSecond('16:30:25'));
+    }
+
+    public function testDateMethodExceptionWhenValueInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $request = Request::create('/', 'GET', [
+            'date' => 'invalid',
+        ]);
+
+        $request->date('date');
+    }
+
+    public function testDateMethodExceptionWhenFormatInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $request = Request::create('/', 'GET', [
+            'date' => '20-01-01 16:30:25',
+        ]);
+
+        $request->date('date', 'invalid_format');
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
@@ -699,6 +750,21 @@ class HttpRequestTest extends TestCase
         $request->merge($merge);
         $this->assertSame('Taylor', $request->input('name'));
         $this->assertSame('Dayle', $request->input('buddy'));
+    }
+
+    public function testMergeIfMissingMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $merge = ['boolean_setting' => 0];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(0, $request->input('boolean_setting'));
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'boolean_setting' => 1]);
+        $merge = ['boolean_setting' => 0];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('name'));
+        $this->assertSame(1, $request->input('boolean_setting'));
     }
 
     public function testReplaceMethod()

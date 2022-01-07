@@ -710,6 +710,19 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Replace text within a portion of a string.
+     *
+     * @param  string|array  $replace
+     * @param  array|int  $offset
+     * @param  array|int|null  $length
+     * @return string|array
+     */
+    public function substrReplace($replace, $offset = 0, $length = null)
+    {
+        return new static(Str::substrReplace($this->value, $replace, $offset, $length));
+    }
+
+    /**
      * Trim the string of the given characters.
      *
      * @param  string  $characters
@@ -806,6 +819,16 @@ class Stringable implements JsonSerializable
     public function wordCount()
     {
         return str_word_count($this->value);
+    }
+
+    /**
+     * Convert the string into a `HtmlString` instance.
+     *
+     * @return \Illuminate\Support\HtmlString
+     */
+    public function toHtmlString()
+    {
+        return new HtmlString($this->value);
     }
 
     /**

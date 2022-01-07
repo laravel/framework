@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -621,6 +622,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
 
+    public function testSubstrReplace()
+    {
+        $this->assertSame('12:00', (string) $this->stringable('1200')->substrReplace(':', 2, 0));
+        $this->assertSame('The Laravel Framework', (string) $this->stringable('The Framework')->substrReplace('Laravel ', 4, 0));
+        $this->assertSame('Laravel – The PHP Framework for Web Artisans', (string) $this->stringable('Laravel Framework')->substrReplace('– The PHP Framework for Web Artisans', 8));
+    }
+
     public function testPadBoth()
     {
         $this->assertSame('__Alien___', (string) $this->stringable('Alien')->padBoth(10, '_'));
@@ -713,6 +721,14 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testToHtmlString()
+    {
+        $this->assertEquals(
+            new HtmlString('<h1>Test String</h1>'),
+            $this->stringable('<h1>Test String</h1>')->toHtmlString()
+        );
     }
 
     public function testStripTags()
