@@ -145,6 +145,7 @@ abstract class Queue
             'maxExceptions' => $job->maxExceptions ?? null,
             'failOnTimeout' => $job->failOnTimeout ?? false,
             'backoff' => $this->getJobBackoff($job),
+            'backoffMode' => $this->getJobBackoffMode($job),
             'timeout' => $job->timeout ?? null,
             'retryUntil' => $this->getJobExpiration($job),
             'data' => [
@@ -198,6 +199,25 @@ abstract class Queue
                 return $backoff instanceof DateTimeInterface
                                 ? $this->secondsUntil($backoff) : $backoff;
             })->implode(',');
+    }
+
+    /**
+     * Get the backoff mode for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return string|null
+     */
+    public function getJobBackoffMode($job)
+    {
+        if (! method_exists($job, 'backoffMode') && ! isset($job->backoffMode)) {
+            return;
+        }
+
+        if (is_null($backoffMode = $job->backoffMode ?? $job->backoffMode())) {
+            return;
+        }
+
+        return $backoffMode;
     }
 
     /**

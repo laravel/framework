@@ -285,6 +285,23 @@ abstract class Job
         return $this->payload()['backoff'] ?? $this->payload()['delay'] ?? null;
     }
 
+
+    /**
+     * @const Backoff Calculation Mode: From total of "attempts" (default) o "exceptions"
+     */
+    const BACKOFF_FROM_ATTEMPTS = 'attempts';
+    const BACKOFF_FROM_EXCEPTIONS = 'exceptions';
+
+    /**
+     * Decide how to calculate the backoff (default: "attempts" - same behavior as before)
+     *
+     * @return string
+     */
+    public function backoffMode()
+    {
+        return $this->payload()['backoffMode'] ?? self::BACKOFF_FROM_ATTEMPTS;
+    }
+
     /**
      * Get the number of seconds the job can run.
      *

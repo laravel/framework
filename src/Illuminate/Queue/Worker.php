@@ -13,6 +13,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
+use Illuminate\Queue\Jobs\Job;
 use Throwable;
 
 class Worker
@@ -553,7 +554,7 @@ class Worker
 
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
 
-        if (! is_null($this->cache->get($jobExceptionsKey))) {
+        if (is_null($this->cache->get($jobExceptionsKey))) {
             $this->cache->put($jobExceptionsKey, 0, Carbon::now()->addDay());
         }
     }
@@ -646,18 +647,28 @@ class Worker
                         : $options->backoff
         );
 
-        // Determine the the backoff value based on total of exceptions
-        $totalExceptions = $this->getJobTotalExceptions($job);
-        if (! is_null($totalExceptions)) {
-            $calculatedBackoff = (int) ($backoff[$totalExceptions - 1] ?? last($backoff));
-        }
+        $backoffMode = $job->backoffMode();
 
-        // If the value is not available, we fallback to the total of attempts
-        else {
+        if ($backoffMode === Job::BACKOFF_FROM_ATTEMPTS) {
+            // Determine the the backoff value based on total of attempts
             $calculatedBackoff = (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
+
+            return $calculatedBackoff;
+        }
+        else if ($backoffMode === Job::BACKOFF_FROM_EXCEPTIONS) {
+            // Determine the the backoff value based on total of exceptions
+            $totalExceptions = $this->getJobTotalExceptions($job);
+
+            if (! is_null($totalExceptions)) {
+                $calculatedBackoff = (int) ($backoff[$totalExceptions - 1] ?? last($backoff));
+
+                return $calculatedBackoff;
+            }
+
+            throw new \RuntimeException('Cannot get total exceptions');
         }
 
-        return $calculatedBackoff;
+        throw new \InvalidArgumentException('Invalid Backoff Mode "' . $backoffMode . '"');
     }
 
     /**
