@@ -12,6 +12,12 @@ abstract class Job
     use InteractsWithTime;
 
     /**
+     * @const Backoff Calculation Mode: From total of "attempts" (default) o "exceptions"
+     */
+    const BACKOFF_FROM_ATTEMPTS = 'attempts';
+    const BACKOFF_FROM_EXCEPTIONS = 'exceptions';
+
+    /**
      * The job handler instance.
      *
      * @var mixed
@@ -286,19 +292,13 @@ abstract class Job
     }
 
     /**
-     * @const Backoff Calculation Mode: From total of "attempts" (default) o "exceptions"
-     */
-    const BACKOFF_FROM_ATTEMPTS = 'attempts';
-    const BACKOFF_FROM_EXCEPTIONS = 'exceptions';
-
-    /**
      * Decide how to calculate the backoff (default: "attempts" - same behavior as before).
      *
      * @return string
      */
     public function backoffMode()
     {
-        return $this->payload()['backoffMode'] ?? self::BACKOFF_FROM_ATTEMPTS;
+        return $this->payload()['backoffMode'] ?? static::BACKOFF_FROM_ATTEMPTS;
     }
 
     /**

@@ -541,10 +541,10 @@ class Worker
     }
 
     /**
-     * Init the job's total number of exceptions if it's missing.
+     * Initiate the job's total number of exceptions if it's missing.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @return null
+     * @return null|void
      */
     private function setupJobTotalExceptionsIfMissing($job)
     {
@@ -567,10 +567,6 @@ class Worker
      */
     private function getJobTotalExceptions($job)
     {
-        if (! $this->cache || is_null($job->uuid())) {
-            return;
-        }
-
         $this->setupJobTotalExceptionsIfMissing($job);
 
         $jobExceptionsKey = $this->getJobTotalExceptionsKey($job);
@@ -649,12 +645,7 @@ class Worker
 
         $backoffMode = $job->backoffMode();
 
-        if ($backoffMode === Job::BACKOFF_FROM_ATTEMPTS) {
-            // Determine the the backoff value based on total of attempts
-            $calculatedBackoff = (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
-
-            return $calculatedBackoff;
-        } elseif ($backoffMode === Job::BACKOFF_FROM_EXCEPTIONS) {
+        if ($job->backoffMode() === Job::BACKOFF_FROM_EXCEPTIONS) {
             // Determine the the backoff value based on total of exceptions
             $totalExceptions = $this->getJobTotalExceptions($job);
 
@@ -663,11 +654,12 @@ class Worker
 
                 return $calculatedBackoff;
             }
-
-            throw new \RuntimeException('Cannot get total exceptions');
         }
 
-        throw new \InvalidArgumentException('Invalid Backoff Mode "'.$backoffMode.'"');
+        // Determine the the backoff value based on total of attempts
+        $calculatedBackoff = (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
+
+        return $calculatedBackoff;
     }
 
     /**

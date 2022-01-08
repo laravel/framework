@@ -433,9 +433,7 @@ class QueueWorkerTest extends TestCase
 
     protected function workerCache()
     {
-        $repository = new Repository(new ArrayStore);
-
-        return $repository;
+        return new Repository(new ArrayStore);
     }
 }
 

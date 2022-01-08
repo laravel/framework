@@ -205,7 +205,7 @@ abstract class Queue
      * Get the backoff mode for an object-based queue handler.
      *
      * @param  mixed  $job
-     * @return string|null
+     * @return string
      */
     public function getJobBackoffMode($job)
     {
