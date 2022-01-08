@@ -12,10 +12,10 @@ use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Jobs\Job;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
-use Illuminate\Queue\Jobs\Job;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Mockery as m;
@@ -434,6 +434,7 @@ class QueueWorkerTest extends TestCase
     protected function workerCache()
     {
         $repository = new Repository(new ArrayStore);
+
         return $repository;
     }
 }
