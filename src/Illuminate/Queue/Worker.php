@@ -12,8 +12,8 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\Looping;
 use Illuminate\Queue\Events\WorkerStopping;
-use Illuminate\Support\Carbon;
 use Illuminate\Queue\Jobs\Job;
+use Illuminate\Support\Carbon;
 use Throwable;
 
 class Worker
@@ -654,8 +654,7 @@ class Worker
             $calculatedBackoff = (int) ($backoff[$job->attempts() - 1] ?? last($backoff));
 
             return $calculatedBackoff;
-        }
-        else if ($backoffMode === Job::BACKOFF_FROM_EXCEPTIONS) {
+        } elseif ($backoffMode === Job::BACKOFF_FROM_EXCEPTIONS) {
             // Determine the the backoff value based on total of exceptions
             $totalExceptions = $this->getJobTotalExceptions($job);
 
@@ -668,7 +667,7 @@ class Worker
             throw new \RuntimeException('Cannot get total exceptions');
         }
 
-        throw new \InvalidArgumentException('Invalid Backoff Mode "' . $backoffMode . '"');
+        throw new \InvalidArgumentException('Invalid Backoff Mode "'.$backoffMode.'"');
     }
 
     /**
