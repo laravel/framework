@@ -698,6 +698,7 @@ class MemoryCache implements CacheContract
         if (! isset($this->data[$key])) {
             return false;
         }
+
         return ++$this->data[$key];
     }
 
@@ -706,6 +707,7 @@ class MemoryCache implements CacheContract
         if (! isset($this->data[$key])) {
             return false;
         }
+
         return --$this->data[$key];
     }
 
@@ -720,6 +722,7 @@ class MemoryCache implements CacheContract
         if (! isset($this->data[$key])) {
             return $this->data[$key] = $callback();
         }
+
         return $this->data[$key];
     }
 
@@ -728,6 +731,7 @@ class MemoryCache implements CacheContract
         if (! isset($this->data[$key])) {
             return $this->data[$key] = $callback();
         }
+
         return $this->data[$key];
     }
 
@@ -736,6 +740,7 @@ class MemoryCache implements CacheContract
         if (! isset($this->data[$key])) {
             return $this->data[$key] = $callback();
         }
+
         return $this->data[$key];
     }
 
@@ -754,6 +759,7 @@ class MemoryCache implements CacheContract
         if (! isset($this->data[$key])) {
             return null;
         }
+
         return $this->data[$key];
     }
 
