@@ -480,6 +480,7 @@ class WorkerFakeJob implements QueueJobContract
     public $shouldFailOnTimeout = false;
     public $uuid;
     public $backoff;
+    public $backoffMode = 'attempts';
     public $retryUntil;
     public $attempts = 0;
     public $failedWith;
@@ -534,6 +535,11 @@ class WorkerFakeJob implements QueueJobContract
     public function backoff()
     {
         return $this->backoff;
+    }
+
+    public function backoffMode()
+    {
+        return $this->backoffMode;
     }
 
     public function retryUntil()
