@@ -714,6 +714,7 @@ class MemoryCache implements CacheContract
     public function forever($key, $value)
     {
         $this->data[$key] = $value;
+
         return true;
     }
 
@@ -747,6 +748,7 @@ class MemoryCache implements CacheContract
     public function forget($key)
     {
         unset($this->data[$key]);
+
         return true;
     }
 
@@ -754,7 +756,7 @@ class MemoryCache implements CacheContract
     {
     }
 
-    public function get($key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         if (! isset($this->data[$key])) {
             return null;
@@ -763,37 +765,37 @@ class MemoryCache implements CacheContract
         return $this->data[$key];
     }
 
-    public function set($key, $value, $ttl = null)
+    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
     {
         $this->data[$key] = $value;
     }
 
-    public function delete($key, $default = null)
+    public function delete(string $key): bool
     {
         unset($this->data[$key]);
     }
 
-    public function clear()
+    public function clear(): bool
     {
         $this->data = [];
     }
 
-    public function getMultiple($key, $default = null)
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
         return $this->data[$key];
     }
 
-    public function setMultiple($key, $default = null)
+    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
     {
         $this->data[$key] = $value;
     }
 
-    public function deleteMultiple($key, $default = null)
+    public function deleteMultiple(iterable $keys): bool
     {
         unset($this->data[$key]);
     }
 
-    public function has($key, $default = null)
+    public function has(string $key): bool
     {
         return isset($this->data[$key]);
     }
