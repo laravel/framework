@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Queue;
 
 use Closure;
 use Exception;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -294,7 +296,7 @@ class QueueWorkerTest extends TestCase
         $job->backoffMode = 'exceptions';
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->setCache(new MemoryCache());
+        $worker->setCache($this->workerCache());
         $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => '1,10', 'maxTries' => 0]));
 
         $this->assertEquals(1, $job->releaseAfter);
@@ -428,6 +430,12 @@ class QueueWorkerTest extends TestCase
         }
 
         return $options;
+    }
+
+    protected function workerCache()
+    {
+        $repository = new Repository(new ArrayStore);
+        return $repository;
     }
 }
 
@@ -670,133 +678,4 @@ class WorkerFakeJob implements QueueJobContract
 class LoopBreakerException extends RuntimeException
 {
     //
-}
-
-class MemoryCache implements CacheContract
-{
-    private $data = [];
-
-    public function pull($key, $default = null)
-    {
-        unset($this->data[$key]);
-    }
-
-    public function put($key, $value, $ttl = null)
-    {
-        $this->data[$key] = $value;
-    }
-
-    public function add($key, $value, $ttl = null)
-    {
-        if (! isset($this->data[$key])) {
-            $this->data[$key] = $value;
-        }
-    }
-
-    public function increment($key, $value = 1)
-    {
-        if (! isset($this->data[$key])) {
-            return false;
-        }
-
-        return ++$this->data[$key];
-    }
-
-    public function decrement($key, $value = 1)
-    {
-        if (! isset($this->data[$key])) {
-            return false;
-        }
-
-        return --$this->data[$key];
-    }
-
-    public function forever($key, $value)
-    {
-        $this->data[$key] = $value;
-
-        return true;
-    }
-
-    public function remember($key, $ttl, Closure $callback)
-    {
-        if (! isset($this->data[$key])) {
-            return $this->data[$key] = $callback();
-        }
-
-        return $this->data[$key];
-    }
-
-    public function sear($key, Closure $callback)
-    {
-        if (! isset($this->data[$key])) {
-            return $this->data[$key] = $callback();
-        }
-
-        return $this->data[$key];
-    }
-
-    public function rememberForever($key, Closure $callback)
-    {
-        if (! isset($this->data[$key])) {
-            return $this->data[$key] = $callback();
-        }
-
-        return $this->data[$key];
-    }
-
-    public function forget($key)
-    {
-        unset($this->data[$key]);
-
-        return true;
-    }
-
-    public function getStore()
-    {
-    }
-
-    public function get(string $key, mixed $default = null): mixed
-    {
-        if (! isset($this->data[$key])) {
-            return null;
-        }
-
-        return $this->data[$key];
-    }
-
-    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
-    {
-        $this->data[$key] = $value;
-    }
-
-    public function delete(string $key): bool
-    {
-        unset($this->data[$key]);
-    }
-
-    public function clear(): bool
-    {
-        $this->data = [];
-    }
-
-    public function getMultiple(iterable $keys, mixed $default = null): iterable
-    {
-        return $this->data[$key];
-    }
-
-    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
-    {
-        $this->data[$key] = $value;
-    }
-
-    public function deleteMultiple(iterable $keys): bool
-    {
-        unset($this->data[$key]);
-    }
-
-    public function has(string $key): bool
-    {
-        return isset($this->data[$key]);
-    }
 }
