@@ -178,6 +178,13 @@ class Connection implements ConnectionInterface
     protected $doctrineConnection;
 
     /**
+     * Type mappings that should be registered with new Doctrine connections.
+     *
+     * @var array
+     */
+    protected $doctrineTypeMappings = [];
+
+    /**
      * The connection resolvers.
      *
      * @var array
@@ -1007,6 +1014,12 @@ class Connection implements ConnectionInterface
                 'driver' => method_exists($driver, 'getName') ? $driver->getName() : null,
                 'serverVersion' => $this->getConfig('server_version'),
             ]), $driver);
+
+            foreach ($this->doctrineTypeMappings as $name => $type) {
+                $this->doctrineConnection
+                    ->getDatabasePlatform()
+                    ->registerDoctrineTypeMapping($type, $name);
+            }
         }
 
         return $this->doctrineConnection;
@@ -1035,9 +1048,7 @@ class Connection implements ConnectionInterface
             Type::addType($name, $class);
         }
 
-        $this->getDoctrineSchemaManager()
-            ->getDatabasePlatform()
-            ->registerDoctrineTypeMapping($type, $name);
+        $this->doctrineTypeMappings[$name] = $type;
     }
 
     /**
