@@ -60,11 +60,6 @@ class SqlServerGrammar extends Grammar
         );
     }
 
-    public function createCatalog($catalog)
-    {
-        return sprintf("CREATE FULLTEXT CATALOG %s AS DEFAULT", $catalog);
-    }
-
     /**
      * Compile a drop database if exists command.
      *
