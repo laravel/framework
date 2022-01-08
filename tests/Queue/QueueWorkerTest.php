@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Exception;
 use Closure;
+use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
@@ -299,6 +299,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertEquals(1, $job->releaseAfter);
     }
+
     public function testJobBasedBackoffDefaultAttemptsMode()
     {
         $job = new WorkerFakeJob(function ($job) {
@@ -673,95 +674,121 @@ class LoopBreakerException extends RuntimeException
 
 class MemoryCache implements CacheContract
 {
-    private $data = array();
+    private $data = [];
 
-    public function pull($key, $default = null){
+    public function pull($key, $default = null)
+    {
         unset($this->data[$key]);
     }
 
-    public function put($key, $value, $ttl = null){
+    public function put($key, $value, $ttl = null)
+    {
         $this->data[$key] = $value;
     }
 
-    public function add($key, $value, $ttl = null){
+    public function add($key, $value, $ttl = null)
+    {
         if (! isset($this->data[$key])) {
             $this->data[$key] = $value;
         }
     }
 
-    public function increment($key, $value = 1){
+    public function increment($key, $value = 1)
+    {
         if (! isset($this->data[$key])) {
             return false;
         }
         return ++$this->data[$key];
     }
 
-    public function decrement($key, $value = 1){
+    public function decrement($key, $value = 1)
+    {
         if (! isset($this->data[$key])) {
             return false;
         }
         return --$this->data[$key];
     }
 
-    public function forever($key, $value){
+    public function forever($key, $value)
+    {
         $this->data[$key] = $value;
         return true;
     }
 
-    public function remember($key, $ttl, Closure $callback){
+    public function remember($key, $ttl, Closure $callback)
+    {
         if (! isset($this->data[$key])) {
-            return ($this->data[$key] = $callback());
+            return $this->data[$key] = $callback();
         }
         return $this->data[$key];
     }
 
-    public function sear($key, Closure $callback){
+    public function sear($key, Closure $callback)
+    {
         if (! isset($this->data[$key])) {
-            return ($this->data[$key] = $callback());
+            return $this->data[$key] = $callback();
         }
         return $this->data[$key];
     }
 
-    public function rememberForever($key, Closure $callback){
+    public function rememberForever($key, Closure $callback)
+    {
         if (! isset($this->data[$key])) {
-            return ($this->data[$key] = $callback());
+            return $this->data[$key] = $callback();
         }
         return $this->data[$key];
     }
 
-    public function forget($key) {
+    public function forget($key)
+    {
         unset($this->data[$key]);
         return true;
     }
 
-    public function getStore() {
+    public function getStore()
+    {
     }
 
-    public function get($key, $default = null) {
+    public function get($key, $default = null)
+    {
         if (! isset($this->data[$key])) {
             return null;
         }
         return $this->data[$key];
     }
-    public function set($key, $value, $ttl = null) {
+
+    public function set($key, $value, $ttl = null)
+    {
         $this->data[$key] = $value;
     }
-    public function delete($key, $default = null) {
+
+    public function delete($key, $default = null)
+    {
         unset($this->data[$key]);
     }
-    public function clear() {
+
+    public function clear()
+    {
         $this->data = [];
     }
-    public function getMultiple($key, $default = null) {
+
+    public function getMultiple($key, $default = null)
+    {
         return $this->data[$key];
     }
-    public function setMultiple($key, $default = null) {
+
+    public function setMultiple($key, $default = null)
+    {
         $this->data[$key] = $value;
     }
-    public function deleteMultiple($key, $default = null) {
+
+    public function deleteMultiple($key, $default = null)
+    {
         unset($this->data[$key]);
     }
-    public function has($key, $default = null) {
+
+    public function has($key, $default = null)
+    {
         return isset($this->data[$key]);
     }
 }
