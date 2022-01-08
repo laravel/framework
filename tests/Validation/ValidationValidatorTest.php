@@ -1677,12 +1677,31 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'gt:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'gt:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'gt:6']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'gt:7']);
+        $this->assertTrue($v->fails());
+
         $fileOne = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileOne->expects($this->any())->method('getSize')->willReturn(5472);
         $fileTwo = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileTwo->expects($this->any())->method('getSize')->willReturn(3151);
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'gt:rhs']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs' => 'gt:5']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs'=>'gt:8']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'gt:1']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'gt:2']);
+        $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
@@ -1718,11 +1737,30 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'lt:rhs']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'lt:5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'lt:6']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'lt:7']);
+        $this->assertTrue($v->passes());
+
         $fileOne = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileOne->expects($this->any())->method('getSize')->willReturn(5472);
         $fileTwo = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileTwo->expects($this->any())->method('getSize')->willReturn(3151);
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'lt:rhs']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs' => 'lt:6']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs'=>'lt:2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'lt:3']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'lt:2']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lt:10']);
@@ -1759,12 +1797,35 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'gte:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'gte:6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'gte:7']);
+        $this->assertTrue($v->fails());
+
         $fileOne = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileOne->expects($this->any())->method('getSize')->willReturn(5472);
         $fileTwo = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileTwo->expects($this->any())->method('getSize')->willReturn(5472);
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs' => 'gte:4']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs'=>'gte:5']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs'=>'gte:6']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'gte:1']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'gte:2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'gte:3']);
+        $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gte:15']);
         $this->assertTrue($v->passes());
@@ -1800,11 +1861,32 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'lte:rhs']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'lte:7']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'lte:6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => 'string'], ['lhs' => 'lte:5']);
+        $this->assertTrue($v->fails());
+
         $fileOne = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileOne->expects($this->any())->method('getSize')->willReturn(5472);
         $fileTwo = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $fileTwo->expects($this->any())->method('getSize')->willReturn(5472);
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'lte:rhs']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs'=>'lte:5']);
+        $this->assertTrue($v->fails());
+        $v = new Validator($trans, ['lhs' => $fileOne], ['lhs'=>'lte:6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'lte:1']);
+        $this->assertTrue($v->fails());
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'lte:2']);
+        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['lhs' => ['a' => 'one', 'b'=>'two']], ['lhs'=>'lte:3']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lte:10']);
