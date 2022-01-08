@@ -38,13 +38,6 @@ class DatabaseManager implements ConnectionResolverInterface
     protected $connections = [];
 
     /**
-     * Custom Doctrine column types.
-     *
-     * @var array
-     */
-    protected $doctrineTypes = [];
-
-    /**
      * The custom connection resolvers.
      *
      * @var array
@@ -57,6 +50,13 @@ class DatabaseManager implements ConnectionResolverInterface
      * @var callable
      */
     protected $reconnector;
+
+    /**
+     * The custom Doctrine column types.
+     *
+     * @var array
+     */
+    protected $doctrineTypes = [];
 
     /**
      * Create a new database manager instance.
