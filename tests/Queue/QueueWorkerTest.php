@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Closure;
 use Exception;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Job as QueueJobContract;
@@ -17,6 +15,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
+use Illuminate\Queue\Jobs\Job;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Mockery as m;
@@ -293,7 +292,7 @@ class QueueWorkerTest extends TestCase
         $job->uuid = 'test';
         $job->attempts = 1;
         $job->maxExceptions = 10;
-        $job->backoffMode = 'exceptions';
+        $job->backoffMode = Job::BACKOFF_FROM_EXCEPTIONS;
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->setCache($this->workerCache());
@@ -526,7 +525,7 @@ class WorkerFakeJob implements QueueJobContract
     public $shouldFailOnTimeout = false;
     public $uuid;
     public $backoff;
-    public $backoffMode = 'attempts';
+    public $backoffMode = Job::BACKOFF_FROM_ATTEMPTS;
     public $retryUntil;
     public $attempts = 0;
     public $failedWith;
