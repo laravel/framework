@@ -893,7 +893,7 @@ class Str
         $start = static::substr($string, 0, $offset);
         $end = static::substr($string, $offset + $length, static::length($string, 'UTF-8'));
 
-        return $start . $replace . $end;
+        return $start.$replace.$end;
     }
 
     /**
