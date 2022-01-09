@@ -397,8 +397,6 @@ abstract class GeneratorCommand extends Command
         return in_array($name, $this->reservedNames);
     }
 
-
-
     /**
      * Checks whether the force option is active.
      *
@@ -408,7 +406,6 @@ abstract class GeneratorCommand extends Command
     {
         return $this->hasOption('force') && $this->option('force');
     }
-
 
     /**
      * Get the first view directory path from the application configuration.
