@@ -108,8 +108,8 @@ trait AuthorizesRequests
      * @param bool $useResourceMap
      * @return void
      */
-    public function authorizeMap($model, $parameter = null, array $options = [], array $methodsWithModels = [],
-                                 array $methodsWithoutModels = [], bool $useResourceMap = false)
+    public function authorizeMap($model, $parameter = null, array $methodsWithModels = [], array $methodsWithoutModels = [],
+                                 bool $useResourceMap = false, array $options = [])
     {
         $parameter = $parameter ?: Str::snake(class_basename($model));
 
