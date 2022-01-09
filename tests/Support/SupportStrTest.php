@@ -540,6 +540,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('12:00', Str::substrReplace('1200', ':', 2, 0));
         $this->assertSame('The Laravel Framework', Str::substrReplace('The Framework', 'Laravel ', 4, 0));
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
+        $this->assertSame('Ларавел – PHP-фреймворк', Str::substrReplace('Ларавел фреймворк', '– PHP-фреймворк', 8));
     }
 
     public function testUcfirst()

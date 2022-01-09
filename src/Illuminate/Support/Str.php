@@ -887,10 +887,13 @@ class Str
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
         if ($length === null) {
-            $length = strlen($string);
+            $length = static::length($string, 'UTF-8');
         }
 
-        return substr_replace($string, $replace, $offset, $length);
+        $start = static::substr($string, 0, $offset);
+        $end = static::substr($string, $offset + $length, static::length($string, 'UTF-8'));
+
+        return $start . $replace . $end;
     }
 
     /**
