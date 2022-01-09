@@ -98,6 +98,45 @@ trait AuthorizesRequests
     }
 
     /**
+     * Authorize a resource action based on the incoming request with custom mapping.
+     *
+     * @param string $model
+     * @param string|null $parameter
+     * @param array $options
+     * @param array $methodsWithModels
+     * @param array $methodsWithoutModels
+     * @param bool $useResourceMap
+     * @return void
+     */
+    public function authorizeMap($model, $parameter = null, array $options = [], array $methodsWithModels = [],
+                                 array $methodsWithoutModels = [], bool $useResourceMap = false)
+    {
+        $parameter = $parameter ?: Str::snake(class_basename($model));
+
+        $middleware = [];
+
+        foreach ($methodsWithModels as $method => $ability) {
+            $middleware["can:{$ability},{$parameter}"][] = $method;
+        }
+
+        foreach ($methodsWithoutModels as $method => $ability) {
+            $middleware["can:{$ability},{$model}"][] = $method;
+        }
+
+        if ($useResourceMap) {
+            foreach ($this->resourceAbilityMap() as $method => $ability) {
+                $modelName = in_array($method,$this->resourceMethodsWithoutModels()) ? $model : $parameter;
+
+                $middleware["can:{$ability},{$modelName}"][] = $method;
+            }
+        }
+
+        foreach ($middleware as $middlewareName => $methods) {
+            $this->middleware($middlewareName, $options)->only($methods);
+        }
+    }
+
+    /**
      * Get the map of resource methods to ability names.
      *
      * @return array
