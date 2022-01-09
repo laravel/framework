@@ -148,9 +148,8 @@ abstract class GeneratorCommand extends Command
         // Next, We will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
-        if ((! $this->hasOption('force') ||
-             ! $this->option('force')) &&
-             $this->alreadyExists($this->getNameInput())) {
+
+        if (! $this->isForced() && $this->alreadyExists($this->getNameInput())) {
             $this->error($this->type.' already exists!');
 
             return false;
@@ -397,6 +396,19 @@ abstract class GeneratorCommand extends Command
 
         return in_array($name, $this->reservedNames);
     }
+
+
+
+    /**
+     * Checks whether the force option is active.
+     *
+     * @return bool
+     */
+    public function isForced()
+    {
+        return $this->hasOption('force') && $this->option('force');
+    }
+
 
     /**
      * Get the first view directory path from the application configuration.
