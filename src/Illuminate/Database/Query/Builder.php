@@ -454,7 +454,7 @@ class Builder
      * @param  bool  $where
      * @return $this
      */
-    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    public function join($table, $first, $operator = null, $second = 'id', $type = 'inner', $where = false)
     {
         $join = $this->newJoinClause($this, $type, $table);
 
