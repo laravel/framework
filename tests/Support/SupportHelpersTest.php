@@ -13,6 +13,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
@@ -836,7 +837,7 @@ class SupportTestArrayIterable implements IteratorAggregate
         $this->items = $items;
     }
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
     }
