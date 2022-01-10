@@ -3,6 +3,8 @@
 namespace Illuminate\Routing;
 
 use BadMethodCallException;
+use Illuminate\Attributes\Routing\Middleware;
+use ReflectionClass;
 
 abstract class Controller
 {
@@ -39,7 +41,53 @@ abstract class Controller
      */
     public function getMiddleware()
     {
-        return $this->middleware;
+        return array_merge($this->middleware, $this->getMiddlewaresByAttributes());
+    }
+
+    /**
+     * Get the controller middlewares by attributes
+     *
+     * @see \Illuminate\Attributes\Routing\Middleware
+     *
+     * @return array
+     */
+    public function getMiddlewaresByAttributes()
+    {
+        $middlewares = [];
+
+        // PHP 8+
+        if (80000 > PHP_VERSION_ID) return $middlewares;
+
+        /** @var \ReflectionAttribute[] $attributes */
+        $push = function (array $attributes, ?string $method = null) use (&$middlewares) {
+            foreach ($attributes as $attribute) {
+                /** @var Middleware $middlewares */
+                $middleware = $attribute->newInstance();
+
+                $name = $middleware->name;
+                $arguments = count($middleware->arguments) ? ':'.implode(',', $middleware->arguments) : '';
+                $options = $middleware->options;
+
+                $middlewares[] = [
+                    'middleware' => "$name$arguments",
+                    'options' => &$options
+                ];
+
+                if ($method) (new ControllerMiddlewareOptions($options))->only($method);
+            }
+        };
+
+        $class = new ReflectionClass($this);
+
+        // Class
+        $push($class->getAttributes(Middleware::class));
+
+        // Methods
+        foreach ($class->getMethods() as $method) {
+            $push($method->getAttributes(Middleware::class), $method->name);
+        }
+
+        return $middlewares;
     }
 
     /**
