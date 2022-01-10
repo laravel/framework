@@ -1743,6 +1743,30 @@ class Builder
     }
 
     /**
+     * Simple and clean way to write 'where' with like operator.
+     *
+     * @param string $column
+     * @param string $value
+     * @param string $position
+     * @return $this
+     */
+    public function whereLike($column, $value, $position = 'both')
+    {
+        switch ($position) {
+            case 'before':
+                $value = '%'.$value;
+                break;
+            case 'after':
+                $value .= '%';
+                break;
+            default:
+                $value = '%'.$value.'%';
+        }
+
+        return $this->where($column, 'like', $value);
+    }
+
+    /**
      * Add an "or where JSON length" clause to the query.
      *
      * @param  string  $column
