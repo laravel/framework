@@ -41,7 +41,7 @@ class BusPendingBatchTest extends TestCase
             //
         })->catch(function () {
             //
-        })->allowFailures()->onConnection('test-connection')->onQueue('test-queue')->addOption('extra-option', 123);
+        })->allowFailures()->onConnection('test-connection')->onQueue('test-queue')->withOption('extra-option', 123);
 
         $this->assertSame('test-connection', $pendingBatch->connection());
         $this->assertSame('test-queue', $pendingBatch->queue());
