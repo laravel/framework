@@ -47,6 +47,12 @@ class MigratorEventsTest extends TestCase
         Event::assertDispatched(MigrationsStarted::class, function ($event) {
             return $event->method === 'down';
         });
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'up';
+        });
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'down';
+        });
 
         Event::assertDispatched(MigrationStarted::class, function ($event) {
             return $event->method === 'up' && $event->migration instanceof Migration;
