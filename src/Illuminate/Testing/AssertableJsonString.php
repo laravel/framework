@@ -219,6 +219,19 @@ class AssertableJsonString implements ArrayAccess, Countable
      */
     public function assertPath($path, $expect)
     {
+        if (! Arr::has($this->json(), $path)) {
+            $actual = json_encode(Arr::sortRecursive(
+                (array) $this->decoded
+            ));
+
+            PHPUnit::fail(
+                'Unable to find path: '.PHP_EOL.PHP_EOL.
+                '['.$path.']'.PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]"
+            );
+        }
+
         PHPUnit::assertSame($expect, $this->json($path));
 
         return $this;
