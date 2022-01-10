@@ -140,7 +140,7 @@ class Factory
      *
      * @param  \Closure  $callback
      * @return $this
-    */
+     */
     public function configure(Closure $callback)
     {
         $this->configureCallback = $callback;
