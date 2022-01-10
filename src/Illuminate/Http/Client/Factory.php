@@ -72,6 +72,13 @@ class Factory
     protected $stubCallbacks;
 
     /**
+     * The callback used to configure all requests.
+     *
+     * @var \Closure
+     */
+    protected $configureCallback;
+
+    /**
      * Indicates if the factory is recording requests and responses.
      *
      * @var bool
@@ -126,6 +133,19 @@ class Factory
         return class_exists(\GuzzleHttp\Promise\Create::class)
             ? \GuzzleHttp\Promise\Create::promiseFor($response)
             : \GuzzleHttp\Promise\promise_for($response);
+    }
+
+    /**
+     * Set the callback used to configure all requests.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+    */
+    public function configure(Closure $callback)
+    {
+        $this->configureCallback = $callback;
+
+        return $this;
     }
 
     /**
@@ -361,7 +381,11 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return new PendingRequest($this);
+        return tap(new PendingRequest($this), function (PendingRequest $request) {
+            if ($this->configureCallback) {
+                call_user_func($this->configureCallback, $request);
+            }
+        });
     }
 
     /**
