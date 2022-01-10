@@ -358,9 +358,9 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values']);
+        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
 
-        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values']);
+        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use BackedEnum;
+use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
@@ -926,6 +927,10 @@ class Builder implements BuilderContract
     public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
+
+        if ($values instanceof CarbonPeriod) {
+            $values = $values->toArray();
+        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
