@@ -1067,4 +1067,21 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('https://example.com');
     }
+
+    public function testConfigureCallbackIsCalled()
+    {
+        $this->factory->configure(function (PendingRequest $request) {
+            $request->withHeaders([
+                'custom' => 'yes!',
+            ]);
+        });
+
+        $this->factory->fake(function (Request $request) {
+            $this->assertTrue($request->hasHeader('custom', 'yes!'));
+
+            return $this->factory->response();
+        });
+
+        $this->factory->get('https://example.com');
+    }
 }
