@@ -45,7 +45,7 @@ abstract class Controller
     }
 
     /**
-     * Get the controller middlewares by attributes
+     * Get the controller middlewares by attributes.
      *
      * @see \Illuminate\Attributes\Routing\Middleware
      *
@@ -56,7 +56,9 @@ abstract class Controller
         $middlewares = [];
 
         // PHP 8+
-        if (80000 > PHP_VERSION_ID) return $middlewares;
+        if (80000 > PHP_VERSION_ID) {
+            return $middlewares;
+        }
 
         /** @var \ReflectionAttribute[] $attributes */
         $push = function (array $attributes, ?string $method = null) use (&$middlewares) {
@@ -70,10 +72,12 @@ abstract class Controller
 
                 $middlewares[] = [
                     'middleware' => "$name$arguments",
-                    'options' => &$options
+                    'options' => &$options,
                 ];
 
-                if ($method) (new ControllerMiddlewareOptions($options))->only($method);
+                if ($method) {
+                    (new ControllerMiddlewareOptions($options))->only($method);
+                }
             }
         };
 

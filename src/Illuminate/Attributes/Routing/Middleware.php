@@ -8,11 +8,11 @@ use Attribute;
 class Middleware
 {
     /**
-     * @param string $name
-     * @param string[] $arguments
-     * @param array $options
+     * @param  string  $name
+     * @param  string[]  $arguments
+     * @param  array  $options
      */
-    function __construct(public string $name, public array $arguments = [], public array $options = [])
+    public function __construct(public string $name, public array $arguments = [], public array $options = [])
     {
     }
 }

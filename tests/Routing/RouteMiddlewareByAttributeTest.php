@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class RouteMiddlewareByAttributeTest extends TestCase
 {
-    /** @var \Illuminate\Tests\Routing\fixtures\MiddlewareByAttributeController | null $controller */
+    /** @var \Illuminate\Tests\Routing\fixtures\MiddlewareByAttributeController | null */
     protected $controller = null;
 
     protected function setUp(): void
@@ -16,7 +16,8 @@ class RouteMiddlewareByAttributeTest extends TestCase
 
         try {
             $this->controller = app()->make('\Illuminate\Tests\Routing\fixtures\MiddlewareByAttributeController');
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
     }
 
     public function testControllerInstance()
