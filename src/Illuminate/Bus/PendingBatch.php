@@ -215,6 +215,20 @@ class PendingBatch
 
         return $this;
     }
+    
+    /**
+     * Specify additional option.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function addOption(string $key, $value)
+    {
+        $this->options[$key] = $value;
+        
+        return $this;
+    }
 
     /**
      * Get the queue used by the pending batch.
