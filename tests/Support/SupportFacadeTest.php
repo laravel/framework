@@ -99,7 +99,8 @@ class ApplicationStub implements ArrayAccess
         return isset($this->attributes[$offset]);
     }
 
-    public function offsetGet($key): mixed
+    #[\ReturnTypeWillChange]
+    public function offsetGet($key)
     {
         return $this->attributes[$key];
     }
