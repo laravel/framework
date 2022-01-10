@@ -227,7 +227,7 @@ class FilesystemManager implements FactoryContract
     {
         $s3Config = $this->formatS3Config($config);
 
-        $root = $s3Config['root'] ?? null;
+        $root = (string) ($s3Config['root'] ?? '');
 
         $visibility = new AwsS3PortableVisibilityConverter(
             $config['visibility'] ?? Visibility::PUBLIC
