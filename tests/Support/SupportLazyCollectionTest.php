@@ -69,6 +69,31 @@ class SupportLazyCollectionTest extends TestCase
         ], $data->all());
     }
 
+    public function testCanCreateCollectionFromGenerator()
+    {
+        $generatorClosure = function () {
+            yield 1;
+            yield 2;
+            yield 3;
+        };
+        $data = LazyCollection::make($generatorClosure());
+
+        $this->assertSame([1, 2, 3], $data->all());
+
+        $generatorClosure = function () {
+            yield 'a' => 1;
+            yield 'b' => 2;
+            yield 'c' => 3;
+        };
+        $data = LazyCollection::make($generatorClosure());
+
+        $this->assertSame([
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+        ], $data->all());
+    }
+
     public function testEager()
     {
         $source = [1, 2, 3, 4, 5];
@@ -211,5 +236,20 @@ class SupportLazyCollectionTest extends TestCase
         $data->all();
 
         $this->assertSame([1, 2], $data->all());
+    }
+
+    public function testGenerator()
+    {
+        $source = [1, 2, 3, 4, 5];
+
+        $generatorClosure = function () use (&$source) {
+            yield from $source;
+        };
+
+        $collection = LazyCollection::make($generatorClosure());
+
+        $source[] = 6;
+
+        $this->assertSame($source, $collection->all());
     }
 }
