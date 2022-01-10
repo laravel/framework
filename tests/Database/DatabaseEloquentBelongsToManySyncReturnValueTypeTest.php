@@ -120,10 +120,10 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
         $user->articles()->sync($articleIDs);
 
-        $article = $user->articles()->selectPivot('artcle_id', 'user_id')->first();
+        $article = $user->articles()->selectPivot('article_id', 'user_id')->first();
         
         $this->assertNull($article->visible);
-        $this->assertNotNull($article->artcle_id);
+        $this->assertNotNull($article->article_id);
         $this->assertNotNull($article->user_id);
     }
 
