@@ -821,17 +821,7 @@ class Stringable implements JsonSerializable
      */
     public function whenEndsWith($needles, $callback, $default = null)
     {
-        if ($this->endsWith($needles)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->endsWith($needles), $callback, $default);
     }
 
     /**
@@ -844,17 +834,7 @@ class Stringable implements JsonSerializable
      */
     public function whenExactly($value, $callback, $default = null)
     {
-        if ($this->exactly($value)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->exactly($value), $callback, $default);
     }
 
     /**
@@ -867,17 +847,7 @@ class Stringable implements JsonSerializable
      */
     public function whenIs($pattern, $callback, $default = null)
     {
-        if ($this->is($pattern)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->is($pattern), $callback, $default);
     }
 
     /**
@@ -889,17 +859,7 @@ class Stringable implements JsonSerializable
      */
     public function whenIsAscii($callback, $default = null)
     {
-        if ($this->isAscii()) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->isAscii(), $callback, $default);
     }
 
     /**
@@ -911,17 +871,7 @@ class Stringable implements JsonSerializable
      */
     public function whenIsUuid($callback, $default = null)
     {
-        if ($this->isUuid()) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->isUuid(), $callback, $default);
     }
 
     /**
@@ -934,17 +884,7 @@ class Stringable implements JsonSerializable
      */
     public function whenTest($pattern, $callback, $default = null)
     {
-        if ($this->test($pattern)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->test($pattern), $callback, $default);
     }
 
     /**
@@ -957,17 +897,7 @@ class Stringable implements JsonSerializable
      */
     public function whenStartsWith($needles, $callback, $default = null)
     {
-        if ($this->startsWith($needles)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->startsWith($needles), $callback, $default);
     }
 
     /**
