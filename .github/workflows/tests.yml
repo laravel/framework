@@ -62,6 +62,14 @@ jobs:
           command: composer require guzzlehttp/guzzle:^7.2 --no-interaction --no-update
         if: matrix.php >= 8
 
+      - name: Set Minimum PHP 8.1 Versions
+        uses: nick-invision/retry@v1
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
+        if: matrix.php >= 8.1
+
       - name: Install dependencies
         uses: nick-invision/retry@v1
         with:
