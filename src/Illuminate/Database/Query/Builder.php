@@ -1745,10 +1745,10 @@ class Builder
     /**
      * Simple and clean way to write 'where' with like operator.
      *
-     * @param string $column
-     * @param string $value
-     * @param string $position
-     * @return $this
+     * @param  string  $column
+     * @param  string  $value
+     * @param  string  $position
+     * @return  $this
      */
     public function whereLike($column, $value, $position = 'both')
     {

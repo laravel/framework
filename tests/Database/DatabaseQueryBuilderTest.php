@@ -875,7 +875,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereLike('first_name', 'eoffre');
         $this->assertSame('select * from "users" where "first_name" like ?', $builder->toSql());
         $this->assertEquals(['%eoffre%'], $builder->getBindings());
-
     }
 
     public function testWhereFulltextMySql()
