@@ -215,7 +215,7 @@ class PendingBatch
 
         return $this;
     }
-    
+
     /**
      * Specify additional option.
      *
@@ -226,7 +226,7 @@ class PendingBatch
     public function addOption(string $key, $value)
     {
         $this->options[$key] = $value;
-        
+
         return $this;
     }
 
