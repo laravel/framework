@@ -587,6 +587,19 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Override the columns on the pivot table to retrieve.
+     *
+     * @param  array|mixed  $columns
+     * @return $this
+     */
+    public function selectPivot($columns)
+    {
+        $this->pivotColumns = is_array($columns) ? $columns : func_get_args();
+
+        return $this;
+    }
+
+    /**
      * Get all of the IDs from the given mixed value.
      *
      * @param  mixed  $value

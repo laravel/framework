@@ -112,6 +112,21 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         });
     }
 
+    public function testReplacesPivotColumnSelect()
+    {
+        $this->seedData();
+
+        $user = BelongsToManySyncTestTestUser::query()->first();
+        $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
+        $user->articles()->sync($articleIDs);
+
+        $article = $user->articles()->selectPivot('article_id', 'user_id')->first();
+
+        $this->assertNull($article->pivot->visible);
+        $this->assertNotNull($article->pivot->article_id);
+        $this->assertNotNull($article->pivot->user_id);
+    }
+
     /**
      * Get a database connection instance.
      *
