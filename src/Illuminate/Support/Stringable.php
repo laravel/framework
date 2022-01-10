@@ -775,17 +775,7 @@ class Stringable implements JsonSerializable
      */
     public function whenContains($needles, $callback, $default = null)
     {
-        if ($this->contains($needles)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->contains($needles), $callback, $default);
     }
 
     /**
@@ -798,17 +788,7 @@ class Stringable implements JsonSerializable
      */
     public function whenContainsAll(array $needles, $callback, $default = null)
     {
-        if ($this->containsAll($needles)) {
-            $result = $callback($this);
-
-            return $result ?? $this;
-        } elseif ($default) {
-            $result = $default($this);
-
-            return $result ?? $this;
-        }
-
-        return $this;
+        return $this->when($this->containsAll($needles), $callback, $default);
     }
 
     /**
