@@ -32,6 +32,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         if ($source instanceof Closure || $source instanceof self) {
             $this->source = $source;
+        } elseif ($source instanceof \Generator) {
+            $this->source = function () use ($source) {
+                yield from $source;
+            };
         } elseif (is_null($source)) {
             $this->source = static::empty();
         } else {

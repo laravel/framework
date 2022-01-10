@@ -29,13 +29,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
-    public function testMakeWithGeneratorIsNotLazy()
+    public function testMakeWithGeneratorIsLazy()
     {
         [$closure, $recorder] = $this->makeGeneratorFunctionWithRecorder(5);
 
         LazyCollection::make($closure());
 
-        $this->assertEquals([1, 2, 3, 4, 5], $recorder->all());
+        $this->assertEquals([], $recorder->all());
     }
 
     public function testEagerEnumeratesOnce()
