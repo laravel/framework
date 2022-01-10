@@ -2,9 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Doctrine\Inflector\CachedWordInflector;
+use Doctrine\Inflector\InflectorFactory;
 use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\Rules\English;
 use Doctrine\Inflector\RulesetInflector;
 
 class Pluralizer
@@ -136,14 +135,7 @@ class Pluralizer
         static $inflector;
 
         if (is_null($inflector)) {
-            $inflector = new Inflector(
-                new CachedWordInflector(new RulesetInflector(
-                    English\Rules::getSingularRuleset()
-                )),
-                new CachedWordInflector(new RulesetInflector(
-                    English\Rules::getPluralRuleset()
-                ))
-            );
+            $inflector = InflectorFactory::createForLanguage('english')->build();
         }
 
         return $inflector;
