@@ -109,7 +109,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         }
 
         $iv = base64_encode($iv);
-        $tag = base64_encode($tag);
+        $tag = base64_encode($tag ?? '');
 
         $mac = self::$supportedCiphers[strtolower($this->cipher)]['aead']
             ? '' // For AEAD-algoritms, the tag / MAC is returned by openssl_encrypt...
