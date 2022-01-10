@@ -598,6 +598,22 @@ trait DecoratesQueryBuilder
     /**
      * {@inheritdoc}
      */
+    public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
+    {
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function orWhereFullText($columns, $value, array $options = [])
+    {
+        return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function groupBy(...$groups)
     {
         return $this->forwardDecoratedCallTo($this->query, __FUNCTION__, func_get_args());
