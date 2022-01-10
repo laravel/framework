@@ -1748,7 +1748,7 @@ class Builder
      * @param  string  $column
      * @param  string  $value
      * @param  string  $position
-     * @return  $this
+     * @return $this
      */
     public function whereLike($column, $value, $position = 'both')
     {
