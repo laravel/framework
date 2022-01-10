@@ -1465,6 +1465,30 @@ class Builder implements BuilderContract
     /**
      * {@inheritdoc}
      */
+    public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
+    {
+        $type = 'Fulltext';
+
+        $columns = (array) $columns;
+
+        $this->wheres[] = compact('type', 'columns', 'value', 'options', 'boolean');
+
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function orWhereFullText($columns, $value, array $options = [])
+    {
+        return $this->whereFulltext($columns, $value, $options, 'or');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function groupBy(...$groups)
     {
         foreach ($groups as $group) {

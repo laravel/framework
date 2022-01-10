@@ -50,6 +50,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
+          ini-values: error_reporting=E_ALL
           tools: composer:v2
           coverage: none
 

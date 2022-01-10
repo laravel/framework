@@ -1623,7 +1623,13 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
-            $callback = $this->{Str::camel($key)}()->set ?: function ($value) use ($key) {
+            $attribute = $this->{Str::camel($key)}();
+
+            if ($attribute->get && ! $attribute->set) {
+                continue;
+            }
+
+            $callback = $attribute->set ?: function ($value) use ($key) {
                 $this->attributes[$key] = $value;
             };
 

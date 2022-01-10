@@ -1663,7 +1663,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Unset the item at a given offset.
      *
+<<<<<<< HEAD
      * @param  TKey  $key
+=======
+     * @param  mixed  $key
+>>>>>>> 8.x
      * @return void
      */
     #[\ReturnTypeWillChange]

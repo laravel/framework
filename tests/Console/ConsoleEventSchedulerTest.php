@@ -120,6 +120,21 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals($binary.' '.$artisan.' foo:bar --force', $events[0]->command);
     }
 
+    public function testItUsesCommandDescriptionAsEventDescription()
+    {
+        $schedule = $this->schedule;
+        $event = $schedule->command(ConsoleCommandStub::class);
+        $this->assertEquals('This is a description about the command', $event->description);
+    }
+
+    public function testItShouldBePossibleToOverwriteTheDescription()
+    {
+        $schedule = $this->schedule;
+        $event = $schedule->command(ConsoleCommandStub::class)
+            ->description('This is an alternative description');
+        $this->assertEquals('This is an alternative description', $event->description);
+    }
+
     public function testCallCreatesNewJobWithTimezone()
     {
         $schedule = new Schedule('UTC');
@@ -147,6 +162,8 @@ class FooClassStub
 class ConsoleCommandStub extends Command
 {
     protected $signature = 'foo:bar';
+
+    protected $description = 'This is a description about the command';
 
     protected $foo;
 
