@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\FormattableHandlerInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
@@ -416,6 +417,10 @@ class LogManager implements LoggerInterface
      */
     protected function prepareHandler(HandlerInterface $handler, array $config = [])
     {
+        if (isset($config['action_level'])) {
+            $handler = new FingersCrossedHandler($handler, $this->actionLevel($config));
+        }
+
         if (Monolog::API !== 1 && (Monolog::API !== 2 || ! $handler instanceof FormattableHandlerInterface)) {
             return $handler;
         }
