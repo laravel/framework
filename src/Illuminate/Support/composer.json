@@ -46,7 +46,7 @@
         "ramsey/uuid": "Required to use Str::uuid() (^4.2.2).",
         "symfony/process": "Required to use the composer class (^5.4).",
         "symfony/var-dumper": "Required to use the dd function (^5.4).",
-        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.2)."
+        "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
     },
     "config": {
         "sort-packages": true
