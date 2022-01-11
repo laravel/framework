@@ -93,7 +93,7 @@ class LogManager implements LoggerInterface
     /**
      * Get a log channel instance.
      *
-     * @param  string|null  $channel
+     * @param  array|string|null  $channel
      * @return \Psr\Log\LoggerInterface
      */
     public function channel($channel = null)
@@ -104,11 +104,14 @@ class LogManager implements LoggerInterface
     /**
      * Get a log driver instance.
      *
-     * @param  string|null  $driver
+     * @param  array|string|null  $driver
      * @return \Psr\Log\LoggerInterface
      */
     public function driver($driver = null)
     {
+        if (is_array($driver)) {
+            return new MultiChannelLogger($driver, $this);
+        }
         return $this->get($this->parseDriver($driver));
     }
 
