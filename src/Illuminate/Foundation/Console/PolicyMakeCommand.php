@@ -87,7 +87,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         return $config->get(
             'auth.providers.'.$guardProvider.'.model'
-        ) ?? "App\\Models\\User";
+        ) ?? 'App\\Models\\User';
     }
 
     /**
