@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use BackedEnum;
 use Illuminate\Contracts\Validation\Rule;
 
 class Enum implements Rule
@@ -37,7 +38,7 @@ class Enum implements Rule
             return false;
         }
 
-        return ! is_null($this->type::tryFrom($value));
+        return in_array($value, array_map(fn (BackedEnum $enum) => $enum->value, $this->type::cases()));
     }
 
     /**
