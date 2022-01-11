@@ -38,6 +38,7 @@ interface Restable
 
     /**
      * Rest until the time specified. Timestamp or Carbon Object.
+     *
      * @var float|int|Carbon
      *
      * @return void

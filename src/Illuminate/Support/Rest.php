@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Illuminate\Support;
 
 use Illuminate\Contracts\Support\Restable;
@@ -31,7 +30,6 @@ class Rest implements Restable
     {
         sleep($seconds);
     }
-
 
     /**
      * @var int
