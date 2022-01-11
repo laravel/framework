@@ -1884,7 +1884,6 @@ class SupportCollectionTest extends TestCase
      */
     public function testSortKeysUsing($collection)
     {
-        /** @var LazyCollection|Collection $data */
         $data = new $collection(['B' => 'dayle', 'a' => 'taylor']);
 
         $this->assertSame(['a' => 'taylor', 'B' => 'dayle'], $data->sortKeysUsing('strnatcasecmp')->all());
