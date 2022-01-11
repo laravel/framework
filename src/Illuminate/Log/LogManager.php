@@ -112,6 +112,7 @@ class LogManager implements LoggerInterface
         if (is_array($driver)) {
             return new MultiChannelLogger($driver, $this);
         }
+
         return $this->get($this->parseDriver($driver));
     }
 
