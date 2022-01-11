@@ -43,7 +43,7 @@
         "symfony/routing": "^5.4",
         "symfony/var-dumper": "^5.4",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
-        "vlucas/phpdotenv": "^5.2",
+        "vlucas/phpdotenv": "^5.4.1",
         "voku/portable-ascii": "^1.4.8"
     },
     "replace": {
