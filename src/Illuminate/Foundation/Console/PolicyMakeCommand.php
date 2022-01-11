@@ -85,6 +85,10 @@ class PolicyMakeCommand extends GeneratorCommand
             throw new LogicException('The ['.$guard.'] guard is not defined in your "auth" configuration file.');
         }
 
+        if (!$config->get('auth.providers.'.$guardProvider.'.model')) {
+            throw new LogicException('The user provider in your "auth" configuration file misses the model key.');
+        }
+
         return $config->get(
             'auth.providers.'.$guardProvider.'.model'
         );
