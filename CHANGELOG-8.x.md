@@ -1,6 +1,16 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.78.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.78.1...8.x)
+
+
+## [v8.78.1 (2022-01-05)](https://github.com/laravel/framework/compare/v8.78.0...v8.78.1)
+
+### Added
+- Added pipeThrough collection method ([#40253](https://github.com/laravel/framework/pull/40253))
+
+### Changed
+- Run clearstatcache after deleting file and asserting Storage using exists/missing ([#40257](https://github.com/laravel/framework/pull/40257))
+- Avoid constructor call when fetching resource JSON options ([#40261](https://github.com/laravel/framework/pull/40261))
 
 
 ## [v8.78.0 (2022-01-04)](https://github.com/laravel/framework/compare/v8.77.1...v8.78.0)
