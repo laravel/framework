@@ -650,6 +650,10 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
+        if ($configureCallback = $this->factory->getConfigureCallback()) {
+            call_user_func($configureCallback, $this);
+        }
+
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
         if (isset($options[$this->bodyFormat])) {

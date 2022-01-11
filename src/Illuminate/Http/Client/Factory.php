@@ -149,6 +149,16 @@ class Factory
     }
 
     /**
+     * Get the callback used to configure all requests.
+     *
+     * @return \Closure|null
+     */
+    public function getConfigureCallback()
+    {
+        return $this->configureCallback;
+    }
+
+    /**
      * Get an invokable object that returns a sequence of responses in order for use during stubbing.
      *
      * @param  array  $responses
@@ -381,11 +391,7 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return tap(new PendingRequest($this), function (PendingRequest $request) {
-            if ($this->configureCallback) {
-                call_user_func($this->configureCallback, $request);
-            }
-        });
+        return new PendingRequest($this);
     }
 
     /**
