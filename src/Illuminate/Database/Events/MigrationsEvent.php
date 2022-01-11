@@ -7,7 +7,7 @@ use Illuminate\Contracts\Database\Events\MigrationEvent as MigrationEventContrac
 abstract class MigrationsEvent implements MigrationEventContract
 {
     /**
-     * The migration method that was called.
+     * The migration method that was invoked.
      *
      * @var string
      */
