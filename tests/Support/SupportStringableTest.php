@@ -112,6 +112,44 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenContains()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('stark')->whenContains('tar', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+
+        $this->assertSame('stark', (string) $this->stringable('stark')->whenContains('xxx', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }));
+
+        $this->assertSame('Arno Stark', (string) $this->stringable('stark')->whenContains('xxx', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+    }
+
+    public function testWhenContainsAll()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenContainsAll(['tony', 'stark'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+
+        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenContainsAll(['xxx'], function ($stringable) {
+            return $stringable->title();
+        }));
+
+        $this->assertSame('TonyStark', (string) $this->stringable('tony stark')->whenContainsAll(['tony', 'xxx'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+    }
+
     public function testWhenEmpty()
     {
         tap($this->stringable(), function ($stringable) {

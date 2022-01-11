@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\FormattableHandlerInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
@@ -109,14 +110,6 @@ class LogManager implements LoggerInterface
     public function driver($driver = null)
     {
         return $this->get($this->parseDriver($driver));
-    }
-
-    /**
-     * @return array
-     */
-    public function getChannels()
-    {
-        return $this->channels;
     }
 
     /**
@@ -416,6 +409,10 @@ class LogManager implements LoggerInterface
      */
     protected function prepareHandler(HandlerInterface $handler, array $config = [])
     {
+        if (isset($config['action_level'])) {
+            $handler = new FingersCrossedHandler($handler, $this->actionLevel($config));
+        }
+
         if (Monolog::API !== 1 && (Monolog::API !== 2 || ! $handler instanceof FormattableHandlerInterface)) {
             return $handler;
         }
@@ -527,6 +524,16 @@ class LogManager implements LoggerInterface
         }
 
         return $driver;
+    }
+
+    /**
+     * Get all of the resolved log channels.
+     *
+     * @return array
+     */
+    public function getChannels()
+    {
+        return $this->channels;
     }
 
     /**
