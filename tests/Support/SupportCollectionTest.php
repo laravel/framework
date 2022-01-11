@@ -4010,6 +4010,25 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testPipeThrough($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+
+        $result = $data->pipeThrough([
+            function ($data) {
+                return $data->merge([4, 5]);
+            },
+            function ($data) {
+                return $data->sum();
+            },
+        ]);
+
+        $this->assertEquals(15, $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testMedianValueWithArrayCollection($collection)
     {
         $data = new $collection([1, 2, 2, 4]);

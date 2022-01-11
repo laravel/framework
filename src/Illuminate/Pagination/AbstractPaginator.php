@@ -380,6 +380,16 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Determine if the paginator is on the last page.
+     *
+     * @return bool
+     */
+    public function onLastPage()
+    {
+        return ! $this->hasMorePages();
+    }
+
+    /**
      * Get the current page.
      *
      * @return int

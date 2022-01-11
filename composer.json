@@ -43,7 +43,7 @@
         "symfony/routing": "^5.4",
         "symfony/var-dumper": "^5.4",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
-        "vlucas/phpdotenv": "^5.2",
+        "vlucas/phpdotenv": "^5.4.1",
         "voku/portable-ascii": "^1.4.8"
     },
     "replace": {
@@ -132,6 +132,7 @@
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0).",
+        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
         "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage and SES mail driver (^3.198.1).",
         "brianium/paratest": "Required to run tests in parallel (^6.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3|^3.1.4).",
