@@ -377,3 +377,11 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('msleep')) {
+    function msleep(int $msleep)
+    {
+        return usleep($msleep * 1000);
+    }
+}
+
