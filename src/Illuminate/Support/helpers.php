@@ -2,10 +2,12 @@
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\Support\Restable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Rest;
 
 if (! function_exists('append_config')) {
     /**
@@ -385,3 +387,13 @@ if (! function_exists('msleep')) {
     }
 }
 
+if (! function_exists('rest')) {
+    function rest(): Restable
+    {
+        static $rest;
+        if (!$rest) {
+            $rest = new Rest;
+        }
+        return $rest;
+    }
+}
