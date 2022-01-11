@@ -2,9 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Doctrine\Inflector\InflectorFactory;
 use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\RulesetInflector;
+use Doctrine\Inflector\InflectorFactory;
 
 class Pluralizer
 {
