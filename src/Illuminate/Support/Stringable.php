@@ -792,6 +792,40 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Execute the given callback if the string is empty.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function whenEmpty($callback)
+    {
+        if ($this->isEmpty()) {
+            $result = $callback($this);
+
+            return is_null($result) ? $this : $result;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute the given callback if the string is not empty.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function whenNotEmpty($callback)
+    {
+        if ($this->isNotEmpty()) {
+            $result = $callback($this);
+
+            return is_null($result) ? $this : $result;
+        }
+
+        return $this;
+    }
+
+    /**
      * Execute the given callback if the string ends with a given substring.
      *
      * @param  string|array  $needles
@@ -855,19 +889,6 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Execute the given callback if the string matches the given pattern.
-     *
-     * @param  string  $pattern
-     * @param  callable  $callback
-     * @param  callable|null  $default
-     * @return static
-     */
-    public function whenTest($pattern, $callback, $default = null)
-    {
-        return $this->when($this->test($pattern), $callback, $default);
-    }
-
-    /**
      * Execute the given callback if the string starts with a given substring.
      *
      * @param  string|array  $needles
@@ -881,37 +902,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Execute the given callback if the string is empty.
+     * Execute the given callback if the string matches the given pattern.
      *
+     * @param  string  $pattern
      * @param  callable  $callback
+     * @param  callable|null  $default
      * @return static
      */
-    public function whenEmpty($callback)
+    public function whenTest($pattern, $callback, $default = null)
     {
-        if ($this->isEmpty()) {
-            $result = $callback($this);
-
-            return is_null($result) ? $this : $result;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Execute the given callback if the string is not empty.
-     *
-     * @param  callable  $callback
-     * @return static
-     */
-    public function whenNotEmpty($callback)
-    {
-        if ($this->isNotEmpty()) {
-            $result = $callback($this);
-
-            return is_null($result) ? $this : $result;
-        }
-
-        return $this;
+        return $this->when($this->test($pattern), $callback, $default);
     }
 
     /**
