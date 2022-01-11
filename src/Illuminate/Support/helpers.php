@@ -391,9 +391,10 @@ if (! function_exists('rest')) {
     function rest(): Restable
     {
         static $rest;
-        if (!$rest) {
+        if (! $rest) {
             $rest = new Rest;
         }
+
         return $rest;
     }
 }

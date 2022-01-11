@@ -9,11 +9,11 @@ use InvalidArgumentException;
 class Rest implements Restable
 {
     /**
-     * @var  int
-     * @var  int
-     * @var  int
+     * @var int
+     * @var int
+     * @var int
      *
-     * @return  void
+     * @return void
      */
     public function for(int $seconds = 0, $milliseconds = 0, $microseconds = 0): void
     {
@@ -23,9 +23,9 @@ class Rest implements Restable
     }
 
     /**
-     * @var  int
+     * @var int
      *
-     * @return  void
+     * @return void
      */
     public function forSeconds(int $seconds = 0): void
     {
@@ -34,9 +34,9 @@ class Rest implements Restable
 
 
     /**
-     * @var  int
+     * @var int
      *
-     * @return  void
+     * @return void
      */
     public function forMilliseconds(int $milliseconds = 0): void
     {
@@ -44,9 +44,9 @@ class Rest implements Restable
     }
 
     /**
-     * @var  int
+     * @var int
      *
-     * @return  void
+     * @return void
      */
     public function forMicroseconds(int $microseconds = 0): void
     {
@@ -54,9 +54,9 @@ class Rest implements Restable
     }
 
     /**
+     * @var float|int|Carbon
      *
-     * @var  float|int|Carbon
-     * @return  void
+     * @return void
      */
     public function until($until): void
     {
