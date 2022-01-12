@@ -593,9 +593,7 @@ trait InteractsWithPivotTable
      */
     public function withoutPivotColumns()
     {
-        $this->pivotColumns = [];
-
-        return $this;
+        return $this->selectPivot([]);
     }
 
     /**
