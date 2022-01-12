@@ -38,6 +38,17 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Remove a given configuration value.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function forget($key)
+    {
+        return Arr::forget($this->items, $key);
+    }
+
+    /**
      * Get the specified configuration value.
      *
      * @param  array|string  $key
