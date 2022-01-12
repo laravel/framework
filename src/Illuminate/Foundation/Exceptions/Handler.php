@@ -226,8 +226,8 @@ class Handler implements ExceptionHandlerContract
 
         if (Reflector::isCallable($reportCallable = [$e, 'report']) &&
             $this->container->call($reportCallable) !== false) {
-                return;
-            }
+            return;
+        }
 
         foreach ($this->reportCallbacks as $reportCallback) {
             if ($reportCallback->handles($e) && $reportCallback($e) === false) {
