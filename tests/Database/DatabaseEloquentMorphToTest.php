@@ -24,27 +24,31 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         if (PHP_VERSION < "8.1") {
             $this->markTestSkipped('PHP 8.1 is required');
+        } else {
+            $relation = $this->getRelation();
+            $relation->addEagerConstraints([
+                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnumStringAllowed::test2]
+            ]);
+            $dictionary = $relation->getDictionary();
+            $value = $dictionary['morph_type_2'][TestEnumStringAllowed::test2->toString()][0]->foreign_key;
+            $this->assertEquals(TestEnumStringAllowed::test2, $value);
         }
-        $relation = $this->getRelation();
-        $relation->addEagerConstraints([
-            $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnumStringAllowed::test2]
-        ]);
-        $dictionary = $relation->getDictionary();
-        $value = $dictionary['morph_type_2'][TestEnumStringAllowed::test2->toString()][0]->foreign_key;
-        $this->assertEquals(TestEnumStringAllowed::test2, $value);
+
     }
 
     public function testLookupDictionaryIsNotProperlyConstructedForEnums()
     {
         if (PHP_VERSION < "8.1") {
             $this->markTestSkipped('PHP 8.1 is required');
+        } else {
+            $this->expectException(InvalidArgumentException::class);
+            $relation = $this->getRelation();
+            $relation->addEagerConstraints([
+                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test]
+            ]);
+            $relation->getDictionary();
         }
-        $this->expectException(InvalidArgumentException::class);
-        $relation = $this->getRelation();
-        $relation->addEagerConstraints([
-            $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test]
-        ]);
-        $dictionary = $relation->getDictionary();
+
     }
 
     public function testLookupDictionaryIsProperlyConstructed()
