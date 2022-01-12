@@ -131,6 +131,12 @@ class RepositoryTest extends TestCase
         $this->assertSame('value2', $this->repository->get('key2'));
     }
 
+    public function testCanForget()
+    {
+        $this->repository->forget('foo');
+        $this->assertFalse($this->repository->has('foo'));
+    }
+
     public function testPrepend()
     {
         $this->repository->prepend('array', 'xxx');
