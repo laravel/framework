@@ -388,8 +388,8 @@ assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collecti
     return 'foo';
 }));
 
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->keyBy('name'));
-assertType('Illuminate\Support\Collection<(int|string), array<User>>', $collection->keyBy(function ($user, $int) {
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy('name'));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(function ($user, $int) {
     // assertType('User', $user);
     // assertType('int', $int);
 
