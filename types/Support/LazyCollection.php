@@ -476,7 +476,7 @@ assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection::make(['
         return 1;
     }));
 
-assertType('Illuminate\Support\LazyCollection<int, mixed>', $collection->mapInto(User::class));
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection->mapInto(User::class));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->merge([2]));
 assertType('Illuminate\Support\LazyCollection<int, string>', $collection->make(['string'])->merge(['string']));
