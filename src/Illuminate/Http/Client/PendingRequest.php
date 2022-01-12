@@ -919,7 +919,7 @@ class PendingRequest
                 $promise = $handler($request, $options);
 
                 return $promise->then(function ($response) use ($request, $options) {
-                    optional($this->factory)->recordRequestResponsePair(
+                    $this->factory?->recordRequestResponsePair(
                         (new Request($request))->withData($options['laravel_data']),
                         new Response($response)
                     );
@@ -1056,7 +1056,7 @@ class PendingRequest
      */
     protected function dispatchRequestSendingEvent()
     {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+        if ($dispatcher = $this->factory?->getDispatcher()) {
             $dispatcher->dispatch(new RequestSending($this->request));
         }
     }
@@ -1069,7 +1069,7 @@ class PendingRequest
      */
     protected function dispatchResponseReceivedEvent(Response $response)
     {
-        if (! ($dispatcher = optional($this->factory)->getDispatcher()) ||
+        if (! ($dispatcher = $this->factory?->getDispatcher()) ||
             ! $this->request) {
             return;
         }
@@ -1084,7 +1084,7 @@ class PendingRequest
      */
     protected function dispatchConnectionFailedEvent()
     {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+        if ($dispatcher = $this->factory?->getDispatcher()) {
             $dispatcher->dispatch(new ConnectionFailed($this->request));
         }
     }
