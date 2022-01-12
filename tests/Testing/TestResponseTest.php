@@ -831,7 +831,12 @@ class TestResponseTest extends TestCase
     public function testAssertJsonPathCanFailWhenPathDoesNotExist()
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Unable to find path: [data.5.id] within');
+        $this->expectExceptionMessage(
+            'Unable to find path: '.PHP_EOL.PHP_EOL.
+            '[data.5.id]'.PHP_EOL.PHP_EOL.
+            'within'.PHP_EOL.PHP_EOL.
+            '[[{"foo":"bar","id":10},{"foo":"bar","id":20},{"foo":"bar","id":30}]]'
+        );
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
