@@ -1,6 +1,12 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.43...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.44...6.x)
+
+
+## [v6.20.44 (2022-01-12)](https://github.com/laravel/framework/compare/v6.20.43...v6.20.44)
+
+### Fixed
+- Fixed digits_between with fractions ([#40278](https://github.com/laravel/framework/pull/40278))
 
 
 ## [v6.20.43 (2021-12-14)](https://github.com/laravel/framework/compare/v6.20.42...v6.20.43)
