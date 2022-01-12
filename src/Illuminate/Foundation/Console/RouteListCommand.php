@@ -5,12 +5,15 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Routing\RedirectController;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\ViewController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionFunction;
+use ReflectionMethod;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
 
@@ -51,7 +54,7 @@ class RouteListCommand extends Command
      *
      * @var string[]
      */
-    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware', 'File'];
 
     /**
      * The terminal width resolver callback.
@@ -59,6 +62,13 @@ class RouteListCommand extends Command
      * @var \Closure|null
      */
     protected static $terminalWidthResolver;
+
+    /**
+     * Different types of routes.
+     */
+    const TYPE_ROUTE = 0;
+    const TYPE_VIEW = 1;
+    const TYPE_REDIRECT = 2;
 
     /**
      * The verb colors for the command.
@@ -139,6 +149,15 @@ class RouteListCommand extends Command
      */
     protected function getRouteInformation(Route $route)
     {
+        $reflection = $this->resolveReflection($route);
+        $type = $this->resolveType($route, $reflection);
+
+        $file = match($type) {
+            self::TYPE_VIEW => str_replace(base_path() . '/', '', resource_path('views/' . $route->defaults['view'] . '.blade.php')),
+            self::TYPE_REDIRECT => $route->defaults['destination'] . ' ' . $route->defaults['status'],
+            self::TYPE_ROUTE => str_replace(base_path() . '/', '', $reflection->getFileName()) . ':' . $reflection->getStartLine()
+        };
+
         return $this->filterRoute([
             'domain' => $route->domain(),
             'method' => implode('|', $route->methods()),
@@ -146,6 +165,7 @@ class RouteListCommand extends Command
             'name' => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
+            'file' => $file,
         ]);
     }
 
@@ -315,6 +335,7 @@ class RouteListCommand extends Command
                 'method' => $method,
                 'middleware' => $middleware,
                 'uri' => $uri,
+                'file' => $file,
             ] = $route;
 
             $middleware = Str::of($middleware)->explode("\n")->filter()->whenNotEmpty(
@@ -322,6 +343,8 @@ class RouteListCommand extends Command
                     fn ($middleware) => sprintf('         %s⇂ %s', str_repeat(' ', $maxMethod), $middleware)
                 )
             )->implode("\n");
+
+            $file = sprintf('         %s└ %s', str_repeat(' ', $maxMethod), $file);
 
             $spaces = str_repeat(' ', max($maxMethod + 6 - mb_strlen($method), 0));
 
@@ -346,8 +369,59 @@ class RouteListCommand extends Command
                 preg_replace('#({[^}]+})#', '<fg=yellow>$1</>', $uri),
                 $dots,
                 str_replace('   ', ' › ', $action),
-            ), $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null];
+            ),
+            $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null,
+            $this->output->isVerbose() && ! empty($file) ? "<fg=#6C7280>$file</>" : null];
         })->flatten()->filter()->prepend('')->push('')->toArray();
+    }
+
+    /**
+     * Return a reflection object for the
+     * code executing on a given route.
+     *
+     * @param  Route  $route
+     * @return string
+     */
+    protected function resolveReflection(Route $route)
+    {
+        if (! $route->getAction('controller')) {
+            $closure = $route->getAction('uses');
+
+            return new ReflectionFunction($closure);
+        }
+
+        [$class, $method] = Str::parseCallback($route->getAction('controller'), '__invoke');
+
+        return new ReflectionMethod($class, $method);
+    }
+
+    /**
+     * Resolve the type of route we are doing.
+     *
+     * @param  Route  $route
+     * @param  mixed  $reflection
+     * @return self::TYPE_REDIRECT|self::TYPE_VIEW|self::TYPE_ROUTE
+     */
+    protected function resolveType(Route $route, $reflection)
+    {
+        $class = null;
+
+        if ($reflection instanceof ReflectionClass) {
+            $class = $reflection;
+        }
+        if ($reflection instanceof ReflectionMethod) {
+            $class = $reflection->getDeclaringClass();
+        }
+
+        if ($class && $class->getName() === RedirectController::class) {
+            return self::TYPE_REDIRECT;
+        }
+
+        if ($class && $class->getName() === ViewController::class) {
+            return self::TYPE_VIEW;
+        }
+
+        return self::TYPE_ROUTE;
     }
 
     /**
