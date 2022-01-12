@@ -346,6 +346,7 @@ class RouteListCommand extends Command
             )->implode("\n");
 
             $file = sprintf('         %s└ %s', str_repeat(' ', $maxMethod), $file);
+            dump($file);
 
             $spaces = str_repeat(' ', max($maxMethod + 6 - mb_strlen($method), 0));
 
