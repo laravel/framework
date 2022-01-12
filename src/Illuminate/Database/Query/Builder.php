@@ -352,7 +352,7 @@ class Builder implements BuilderContract
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            if (! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
                 $query->from($databaseName.'.'.$query->from);
             }
         }
@@ -2203,7 +2203,7 @@ class Builder implements BuilderContract
             return $column;
         }
 
-        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $separator = str_contains(strtolower($column), ' as ') ? ' as ' : '\.';
 
         return last(preg_split('~'.$separator.'~i', $column));
     }
@@ -2439,7 +2439,7 @@ class Builder implements BuilderContract
         // If the result doesn't contain a decimal place, we will assume it is an int then
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
-        return strpos((string) $result, '.') === false
+        return ! str_contains((string) $result, '.')
                 ? (int) $result : (float) $result;
     }
 
