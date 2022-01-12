@@ -507,7 +507,7 @@ class UrlGenerator implements UrlGeneratorContract
             $action = '\\'.implode('@', $action);
         }
 
-        if ($this->rootNamespace && strpos($action, '\\') !== 0) {
+        if ($this->rootNamespace && ! str_starts_with($action, '\\')) {
             return $this->rootNamespace.'\\'.$action;
         } else {
             return trim($action, '\\');
