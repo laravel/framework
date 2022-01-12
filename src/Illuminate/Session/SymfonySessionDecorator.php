@@ -75,10 +75,10 @@ class SymfonySessionDecorator implements SessionInterface
      * Clears all session attributes and flashes and regenerates the
      * session and deletes the old session from persistence.
      *
-     * @param int $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                      will leave the system settings unchanged, 0 sets the cookie
-     *                      to expire with browser session. Time is in seconds, and is
-     *                      not a Unix timestamp.
+     * @param  int  $lifetime  Sets the cookie lifetime for the session cookie. A null value
+     *                         will leave the system settings unchanged, 0 sets the cookie
+     *                         to expire with browser session. Time is in seconds, and is
+     *                         not a Unix timestamp.
      */
     public function invalidate(int $lifetime = null): bool
     {
@@ -91,11 +91,11 @@ class SymfonySessionDecorator implements SessionInterface
      * Migrates the current session to a new session id while maintaining all
      * session attributes.
      *
-     * @param bool $destroy  Whether to delete the old session or leave it to garbage collection
-     * @param int  $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                       will leave the system settings unchanged, 0 sets the cookie
-     *                       to expire with browser session. Time is in seconds, and is
-     *                       not a Unix timestamp.
+     * @param  bool  $destroy  Whether to delete the old session or leave it to garbage collection
+     * @param  int  $lifetime  Sets the cookie lifetime for the session cookie. A null value
+     *                         will leave the system settings unchanged, 0 sets the cookie
+     *                         to expire with browser session. Time is in seconds, and is
+     *                         not a Unix timestamp.
      */
     public function migrate(bool $destroy = false, int $lifetime = null): bool
     {
@@ -187,7 +187,7 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function registerBag(SessionBagInterface $bag)
     {
-        throw new BadMethodCallException("Method not implemented by Laravel.");
+        throw new BadMethodCallException('Method not implemented by Laravel.');
     }
 
     /**
@@ -195,7 +195,7 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function getBag(string $name): SessionBagInterface
     {
-        throw new BadMethodCallException("Method not implemented by Laravel.");
+        throw new BadMethodCallException('Method not implemented by Laravel.');
     }
 
     /**
@@ -203,6 +203,6 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function getMetadataBag(): MetadataBag
     {
-        throw new BadMethodCallException("Method not implemented by Laravel.");
+        throw new BadMethodCallException('Method not implemented by Laravel.');
     }
 }
