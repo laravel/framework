@@ -827,6 +827,17 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('0.id', '10');
     }
 
+    /** @test */
+    public function testAssertJsonPathCanFailWhenPathDoesNotExist()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Unable to find path: [data.5.id] within');
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonPath('data.5.id', '10');
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
