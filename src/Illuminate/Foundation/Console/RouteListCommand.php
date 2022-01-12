@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
+use ReflectionFunctionAbstract;
 use ReflectionMethod;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
@@ -152,10 +153,10 @@ class RouteListCommand extends Command
         $reflection = $this->resolveReflection($route);
         $type = $this->resolveType($route, $reflection);
 
-        $file = match($type) {
-            self::TYPE_VIEW => str_replace(base_path() . '/', '', resource_path('views/' . $route->defaults['view'] . '.blade.php')),
-            self::TYPE_REDIRECT => $route->defaults['destination'] . ' ' . $route->defaults['status'],
-            self::TYPE_ROUTE => str_replace(base_path() . '/', '', $reflection->getFileName()) . ':' . $reflection->getStartLine()
+        $file = match ($type) {
+            self::TYPE_VIEW => str_replace(base_path().'/', '', resource_path('views/'.$route->defaults['view'].'.blade.php')),
+            self::TYPE_REDIRECT => $route->defaults['destination'].' '.$route->defaults['status'],
+            self::TYPE_ROUTE => str_replace(base_path().'/', '', $reflection->getFileName()).':'.$reflection->getStartLine()
         };
 
         return $this->filterRoute([
@@ -370,8 +371,8 @@ class RouteListCommand extends Command
                 $dots,
                 str_replace('   ', ' › ', $action),
             ),
-            $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null,
-            $this->output->isVerbose() && ! empty($file) ? "<fg=#6C7280>$file</>" : null];
+                $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null,
+                $this->output->isVerbose() && ! empty($file) ? "<fg=#6C7280>$file</>" : null, ];
         })->flatten()->filter()->prepend('')->push('')->toArray();
     }
 
@@ -380,9 +381,9 @@ class RouteListCommand extends Command
      * code executing on a given route.
      *
      * @param  Route  $route
-     * @return string
+     * @return ReflectionFunctionAbstract
      */
-    protected function resolveReflection(Route $route)
+    protected function resolveReflection(Route $route): ReflectionFunctionAbstract
     {
         if (! $route->getAction('controller')) {
             $closure = $route->getAction('uses');
