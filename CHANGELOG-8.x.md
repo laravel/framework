@@ -1,6 +1,34 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.78.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.79.0...8.x)
+
+
+## [v8.79.0 (2022-01-12)](https://github.com/laravel/framework/compare/v8.78.1...v8.79.0)
+
+### Added
+- Added onLastPage method to the Paginator ([#40265](https://github.com/laravel/framework/pull/40265))
+- Allow method typed variadics dependencies ([#40255](https://github.com/laravel/framework/pull/40255))
+- Added `ably/ably-php` to composer.json to suggest ([#40277](https://github.com/laravel/framework/pull/40277))
+- Implement Full-Text Search for MySQL & PostgreSQL ([#40129](https://github.com/laravel/framework/pull/40129))
+- Added whenContains and whenContainsAll to Stringable ([#40285](https://github.com/laravel/framework/pull/40285))
+- Support action_level configuration in LogManager ([#40305](https://github.com/laravel/framework/pull/40305))
+- Added whenEndsWith(), whenExactly(), whenStartsWith(), etc to Stringable ([#40320](https://github.com/laravel/framework/pull/40320))
+- Makes it easy to add additional options to PendingBatch ([#40333](https://github.com/laravel/framework/pull/40333))
+- Added method to MigrationsStarted/MigrationEnded events ([#40334](https://github.com/laravel/framework/pull/40334))
+
+### Fixed
+- Fixed failover mailer when used with Mailgun & SES mailers ([#40254](https://github.com/laravel/framework/pull/40254))
+- Fixed digits_between with fractions ([#40278](https://github.com/laravel/framework/pull/40278))
+- Fixed cursor pagination with HasManyThrough ([#40300](https://github.com/laravel/framework/pull/40300))
+- Fixed virtual attributes ([29a6692](https://github.com/laravel/framework/commit/29a6692fb0f0d14e5109ae5f02ed70065f10e966))
+- Fixed timezone option in `schedule:list` command ([#40304](https://github.com/laravel/framework/pull/40304))
+- Fixed Doctrine type mappings creating too many connections ([#40303](https://github.com/laravel/framework/pull/40303))
+- Fixed of resolving Blueprint class out of the container ([#40307](https://github.com/laravel/framework/pull/40307))
+- Handle type mismatch in the enum validation rule ([#40362](https://github.com/laravel/framework/pull/40362))
+
+### Changed
+- Automatically add event description when scheduling a command ([#40286](https://github.com/laravel/framework/pull/40286))
+- Update the Pluralizer Inflector instanciator ([#40336](https://github.com/laravel/framework/pull/40336))
 
 
 ## [v8.78.1 (2022-01-05)](https://github.com/laravel/framework/compare/v8.78.0...v8.78.1)
