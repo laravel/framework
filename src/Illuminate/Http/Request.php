@@ -496,8 +496,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Whether the request contains a Session object.
-     *
      * {@inheritdoc}
      */
     public function hasSession(bool $skipIfUninitialized = false): bool

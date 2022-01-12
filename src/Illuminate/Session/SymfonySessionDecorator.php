@@ -28,9 +28,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Starts the session storage.
-     *
-     * @throws \RuntimeException if session fails to start
+     * {@inheritdoc}
      */
     public function start(): bool
     {
@@ -38,7 +36,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Returns the session ID.
+     * {@inheritdoc}
      */
     public function getId(): string
     {
@@ -46,7 +44,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Sets the session ID.
+     * {@inheritdoc}
      */
     public function setId(string $id)
     {
@@ -54,7 +52,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Returns the session name.
+     * {@inheritdoc}
      */
     public function getName(): string
     {
@@ -62,7 +60,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Sets the session name.
+     * {@inheritdoc}
      */
     public function setName(string $name)
     {
@@ -70,15 +68,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Invalidates the current session.
-     *
-     * Clears all session attributes and flashes and regenerates the
-     * session and deletes the old session from persistence.
-     *
-     * @param int $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                      will leave the system settings unchanged, 0 sets the cookie
-     *                      to expire with browser session. Time is in seconds, and is
-     *                      not a Unix timestamp.
+     * {@inheritdoc}
      */
     public function invalidate(int $lifetime = null): bool
     {
@@ -88,14 +78,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Migrates the current session to a new session id while maintaining all
-     * session attributes.
-     *
-     * @param bool $destroy  Whether to delete the old session or leave it to garbage collection
-     * @param int  $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                       will leave the system settings unchanged, 0 sets the cookie
-     *                       to expire with browser session. Time is in seconds, and is
-     *                       not a Unix timestamp.
+     * {@inheritdoc}
      */
     public function migrate(bool $destroy = false, int $lifetime = null): bool
     {
@@ -105,11 +88,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Force the session to be saved and closed.
-     *
-     * This method is generally not required for real sessions as
-     * the session will be automatically saved at the end of
-     * code execution.
+     * {@inheritdoc}
      */
     public function save()
     {
@@ -117,7 +96,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Checks if an attribute is defined.
+     * {@inheritdoc}
      */
     public function has(string $name): bool
     {
@@ -125,7 +104,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Returns an attribute.
+     * {@inheritdoc}
      */
     public function get(string $name, mixed $default = null): mixed
     {
@@ -133,7 +112,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Sets an attribute.
+     * {@inheritdoc}
      */
     public function set(string $name, mixed $value)
     {
@@ -141,7 +120,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Returns attributes.
+     * {@inheritdoc}
      */
     public function all(): array
     {
@@ -149,7 +128,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Sets attributes.
+     * {@inheritdoc}
      */
     public function replace(array $attributes)
     {
@@ -157,9 +136,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Removes an attribute.
-     *
-     * @return mixed The removed value or null when it does not exist
+     * {@inheritdoc}
      */
     public function remove(string $name): mixed
     {
@@ -167,7 +144,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Clears all attributes.
+     * {@inheritdoc}
      */
     public function clear()
     {
@@ -175,7 +152,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Checks if the session was started.
+     * {@inheritdoc}
      */
     public function isStarted(): bool
     {
@@ -183,7 +160,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Registers a SessionBagInterface with the session.
+     * {@inheritdoc}
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -191,7 +168,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Gets a bag instance by name.
+     * {@inheritdoc}
      */
     public function getBag(string $name): SessionBagInterface
     {
@@ -199,7 +176,7 @@ class SymfonySessionDecorator implements SessionInterface
     }
 
     /**
-     * Gets session meta.
+     * {@inheritdoc}
      */
     public function getMetadataBag(): MetadataBag
     {
