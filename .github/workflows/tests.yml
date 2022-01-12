@@ -50,6 +50,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd, redis, memcached
+          ini-values: error_reporting=E_ALL
           tools: composer:v2
           coverage: none
 
@@ -66,7 +67,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer require league/commonmark:^2.0.2 phpunit/phpunit:^9.5.8 --no-interaction --no-update
+          command: composer require league/commonmark:^2.0.2 phpunit/phpunit:^9.5.8 ramsey/collection:^1.2 brick/math:^0.9.3 --no-interaction --no-update
         if: matrix.php >= 8.1
 
       - name: Install dependencies

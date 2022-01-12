@@ -1,6 +1,15 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.42...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.43...6.x)
+
+
+## [v6.20.43 (2021-12-14)](https://github.com/laravel/framework/compare/v6.20.42...v6.20.43)
+
+### Fixed
+- Fixed inconsistent escaping of artisan argument ([#39953](https://github.com/laravel/framework/pull/39953))
+
+### Changed
+- Do not return anything `Illuminate/Foundation/Application::afterLoadingEnvironment()`
 
 
 ## [v6.20.42 (2021-12-07)](https://github.com/laravel/framework/compare/v6.20.41...v6.20.42)

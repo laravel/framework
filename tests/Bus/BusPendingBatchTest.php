@@ -41,12 +41,14 @@ class BusPendingBatchTest extends TestCase
             //
         })->catch(function () {
             //
-        })->allowFailures()->onConnection('test-connection')->onQueue('test-queue');
+        })->allowFailures()->onConnection('test-connection')->onQueue('test-queue')->withOption('extra-option', 123);
 
         $this->assertSame('test-connection', $pendingBatch->connection());
         $this->assertSame('test-queue', $pendingBatch->queue());
         $this->assertCount(1, $pendingBatch->thenCallbacks());
         $this->assertCount(1, $pendingBatch->catchCallbacks());
+        $this->assertArrayHasKey('extra-option', $pendingBatch->options);
+        $this->assertSame(123, $pendingBatch->options['extra-option']);
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
