@@ -608,6 +608,27 @@ class Blueprint
     }
 
     /**
+     * Create a new email column on the table.
+     *
+     * @param  string  $column
+     * @param  bool  $unique
+     * @param  int|null  $length
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function email($column = 'email', bool $unique = true, $length = null)
+    {
+        $length = $length ?: Builder::$defaultStringLength;
+
+        $emailColumn = $this->addColumn('string', $column, compact('length'));
+
+        if ($unique) {
+            $emailColumn->unique();
+        }
+
+        return $emailColumn;
+    }
+
+    /**
      * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
