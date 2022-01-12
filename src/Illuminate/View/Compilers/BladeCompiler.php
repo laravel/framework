@@ -275,11 +275,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storeUncompiledBlocks($value)
     {
-        if (strpos($value, '@verbatim') !== false) {
+        if (str_contains($value, '@verbatim')) {
             $value = $this->storeVerbatimBlocks($value);
         }
 
-        if (strpos($value, '@php') !== false) {
+        if (str_contains($value, '@php')) {
             $value = $this->storePhpBlocks($value);
         }
 

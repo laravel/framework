@@ -2347,7 +2347,7 @@ class SupportCollectionTest extends TestCase
         // Foo() macro : unique values starting with A
         $collection::macro('foo', function () {
             return $this->filter(function ($item) {
-                return strpos($item, 'a') === 0;
+                return str_starts_with($item, 'a');
             })
                 ->unique()
                 ->values();

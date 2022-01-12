@@ -1554,7 +1554,7 @@ trait HasAttributes
 
         $arguments = [];
 
-        if (is_string($castType) && strpos($castType, ':') !== false) {
+        if (is_string($castType) && str_contains($castType, ':')) {
             $segments = explode(':', $castType, 2);
 
             $castType = $segments[0];
@@ -1580,7 +1580,7 @@ trait HasAttributes
      */
     protected function parseCasterClass($class)
     {
-        return strpos($class, ':') === false
+        return ! str_contains($class, ':')
             ? $class
             : explode(':', $class, 2)[0];
     }
