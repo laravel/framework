@@ -120,7 +120,28 @@ class DatabaseEloquentBelongsToManySyncReturnValueTypeTest extends TestCase
         $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
         $user->articles()->sync($articleIDs);
 
-        $article = $user->articles()->selectPivot('article_id', 'user_id')->first();
+        $article = $user->articles()->selectPivot('article_id')->first();
+
+        $this->assertNull($article->pivot->visible);
+        $this->assertNotNull($article->pivot->article_id);
+        $this->assertNotNull($article->pivot->user_id);
+
+        $article = $user->articles()->selectPivot('visible')->first();
+
+        $this->assertNotNull($article->pivot->visible);
+        $this->assertNotNull($article->pivot->article_id);
+        $this->assertNotNull($article->pivot->user_id);
+    }
+
+    public function testRemovesAdditionalPivotColumns()
+    {
+        $this->seedData();
+
+        $user = BelongsToManySyncTestTestUser::query()->first();
+        $articleIDs = BelongsToManySyncTestTestArticle::all()->pluck('id')->toArray();
+        $user->articles()->sync($articleIDs);
+
+        $article = $user->articles()->withoutPivotColumns()->first();
 
         $this->assertNull($article->pivot->visible);
         $this->assertNotNull($article->pivot->article_id);

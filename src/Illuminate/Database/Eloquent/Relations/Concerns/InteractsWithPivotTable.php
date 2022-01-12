@@ -587,6 +587,18 @@ trait InteractsWithPivotTable
     }
 
     /**
+     * Removes additional columns to retrieve on the pivot table.
+     *
+     * @return $this
+     */
+    public function withoutPivotColumns()
+    {
+        $this->pivotColumns = [];
+
+        return $this;
+    }
+
+    /**
      * Override the columns on the pivot table to retrieve.
      *
      * @param  array|mixed  $columns
