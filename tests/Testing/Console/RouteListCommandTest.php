@@ -88,7 +88,7 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('             ⇂ web')
             ->expectsOutput('             └ '.__FILE__.':69')
             ->expectsOutput('  GET|HEAD   view .................................................. ')
-            ->expectsOutput('             └ resources/views/welcome.blade.php')
+            ->expectsOutput('             └ resources'.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.'welcome.blade.php')
             ->expectsOutput('');
     }
 
