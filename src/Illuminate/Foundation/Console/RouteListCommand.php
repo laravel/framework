@@ -154,9 +154,9 @@ class RouteListCommand extends Command
         $type = $this->resolveType($route, $reflection);
 
         $file = match ($type) {
-            self::TYPE_VIEW => str_replace(base_path().'/', '', resource_path('views/'.$route->defaults['view'].'.blade.php')),
+            self::TYPE_VIEW => str_replace(base_path().DIRECTORY_SEPARATOR, '', resource_path('views'.DIRECTORY_SEPARATOR.$route->defaults['view'].'.blade.php')),
             self::TYPE_REDIRECT => $route->defaults['destination'].' '.$route->defaults['status'],
-            self::TYPE_ROUTE => str_replace(base_path().'/', '', $reflection->getFileName()).':'.$reflection->getStartLine()
+            self::TYPE_ROUTE => str_replace(base_path().DIRECTORY_SEPARATOR, '', $reflection->getFileName()).':'.$reflection->getStartLine()
         };
 
         return $this->filterRoute([
