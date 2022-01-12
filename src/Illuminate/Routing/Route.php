@@ -914,7 +914,7 @@ class Route
     {
         $groupStack = last($this->router->getGroupStack());
 
-        if (isset($groupStack['namespace']) && !str_starts_with($action, '\\')) {
+        if (isset($groupStack['namespace']) && ! str_starts_with($action, '\\')) {
             return $groupStack['namespace'].'\\'.$action;
         }
 
