@@ -476,7 +476,7 @@ assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['stri
         return 1;
     }));
 
-assertType('Illuminate\Support\Collection<int, mixed>', $collection->mapInto(User::class));
+assertType('Illuminate\Support\Collection<int, User>', $collection->mapInto(User::class));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->merge([2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->merge(['string']));
