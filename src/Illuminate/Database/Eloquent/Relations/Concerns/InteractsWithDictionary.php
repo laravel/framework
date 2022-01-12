@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
+use Illuminate\Contracts\Database\Eloquent\StringableAttribute;
 
 trait InteractsWithDictionary
 {
@@ -21,7 +22,13 @@ trait InteractsWithDictionary
                 return $attribute->__toString();
             }
 
-            throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');
+            if ($attribute instanceof StringableAttribute) {
+                return $attribute->toString();
+            }
+
+            $msg = 'Model attribute value is an object but does not have a __toString method '.
+                'and does not implement \Illuminate\Contracts\Database\Eloquent\StringableAttribute interface.';
+            throw new InvalidArgumentException($msg);
         }
 
         return $attribute;

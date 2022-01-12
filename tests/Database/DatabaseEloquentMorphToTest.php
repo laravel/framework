@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
+use Doctrine\Instantiator\Exception\InvalidArgumentException;
+use Illuminate\Contracts\Database\Eloquent\StringableAttribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -17,6 +19,32 @@ class DatabaseEloquentMorphToTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+    }
+    public function testLookupDictionaryIsProperlyConstructedForStringableEnums()
+    {
+        if (PHP_VERSION < "8.1") {
+            $this->markTestSkipped('PHP 8.1 is required');
+        }
+        $relation = $this->getRelation();
+        $relation->addEagerConstraints([
+            $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnumStringAllowed::test2]
+        ]);
+        $dictionary = $relation->getDictionary();
+        $value = $dictionary['morph_type_2'][TestEnumStringAllowed::test2->toString()][0]->foreign_key;
+        $this->assertEquals(TestEnumStringAllowed::test2, $value);
+    }
+
+    public function testLookupDictionaryIsNotProperlyConstructedForEnums()
+    {
+        if (PHP_VERSION < "8.1") {
+            $this->markTestSkipped('PHP 8.1 is required');
+        }
+        $this->expectException(InvalidArgumentException::class);
+        $relation = $this->getRelation();
+        $relation->addEagerConstraints([
+            $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test]
+        ]);
+        $dictionary = $relation->getDictionary();
     }
 
     public function testLookupDictionaryIsProperlyConstructed()
@@ -384,4 +412,26 @@ class EloquentMorphToModelStub extends Model
 class EloquentMorphToRelatedStub extends Model
 {
     public $table = 'eloquent_morph_to_related_stubs';
+}
+
+if (PHP_VERSION >= '8.1')
+{
+    enum TestEnum: string
+    {
+        case test = 'Test';
+    }
+
+    enum TestEnumStringAllowed: string implements StringableAttribute
+    {
+        case test2 = "Test2";
+
+        /**
+         * Allows enums to be used as morthed entity type
+         * @return string
+         */
+        public function toString(): string
+        {
+            return $this->value;
+        }
+    }
 }
