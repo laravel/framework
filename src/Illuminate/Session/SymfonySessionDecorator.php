@@ -164,7 +164,7 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function registerBag(SessionBagInterface $bag)
     {
-        throw new BadMethodCallException("Method not implemented by Laravel.");
+        throw new BadMethodCallException('Method not implemented by Laravel.');
     }
 
     /**
@@ -172,7 +172,7 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function getBag(string $name): SessionBagInterface
     {
-        throw new BadMethodCallException("Method not implemented by Laravel.");
+        throw new BadMethodCallException('Method not implemented by Laravel.');
     }
 
     /**
@@ -180,6 +180,6 @@ class SymfonySessionDecorator implements SessionInterface
      */
     public function getMetadataBag(): MetadataBag
     {
-        throw new BadMethodCallException("Method not implemented by Laravel.");
+        throw new BadMethodCallException('Method not implemented by Laravel.');
     }
 }
