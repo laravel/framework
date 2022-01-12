@@ -3,7 +3,7 @@
 namespace Illuminate\Validation\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Throwable;
+use TypeError;
 
 class Enum implements Rule
 {
@@ -40,7 +40,7 @@ class Enum implements Rule
 
         try {
             return ! is_null($this->type::tryFrom($value));
-        } catch (Throwable $e) {
+        } catch (TypeError $e) {
             return false;
         }
     }
