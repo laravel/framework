@@ -388,8 +388,8 @@ assertType('Illuminate\Support\LazyCollection<(int|string), array<User>>', $coll
     return 'foo';
 }));
 
-assertType('Illuminate\Support\LazyCollection<(int|string), array<User>>', $collection->keyBy('name'));
-assertType('Illuminate\Support\LazyCollection<(int|string), array<User>>', $collection->keyBy(function ($user, $int) {
+assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy('name'));
+assertType('Illuminate\Support\LazyCollection<(int|string), User>', $collection->keyBy(function ($user, $int) {
     // assertType('User', $user);
     // assertType('int', $int);
 
