@@ -146,6 +146,20 @@ if (! function_exists('filled')) {
     }
 }
 
+if (! function_exists('is_environment')) {
+    /**
+     * Determine if the current environment is
+     * one of the passed environments.
+     *
+     * @param  mixed  $environments
+     * @return bool
+     */
+    function is_environment(...$environments)
+    {
+        return app()->environment(...func_get_args());
+    }
+}
+
 if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
