@@ -1,0 +1,28 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Http\Filter\Filter;
+use Illuminate\Database\Eloquent\Builder;
+
+class {{ class }} extends Filter
+{
+    /**
+     * request parameter, which should be filtered by this class.
+     *
+     * @var string
+     */
+    public $filterParameter = '';
+
+    /**
+     * Apply filter query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function apply($builder)
+    {
+        // return query builder which will be used to filter the query
+        return $builder;
+    }
+}
