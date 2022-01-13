@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Testing;
+namespace Illuminate\Tests\Testing\Console;
 
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Foundation\Auth\User;
@@ -51,8 +51,8 @@ class RouteListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
-            ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\FooContr…')
-            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\FooC…')
+            ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
+            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
             ->expectsOutput('');
     }
@@ -75,8 +75,8 @@ class RouteListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
-            ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\FooController')
-            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\FooController@show')
+            ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\Console\\FooController')
+            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\Console\\FooController@show')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
             ->expectsOutput('             ⇂ web')
             ->expectsOutput('');
