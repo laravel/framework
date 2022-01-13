@@ -9,14 +9,14 @@ use Illuminate\Support\Str;
 use Redis;
 use RedisCluster;
 use RedisException;
-use RuntimeException;
-use UnexpectedValueException;
 
 /**
  * @mixin \Redis
  */
 class PhpRedisConnection extends Connection implements ConnectionContract
 {
+    use PacksPhpRedisValues;
+
     /**
      * The connection creation callback.
      *
@@ -30,27 +30,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @var array
      */
     protected $config;
-
-    /**
-     * In memory cache of version check whether phpredis supports packing.
-     *
-     * @var bool|null
-     */
-    private $supportsPack = null;
-
-    /**
-     * In memory cache of version check whether phpredis supports lzf compression.
-     *
-     * @var bool|null
-     */
-    private $supportsLzf = null;
-
-    /**
-     * In memory cache of version check whether phpredis supports zstd compression.
-     *
-     * @var bool|null
-     */
-    private $supportsZstd = null;
 
     /**
      * Create a new PhpRedis connection.
@@ -595,139 +574,5 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function __call($method, $parameters)
     {
         return parent::__call(strtolower($method), $parameters);
-    }
-
-    /**
-     * Prepares values to be used with e.g. the `eval` command, because the
-     * phpredis extension does not do it for us. This includes serialization and
-     * compression if any of those settings are configured.
-     *
-     * @param  array<int|string,string>  $values
-     * @return array<int|string,string>
-     */
-    public function pack(array $values): array
-    {
-        if (empty($values)) {
-            return $values;
-        }
-
-        if ($this->supportsPack()) {
-            return array_map([$this->client, '_pack'], $values);
-        }
-
-        if ($this->compressed()) {
-            if ($this->supportsLzf() && $this->lzfCompressed()) {
-                if (! function_exists('lzf_compress')) {
-                    throw new RuntimeException("Missing 'lzf' extension to call 'lzf_compress'.");
-                }
-
-                $processor = function ($value) {
-                    return \lzf_compress($this->client->_serialize($value));
-                };
-            } elseif ($this->supportsZstd() && $this->zstdCompressed()) {
-                if (! function_exists('zstd_compress')) {
-                    throw new RuntimeException("Missing 'zstd' extension to call 'zstd_compress'.");
-                }
-
-                $compressionLevel = $this->client->getOption(Redis::OPT_COMPRESSION_LEVEL);
-                $processor = function ($value) use ($compressionLevel) {
-                    return \zstd_compress(
-                        $this->client->_serialize($value),
-                        $compressionLevel === 0 ? Redis::COMPRESSION_ZSTD_DEFAULT : $compressionLevel
-                    );
-                };
-            } else {
-                throw new UnexpectedValueException(sprintf(
-                    'Not supported phpredis compression in use [%d].',
-                    $this->client->getOption(Redis::OPT_COMPRESSION)
-                ));
-            }
-        } else {
-            $processor = function ($value) {
-                return $this->client->_serialize($value);
-            };
-        }
-
-        return array_map($processor, $values);
-    }
-
-    /**
-     * Determine if compression is enabled.
-     *
-     * @return bool
-     */
-    public function compressed(): bool
-    {
-        return defined('Redis::OPT_COMPRESSION') &&
-               $this->client->getOption(Redis::OPT_COMPRESSION) !== Redis::COMPRESSION_NONE;
-    }
-
-    /**
-     * Determine if LZF compression is enabled.
-     *
-     * @return bool
-     */
-    public function lzfCompressed(): bool
-    {
-        return defined('Redis::COMPRESSION_LZF') &&
-               $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
-    }
-
-    /**
-     * Determine if ZSTD compression is enabled.
-     *
-     * @return bool
-     */
-    public function zstdCompressed(): bool
-    {
-        return defined('Redis::COMPRESSION_ZSTD') &&
-               $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
-    }
-
-    /**
-     * Determine if LZ4 compression is enabled.
-     *
-     * @return bool
-     */
-    public function lz4Compressed(): bool
-    {
-        return defined('Redis::COMPRESSION_LZ4') &&
-               $this->client->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
-    }
-
-    private function supportsPack(): bool
-    {
-        if ($this->supportsPack === null) {
-            $phpredisVersion = phpversion('redis');
-
-            $this->supportsPack =
-                ($phpredisVersion !== false && version_compare($phpredisVersion, '5.3.5', '>='));
-        }
-
-        return $this->supportsPack;
-    }
-
-    private function supportsLzf(): bool
-    {
-        if ($this->supportsLzf === null) {
-            $phpredisVersion = phpversion('redis');
-
-            $this->supportsLzf =
-                ($phpredisVersion !== false && version_compare($phpredisVersion, '4.3.0', '>='));
-        }
-
-        return $this->supportsLzf;
-    }
-
-    private function supportsZstd(): bool
-    {
-        if ($this->supportsZstd === null) {
-            $phpredisVersion = phpversion('redis');
-
-            $this->supportsZstd =
-                ($phpredisVersion !== false && version_compare($phpredisVersion, '5.1.0', '>='));
-        }
-
-        return $this->supportsZstd;
     }
 }
