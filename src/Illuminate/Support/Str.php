@@ -245,9 +245,9 @@ class Str
     /**
      * Extract the initials of a given value.
      *
-     * @param  string $value
-     * @param  string $separator
-     * @param  string $glue
+     * @param  string  $value
+     * @param  string  $separator
+     * @param  string  $glue
      * @return string
      */
     public static function initials($value, $separator = ' ', $glue = ' ')
