@@ -407,4 +407,3 @@ class EloquentMorphToRelatedStub extends Model
 {
     public $table = 'eloquent_morph_to_related_stubs';
 }
-
