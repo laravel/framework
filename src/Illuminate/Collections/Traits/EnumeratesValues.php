@@ -141,7 +141,7 @@ trait EnumeratesValues
     /**
      * Create a new instance with no items.
      *
-     * @return static<TKey, TValue>
+     * @return static
      */
     public static function empty()
     {
@@ -270,7 +270,7 @@ trait EnumeratesValues
      * Execute a callback over each nested chunk of items.
      *
      * @param  callable(...mixed): mixed  $callback
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function eachSpread(callable $callback)
     {
@@ -448,7 +448,7 @@ trait EnumeratesValues
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
      * @param  TValue|string|null  $operator
      * @param  TValue|null  $value
-     * @return array<int, static<TKey, TValue>>
+     * @return array<int, static>
      */
     public function partition($key, $operator = null, $value = null)
     {
@@ -549,7 +549,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function where($key, $operator = null, $value = null)
     {
@@ -560,7 +560,7 @@ trait EnumeratesValues
      * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNull($key = null)
     {
@@ -571,7 +571,7 @@ trait EnumeratesValues
      * Filter items where the value for the given key is not null.
      *
      * @param  string|null  $key
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotNull($key = null)
     {
@@ -584,7 +584,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  mixed  $value
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereStrict($key, $value)
     {
@@ -597,7 +597,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereIn($key, $values, $strict = false)
     {
@@ -613,7 +613,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereInStrict($key, $values)
     {
@@ -625,7 +625,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereBetween($key, $values)
     {
@@ -637,7 +637,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotBetween($key, $values)
     {
@@ -652,7 +652,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotIn($key, $values, $strict = false)
     {
@@ -668,7 +668,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotInStrict($key, $values)
     {
@@ -679,7 +679,7 @@ trait EnumeratesValues
      * Filter the items, removing any items that don't match the given type(s).
      *
      * @param  class-string|array<array-key, class-string>  $type
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereInstanceOf($type)
     {
@@ -821,7 +821,7 @@ trait EnumeratesValues
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param  (callable(TValue): bool)|bool  $callback
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function reject($callback = true)
     {
@@ -852,7 +852,7 @@ trait EnumeratesValues
      *
      * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function unique($key = null, $strict = false)
     {
@@ -873,7 +873,7 @@ trait EnumeratesValues
      * Return only unique items from the collection array using strict comparison.
      *
      * @param  (callable(TValue, TKey): bool)|string|null  $key
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function uniqueStrict($key = null)
     {
