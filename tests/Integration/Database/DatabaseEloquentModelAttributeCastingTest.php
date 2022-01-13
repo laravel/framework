@@ -188,6 +188,16 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $this->assertTrue(empty($model->getDirty()));
     }
+
+    public function testCastingModelWithConstructorParameters()
+    {
+        $model = new TestEloquentModelWithConstructor('__test__');
+        $model->uppercase = 'taylor';
+
+        $this->assertSame('TAYLOR', $model->uppercase);
+        $this->assertSame('TAYLOR', $model->getAttributes()['uppercase']);
+        $this->assertSame('TAYLOR', $model->toArray()['uppercase']);
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -272,6 +282,14 @@ class TestEloquentModelWithAttributeCast extends Model
                 return collect();
             }
         );
+    }
+}
+
+class TestEloquentModelWithConstructor extends TestEloquentModelWithAttributeCast
+{
+    public function __construct($param)
+    {
+       return parent::__construct();
     }
 }
 
