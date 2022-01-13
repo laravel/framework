@@ -64,12 +64,12 @@ class ControllerDispatcher implements ControllerDispatcherContract
     }
 
     /**
-     * Whether a controller should gather middlewares or not.
+     * Whether a controller should gather middleware.
      *
      * @param  string  $controller
      * @return bool
      */
-    public function shouldGatherMiddlewares($controller)
+    public function shouldGatherMiddleware($controller)
     {
         return method_exists($controller, 'getMiddleware');
     }

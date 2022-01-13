@@ -63,7 +63,7 @@ class Route
      *
      * @var string
      */
-    public $controllerReference;
+    public $controllerClass;
 
     /**
      * The default values for the route.
@@ -277,21 +277,21 @@ class Route
     public function getController()
     {
         if (! $this->controller) {
-            $this->controller = $this->container->make($this->getControllerReference());
+            $this->controller = $this->container->make($this->getControllerClass());
         }
 
         return $this->controller;
     }
 
-    public function getControllerReference()
+    public function getControllerClass()
     {
-        if (! $this->controllerReference) {
+        if (! $this->controllerClass) {
             $class = $this->parseControllerCallback()[0];
 
-            $this->controllerReference = ltrim($class, '\\');
+            $this->controllerClass = ltrim($class, '\\');
         }
 
-        return $this->controllerReference;
+        return $this->controllerClass;
     }
 
     /**
@@ -1083,7 +1083,7 @@ class Route
             return [];
         }
         
-        if (! $this->controllerDispatcher()->shouldGatherMiddlewares($this->getControllerReference())) {
+        if (! $this->controllerDispatcher()->shouldGatherMiddleware($this->getControllerClass())) {
             return [];
         }
 
