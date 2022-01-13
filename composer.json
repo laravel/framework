@@ -87,7 +87,7 @@
         "league/flysystem-ftp": "^2.0",
         "league/flysystem-sftp-v3": "^2.4",
         "mockery/mockery": "^1.4.4",
-        "orchestra/testbench-core": "^7.0",
+        "orchestra/testbench-core": "^8.0",
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.0",
         "predis/predis": "^1.1.9",
@@ -127,7 +127,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "suggest": {
