@@ -847,7 +847,7 @@ class Builder
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
-     * {@inheritdoc}
+     *               {@inheritdoc}
      */
     public function orWhere($column, $operator = null, $value = null)
     {
@@ -1442,7 +1442,6 @@ class Builder
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
     }
-
 
     /**
      * Add an "or where year" statement to the query.
