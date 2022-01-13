@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use function method_exists;
 
 class ControllerDispatcher implements ControllerDispatcherContract
 {
@@ -57,13 +58,20 @@ class ControllerDispatcher implements ControllerDispatcherContract
      */
     public function getMiddleware($controller, $method)
     {
-        if (! method_exists($controller, 'getMiddleware')) {
-            return [];
-        }
-
         return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
             return static::methodExcludedByOptions($method, $data['options']);
         })->pluck('middleware')->all();
+    }
+
+    /**
+     * Whether a controller should gather middlewares or not.
+     *
+     * @param  string  $controller
+     * @return bool
+     */
+    public function shouldGatherMiddlewares($controller)
+    {
+        return method_exists($controller, 'getMiddleware');
     }
 
     /**
