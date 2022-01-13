@@ -256,6 +256,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('abcbbc', Str::finish('abcbbcbc', 'bc'));
     }
 
+    public function testInitials()
+    {
+        $this->assertSame('t o', Str::initials('taylor otwell'));
+        $this->assertSame('T O', Str::initials('Taylor Otwell'));
+        $this->assertSame('T M O', Str::initials('Taylor Master Otwell'));
+        $this->assertSame('T+O', Str::initials('Taylor Otwell', ' ', '+'));
+        $this->assertSame('T O', Str::initials('Taylor_Otwell', '_'));
+    }
+
     public function testIs()
     {
         $this->assertTrue(Str::is('/', '/'));

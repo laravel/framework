@@ -243,6 +243,21 @@ class Str
     }
 
     /**
+     * Extract the initials of a given value.
+     *
+     * @param  string $value
+     * @param  string $separator
+     * @param  string $glue
+     * @return string
+     */
+    public static function initials($value, $separator = ' ', $glue = ' ')
+    {
+        return trim(collect(explode($separator, $value))->map(function ($segment) {
+            return $segment[0] ?? '';
+        })->join($glue));
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|array  $pattern
