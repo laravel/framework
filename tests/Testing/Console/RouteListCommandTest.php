@@ -6,11 +6,10 @@ use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Tests\Testing\Console\Fixtures\FooController;
-use Orchestra\Testbench\TestCase;
-
 use function Illuminate\Tests\Testing\Console\Fixtures\accountId;
+use Illuminate\Tests\Testing\Console\Fixtures\FooController;
 use function Illuminate\Tests\Testing\Console\Fixtures\signedRoute;
+use Orchestra\Testbench\TestCase;
 
 class RouteListCommandTest extends TestCase
 {
@@ -64,7 +63,7 @@ class RouteListCommandTest extends TestCase
         $ds = DIRECTORY_SEPARATOR;
         $functions = __DIR__.$ds.'Fixtures'.$ds.'functions.php';
         $controller = __DIR__.$ds.'Fixtures'.$ds.'FooController.php';
-        require_once($functions);
+        require_once $functions;
 
         $this->router->get('closure', signedRoute());
 

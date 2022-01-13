@@ -4,13 +4,15 @@ namespace Illuminate\Tests\Testing\Console\Fixtures;
 
 use Illuminate\Http\RedirectResponse;
 
-function signedRoute() {
+function signedRoute()
+{
     return function () {
         return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
     };
-};
+}
 
-function accountId() {
+function accountId()
+{
     return function ($account, $id) {
         //
     };
