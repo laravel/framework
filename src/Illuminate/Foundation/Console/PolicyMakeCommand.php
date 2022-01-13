@@ -86,7 +86,7 @@ class PolicyMakeCommand extends GeneratorCommand
         }
 
         if (! $config->get('auth.providers.'.$guardProvider.'.model')) {
-            throw new LogicException('The ['.$guardProvider.'] user provider in your "auth" configuration file does not contain a [model] configuration key.');
+            throw new LogicException('The ['.$guardProvider.'] user provider in your "auth" configuration file does not contain a [model] configuration value.');
         }
 
         return $config->get(
