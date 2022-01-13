@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use Illuminate\Http\Filter\Filter;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
 class {{ class }} extends Filter
@@ -17,10 +18,11 @@ class {{ class }} extends Filter
     /**
      * Apply filter query.
      *
+     * @param Request $request
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function apply($builder)
+    public function apply(Request $request, $builder)
     {
         // return query builder which will be used to filter the query
         return $builder;

@@ -28,8 +28,13 @@ abstract class Filter
     {
         $builder = $next($request);
         $cleanRequest = array_filter($request->all());
-        return array_key_exists($this->filterParameters, $cleanRequest) ? $this->apply($builder) : $builder;
+        return array_key_exists($this->filterParameters, $cleanRequest) ? $this->apply($builder, $request) : $builder;
     }
 
-    abstract public function apply($builder);
+    /**
+     * @param $builder
+     * @param Request $request
+     * @return mixed
+     */
+    abstract public function apply(Request $request, $builder);
 }
