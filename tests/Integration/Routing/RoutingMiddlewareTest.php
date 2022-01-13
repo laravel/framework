@@ -2,11 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Routing\Controller;
 
 class RoutingMiddlewareTest extends TestCase
 {
@@ -67,8 +66,6 @@ class RoutingMiddlewareTestWithGetMiddlewareController extends Controller
 
 class RoutingMiddlewareTestTestingMiddleware
 {
-
-
     public function handle($request, $next)
     {
         $_SERVER['routing.middleware.test.last.constructed'] = 'middleware';

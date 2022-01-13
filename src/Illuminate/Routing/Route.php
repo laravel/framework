@@ -1082,7 +1082,7 @@ class Route
         if (! $this->isControllerAction()) {
             return [];
         }
-        
+
         if (! $this->controllerDispatcher()->shouldGatherMiddleware($this->getControllerClass())) {
             return [];
         }
