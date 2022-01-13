@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -23,20 +22,18 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testLookupDictionaryIsProperlyConstructedForEnums()
     {
-
-        if (version_compare(PHP_VERSION,'8.1') < 0) {
+        if (version_compare(PHP_VERSION, '8.1') < 0) {
             $this->markTestSkipped('PHP 8.1 is required');
         } else {
             $relation = $this->getRelation();
             $relation->addEagerConstraints([
-                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test]
+                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test],
             ]);
             $dictionary = $relation->getDictionary();
             $relation->getDictionary();
             $value = $dictionary['morph_type_2'][TestEnum::test->value][0]->foreign_key;
             $this->assertEquals(TestEnum::test, $value);
         }
-
     }
 
     public function testLookupDictionaryIsProperlyConstructed()
