@@ -16,10 +16,10 @@
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
-        "illuminate/collections": "^9.0",
-        "illuminate/macroable": "^9.0",
-        "illuminate/session": "^9.0",
-        "illuminate/support": "^9.0",
+        "illuminate/collections": "^10.0",
+        "illuminate/macroable": "^10.0",
+        "illuminate/session": "^10.0",
+        "illuminate/support": "^10.0",
         "symfony/http-foundation": "^6.0",
         "symfony/http-kernel": "^6.0",
         "symfony/mime": "^6.0"
@@ -35,7 +35,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "config": {
