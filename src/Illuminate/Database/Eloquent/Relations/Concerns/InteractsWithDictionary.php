@@ -25,9 +25,7 @@ trait InteractsWithDictionary
                 return $attribute->value;
             }
 
-            $msg = 'Model attribute value is an object but does not have a __toString method '.
-                'and does not implement \Illuminate\Contracts\Database\Eloquent\StringableAttribute interface.';
-            throw new InvalidArgumentException($msg);
+            throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');
         }
 
         return $attribute;
