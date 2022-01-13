@@ -69,6 +69,7 @@ class RoutingMiddlewareTestTestingMiddleware
     public function handle($request, $next)
     {
         $_SERVER['routing.middleware.test.last.constructed'] = 'middleware';
+
         return $next($request);
     }
 }
