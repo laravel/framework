@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
-use Illuminate\Contracts\Database\Eloquent\StringableAttribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -20,33 +20,21 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         m::close();
     }
-    public function testLookupDictionaryIsProperlyConstructedForStringableEnums()
+
+    public function testLookupDictionaryIsProperlyConstructedForEnums()
     {
-        if (PHP_VERSION < "8.1") {
+
+        if (version_compare(PHP_VERSION,'8.1') < 0) {
             $this->markTestSkipped('PHP 8.1 is required');
         } else {
-            $relation = $this->getRelation();
-            $relation->addEagerConstraints([
-                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnumStringAllowed::test2]
-            ]);
-            $dictionary = $relation->getDictionary();
-            $value = $dictionary['morph_type_2'][TestEnumStringAllowed::test2->toString()][0]->foreign_key;
-            $this->assertEquals(TestEnumStringAllowed::test2, $value);
-        }
-
-    }
-
-    public function testLookupDictionaryIsNotProperlyConstructedForEnums()
-    {
-        if (PHP_VERSION < "8.1") {
-            $this->markTestSkipped('PHP 8.1 is required');
-        } else {
-            $this->expectException(InvalidArgumentException::class);
             $relation = $this->getRelation();
             $relation->addEagerConstraints([
                 $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test]
             ]);
+            $dictionary = $relation->getDictionary();
             $relation->getDictionary();
+            $value = $dictionary['morph_type_2'][TestEnum::test->value][0]->foreign_key;
+            $this->assertEquals(TestEnum::test, $value);
         }
 
     }
@@ -418,24 +406,3 @@ class EloquentMorphToRelatedStub extends Model
     public $table = 'eloquent_morph_to_related_stubs';
 }
 
-if (PHP_VERSION >= '8.1')
-{
-    enum TestEnum: string
-    {
-        case test = 'Test';
-    }
-
-    enum TestEnumStringAllowed: string implements StringableAttribute
-    {
-        case test2 = "Test2";
-
-        /**
-         * Allows enums to be used as morthed entity type
-         * @return string
-         */
-        public function toString(): string
-        {
-            return $this->value;
-        }
-    }
-}
