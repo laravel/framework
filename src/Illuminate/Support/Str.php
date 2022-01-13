@@ -253,7 +253,7 @@ class Str
     public static function initials($value, $separator = ' ', $glue = ' ')
     {
         return trim(collect(explode($separator, $value))->map(function ($segment) {
-            return $segment[0] ?? '';
+            return static::substr($segment, 0, 1) ?? '';
         })->join($glue));
     }
 

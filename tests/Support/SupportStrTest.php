@@ -263,6 +263,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('T M O', Str::initials('Taylor Master Otwell'));
         $this->assertSame('T+O', Str::initials('Taylor Otwell', ' ', '+'));
         $this->assertSame('T O', Str::initials('Taylor_Otwell', '_'));
+        $this->assertSame('你 世', Str::initials('你好 世界'));
+        $this->assertSame('Т М О', Str::initials('Тейлор Мастер Отвелл'));
+        $this->assertSame('З м', Str::initials('Здравствуй мир'));
     }
 
     public function testIs()
