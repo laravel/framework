@@ -217,11 +217,11 @@ class SupportStrTest extends TestCase
 
     public function testStrDoesntContain()
     {
+        $this->assertTrue(Str::doesntContain('', ''));
         $this->assertTrue(Str::doesntContain('taylor', 'xxx'));
         $this->assertTrue(Str::doesntContain('taylor', ['xxx']));
         $this->assertTrue(Str::doesntContain('taylor', ['foo', 'bar']));
         $this->assertTrue(Str::doesntContain('taylor', ''));
-        $this->assertTrue(Str::doesntContain('', ''));
         $this->assertFalse(Str::doesntContain('taylor', 'ylo'));
         $this->assertFalse(Str::doesntContain('taylor', 'taylor'));
         $this->assertFalse(Str::doesntContain('taylor', ['ylo']));

@@ -551,6 +551,19 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('taylor')->contains(''));
     }
 
+    public function testStrDoesntContain()
+    {
+        $this->assertTrue($this->stringable('')->doesntContain(''));
+        $this->assertTrue($this->stringable('taylor')->doesntContain('xxx'));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx']));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(['foo', 'bar']));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(''));
+        $this->assertFalse($this->stringable('taylor')->doesntContain('ylo'));
+        $this->assertFalse($this->stringable('taylor')->doesntContain('taylor'));
+        $this->assertFalse($this->stringable('taylor')->doesntContain(['ylo']));
+        $this->assertFalse($this->stringable('taylor')->doesntContain(['xxx', 'ylo']));
+    }
+
     public function testContainsAll()
     {
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor', 'otwell']));

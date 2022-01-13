@@ -174,6 +174,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Determine if a given string does not contain a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|string[]  $needles
+     * @return bool
+     */
+    public function doesntContain($needles)
+    {
+        return Str::doesntContain($this->value, $needles);
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string|array  $needles
