@@ -516,8 +516,8 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         // Here we'll merge any group "controller" and "uses" statements if necessary so that
-        // the action has the proper clause for this property. Then we can simply set the
-        // name of the controller on the action and return the action array for usage.
+        // the action has the proper clause for this property. Then, we can simply set the
+        // name of this controller on the action plus return the action array for usage.
         if ($this->hasGroupStack()) {
             $action['uses'] = $this->prependGroupController($action['uses']);
             $action['uses'] = $this->prependGroupNamespace($action['uses']);
