@@ -31,8 +31,13 @@ class DatabaseEloquentMorphToTest extends TestCase
             ]);
             $dictionary = $relation->getDictionary();
             $relation->getDictionary();
-            $value = $dictionary['morph_type_2'][TestEnum::test->value][0]->foreign_key;
-            $this->assertEquals(TestEnum::test, $value);
+            $enumKey = TestEnum::test;
+            if (isset($enumKey->value)) {
+                $value = $dictionary['morph_type_2'][$enumKey->value][0]->foreign_key;
+                $this->assertEquals(TestEnum::test, $value);
+            } else {
+                $this->fail('An enum should contain value property');
+            }
         }
     }
 
