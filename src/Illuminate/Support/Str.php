@@ -220,18 +220,6 @@ class Str
     }
 
     /**
-     * Determine if a given string does not contain any array values.
-     *
-     * @param  string  $haystack
-     * @param  string[]  $needles
-     * @return bool
-     */
-    public static function doesntContainAny($haystack, array $needles)
-    {
-        return ! static::containsAll(...func_get_args());
-    }
-
-    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
