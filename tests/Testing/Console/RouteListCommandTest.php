@@ -53,8 +53,8 @@ class RouteListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
-            ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\FooContr…')
-            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\FooC…')
+            ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
+            ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
             ->expectsOutput('');
     }
