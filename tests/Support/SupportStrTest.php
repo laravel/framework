@@ -215,11 +215,30 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::contains('', ''));
     }
 
+    public function testStrDoesntContain()
+    {
+        $this->assertTrue(Str::doesntContain('taylor', 'xxx'));
+        $this->assertTrue(Str::doesntContain('taylor', ['xxx']));
+        $this->assertTrue(Str::doesntContain('taylor', ''));
+        $this->assertTrue(Str::doesntContain('', ''));
+        $this->assertFalse(Str::doesntContain('taylor', 'ylo'));
+        $this->assertFalse(Str::doesntContain('taylor', 'taylor'));
+        $this->assertFalse(Str::doesntContain('taylor', ['ylo']));
+        $this->assertFalse(Str::doesntContain('taylor', ['xxx', 'ylo']));
+    }
+
     public function testStrContainsAll()
     {
         $this->assertTrue(Str::containsAll('taylor otwell', ['taylor', 'otwell']));
         $this->assertTrue(Str::containsAll('taylor otwell', ['taylor']));
         $this->assertFalse(Str::containsAll('taylor otwell', ['taylor', 'xxx']));
+    }
+
+    public function testStrDoesntContainAny()
+    {
+        $this->assertFalse(Str::doesntContainAny('taylor otwell', ['taylor', 'otwell']));
+        $this->assertFalse(Str::doesntContainAny('taylor otwell', ['taylor']));
+        $this->assertTrue(Str::doesntContainAny('taylor otwell', ['taylor', 'xxx']));
     }
 
     public function testParseCallback()
