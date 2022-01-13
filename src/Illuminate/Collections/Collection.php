@@ -893,7 +893,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Push one or more items onto the end of the collection.
      *
-     * @param  TValue ...$values
+     * @param  TValue  ...$values
      * @return $this
      */
     public function push(...$values)
