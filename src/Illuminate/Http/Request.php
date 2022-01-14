@@ -491,7 +491,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  array  $rules
      * @param  $params
-     *
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function getValidatorInstance(array $rules, ...$params)
