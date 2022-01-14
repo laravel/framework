@@ -603,6 +603,17 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Indicate that Bootstrap 5 styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useBootstrapFive()
+    {
+        static::defaultView('pagination::bootstrap-5');
+        static::defaultSimpleView('pagination::simple-bootstrap-5');
+    }
+
+    /**
      * Indicate that Bootstrap 4 styling should be used for generated links.
      *
      * @return void
