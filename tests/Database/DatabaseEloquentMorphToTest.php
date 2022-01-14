@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +18,27 @@ class DatabaseEloquentMorphToTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    public function testLookupDictionaryIsProperlyConstructedForEnums()
+    {
+        if (version_compare(PHP_VERSION, '8.1') < 0) {
+            $this->markTestSkipped('PHP 8.1 is required');
+        } else {
+            $relation = $this->getRelation();
+            $relation->addEagerConstraints([
+                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test],
+            ]);
+            $dictionary = $relation->getDictionary();
+            $relation->getDictionary();
+            $enumKey = TestEnum::test;
+            if (isset($enumKey->value)) {
+                $value = $dictionary['morph_type_2'][$enumKey->value][0]->foreign_key;
+                $this->assertEquals(TestEnum::test, $value);
+            } else {
+                $this->fail('An enum should contain value property');
+            }
+        }
     }
 
     public function testLookupDictionaryIsProperlyConstructed()
