@@ -21,6 +21,14 @@ class ValidationRequiredIfTest extends TestCase
 
         $this->assertSame('', (string) $rule);
 
+        $rule = new RequiredIf('Illuminate\Tests\Validation\example_required_if_true_test');
+
+        $this->assertSame('required', (string) $rule);
+
+        $rule = new RequiredIf('Illuminate\Tests\Validation\example_required_if_false_test');
+
+        $this->assertSame('', (string) $rule);
+
         $rule = new RequiredIf(true);
 
         $this->assertSame('required', (string) $rule);
@@ -49,4 +57,14 @@ class ValidationRequiredIfTest extends TestCase
             return true;
         }));
     }
+}
+
+function example_required_if_true_test()
+{
+    return true;
+}
+
+function example_required_if_false_test()
+{
+    return false;
 }
