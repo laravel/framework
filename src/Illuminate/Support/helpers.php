@@ -214,7 +214,7 @@ if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
      *
-     * @param  int  $times
+     * @param  int|array  $times
      * @param  callable  $callback
      * @param  int|\Closure  $sleepMilliseconds
      * @param  callable|null  $when
@@ -225,6 +225,12 @@ if (! function_exists('retry')) {
     function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
         $attempts = 0;
+        $backoff = [];
+
+        if (is_array($times)) {
+            $backoff = $times;
+            $times = count($times) + 1;
+        }
 
         beginning:
         $attempts++;
@@ -236,6 +242,8 @@ if (! function_exists('retry')) {
             if ($times < 1 || ($when && ! $when($e))) {
                 throw $e;
             }
+
+            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
 
             if ($sleepMilliseconds) {
                 usleep(value($sleepMilliseconds, $attempts) * 1000);
