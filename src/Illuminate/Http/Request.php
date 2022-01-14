@@ -5,12 +5,15 @@ namespace Illuminate\Http;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @method array validate(array $rules, ...$params)
@@ -490,6 +493,24 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return $files;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasSession(bool $skipIfUninitialized = false): bool
+    {
+        return ! is_null($this->session);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSession(): SessionInterface
+    {
+        return $this->hasSession()
+                    ? new SymfonySessionDecorator($this->session())
+                    : throw new SessionNotFoundException;
     }
 
     /**
