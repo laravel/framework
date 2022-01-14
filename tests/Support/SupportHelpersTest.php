@@ -623,6 +623,23 @@ class SupportHelpersTest extends TestCase
         });
     }
 
+    public function testRetryWithBackoff()
+    {
+        $startTime = microtime(true);
+        $attempts = retry([50, 100, 200], function ($attempts) {
+            if ($attempts > 3) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        });
+
+        // Make sure we made four attempts
+        $this->assertEquals(4, $attempts);
+
+        $this->assertEqualsWithDelta(0.05 + 0.1 + 0.2, microtime(true) - $startTime, 0.02);
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
