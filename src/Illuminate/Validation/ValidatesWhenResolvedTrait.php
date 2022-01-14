@@ -54,19 +54,6 @@ trait ValidatesWhenResolvedTrait
     }
 
     /**
-     * Handle a failed validation attempt.
-     *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function failedValidation(Validator $validator)
-    {
-        throw new ValidationException($validator);
-    }
-
-    /**
      * Determine if the request passes the authorization check.
      *
      * @return bool

@@ -502,7 +502,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $factory = app(ValidationFactory::class);
 
         if (method_exists($this, 'validator')) {
-            $validator = $this->container->call([$this, 'validator'], compact('factory'));
+            $validator = call_user_func_array([$this, 'validator'], compact('factory','rules','params'));
         } else {
             $validator = $this->createDefaultValidator($factory, $rules, ...$params);
         }
@@ -526,9 +526,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function validate(array $rules, ...$params)
     {
-        $this->getValidatorInstance($rules, ...$params);
+        $instance = $this->getValidatorInstance($rules, ...$params);
 
-        return $this->validator->validated();
+        if ($instance->fails()) {
+            $this->failedValidation($instance);
+        }
+
+        return $instance->validated();
     }
 
     /**
@@ -549,6 +553,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
             throw $e;
         }
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    private function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator);
     }
 
     /**
