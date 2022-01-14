@@ -499,10 +499,14 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->validator;
         }
 
-        $factory = app(ValidationFactory::class);
+        if ($this->container) {
+            $factory = $this->container->make(ValidationFactory::class);
+        } else {
+            $factory = app(ValidationFactory::class);
+        }
 
         if (method_exists($this, 'validator')) {
-            $validator = call_user_func_array([$this, 'validator'], compact('factory','rules','params'));
+            $validator = call_user_func_array([$this, 'validator'], compact('factory', 'rules', 'params'));
         } else {
             $validator = $this->createDefaultValidator($factory, $rules, ...$params);
         }
