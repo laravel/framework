@@ -847,7 +847,6 @@ class Builder
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return $this
-     *               {@inheritdoc}
      */
     public function orWhere($column, $operator = null, $value = null)
     {
@@ -1829,9 +1828,14 @@ class Builder
         $this->where(Str::snake($segment), '=', $parameters[$index], $bool);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+     /**
+      * Add a "where fulltext" clause to the query.
+      *
+      * @param  string|string[]  $columns
+      * @param  string  $value
+      * @param  string  $boolean
+      * @return $this
+      */
     public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
     {
         $type = 'Fulltext';
@@ -1845,9 +1849,13 @@ class Builder
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+     /**
+      * Add a "or where fulltext" clause to the query.
+      *
+      * @param  string|string[]  $columns
+      * @param  string  $value
+      * @return $this
+      */
     public function orWhereFullText($columns, $value, array $options = [])
     {
         return $this->whereFulltext($columns, $value, $options, 'or');
