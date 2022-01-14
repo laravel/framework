@@ -473,6 +473,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $this->assertCount(1, $abigail->posts);
         $this->assertSame('First Title', $abigail->posts->first()->title);
+        $this->assertCount(1, $abigail->posts()->get());
         $this->assertCount(2, $abigail->posts()->withTrashed()->get());
 
         // restore
@@ -504,6 +505,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = $abigail->fresh();
 
         $this->assertCount(0, $abigail->posts()->first()->comments);
+        $this->assertCount(0, $abigail->posts()->first()->comments()->get());
         $this->assertCount(1, $abigail->posts()->first()->comments()->withTrashed()->get());
     }
 

@@ -314,7 +314,7 @@ abstract class Relation
      */
     public function toBase()
     {
-        return $this->query->getQuery();
+        return $this->query->toBase();
     }
 
     /**
