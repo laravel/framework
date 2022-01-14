@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
-use function method_exists;
 
 class ControllerDispatcher implements ControllerDispatcherContract
 {
