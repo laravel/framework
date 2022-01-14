@@ -471,6 +471,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $abigail = $abigail->fresh();
 
+        $this->assertSame('select * from "posts" where "posts"."user_id" = ? and "posts"."user_id" is not null and "posts"."deleted_at" is null', $abigail->posts()->toSql());
+
         $this->assertCount(1, $abigail->posts);
         $this->assertSame('First Title', $abigail->posts->first()->title);
         $this->assertCount(1, $abigail->posts()->get());
