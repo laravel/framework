@@ -227,6 +227,20 @@ class PendingBatch
     }
 
     /**
+     * Add additional data into the batch's options array.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withOption(string $key, $value)
+    {
+        $this->options[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Dispatch the batch.
      *
      * @return \Illuminate\Bus\Batch

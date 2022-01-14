@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "illuminate/collections": "^9.0",
-        "illuminate/contracts": "^9.0",
-        "illuminate/macroable": "^9.0",
-        "illuminate/support": "^9.0"
+        "illuminate/collections": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/macroable": "^10.0",
+        "illuminate/support": "^10.0"
     },
     "provide": {
         "psr/simple-cache-implementation": "1.0|2.0|3.0"
@@ -30,14 +30,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "suggest": {
         "ext-memcached": "Required to use the memcache cache driver.",
-        "illuminate/database": "Required to use the database cache driver (^9.0).",
-        "illuminate/filesystem": "Required to use the file cache driver (^9.0).",
-        "illuminate/redis": "Required to use the redis cache driver (^9.0).",
+        "illuminate/database": "Required to use the database cache driver (^10.0).",
+        "illuminate/filesystem": "Required to use the file cache driver (^10.0).",
+        "illuminate/redis": "Required to use the redis cache driver (^10.0).",
         "symfony/cache": "Required to use PSR-6 cache bridge (^6.0)."
     },
     "config": {

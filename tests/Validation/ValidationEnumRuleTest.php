@@ -131,6 +131,22 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidationFailsWhenProvidingStringToIntegerType()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'abc',
+            ],
+            [
+                'status' => new Enum(IntegerStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();

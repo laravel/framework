@@ -15,9 +15,9 @@
     ],
     "require": {
         "php": "^8.0.2",
-        "illuminate/conditionable": "^9.0",
-        "illuminate/contracts": "^9.0",
-        "illuminate/macroable": "^9.0"
+        "illuminate/conditionable": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/macroable": "^10.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "suggest": {
