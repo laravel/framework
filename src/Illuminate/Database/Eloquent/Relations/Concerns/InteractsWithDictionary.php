@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
+use BackedEnum;
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
 
 trait InteractsWithDictionary
@@ -21,7 +22,8 @@ trait InteractsWithDictionary
                 return $attribute->__toString();
             }
 
-            if (isset($attribute->value) && (is_string($attribute->value) || is_numeric($attribute->value))) {
+            if (function_exists('enum_exists') &&
+                $attribute instanceof BackedEnum) {
                 return $attribute->value;
             }
 
