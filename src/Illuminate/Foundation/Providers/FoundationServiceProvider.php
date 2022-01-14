@@ -45,33 +45,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
     {
         parent::register();
 
-        $this->registerRequestValidation();
         $this->registerRequestSignatureValidation();
         $this->registerExceptionTracking();
-    }
-
-    /**
-     * Register the "validate" macro on the request.
-     *
-     * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function registerRequestValidation()
-    {
-        Request::macro('validate', function (array $rules, ...$params) {
-            return validator()->validate($this->all(), $rules, ...$params);
-        });
-
-        Request::macro('validateWithBag', function (string $errorBag, array $rules, ...$params) {
-            try {
-                return $this->validate($rules, ...$params);
-            } catch (ValidationException $e) {
-                $e->errorBag = $errorBag;
-
-                throw $e;
-            }
-        });
     }
 
     /**

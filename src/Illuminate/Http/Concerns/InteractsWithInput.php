@@ -270,6 +270,29 @@ trait InteractsWithInput
     }
 
     /**
+     * Get a validated input container for the validated input.
+     *
+     * @param  array|null  $keys
+     * @return \Illuminate\Support\ValidatedInput|array
+     */
+    public function safe(array $keys = null)
+    {
+        return is_array($keys)
+            ? $this->validator->safe()->only($keys)
+            : $this->validator->safe();
+    }
+
+    /**
+     * Get the validated data from the request.
+     *
+     * @return array
+     */
+    public function validated()
+    {
+        return $this->validator->validated();
+    }
+    
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string|null  $key
