@@ -52,7 +52,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $table->increments('id');
             $table->integer('user_id');
             $table->string('title');
-            $table->integer('priority');
+            $table->integer('priority')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
