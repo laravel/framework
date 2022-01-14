@@ -491,7 +491,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  array  $rules
      * @param  $params
-     * 
+     *
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function getValidatorInstance(array $rules, ...$params)
@@ -522,7 +522,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  array  $rules
      * @param  $params
-     * 
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(array $rules, ...$params)
