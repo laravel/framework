@@ -1468,7 +1468,12 @@ class Builder implements BuilderContract
     }
 
     /**
-     * {@inheritdoc}
+     * Add a "where fulltext" clause to the query.
+     *
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @param  string  $boolean
+     * @return $this
      */
     public function whereFullText($columns, $value, array $options = [], $boolean = 'and')
     {
@@ -1484,7 +1489,11 @@ class Builder implements BuilderContract
     }
 
     /**
-     * {@inheritdoc}
+     * Add a "or where fulltext" clause to the query.
+     *
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @return $this
      */
     public function orWhereFullText($columns, $value, array $options = [])
     {
