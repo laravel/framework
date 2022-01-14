@@ -20,7 +20,11 @@ trait ValidatesWhenResolvedTrait
             $this->failedAuthorization();
         }
 
-        $instance = $this->getValidatorInstance();
+        $instance = $this->getValidatorInstance(
+            $this->container->call([$this, 'rules']),
+            $this->messages(),
+            $this->attributes(),
+        );
 
         if ($instance->fails()) {
             $this->failedValidation($instance);
@@ -37,16 +41,6 @@ trait ValidatesWhenResolvedTrait
     protected function prepareForValidation()
     {
         //
-    }
-
-    /**
-     * Get the validator instance for the request.
-     *
-     * @return \Illuminate\Validation\Validator
-     */
-    protected function getValidatorInstance()
-    {
-        return $this->validator();
     }
 
     /**

@@ -52,20 +52,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $redirectAction;
 
     /**
-     * Create the default validator instance.
-     *
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validator()
-    {
-        return $this->validate(
-            $this->container->call([$this, 'rules']),
-            $this->messages(),
-            $this->attributes(),
-        );
-    }
-
-    /**
      * Handle a failed validation attempt.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator

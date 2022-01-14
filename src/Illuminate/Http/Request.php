@@ -487,29 +487,47 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Make validate.
+     * Get the validator instance for the request.
      *
-     * @param  string  $errorBag
      * @param  array  $rules
-     * @param  mixed  ...$params
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * @param  $params
+     * 
+     * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validate(array $rules, ...$params)
+    protected function getValidatorInstance(array $rules, ...$params)
     {
         if ($this->validator) {
             return $this->validator;
         }
 
-        $factory = app(ValidationFactory::class);
+        $factory = $this->container->make(ValidationFactory::class);
 
-        $validator = $this->createDefaultValidator($factory, $rules, ...$params);
+        if (method_exists($this, 'validator')) {
+            $validator = $this->container->call([$this, 'validator'], compact('factory'));
+        } else {
+            $validator = $this->createDefaultValidator($factory, $rules, ...$params);
+        }
 
         if (method_exists($this, 'withValidator')) {
             $this->withValidator($validator);
         }
 
         $this->setValidator($validator);
+
+        return $this->validator;
+    }
+
+    /**
+     * Make validate.
+     *
+     * @param  array  $rules
+     * @param  $params
+     * 
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function validate(array $rules, ...$params)
+    {
+        $this->getValidatorInstance($rules, ...$params);
 
         return $this->validator->validated();
     }
