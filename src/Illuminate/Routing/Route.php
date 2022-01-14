@@ -59,7 +59,7 @@ class Route
     public $controller;
 
     /**
-     * The controller reference.
+     * The controller instance class name.
      *
      * @var string
      */
@@ -283,12 +283,15 @@ class Route
         return $this->controller;
     }
 
+    /**
+     * Get the controller class reference for the route.
+     *
+     * @return string
+     */
     public function getControllerClass()
     {
         if (! $this->controllerClass) {
-            $class = $this->parseControllerCallback()[0];
-
-            $this->controllerClass = ltrim($class, '\\');
+            $this->controllerClass = ltrim($this->parseControllerCallback()[0], '\\');
         }
 
         return $this->controllerClass;
