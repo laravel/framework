@@ -64,7 +64,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $this->attributes(),
         );
     }
-    
+
     /**
      * Handle a failed validation attempt.
      *

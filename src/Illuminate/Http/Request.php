@@ -5,15 +5,15 @@ namespace Illuminate\Http;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Validation\ValidationException;
 
 /**
  * @method array validate(array $rules, ...$params)
@@ -473,12 +473,11 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Create the default validator instance.
      *
      * @param  \Illuminate\Contracts\Validation\Factory  $factory
-     * @param  array   $rules
-     * @param  mixed   ...$params
-     * 
+     * @param  array  $rules
+     * @param  mixed  ...$params
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function createDefaultValidator(ValidationFactory  $factory, array $rules, ...$params)
+    protected function createDefaultValidator(ValidationFactory $factory, array $rules, ...$params)
     {
         return $factory->make(
             $this->validationData(),
@@ -491,9 +490,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Make validate.
      *
      * @param  string  $errorBag
-     * @param  array   $rules
-     * @param  mixed   ...$params
-     * 
+     * @param  array  $rules
+     * @param  mixed  ...$params
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validate(array $rules, ...$params)
@@ -519,9 +518,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Make validate with bag.
      *
      * @param  string  $errorBag
-     * @param  array   $rules
-     * @param  mixed   ...$params
-     * 
+     * @param  array  $rules
+     * @param  mixed  ...$params
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function validateWithBag(string $errorBag, array $rules, ...$params)

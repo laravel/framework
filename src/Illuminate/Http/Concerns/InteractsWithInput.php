@@ -291,7 +291,7 @@ trait InteractsWithInput
     {
         return $this->validator->validated();
     }
-    
+
     /**
      * Retrieve an input item from the request.
      *
