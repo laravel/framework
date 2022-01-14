@@ -225,10 +225,12 @@ if (! function_exists('retry')) {
     function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
         $attempts = 0;
+
         $backoff = [];
 
         if (is_array($times)) {
             $backoff = $times;
+
             $times = count($times) + 1;
         }
 
