@@ -92,6 +92,7 @@ assertType('bool', $collection->containsStrict(function ($user) {
     return true;
 }));
 assertType('bool', $collection::make(['string'])->containsStrict('string', 'string'));
+assertType('bool', $collection::make([[1]])->containsStrict(0));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->lazy());
 
