@@ -379,3 +379,20 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('filter_pipes')) {
+    /**
+     * send your query into it with your filterable classes the get the results back
+     *
+     * @param mixed $cause
+     * @param  array  $classes
+     * @return mixed
+     */
+    function filter_pipes($cause, $classes = [])
+    {
+        return app(\Illuminate\Pipeline\Pipeline::class)
+            ->send($cause)
+            ->through($classes)
+            ->thenReturn();
+    }
+}
