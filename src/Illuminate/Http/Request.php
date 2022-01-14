@@ -511,7 +511,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $this->setValidator($validator);
 
-        return $this->validator;
+        return $this->validator->validated();
     }
 
     /**
