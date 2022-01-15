@@ -319,7 +319,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the array of primary keys.
      *
-     * @return array<int, mixed>
+     * @return array<int, array-key>
      */
     public function modelKeys()
     {
