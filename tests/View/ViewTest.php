@@ -233,14 +233,27 @@ class ViewTest extends TestCase
         $this->assertSame('baz', $foo[0]);
     }
 
-    protected function getView($data = [])
+    public function testArgumentPassing()
+    {
+        $normal = $this->getView(['foo' => 'bar']);
+        $this->assertSame(['foo' => 'bar'], $normal->getData());
+        $named = $this->getView(foo: 'bar');
+        $this->assertSame(['foo' => 'bar'], $named->getData());
+
+        $normal = $this->getView(['foo' => 'bar'], ['bar' =>'baz']);
+        $this->assertSame(['bar' => 'baz', 'foo' => 'bar'], $normal->getData());
+        $named = $this->getView(foo: 'bar', mergeData: ['bar' => 'baz']);
+        $this->assertSame(['bar' => 'baz', 'foo' => 'bar'], $normal->getData());
+    }
+
+    protected function getView(...$data)
     {
         return new View(
             m::mock(Factory::class),
             m::mock(Engine::class),
             'view',
             'path',
-            $data
+            ...$data
         );
     }
 }

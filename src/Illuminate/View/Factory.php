@@ -128,11 +128,10 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param  mixed  ...$data
      * @return \Illuminate\Contracts\View\View
      */
-    public function make($view, $data = [], $mergeData = [])
+    public function make($view, ...$data)
     {
         $path = $this->finder->find(
             $view = $this->normalizeName($view)
@@ -141,9 +140,8 @@ class Factory implements FactoryContract
         // Next, we will create the view instance and call the view creator for the view
         // which can set any data, etc. Then we will return the view instance back to
         // the caller for rendering or performing other view manipulations on this.
-        $data = array_merge($mergeData, $this->parseData($data));
 
-        return tap($this->viewInstance($view, $path, $data), function ($view) {
+        return tap($this->viewInstance($view, $path, ...$data), function ($view) {
             $this->callCreator($view);
         });
     }
@@ -266,12 +264,12 @@ class Factory implements FactoryContract
      *
      * @param  string  $view
      * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  mixed  ...$data
      * @return \Illuminate\Contracts\View\View
      */
-    protected function viewInstance($view, $path, $data)
+    protected function viewInstance($view, $path, ...$data)
     {
-        return new View($this, $this->getEngineFromPath($path), $view, $path, $data);
+        return new View($this, $this->getEngineFromPath($path), $view, $path, ...$data);
     }
 
     /**

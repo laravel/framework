@@ -26,11 +26,10 @@ interface Factory
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param  mixed  ...$data
      * @return \Illuminate\Contracts\View\View
      */
-    public function make($view, $data = [], $mergeData = []);
+    public function make($view, ...$data);
 
     /**
      * Add a piece of shared data to the environment.

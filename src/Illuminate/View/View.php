@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -64,17 +65,42 @@ class View implements ArrayAccess, Htmlable, ViewContract
      * @param  \Illuminate\Contracts\View\Engine  $engine
      * @param  string  $view
      * @param  string  $path
-     * @param  mixed  $data
+     * @param  mixed  ...$data
      * @return void
      */
-    public function __construct(Factory $factory, Engine $engine, $view, $path, $data = [])
+    public function __construct(Factory $factory, Engine $engine, $view, $path, ...$data)
     {
         $this->view = $view;
         $this->path = $path;
         $this->engine = $engine;
         $this->factory = $factory;
 
-        $this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
+        $this->data = $this->parseData($data);
+    }
+
+    /**
+     * Parses given view data, so using named arguments will produce same output as array.
+     *
+     * @param array  $raw_data
+     * @return array
+     */
+    public function parseData(array $raw_data)
+    {
+        if (Arr::isAssoc($raw_data))
+        {
+            $merge_data = $raw_data['mergeData'] ?? [];
+            unset($raw_data['mergeData']);
+            $data = $raw_data;
+        }
+        else
+        {
+            $data = $raw_data[0] ?? [];
+            $merge_data = $raw_data[1] ?? [];
+        }
+
+        return array_merge($merge_data, (
+            $data instanceof Arrayable ? $data->toArray() : (array) $data
+        ));
     }
 
     /**

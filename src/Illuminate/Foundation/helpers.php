@@ -917,11 +917,10 @@ if (! function_exists('view')) {
      * Get the evaluated view contents for the given view.
      *
      * @param  string|null  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param  mixed  ...$data
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    function view($view = null, $data = [], $mergeData = [])
+    function view($view = null, ...$data)
     {
         $factory = app(ViewFactory::class);
 
@@ -929,6 +928,6 @@ if (! function_exists('view')) {
             return $factory;
         }
 
-        return $factory->make($view, $data, $mergeData);
+        return $factory->make($view, ...$data);
     }
 }
