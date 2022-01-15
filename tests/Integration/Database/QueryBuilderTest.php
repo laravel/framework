@@ -10,15 +10,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class QueryBuilderTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -36,7 +31,7 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
     }
 
     public function testSoleFailsForMultipleRecords()
@@ -61,13 +56,13 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->select('id', 'title')->first());
-        $this->assertSame($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
     }
 
     public function testSelectReplacesExistingSelects()
     {
-        $this->assertSame(
+        $this->assertEquals(
             ['id' => '1', 'title' => 'Foo Post'],
             (array) DB::table('posts')->select('content')->select(['id', 'title'])->first()
         );
@@ -75,10 +70,10 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testSelectWithSubQuery()
     {
-        $this->assertSame(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+        $this->assertEquals(
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
-                $query->select('bar');
+                $query->select('content');
             }])->first()
         );
     }
@@ -87,24 +82,24 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
-        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
-        $this->assertSame($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
     }
 
     public function testAddSelectWithSubQuery()
     {
-        $this->assertSame(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+        $this->assertEquals(
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
-                $query->select('bar');
+                $query->select('content');
             }])->first()
         );
     }
 
     public function testFromWithAlias()
     {
-        $this->assertSame('select * from "posts" as "alias"', DB::table('posts', 'alias')->toSql());
+        $this->assertCount(2, DB::table('posts', 'alias')->select('alias.*')->get());
     }
 
     public function testFromWithSubQuery()
@@ -130,7 +125,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testWhereValueSubQueryBuilder()
     {
-        $subQuery = DB::table('posts')->selectRaw("'Sub query value'");
+        $subQuery = DB::table('posts')->selectRaw("'Sub query value'")->limit(1);
 
         $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
         $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());

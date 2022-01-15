@@ -472,6 +472,22 @@ class TestResponseTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function testAssertUnprocessable()
+    {
+        $statusCode = 500;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->expectExceptionMessage('Expected response status code');
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertUnprocessable();
+    }
+
     public function testAssertNoContentAsserts204StatusCodeByDefault()
     {
         $statusCode = 500;
@@ -699,6 +715,29 @@ class TestResponseTest extends TestCase
 
         $response->assertJson(function (AssertableJson $json) {
             //
+        });
+    }
+
+    public function testAssertJsonWithFluentHasAnyThrows()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([]));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('None of properties [data, errors, meta] exist.');
+
+        $response->assertJson(function (AssertableJson $json) {
+            $json->hasAny('data', 'errors', 'meta');
+        });
+    }
+
+    public function testAssertJsonWithFluentHasAnyPasses()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => [],
+        ]));
+
+        $response->assertJson(function (AssertableJson $json) {
+            $json->hasAny('data', 'errors', 'meta');
         });
     }
 
@@ -1173,6 +1212,45 @@ class TestResponseTest extends TestCase
         $testResponse->assertJsonValidationErrors(['one' => 'taylor', 'otwell']);
     }
 
+    public function testAssertJsonValidationErrorMessagesMultipleErrors()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => [
+                'one' => [
+                    'First error message.',
+                    'Second error message.',
+                ],
+            ],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => ['First error message.', 'Second error message.']]);
+    }
+
+    public function testAssertJsonValidationErrorMessagesMultipleErrorsCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $data = [
+            'status' => 'ok',
+            'errors' => [
+                'one' => [
+                    'First error message.',
+                ],
+            ],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        $testResponse->assertJsonValidationErrors(['one' => ['First error message.', 'Second error message.']]);
+    }
+
     public function testAssertJsonMissingValidationErrors()
     {
         $baseResponse = tap(new Response, function ($response) {
@@ -1390,6 +1468,21 @@ class TestResponseTest extends TestCase
         $files->deleteDirectory($tempDir);
     }
 
+    public function testAssertDownloadOfferedWithAFileNameWithSpacesInIt()
+    {
+        $files = new Filesystem;
+        $tempDir = __DIR__.'/tmp';
+        $files->makeDirectory($tempDir, 0755, false, true);
+        $files->put($tempDir.'/file.txt', 'Hello World');
+        $testResponse = TestResponse::fromBaseResponse(new Response(
+            $files->get($tempDir.'/file.txt'), 200, [
+                'Content-Disposition' => 'attachment; filename = "test file.txt"',
+            ]
+        ));
+        $testResponse->assertDownload('test file.txt');
+        $files->deleteDirectory($tempDir);
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
@@ -1510,6 +1603,19 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response);
 
         $response->assertCookieMissing('cookie-name');
+    }
+
+    public function testAssertRedirectContains()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+        );
+
+        $response->assertRedirectContains('url.com');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $response->assertRedirectContains('url.net');
     }
 
     private function makeMockResponse($content)

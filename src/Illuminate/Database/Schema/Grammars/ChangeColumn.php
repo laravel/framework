@@ -198,6 +198,7 @@ class ChangeColumn
             'binary',
             'boolean',
             'date',
+            'dateTime',
             'decimal',
             'double',
             'float',

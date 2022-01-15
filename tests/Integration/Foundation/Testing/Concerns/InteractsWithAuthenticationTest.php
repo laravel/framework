@@ -21,13 +21,6 @@ class InteractsWithAuthenticationTest extends TestCase
             'provider' => 'users',
             'hash' => false,
         ]);
-
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
     }
 
     protected function setUp(): void

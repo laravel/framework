@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class CallQueuedHandlerTest extends TestCase
 {
     protected function tearDown(): void

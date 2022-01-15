@@ -649,7 +649,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, [], []);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
 
         $v->setException(\RuntimeException::class);
@@ -1470,6 +1470,58 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The last field is prohibited unless first is in taylor, jess.', $v->messages()->first('last'));
     }
 
+    public function testProhibits()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => ['foo']], ['email' => 'prohibits:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => []], ['email' => 'prohibits:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => ''], ['email' => 'prohibits:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => null], ['email' => 'prohibits:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => false], ['email' => 'prohibits:emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => ['foo']], ['email' => 'prohibits:email_address,emails']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo'], ['email' => 'prohibits:emails']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'foo', 'other' => 'foo'], ['email' => 'prohibits:email_address,emails']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibits' => 'The :attribute field prohibits :other being present.'], 'en');
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibits:emails,email_address']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The email field prohibits emails / email address being present.', $v->messages()->first('email'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [
+            'foo' => [
+                ['email' => 'foo', 'emails' => 'foo'],
+                ['emails' => 'foo'],
+            ],
+        ], ['foo.*.email' => 'prohibits:foo.*.emails']);
+        $this->assertFalse($v->passes());
+        $this->assertTrue($v->messages()->has('foo.0.email'));
+        $this->assertFalse($v->messages()->has('foo.1.email'));
+    }
+
     public function testFailedFileUploads()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -1765,6 +1817,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'off'], ['foo' => 'Accepted']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => null], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
@@ -1772,6 +1827,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 0], ['foo' => 'Accepted']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'Accepted']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => false], ['foo' => 'Accepted']);
@@ -1805,10 +1863,16 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => 'off', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
         $v = new Validator($trans, ['foo' => null, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => 0, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => false, 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
@@ -1865,6 +1929,126 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
+    }
+
+    public function testValidateDeclined()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Declined']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'off'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => false], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Declined']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateDeclinedIf()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => true, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'true', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'off', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => false, 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'false', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertTrue($v->passes());
+
+        // declined_if:bar,aaa
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'aaa'], ['foo' => 'declined_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is aaa.', $v->messages()->first('foo'));
+
+        // declined_if:bar,aaa,...
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'abc'], ['foo' => 'declined_if:bar,aaa,bbb,abc']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is abc.', $v->messages()->first('foo'));
+
+        // declined_if:bar,boolean
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => false], ['foo' => 'declined_if:bar,false']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is false.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.declined_if' => 'The :attribute field must be declined when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => true], ['foo' => 'declined_if:bar,true']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be declined when bar is true.', $v->messages()->first('foo'));
     }
 
     public function testValidateEndsWith()
@@ -2100,6 +2284,12 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'digits_between:1,10']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'digits_between:1,5']);
+        $this->assertTrue($v->fails());
     }
 
     public function testValidateSize()
@@ -2837,6 +3027,49 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['ip' => '::1'], ['ip' => 'Ipv4']);
         $this->assertTrue($v->fails());
+    }
+
+    public function testValidateMacAddress()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => 'foo'], ['mac' => 'mac_address']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-ab'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-AB'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01-23-45-67-89-aB'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01:23:45:67:89:ab'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01:23:45:67:89:AB'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01:23:45:67:89:aB'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '01:23:45-67:89:aB'], ['mac' => 'mac_address']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => 'xx:23:45:67:89:aB'], ['mac' => 'mac_address']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['mac' => '0123.4567.89ab'], ['mac' => 'mac_address']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateEmail()
@@ -3733,6 +3966,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:H:i:s']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:Y-m-d H:i:s,H:i:s']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'date_format:Y-m-d H:i:s,H:i:s']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'date_format:H:i:s']);
         $this->assertTrue($v->passes());
 
@@ -3980,6 +4219,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['start' => 'invalid', 'ends' => 'invalid'], ['start' => 'date_format:d/m/Y|before:ends', 'ends' => 'date_format:d/m/Y|after:start']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['start' => '31/12/2012', 'ends' => null], ['start' => 'date_format:d/m/Y|before:ends', 'ends' => 'date_format:d/m/Y|after:start']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['start' => '31/12/2012', 'ends' => null], ['start' => 'date_format:d/m/Y|before:ends', 'ends' => 'nullable|date_format:d/m/Y|after:start']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['x' => date('d/m/Y')], ['x' => 'date_format:d/m/Y|after:yesterday|before:tomorrow']);
         $this->assertTrue($v->passes());
 
@@ -4155,6 +4400,242 @@ class ValidationValidatorTest extends TestCase
             return is_null($i['foo'][0]['title']);
         });
         $this->assertEquals(['foo.0.name' => ['Required', 'String']], $v->getRules());
+    }
+
+    public function testItemAwareSometimesAddingRules()
+    {
+        // ['users'] -> if users is not empty it must be validated as array
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
+        $v->sometimes(['users'], 'array', function ($i, $item) {
+            return $item !== null;
+        });
+        $this->assertEquals(['users' => ['array'], 'users.0.name' => ['required', 'string'], 'users.1.name' => ['required', 'string']], $v->getRules());
+
+        // ['users'] -> if users is null no rules will be applied
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['users' => null], ['users.*.name'=> 'required|string']);
+        $v->sometimes(['users'], 'array', function ($i, $item) {
+            return (bool) $item;
+        });
+        $this->assertEquals([], $v->getRules());
+
+        // ['company.users'] -> if users is not empty it must be validated as array
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v->sometimes(['company.users'], 'array', function ($i, $item) {
+            return $item->users !== null;
+        });
+        $this->assertEquals(['company.users' => ['array'], 'company.users.0.name' => ['required', 'string'], 'company.users.1.name' => ['required', 'string']], $v->getRules());
+
+        // ['company.users'] -> if users is null no rules will be applied
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
+        $v->sometimes(['company.users'], 'array', function ($i, $item) {
+            return (bool) $item->users;
+        });
+        $this->assertEquals(['company' => ['required']], $v->getRules());
+
+        // ['company.*'] -> if users is not empty it must be validated as array
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v->sometimes(['company.*'], 'array', function ($i, $item) {
+            return $item !== null;
+        });
+        $this->assertEquals(['company.users' => ['array'], 'company.users.0.name' => ['required', 'string'], 'company.users.1.name' => ['required', 'string']], $v->getRules());
+
+        // ['company.*'] -> if users is null no rules will be applied
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['company' => ['users' => null]], ['company'=> 'required', 'company.users.*.name'=> 'required|string']);
+        $v->sometimes(['company.*'], 'array', function ($i, $item) {
+            return (bool) $item;
+        });
+        $this->assertEquals(['company' => ['required']], $v->getRules());
+
+        // ['users.*'] -> all nested array items in users must be validated as array
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]], ['users.*.name'=> 'required|string']);
+        $v->sometimes(['users.*'], 'array', function ($i, $item) {
+            return (bool) $item;
+        });
+        $this->assertEquals(['users.0' => ['array'], 'users.1' => ['array'], 'users.0.name' => ['required', 'string'], 'users.1.name' => ['required', 'string']], $v->getRules());
+
+        // ['company.users.*'] -> all nested array items in users must be validated as array
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v->sometimes(['company.users.*'], 'array', function () {
+            return true;
+        });
+        $this->assertEquals(['company.users.0' => ['array'], 'company.users.1' => ['array'], 'company.users.0.name' => ['required', 'string'], 'company.users.1.name' => ['required', 'string']], $v->getRules());
+
+        // ['company.*.*'] -> all nested array items in users must be validated as array
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['company' => ['users' => [['name' => 'Taylor'], ['name' => 'Abigail']]]], ['company.users.*.name'=> 'required|string']);
+        $v->sometimes(['company.*.*'], 'array', function ($i, $item) {
+            return true;
+        });
+        $this->assertEquals(['company.users.0' => ['array'], 'company.users.1' => ['array'], 'company.users.0.name' => ['required', 'string'], 'company.users.1.name' => ['required', 'string']], $v->getRules());
+
+        // ['user.profile.value'] -> multiple true cases, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['user' => ['profile' => ['photo' => 'image.jpg', 'type' => 'email', 'value' => 'test@test.com']]], ['user.profile.*' => ['required']]);
+        $v->sometimes(['user.profile.value'], 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $v->sometimes('user.profile.photo', 'mimes:jpg,bmp,png', function ($i, $item) {
+            return $item->photo;
+        });
+        $this->assertEquals(['user.profile.value' => ['required', 'email'], 'user.profile.photo' => ['required', 'mimes:jpg,bmp,png'], 'user.profile.type' => ['required']], $v->getRules());
+
+        // ['user.profile.value'] -> multiple true cases with middle wildcard, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['user' => ['profile' => ['photo' => 'image.jpg', 'type' => 'email', 'value' => 'test@test.com']]], ['user.profile.*' => ['required']]);
+        $v->sometimes('user.*.value', 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $v->sometimes('user.*.photo', 'mimes:jpg,bmp,png', function ($i, $item) {
+            return $item->photo;
+        });
+        $this->assertEquals(['user.profile.value' => ['required', 'email'], 'user.profile.photo' => ['required', 'mimes:jpg,bmp,png'], 'user.profile.type' => ['required']], $v->getRules());
+
+        // ['profiles.*.value'] -> true and false cases for the same field with middle wildcard, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['profiles' => [['type' => 'email'], ['type' => 'string']]], ['profiles.*.value' => ['required']]);
+        $v->sometimes(['profiles.*.value'], 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $v->sometimes('profiles.*.value', 'url', function ($i, $item) {
+            return $item->type !== 'email';
+        });
+        $this->assertEquals(['profiles.0.value' => ['required', 'email'], 'profiles.1.value' => ['required', 'url']], $v->getRules());
+
+        // ['profiles.*.value'] -> true case with middle wildcard, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['profiles' => [['type' => 'email'], ['type' => 'string']]], ['profiles.*.value' => ['required']]);
+        $v->sometimes(['profiles.*.value'], 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['profiles.0.value' => ['required', 'email'], 'profiles.1.value' => ['required']], $v->getRules());
+
+        // ['profiles.*.value'] -> false case with middle wildcard, the item based condition does not match and the optional validation is not added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['profiles' => [['type' => 'string'], ['type' => 'string']]], ['profiles.*.value' => ['required']]);
+        $v->sometimes(['profiles.*.value'], 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['profiles.0.value' => ['required'], 'profiles.1.value' => ['required']], $v->getRules());
+
+        // ['users.profiles.*.value'] -> true case nested and with middle wildcard, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['users' => ['profiles' => [['type' => 'email'], ['type' => 'string']]]], ['users.profiles.*.value' => ['required']]);
+        $v->sometimes(['users.profiles.*.value'], 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['users.profiles.0.value' => ['required', 'email'], 'users.profiles.1.value' => ['required']], $v->getRules());
+
+        // ['users.*.*.value'] -> true case nested and with double middle wildcard, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['users' => ['profiles' => [['type' => 'email'], ['type' => 'string']]]], ['users.profiles.*.value' => ['required']]);
+        $v->sometimes(['users.*.*.value'], 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['users.profiles.0.value' => ['required', 'email'], 'users.profiles.1.value' => ['required']], $v->getRules());
+
+        // 'user.value' -> true case nested with string, the item based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['user' => ['name' => 'username', 'type' => 'email', 'value' => 'test@test.com']], ['user.*' => ['required']]);
+        $v->sometimes('user.value', 'email', function ($i, $item) {
+            return $item->type === 'email';
+        });
+        $this->assertEquals(['user.name' => ['required'], 'user.type' => ['required'], 'user.value' => ['required', 'email']], $v->getRules());
+
+        // 'user.value' -> standard true case with string, the INPUT based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'username', 'type' => 'email', 'value' => 'test@test.com'], ['*' => ['required']]);
+        $v->sometimes('value', 'email', function ($i) {
+            return $i->type === 'email';
+        });
+        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
+
+        // ['value'] -> standard true case with array, the INPUT based condition does match and the optional validation is added
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'username', 'type' => 'email', 'value' => 'test@test.com'], ['*' => ['required']]);
+        $v->sometimes(['value'], 'email', function ($i, $item) {
+            return $i->type === 'email';
+        });
+        $this->assertEquals(['name' => ['required'], 'type' => ['required'], 'value' => ['required', 'email']], $v->getRules());
+
+        // ['email'] -> if value is set, it will be validated as string
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['email' => 'test@test.com'], ['*' => ['required']]);
+        $v->sometimes(['email'], 'email', function ($i, $item) {
+            return $item;
+        });
+        $this->assertEquals(['email' => ['required', 'email']], $v->getRules());
+
+        // ['attendee.*'] -> if attendee name is set, all other fields will be required as well
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['attendee' => ['name' => 'Taylor', 'title' => 'Creator of Laravel', 'type' => 'Developer']], ['attendee.*'=> 'string']);
+        $v->sometimes(['attendee.*'], 'required', function ($i, $item) {
+            return (bool) $item;
+        });
+        $this->assertEquals(['attendee.name' => ['string', 'required'], 'attendee.title' => ['string', 'required'], 'attendee.type' => ['string', 'required']], $v->getRules());
+    }
+
+    public function testValidateSometimesImplicitEachWithAsterisksBeforeAndAfter()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'foo' => [
+                ['start' => '2016-04-19', 'end' => '2017-04-19'],
+            ],
+        ], []);
+        $v->sometimes('foo.*.start', ['before:foo.*.end'], function () {
+            return true;
+        });
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'foo' => [
+                ['start' => '2016-04-19', 'end' => '2017-04-19'],
+            ],
+        ], []);
+        $v->sometimes('foo.*.start', 'before:foo.*.end', function () {
+            return true;
+        });
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'foo' => [
+                ['start' => '2016-04-19', 'end' => '2017-04-19'],
+            ],
+        ], []);
+        $v->sometimes('foo.*.end', ['before:foo.*.start'], function () {
+            return true;
+        });
+
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [
+            'foo' => [
+                ['start' => '2016-04-19', 'end' => '2017-04-19'],
+            ],
+        ], []);
+        $v->sometimes('foo.*.end', ['after:foo.*.start'], function () {
+            return true;
+        });
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'foo' => [
+                ['start' => '2016-04-19', 'end' => '2017-04-19'],
+            ],
+        ], []);
+        $v->sometimes('foo.*.start', ['after:foo.*.end'], function () {
+            return true;
+        });
+        $this->assertTrue($v->fails());
     }
 
     public function testCustomValidators()
@@ -4430,21 +4911,44 @@ class ValidationValidatorTest extends TestCase
     public function testParsingArrayKeysWithDot()
     {
         $trans = $this->getIlluminateArrayTranslator();
-
+        // Interpreted dot fails on empty value
         $v = new Validator($trans, ['foo' => ['bar' => ''], 'foo.bar' => 'valid'], ['foo.bar' => 'required']);
         $this->assertTrue($v->fails());
-
+        // Escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => ['bar' => 'valid'], 'foo.bar' => ''], ['foo\.bar' => 'required']);
         $this->assertTrue($v->fails());
-
+        // Interpreted dot succeeds
         $v = new Validator($trans, ['foo' => ['bar' => 'valid'], 'foo.bar' => 'zxc'], ['foo\.bar' => 'required']);
         $this->assertFalse($v->fails());
-
+        // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => ['bar.baz' => '']], ['foo.bar\.baz' => 'required']);
         $this->assertTrue($v->fails());
-
+        // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
         $this->assertTrue($v->fails());
+    }
+
+    public function testParsingArrayKeysWithDotWhenTestingExistence()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        // RequiredWith using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_with:bar.foo\.bar']);
+        $this->assertFalse($v->passes());
+        // RequiredWithAll using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_with_all:bar.foo\.bar']);
+        $this->assertFalse($v->passes());
+        // RequiredWithout using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => 'valid', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_without:bar.foo\.bar']);
+        $this->assertTrue($v->passes());
+        // RequiredWithoutAll using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => 'valid', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_without_all:bar.foo\.bar']);
+        $this->assertTrue($v->passes());
+        // Same using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => 'valid', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'same:bar.foo\.bar']);
+        $this->assertTrue($v->passes());
+        // RequiredUnless using escaped dot in a nested array
+        $v = new Validator($trans, ['foo' => '', 'bar' => ['foo.bar' => 'valid']], ['foo' => 'required_unless:bar.foo\.bar,valid']);
+        $this->assertTrue($v->passes());
     }
 
     public function testPassingSlashVulnerability()
@@ -6240,6 +6744,49 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($fails, $message ?? '');
 
         $this->assertSame($expectedMessages, $validator->messages()->toArray());
+    }
+
+    public function providesPassingExcludeData()
+    {
+        return [
+            [
+                [
+                    'has_appointment' => ['required', 'bool'],
+                    'appointment_date' => ['exclude'],
+                ], [
+                    'has_appointment' => false,
+                    'appointment_date' => 'should be excluded',
+                ], [
+                    'has_appointment' => false,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providesPassingExcludeData
+     */
+    public function testExclude($rules, $data, $expectedValidatedData)
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            $data,
+            $rules
+        );
+
+        $passes = $validator->passes();
+
+        if (! $passes) {
+            $message = sprintf("Validation unexpectedly failed:\nRules: %s\nData: %s\nValidation error: %s",
+                json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                json_encode($validator->messages()->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            );
+        }
+
+        $this->assertTrue($passes, $message ?? '');
+
+        $this->assertSame($expectedValidatedData, $validator->validated());
     }
 
     public function testExcludingArrays()

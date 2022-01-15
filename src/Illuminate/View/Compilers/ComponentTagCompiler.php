@@ -52,7 +52,7 @@ class ComponentTagCompiler
      *
      * @param  array  $aliases
      * @param  array  $namespaces
-     * @param  \Illuminate\View\Compilers\BladeCompiler|null $blade
+     * @param  \Illuminate\View\Compilers\BladeCompiler|null  $blade
      * @return void
      */
     public function __construct(array $aliases = [], array $namespaces = [], ?BladeCompiler $blade = null)
@@ -269,6 +269,10 @@ class ComponentTagCompiler
         }
 
         if ($viewFactory->exists($view = $this->guessViewName($component))) {
+            return $view;
+        }
+
+        if ($viewFactory->exists($view = $this->guessViewName($component).'.index')) {
             return $view;
         }
 

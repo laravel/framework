@@ -5,12 +5,13 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use stdClass;
 
-class LazyCollection implements Enumerable
+class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 {
     use EnumeratesValues, Macroable;
 
@@ -202,6 +203,19 @@ class LazyCollection implements Enumerable
         }
 
         return $this->contains($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
+     * Determine if an item is not contained in the enumerable.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContain($key, $operator = null, $value = null)
+    {
+        return ! $this->contains(...func_get_args());
     }
 
     /**
@@ -505,6 +519,25 @@ class LazyCollection implements Enumerable
 
         foreach ($this as $key => $value) {
             if (array_key_exists($key, $keys) && --$count == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if any of the keys exist in the collection.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function hasAny($key)
+    {
+        $keys = array_flip(is_array($key) ? $key : func_get_args());
+
+        foreach ($this as $key => $value) {
+            if (array_key_exists($key, $keys)) {
                 return true;
             }
         }
@@ -1348,6 +1381,40 @@ class LazyCollection implements Enumerable
                 $callback($value, $key);
 
                 yield $key => $value;
+            }
+        });
+    }
+
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot()
+    {
+        return $this->passthru('undot', []);
+    }
+
+    /**
+     * Return only unique items from the collection array.
+     *
+     * @param  string|callable|null  $key
+     * @param  bool  $strict
+     * @return static
+     */
+    public function unique($key = null, $strict = false)
+    {
+        $callback = $this->valueRetriever($key);
+
+        return new static(function () use ($callback, $strict) {
+            $exists = [];
+
+            foreach ($this as $key => $item) {
+                if (! in_array($id = $callback($item, $key), $exists, $strict)) {
+                    yield $key => $item;
+
+                    $exists[] = $id;
+                }
             }
         });
     }

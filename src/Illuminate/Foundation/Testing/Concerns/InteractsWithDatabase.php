@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
+use Illuminate\Testing\Constraints\NotSoftDeletedInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
@@ -98,7 +99,12 @@ trait InteractsWithDatabase
     protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
         if ($this->isSoftDeletableModel($table)) {
-            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName(), $table->getDeletedAtColumn());
+            return $this->assertSoftDeleted(
+                $table->getTable(),
+                array_merge($data, [$table->getKeyName() => $table->getKey()]),
+                $table->getConnectionName(),
+                $table->getDeletedAtColumn()
+            );
         }
 
         $this->assertThat(
@@ -106,6 +112,63 @@ trait InteractsWithDatabase
         );
 
         return $this;
+    }
+
+    /**
+     * Assert the given record has not been "soft deleted".
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @param  array  $data
+     * @param  string|null  $connection
+     * @param  string|null  $deletedAtColumn
+     * @return $this
+     */
+    protected function assertNotSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
+    {
+        if ($this->isSoftDeletableModel($table)) {
+            return $this->assertNotSoftDeleted(
+                $table->getTable(),
+                array_merge($data, [$table->getKeyName() => $table->getKey()]),
+                $table->getConnectionName(),
+                $table->getDeletedAtColumn()
+            );
+        }
+
+        $this->assertThat(
+            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the given model exists in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
+     */
+    protected function assertModelExists($model)
+    {
+        return $this->assertDatabaseHas(
+            $model->getTable(),
+            [$model->getKeyName() => $model->getKey()],
+            $model->getConnectionName()
+        );
+    }
+
+    /**
+     * Assert the given model does not exist in the database.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
+     */
+    protected function assertModelMissing($model)
+    {
+        return $this->assertDatabaseMissing(
+            $model->getTable(),
+            [$model->getKeyName() => $model->getKey()],
+            $model->getConnectionName()
+        );
     }
 
     /**

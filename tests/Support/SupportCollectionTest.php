@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
+use UnexpectedValueException;
 
 class SupportCollectionTest extends TestCase
 {
@@ -237,6 +238,28 @@ class SupportCollectionTest extends TestCase
                 return $value === 'bar';
             })
         );
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstOrFailStopsIteratingAtFirstMatch($collection)
+    {
+        $data = new $collection([
+            function () {
+                return false;
+            },
+            function () {
+                return true;
+            },
+            function () {
+                throw new Exception();
+            },
+        ]);
+
+        $this->assertNotNull($data->firstOrFail(function ($callback) {
+            return $callback();
+        }));
     }
 
     /**
@@ -1808,6 +1831,17 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortByCallableString($collection)
+    {
+        $data = new $collection([['sort' => 2], ['sort' => 1]]);
+        $data = $data->sortBy([['sort', 'asc']]);
+
+        $this->assertEquals([['sort' => 1], ['sort' => 2]], array_values($data->all()));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortByAlwaysReturnsAssoc($collection)
     {
         $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);
@@ -2053,6 +2087,20 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($data->has('third'));
         $this->assertTrue($data->has(['first', 'second']));
         $this->assertFalse($data->has(['third', 'first']));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testHasAny($collection)
+    {
+        $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+
+        $this->assertTrue($data->hasAny('first'));
+        $this->assertFalse($data->hasAny('third'));
+        $this->assertTrue($data->hasAny(['first', 'second']));
+        $this->assertTrue($data->hasAny(['first', 'fourth']));
+        $this->assertFalse($data->hasAny(['third', 'fourth']));
     }
 
     /**
@@ -2608,6 +2656,14 @@ class SupportCollectionTest extends TestCase
         $cut = $data->splice(1, 1, 'bar');
         $this->assertEquals(['foo', 'bar'], $data->all());
         $this->assertEquals(['baz'], $cut->all());
+
+        $data = new Collection(['foo', 'baz']);
+        $data->splice(1, 0, ['bar']);
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
+
+        $data = new Collection(['foo', 'baz']);
+        $data->splice(1, 0, new Collection(['bar']));
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
     }
 
     /**
@@ -3883,6 +3939,40 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testReduceSpread($collection)
+    {
+        $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
+
+        [$sum, $max, $min] = $data->reduceSpread(function ($sum, $max, $min, $value) {
+            $sum += $value;
+            $max = max($max, $value);
+            $min = min($min, $value);
+
+            return [$sum, $max, $min];
+        }, 0, PHP_INT_MIN, PHP_INT_MAX);
+
+        $this->assertEquals(14, $sum);
+        $this->assertEquals(5, $max);
+        $this->assertEquals(-1, $min);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testReduceSpreadThrowsAnExceptionIfReducerDoesNotReturnAnArray($collection)
+    {
+        $data = new $collection([1]);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        $data->reduceSpread(function () {
+            return false;
+        }, null);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize($collection)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -3915,6 +4005,25 @@ class SupportCollectionTest extends TestCase
         $instance = $data->pipeInto(TestCollectionMapIntoObject::class);
 
         $this->assertSame($data, $instance->value);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPipeThrough($collection)
+    {
+        $data = new $collection([1, 2, 3]);
+
+        $result = $data->pipeThrough([
+            function ($data) {
+                return $data->merge([4, 5]);
+            },
+            function ($data) {
+                return $data->sum();
+            },
+        ]);
+
+        $this->assertEquals(15, $result);
     }
 
     /**
@@ -4777,6 +4886,42 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testUndot($collection)
+    {
+        $data = $collection::make([
+            'name' => 'Taylor',
+            'meta.foo' => 'bar',
+            'meta.baz' => 'boom',
+            'meta.bam.boom' => 'bip',
+        ])->undot();
+        $this->assertSame([
+            'name' => 'Taylor',
+            'meta' => [
+                'foo' => 'bar',
+                'baz' => 'boom',
+                'bam' => [
+                    'boom' => 'bip',
+                ],
+            ],
+        ], $data->all());
+
+        $data = $collection::make([
+            'foo.0' => 'bar',
+            'foo.1' => 'baz',
+            'foo.baz' => 'boom',
+        ])->undot();
+        $this->assertSame([
+            'foo' => [
+                'bar',
+                'baz',
+                'baz' => 'boom',
+            ],
+        ], $data->all());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
@@ -4855,21 +5000,25 @@ class TestArrayAccessImplementation implements ArrayAccess
         $this->arr = $arr;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->arr[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->arr[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->arr[$offset] = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->arr[$offset]);

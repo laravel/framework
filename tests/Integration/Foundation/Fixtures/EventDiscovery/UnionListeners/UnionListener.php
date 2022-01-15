@@ -7,7 +7,7 @@ use Illuminate\Tests\Integration\Foundation\Fixtures\EventDiscovery\Events\Event
 
 class UnionListener
 {
-    public function handle(EventOne | EventTwo $event)
+    public function handle(EventOne|EventTwo $event)
     {
         //
     }

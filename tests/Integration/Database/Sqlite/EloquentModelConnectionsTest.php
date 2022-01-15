@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -8,14 +8,13 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class EloquentModelConnectionsTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
+        if (getenv('DB_CONNECTION') !== 'testing') {
+            $this->markTestSkipped('Test requires a Sqlite connection.');
+        }
 
         $app['config']->set('database.default', 'conn1');
 
@@ -32,10 +31,8 @@ class EloquentModelConnectionsTest extends TestCase
         ]);
     }
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrations()
     {
-        parent::setUp();
-
         Schema::create('parent', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');

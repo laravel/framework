@@ -131,6 +131,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -219,6 +221,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -276,6 +280,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -367,7 +373,7 @@ class Repository implements ArrayAccess, CacheContract
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -382,7 +388,7 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $ttl);
+        $this->put($key, $value = $callback(), value($ttl));
 
         return $value;
     }
@@ -439,6 +445,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -447,6 +455,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -463,6 +473,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear()
     {
@@ -566,7 +578,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Fire an event for this cache instance.
      *
-     * @param  string  $event
+     * @param  object|string  $event
      * @return void
      */
     protected function event($event)

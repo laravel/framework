@@ -6,8 +6,10 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 
 class PruneCommand extends Command
@@ -19,7 +21,9 @@ class PruneCommand extends Command
      */
     protected $signature = 'model:prune
                                 {--model=* : Class names of the models to be pruned}
-                                {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}';
+                                {--except=* : Class names of the models to be excluded from pruning}
+                                {--chunk=1000 : The number of models to retrieve per chunk of models to be deleted}
+                                {--pretend : Display the number of prunable records found instead of deleting them}';
 
     /**
      * The console command description.
@@ -40,6 +44,14 @@ class PruneCommand extends Command
 
         if ($models->isEmpty()) {
             $this->info('No prunable models found.');
+
+            return;
+        }
+
+        if ($this->option('pretend')) {
+            $models->each(function ($model) {
+                $this->pretendToPrune($model);
+            });
 
             return;
         }
@@ -78,7 +90,13 @@ class PruneCommand extends Command
             return collect($models);
         }
 
-        return collect((new Finder)->in(app_path('Models'))->files())
+        $except = $this->option('except');
+
+        if (! empty($models) && ! empty($except)) {
+            throw new InvalidArgumentException('The --models and --except options cannot be combined.');
+        }
+
+        return collect((new Finder)->in(app_path('Models'))->files()->name('*.php'))
             ->map(function ($model) {
                 $namespace = $this->laravel->getNamespace();
 
@@ -87,6 +105,10 @@ class PruneCommand extends Command
                     ['\\', ''],
                     Str::after($model->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR)
                 );
+            })->when(! empty($except), function ($models) use ($except) {
+                return $models->reject(function ($model) use ($except) {
+                    return in_array($model, $except);
+                });
             })->filter(function ($model) {
                 return $this->isPrunable($model);
             })->values();
@@ -103,5 +125,27 @@ class PruneCommand extends Command
         $uses = class_uses_recursive($model);
 
         return in_array(Prunable::class, $uses) || in_array(MassPrunable::class, $uses);
+    }
+
+    /**
+     * Display how many models will be pruned.
+     *
+     * @param  string  $model
+     * @return void
+     */
+    protected function pretendToPrune($model)
+    {
+        $instance = new $model;
+
+        $count = $instance->prunable()
+            ->when(in_array(SoftDeletes::class, class_uses_recursive(get_class($instance))), function ($query) {
+                $query->withTrashed();
+            })->count();
+
+        if ($count === 0) {
+            $this->info("No prunable [$model] records found.");
+        } else {
+            $this->info("{$count} [{$model}] records will be pruned.");
+        }
     }
 }

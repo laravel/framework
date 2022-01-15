@@ -515,10 +515,11 @@ class Router implements BindingRegistrar, RegistrarContract
             $action = ['uses' => $action];
         }
 
-        // Here we'll merge any group "uses" statement if necessary so that the action
-        // has the proper clause for this property. Then we can simply set the name
-        // of the controller on the action and return the action array for usage.
+        // Here we'll merge any group "controller" and "uses" statements if necessary so that
+        // the action has the proper clause for this property. Then, we can simply set the
+        // name of this controller on the action plus return the action array for usage.
         if ($this->hasGroupStack()) {
+            $action['uses'] = $this->prependGroupController($action['uses']);
             $action['uses'] = $this->prependGroupNamespace($action['uses']);
         }
 
@@ -542,6 +543,31 @@ class Router implements BindingRegistrar, RegistrarContract
 
         return isset($group['namespace']) && strpos($class, '\\') !== 0
                 ? $group['namespace'].'\\'.$class : $class;
+    }
+
+    /**
+     * Prepend the last group controller onto the use clause.
+     *
+     * @param  string  $class
+     * @return string
+     */
+    protected function prependGroupController($class)
+    {
+        $group = end($this->groupStack);
+
+        if (! isset($group['controller'])) {
+            return $class;
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
+        if (strpos($class, '@') !== false) {
+            return $class;
+        }
+
+        return $group['controller'].'@'.$class;
     }
 
     /**
@@ -1326,6 +1352,6 @@ class Router implements BindingRegistrar, RegistrarContract
             return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
-        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
+        return (new RouteRegistrar($this))->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);
     }
 }

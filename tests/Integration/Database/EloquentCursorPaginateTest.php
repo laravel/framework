@@ -8,15 +8,10 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentCursorPaginateTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
@@ -69,6 +64,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(3, $query->cursorPaginate()->items());
     }
 
+    /** @group SkipMSSQL */
     public function testPaginationWithHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -85,6 +81,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
+    /** @group SkipMSSQL */
     public function testPaginationWithWhereHasClause()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -103,6 +100,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(1, $query->cursorPaginate()->items());
     }
 
+    /** @group SkipMSSQL */
     public function testPaginationWithWhereExistsClause()
     {
         for ($i = 1; $i <= 3; $i++) {
@@ -123,6 +121,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(2, $query->cursorPaginate()->items());
     }
 
+    /** @group SkipMSSQL */
     public function testPaginationWithMultipleWhereClauses()
     {
         for ($i = 1; $i <= 4; $i++) {
@@ -155,6 +154,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         );
     }
 
+    /** @group SkipMSSQL */
     public function testPaginationWithAliasedOrderBy()
     {
         for ($i = 1; $i <= 6; $i++) {
@@ -183,7 +183,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             TestPost::create(['title' => 'Goodbye world']);
         }
 
-        $query = TestPost::query()->distinct('title')->select('title');
+        $query = TestPost::query()->orderBy('title')->distinct('title')->select('title');
 
         $this->assertEquals(2, $query->get()->count());
         $this->assertEquals(2, $query->count());

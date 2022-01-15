@@ -6,9 +6,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JsonResponseTest extends TestCase
 {
     public function testResponseWithInvalidJsonThrowsException()

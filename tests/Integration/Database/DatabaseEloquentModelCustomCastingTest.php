@@ -13,15 +13,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_eloquent_model_with_custom_casts', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
@@ -230,6 +225,7 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         ]);
 
         $this->assertInstanceOf(ValueObject::class, $model->value_object_with_caster);
+        $this->assertSame(serialize(new ValueObject('hello')), $model->toArray()['value_object_with_caster']);
 
         $model->setRawAttributes([
             'value_object_caster_with_argument' => null,
@@ -418,7 +414,7 @@ class ValueObject implements Castable
 
     public static function castUsing(array $arguments)
     {
-        return new class(...$arguments) implements CastsAttributes
+        return new class(...$arguments) implements CastsAttributes, SerializesCastableAttributes
         {
             private $argument;
 
@@ -437,6 +433,11 @@ class ValueObject implements Castable
             }
 
             public function set($model, $key, $value, $attributes)
+            {
+                return serialize($value);
+            }
+
+            public function serialize($model, $key, $value, $attributes)
             {
                 return serialize($value);
             }

@@ -2,8 +2,10 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
 use Swift_Mime_SimpleMessage;
+use Swift_TransportException;
 
 class SesTransport extends Transport
 {
@@ -36,21 +38,27 @@ class SesTransport extends Transport
 
     /**
      * {@inheritdoc}
+     *
+     * @return int
      */
     public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->beforeSendPerformed($message);
 
-        $result = $this->ses->sendRawEmail(
-            array_merge(
-                $this->options, [
-                    'Source' => key($message->getSender() ?: $message->getFrom()),
-                    'RawMessage' => [
-                        'Data' => $message->toString(),
-                    ],
-                ]
-            )
-        );
+        try {
+            $result = $this->ses->sendRawEmail(
+                array_merge(
+                    $this->options, [
+                        'Source' => key($message->getSender() ?: $message->getFrom()),
+                        'RawMessage' => [
+                            'Data' => $message->toString(),
+                        ],
+                    ]
+                )
+            );
+        } catch (AwsException $e) {
+            throw new Swift_TransportException('Request to AWS SES API failed.', $e->getCode(), $e);
+        }
 
         $messageId = $result->get('MessageId');
 

@@ -1,13 +1,32 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
-class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
+/**
+ * @requires extension pdo_mysql
+ * @requires OS Linux|Darwin
+ */
+class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
 {
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('name');
+            $table->string('age');
+            $table->enum('color', ['red', 'blue']);
+        });
+    }
+
+    protected function destroyDatabaseMigrations()
+    {
+        Schema::drop('users');
+    }
+
     public function testRenameColumnOnTableWithEnum()
     {
         Schema::table('users', function (Blueprint $table) {
@@ -30,38 +49,27 @@ class DatabaseSchemaBuilderAlterTableWithEnumTest extends DatabaseMySqlTestCase
     {
         $tables = Schema::getAllTables();
 
-        $this->assertCount(1, $tables);
-        $this->assertInstanceOf(stdClass::class, $tables[0]);
-
+        $this->assertCount(2, $tables);
         $tableProperties = array_values((array) $tables[0]);
+        $this->assertEquals(['migrations', 'BASE TABLE'], $tableProperties);
+
+        $this->assertInstanceOf(stdClass::class, $tables[1]);
+
+        $tableProperties = array_values((array) $tables[1]);
         $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
-        $this->assertEquals(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
+
+        $columns = Schema::getColumnListing('users');
+
+        foreach (['id', 'name', 'age', 'color'] as $column) {
+            $this->assertContains($column, $columns);
+        }
 
         Schema::create('posts', function (Blueprint $table) {
             $table->integer('id');
             $table->string('title');
         });
         $tables = Schema::getAllTables();
-        $this->assertCount(2, $tables);
+        $this->assertCount(3, $tables);
         Schema::drop('posts');
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Schema::create('users', function (Blueprint $table) {
-            $table->integer('id');
-            $table->string('name');
-            $table->string('age');
-            $table->enum('color', ['red', 'blue']);
-        });
-    }
-
-    protected function tearDown(): void
-    {
-        Schema::drop('users');
-
-        parent::tearDown();
     }
 }

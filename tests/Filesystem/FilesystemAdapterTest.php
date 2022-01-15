@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Carbon\Carbon;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -330,5 +331,23 @@ class FilesystemAdapterTest extends TestCase
         });
 
         $this->assertSame('Hello World', $filesystemAdapter->getFoo());
+    }
+
+    public function testTemporaryUrlWithCustomCallback()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $filesystemAdapter->buildTemporaryUrlsUsing(function ($path, Carbon $expiration, $options) {
+            return $path.$expiration->toString().implode('', $options);
+        });
+
+        $path = 'foo';
+        $expiration = Carbon::create(2021, 18, 12, 13);
+        $options = ['bar' => 'baz'];
+
+        $this->assertSame(
+            $path.$expiration->toString().implode('', $options),
+            $filesystemAdapter->temporaryUrl($path, $expiration, $options)
+        );
     }
 }

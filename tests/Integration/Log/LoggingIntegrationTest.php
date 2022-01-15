@@ -9,8 +9,8 @@ class LoggingIntegrationTest extends TestCase
 {
     public function testLoggingCanBeRunWithoutEncounteringExceptions()
     {
-        Log::info('Hello World');
+        $this->expectNotToPerformAssertions();
 
-        $this->assertTrue(true);
+        Log::info('Hello World');
     }
 }

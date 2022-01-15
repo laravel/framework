@@ -96,7 +96,10 @@ class AssertableJsonString implements ArrayAccess, Countable
 
         $expected = $this->reorderAssocKeys($data);
 
-        PHPUnit::assertEquals(json_encode($expected), json_encode($actual));
+        PHPUnit::assertEquals(
+            json_encode($expected, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+            json_encode($actual, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
 
         return $this;
     }

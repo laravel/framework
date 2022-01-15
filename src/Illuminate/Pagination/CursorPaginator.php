@@ -26,7 +26,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
      * @param  mixed  $items
      * @param  int  $perPage
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
-     * @param  array  $options (path, query, fragment, pageName)
+     * @param  array  $options  (path, query, fragment, pageName)
      * @return void
      */
     public function __construct($items, $perPage, $cursor = null, array $options = [])

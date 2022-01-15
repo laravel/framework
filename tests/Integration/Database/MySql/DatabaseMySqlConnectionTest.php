@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -8,22 +8,17 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * @requires extension pdo_mysql
+ * @requires OS Linux|Darwin
  */
-class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
+class DatabaseMySqlConnectionTest extends MySqlTestCase
 {
     const TABLE = 'player';
     const FLOAT_COL = 'float_col';
     const JSON_COL = 'json_col';
     const FLOAT_VAL = 0.2;
 
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
-        if (! isset($_SERVER['CI']) || windows_os()) {
-            $this->markTestSkipped('This test is only executed on CI in Linux.');
-        }
-
         if (! Schema::hasTable(self::TABLE)) {
             Schema::create(self::TABLE, function (Blueprint $table) {
                 $table->json(self::JSON_COL)->nullable();
@@ -32,11 +27,9 @@ class DatabaseMySqlConnectionTest extends DatabaseMySqlTestCase
         }
     }
 
-    protected function tearDown(): void
+    protected function destroyDatabaseMigrations()
     {
         Schema::drop(self::TABLE);
-
-        parent::tearDown();
     }
 
     /**

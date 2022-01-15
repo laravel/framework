@@ -101,6 +101,31 @@ class CacheFileStoreTest extends TestCase
         m::close();
     }
 
+    public function testStoreItemDirectoryProperlySetsPermissions()
+    {
+        $files = m::mock(Filesystem::class);
+        $files->shouldIgnoreMissing();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0606])->getMock();
+        $hash = sha1('foo');
+        $cache_parent_dir = substr($hash, 0, 2);
+        $cache_dir = $cache_parent_dir.'/'.substr($hash, 2, 2);
+
+        $files->shouldReceive('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, m::any(), m::any()])->andReturnUsing(function ($name, $value) {
+            return strlen($value);
+        });
+
+        $files->shouldReceive('exists')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(false)->once();
+        $files->shouldReceive('makeDirectory')->withArgs([__DIR__.'/'.$cache_dir, 0777, true, true])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_parent_dir])->andReturn(['0600'])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_parent_dir, 0606])->andReturn([true])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(['0600'])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir, 0606])->andReturn([true])->once();
+
+        $result = $store->put('foo', 'foo', 10);
+        $this->assertTrue($result);
+        m::close();
+    }
+
     public function testForeversAreStoredWithHighTimestamp()
     {
         $files = $this->mockFilesystem();

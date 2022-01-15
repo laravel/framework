@@ -8,15 +8,17 @@ use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class EloquentStrictLoadingTest extends DatabaseTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
+        Model::preventLazyLoading();
+    }
+
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('number')->default(1);
@@ -31,8 +33,6 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
             $table->increments('id');
             $table->foreignId('model_2_id');
         });
-
-        Model::preventLazyLoading();
     }
 
     public function testStrictModeThrowsAnExceptionOnLazyLoading()
@@ -68,7 +68,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
     public function testStrictModeDoesntThrowAnExceptionOnEagerLoading()
     {
-        $this->app['config']->set('database.connections.testbench.zxc', false);
+        $this->app['config']->set('database.connections.testing.zxc', false);
 
         EloquentStrictLoadingTestModel1::create();
         EloquentStrictLoadingTestModel1::create();

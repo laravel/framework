@@ -13,15 +13,10 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SendingMailWithLocaleTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         $app['config']->set('mail.driver', 'array');
 
         $app['config']->set('app.locale', 'en');

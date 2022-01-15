@@ -50,6 +50,28 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->ok());
     }
 
+    public function testUnauthorizedRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->unauthorized());
+    }
+
+    public function testForbiddenRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 403),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->forbidden());
+    }
+
     public function testResponseBodyCasting()
     {
         $this->factory->fake([
@@ -156,6 +178,23 @@ class HttpClientTest extends TestCase
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
         });
+    }
+
+    public function testRecordedCallsAreEmptiedWhenFakeIsCalled()
+    {
+        $this->factory->fake([
+            'http://foo.com/*' => ['page' => 'foo'],
+        ]);
+
+        $this->factory->get('http://foo.com/test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/test';
+        });
+
+        $this->factory->fake();
+
+        $this->factory->assertNothingSent();
     }
 
     public function testSpecificRequestIsNotBeingSent()
@@ -292,6 +331,23 @@ class HttpClientTest extends TestCase
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/json' &&
                 $request->hasHeader('User-Agent', 'Laravel');
+        });
+    }
+
+    public function testItOnlySendsOneUserAgentHeader()
+    {
+        $this->factory->fake();
+
+        $this->factory->withUserAgent('Laravel')
+            ->withUserAgent('FooBar')
+            ->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            $userAgent = $request->header('User-Agent');
+
+            return $request->url() === 'http://foo.com/json' &&
+                count($userAgent) === 1 &&
+                $userAgent[0] === 'FooBar';
         });
     }
 

@@ -1,6 +1,76 @@
 # Release Notes for 6.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v6.20.32...6.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v6.20.43...6.x)
+
+
+## [v6.20.43 (2021-12-14)](https://github.com/laravel/framework/compare/v6.20.42...v6.20.43)
+
+### Fixed
+- Fixed inconsistent escaping of artisan argument ([#39953](https://github.com/laravel/framework/pull/39953))
+
+### Changed
+- Do not return anything `Illuminate/Foundation/Application::afterLoadingEnvironment()`
+
+
+## [v6.20.42 (2021-12-07)](https://github.com/laravel/framework/compare/v6.20.41...v6.20.42)
+
+### Fixed
+- Fixed for dropping columns when using MSSQL as  ([#39905](https://github.com/laravel/framework/pull/39905))
+- Fixed parent call in View ([#39908](https://github.com/laravel/framework/pull/39908))
+
+
+## [v6.20.41 (2021-11-23)](https://github.com/laravel/framework/compare/v6.20.40...v6.20.41)
+
+### Added
+- Added phar to list of shouldBlockPhpUpload() in validator ([2d1f76a](https://github.com/laravel/framework/commit/2d1f76ab752ced011da05cf139799eab2a36ef90))
+
+
+## [v6.20.40 (2021-11-17)](https://github.com/laravel/framework/compare/v6.20.39...v6.20.40)
+
+### Fixed
+- Fixes `Illuminate/Database/Query/Builder::limit()` to only cast integer when given other than null ([#39644](https://github.com/laravel/framework/pull/39644))
+
+
+## [v6.20.39 (2021-11-16)](https://github.com/laravel/framework/compare/v6.20.38...v6.20.39)
+
+### Fixed
+- Fixed $value in `Illuminate/Database/Query/Builder::limit()` ([ddfa71e](https://github.com/laravel/framework/commit/ddfa71ee9f101394b4ff682471bc31a7ba6de5cf))
+
+
+## [v6.20.38 (2021-11-09)](https://github.com/laravel/framework/compare/v6.20.37...v6.20.38)
+
+### Added
+- Added new lost connection error message for sqlsrv ([#39466](https://github.com/laravel/framework/pull/39466))
+
+
+## [v6.20.37 (2021-11-02)](https://github.com/laravel/framework/compare/v6.20.36...v6.20.37)
+
+### Fixed
+- Fixed rate limiting unicode issue ([#39375](https://github.com/laravel/framework/pull/39375))
+
+
+## [v6.20.36 (2021-10-19)](https://github.com/laravel/framework/compare/v6.20.35...v6.20.36)
+
+### Fixed
+- Add new lost connection message to DetectsLostConnections for Vapor ([#39209](https://github.com/laravel/framework/pull/39209))
+
+
+## [v6.20.35 (2021-10-05)](https://github.com/laravel/framework/compare/v6.20.34...v6.20.35)
+
+### Added
+- Added new lost connection message to DetectsLostConnections ([#39028](https://github.com/laravel/framework/pull/39028))
+
+
+## [v6.20.34 (2021-09-07)](https://github.com/laravel/framework/compare/v6.20.33...v6.20.34)
+
+### Fixed
+- Silence validator date parse warnings ([#38670](https://github.com/laravel/framework/pull/38670))
+
+
+## [v6.20.33 (2021-08-31)](https://github.com/laravel/framework/compare/v6.20.32...v6.20.33)
+
+### Changed
+- Error out when detecting incompatible DBAL version ([#38543](https://github.com/laravel/framework/pull/38543))
 
 
 ## [v6.20.32 (2021-08-10)](https://github.com/laravel/framework/compare/v6.20.31...v6.20.32)

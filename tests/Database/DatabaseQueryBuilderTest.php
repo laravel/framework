@@ -15,6 +15,7 @@ use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
+use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -858,6 +859,72 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereFulltextMySql()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['expanded' => true]);
+        $this->assertSame('select * from `users` where match (`body`) against (? in natural language mode with query expansion)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean']);
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'boolean', 'expanded' => true]);
+        $this->assertSame('select * from `users` where match (`body`) against (? in boolean mode)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car,Plane');
+        $this->assertSame('select * from `users` where match (`body`, `title`) against (? in natural language mode)', $builder->toSql());
+        $this->assertEquals(['Car,Plane'], $builder->getBindings());
+    }
+
+    public function testWhereFulltextPostgres()
+    {
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'plain']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['mode' => 'phrase']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ phraseto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', '+Hello -World', ['mode' => 'websearch']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body")) @@ websearch_to_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['+Hello -World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext('body', 'Hello World', ['language' => 'simple', 'mode' => 'plain']);
+        $this->assertSame('select * from "users" where (to_tsvector(\'simple\', "body")) @@ plainto_tsquery(\'simple\', ?)', $builder->toSql());
+        $this->assertEquals(['Hello World'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilderWithProcessor();
+        $builder->select('*')->from('users')->whereFulltext(['body', 'title'], 'Car Plane');
+        $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")) @@ plainto_tsquery(\'english\', ?)', $builder->toSql());
+        $this->assertEquals(['Car Plane'], $builder->getBindings());
+    }
+
     public function testUnions()
     {
         $builder = $this->getBuilder();
@@ -1221,7 +1288,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(25)->take(10)->orderByRaw('[email] desc');
-        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 26 and 35 order by row_num', $builder->toSql());
+        $this->assertSame('select * from [users] order by [email] desc offset 25 rows fetch next 10 rows only', $builder->toSql());
     }
 
     public function testReorder()
@@ -1380,6 +1447,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->limit(null);
+        $this->assertSame('select * from "users"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->limit(0);
+        $this->assertSame('select * from "users" limit 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(5)->take(10);
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
@@ -1390,6 +1465,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->skip(-5)->take(-10);
         $this->assertSame('select * from "users" offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(null)->take(null);
+        $this->assertSame('select * from "users" offset 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->skip(5)->take(null);
+        $this->assertSame('select * from "users" offset 5', $builder->toSql());
     }
 
     public function testForPage()
@@ -2437,6 +2520,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateFromMethodWithJoinsOnPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = ? and "users"."id" = "orders"."user_id"', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->updateFrom(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->join('orders', function ($join) {
+            $join->on('users.id', '=', 'orders.user_id')
+                ->where('users.id', '=', 1);
+        })->updateFrom(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? from "orders" where "name" = ? and "users"."id" = "orders"."user_id" and "users"."id" = ?', ['foo', 'bar', 'baz', 1])->andReturn(1);
+        $result = $builder->from('users')
+            ->join('orders', function ($join) {
+                $join->on('users.id', '=', 'orders.user_id')
+                   ->where('users.id', '=', 1);
+            })->where('name', 'baz')
+           ->updateFrom(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateMethodRespectsRaw()
     {
         $builder = $this->getBuilder();
@@ -3067,8 +3176,8 @@ SQL;
         $this->assertSame('select * from (select *, row_number() over (order by (select 0)) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
-        $this->assertSame('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
+        $builder->select('*')->from('users')->skip(11)->take(10)->orderBy('email', 'desc');
+        $this->assertSame('select * from [users] order by [email] desc offset 11 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $subQueryBuilder = $this->getSqlServerBuilder();
@@ -3076,8 +3185,8 @@ SQL;
             return $query->select('created_at')->from('logins')->where('users.name', 'nameBinding')->whereColumn('user_id', 'users.id')->limit(1);
         };
         $builder->select('*')->from('users')->where('email', 'emailBinding')->orderBy($subQuery)->skip(10)->take(10);
-        $this->assertSame('select * from (select *, row_number() over (order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc) as row_num from [users] where [email] = ?) as temp_table where row_num between 11 and 20 order by row_num', $builder->toSql());
-        $this->assertEquals(['nameBinding', 'emailBinding'], $builder->getBindings());
+        $this->assertSame('select * from [users] where [email] = ? order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc offset 10 rows fetch next 10 rows only', $builder->toSql());
+        $this->assertEquals(['emailBinding', 'nameBinding'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->take('foo');
@@ -4266,6 +4375,14 @@ SQL;
     {
         $grammar = new MySqlGrammar;
         $processor = new MySqlProcessor;
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    protected function getPostgresBuilderWithProcessor()
+    {
+        $grammar = new PostgresGrammar;
+        $processor = new PostgresProcessor;
 
         return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }

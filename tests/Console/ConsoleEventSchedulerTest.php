@@ -101,9 +101,10 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $events = $schedule->events();
         $binary = $escape.PHP_BINARY.$escape;
-        $this->assertEquals($binary.' artisan queue:listen', $events[0]->command);
-        $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[1]->command);
-        $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[2]->command);
+        $artisan = $escape.'artisan'.$escape;
+        $this->assertEquals($binary.' '.$artisan.' queue:listen', $events[0]->command);
+        $this->assertEquals($binary.' '.$artisan.' queue:listen --tries=3', $events[1]->command);
+        $this->assertEquals($binary.' '.$artisan.' queue:listen --tries=3', $events[2]->command);
     }
 
     public function testCreateNewArtisanCommandUsingCommandClass()
@@ -115,7 +116,23 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $events = $schedule->events();
         $binary = $escape.PHP_BINARY.$escape;
-        $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
+        $artisan = $escape.'artisan'.$escape;
+        $this->assertEquals($binary.' '.$artisan.' foo:bar --force', $events[0]->command);
+    }
+
+    public function testItUsesCommandDescriptionAsEventDescription()
+    {
+        $schedule = $this->schedule;
+        $event = $schedule->command(ConsoleCommandStub::class);
+        $this->assertEquals('This is a description about the command', $event->description);
+    }
+
+    public function testItShouldBePossibleToOverwriteTheDescription()
+    {
+        $schedule = $this->schedule;
+        $event = $schedule->command(ConsoleCommandStub::class)
+            ->description('This is an alternative description');
+        $this->assertEquals('This is an alternative description', $event->description);
     }
 
     public function testCallCreatesNewJobWithTimezone()
@@ -145,6 +162,8 @@ class FooClassStub
 class ConsoleCommandStub extends Command
 {
     protected $signature = 'foo:bar';
+
+    protected $description = 'This is a description about the command';
 
     protected $foo;
 
