@@ -2,6 +2,11 @@
 
 namespace Illuminate\Foundation;
 
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionParameter;
+use Throwable;
+
 class AliasLoader
 {
     /**
@@ -126,8 +131,14 @@ class AliasLoader
             substr($alias, strlen(static::$facadeNamespace)),
         ];
 
+        try {
+            $replacements[3] = $this->getMethodsDocblock($replacements[2]);
+        } catch (Throwable $e) {
+            $replacements[3] = '';
+        }
+
         return str_replace(
-            ['DummyNamespace', 'DummyClass', 'DummyTarget'], $replacements, $stub
+            ['DummyNamespace', 'DummyClass', 'DummyTarget', 'DummyDocs'], $replacements, $stub
         );
     }
 
@@ -229,6 +240,60 @@ class AliasLoader
     public static function setInstance($loader)
     {
         static::$instance = $loader;
+    }
+
+    protected function getMethodsDocblock($class): string
+    {
+        $publicMethods = (new ReflectionClass($class))->getMethods(ReflectionMethod::IS_PUBLIC);
+
+        $methodsDoc = '';
+        foreach ($publicMethods as $method) {
+            if ($method->isStatic()) {
+                continue;
+            }
+
+            $params = $method->getParameters();
+            $signature = '';
+            foreach ($params as $param) {
+                $name = $param->getName();
+                $type = $param->getType();
+                if ($type) {
+                    $type = $type.' ';
+                }
+                $defaultValue = $this->getDefaultValue($param);
+
+                $signature = $signature.$type.'$'.$name.$defaultValue.', ';
+            }
+            $signature = '('.trim($signature, ', ').')';
+
+            $returnType = $method->hasReturnType() ? $method->getReturnType().' ' : '';
+            $methodName = $method->getName();
+            $methodsDoc .= ' * @method static '.$returnType.$methodName.$signature.PHP_EOL;
+        }
+        $methodsDoc .= ' *';
+
+        return $methodsDoc;
+    }
+
+    protected function getDefaultValue(ReflectionParameter $param): string
+    {
+        if (! $param->isDefaultValueAvailable()) {
+            return '';
+        }
+
+        $defaultValue = $param->getDefaultValue();
+
+        if (is_array($defaultValue)) {
+            $strDefaultValue = '[';
+            foreach ($defaultValue as $element) {
+                $element = is_string($element) ? '"'.$element.'"' : $element;
+                $strDefaultValue .= $element.', ';
+            }
+            $strDefaultValue = trim($strDefaultValue, ', ');
+            $defaultValue = $strDefaultValue.']';
+        }
+
+        return ' = '.$defaultValue;
     }
 
     /**
