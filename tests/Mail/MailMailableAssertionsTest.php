@@ -71,6 +71,54 @@ class MailMailableAssertionsTest extends TestCase
 
         $mailable->assertDontSeeInHtml('<li>First Item</li>');
     }
+
+    public function testMailableAssertSeeInOrderTextPassesWhenPresentInOrder()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $mailable->assertSeeInOrderText([
+            'First Item',
+            'Second Item',
+            'Third Item',
+        ]);
+    }
+
+    public function testMailableAssertSeeInOrderTextFailsWhenAbsentInOrder()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertSeeInOrderText([
+            'First Item',
+            'Third Item',
+            'Second Item',
+        ]);
+    }
+
+    public function testMailableAssertInOrderHtmlPassesWhenPresentInOrder()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $mailable->assertSeeInOrderHtml([
+            '<li>First Item</li>',
+            '<li>Second Item</li>',
+            '<li>Third Item</li>',
+        ]);
+    }
+
+    public function testMailableAssertInOrderHtmlFailsWhenAbsentInOrder()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertSeeInOrderHtml([
+            '<li>Second Item</li>',
+            '<li>First Item</li>',
+            '<li>Third Item</li>',
+        ]);
+    }
 }
 
 class MailableAssertionsStub extends Mailable
