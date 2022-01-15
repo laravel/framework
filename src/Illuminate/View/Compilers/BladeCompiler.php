@@ -2,9 +2,11 @@
 
 namespace Illuminate\View\Compilers;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
+use Illuminate\View\Component;
 use InvalidArgumentException;
 
 class BladeCompiler extends Compiler implements CompilerInterface
@@ -264,6 +266,40 @@ class BladeCompiler extends Compiler implements CompilerInterface
             ['##BEGIN-COMPONENT-CLASS##', '##END-COMPONENT-CLASS##'],
             '',
             $result);
+    }
+
+    /**
+     * Render a string with Blade.
+     *
+     * @param  string  $string
+     * @param  array   $data
+     * @param  boolean $cleanupCachedView
+     * @return string
+     */
+    public static function render($string, $data = [], $cleanupCachedView = true)
+    {
+        $component = new class($string) extends Component
+        {
+            public function __construct($template)
+            {
+                $this->template = $template;
+            }
+
+            public function render()
+            {
+                return $this->template;
+            }
+        };
+
+        $view = Container::getInstance()->make('view')->make($component->resolveView(), $data);
+
+        $result = $view->render();
+
+        if ($cleanupCachedView) {
+            unlink($view->getPath());
+        }
+
+        return $result;
     }
 
     /**
