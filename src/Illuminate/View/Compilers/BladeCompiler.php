@@ -272,8 +272,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Render a string with Blade.
      *
      * @param  string  $string
-     * @param  array   $data
-     * @param  boolean $cleanupCachedView
+     * @param  array  $data
+     * @param  bool  $cleanupCachedView
      * @return string
      */
     public static function render($string, $data = [], $cleanupCachedView = true)
