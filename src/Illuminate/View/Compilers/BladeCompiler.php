@@ -280,7 +280,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public static function render($string, $data = [], $deleteCachedView = false)
     {
-        $component = new class($string) extends Component {
+        $component = new class($string) extends Component
+        {
             protected $template;
 
             public function __construct($template)
