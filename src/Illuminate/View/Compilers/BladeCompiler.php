@@ -3,6 +3,7 @@
 namespace Illuminate\View\Compilers;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -270,17 +271,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Render a string with Blade.
+     * Evaluate and render a Blade string to HTML.
      *
      * @param  string  $string
      * @param  array  $data
-     * @param  bool  $cleanupCachedView
+     * @param  bool  $deleteCachedView
      * @return string
      */
-    public static function render($string, $data = [], $cleanupCachedView = true)
+    public static function render($string, $data = [], $deleteCachedView = false)
     {
-        $component = new class($string) extends Component
-        {
+        $component = new class($string) extends Component {
+            protected $template;
+
             public function __construct($template)
             {
                 $this->template = $template;
@@ -292,15 +294,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
             }
         };
 
-        $view = Container::getInstance()->make('view')->make($component->resolveView(), $data);
+        $view = Container::getInstance()
+                    ->make(ViewFactory::class)
+                    ->make($component->resolveView(), $data);
 
-        $result = $view->render();
-
-        if ($cleanupCachedView) {
-            unlink($view->getPath());
-        }
-
-        return $result;
+        return tap($view->render(), function () use ($view, $deleteCachedView) {
+            if ($deleteCachedView) {
+                unlink($view->getPath());
+            }
+        });
     }
 
     /**
