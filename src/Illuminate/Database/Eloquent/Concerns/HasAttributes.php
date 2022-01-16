@@ -901,6 +901,11 @@ trait HasAttributes
      */
     protected function castAttributeAsJson($key, $value)
     {
+        $castType = $this->getCastType($key);
+        if ($castType === 'object') {
+            $value = (object) $value;
+        }
+
         $value = $this->asJson($value);
 
         if ($value === false) {
