@@ -1429,6 +1429,18 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is an object.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateObject($attribute, $value)
+    {
+        return is_object($value);
+    }
+
+    /**
      * Validate that an attribute exists even if not filled.
      *
      * @param  string  $attribute
