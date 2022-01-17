@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\TestCase;
 
 class MailMailableAssertionsTest extends TestCase
 {
@@ -125,14 +125,14 @@ class MailableAssertionsStub extends Mailable
 {
     protected function renderForAssertions()
     {
-        $text = <<<EOD
+        $text = <<<'EOD'
         # List
         - First Item
         - Second Item
         - Third Item
         EOD;
 
-        $html = <<<EOD
+        $html = <<<'EOD'
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
