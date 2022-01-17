@@ -812,7 +812,7 @@ class Stringable implements JsonSerializable
      */
     public function whenNotEmpty($callback, $default = null)
     {
-        return $this->when(! $this->isEmpty(), $callback, $default);
+        return $this->when($this->isNotEmpty(), $callback, $default);
     }
 
     /**
