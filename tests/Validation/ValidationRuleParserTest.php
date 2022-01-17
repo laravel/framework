@@ -96,7 +96,7 @@ class ValidationRuleParserTest extends TestCase
                 return 'required';
             }),
         ]);
-        
+
         $this->assertEquals(['name' => ['required']], $results->rules);
         $this->assertEquals([], $results->implicitAttributes);
     }
