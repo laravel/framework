@@ -105,6 +105,7 @@ class ValidationRuleParser
         }
 
         if (! is_object($rule) ||
+            $rule instanceof NestedRules ||
             $rule instanceof RuleContract ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
@@ -130,10 +131,14 @@ class ValidationRuleParser
 
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
-                foreach ((array) $rules as $rule) {
+                foreach (Arr::flatten((array) $rules) as $rule) {
                     $this->implicitAttributes[$attribute][] = $key;
 
-                    $results = $this->mergeRules($results, $key, $rule);
+                    if ($rule instanceof NestedRules) {
+                        $results = $this->mergeRules($results, $key, $rule->compile($key, $value, $data));
+                    } else {
+                        $results = $this->mergeRules($results, $key, $rule);
+                    }
                 }
             }
         }
@@ -191,7 +196,7 @@ class ValidationRuleParser
      */
     public static function parse($rule)
     {
-        if ($rule instanceof RuleContract) {
+        if ($rule instanceof RuleContract || $rule instanceof NestedRules) {
             return [$rule, []];
         }
 

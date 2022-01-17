@@ -29,6 +29,17 @@ class Rule
     }
 
     /**
+     * Create a new nested rule set.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Validation\NestedRules
+     */
+    public static function nested($callback)
+    {
+        return new NestedRules($callback);
+    }
+
+    /**
      * Get a dimensions constraint builder instance.
      *
      * @param  array  $constraints
