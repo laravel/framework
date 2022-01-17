@@ -43,13 +43,13 @@ class FacadesTest extends TestCase
         $this->assertTrue(isset($_SERVER['__laravel.authResolved']));
     }
 
-    public function testAliases()
+    public function testDefaultAliases()
     {
-        $aliases = Facade::aliases();
+        $defaultAliases = Facade::defaultAliases();
 
-        $this->assertInstanceOf(Collection::class, $aliases);
+        $this->assertInstanceOf(Collection::class, $defaultAliases);
 
-        foreach ($aliases as $alias => $abstract) {
+        foreach ($defaultAliases as $alias => $abstract) {
             $this->assertTrue(class_exists($alias));
             $this->assertTrue(class_exists($abstract));
 
