@@ -6,5 +6,7 @@ use Faker\Generator;
 
 trait UsesFaker
 {
-    public function __construct(public Generator $faker) {}
+    public function __construct(public Generator $faker)
+    {
+    }
 }
