@@ -27,7 +27,6 @@ class NestedRules
      * @param  string  $attr
      * @param  mixed  $value
      * @param  array  $data
-     *
      * @return array
      */
     public function compile($attribute, $value, $data)

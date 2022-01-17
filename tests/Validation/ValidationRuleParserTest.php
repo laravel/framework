@@ -139,7 +139,7 @@ class ValidationRuleParserTest extends TestCase
 
         $this->assertEquals([
             'users.*.name' => [
-                'users.0.name', 
+                'users.0.name',
                 'users.0.name',
                 'users.1.name',
                 'users.1.name',
