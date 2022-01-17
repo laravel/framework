@@ -68,7 +68,7 @@ class ValidationRuleParser
 
                 unset($rules[$key]);
             } else {
-                $rules[$key] = $this->explodeExplicitRule($rule);
+                $rules[$key] = $this->explodeExplicitRule($rule, $key);
             }
         }
 
@@ -79,33 +79,42 @@ class ValidationRuleParser
      * Explode the explicit rule into an array if necessary.
      *
      * @param  mixed  $rule
+     * @param  string $attribute
      * @return array
      */
-    protected function explodeExplicitRule($rule)
+    protected function explodeExplicitRule($rule, $attribute)
     {
         if (is_string($rule)) {
             return explode('|', $rule);
         } elseif (is_object($rule)) {
-            return [$this->prepareRule($rule)];
+            return [$this->prepareRule($rule, $attribute)];
         }
 
-        return array_map([$this, 'prepareRule'], $rule);
+        $attributes = array_fill(
+            array_key_first($rule), count($rule), $attribute
+        );
+
+        return array_map(
+            [$this, 'prepareRule'], $rule, $attributes
+        );
     }
 
     /**
      * Prepare the given rule for the Validator.
      *
      * @param  mixed  $rule
+     * @param  string $attribute
      * @return mixed
      */
-    protected function prepareRule($rule)
+    protected function prepareRule($rule, $attribute)
     {
         if ($rule instanceof Closure) {
             $rule = new ClosureValidationRule($rule);
+        } elseif ($rule instanceof NestedRules) {
+            $rule = $rule->compile($attribute, $this->data[$attribute] ?? null);
         }
 
         if (! is_object($rule) ||
-            $rule instanceof NestedRules ||
             $rule instanceof RuleContract ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
@@ -182,7 +191,7 @@ class ValidationRuleParser
         $merge = head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
-            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [], $merge
+            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute], $attribute) : [], $merge
         );
 
         return $results;

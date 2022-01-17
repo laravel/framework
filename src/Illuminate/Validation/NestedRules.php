@@ -24,13 +24,11 @@ class NestedRules
     /**
      * Compile the callback into an array of rules.
      *
-     * @param  string  $attr
-     * @param  mixed  $value
-     * @param  array  $data
+     * @param  mixed  $args
      * @return array
      */
-    public function compile($attribute, $value, $data)
+    public function compile(...$args)
     {
-        return call_user_func($this->callback, $attribute, $value, $data);
+        return call_user_func($this->callback, ...$args);
     }
 }
