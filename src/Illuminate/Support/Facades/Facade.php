@@ -252,7 +252,7 @@ abstract class Facade
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function aliases()
+    public static function defaultAliases()
     {
         return collect([
             'App' => App::class,
