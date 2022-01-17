@@ -64,7 +64,7 @@ class PredisConnection extends Connection implements ConnectionContract
             return $this->command('flushdb');
         }
 
-        foreach ($this->getConnection() as $node) {
+        foreach ($this->getConnection()->getIterator() as $node) {
             $node->executeCommand(new ServerFlushDatabase);
         }
     }
