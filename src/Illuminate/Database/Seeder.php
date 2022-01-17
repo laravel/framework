@@ -5,10 +5,12 @@ namespace Illuminate\Database;
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
+use Illuminate\Support\UsesFaker;
 use InvalidArgumentException;
 
 abstract class Seeder
 {
+    use UsesFaker;
     /**
      * The container instance.
      *
