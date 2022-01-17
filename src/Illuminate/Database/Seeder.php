@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
-use Illuminate\Support\UsesFaker;
 use InvalidArgumentException;
 
 abstract class Seeder
