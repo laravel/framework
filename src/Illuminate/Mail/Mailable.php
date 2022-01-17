@@ -909,7 +909,7 @@ class Mailable implements MailableContract, Renderable
      * @param  array  $strings
      * @return $this
      */
-    public function assertSeeInOrderHtml($strings)
+    public function assertSeeInOrderInHtml($strings)
     {
         [$html, $text] = $this->renderForAssertions();
 
@@ -960,7 +960,7 @@ class Mailable implements MailableContract, Renderable
      * @param  array  $strings
      * @return $this
      */
-    public function assertSeeInOrderText($strings)
+    public function assertSeeInOrderInText($strings)
     {
         [$html, $text] = $this->renderForAssertions();
 

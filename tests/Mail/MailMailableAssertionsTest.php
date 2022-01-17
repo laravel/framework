@@ -76,7 +76,7 @@ class MailMailableAssertionsTest extends TestCase
     {
         $mailable = new MailableAssertionsStub;
 
-        $mailable->assertSeeInOrderText([
+        $mailable->assertSeeInOrderInText([
             'First Item',
             'Second Item',
             'Third Item',
@@ -89,7 +89,7 @@ class MailMailableAssertionsTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $mailable->assertSeeInOrderText([
+        $mailable->assertSeeInOrderInText([
             'First Item',
             'Third Item',
             'Second Item',
@@ -100,7 +100,7 @@ class MailMailableAssertionsTest extends TestCase
     {
         $mailable = new MailableAssertionsStub;
 
-        $mailable->assertSeeInOrderHtml([
+        $mailable->assertSeeInOrderInHtml([
             '<li>First Item</li>',
             '<li>Second Item</li>',
             '<li>Third Item</li>',
@@ -113,7 +113,7 @@ class MailMailableAssertionsTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $mailable->assertSeeInOrderHtml([
+        $mailable->assertSeeInOrderInHtml([
             '<li>Second Item</li>',
             '<li>First Item</li>',
             '<li>Third Item</li>',
