@@ -84,13 +84,13 @@ class ValidationRuleParserTest extends TestCase
     public function test_explode_generates_nested_rules_for_non_nested_data()
     {
         $parser = (new ValidationRuleParser([
-            'name' => 'Taylor',
+            'name' => 'Taylor Otwell',
         ]));
 
         $results = $parser->explode([
             'name' => Rule::nested(function ($attribute, $value, $data = null) {
                 $this->assertEquals('name', $attribute);
-                $this->assertEquals('Taylor', $value);
+                $this->assertEquals('Taylor Otwell', $value);
                 $this->assertNull($data);
 
                 return 'required';
