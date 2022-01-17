@@ -190,7 +190,7 @@ class VerifyCsrfToken
 
         $response->headers->setCookie(
             new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
+                $config['csrf_cookie'] ?? 'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
                 $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
             )
         );
@@ -205,6 +205,6 @@ class VerifyCsrfToken
      */
     public static function serialized()
     {
-        return EncryptCookies::serialized('XSRF-TOKEN');
+        return EncryptCookies::serialized(config('session.csrf_cookie', 'XSRF-TOKEN'));
     }
 }
