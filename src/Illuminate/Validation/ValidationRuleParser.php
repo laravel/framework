@@ -79,7 +79,7 @@ class ValidationRuleParser
      * Explode the explicit rule into an array if necessary.
      *
      * @param  mixed  $rule
-     * @param  string $attribute
+     * @param  string  $attribute
      * @return array
      */
     protected function explodeExplicitRule($rule, $attribute)
@@ -103,7 +103,7 @@ class ValidationRuleParser
      * Prepare the given rule for the Validator.
      *
      * @param  mixed  $rule
-     * @param  string $attribute
+     * @param  string  $attribute
      * @return mixed
      */
     protected function prepareRule($rule, $attribute)
