@@ -11,13 +11,18 @@ use InvalidArgumentException;
 
 abstract class Seeder
 {
-    use UsesFaker;
     /**
      * The container instance.
      *
      * @var \Illuminate\Container\Container
      */
     protected $container;
+    /**
+     * The current Faker instance.
+     *
+     * @var \Faker\Generator
+     */
+    protected $faker;
 
     /**
      * The console command instance.
