@@ -83,13 +83,13 @@ class ValidationRuleParserTest extends TestCase
 
     public function test_explode_generates_nested_rules()
     {
-        $rules = (new ValidationRuleParser([
+        $parser = (new ValidationRuleParser([
             'users' => [
                 ['name' => 'Taylor Otwell'],
             ],
         ]));
 
-        $results = $rules->explode([
+        $results = $parser->explode([
             'users.*.name' => Rule::nested(function ($attribute, $value, $data) {
                 $this->assertEquals('users.0.name', $attribute);
                 $this->assertEquals('Taylor Otwell', $value);
@@ -105,14 +105,14 @@ class ValidationRuleParserTest extends TestCase
 
     public function test_explode_handles_arrays_of_nested_rules()
     {
-        $rules = (new ValidationRuleParser([
+        $parser = (new ValidationRuleParser([
             'users' => [
                 ['name' => 'Taylor Otwell'],
                 ['name' => 'Abigail Otwell'],
             ],
         ]));
 
-        $results = $rules->explode([
+        $results = $parser->explode([
             'users.*.name' => [
                 Rule::nested(function ($attribute, $value, $data) {
                     $this->assertEquals([
