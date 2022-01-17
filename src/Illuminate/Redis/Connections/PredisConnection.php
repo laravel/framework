@@ -50,4 +50,14 @@ class PredisConnection extends Connection implements ConnectionContract
 
         unset($loop);
     }
+
+    /**
+     * Flush the selected Redis database.
+     *
+     * @return void
+     */
+    public function flushdb()
+    {
+        return $this->command('flushdb');
+    }
 }
