@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
@@ -42,11 +43,13 @@ class FacadesTest extends TestCase
         $this->assertTrue(isset($_SERVER['__laravel.authResolved']));
     }
 
-    public function testDefaultAliases()
+    public function testAliases()
     {
-        $defaultAliases = Facade::defaultAliases();
+        $aliases = Facade::aliases();
 
-        foreach ($defaultAliases as $alias => $abstract) {
+        $this->assertInstanceOf(Collection::class, $aliases);
+
+        foreach ($aliases as $alias => $abstract) {
             $this->assertTrue(class_exists($alias));
             $this->assertTrue(class_exists($abstract));
 
