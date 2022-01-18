@@ -71,6 +71,56 @@ class ValidationNestedTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
+    public function testNestedCallbacksCanReturnMultipleValidationRules()
+    {
+        $data = [
+            'items' => [
+                [
+                    'discounts' => [
+                        ['percent' => 30, 'discount' => 1400],
+                        ['percent' => -1, 'discount' => 12300],
+                        ['percent' => 120, 'discount' => 1200]
+                    ]
+                ],
+                [
+                    'discounts' => [
+                        ['percent' => 30, 'discount' => 'invalid'],
+                        ['percent' => 'invalid', 'discount' => 1250],
+                        ['percent' => 'invalid', 'discount' => 'invalid']
+                    ],
+                ],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::nested(function () {
+                return [
+                    'discounts.*' => Rule::nested(function () {
+                        return [
+                            'percent' => 'numeric|min:0|max:100',
+                            'discount' => 'numeric',
+                        ];
+                    }),
+                ];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.discounts.1.percent' => ['validation.min.numeric'],
+            'items.0.discounts.2.percent' => ['validation.max.numeric'],
+            'items.1.discounts.0.discount' => ['validation.numeric'],
+            'items.1.discounts.1.percent' => ['validation.numeric'],
+            'items.1.discounts.2.percent' => ['validation.numeric'],
+            'items.1.discounts.2.discount' => ['validation.numeric'],
+        ], $v->getMessageBag()->toArray());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
