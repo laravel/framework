@@ -10,6 +10,7 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use stdClass;
+use Traversable;
 
 /**
  * @template TKey of array-key
@@ -1542,8 +1543,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @return \Traversable<TKey, TValue>
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->makeIterator($this->source);
     }
@@ -1553,8 +1553,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         if (is_array($this->source)) {
             return count($this->source);

@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Tappable;
+use Traversable;
 
 /**
  * @mixin \Illuminate\Support\Collection
@@ -515,8 +516,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @return \ArrayIterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->items->getIterator();
     }
@@ -546,8 +546,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return $this->items->count();
     }
@@ -591,8 +590,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $key
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return $this->items->has($key);
     }
@@ -603,8 +601,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $key
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->items->get($key);
     }
@@ -616,8 +613,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $value
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         $this->items->put($key, $value);
     }
@@ -628,8 +624,7 @@ abstract class AbstractCursorPaginator implements Htmlable
      * @param  mixed  $key
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         $this->items->forget($key);
     }

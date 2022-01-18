@@ -108,10 +108,10 @@ class SupportFluentTest extends TestCase
     public function testToJsonEncodesTheToArrayResult()
     {
         $fluent = $this->getMockBuilder(Fluent::class)->onlyMethods(['toArray'])->getMock();
-        $fluent->expects($this->once())->method('toArray')->willReturn('foo');
+        $fluent->expects($this->once())->method('toArray')->willReturn(['foo']);
         $results = $fluent->toJson();
 
-        $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
+        $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
     }
 }
 
@@ -124,8 +124,7 @@ class FluentArrayIteratorStub implements IteratorAggregate
         $this->items = $items;
     }
 
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->items);
     }
