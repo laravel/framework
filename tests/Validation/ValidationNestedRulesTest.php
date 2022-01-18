@@ -9,7 +9,7 @@ use Illuminate\Validation\Validator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class ValidationNestedTest extends TestCase
+class ValidationNestedRulesTest extends TestCase
 {
     public function testNestedCallbacksCanProperlySegmentRules()
     {
@@ -121,6 +121,54 @@ class ValidationNestedTest extends TestCase
             'items.1.discounts.1.percent' => ['validation.numeric'],
             'items.1.discounts.2.percent' => ['validation.numeric'],
             'items.1.discounts.2.discount' => ['validation.numeric'],
+        ], $v->getMessageBag()->toArray());
+    }
+    
+    public function testNestedCallbacksCanReturnDifferentRules()
+    {
+        $data = [
+            'items' => [
+                [
+                    'discounts' => [
+                        ['id' => 1, 'type' => 'percent', 'discount' => 120],
+                        ['id' => 1, 'type' => 'absolute', 'discount' => 100],
+                        ['id' => 2, 'type' => 'percent', 'discount' => 50],
+                    ],
+                ],
+                [
+                    'discounts' => [
+                        ['id' => 2, 'type' => 'percent', 'discount' => 'invalid'],
+                        ['id' => 3, 'type' => 'absolute', 'discount' => 2000]
+                    ],
+                ],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::nested(function () {
+                return [
+                    'discounts.*.id' => 'distinct',
+                    'discounts.*.type' => 'in:percent,absolute',
+                    'discounts.*' => Rule::nested(function ($attribute, $value) {
+                        return $value['type'] === 'percent' 
+                            ? ['discount' => 'numeric|min:0|max:100']
+                            : ['discount' => 'numeric'];
+                    }),
+                ];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.discounts.0.id' => ['validation.distinct'],
+            'items.0.discounts.1.id' => ['validation.distinct'],
+            'items.0.discounts.0.discount' => ['validation.max.numeric'],
+            'items.1.discounts.0.discount' => ['validation.numeric'],
         ], $v->getMessageBag()->toArray());
     }
 
