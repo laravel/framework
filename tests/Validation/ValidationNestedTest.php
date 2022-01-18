@@ -79,14 +79,14 @@ class ValidationNestedTest extends TestCase
                     'discounts' => [
                         ['percent' => 30, 'discount' => 1400],
                         ['percent' => -1, 'discount' => 12300],
-                        ['percent' => 120, 'discount' => 1200]
+                        ['percent' => 120, 'discount' => 1200],
                     ]
                 ],
                 [
                     'discounts' => [
                         ['percent' => 30, 'discount' => 'invalid'],
                         ['percent' => 'invalid', 'discount' => 1250],
-                        ['percent' => 'invalid', 'discount' => 'invalid']
+                        ['percent' => 'invalid', 'discount' => 'invalid'],
                     ],
                 ],
             ],
