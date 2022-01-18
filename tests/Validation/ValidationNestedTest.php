@@ -58,7 +58,7 @@ class ValidationNestedTest extends TestCase
                 ];
             }),
         ];
-        
+
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, $data, $rules);
