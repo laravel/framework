@@ -123,7 +123,7 @@ class ValidationNestedRulesTest extends TestCase
             'items.1.discounts.2.discount' => ['validation.numeric'],
         ], $v->getMessageBag()->toArray());
     }
-    
+
     public function testNestedCallbacksCanReturnDifferentRules()
     {
         $data = [
