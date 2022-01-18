@@ -87,7 +87,7 @@ class ValidationRuleParser
         if (is_string($rule)) {
             return explode('|', $rule);
         } elseif (is_object($rule)) {
-            return [$this->prepareRule($rule, $attribute)];
+            return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
         $attributes = array_fill(
@@ -110,8 +110,6 @@ class ValidationRuleParser
     {
         if ($rule instanceof Closure) {
             $rule = new ClosureValidationRule($rule);
-        } elseif ($rule instanceof NestedRules) {
-            $rule = $rule->compile($attribute, $this->data[$attribute] ?? null);
         }
 
         if (! is_object($rule) ||
@@ -119,6 +117,12 @@ class ValidationRuleParser
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
+        }
+
+        if ($rule instanceof NestedRules) {
+            return $rule->compile(
+                $attribute, $this->data[$attribute] ?? null, Arr::dot($this->data)
+            )->rules[$attribute];
         }
 
         return (string) $rule;
@@ -141,11 +145,19 @@ class ValidationRuleParser
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach (Arr::flatten((array) $rules) as $rule) {
-                    $this->implicitAttributes[$attribute][] = $key;
-
                     if ($rule instanceof NestedRules) {
-                        $results = $this->mergeRules($results, $key, $rule->compile($key, $value, $data));
+                        $compiled = $rule->compile($key, $value, $data);
+
+                        $this->implicitAttributes = array_merge_recursive(
+                            $compiled->implicitAttributes,
+                            $this->implicitAttributes,
+                            [$attribute => [$key]]
+                        );
+
+                        $results = $this->mergeRules($results, $compiled->rules);
                     } else {
+                        $this->implicitAttributes[$attribute][] = $key;
+
                         $results = $this->mergeRules($results, $key, $rule);
                     }
                 }

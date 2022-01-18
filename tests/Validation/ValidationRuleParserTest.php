@@ -91,7 +91,7 @@ class ValidationRuleParserTest extends TestCase
             'name' => Rule::nested(function ($attribute, $value, $data = null) {
                 $this->assertEquals('name', $attribute);
                 $this->assertEquals('Taylor Otwell', $value);
-                $this->assertNull($data);
+                $this->assertEquals(['name' => 'Taylor Otwell'], $data);
 
                 return 'required';
             }),
@@ -164,6 +164,80 @@ class ValidationRuleParserTest extends TestCase
                 'users.1.name',
                 'users.1.name',
             ],
+        ], $results->implicitAttributes);
+    }
+
+    public function test_explode_handles_recursively_nested_rules()
+    {
+        $parser = (new ValidationRuleParser([
+            'users' => [['name' => 'Taylor Otwell']],
+        ]));
+
+        $results = $parser->explode([
+            'users.*.name' => [
+                Rule::nested(function ($attribute, $value, $data) {
+                    $this->assertEquals('users.0.name', $attribute);
+                    $this->assertEquals('Taylor Otwell', $value);
+                    $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
+
+                    return Rule::nested(function ($attribute, $value, $data) {
+                        $this->assertEquals('users.0.name', $attribute);
+                        $this->assertNull($value);
+                        $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
+
+                        return Rule::nested(function ($attribute, $value, $data) {
+                            $this->assertEquals('users.0.name', $attribute);
+                            $this->assertNull($value);
+                            $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
+
+                            return [Rule::requiredIf(true)];
+                        });
+                    });
+                }),
+            ],
+        ]);
+
+        $this->assertEquals(['users.0.name' => ['required']], $results->rules);
+        $this->assertEquals(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
+    }
+
+    public function test_explode_handles_segmenting_nested_rules()
+    {
+        $parser = (new ValidationRuleParser([
+            'items' => [
+                ['discounts' => [['id' => 1], ['id' => 2]]],
+                ['discounts' => [['id' => 1], ['id' => 2]]],
+            ],
+        ]));
+
+        $rules = [
+            'items.*' => Rule::nested(function () {
+                return ['discounts.*.id' => 'distinct'];
+            }),
+        ];
+
+        $results = $parser->explode($rules);
+
+        $this->assertEquals([
+            'items.0.discounts.0.id' => ['distinct'],
+            'items.0.discounts.1.id' => ['distinct'],
+            'items.1.discounts.0.id' => ['distinct'],
+            'items.1.discounts.1.id' => ['distinct'],
+        ], $results->rules);
+
+        $this->assertEquals([
+            'items.1.discounts.*.id' => [
+                'items.1.discounts.0.id',
+                'items.1.discounts.1.id',
+            ],
+            'items.0.discounts.*.id' => [
+                'items.0.discounts.0.id',
+                'items.0.discounts.1.id',
+            ],
+            'items.*' => [
+                'items.0',
+                'items.1'
+            ]
         ], $results->implicitAttributes);
     }
 }

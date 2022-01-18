@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Support\Arr;
+
 class NestedRules
 {
     /**
@@ -25,11 +27,21 @@ class NestedRules
     /**
      * Compile the callback into an array of rules.
      *
-     * @param  mixed  $args
-     * @return array
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  mixed   $data
+     * @return \stdClass
      */
-    public function compile(...$args)
+    public function compile($attribute, $value, $data = null)
     {
-        return call_user_func($this->callback, ...$args);
+        $rules = call_user_func($this->callback, $attribute, $value, $data);
+
+        $parser = new ValidationRuleParser(
+            Arr::undot(Arr::wrap($data))
+        );
+
+        return is_array($rules) && Arr::isAssoc($rules)
+            ? $parser->explode(Arr::dot($rules, "$attribute."))
+            : $parser->explode([$attribute => $rules]);
     }
 }
