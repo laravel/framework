@@ -26,7 +26,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
         $this->assertThat(
-            $this->getTable($table), new HasInDatabase($this->getConnection($connection), $data)
+            $this->getTable($table), new HasInDatabase($this->getConnection($table, $connection), $data)
         );
 
         return $this;
@@ -43,7 +43,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseMissing($table, array $data, $connection = null)
     {
         $constraint = new ReverseConstraint(
-            new HasInDatabase($this->getConnection($connection), $data)
+            new HasInDatabase($this->getConnection($table, $connection), $data)
         );
 
         $this->assertThat($this->getTable($table), $constraint);
@@ -89,7 +89,7 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
+            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($table, $connection), $data, $deletedAtColumn)
         );
 
         return $this;
@@ -116,7 +116,7 @@ trait InteractsWithDatabase
         }
 
         $this->assertThat(
-            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
+            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($table, $connection), $data, $deletedAtColumn)
         );
 
         return $this;
