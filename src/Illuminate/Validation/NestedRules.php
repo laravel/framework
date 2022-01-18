@@ -49,7 +49,7 @@ class NestedRules
 
             return $parser->explode($nested);
         }
-        
+
         return $parser->explode([$attribute => $rules]);
     }
 }
