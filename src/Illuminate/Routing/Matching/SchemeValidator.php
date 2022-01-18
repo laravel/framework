@@ -19,7 +19,7 @@ class SchemeValidator implements ValidatorInterface
         if ($route->httpOnly()) {
             return ! $request->secure();
         }
-        
+
         if ($route->secure()) {
             return $request->secure();
         }
