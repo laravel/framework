@@ -60,11 +60,7 @@ trait InteractsWithInput
         if ($position !== false) {
             $header = substr($header, $position + 7);
 
-<<<<<<< HEAD
-            return str_contains($header, ',') ? strstr(',', $header, true) : $header;
-=======
-            return strpos($header, ',') !== false ? strstr($header, ',', true) : $header;
->>>>>>> 8.x
+            return str_contains($header, ',') ? strstr($header, ',', true) : $header;
         }
     }
 
