@@ -206,7 +206,7 @@ trait InteractsWithDatabase
      */
     protected function getTable($table)
     {
-        return $this->getModelEntity($table)?->getTable() ?: $table;
+        return $this->newModelFor($table)?->getTable() ?: $table;
     }
 
     /**
@@ -217,7 +217,7 @@ trait InteractsWithDatabase
      */
     protected function getTableConnection($table)
     {
-        return $this->getModelEntity($table)?->getConnectionName();
+        return $this->newModelFor($table)?->getConnectionName();
     }
 
     /**
@@ -226,7 +226,7 @@ trait InteractsWithDatabase
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    protected function getModelEntity($table)
+    protected function newModelFor($table)
     {
         return is_subclass_of($table, Model::class) ? (new $table) : null;
     }
