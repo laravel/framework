@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationRuleParserTest extends TestCase
 {
-    public function test_conditional_rules_are_properly_expanded_and_filtered()
+    public function testConditionalRulesAreProperlyExpandedAndFiltered()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when(true, ['required', 'min:2']),
@@ -32,7 +32,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_empty_rules_are_preserved()
+    public function testEmptyRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => [],
@@ -47,7 +47,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_conditional_rules_with_default()
+    public function testConditionalRulesWithDefault()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when(true, ['required', 'min:2'], ['string', 'max:10']),
@@ -66,7 +66,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_empty_conditional_rules_are_preserved()
+    public function testEmptyConditionalRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::when(true, '', ['string', 'max:10']),
@@ -81,7 +81,7 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_explode_generates_nested_rules()
+    public function testExplodeGeneratesNestedRules()
     {
         $parser = (new ValidationRuleParser([
             'users' => [
@@ -103,7 +103,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertEquals(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
     }
 
-    public function test_explode_generates_nested_rules_for_non_nested_data()
+    public function testExplodeGeneratesNestedRulesForNonNestedData()
     {
         $parser = (new ValidationRuleParser([
             'name' => 'Taylor Otwell',
@@ -123,7 +123,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertEquals([], $results->implicitAttributes);
     }
 
-    public function test_explode_handles_arrays_of_nested_rules()
+    public function testExplodeHandlesArraysOfNestedRules()
     {
         $parser = (new ValidationRuleParser([
             'users' => [
@@ -172,7 +172,7 @@ class ValidationRuleParserTest extends TestCase
         ], $results->implicitAttributes);
     }
 
-    public function test_explode_handles_recursively_nested_rules()
+    public function testExplodeHandlesRecursivelyNestedRules()
     {
         $parser = (new ValidationRuleParser([
             'users' => [['name' => 'Taylor Otwell']],
@@ -206,7 +206,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertEquals(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
     }
 
-    public function test_explode_handles_segmenting_nested_rules()
+    public function testExplodeHandlesSegmentingNestedRules()
     {
         $parser = (new ValidationRuleParser([
             'items' => [
