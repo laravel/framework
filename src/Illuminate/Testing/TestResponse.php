@@ -1561,8 +1561,7 @@ EOF;
      * @param  string  $offset
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->responseHasView()
                     ? isset($this->original->gatherData()[$offset])
@@ -1575,8 +1574,7 @@ EOF;
      * @param  string  $offset
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->responseHasView()
                     ? $this->viewData($offset)
@@ -1592,8 +1590,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }
@@ -1606,8 +1603,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }

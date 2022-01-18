@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
@@ -45,6 +46,8 @@ class FacadesTest extends TestCase
     public function testDefaultAliases()
     {
         $defaultAliases = Facade::defaultAliases();
+
+        $this->assertInstanceOf(Collection::class, $defaultAliases);
 
         foreach ($defaultAliases as $alias => $abstract) {
             $this->assertTrue(class_exists($alias));

@@ -22,6 +22,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
  * @method \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
+ * @method \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
  * @method \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method \Illuminate\Http\Client\PendingRequest dd()
  * @method \Illuminate\Http\Client\PendingRequest dump()

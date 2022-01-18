@@ -651,9 +651,9 @@ class SupportCollectionTest extends TestCase
     public function testToJsonEncodesTheJsonSerializeResult($collection)
     {
         $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
-        $c->expects($this->once())->method('jsonSerialize')->willReturn('foo');
+        $c->expects($this->once())->method('jsonSerialize')->willReturn(['foo']);
         $results = $c->toJson();
-        $this->assertJsonStringEqualsJsonString(json_encode('foo'), $results);
+        $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
     }
 
     /**
@@ -662,9 +662,9 @@ class SupportCollectionTest extends TestCase
     public function testCastingToStringJsonEncodesTheToArrayResult($collection)
     {
         $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
-        $c->expects($this->once())->method('jsonSerialize')->willReturn('foo');
+        $c->expects($this->once())->method('jsonSerialize')->willReturn(['foo']);
 
-        $this->assertJsonStringEqualsJsonString(json_encode('foo'), (string) $c);
+        $this->assertJsonStringEqualsJsonString(json_encode(['foo']), (string) $c);
     }
 
     public function testOffsetAccess()
@@ -5051,26 +5051,22 @@ class TestArrayAccessImplementation implements ArrayAccess
         $this->arr = $arr;
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->arr[$offset]);
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->arr[$offset];
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->arr[$offset] = $value;
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->arr[$offset]);
     }

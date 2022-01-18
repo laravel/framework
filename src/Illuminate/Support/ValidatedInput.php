@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Illuminate\Contracts\Support\ValidatedData;
 use stdClass;
+use Traversable;
 
 class ValidatedInput implements ValidatedData
 {
@@ -159,8 +160,7 @@ class ValidatedInput implements ValidatedData
      * @param  mixed  $key
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return isset($this->input[$key]);
     }
@@ -171,8 +171,7 @@ class ValidatedInput implements ValidatedData
      * @param  mixed  $key
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->input[$key];
     }
@@ -184,8 +183,7 @@ class ValidatedInput implements ValidatedData
      * @param  mixed  $value
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         if (is_null($key)) {
             $this->input[] = $value;
@@ -200,8 +198,7 @@ class ValidatedInput implements ValidatedData
      * @param  string  $key
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         unset($this->input[$key]);
     }
@@ -211,8 +208,7 @@ class ValidatedInput implements ValidatedData
      *
      * @return \ArrayIterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->input);
     }
