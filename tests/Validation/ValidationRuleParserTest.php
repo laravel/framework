@@ -81,26 +81,6 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
-    public function test_explode_generates_nested_rules_for_non_nested_data()
-    {
-        $parser = (new ValidationRuleParser([
-            'name' => 'Taylor Otwell',
-        ]));
-
-        $results = $parser->explode([
-            'name' => Rule::nested(function ($attribute, $value, $data = null) {
-                $this->assertEquals('name', $attribute);
-                $this->assertEquals('Taylor Otwell', $value);
-                $this->assertEquals(['name' => 'Taylor Otwell'], $data);
-
-                return 'required';
-            }),
-        ]);
-
-        $this->assertEquals(['name' => ['required']], $results->rules);
-        $this->assertEquals([], $results->implicitAttributes);
-    }
-
     public function test_explode_generates_nested_rules()
     {
         $parser = (new ValidationRuleParser([
@@ -121,6 +101,26 @@ class ValidationRuleParserTest extends TestCase
 
         $this->assertEquals(['users.0.name' => ['required']], $results->rules);
         $this->assertEquals(['users.*.name' => ['users.0.name']], $results->implicitAttributes);
+    }
+
+    public function test_explode_generates_nested_rules_for_non_nested_data()
+    {
+        $parser = (new ValidationRuleParser([
+            'name' => 'Taylor Otwell',
+        ]));
+
+        $results = $parser->explode([
+            'name' => Rule::nested(function ($attribute, $value, $data = null) {
+                $this->assertEquals('name', $attribute);
+                $this->assertEquals('Taylor Otwell', $value);
+                $this->assertEquals(['name' => 'Taylor Otwell'], $data);
+
+                return 'required';
+            }),
+        ]);
+
+        $this->assertEquals(['name' => ['required']], $results->rules);
+        $this->assertEquals([], $results->implicitAttributes);
     }
 
     public function test_explode_handles_arrays_of_nested_rules()
