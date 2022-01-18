@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Support\Str;
-use Mockery as m;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ValidationNestedTest extends TestCase
@@ -39,7 +38,7 @@ class ValidationNestedTest extends TestCase
             'items.0.discounts.1.id' => ['validation.distinct'],
         ], $v->getMessageBag()->toArray());
     }
-    
+
     public function testNestedCallbacksCanBeRecursivelyNested()
     {
         $data = [
@@ -71,7 +70,7 @@ class ValidationNestedTest extends TestCase
             'items.0.discounts.1.id' => ['validation.distinct'],
         ], $v->getMessageBag()->toArray());
     }
-    
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

@@ -28,8 +28,8 @@ class NestedRules
      * Compile the callback into an array of rules.
      *
      * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  mixed   $data
+     * @param  mixed  $value
+     * @param  mixed  $data
      * @return \stdClass
      */
     public function compile($attribute, $value, $data = null)
