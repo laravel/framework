@@ -124,6 +124,35 @@ class ValidationNestedRulesTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
+    public function testNestedCallbacksCanReturnArraysOfValidationRules()
+    {
+        $data = [
+            'items' => [
+                // Contains duplicate ID.
+                ['discounts' => [['id' => 1], ['id' => 1], ['id' => 2]]],
+                ['discounts' => [['id' => 1], ['id' => 'invalid']]],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::nested(function () {
+                return ['discounts.*.id' => ['distinct', 'numeric']];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.discounts.0.id' => ['validation.distinct'],
+            'items.0.discounts.1.id' => ['validation.distinct'],
+            'items.1.discounts.1.id' => ['validation.numeric'],
+        ], $v->getMessageBag()->toArray());
+    }
+
     public function testNestedCallbacksCanReturnDifferentRules()
     {
         $data = [

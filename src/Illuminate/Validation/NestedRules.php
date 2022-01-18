@@ -40,8 +40,16 @@ class NestedRules
             Arr::undot(Arr::wrap($data))
         );
 
-        return is_array($rules) && Arr::isAssoc($rules)
-            ? $parser->explode(Arr::dot($rules, "$attribute."))
-            : $parser->explode([$attribute => $rules]);
+        if (is_array($rules) && Arr::isAssoc($rules)) {
+            $nested = [];
+
+            foreach ($rules as $key => $rule) {
+                $nested[$attribute.'.'.$key] = $rule;
+            }
+
+            return $parser->explode($nested);
+        }
+        
+        return $parser->explode([$attribute => $rules]);
     }
 }
