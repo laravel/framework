@@ -62,7 +62,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseCount($table, int $count, $connection = null)
     {
         $this->assertThat(
-            $this->getTable($table), new CountInDatabase($this->getConnection($connection), $count)
+            $this->getTable($table), new CountInDatabase($this->getConnection($table, $connection), $count)
         );
 
         return $this;
@@ -189,11 +189,11 @@ trait InteractsWithDatabase
      * @param  string|null  $connection
      * @return \Illuminate\Database\Connection
      */
-    protected function getConnection($connection = null)
+    protected function getConnection($table, $connection = null)
     {
         $database = $this->app->make('db');
 
-        $connection = $connection ?: $database->getDefaultConnection();
+        $connection = $connection ?: $this->getTableConnection($table) ?: $database->getDefaultConnection();
 
         return $database->connection($connection);
     }
@@ -206,7 +206,21 @@ trait InteractsWithDatabase
      */
     protected function getTable($table)
     {
-        return is_subclass_of($table, Model::class) ? (new $table)->getTable() : $table;
+        $entity = $this->getModelEntity($table);
+
+        return $entity ? $entity->getTable() : $table;
+    }
+
+    protected function getTableConnection($table)
+    {
+        $entity = $this->getModelEntity($table);
+
+        return $entity ? $entity->getConnectionName() : null;
+    }
+
+    protected function getModelEntity($table)
+    {
+        return is_subclass_of($table, Model::class) ? (new $table) : null;
     }
 
     /**
