@@ -13,7 +13,7 @@ class PredisClusterConnection extends PredisConnection
      */
     public function flushdb()
     {
-        foreach ($this->getConnection()->getIterator() as $node) {
+        foreach ($this->client->getIterator() as $node) {
             $node->executeCommand(new ServerFlushDatabase);
         }
     }
