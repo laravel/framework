@@ -581,7 +581,7 @@ class Stringable implements JsonSerializable
     /**
      * Parse input from a string to a collection, according to a format.
      *
-     * @param  string $format
+     * @param  string  $format
      * @return \Illuminate\Support\Collection
      */
     public function scan($format)
