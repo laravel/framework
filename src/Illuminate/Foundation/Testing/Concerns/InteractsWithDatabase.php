@@ -206,18 +206,26 @@ trait InteractsWithDatabase
      */
     protected function getTable($table)
     {
-        $entity = $this->getModelEntity($table);
-
-        return $entity ? $entity->getTable() : $table;
+        return $this->getModelEntity($table)?->getTable() ?: $table;
     }
 
+    /**
+     * Get the table connection specified in the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @return string|null
+     */
     protected function getTableConnection($table)
     {
-        $entity = $this->getModelEntity($table);
-
-        return $entity ? $entity->getConnectionName() : null;
+        return $this->getModelEntity($table)?->getConnectionName();
     }
 
+    /**
+     * Get the model entity from the given model or string
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     protected function getModelEntity($table)
     {
         return is_subclass_of($table, Model::class) ? (new $table) : null;
