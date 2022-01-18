@@ -77,26 +77,27 @@ class ValidationNestedTest extends TestCase
             'items' => [
                 [
                     'discounts' => [
-                        ['percent' => 30, 'discount' => 1400],
-                        ['percent' => -1, 'discount' => 12300],
-                        ['percent' => 120, 'discount' => 1200],
+                        ['id' => 1, 'percent' => 30, 'discount' => 1400],
+                        ['id' => 1, 'percent' => -1, 'discount' => 12300],
+                        ['id' => 2, 'percent' => 120, 'discount' => 1200],
                     ],
                 ],
                 [
                     'discounts' => [
-                        ['percent' => 30, 'discount' => 'invalid'],
-                        ['percent' => 'invalid', 'discount' => 1250],
-                        ['percent' => 'invalid', 'discount' => 'invalid'],
+                        ['id' => 1, 'percent' => 30, 'discount' => 'invalid'],
+                        ['id' => 2, 'percent' => 'invalid', 'discount' => 1250],
+                        ['id' => 3, 'percent' => 'invalid', 'discount' => 'invalid'],
                     ],
                 ],
             ],
         ];
-
         $rules = [
             'items.*' => Rule::nested(function () {
                 return [
+                    'discounts.*.id' => 'distinct',
                     'discounts.*' => Rule::nested(function () {
                         return [
+                            'id' => 'distinct',
                             'percent' => 'numeric|min:0|max:100',
                             'discount' => 'numeric',
                         ];
@@ -112,6 +113,8 @@ class ValidationNestedTest extends TestCase
         $this->assertFalse($v->passes());
 
         $this->assertEquals([
+            'items.0.discounts.0.id' => ['validation.distinct'],
+            'items.0.discounts.1.id' => ['validation.distinct'],
             'items.0.discounts.1.percent' => ['validation.min.numeric'],
             'items.0.discounts.2.percent' => ['validation.max.numeric'],
             'items.1.discounts.0.discount' => ['validation.numeric'],
