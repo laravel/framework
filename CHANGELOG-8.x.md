@@ -1,6 +1,24 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.79.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.80.0...8.x)
+
+
+## [v8.80.0 (2022-01-18)](https://github.com/laravel/framework/compare/v8.79.0...v8.80.0)
+
+### Added
+- Allow enums as entity_type in morphs ([#40375](https://github.com/laravel/framework/pull/40375))
+- Added support for specifying a route group controller ([#40276](https://github.com/laravel/framework/pull/40276))
+- Added phpredis serialization and compression config support ([#40282](https://github.com/laravel/framework/pull/40282))
+- Added a BladeCompiler::render() method to render a string with Blade ([#40425](https://github.com/laravel/framework/pull/40425))
+- Added a method to sort keys in a collection using a callback ([#40458](https://github.com/laravel/framework/pull/40458))
+
+### Changed
+- Convert "/" in -e parameter to "\" in `Illuminate/Foundation/Console/ListenerMakeCommand` ([#40383](https://github.com/laravel/framework/pull/40383))
+
+### Fixed
+- Throws an error upon make:policy if no model class is configured ([#40348](https://github.com/laravel/framework/pull/40348))
+- Fix forwarded call with named arguments in `Illuminate/Filesystem/FilesystemAdapter` ([#40421](https://github.com/laravel/framework/pull/40421))
+- Fix 'strstr' function usage based on its signature ([#40457](https://github.com/laravel/framework/pull/40457))
 
 
 ## [v8.79.0 (2022-01-12)](https://github.com/laravel/framework/compare/v8.78.1...v8.79.0)
