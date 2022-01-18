@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -60,7 +61,13 @@ class SeedCommand extends Command
 
         $previousConnection = $this->resolver->getDefaultConnection();
 
-        $this->resolver->setDefaultConnection($this->getDatabase());
+        $this->resolver->setDefaultConnection($database = $this->getDatabase());
+
+        if ($this->input->getOption('fresh')) {
+            $this->truncateAllTables($database);
+
+            $this->info('Truncated all tables successfully.');
+        }
 
         Model::unguarded(function () {
             $this->getSeeder()->__invoke();
@@ -73,6 +80,32 @@ class SeedCommand extends Command
         $this->info('Database seeding completed successfully.');
 
         return 0;
+    }
+
+    /**
+     * Truncate all Database tables.
+     *
+     * @return \Illuminate\Database\Seeder
+     */
+    protected function truncateAllTables($database)
+    {
+        $connection =  $this->laravel['db']->connection($database);
+        $schemaBuilder = $connection->getSchemaBuilder();
+
+        $schemaBuilder->disableForeignKeyConstraints();
+
+        collect($schemaBuilder->getAllTables())
+            ->map(function($table) {
+                return reset($table);
+            })
+            ->reject(function($table) {
+                return $table === Config::get('database.migrations', 'migrations');
+            })
+            ->each(function($table) use ($connection) {
+                $connection->table($table)->truncate();
+            });
+
+        $schemaBuilder->enableForeignKeyConstraints();
     }
 
     /**
@@ -133,6 +166,7 @@ class SeedCommand extends Command
             ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'Database\\Seeders\\DatabaseSeeder'],
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+            ['fresh', null, InputOption::VALUE_NONE, 'Truncate all the tables first'],
         ];
     }
 }
