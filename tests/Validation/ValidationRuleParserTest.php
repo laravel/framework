@@ -142,7 +142,12 @@ class ValidationRuleParserTest extends TestCase
 
                     return [Rule::requiredIf(true)];
                 }),
-                Rule::nested(function ($attribute, $value) {
+                Rule::nested(function ($attribute, $value, $data) {
+                    $this->assertEquals([
+                        'users.0.name' => 'Taylor Otwell',
+                        'users.1.name' => 'Abigail Otwell',
+                    ], $data);
+
                     return [
                         $value === 'Taylor Otwell'
                             ? Rule::in('taylor')
