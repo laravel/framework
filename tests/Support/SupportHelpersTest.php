@@ -828,8 +828,7 @@ class SupportTestArrayAccess implements ArrayAccess
         return array_key_exists($offset, $this->attributes);
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->attributes[$offset];
     }
