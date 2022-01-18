@@ -221,7 +221,7 @@ trait InteractsWithDatabase
     }
 
     /**
-     * Get the model entity from the given model or string
+     * Get the model entity from the given model or string.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $table
      * @return \Illuminate\Database\Eloquent\Model|null
