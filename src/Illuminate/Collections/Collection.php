@@ -1414,6 +1414,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Sort the collection keys using a callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function sortKeysUsing(callable $callback)
+    {
+        $items = $this->items;
+
+        uksort($items, $callback);
+
+        return new static($items);
+    }
+
+    /**
      * Splice a portion of the underlying collection array.
      *
      * @param  int  $offset

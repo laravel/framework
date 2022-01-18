@@ -854,6 +854,6 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->macroCall($method, $parameters);
         }
 
-        return $this->driver->{$method}(...array_values($parameters));
+        return $this->driver->{$method}(...$parameters);
     }
 }

@@ -18,7 +18,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest asJson()
  * @method \Illuminate\Http\Client\PendingRequest asMultipart()
  * @method \Illuminate\Http\Client\PendingRequest async()
- * @method \Illuminate\Http\Client\PendingRequest attach(string|array $name, string $contents = '', string|null $filename = null, array $headers = [])
+ * @method \Illuminate\Http\Client\PendingRequest attach(string|array $name, string|resource $contents = '', string|null $filename = null, array $headers = [])
  * @method \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
  * @method \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)

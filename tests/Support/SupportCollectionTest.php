@@ -1882,6 +1882,16 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortKeysUsing($collection)
+    {
+        $data = new $collection(['B' => 'dayle', 'a' => 'taylor']);
+
+        $this->assertSame(['a' => 'taylor', 'B' => 'dayle'], $data->sortKeysUsing('strnatcasecmp')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testReverse($collection)
     {
         $data = new $collection(['zaeed', 'alan']);
