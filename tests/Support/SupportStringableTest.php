@@ -929,7 +929,7 @@ class SupportStringableTest extends TestCase
     public function testScan()
     {
         $this->assertSame([123456], $this->stringable('SN/123456')->scan('SN/%d')->toArray());
-        $this->assertSame(['Otwell', 'Taylor'], $this->stringable('Otwell, Taylor')->scan("%[^,],%s")->toArray());
-        $this->assertSame(['filename', 'jpg'], $this->stringable('filename.jpg')->scan("%[^.].%s")->toArray());
+        $this->assertSame(['Otwell', 'Taylor'], $this->stringable('Otwell, Taylor')->scan('%[^,],%s')->toArray());
+        $this->assertSame(['filename', 'jpg'], $this->stringable('filename.jpg')->scan('%[^.].%s')->toArray());
     }
 }
