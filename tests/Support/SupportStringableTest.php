@@ -925,4 +925,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
         $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
     }
+
+    public function testScan()
+    {
+        $this->assertSame([123456], $this->stringable('SN/123456')->scan('SN/%d')->toArray());
+        $this->assertSame(['Otwell', 'Taylor'], $this->stringable('Otwell, Taylor')->scan('%[^,],%s')->toArray());
+        $this->assertSame(['filename', 'jpg'], $this->stringable('filename.jpg')->scan('%[^.].%s')->toArray());
+    }
 }
