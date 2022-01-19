@@ -34,6 +34,9 @@ class ConvertToCliCommand extends Command
         // Remove "Http" directory...
         $files->deleteDirectory(app_path('Http'));
 
+        // Remove "Models" directory...
+        $files->deleteDirectory(app_path('Models'));
+
         // Remove unnecessary providers...
         $files->delete(app_path('Providers/AuthServiceProvider.php'));
         $files->delete(app_path('Providers/BroadcastServiceProvider.php'));
@@ -67,7 +70,8 @@ class ConvertToCliCommand extends Command
         $files->delete(base_path('webpack.mix.js'));
 
         // Install stubs...
-        $files->copy(__DIR__.'/stubs/convert-to-cli/app.php', config_path('app.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/app.stub', config_path('app.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/ExampleTest.stub', base_path('tests/Feature/ExampleTest.php'));
 
         // Remove Composer packages...
         $this->removeComposerPackages([
