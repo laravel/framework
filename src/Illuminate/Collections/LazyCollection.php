@@ -48,7 +48,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $this->source = static::empty();
         } elseif ($source instanceof Generator) {
             throw new InvalidArgumentException(
-                'Generators should not be passed directly. Passs a generator function instead.'
+                'Generators should not be passed directly to LazyCollection. Instead, Pass a generator function.'
             );
         } else {
             $this->source = $this->getArrayableItems($source);
