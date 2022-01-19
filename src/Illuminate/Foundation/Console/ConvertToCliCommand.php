@@ -31,12 +31,6 @@ class ConvertToCliCommand extends Command
     {
         $files = new Filesystem;
 
-        // Remove frontend asset related files and directories...
-        $files->delete(base_path('package.json'));
-        $files->delete(base_path('webpack.mix.js'));
-
-        $files->deleteDirectory(base_path('resources'));
-
         // Remove "Http" directory...
         $files->deleteDirectory(app_path('Http'));
 
@@ -58,10 +52,17 @@ class ConvertToCliCommand extends Command
         // Remove "public" directory...
         $files->deleteDirectory(public_path());
 
+        // Remove "resources" directory...
+        $files->deleteDirectory(base_path('resources'));
+
         // Remove route files...
         $files->delete(base_path('routes/api.php'));
         $files->delete(base_path('routes/channels.php'));
         $files->delete(base_path('routes/web.php'));
+
+        // Remove frontend asset related files and directories...
+        $files->delete(base_path('package.json'));
+        $files->delete(base_path('webpack.mix.js'));
 
         // Remove Composer packages...
         $this->removeComposerPackages([

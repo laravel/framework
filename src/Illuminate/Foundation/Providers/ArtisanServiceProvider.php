@@ -28,6 +28,7 @@ use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\ConvertToApiCommand;
+use Illuminate\Foundation\Console\ConvertToCliCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EventCacheCommand;
@@ -152,6 +153,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
         'ConvertToApi' => ConvertToApiCommand::class,
+        'ConvertToCli' => ConvertToCliCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
         'EventMake' => EventMakeCommand::class,
         'ExceptionMake' => ExceptionMakeCommand::class,
@@ -357,6 +359,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(ConvertToApiCommand::class, function ($app) {
             return new ConvertToApiCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerConvertToCliCommand()
+    {
+        $this->app->singleton(ConvertToCliCommand::class, function ($app) {
+            return new ConvertToCliCommand;
         });
     }
 
