@@ -187,6 +187,7 @@ trait InteractsWithDatabase
      * Get the database connection.
      *
      * @param  string|null  $connection
+     * @param  string|null  $table
      * @return \Illuminate\Database\Connection
      */
     protected function getConnection($connection = null, $table = null)
