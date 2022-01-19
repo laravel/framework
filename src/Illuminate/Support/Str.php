@@ -909,8 +909,7 @@ class Str
     /**
      * Split a string into pieces by uppercase characters.
      *
-     * @param string $string
-     * 
+     * @param  string  $string
      * @return array
      */
     public static function ucsplit($string)
