@@ -18,6 +18,7 @@ use Traversable;
 
 /**
  * @mixin \Illuminate\Support\Collection
+ *
  * @property bool $hasMore
  */
 abstract class AbstractCursorPaginator implements Htmlable
