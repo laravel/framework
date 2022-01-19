@@ -323,7 +323,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
      *
-     * @template TWhenReturnType
+     * @template TUnlessReturnType
      *
      * @param  bool  $value
      * @param  (callable($this): TUnlessReturnType)  $callback
