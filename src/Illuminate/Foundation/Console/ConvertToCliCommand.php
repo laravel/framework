@@ -46,8 +46,10 @@ class ConvertToCliCommand extends Command
         $files->delete(config_path('sanctum.php'));
         $files->delete(config_path('session.php'));
 
-        // Remove "lang" directory...
-        $files->deleteDirectory(lang_path());
+        // Remove "lang" files...
+        $files->delete(lang_path('en/auth.php'));
+        $files->delete(lang_path('en/pagination.php'));
+        $files->delete(lang_path('en/passwords.php'));
 
         // Remove "public" directory...
         $files->deleteDirectory(public_path());
@@ -63,6 +65,9 @@ class ConvertToCliCommand extends Command
         // Remove frontend asset related files and directories...
         $files->delete(base_path('package.json'));
         $files->delete(base_path('webpack.mix.js'));
+
+        // Install stubs...
+        $files->copy(__DIR__.'/stubs/convert-to-cli/app.php', config_path('app.php'));
 
         // Remove Composer packages...
         $this->removeComposerPackages([
