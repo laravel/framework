@@ -47,7 +47,6 @@ class ConvertToApiCommand extends Command
 
         // Install stubs...
         $files->copy(__DIR__.'/stubs/convert-to-api/AlwaysAcceptJsonResponses.stub', app_path('Http/Middleware/AlwaysAcceptJsonResponses.php'));
-        $files->copy(__DIR__.'/stubs/convert-to-api/Handler.stub', app_path('Exceptions/Handler.php'));
         $files->copy(__DIR__.'/stubs/convert-to-api/Kernel.stub', app_path('Http/Kernel.php'));
         $files->copy(__DIR__.'/stubs/convert-to-api/RouteServiceProvider.stub', app_path('Providers/RouteServiceProvider.php'));
         $files->copy(__DIR__.'/stubs/convert-to-api/api.stub', base_path('routes/api.php'));
