@@ -1,4 +1,4 @@
-name: Static Analysis Internal
+name: static analysis internal
 
 on:
   push:

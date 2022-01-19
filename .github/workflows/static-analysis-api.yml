@@ -1,4 +1,4 @@
-name: Static Analysis API
+name: static analysis api
 
 on:
   push:
