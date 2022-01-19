@@ -777,6 +777,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Split a string by uppercase characters.
+     *
+     * @return static
+     */
+    public function ucsplit()
+    {
+        return new static(Str::ucsplit($this->value));
+    }
+
+    /**
      * Execute the given callback if the string contains a given substring.
      *
      * @param  string|array  $needles
