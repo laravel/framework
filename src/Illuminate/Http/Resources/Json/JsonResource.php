@@ -236,8 +236,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      *
      * @return array
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->resolve(Container::getInstance()->make('request'));
     }

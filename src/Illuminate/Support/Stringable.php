@@ -579,6 +579,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Parse input from a string to a collection, according to a format.
+     *
+     * @param  string  $format
+     * @return \Illuminate\Support\Collection
+     */
+    public function scan($format)
+    {
+        return collect(sscanf($this->value, $format));
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $prefix
@@ -965,8 +976,7 @@ class Stringable implements JsonSerializable
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return $this->__toString();
     }

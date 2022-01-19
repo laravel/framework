@@ -21,10 +21,8 @@ class Parser
     {
         $name = static::name($expression);
 
-        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches)) {
-            if (count($matches[1])) {
-                return array_merge([$name], static::parameters($matches[1]));
-            }
+        if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches) && count($matches[1])) {
+            return array_merge([$name], static::parameters($matches[1]));
         }
 
         return [$name, [], []];

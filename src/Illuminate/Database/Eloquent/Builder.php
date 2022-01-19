@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -25,9 +26,8 @@ use ReflectionMethod;
  */
 class Builder
 {
-    use Concerns\QueriesRelationships, ForwardsCalls;
-    use BuildsQueries {
-        sole as baseSole;
+    use BuildsQueries, ForwardsCalls, QueriesRelationships {
+        BuildsQueries::sole as baseSole;
     }
 
     /**
@@ -638,7 +638,7 @@ class Builder
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
-            if (strpos($name, '.') === false) {
+            if (! str_contains($name, '.')) {
                 $models = $this->eagerLoadRelation($models, $name, $constraints);
             }
         }

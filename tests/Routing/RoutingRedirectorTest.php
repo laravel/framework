@@ -83,7 +83,7 @@ class RoutingRedirectorTest extends TestCase
 
     public function testGuestPutPreviousUrlInSession()
     {
-        $this->request->shouldReceive('method')->once()->andReturn('POST');
+        $this->request->shouldReceive('isMethod')->once()->with('GET')->andReturn(false);
         $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
         $this->url->shouldReceive('previous')->once()->andReturn('http://foo.com/bar');
 
@@ -182,6 +182,7 @@ class RoutingRedirectorTest extends TestCase
     {
         $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
 
-        $this->redirect->setIntendedUrl('http://foo.com/bar');
+        $result = $this->redirect->setIntendedUrl('http://foo.com/bar');
+        $this->assertInstanceOf(Redirector::class, $result);
     }
 }

@@ -12,8 +12,10 @@ use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class HttpRequestTest extends TestCase
 {
@@ -1111,6 +1113,42 @@ class HttpRequestTest extends TestCase
         $request->session();
     }
 
+    public function testHasSessionMethod()
+    {
+        $request = Request::create('/');
+
+        $this->assertFalse($request->hasSession());
+
+        $session = m::mock(Store::class);
+        $request->setLaravelSession($session);
+
+        $this->assertTrue($request->hasSession());
+    }
+
+    public function testGetSessionMethodWithLaravelSession()
+    {
+        $request = Request::create('/');
+
+        $laravelSession = m::mock(Store::class);
+        $request->setLaravelSession($laravelSession);
+
+        $session = $request->getSession();
+        $this->assertInstanceOf(SessionInterface::class, $session);
+
+        $laravelSession->shouldReceive('start')->once()->andReturn(true);
+        $session->start();
+    }
+
+    public function testGetSessionMethodWithoutLaravelSession()
+    {
+        $this->expectException(SessionNotFoundException::class);
+        $this->expectExceptionMessage('There is currently no session available.');
+
+        $request = Request::create('/');
+
+        $request->getSession();
+    }
+
     public function testUserResolverMakesUserAvailableAsMagicProperty()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -1142,7 +1180,12 @@ class HttpRequestTest extends TestCase
         $request->fingerprint();
     }
 
-    public function testCreateFromBase()
+    /**
+     * Ensure JSON GET requests populate $request->request with the JSON content.
+     *
+     * @link https://github.com/laravel/framework/pull/7052 Correctly fill the $request->request parameter bag on creation.
+     */
+    public function testJsonRequestFillsRequestBodyParams()
     {
         $body = [
             'foo' => 'bar',
@@ -1158,6 +1201,24 @@ class HttpRequestTest extends TestCase
         $request = Request::createFromBase($base);
 
         $this->assertEquals($request->request->all(), $body);
+    }
+
+    /**
+     * Ensure non-JSON GET requests don't pollute $request->request with the GET parameters.
+     *
+     * @link https://github.com/laravel/framework/pull/37921 Manually populate POST request body with JSON data only when required.
+     */
+    public function testNonJsonRequestDoesntFillRequestBodyParams()
+    {
+        $params = ['foo' => 'bar'];
+
+        $getRequest = Request::create('/', 'GET', $params, [], [], []);
+        $this->assertEquals($getRequest->request->all(), []);
+        $this->assertEquals($getRequest->query->all(), $params);
+
+        $postRequest = Request::create('/', 'POST', $params, [], [], []);
+        $this->assertEquals($postRequest->request->all(), $params);
+        $this->assertEquals($postRequest->query->all(), []);
     }
 
     /**

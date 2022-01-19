@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use Carbon\Carbon;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class CursorTest extends TestCase

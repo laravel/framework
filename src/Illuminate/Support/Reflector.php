@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use ReflectionClass;
+use ReflectionEnum;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionUnionType;
@@ -138,5 +139,25 @@ class Reflector
         return $paramClassName
             && class_exists($paramClassName)
             && (new ReflectionClass($paramClassName))->isSubclassOf($className);
+    }
+
+    /**
+     * Determine if the parameter's type is a Backed Enum with a string backing type.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return bool
+     */
+    public static function isParameterBackedEnumWithStringBackingType($parameter)
+    {
+        $backedEnumClass = (string) $parameter->getType();
+
+        if (function_exists('enum_exists') && enum_exists($backedEnumClass)) {
+            $reflectionBackedEnum = new ReflectionEnum($backedEnumClass);
+
+            return $reflectionBackedEnum->isBacked()
+                && $reflectionBackedEnum->getBackingType()->getName() == 'string';
+        }
+
+        return false;
     }
 }

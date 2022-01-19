@@ -228,7 +228,7 @@ if (! function_exists('cache')) {
      * @param  dynamic  key|key,default|data,expiration|null
      * @return mixed|\Illuminate\Cache\CacheManager
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     function cache()
     {
@@ -243,7 +243,7 @@ if (! function_exists('cache')) {
         }
 
         if (! is_array($arguments[0])) {
-            throw new Exception(
+            throw new InvalidArgumentException(
                 'When setting a value in the cache, you must pass an array of key / value pairs.'
             );
         }
@@ -492,7 +492,7 @@ if (! function_exists('lang_path')) {
      */
     function lang_path($path = '')
     {
-        return app('path.lang').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->langPath($path);
     }
 }
 
@@ -800,7 +800,7 @@ if (! function_exists('storage_path')) {
      */
     function storage_path($path = '')
     {
-        return app('path.storage').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->storagePath($path);
     }
 }
 

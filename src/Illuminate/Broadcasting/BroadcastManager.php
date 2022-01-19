@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting;
 
 use Ably\AblyRest;
 use Closure;
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
@@ -214,8 +215,13 @@ class BroadcastManager implements FactoryContract
     protected function createPusherDriver(array $config)
     {
         $pusher = new Pusher(
-            $config['key'], $config['secret'],
-            $config['app_id'], $config['options'] ?? []
+            $config['key'],
+            $config['secret'],
+            $config['app_id'],
+            $config['options'] ?? [],
+            isset($config['client_options']) && ! empty($config['client_options'])
+                    ? new GuzzleClient($config['client_options'])
+                    : null,
         );
 
         if ($config['log'] ?? false) {

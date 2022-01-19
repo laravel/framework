@@ -13,13 +13,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
 abstract class Relation
 {
     use ForwardsCalls, Macroable {
-        __call as macroCall;
+        Macroable::__call as macroCall;
     }
 
     /**
@@ -301,9 +298,21 @@ abstract class Relation
     /**
      * Get the base query builder driving the Eloquent builder.
      *
+     * @deprecated Use toBase() instead
+     *
      * @return \Illuminate\Database\Query\Builder
      */
     public function getBaseQuery()
+    {
+        return $this->toBase();
+    }
+
+    /**
+     * Get a base query builder instance.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function toBase()
     {
         return $this->query->getQuery();
     }

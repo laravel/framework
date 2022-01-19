@@ -68,13 +68,13 @@ class MigrationCreator
         $this->files->ensureDirectoryExists(dirname($path));
 
         $this->files->put(
-            $path, $this->populateStub($name, $stub, $table)
+            $path, $this->populateStub($stub, $table)
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
         // created. Once that is done we'll be ready to return the full path to the
         // migration file so it can be used however it's needed by the developer.
-        $this->firePostCreateHooks($table);
+        $this->firePostCreateHooks($table, $path);
 
         return $path;
     }
@@ -132,18 +132,12 @@ class MigrationCreator
     /**
      * Populate the place-holders in the migration stub.
      *
-     * @param  string  $name
      * @param  string  $stub
      * @param  string|null  $table
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($stub, $table)
     {
-        $stub = str_replace(
-            ['DummyClass', '{{ class }}', '{{class}}'],
-            $this->getClassName($name), $stub
-        );
-
         // Here we will replace the table place-holders with the table specified by
         // the developer, which is useful for quickly creating a tables creation
         // or update migration from the console instead of typing it manually.
@@ -184,12 +178,13 @@ class MigrationCreator
      * Fire the registered post create hooks.
      *
      * @param  string|null  $table
+     * @param  string  $path
      * @return void
      */
-    protected function firePostCreateHooks($table)
+    protected function firePostCreateHooks($table, $path)
     {
         foreach ($this->postCreate as $callback) {
-            $callback($table);
+            $callback($table, $path);
         }
     }
 

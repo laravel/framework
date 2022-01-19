@@ -214,7 +214,7 @@ if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
      *
-     * @param  int  $times
+     * @param  int|array  $times
      * @param  callable  $callback
      * @param  int|\Closure  $sleepMilliseconds
      * @param  callable|null  $when
@@ -226,6 +226,14 @@ if (! function_exists('retry')) {
     {
         $attempts = 0;
 
+        $backoff = [];
+
+        if (is_array($times)) {
+            $backoff = $times;
+
+            $times = count($times) + 1;
+        }
+
         beginning:
         $attempts++;
         $times--;
@@ -236,6 +244,8 @@ if (! function_exists('retry')) {
             if ($times < 1 || ($when && ! $when($e))) {
                 throw $e;
             }
+
+            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
 
             if ($sleepMilliseconds) {
                 usleep(value($sleepMilliseconds, $attempts) * 1000);
@@ -368,9 +378,11 @@ if (! function_exists('with')) {
     /**
      * Return the given value, optionally passed through the given callback.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
-     * @return mixed
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): TValue)|null  $callback
+     * @return TValue
      */
     function with($value, callable $callback = null)
     {

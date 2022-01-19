@@ -21,6 +21,15 @@ class SeedCommand extends Command
     protected $name = 'db:seed';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'db:seed';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -84,7 +93,7 @@ class SeedCommand extends Command
     {
         $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
 
-        if (strpos($class, '\\') === false) {
+        if (! str_contains($class, '\\')) {
             $class = 'Database\\Seeders\\'.$class;
         }
 

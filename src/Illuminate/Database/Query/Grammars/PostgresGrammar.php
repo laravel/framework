@@ -22,7 +22,7 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * {@inheritdoc}
+     * Compile a basic where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
@@ -203,7 +203,7 @@ class PostgresGrammar extends Grammar
     {
         $column = str_replace('->>', '->', $this->wrap($column));
 
-        return 'json_array_length(('.$column.')::json) '.$operator.' '.$value;
+        return 'jsonb_array_length(('.$column.')::jsonb) '.$operator.' '.$value;
     }
 
     /**

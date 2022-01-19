@@ -3,14 +3,17 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
+use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use IteratorAggregate;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
@@ -87,9 +90,17 @@ class SupportHelpersTest extends TestCase
             ['name' => 'abigail'],
             ['name' => 'dayle'],
         ];
+        $arrayIterable = new SupportTestArrayIterable([
+            ['name' => 'taylor', 'email' => 'taylorotwell@gmail.com'],
+            ['name' => 'abigail'],
+            ['name' => 'dayle'],
+        ]);
 
         $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
         $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($arrayIterable, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($arrayIterable, '*.email', 'irrelevant'));
 
         $array = [
             'users' => [
@@ -612,6 +623,23 @@ class SupportHelpersTest extends TestCase
         });
     }
 
+    public function testRetryWithBackoff()
+    {
+        $startTime = microtime(true);
+        $attempts = retry([50, 100, 200], function ($attempts) {
+            if ($attempts > 3) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        });
+
+        // Make sure we made four attempts
+        $this->assertEquals(4, $attempts);
+
+        $this->assertEqualsWithDelta(0.05 + 0.1 + 0.2, microtime(true) - $startTime, 0.02);
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
@@ -800,8 +828,7 @@ class SupportTestArrayAccess implements ArrayAccess
         return array_key_exists($offset, $this->attributes);
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->attributes[$offset];
     }
@@ -814,5 +841,20 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset): void
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestArrayIterable implements IteratorAggregate
+{
+    protected $items = [];
+
+    public function __construct($items = [])
+    {
+        $this->items = $items;
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->items);
     }
 }

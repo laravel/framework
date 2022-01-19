@@ -50,7 +50,7 @@ class FakeNullSessionHandler extends NullSessionHandler
 {
     public $written = false;
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $this->written = true;
 

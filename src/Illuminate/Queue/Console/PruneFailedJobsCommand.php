@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue\Console;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
+use Illuminate\Support\Carbon;
 
 class PruneFailedJobsCommand extends Command
 {
@@ -15,6 +15,15 @@ class PruneFailedJobsCommand extends Command
      */
     protected $signature = 'queue:prune-failed
                 {--hours=24 : The number of hours to retain failed jobs data}';
+
+    /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:prune-failed';
 
     /**
      * The console command description.

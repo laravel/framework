@@ -600,6 +600,31 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('really required!', $v->messages()->first('name'));
     }
 
+    public function testCustomValidationLinesForSizeRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'required' => 'required!',
+            'custom' => [
+                'image' => [
+                    'gte' => [
+                        'file' => 'Custom message for image files.',
+                        'string' => 'Custom message for image filenames.',
+                    ],
+                ],
+            ],
+        ]);
+
+        $v = new Validator($trans, ['image' => 'image.png'], ['image' => 'gte:50']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Custom message for image filenames.', $v->messages()->first('image'));
+
+        $file = new UploadedFile(__FILE__, '', null, null, true);
+        $v = new Validator($trans, ['image' => $file], ['image' => 'gte:50']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Custom message for image files.', $v->messages()->first('image'));
+    }
+
     public function testCustomValidationLinesAreRespectedWithAsterisks()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -878,100 +903,6 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], ['name' => 'present|string']);
         $v->passes();
         $this->assertEquals(['validation.present'], $v->errors()->get('name'));
-    }
-
-    public function testValidatePassword()
-    {
-        // Fails when user is not logged in.
-        $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(true);
-
-        $hasher = m::mock(Hasher::class);
-
-        $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
-
-        $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
-
-        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
-        $v->setContainer($container);
-
-        $this->assertFalse($v->passes());
-
-        // Fails when password is incorrect.
-        $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthPassword');
-
-        $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(false);
-        $auth->shouldReceive('user')->andReturn($user);
-
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(false);
-
-        $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
-
-        $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
-
-        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
-        $v->setContainer($container);
-
-        $this->assertFalse($v->passes());
-
-        // Succeeds when password is correct.
-        $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthPassword');
-
-        $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(false);
-        $auth->shouldReceive('user')->andReturn($user);
-
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(true);
-
-        $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
-
-        $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
-
-        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password']);
-        $v->setContainer($container);
-
-        $this->assertTrue($v->passes());
-
-        // We can use a specific guard.
-        $user = m::mock(Authenticatable::class);
-        $user->shouldReceive('getAuthPassword');
-
-        $auth = m::mock(Guard::class);
-        $auth->shouldReceive('guard')->with('custom')->andReturn($auth);
-        $auth->shouldReceive('guest')->andReturn(false);
-        $auth->shouldReceive('user')->andReturn($user);
-
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(true);
-
-        $container = m::mock(Container::class);
-        $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
-
-        $trans = $this->getTranslator();
-        $trans->shouldReceive('get')->andReturnArg(0);
-
-        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'password:custom']);
-        $v->setContainer($container);
-
-        $this->assertTrue($v->passes());
     }
 
     public function testValidatePresent()
@@ -6796,6 +6727,7 @@ class ValidationValidatorTest extends TestCase
             ['users' => [['name' => 'Mohamed', 'location' => 'cairo']]],
             ['users' => 'array', 'users.*.name' => 'string']
         );
+        $validator->excludeUnvalidatedArrayKeys = false;
         $this->assertTrue($validator->passes());
         $this->assertSame(['users' => [['name' => 'Mohamed', 'location' => 'cairo']]], $validator->validated());
 

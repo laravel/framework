@@ -226,7 +226,7 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $session->put('boom', 'baz');
-        $session->flashInput(['foo' => 'bar', 'bar' => 0]);
+        $session->flashInput(['foo' => 'bar', 'bar' => 0, 'name' => null]);
 
         $this->assertTrue($session->hasOldInput('foo'));
         $this->assertSame('bar', $session->getOldInput('foo'));
@@ -239,6 +239,9 @@ class SessionStoreTest extends TestCase
         $this->assertSame('bar', $session->getOldInput('foo'));
         $this->assertEquals(0, $session->getOldInput('bar'));
         $this->assertFalse($session->hasOldInput('boom'));
+
+        $this->assertSame('default', $session->getOldInput('input', 'default'));
+        $this->assertSame(null, $session->getOldInput('name', 'default'));
     }
 
     public function testDataFlashing()

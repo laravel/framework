@@ -15,6 +15,15 @@ class EventClearCommand extends Command
     protected $name = 'event:clear';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'event:clear';
+
+    /**
      * The console command description.
      *
      * @var string

@@ -16,6 +16,15 @@ class ScheduleWorkCommand extends Command
     protected $name = 'schedule:work';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'schedule:work';
+
+    /**
      * The console command description.
      *
      * @var string

@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
+use Illuminate\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
 use ReflectionProperty;
@@ -167,11 +168,11 @@ class Mailable implements MailableContract, Renderable
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
-     * @return void
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send($mailer)
     {
-        $this->withLocale($this->locale, function () use ($mailer) {
+        return $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer = $mailer instanceof MailFactory
@@ -450,7 +451,7 @@ class Mailable implements MailableContract, Renderable
     protected function runCallbacks($message)
     {
         foreach ($this->callbacks as $callback) {
-            $callback($message->getSwiftMessage());
+            $callback($message->getSymfonyMessage());
         }
 
         return $this;
@@ -903,6 +904,21 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Assert that the given text strings are present in order in the HTML email body.
+     *
+     * @param  array  $strings
+     * @return $this
+     */
+    public function assertSeeInOrderInHtml($strings)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertThat($strings, new SeeInOrder($html));
+
+        return $this;
+    }
+
+    /**
      * Assert that the given text is present in the plain-text email body.
      *
      * @param  string  $string
@@ -934,6 +950,21 @@ class Mailable implements MailableContract, Renderable
             Str::contains($text, $string),
             "Saw unexpected text [{$string}] within text email body."
         );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given text strings are present in order in the plain-text email body.
+     *
+     * @param  array  $strings
+     * @return $this
+     */
+    public function assertSeeInOrderInText($strings)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertThat($strings, new SeeInOrder($text));
 
         return $this;
     }
@@ -988,12 +1019,12 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Register a callback to be called with the Swift message instance.
+     * Register a callback to be called with the Symfony message instance.
      *
      * @param  callable  $callback
      * @return $this
      */
-    public function withSwiftMessage($callback)
+    public function withSymfonyMessage($callback)
     {
         $this->callbacks[] = $callback;
 

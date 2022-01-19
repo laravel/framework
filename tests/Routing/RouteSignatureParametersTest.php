@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Routing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\RouteSignatureParameters;
 use Laravel\SerializableClosure\SerializableClosure;
-use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 use PHPUnit\Framework\TestCase;
 use ReflectionParameter;
 
@@ -17,9 +16,8 @@ class RouteSignatureParametersTest extends TestCase
             return $user;
         };
 
-        $action = ['uses' => serialize(\PHP_VERSION_ID < 70400
-            ? new OpisSerializableClosure($callable)
-            : new SerializableClosure($callable)
+        $action = ['uses' => serialize(
+            new SerializableClosure($callable)
         )];
 
         $parameters = RouteSignatureParameters::fromAction($action);

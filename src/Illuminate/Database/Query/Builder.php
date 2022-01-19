@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query;
 
 use BackedEnum;
+use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
@@ -237,6 +238,7 @@ class Builder
     {
         $this->columns = [];
         $this->bindings['select'] = [];
+
         $columns = is_array($columns) ? $columns : func_get_args();
 
         foreach ($columns as $as => $column) {
@@ -373,7 +375,7 @@ class Builder
             $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            if (! str_starts_with($query->from, $databaseName) && ! str_contains($query->from, '.')) {
                 $query->from($databaseName.'.'.$query->from);
             }
         }
@@ -409,7 +411,6 @@ class Builder
     /**
      * Force the query to only return distinct results.
      *
-     * @param  mixed  ...$distinct
      * @return $this
      */
     public function distinct()
@@ -676,6 +677,8 @@ class Builder
         $this->bindings['where'] = array_values(
             array_merge($this->bindings['where'], (array) $bindings)
         );
+
+        return $this;
     }
 
     /**
@@ -1120,14 +1123,18 @@ class Builder
      * Add a where between statement to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
+
+        if ($values instanceof CarbonPeriod) {
+            $values = $values->toArray();
+        }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
@@ -1158,10 +1165,10 @@ class Builder
      * Add an or where between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @return $this
      */
-    public function orWhereBetween($column, array $values)
+    public function orWhereBetween($column, iterable $values)
     {
         return $this->whereBetween($column, $values, 'or');
     }
@@ -1182,11 +1189,11 @@ class Builder
      * Add a where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNotBetween($column, array $values, $boolean = 'and')
+    public function whereNotBetween($column, iterable $values, $boolean = 'and')
     {
         return $this->whereBetween($column, $values, $boolean, true);
     }
@@ -1208,10 +1215,10 @@ class Builder
      * Add an or where not between statement to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @return $this
      */
-    public function orWhereNotBetween($column, array $values)
+    public function orWhereNotBetween($column, iterable $values)
     {
         return $this->whereNotBetween($column, $values, 'or');
     }
@@ -1242,7 +1249,7 @@ class Builder
     /**
      * Add a "where date" statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $column
+     * @param  string  $column
      * @param  string  $operator
      * @param  \DateTimeInterface|string|null  $value
      * @param  string  $boolean
@@ -1942,6 +1949,59 @@ class Builder
     }
 
     /**
+     * Add a "having null" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function havingNull($columns, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotNull' : 'Null';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->havings[] = compact('type', 'column', 'boolean');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or having null" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orHavingNull($column)
+    {
+        return $this->havingNull($column, 'or');
+    }
+
+    /**
+     * Add a "having not null" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingNotNull($columns, $boolean = 'and')
+    {
+        return $this->havingNull($columns, $boolean, true);
+    }
+
+    /**
+     * Add an "or having not null" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orHavingNotNull($column)
+    {
+        return $this->havingNotNull($column, 'or');
+    }
+
+    /**
      * Add a "having between " clause to the query.
      *
      * @param  string  $column
@@ -1995,7 +2055,7 @@ class Builder
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -2028,7 +2088,7 @@ class Builder
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @return $this
      */
     public function orderByDesc($column)
@@ -2039,7 +2099,7 @@ class Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @return $this
      */
     public function latest($column = 'created_at')
@@ -2050,7 +2110,7 @@ class Builder
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @return $this
      */
     public function oldest($column = 'created_at')
@@ -2627,7 +2687,7 @@ class Builder
             return $column;
         }
 
-        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $separator = str_contains(strtolower($column), ' as ') ? ' as ' : '\.';
 
         return last(preg_split('~'.$separator.'~i', $column));
     }
@@ -2863,7 +2923,7 @@ class Builder
         // If the result doesn't contain a decimal place, we will assume it is an int then
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
-        return strpos((string) $result, '.') === false
+        return ! str_contains((string) $result, '.')
                 ? (int) $result : (float) $result;
     }
 

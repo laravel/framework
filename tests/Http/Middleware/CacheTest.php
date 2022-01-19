@@ -63,6 +63,15 @@ class CacheTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
     }
 
+    public function testDoesNotOverrideEtag()
+    {
+        $response = (new Cache)->handle(new Request, function () {
+            return (new Response('some content'))->setEtag('XYZ');
+        }, 'etag');
+
+        $this->assertSame('"XYZ"', $response->getEtag());
+    }
+
     public function testIsNotModified()
     {
         $request = new Request;

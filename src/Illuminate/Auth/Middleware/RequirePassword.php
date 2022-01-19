@@ -50,11 +50,12 @@ class RequirePassword
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string|null  $redirectToRoute
+     * @param  int|null  $passwordTimeoutSeconds
      * @return mixed
      */
-    public function handle($request, Closure $next, $redirectToRoute = null)
+    public function handle($request, Closure $next, $redirectToRoute = null, $passwordTimeoutSeconds = null)
     {
-        if ($this->shouldConfirmPassword($request)) {
+        if ($this->shouldConfirmPassword($request, $passwordTimeoutSeconds)) {
             if ($request->expectsJson()) {
                 return $this->responseFactory->json([
                     'message' => 'Password confirmation required.',
@@ -73,12 +74,13 @@ class RequirePassword
      * Determine if the confirmation timeout has expired.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  int|null  $passwordTimeoutSeconds
      * @return bool
      */
-    protected function shouldConfirmPassword($request)
+    protected function shouldConfirmPassword($request, $passwordTimeoutSeconds = null)
     {
         $confirmedAt = time() - $request->session()->get('auth.password_confirmed_at', 0);
 
-        return $confirmedAt > $this->passwordTimeout;
+        return $confirmedAt > ($passwordTimeoutSeconds ?? $this->passwordTimeout);
     }
 }

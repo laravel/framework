@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
+use ReflectionClass;
 
 class FacadesTest extends TestCase
 {
@@ -38,5 +41,20 @@ class FacadesTest extends TestCase
         });
 
         $this->assertTrue(isset($_SERVER['__laravel.authResolved']));
+    }
+
+    public function testDefaultAliases()
+    {
+        $defaultAliases = Facade::defaultAliases();
+
+        $this->assertInstanceOf(Collection::class, $defaultAliases);
+
+        foreach ($defaultAliases as $alias => $abstract) {
+            $this->assertTrue(class_exists($alias));
+            $this->assertTrue(class_exists($abstract));
+
+            $reflection = new ReflectionClass($alias);
+            $this->assertSame($abstract, $reflection->getName());
+        }
     }
 }

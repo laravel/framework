@@ -21,6 +21,15 @@ class ClearCommand extends Command
     protected $name = 'queue:clear';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:clear';
+
+    /**
      * The console command description.
      *
      * @var string

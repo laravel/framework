@@ -4,6 +4,7 @@ namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
 use Illuminate\Container\Container;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -22,6 +23,13 @@ abstract class Seeder
      * @var \Illuminate\Console\Command
      */
     protected $command;
+
+    /**
+     * Seeders that have been called at least one time.
+     *
+     * @var array
+     */
+    protected static $called = [];
 
     /**
      * Run the given seeder class.
@@ -53,6 +61,8 @@ abstract class Seeder
             if ($silent === false && isset($this->command)) {
                 $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime}ms)");
             }
+
+            static::$called[] = $class;
         }
 
         return $this;
@@ -80,6 +90,22 @@ abstract class Seeder
     public function callSilent($class, array $parameters = [])
     {
         $this->call($class, true, $parameters);
+    }
+
+    /**
+     * Run the given seeder class once.
+     *
+     * @param  array|string  $class
+     * @param  bool  $silent
+     * @return void
+     */
+    public function callOnce($class, $silent = false, array $parameters = [])
+    {
+        if (in_array($class, static::$called)) {
+            return;
+        }
+
+        $this->call($class, $silent, $parameters);
     }
 
     /**
@@ -145,8 +171,16 @@ abstract class Seeder
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        return isset($this->container)
-                    ? $this->container->call([$this, 'run'], $parameters)
-                    : $this->run(...$parameters);
+        $callback = fn () => isset($this->container)
+            ? $this->container->call([$this, 'run'], $parameters)
+            : $this->run(...$parameters);
+
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[WithoutModelEvents::class])) {
+            $callback = $this->withoutModelEvents($callback);
+        }
+
+        return $callback();
     }
 }

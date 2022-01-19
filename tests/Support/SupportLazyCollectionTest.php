@@ -2,9 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -67,6 +68,17 @@ class SupportLazyCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    public function testDoesNotCreateCollectionFromGenerator()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $generateNumber = function () {
+            yield 1;
+        };
+
+        LazyCollection::make($generateNumber());
     }
 
     public function testEager()
@@ -164,7 +176,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $results = $mock
             ->times(10)
-            ->pipe(function ($collection) use ($mock, $timeout) {
+            ->tap(function ($collection) use ($mock, $timeout) {
                 tap($collection)
                     ->mockery_init($mock->mockery_getContainer())
                     ->shouldAllowMockingProtectedMethods()
@@ -175,8 +187,6 @@ class SupportLazyCollectionTest extends TestCase
                         (clone $timeout)->sub(1, 'minute')->getTimestamp(),
                         $timeout->getTimestamp()
                     );
-
-                return $collection;
             })
             ->takeUntilTimeout($timeout)
             ->all();

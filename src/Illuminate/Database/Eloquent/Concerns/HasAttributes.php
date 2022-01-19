@@ -857,8 +857,8 @@ trait HasAttributes
      */
     protected function isCustomDateTimeCast($cast)
     {
-        return strncmp($cast, 'date:', 5) === 0 ||
-               strncmp($cast, 'datetime:', 9) === 0;
+        return str_starts_with($cast, 'date:') ||
+                str_starts_with($cast, 'datetime:');
     }
 
     /**
@@ -881,7 +881,7 @@ trait HasAttributes
      */
     protected function isDecimalCast($cast)
     {
-        return strncmp($cast, 'decimal:', 8) === 0;
+        return str_starts_with($cast, 'decimal:');
     }
 
     /**
@@ -1062,22 +1062,12 @@ trait HasAttributes
     {
         $caster = $this->resolveCasterClass($key);
 
-        if (is_null($value)) {
-            $this->attributes = array_merge($this->attributes, array_map(
-                function () {
-                },
-                $this->normalizeCastClassResponse($key, $caster->set(
-                    $this, $key, $this->{$key}, $this->attributes
-                ))
-            ));
-        } else {
-            $this->attributes = array_merge(
-                $this->attributes,
-                $this->normalizeCastClassResponse($key, $caster->set(
-                    $this, $key, $value, $this->attributes
-                ))
-            );
-        }
+        $this->attributes = array_merge(
+            $this->attributes,
+            $this->normalizeCastClassResponse($key, $caster->set(
+                $this, $key, $value, $this->attributes
+            ))
+        );
 
         if ($caster instanceof CastsInboundAttributes || ! is_object($value)) {
             unset($this->classCastCache[$key]);
@@ -1225,16 +1215,12 @@ trait HasAttributes
      */
     public function fromFloat($value)
     {
-        switch ((string) $value) {
-            case 'Infinity':
-                return INF;
-            case '-Infinity':
-                return -INF;
-            case 'NaN':
-                return NAN;
-            default:
-                return (float) $value;
-        }
+        return match ((string) $value) {
+            'Infinity' => INF,
+            '-Infinity' => -INF,
+            'NaN' => NAN,
+            default => (float) $value,
+        };
     }
 
     /**
@@ -1568,7 +1554,7 @@ trait HasAttributes
 
         $arguments = [];
 
-        if (is_string($castType) && strpos($castType, ':') !== false) {
+        if (is_string($castType) && str_contains($castType, ':')) {
             $segments = explode(':', $castType, 2);
 
             $castType = $segments[0];
@@ -1594,7 +1580,7 @@ trait HasAttributes
      */
     protected function parseCasterClass($class)
     {
-        return strpos($class, ':') === false
+        return ! str_contains($class, ':')
             ? $class
             : explode(':', $class, 2)[0];
     }

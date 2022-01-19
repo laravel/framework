@@ -20,6 +20,15 @@ class MonitorCommand extends Command
                        {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     */
+    protected static $defaultName = 'queue:monitor';
+
+    /**
      * The console command description.
      *
      * @var string
