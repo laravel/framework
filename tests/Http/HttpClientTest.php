@@ -1067,4 +1067,25 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('https://example.com');
     }
+
+    public function testDefaults()
+    {
+        $this->factory->fake();
+
+        $this->factory->defaults(function (PendingRequest $request) {
+            $request->withHeaders([
+                'X-Test-Header' => 'foo',
+            ]);
+        })->defaults(function (PendingRequest $request) {
+            $request->withUserAgent('Laravel');
+        });
+
+        $this->factory->get('http://foo.com/get');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get' &&
+                $request->hasHeader('X-Test-Header', 'foo') &&
+                $request->hasHeader('User-Agent', 'Laravel');
+        });
+    }
 }

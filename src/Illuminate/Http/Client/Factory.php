@@ -72,6 +72,13 @@ class Factory
     protected $stubCallbacks;
 
     /**
+     * The callbacks that should execute when a pending request is created.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $defaultsCallbacks;
+
+    /**
      * Indicates if the factory is recording requests and responses.
      *
      * @var bool
@@ -103,6 +110,7 @@ class Factory
         $this->dispatcher = $dispatcher;
 
         $this->stubCallbacks = collect();
+        $this->defaultsCallbacks = collect();
     }
 
     /**
@@ -375,6 +383,19 @@ class Factory
     }
 
     /**
+     * Add a new "defaults" callback.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function defaults($callback)
+    {
+        return tap($this, function () use ($callback) {
+            $this->defaultsCallbacks[] = $callback;
+        });
+    }
+
+    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method
@@ -389,6 +410,7 @@ class Factory
 
         return tap($this->newPendingRequest(), function ($request) {
             $request->stub($this->stubCallbacks);
+            $this->defaultsCallbacks->each->__invoke($request, $this);
         })->{$method}(...$parameters);
     }
 }
