@@ -5,9 +5,11 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use IteratorAggregate;
 use stdClass;
 use Traversable;
@@ -44,6 +46,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $this->source = $source;
         } elseif (is_null($source)) {
             $this->source = static::empty();
+        } elseif ($source instanceof Generator) {
+            throw new InvalidArgumentException(
+                'Generators should not be passed directly to LazyCollection. Instead, pass a generator function.'
+            );
         } else {
             $this->source = $this->getArrayableItems($source);
         }
