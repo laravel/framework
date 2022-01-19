@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -211,6 +212,17 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $this->assertNotSame($previous, $previous = $model->virtualObject);
         }
     }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsDateTimeAreNotCached()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = null;
+
+        foreach (range(0, 10) as $i) {
+            $this->assertNotSame($previous, $previous = $model->virtualDateTime);
+        }
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -311,6 +323,15 @@ class TestEloquentModelWithAttributeCast extends Model
         return new Attribute(
             function () {
                 return new AttributeCastAddress(Str::random(10), Str::random(10));
+            }
+        );
+    }
+
+    public function virtualDateTime(): Attribute
+    {
+        return new Attribute(
+            function () {
+                return Date::now()->addSeconds(mt_rand(0, 10000));
             }
         );
     }
