@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 {
@@ -188,6 +189,28 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $this->assertTrue(empty($model->getDirty()));
     }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsPrimitivesAreNotCached()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = null;
+
+        foreach (range(0, 10) as $i) {
+            $this->assertNotSame($previous, $previous = $model->virtualString);
+        }
+    }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsObjectAreNotCached()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = null;
+
+        foreach (range(0, 10) as $i) {
+            $this->assertNotSame($previous, $previous = $model->virtualObject);
+        }
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -270,6 +293,24 @@ class TestEloquentModelWithAttributeCast extends Model
         return new Attribute(
             function () {
                 return collect();
+            }
+        );
+    }
+
+    public function virtualString(): Attribute
+    {
+        return new Attribute(
+            function () {
+                return Str::random(10);
+            }
+        );
+    }
+
+    public function virtualObject(): Attribute
+    {
+        return new Attribute(
+            function () {
+                return new AttributeCastAddress(Str::random(10), Str::random(10));
             }
         );
     }
