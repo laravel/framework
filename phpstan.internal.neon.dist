@@ -1,0 +1,24 @@
+parameters:
+  paths:
+    - src
+  level: 0
+  ignoreErrors:
+    - "#\\(void\\) is used#"
+    - "#Access to undefined constant RedisCluster::#"
+    - "#but return statement is missing.#"
+    - "#Caught class Ably#"
+    - "#Caught class Pusher#"
+    - "#Composer\\\\Script#"
+    - "#has invalid type Ably#"
+    - "#has invalid type Pusher#"
+    - "#Function GuzzleHttp\\\\Psr7#"
+    - "#Instantiated class Ably#"
+    - "#Instantiated class Egulias#"
+    - "#Instantiated class Whoops#"
+    - "#Instantiated class Pusher#"
+    - "#Instantiated class Symfony\\\\Bridge#"
+    - "#Instantiated class Symfony\\\\Component\\\\Mailer\\\\Bridge#"
+    - "#Unsafe usage of new static#"
+  excludePaths:
+    - "src/Illuminate/Testing/ParallelRunner.php"
+    - "src/Illuminate/Testing/Constraints/ArraySubset.php"

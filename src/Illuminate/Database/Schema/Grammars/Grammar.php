@@ -12,6 +12,9 @@ use Illuminate\Support\Fluent;
 use LogicException;
 use RuntimeException;
 
+/**
+ * @property array $modifiers
+ */
 abstract class Grammar extends BaseGrammar
 {
     /**

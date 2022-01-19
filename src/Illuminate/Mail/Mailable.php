@@ -20,6 +20,9 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
 use ReflectionProperty;
 
+/**
+ * @property array $middleware
+ */
 class Mailable implements MailableContract, Renderable
 {
     use Conditionable, ForwardsCalls, Localizable;

@@ -12,6 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
+/**
+ * @mixin \Illuminate\Contracts\Queue\Queue
+ */
 abstract class Queue
 {
     use InteractsWithTime;
