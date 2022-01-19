@@ -244,7 +244,6 @@ abstract class ServiceProvider
      */
     protected function loadFactoriesFrom($paths)
     {
-        // @phpstan-ignore-next-line
         $this->callAfterResolving(ModelFactory::class, function ($factory) use ($paths) {
             foreach ((array) $paths as $path) {
                 $factory->load($path);

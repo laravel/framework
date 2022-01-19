@@ -7,10 +7,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
-/**
- * @property \GuzzleHttp\TransferStats $transferStats
- * @property \GuzzleHttp\Cookie\CookieJar $cookies
- */
 class Response implements ArrayAccess
 {
     use Macroable {

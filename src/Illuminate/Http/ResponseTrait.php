@@ -6,9 +6,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Throwable;
 
-/**
- * @property string|null $callback
- */
 trait ResponseTrait
 {
     /**

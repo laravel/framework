@@ -178,7 +178,6 @@ abstract class Seeder
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[WithoutModelEvents::class])) {
-            // @phpstan-ignore-next-line
             $callback = $this->withoutModelEvents($callback);
         }
 

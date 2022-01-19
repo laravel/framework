@@ -41,7 +41,6 @@ if (! function_exists('abort')) {
             throw new HttpResponseException($code->toResponse(request()));
         }
 
-        // @phpstan-ignore-next-line
         app()->abort($code, $message, $headers);
     }
 }

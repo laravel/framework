@@ -119,27 +119,27 @@ abstract class TestCase extends BaseTestCase
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[RefreshDatabase::class])) {
-            $this->refreshDatabase(); // @phpstan-ignore-line
+            $this->refreshDatabase();
         }
 
         if (isset($uses[DatabaseMigrations::class])) {
-            $this->runDatabaseMigrations(); // @phpstan-ignore-line
+            $this->runDatabaseMigrations();
         }
 
         if (isset($uses[DatabaseTransactions::class])) {
-            $this->beginDatabaseTransaction(); // @phpstan-ignore-line
+            $this->beginDatabaseTransaction();
         }
 
         if (isset($uses[WithoutMiddleware::class])) {
-            $this->disableMiddlewareForAllTests(); // @phpstan-ignore-line
+            $this->disableMiddlewareForAllTests();
         }
 
         if (isset($uses[WithoutEvents::class])) {
-            $this->disableEventsForAllTests(); // @phpstan-ignore-line
+            $this->disableEventsForAllTests();
         }
 
         if (isset($uses[WithFaker::class])) {
-            $this->setUpFaker(); // @phpstan-ignore-line
+            $this->setUpFaker();
         }
 
         return $uses;

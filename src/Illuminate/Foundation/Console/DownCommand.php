@@ -98,7 +98,6 @@ class DownCommand extends Command
     protected function excludedPaths()
     {
         try {
-            // @phpstan-ignore-next-line
             return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExcludedPaths();
         } catch (Throwable $e) {
             return [];

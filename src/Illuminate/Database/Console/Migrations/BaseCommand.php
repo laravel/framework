@@ -4,9 +4,6 @@ namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
 
-/**
- * @property \Illuminate\Database\Migrations\Migrator $migrator
- */
 class BaseCommand extends Command
 {
     /**

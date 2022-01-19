@@ -24,9 +24,6 @@ use PDO;
 use PDOStatement;
 use RuntimeException;
 
-/**
- * @method \Doctrine\DBAL\Driver\AbstractMySQLDriver getDoctrineDriver()
- */
 class Connection implements ConnectionInterface
 {
     use DetectsConcurrencyErrors,
