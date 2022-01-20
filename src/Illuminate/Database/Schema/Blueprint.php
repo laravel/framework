@@ -1667,6 +1667,7 @@ class Blueprint
                 unset($this->commands[$index]);
             }
         }
+
         return $this;
     }
 

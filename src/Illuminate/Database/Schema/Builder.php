@@ -219,6 +219,7 @@ class Builder
                     $params = collect($method->getParameters())->mapWithKeys(
                         function ($parameter) use ($command) {
                             $paramName = $parameter->name;
+
                             return [$paramName => $command->$paramName];
                         }
                     )->toArray();
