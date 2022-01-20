@@ -330,6 +330,17 @@ trait InteractsWithInput
     }
 
     /**
+     * Get a subset of request values by the provided key.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function values($key)
+    {
+        return Arr::get($this->only($key), $key);
+    }
+
+    /**
      * Get a subset containing the provided keys with values from the input data.
      *
      * @param  array|mixed  $keys

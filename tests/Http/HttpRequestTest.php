@@ -649,6 +649,39 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['name', 'foo'], $request->keys());
     }
 
+    public function testValuesMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals('Taylor', $request->values('name'));
+        $this->assertNull($request->values('missing'));
+
+        $request = Request::create('/', 'GET', ['foo' => ['bar', 'baz']]);
+        $this->assertEquals(['bar', 'baz'], $request->values('foo'));
+
+        $request = Request::create('/', 'GET', [
+            'products' => $products = [
+                ['id' => 1],
+                ['id' => 2],
+                ['id' => 3],
+                ['foo' => 'bar'],
+            ]
+        ]);
+        $this->assertEquals([1,2,3,null], $request->values('products.*.id'));
+        $this->assertEquals([null,null,null,'bar'], $request->values('products.*.foo'));
+        $this->assertSame($products, $request->values('products.*'));
+
+        $request = Request::create('/', 'GET', [
+            'products' => $reviews = [
+                ['reviews' => [['id' => 1], ['id' => 2]]],
+                ['reviews' => [['id' => 3], ['foo' => 'bar']]],
+                ['reviews' => [['id' => 4], ['id' => 5], ['id' => 6]]],
+            ]
+        ]);
+        $this->assertEquals([1,2,3,null,4,5,6], $request->values('products.*.reviews.*.id'));
+        $this->assertSame($reviews, $request->values('products.*'));
+        $this->assertSame($reviews, $request->values('products'));
+    }
+
     public function testOnlyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
