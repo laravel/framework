@@ -149,7 +149,7 @@ if (! function_exists('filled')) {
 
 if (! function_exists('multitap')) {
     /**
-     * Continuously chain methods to be called on the given value
+     * Continuously chain methods to be called on the given value.
      *
      * @param  mixed  $value
      * @return Illuminate\Support\InfiniteHigherOrderTapProxy

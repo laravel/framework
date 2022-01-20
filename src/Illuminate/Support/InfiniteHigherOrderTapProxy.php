@@ -5,11 +5,11 @@ namespace Illuminate\Support;
 class InfiniteHigherOrderTapProxy extends HigherOrderTapProxy
 {
     /**
-     * Stop chaining and return the original object
+     * Stop chaining and return the original object.
      *
      * @return mixed
      */
-    public function finish()
+    public function finally()
     {
         return $this->target;
     }
