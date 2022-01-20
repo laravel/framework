@@ -126,7 +126,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  (callable(TValue): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -323,7 +323,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
      *
-     * @template TWhenReturnType
+     * @template TUnlessReturnType
      *
      * @param  bool  $value
      * @param  (callable($this): TUnlessReturnType)  $callback

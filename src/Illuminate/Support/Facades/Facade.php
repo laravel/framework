@@ -250,11 +250,11 @@ abstract class Facade
     /**
      * Get the application default aliases.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public static function defaultAliases()
     {
-        return [
+        return collect([
             'App' => App::class,
             'Arr' => Arr::class,
             'Artisan' => Artisan::class,
@@ -293,7 +293,7 @@ abstract class Facade
             'URL' => URL::class,
             'Validator' => Validator::class,
             'View' => View::class,
-        ];
+        ]);
     }
 
     /**

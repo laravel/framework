@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\RouteCollection as SymfonyRouteCollection;
+use Traversable;
 
 abstract class AbstractRouteCollection implements Countable, IteratorAggregate, RouteCollectionInterface
 {
@@ -238,8 +239,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      *
      * @return \ArrayIterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->getRoutes());
     }
@@ -249,8 +249,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         return count($this->getRoutes());
     }
