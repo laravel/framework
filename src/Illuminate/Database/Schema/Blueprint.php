@@ -1660,7 +1660,8 @@ class Blueprint
      * @param $name
      * @return Blueprint
      */
-    public function removeCommand($name) {
+    public function removeCommand($name)
+    {
         foreach($this->commands as $index => $command) {
             if($command->name === $name) {
                 unset($this->commands[$index]);
@@ -1710,9 +1711,10 @@ class Blueprint
      *
      * @return bool
      */
-    public function hasRenamedOrDroppedColumn() {
-        return ! is_null(collect($this->commands)->filter(function($command) {
-            if(Str::contains($command->name, ['renameColumn', 'dropColumn'])) {
+    public function hasRenamedOrDroppedColumn()
+    {
+        return ! is_null(collect($this->commands)->filter(function ($command) {
+            if (Str::contains($command->name, ['renameColumn', 'dropColumn'])) {
                 return $command;
             }
         })->first());

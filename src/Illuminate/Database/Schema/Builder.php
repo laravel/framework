@@ -5,7 +5,6 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
@@ -50,7 +49,7 @@ class Builder
     /**
      * Create a new database Schema manager.
      *
-     * @param  \Illuminate\Database\Connection $connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @return void
      */
     public function __construct(Connection $connection)
@@ -62,7 +61,7 @@ class Builder
     /**
      * Set the default string length for migrations.
      *
-     * @param  int $length
+     * @param  int  $length
      * @return void
      */
     public static function defaultStringLength($length)
@@ -73,7 +72,7 @@ class Builder
     /**
      * Set the default morph key type for migrations.
      *
-     * @param  string $type
+     * @param  string  $type
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -100,7 +99,7 @@ class Builder
     /**
      * Create a database in the schema.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      *
      * @throws \LogicException
@@ -113,7 +112,7 @@ class Builder
     /**
      * Drop a database from the schema if the database exists.
      *
-     * @param  string $name
+     * @param  string  $name
      * @return bool
      *
      * @throws \LogicException
@@ -126,25 +125,23 @@ class Builder
     /**
      * Determine if the given table exists.
      *
-     * @param  string $table
+     * @param  string  $table
      * @return bool
      */
     public function hasTable($table)
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return count(
-            $this->connection->selectFromWriteConnection(
-                $this->grammar->compileTableExists(), [$table]
-            )
-        ) > 0;
+        return count($this->connection->selectFromWriteConnection(
+            $this->grammar->compileTableExists(), [$table]
+        )) > 0;
     }
 
     /**
      * Determine if the given table has a given column.
      *
-     * @param  string $table
-     * @param  string $column
+     * @param  string  $table
+     * @param  string  $column
      * @return bool
      */
     public function hasColumn($table, $column)
@@ -157,7 +154,7 @@ class Builder
     /**
      * Determine if the given table has given columns.
      *
-     * @param  string $table
+     * @param  string  $table
      * @param  array  $columns
      * @return bool
      */
@@ -177,8 +174,8 @@ class Builder
     /**
      * Get the data type for the given column name.
      *
-     * @param  string $table
-     * @param  string $column
+     * @param  string  $table
+     * @param  string  $column
      * @return string
      */
     public function getColumnType($table, $column)
@@ -191,16 +188,14 @@ class Builder
     /**
      * Get the column listing for a given table.
      *
-     * @param  string $table
+     * @param  string  $table
      * @return array
      */
     public function getColumnListing($table)
     {
-        $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumnListing(
-                $this->connection->getTablePrefix().$table
-            )
-        );
+        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
+            $this->connection->getTablePrefix().$table
+        ));
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
@@ -208,8 +203,8 @@ class Builder
     /**
      * Modify a table on the schema.
      *
-     * @param  string   $table
-     * @param  \Closure $callback
+     * @param  string  $table
+     * @param  \Closure  $callback
      * @return void
      */
     public function table($table, Closure $callback)
@@ -241,71 +236,57 @@ class Builder
     /**
      * Create a new table on the schema.
      *
-     * @param  string   $table
-     * @param  \Closure $callback
+     * @param  string  $table
+     * @param  \Closure  $callback
      * @return void
      */
     public function create($table, Closure $callback)
     {
-        $this->build(
-            tap(
-                $this->createBlueprint($table), function ($blueprint) use ($callback) {
-                    $blueprint->create();
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback) {
+            $blueprint->create();
 
-                    $callback($blueprint);
-                }
-            )
-        );
+            $callback($blueprint);
+        }));
     }
 
     /**
      * Drop a table from the schema.
      *
-     * @param  string $table
+     * @param  string  $table
      * @return void
      */
     public function drop($table)
     {
-        $this->build(
-            tap(
-                $this->createBlueprint($table), function ($blueprint) {
-                    $blueprint->drop();
-                }
-            )
-        );
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+            $blueprint->drop();
+        }));
     }
 
     /**
      * Drop a table from the schema if it exists.
      *
-     * @param  string $table
+     * @param  string  $table
      * @return void
      */
     public function dropIfExists($table)
     {
-        $this->build(
-            tap(
-                $this->createBlueprint($table), function ($blueprint) {
-                    $blueprint->dropIfExists();
-                }
-            )
-        );
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+            $blueprint->dropIfExists();
+        }));
     }
 
     /**
      * Drop columns from a table schema.
      *
-     * @param  string       $table
-     * @param  string|array $columns
+     * @param  string  $table
+     * @param  string|array  $columns
      * @return void
      */
     public function dropColumns($table, $columns)
     {
-        $this->table(
-            $table, function (Blueprint $blueprint) use ($columns) {
-                $blueprint->dropColumn($columns);
-            }
-        );
+        $this->table($table, function (Blueprint $blueprint) use ($columns) {
+            $blueprint->dropColumn($columns);
+        });
     }
 
     /**
@@ -359,19 +340,15 @@ class Builder
     /**
      * Rename a table on the schema.
      *
-     * @param  string $from
-     * @param  string $to
+     * @param  string  $from
+     * @param  string  $to
      * @return void
      */
     public function rename($from, $to)
     {
-        $this->build(
-            tap(
-                $this->createBlueprint($from), function ($blueprint) use ($to) {
-                    $blueprint->rename($to);
-                }
-            )
-        );
+        $this->build(tap($this->createBlueprint($from), function ($blueprint) use ($to) {
+            $blueprint->rename($to);
+        }));
     }
 
     /**
@@ -401,7 +378,7 @@ class Builder
     /**
      * Execute the blueprint to build / modify the table.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return void
      */
     protected function build(Blueprint $blueprint)
@@ -412,8 +389,8 @@ class Builder
     /**
      * Create a new command set with a Closure.
      *
-     * @param  string        $table
-     * @param  \Closure|null $callback
+     * @param  string  $table
+     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Schema\Blueprint
      */
     protected function createBlueprint($table, Closure $callback = null)
@@ -432,9 +409,9 @@ class Builder
     /**
      * Register a custom Doctrine mapping type.
      *
-     * @param  string $class
-     * @param  string $name
-     * @param  string $type
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
      * @return void
      */
     public function registerCustomDoctrineType($class, $name, $type)
@@ -455,7 +432,7 @@ class Builder
     /**
      * Set the database connection instance.
      *
-     * @param  \Illuminate\Database\Connection $connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @return $this
      */
     public function setConnection(Connection $connection)
@@ -468,7 +445,7 @@ class Builder
     /**
      * Set the Schema Blueprint resolver callback.
      *
-     * @param  \Closure $resolver
+     * @param  \Closure  $resolver
      * @return void
      */
     public function blueprintResolver(Closure $resolver)
