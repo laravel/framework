@@ -18,6 +18,6 @@ CHANGELOG-* export-ignore
 CODE_OF_CONDUCT.md export-ignore
 CONTRIBUTING.md export-ignore
 docker-compose.yml export-ignore
-phpstan.api.neon.dist export-ignore
-phpstan.internal.neon.dist export-ignore
+phpstan.src.neon.dist export-ignore
+phpstan.types.neon.dist export-ignore
 phpunit.xml.dist export-ignore

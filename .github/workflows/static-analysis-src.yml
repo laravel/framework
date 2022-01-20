@@ -1,4 +1,4 @@
-name: static analysis api
+name: static analysis src
 
 on:
   push:
@@ -36,5 +36,4 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
 
       - name: Execute type checking
-        run: vendor/bin/phpstan --configuration="phpstan.api.neon.dist"
-
+        run: vendor/bin/phpstan --configuration="phpstan.src.neon.dist"
