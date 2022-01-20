@@ -23,7 +23,7 @@ class Attribute
      *
      * @var bool
      */
-    public $withoutObjectCaching = false;
+    public $withObjectCaching = true;
 
     /**
      * Create a new attribute accessor / mutator.
@@ -67,7 +67,7 @@ class Attribute
      */
     public function withoutObjectCaching()
     {
-        $this->withoutObjectCaching = true;
+        $this->withObjectCaching = false;
 
         return $this;
     }
