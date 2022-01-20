@@ -267,7 +267,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
-     * @return static<TValue, int>
+     * @return static<array-key, int>
      */
     public function countBy($countBy = null)
     {
@@ -782,8 +782,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Recursively merge the collection with the given items.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
-     * @return static<TKey, array<int, TValue>>
+     * @template TMergeRecursiveValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TMergeRecursiveValue>|iterable<TKey, TMergeRecursiveValue>  $items
+     * @return static<TKey, TValue|TMergeRecursiveValue>
      */
     public function mergeRecursive($items)
     {
