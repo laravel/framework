@@ -52,6 +52,17 @@ class SupportStrTest extends TestCase
         $this->assertSame('Foo Bar', Str::headline('foo_bar'));
         $this->assertSame('Foo Bar Baz', Str::headline('foo-barBaz'));
         $this->assertSame('Foo Bar Baz', Str::headline('foo-bar_baz'));
+
+        $this->assertSame('Öffentliche Überraschungen', Str::headline('öffentliche-überraschungen'));
+        $this->assertSame('Öffentliche Überraschungen', Str::headline('-_öffentliche_überraschungen_-'));
+        $this->assertSame('Öffentliche Überraschungen', Str::headline('-öffentliche überraschungen'));
+
+        $this->assertSame('Sind Öde Und So', Str::headline('sindÖdeUndSo'));
+
+        $this->assertSame('Orwell 1984', Str::headline('orwell 1984'));
+        $this->assertSame('Orwell 1984', Str::headline('orwell   1984'));
+        $this->assertSame('Orwell 1984', Str::headline('-orwell-1984 -'));
+        $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
     }
 
     public function testStringWithoutWordsDoesntProduceError()
@@ -456,6 +467,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('FooBar', Str::studly('foo_bar')); // test cache
         $this->assertSame('FooBarBaz', Str::studly('foo-barBaz'));
         $this->assertSame('FooBarBaz', Str::studly('foo-bar_baz'));
+
+        $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
     }
 
     public function testMask()
@@ -548,6 +561,18 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertSame('Мама', Str::ucfirst('мама'));
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+
+    public function testUcsplit()
+    {
+        $this->assertSame(['Laravel_p_h_p_framework'], Str::ucsplit('Laravel_p_h_p_framework'));
+        $this->assertSame(['Laravel_', 'P_h_p_framework'], Str::ucsplit('Laravel_P_h_p_framework'));
+        $this->assertSame(['laravel', 'P', 'H', 'P', 'Framework'], Str::ucsplit('laravelPHPFramework'));
+        $this->assertSame(['Laravel-ph', 'P-framework'], Str::ucsplit('Laravel-phP-framework'));
+
+        $this->assertSame(['Żółta', 'Łódka'], Str::ucsplit('ŻółtaŁódka'));
+        $this->assertSame(['sind', 'Öde', 'Und', 'So'], Str::ucsplit('sindÖdeUndSo'));
+        $this->assertSame(['Öffentliche', 'Überraschungen'], Str::ucsplit('ÖffentlicheÜberraschungen'));
     }
 
     public function testUuid()
