@@ -5,6 +5,13 @@ namespace Illuminate\Foundation;
 class AliasLoader
 {
     /**
+     * The array of alias loader objects.
+     *
+     * @var array
+     */
+    protected $loaders = [];
+
+    /**
      * The array of class aliases.
      *
      * @var array
@@ -63,6 +70,17 @@ class AliasLoader
     }
 
     /**
+     * Appends an alias loader to the loaders property.
+     *
+     * @param  object  $loader
+     * @return void
+     */
+    public function addLoader($loader)
+    {
+        $this->loaders[] = $loader;
+    }
+
+    /**
      * Load a class alias if it is registered.
      *
      * @param  string  $alias
@@ -70,6 +88,12 @@ class AliasLoader
      */
     public function load($alias)
     {
+        foreach ($this->loaders as $loader) {
+            if ($loader->canLoad($alias)) {
+                return $loader->load($alias);
+            }
+        }
+
         if (static::$facadeNamespace && strpos($alias, static::$facadeNamespace) === 0) {
             $this->loadFacade($alias);
 
