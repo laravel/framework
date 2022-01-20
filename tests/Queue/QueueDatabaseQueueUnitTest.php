@@ -17,6 +17,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoDatabase()
@@ -42,8 +43,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->push('foo', ['data']);
 
         $container->shouldHaveReceived('bound')->with('events')->once();
-
-        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoDatabase()
@@ -73,8 +72,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->later(10, 'foo', ['data']);
 
         $container->shouldHaveReceived('bound')->with('events')->once();
-
-        Str::createUuidsNormally();
     }
 
     public function testFailureToCreatePayloadFromObject()
@@ -142,8 +139,6 @@ class QueueDatabaseQueueUnitTest extends TestCase
         });
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
-
-        Str::createUuidsNormally();
     }
 
     public function testBuildDatabaseRecordWithPayloadAtTheEnd()

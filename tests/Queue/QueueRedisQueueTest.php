@@ -17,6 +17,7 @@ class QueueRedisQueueTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedis()
@@ -36,8 +37,6 @@ class QueueRedisQueueTest extends TestCase
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->once();
-
-        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
@@ -63,8 +62,6 @@ class QueueRedisQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->once();
 
         Queue::createPayloadUsing(null);
-
-        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoRedisWithTwoCustomPayloadHook()
@@ -94,8 +91,6 @@ class QueueRedisQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->once();
 
         Queue::createPayloadUsing(null);
-
-        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoRedis()
@@ -121,8 +116,6 @@ class QueueRedisQueueTest extends TestCase
         $id = $queue->later(1, 'foo', ['data']);
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->once();
-
-        Str::createUuidsNormally();
     }
 
     public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
@@ -148,7 +141,5 @@ class QueueRedisQueueTest extends TestCase
 
         $queue->later($date, 'foo', ['data']);
         $container->shouldHaveReceived('bound')->with('events')->once();
-
-        Str::createUuidsNormally();
     }
 }

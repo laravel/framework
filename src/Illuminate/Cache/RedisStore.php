@@ -59,9 +59,11 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        $value = $this->connection()->get($this->prefix.$key);
+        $connection = $this->connection();
 
-        return ! is_null($value) ? $this->unserialize($value) : null;
+        $value = $connection->get($this->prefix.$key);
+
+        return $value === null ? null : $this->connectionAwareUnserialize($value, $connection);
     }
 
     /**
@@ -76,12 +78,14 @@ class RedisStore extends TaggableStore implements LockProvider
     {
         $results = [];
 
-        $values = $this->connection()->mget(array_map(function ($key) {
+        $connection = $this->connection();
+
+        $values = $connection->mget(array_map(function ($key) {
             return $this->prefix.$key;
         }, $keys));
 
         foreach ($values as $index => $value) {
-            $results[$keys[$index]] = ! is_null($value) ? $this->unserialize($value) : null;
+            $results[$keys[$index]] = $value === null ? null : $this->connectionAwareUnserialize($value, $connection);
         }
 
         return $results;
@@ -97,8 +101,10 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
-        return (bool) $this->connection()->setex(
-            $this->prefix.$key, (int) max(1, $seconds), $this->serialize($value)
+        $connection = $this->connection();
+
+        return (bool) $connection->setex(
+            $this->prefix.$key, (int) max(1, $seconds), $this->connectionAwareSerialize($value, $connection)
         );
     }
 
@@ -136,10 +142,10 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function add($key, $value, $seconds)
     {
-        $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
+        $connection = $this->connection();
 
-        return (bool) $this->connection()->eval(
-            $lua, 1, $this->prefix.$key, $this->serialize($value), (int) max(1, $seconds)
+        return (bool) $connection->eval(
+            LuaScripts::add(), 1, $this->prefix.$key, $this->pack($value, $connection), (int) max(1, $seconds)
         );
     }
 
@@ -176,7 +182,9 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function forever($key, $value)
     {
-        return (bool) $this->connection()->set($this->prefix.$key, $this->serialize($value));
+        $connection = $this->connection();
+
+        return (bool) $connection->set($this->prefix.$key, $this->connectionAwareSerialize($value, $connection));
     }
 
     /**
@@ -343,5 +351,59 @@ class RedisStore extends TaggableStore implements LockProvider
     protected function unserialize($value)
     {
         return is_numeric($value) ? $value : unserialize($value);
+    }
+
+    /**
+     * Prepares a value to be used with the redis cache store when used with eval scripts.
+     *
+     * @param  mixed  $value
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @return mixed
+     */
+    protected function pack($value, $connection)
+    {
+        if ($connection instanceof PhpRedisConnection) {
+            if ($connection->serialized()) {
+                return $connection->pack([$value])[0];
+            }
+
+            if ($connection->compressed()) {
+                return $connection->pack([$this->serialize($value)])[0];
+            }
+        }
+
+        return $this->serialize($value);
+    }
+
+    /**
+     * Does connection specific considerations when a value needs to be serialized.
+     *
+     * @param  mixed  $value
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @return mixed
+     */
+    protected function connectionAwareSerialize($value, $connection)
+    {
+        if ($connection instanceof PhpRedisConnection && $connection->serialized()) {
+            return $value;
+        }
+
+        return $this->serialize($value);
+    }
+
+    /**
+     * Does connection specific considerations when a value needs to be unserialized.
+     *
+     * @param  mixed  $value
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @return mixed
+     */
+    protected function connectionAwareUnserialize($value, $connection)
+    {
+        if ($connection instanceof PhpRedisConnection && $connection->serialized()) {
+            return $value;
+        }
+
+        return $this->unserialize($value);
     }
 }

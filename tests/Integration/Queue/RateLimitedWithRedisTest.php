@@ -13,31 +13,28 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimitedWithRedis;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setUpRedis();
-    }
-
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
+        Mockery::close();
 
-        m::close();
+        parent::tearDown();
     }
 
-    public function testUnlimitedJobsAreExecuted()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testUnlimitedJobsAreExecuted($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $rateLimiter = $this->app->make(RateLimiter::class);
 
         $testJob = new RedisRateLimitedTestJob;
@@ -50,8 +47,13 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobRanSuccessfully($testJob);
     }
 
-    public function testRateLimitedJobsAreNotExecutedOnLimitReached()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testRateLimitedJobsAreNotExecutedOnLimitReached($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $rateLimiter = $this->app->make(RateLimiter::class);
 
         $testJob = new RedisRateLimitedTestJob;
@@ -64,8 +66,13 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasReleased($testJob);
     }
 
-    public function testRateLimitedJobsCanBeSkippedOnLimitReached()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testRateLimitedJobsCanBeSkippedOnLimitReached($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $rateLimiter = $this->app->make(RateLimiter::class);
 
         $testJob = new RedisRateLimitedDontReleaseTestJob;
@@ -78,8 +85,13 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasSkipped($testJob);
     }
 
-    public function testJobsCanHaveConditionalRateLimits()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testJobsCanHaveConditionalRateLimits($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $rateLimiter = $this->app->make(RateLimiter::class);
 
         $adminJob = new RedisAdminTestJob;
@@ -109,8 +121,13 @@ class RateLimitedWithRedisTest extends TestCase
         $this->assertJobWasReleased($nonAdminJob);
     }
 
-    public function testMiddlewareSerialization()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testMiddlewareSerialization($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $rateLimited = new RateLimitedWithRedis('limiterName');
         $rateLimited->shouldRelease = false;
 
@@ -131,7 +148,7 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
@@ -150,7 +167,7 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('release')->once();
@@ -169,7 +186,7 @@ class RateLimitedWithRedisTest extends TestCase
         $testJob::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -12,76 +13,88 @@ class RedisCacheLockTest extends TestCase
 {
     use InteractsWithRedis;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setUpRedis();
-    }
-
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
+        Carbon::setTestNow(false);
+
+        parent::tearDown();
     }
 
-    public function testRedisLocksCanBeAcquiredAndReleased()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testRedisLocksCanBeAcquiredAndReleased($connection)
     {
-        Cache::store('redis')->lock('foo')->forceRelease();
+        $repository = $this->getRepository($connection);
+        $repository->lock('foo')->forceRelease();
 
-        $lock = Cache::store('redis')->lock('foo', 10);
+        $lock = $repository->lock('foo', 10);
         $this->assertTrue($lock->get());
-        $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
+        $this->assertFalse($repository->lock('foo', 10)->get());
         $lock->release();
 
-        $lock = Cache::store('redis')->lock('foo', 10);
+        $lock = $repository->lock('foo', 10);
         $this->assertTrue($lock->get());
-        $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
-        Cache::store('redis')->lock('foo')->release();
+        $this->assertFalse($repository->lock('foo', 10)->get());
+        $repository->lock('foo')->release();
     }
 
     public function testRedisLockCanHaveASeparateConnection()
     {
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
+        $this->app['redis'] = $this->getRedisManager('phpredis');
+
         $this->assertSame('default', Cache::store('redis')->lock('foo')->getConnectionName());
     }
 
-    public function testRedisLocksCanBlockForSeconds()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testRedisLocksCanBlockForSeconds($connection)
     {
+        $repository = $this->getRepository($connection);
         Carbon::setTestNow();
 
-        Cache::store('redis')->lock('foo')->forceRelease();
-        $this->assertSame('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
+        $repository->lock('foo')->forceRelease();
+        $this->assertSame('taylor', $repository->lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
 
-        Cache::store('redis')->lock('foo')->forceRelease();
-        $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block(1));
+        $repository->lock('foo')->forceRelease();
+        $this->assertTrue($repository->lock('foo', 10)->block(1));
     }
 
-    public function testConcurrentRedisLocksAreReleasedSafely()
+    /**
+     * @dataProvider redisConnectionDataProvider
+     */
+    public function testConcurrentRedisLocksAreReleasedSafely($connection)
     {
-        Cache::store('redis')->lock('foo')->forceRelease();
+        $repository = $this->getRepository($connection);
+        $repository->lock('foo')->forceRelease();
 
-        $firstLock = Cache::store('redis')->lock('foo', 1);
+        $firstLock = $repository->lock('foo', 1);
         $this->assertTrue($firstLock->get());
-        sleep(2);
+        usleep(1100000);
 
-        $secondLock = Cache::store('redis')->lock('foo', 10);
+        $secondLock = $repository->lock('foo', 10);
         $this->assertTrue($secondLock->get());
 
         $firstLock->release();
 
-        $this->assertFalse(Cache::store('redis')->lock('foo')->get());
+        $this->assertFalse($repository->lock('foo')->get());
     }
 
-    public function testRedisLocksWithFailedBlockCallbackAreReleased()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testRedisLocksWithFailedBlockCallbackAreReleased($connection)
     {
-        Cache::store('redis')->lock('foo')->forceRelease();
+        $repository = $this->getRepository($connection);
+        $repository->lock('foo')->forceRelease();
 
-        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $firstLock = $repository->lock('foo', 10);
 
         try {
             $firstLock->block(1, function () {
@@ -93,22 +106,40 @@ class RedisCacheLockTest extends TestCase
             // thrown by the callback was handled.
         }
 
-        $secondLock = Cache::store('redis')->lock('foo', 1);
+        $secondLock = $repository->lock('foo', 1);
 
         $this->assertTrue($secondLock->get());
     }
 
-    public function testRedisLocksCanBeReleasedUsingOwnerToken()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testRedisLocksCanBeReleasedUsingOwnerToken($connection)
     {
-        Cache::store('redis')->lock('foo')->forceRelease();
+        $repository = $this->getRepository($connection);
+        $repository->lock('foo')->forceRelease();
 
-        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $firstLock = $repository->lock('foo', 10);
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->owner();
 
-        $secondLock = Cache::store('redis')->restoreLock('foo', $owner);
+        $secondLock = $repository->restoreLock('foo', $owner);
         $secondLock->release();
 
-        $this->assertTrue(Cache::store('redis')->lock('foo')->get());
+        $this->assertTrue($repository->lock('foo')->get());
+    }
+
+    /**
+     * Builds a cache repository out of a predefined redis connection name.
+     *
+     * @param  string  $connection
+     * @return \Illuminate\Cache\Repository
+     */
+    private function getRepository($connection)
+    {
+        /** @var \Illuminate\Cache\CacheManager $cacheManager */
+        $cacheManager = $this->app->get('cache');
+
+        return $cacheManager->repository(new RedisStore($this->getRedisManager($connection)));
     }
 }

@@ -83,6 +83,38 @@ trait PacksPhpRedisValues
     }
 
     /**
+     * Determine whether serialization and/or compression is enabled.
+     *
+     * @return bool
+     */
+    public function packed(): bool
+    {
+        return $this->serialized() || $this->compressed();
+    }
+
+    /**
+     * Determine if serialization is enabled.
+     *
+     * @return bool
+     */
+    public function serialized(): bool
+    {
+        return defined('Redis::OPT_SERIALIZER') &&
+               $this->client->getOption(Redis::OPT_SERIALIZER) !== Redis::SERIALIZER_NONE;
+    }
+
+    /**
+     * Determine if JSON serialization is enabled.
+     *
+     * @return bool
+     */
+    public function jsonSerialized(): bool
+    {
+        return defined('Redis::SERIALIZER_JSON') &&
+               $this->client->getOption(Redis::OPT_SERIALIZER) === Redis::SERIALIZER_JSON;
+    }
+
+    /**
      * Determine if compression is enabled.
      *
      * @return bool

@@ -17,6 +17,7 @@ class DynamoDbFailedJobProviderTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Str::createUuidsNormally();
     }
 
     public function testCanProperlyLogFailedJob()
@@ -50,8 +51,6 @@ class DynamoDbFailedJobProviderTest extends TestCase
         $provider = new DynamoDbFailedJobProvider($dynamoDbClient, 'application', 'table');
 
         $provider->log('connection', 'queue', json_encode(['uuid' => (string) $uuid]), $exception);
-
-        Str::createUuidsNormally();
     }
 
     public function testCanRetrieveAllFailedJobs()

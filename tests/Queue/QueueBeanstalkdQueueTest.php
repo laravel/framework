@@ -26,6 +26,7 @@ class QueueBeanstalkdQueueTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobOntoBeanstalkd()
@@ -46,8 +47,6 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->queue->push('foo', ['data']);
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(2);
-
-        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
@@ -68,8 +67,6 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->queue->later(5, 'foo', ['data']);
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(2);
-
-        Str::createUuidsNormally();
     }
 
     public function testPopProperlyPopsJobOffOfBeanstalkd()
