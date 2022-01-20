@@ -13,7 +13,7 @@ class {{ class }} extends Filter
      *
      * @var string
      */
-    public $filterParameter = '';
+    public $filterParameter = '{{ filter_parameter }}';
 
     /**
      * Apply filter query.

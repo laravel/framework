@@ -4,6 +4,7 @@ namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 
 class FilterMakeCommand extends GeneratorCommand
 {
@@ -71,5 +72,13 @@ class FilterMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Http\Filter';
+    }
+
+    protected function buildClass($name)
+    {
+        $stub = $this->files->get($this->getStub());
+        $filter = Str::snake($name);
+        $stub = str_replace(['{{ filter_parameter }}', '{{filter_parameter}}'], $filter, $stub);
+        return parent::buildClass($name);
     }
 }
