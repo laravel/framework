@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 class ConvertToApiCommand extends Command
 {
@@ -50,29 +49,5 @@ class ConvertToApiCommand extends Command
         $files->copy(__DIR__.'/stubs/convert-to-api/Kernel.stub', app_path('Http/Kernel.php'));
         $files->copy(__DIR__.'/stubs/convert-to-api/RouteServiceProvider.stub', app_path('Providers/RouteServiceProvider.php'));
         $files->copy(__DIR__.'/stubs/convert-to-api/api.stub', base_path('routes/api.php'));
-
-        // Remove Composer packages...
-        $this->removeComposerPackages(['spatie/laravel-ignition'], $dev = true);
-    }
-
-    /**
-     * Remove the given Composer Packages from the application.
-     *
-     * @param  array  $packages
-     * @param  bool  $dev
-     * @return void
-     */
-    protected function removeComposerPackages(array $packages, bool $dev = false)
-    {
-        $command = array_merge(
-            array_values(array_filter(['composer', 'remove', $dev ? '--dev' : ''])),
-            $packages
-        );
-
-        (new Process($command, base_path(), ['COMPOSER_MEMORY_LIMIT' => '-1']))
-            ->setTimeout(null)
-            ->run(function ($type, $output) {
-                $this->output->write($output);
-            });
     }
 }
