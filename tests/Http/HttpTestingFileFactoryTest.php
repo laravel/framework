@@ -7,11 +7,17 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension gd
+ *
+ * @link https://www.php.net/manual/en/function.gd-info.php
  */
 class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
     {
+        if (! $this->isGDSupported('PNG Support')) {
+            $this->markTestSkipped('Requires PNG support.');
+        }
+
         $image = (new FileFactory)->image('test.png', 15, 20);
 
         $info = getimagesize($image->getRealPath());
@@ -23,6 +29,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
+        if (! $this->isGDSupported('JPEG Support')) {
+            $this->markTestSkipped('Requires JPEG support.');
+        }
+
         $jpeg = (new FileFactory)->image('test.jpeg', 15, 20);
         $jpg = (new FileFactory)->image('test.jpg');
 
@@ -39,6 +49,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
+        if (! $this->isGDSupported('GIF Create Support')) {
+            $this->markTestSkipped('Requires GIF Create support.');
+        }
+
         $image = (new FileFactory)->image('test.gif');
 
         $this->assertSame(
@@ -49,6 +63,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
+        if (! $this->isGDSupported('WebP Support')) {
+            $this->markTestSkipped('Requires Webp support.');
+        }
+
         $image = (new FileFactory)->image('test.webp');
 
         $this->assertSame(
@@ -59,6 +77,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
+        if (! $this->isGDSupported('WBMP Support')) {
+            $this->markTestSkipped('Requires WBMP support.');
+        }
+
         $image = (new FileFactory)->image('test.wbmp');
 
         $this->assertSame(
@@ -92,5 +114,20 @@ class HttpTestingFileFactoryTest extends TestCase
             'video/webm',
             (new FileFactory)->create('someaudio.webm')->getMimeType()
         );
+    }
+
+    /**
+     * @param  string  $driver
+     * @return bool
+     */
+    private function isGDSupported(string $driver = 'GD Version'): bool
+    {
+        $gdInfo = gd_info();
+
+        if (isset($gdInfo[$driver])) {
+            return $gdInfo[$driver];
+        }
+
+        return false;
     }
 }
