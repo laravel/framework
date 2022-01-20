@@ -87,7 +87,7 @@ class Rule
      * @param  callable  $callback
      * @return \Illuminate\Validation\NestedRules
      */
-    public static function forEach($callback)
+    public static function nested($callback)
     {
         return new NestedRules($callback);
     }
