@@ -325,6 +325,55 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
+    public function testItEnsuresDroppingMultipleColumnsIsAvailable()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email');
+        });
+
+        $this->db->connection()->commit();
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+            $table->dropColumn('email');
+        });
+    }
+
+    public function testItEnsuresRenamingMultipleColumnsIsAvailable()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email');
+        });
+
+        $this->db->connection()->commit();
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->renameColumn('name', 'first_name');
+            $table->renameColumn('email', 'last_name');
+        });
+    }
+
+    public function testItEnsuresRenamingAndDroppingMultipleColumnsIsAvailable()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email');
+        });
+
+        $this->db->connection()->commit();
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+            $table->renameColumn('email', 'first_name');
+        });
+    }
+
+
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
         $this->expectException(BadMethodCallException::class);
