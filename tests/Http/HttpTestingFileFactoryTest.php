@@ -7,11 +7,23 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension gd
+ * @link https://www.php.net/manual/en/function.gd-info.php
  */
 class HttpTestingFileFactoryTest extends TestCase
 {
+    private const GD_VERSION = 'GD Version';
+    private const GD_PNG_SUPPORT = 'PNG Support';
+    private const GD_JPEG_SUPPORT = 'JPEG Support';
+    private const GD_GIF_CREATE_SUPPORT = 'GIF Create Support';
+    private const GD_WEBP_SUPPORT = 'WebP Support';
+    private const GD_WBMP_SUPPORT = 'WBMP Support';
+
     public function testImagePng()
     {
+        if (!$this->isGDSupported(self::GD_PNG_SUPPORT)) {
+            $this->markTestSkipped('Requires PNG support.');
+        }
+
         $image = (new FileFactory)->image('test.png', 15, 20);
 
         $info = getimagesize($image->getRealPath());
@@ -23,6 +35,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
+        if (!$this->isGDSupported(self::GD_JPEG_SUPPORT)) {
+            $this->markTestSkipped('Requires JPEG support.');
+        }
+
         $jpeg = (new FileFactory)->image('test.jpeg', 15, 20);
         $jpg = (new FileFactory)->image('test.jpg');
 
@@ -39,6 +55,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
+        if (!$this->isGDSupported(self::GD_GIF_CREATE_SUPPORT)) {
+            $this->markTestSkipped('Requires GIF Create support.');
+        }
+
         $image = (new FileFactory)->image('test.gif');
 
         $this->assertSame(
@@ -49,6 +69,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
+        if (!$this->isGDSupported(self::GD_WEBP_SUPPORT)) {
+            $this->markTestSkipped('Requires Webp support.');
+        }
+
         $image = (new FileFactory)->image('test.webp');
 
         $this->assertSame(
@@ -59,6 +83,10 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
+        if (!$this->isGDSupported(self::GD_WBMP_SUPPORT)) {
+            $this->markTestSkipped('Requires WBMP support.');
+        }
+
         $image = (new FileFactory)->image('test.wbmp');
 
         $this->assertSame(
@@ -92,5 +120,20 @@ class HttpTestingFileFactoryTest extends TestCase
             'video/webm',
             (new FileFactory)->create('someaudio.webm')->getMimeType()
         );
+    }
+
+    /**
+     * @param string $driver
+     * @return bool
+     */
+    private function isGDSupported(string $driver = self::GD_VERSION): bool
+    {
+        $gdInfo = gd_info();
+
+        if (isset($gdInfo[$driver])) {
+            return $gdInfo[$driver];
+        }
+
+        return false;
     }
 }
