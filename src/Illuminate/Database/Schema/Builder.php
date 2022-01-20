@@ -215,7 +215,7 @@ class Builder
     public function table($table, Closure $callback)
     {
         $blueprint = $this->createBlueprint($table, $callback);
-        if($blueprint->hasRenamedOrDroppedColumn()) {
+        if($this->connection->getDriverName() === 'sqlite' && $blueprint->hasRenamedOrDroppedColumn()) {
             foreach($blueprint->getCommands() as $command) {
                 $seperateBlueprint = new Blueprint($table);
                 if(method_exists($seperateBlueprint, $command->name)) {
@@ -234,7 +234,7 @@ class Builder
             }
             $this->build($blueprint);
         }else {
-            $this->build($this->createBlueprint($table, $callback));
+            $this->build($blueprint);
         }
     }
 
