@@ -196,6 +196,7 @@ class AuthorizesResourcesMiddleware
     public function handle($request, Closure $next, $method, $parameter, ...$models)
     {
         $params = array_merge([$parameter], $models);
-        return "caught can:{$method}," . implode(',', $params);
+
+        return "caught can:{$method},".implode(',', $params);
     }
 }
