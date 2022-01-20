@@ -70,8 +70,12 @@ class ConvertToCliCommand extends Command
         $files->delete(base_path('webpack.mix.js'));
 
         // Install stubs...
+        $files->makeDirectory(app_path('Console/Commands'));
+
         $files->copy(__DIR__.'/stubs/convert-to-cli/EventServiceProvider.stub', app_path('Providers/EventServiceProvider.php'));
         $files->copy(__DIR__.'/stubs/convert-to-cli/ExampleTest.stub', base_path('tests/Feature/ExampleTest.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/Handler.stub', app_path('Exceptions/Handler.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/InspireCommand.stub', app_path('Console/Commands/InspireCommand.php'));
         $files->copy(__DIR__.'/stubs/convert-to-cli/Kernel.stub', app_path('Console/Kernel.php'));
         $files->copy(__DIR__.'/stubs/convert-to-cli/app.stub', config_path('app.php'));
 
@@ -80,6 +84,10 @@ class ConvertToCliCommand extends Command
             'laravel/sanctum',
             'fruitcake/laravel-cors'
         ]);
+
+        $this->removeComposerPackages([
+            'laravel/sail',
+        ], $dev = true);
     }
 
     /**
