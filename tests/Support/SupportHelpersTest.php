@@ -6,7 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
-use Illuminate\Support\InfiniteHigherOrderTapProxy;
+use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
 use IteratorAggregate;
 use LogicException;
@@ -377,7 +377,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
-    public function testMultitap()
+    public function testTapAllowsContinuousChaining()
     {
         $mock = m::mock('Double', [
             'foo' => 'bar',
@@ -385,14 +385,16 @@ class SupportHelpersTest extends TestCase
         ]);
 
         $this->assertInstanceOf(
-            InfiniteHigherOrderTapProxy::class,
-            multitap($mock)->foo()
+            HigherOrderTapProxy::class,
+            tap($mock)->chain()->foo()
         );
+
         $this->assertEquals(
             'baz',
-            multitap($mock)
+            tap($mock)
+                ->chain()
                 ->foo()
-                ->finally()
+                ->break()
                 ->bar()
         );
     }
