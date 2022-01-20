@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\InfiniteHigherOrderTapProxy;
 use Illuminate\Support\Optional;
 
 if (! function_exists('append_config')) {
@@ -143,6 +144,19 @@ if (! function_exists('filled')) {
     function filled($value)
     {
         return ! blank($value);
+    }
+}
+
+if (! function_exists('multitap')) {
+    /**
+     * Continuously chain methods to be called on the given value
+     *
+     * @param  mixed  $value
+     * @return Illuminate\Support\InfiniteHigherOrderTapProxy
+     */
+    function multitap($value)
+    {
+        return new InfiniteHigherOrderTapProxy($value);
     }
 }
 
