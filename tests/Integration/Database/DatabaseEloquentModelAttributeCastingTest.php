@@ -386,7 +386,7 @@ class TestEloquentModelWithAttributeCast extends Model
             function () {
                 return new AttributeCastAddress(Str::random(10), Str::random(10));
             }
-        ))->disableObjectCaching();
+        ))->withoutObjectCaching();
     }
 
     public function virtualDateTimeWithoutCachingFluent(): Attribute
@@ -395,21 +395,21 @@ class TestEloquentModelWithAttributeCast extends Model
             function () {
                 return Date::now()->addSeconds(mt_rand(0, 10000));
             }
-        ))->disableObjectCaching();
+        ))->withoutObjectCaching();
     }
 
     public function virtualObjectWithoutCaching(): Attribute
     {
-        return Attribute::getWithoutCaching(function () {
+        return Attribute::get(function () {
             return new AttributeCastAddress(Str::random(10), Str::random(10));
-        });
+        })->withoutObjectCaching();
     }
 
     public function virtualDateTimeWithoutCaching(): Attribute
     {
-        return Attribute::getWithoutCaching(function () {
+        return Attribute::get(function () {
             return Date::now()->addSeconds(mt_rand(0, 10000));
-        });
+        })->withoutObjectCaching();
     }
 }
 

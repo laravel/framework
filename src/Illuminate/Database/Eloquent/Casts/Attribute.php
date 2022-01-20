@@ -19,11 +19,11 @@ class Attribute
     public $set;
 
     /**
-     * Whether caching of objects should be disabled for this attribute.
+     * Indicates if caching of objects should be disabled for this attribute.
      *
      * @var bool
      */
-    public $disableObjectCaching = false;
+    public $withoutObjectCaching = false;
 
     /**
      * Create a new attribute accessor / mutator.
@@ -39,16 +39,6 @@ class Attribute
     }
 
     /**
-     * @return static
-     */
-    public function disableObjectCaching()
-    {
-        $this->disableObjectCaching = true;
-
-        return $this;
-    }
-
-    /**
      * Create a new attribute accessor.
      *
      * @param  callable  $get
@@ -60,17 +50,6 @@ class Attribute
     }
 
     /**
-     * Create a new attribute accessor with object caching disabled.
-     *
-     * @param  callable  $get
-     * @return static
-     */
-    public static function getWithoutCaching(callable $get)
-    {
-        return (new static($get))->disableObjectCaching();
-    }
-
-    /**
      * Create a new attribute mutator.
      *
      * @param  callable  $set
@@ -79,5 +58,17 @@ class Attribute
     public static function set(callable $set)
     {
         return new static(null, $set);
+    }
+
+    /**
+     * Disable object caching for the attribute.
+     *
+     * @return static
+     */
+    public function withoutObjectCaching()
+    {
+        $this->withoutObjectCaching = true;
+
+        return $this;
     }
 }
