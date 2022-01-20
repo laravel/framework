@@ -125,7 +125,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresSearchPathCommaSeparatedValueSupported()
     {
-        $dsn = 'pgsql:host=foo;dbname=bar';
+        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => 'public, "user"', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('stdClass');
@@ -141,7 +141,7 @@ class DatabaseConnectorTest extends TestCase
 
     public function testPostgresSearchPathVariablesSupported()
     {
-        $dsn = 'pgsql:host=foo;dbname=bar';
+        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
         $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => '"$user", public, user', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('stdClass');
