@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @requires extension gd
+ *
  * @link https://www.php.net/manual/en/function.gd-info.php
  */
 class HttpTestingFileFactoryTest extends TestCase
@@ -20,7 +21,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImagePng()
     {
-        if (!$this->isGDSupported(self::GD_PNG_SUPPORT)) {
+        if (! $this->isGDSupported(self::GD_PNG_SUPPORT)) {
             $this->markTestSkipped('Requires PNG support.');
         }
 
@@ -35,7 +36,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
-        if (!$this->isGDSupported(self::GD_JPEG_SUPPORT)) {
+        if (! $this->isGDSupported(self::GD_JPEG_SUPPORT)) {
             $this->markTestSkipped('Requires JPEG support.');
         }
 
@@ -55,7 +56,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
-        if (!$this->isGDSupported(self::GD_GIF_CREATE_SUPPORT)) {
+        if (! $this->isGDSupported(self::GD_GIF_CREATE_SUPPORT)) {
             $this->markTestSkipped('Requires GIF Create support.');
         }
 
@@ -69,7 +70,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
-        if (!$this->isGDSupported(self::GD_WEBP_SUPPORT)) {
+        if (! $this->isGDSupported(self::GD_WEBP_SUPPORT)) {
             $this->markTestSkipped('Requires Webp support.');
         }
 
@@ -83,7 +84,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
-        if (!$this->isGDSupported(self::GD_WBMP_SUPPORT)) {
+        if (! $this->isGDSupported(self::GD_WBMP_SUPPORT)) {
             $this->markTestSkipped('Requires WBMP support.');
         }
 
@@ -123,7 +124,7 @@ class HttpTestingFileFactoryTest extends TestCase
     }
 
     /**
-     * @param string $driver
+     * @param  string  $driver
      * @return bool
      */
     private function isGDSupported(string $driver = self::GD_VERSION): bool
