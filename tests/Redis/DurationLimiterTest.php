@@ -12,13 +12,6 @@ class DurationLimiterTest extends TestCase
 {
     use InteractsWithRedis;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setUpRedis();
-    }
-
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -26,20 +19,23 @@ class DurationLimiterTest extends TestCase
         $this->tearDownRedis();
     }
 
-    public function testItLocksTasksWhenNoSlotAvailable()
+    /**
+     * @dataProvider redisConnectionDataProvider
+     */
+    public function testItLocksTasksWhenNoSlotAvailable($connection)
     {
         $store = [];
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+        (new DurationLimiter($this->redis($connection), 'key', 2, 2))->block(0, function () use (&$store) {
             $store[] = 1;
         });
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+        (new DurationLimiter($this->redis($connection), 'key', 2, 2))->block(0, function () use (&$store) {
             $store[] = 2;
         });
 
         try {
-            (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+            (new DurationLimiter($this->redis($connection), 'key', 2, 2))->block(0, function () use (&$store) {
                 $store[] = 3;
             });
         } catch (Throwable $e) {
@@ -50,39 +46,45 @@ class DurationLimiterTest extends TestCase
 
         sleep(2);
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
+        (new DurationLimiter($this->redis($connection), 'key', 2, 2))->block(0, function () use (&$store) {
             $store[] = 3;
         });
 
         $this->assertEquals([1, 2, 3], $store);
     }
 
-    public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout()
+    /**
+     * @dataProvider redisConnectionDataProvider
+     */
+    public function testItFailsImmediatelyOrRetriesForAWhileBasedOnAGivenTimeout($connection)
     {
         $store = [];
 
-        (new DurationLimiter($this->redis(), 'key', 1, 1))->block(2, function () use (&$store) {
+        (new DurationLimiter($this->redis($connection), 'key', 1, 1))->block(2, function () use (&$store) {
             $store[] = 1;
         });
 
         try {
-            (new DurationLimiter($this->redis(), 'key', 1, 1))->block(0, function () use (&$store) {
+            (new DurationLimiter($this->redis($connection), 'key', 1, 1))->block(0, function () use (&$store) {
                 $store[] = 2;
             });
         } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
-        (new DurationLimiter($this->redis(), 'key', 1, 1))->block(2, function () use (&$store) {
+        (new DurationLimiter($this->redis($connection), 'key', 1, 1))->block(2, function () use (&$store) {
             $store[] = 3;
         });
 
         $this->assertEquals([1, 3], $store);
     }
 
-    public function testItReturnsTheCallbackResult()
+    /**
+     * @dataProvider redisConnectionDataProvider
+     */
+    public function testItReturnsTheCallbackResult($connection)
     {
-        $limiter = new DurationLimiter($this->redis(), 'key', 1, 1);
+        $limiter = new DurationLimiter($this->redis($connection), 'key', 1, 1);
 
         $result = $limiter->block(1, function () {
             return 'foo';
@@ -91,8 +93,8 @@ class DurationLimiterTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    private function redis()
+    private function redis($connection)
     {
-        return $this->redis['phpredis']->connection();
+        return $this->getRedisManager($connection)->connection();
     }
 }
