@@ -76,9 +76,8 @@ class FilterMakeCommand extends GeneratorCommand
 
     protected function buildClass($name)
     {
-        $stub = $this->files->get($this->getStub());
-        $filter = Str::snake($name);
-        $stub = str_replace(['{{ filter_parameter }}', '{{filter_parameter}}'], $filter, $stub);
+        $class = str_replace($this->getNamespace($name).'\\', '', $name);
+        $filter = Str::snake($class);
         return str_replace('{{ filter_parameter }}', $filter, parent::buildClass($name)
         );
     }
