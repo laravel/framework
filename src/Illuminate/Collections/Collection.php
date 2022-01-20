@@ -1297,7 +1297,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using the given callback.
      *
-     * @param  (callable(TValue, TKey): mixed)|string  $callback
+     * @param  (callable(TValue, TKey): mixed)|string|string[]  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static

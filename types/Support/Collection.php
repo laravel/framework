@@ -657,6 +657,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy(funct
     return 1;
 }));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy('string'));
+assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy(['string']));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy('string', 1, false));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc(function ($user, $int) {
