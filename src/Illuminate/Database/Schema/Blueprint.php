@@ -1662,8 +1662,8 @@ class Blueprint
      */
     public function removeCommand($name)
     {
-        foreach($this->commands as $index => $command) {
-            if($command->name === $name) {
+        foreach ($this->commands as $index => $command) {
+            if ($command->name === $name) {
                 unset($this->commands[$index]);
             }
         }

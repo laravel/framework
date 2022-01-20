@@ -210,10 +210,10 @@ class Builder
     public function table($table, Closure $callback)
     {
         $blueprint = $this->createBlueprint($table, $callback);
-        if($this->connection->getDriverName() === 'sqlite' && $blueprint->hasRenamedOrDroppedColumn()) {
-            foreach($blueprint->getCommands() as $command) {
+        if ($this->connection->getDriverName() === 'sqlite' && $blueprint->hasRenamedOrDroppedColumn()) {
+            foreach ($blueprint->getCommands() as $command) {
                 $seperateBlueprint = new Blueprint($table);
-                if(method_exists($seperateBlueprint, $command->name)) {
+                if (method_exists($seperateBlueprint, $command->name)) {
                     $method = (new ReflectionClass($seperateBlueprint))->getMethod($command->name);
                     $methodName = $method->name;
                     $params = collect($method->getParameters())->mapWithKeys(
@@ -228,7 +228,7 @@ class Builder
                 }
             }
             $this->build($blueprint);
-        }else {
+        } else {
             $this->build($blueprint);
         }
     }

@@ -130,7 +130,8 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
     }
 
-    public function testAddAndRenameColumns() {
+    public function testAddAndRenameColumns()
+    {
         $this->schemaBuilder()
             ->create('users', function (Blueprint $table) {
                 $table->id();
@@ -146,7 +147,8 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'last_name'));
     }
 
-    public function testAddAndDropColumns() {
+    public function testAddAndDropColumns()
+    {
         $this->schemaBuilder()
             ->create('users', function (Blueprint $table) {
                 $table->id();
@@ -163,7 +165,8 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'email'));
     }
 
-    public function testMultipleDropColumns() {
+    public function testMultipleDropColumns()
+    {
         $this->schemaBuilder()
             ->create('users', function (Blueprint $table) {
                 $table->id();
@@ -180,7 +183,8 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'last_name'));
     }
 
-    public function testMultipleRenameColumns() {
+    public function testMultipleRenameColumns()
+    {
         $this->schemaBuilder()
             ->create('users', function (Blueprint $table) {
                 $table->id();
