@@ -12,16 +12,9 @@ use PHPUnit\Framework\TestCase;
  */
 class HttpTestingFileFactoryTest extends TestCase
 {
-    private const GD_VERSION = 'GD Version';
-    private const GD_PNG_SUPPORT = 'PNG Support';
-    private const GD_JPEG_SUPPORT = 'JPEG Support';
-    private const GD_GIF_CREATE_SUPPORT = 'GIF Create Support';
-    private const GD_WEBP_SUPPORT = 'WebP Support';
-    private const GD_WBMP_SUPPORT = 'WBMP Support';
-
     public function testImagePng()
     {
-        if (! $this->isGDSupported(self::GD_PNG_SUPPORT)) {
+        if (! $this->isGDSupported('PNG Support')) {
             $this->markTestSkipped('Requires PNG support.');
         }
 
@@ -36,7 +29,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
-        if (! $this->isGDSupported(self::GD_JPEG_SUPPORT)) {
+        if (! $this->isGDSupported('JPEG Support')) {
             $this->markTestSkipped('Requires JPEG support.');
         }
 
@@ -56,7 +49,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageGif()
     {
-        if (! $this->isGDSupported(self::GD_GIF_CREATE_SUPPORT)) {
+        if (! $this->isGDSupported('GIF Create Support')) {
             $this->markTestSkipped('Requires GIF Create support.');
         }
 
@@ -70,7 +63,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWebp()
     {
-        if (! $this->isGDSupported(self::GD_WEBP_SUPPORT)) {
+        if (! $this->isGDSupported('WebP Support')) {
             $this->markTestSkipped('Requires Webp support.');
         }
 
@@ -84,7 +77,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageWbmp()
     {
-        if (! $this->isGDSupported(self::GD_WBMP_SUPPORT)) {
+        if (! $this->isGDSupported('WBMP Support')) {
             $this->markTestSkipped('Requires WBMP support.');
         }
 
@@ -127,7 +120,7 @@ class HttpTestingFileFactoryTest extends TestCase
      * @param  string  $driver
      * @return bool
      */
-    private function isGDSupported(string $driver = self::GD_VERSION): bool
+    private function isGDSupported(string $driver = 'GD Version'): bool
     {
         $gdInfo = gd_info();
 
