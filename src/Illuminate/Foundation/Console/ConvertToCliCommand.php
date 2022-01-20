@@ -46,8 +46,10 @@ class ConvertToCliCommand extends Command
         $files->delete(config_path('auth.php'));
         $files->delete(config_path('broadcasting.php'));
         $files->delete(config_path('cors.php'));
+        $files->delete(config_path('mail.php'));
         $files->delete(config_path('sanctum.php'));
         $files->delete(config_path('session.php'));
+        $files->delete(config_path('view.php'));
 
         // Remove "lang" files...
         $files->delete(lang_path('en/auth.php'));
