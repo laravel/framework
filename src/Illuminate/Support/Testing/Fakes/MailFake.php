@@ -416,18 +416,6 @@ class MailFake implements Factory, Mailer, MailQueue
     }
 
     /**
-     * Forget all of the resolved mailer instances.
-     *
-     * @return $this
-     */
-    public function forgetMailers()
-    {
-        $this->currentMailer = null;
-
-        return $this;
-    }
-
-    /**
      * Infer mailable class using reflection if a typehinted closure is passed to assertion.
      *
      * @param  string|\Closure  $mailable
@@ -441,5 +429,17 @@ class MailFake implements Factory, Mailer, MailQueue
         }
 
         return [$mailable, $callback];
+    }
+
+    /**
+     * Forget all of the resolved mailer instances.
+     *
+     * @return $this
+     */
+    public function forgetMailers()
+    {
+        $this->currentMailer = null;
+
+        return $this;
     }
 }
