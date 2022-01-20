@@ -675,7 +675,7 @@ class HttpRequestTest extends TestCase
                 ['reviews' => [['id' => 1], ['id' => 2]]],
                 ['reviews' => [['id' => 3], ['foo' => 'bar']]],
                 ['reviews' => [['id' => 4], ['id' => 5], ['id' => 6]]],
-            ]
+            ],
         ]);
         $this->assertEquals([1, 2, 3, null, 4, 5, 6], $request->values('products.*.reviews.*.id'));
         $this->assertSame($reviews, $request->values('products.*'));
