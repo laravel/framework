@@ -62,18 +62,18 @@ class ConvertToCliCommand extends Command
         // Remove "resources" directory...
         $files->deleteDirectory(base_path('resources'));
 
-        // Remove route files...
-        $files->delete(base_path('routes/api.php'));
-        $files->delete(base_path('routes/channels.php'));
-        $files->delete(base_path('routes/web.php'));
+        // Remove "routes" directory...
+        $files->deleteDirectory(base_path('routes'));
 
         // Remove frontend asset related files and directories...
         $files->delete(base_path('package.json'));
         $files->delete(base_path('webpack.mix.js'));
 
         // Install stubs...
-        $files->copy(__DIR__.'/stubs/convert-to-cli/app.stub', config_path('app.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/EventServiceProvider.stub', app_path('Providers/EventServiceProvider.php'));
         $files->copy(__DIR__.'/stubs/convert-to-cli/ExampleTest.stub', base_path('tests/Feature/ExampleTest.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/Kernel.stub', app_path('Console/Kernel.php'));
+        $files->copy(__DIR__.'/stubs/convert-to-cli/app.stub', config_path('app.php'));
 
         // Remove Composer packages...
         $this->removeComposerPackages([
