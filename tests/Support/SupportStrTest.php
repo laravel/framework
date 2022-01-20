@@ -58,6 +58,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('Öffentliche Überraschungen', Str::headline('-öffentliche überraschungen'));
 
         $this->assertSame('Sind Öde Und So', Str::headline('sindÖdeUndSo'));
+
+        $this->assertSame('Orwell 1984', Str::headline('orwell 1984'));
+        $this->assertSame('Orwell 1984', Str::headline('orwell   1984'));
+        $this->assertSame('Orwell 1984', Str::headline('-orwell-1984 -'));
+        $this->assertSame('Orwell 1984', Str::headline(' orwell_- 1984 '));
     }
 
     public function testStringWithoutWordsDoesntProduceError()
