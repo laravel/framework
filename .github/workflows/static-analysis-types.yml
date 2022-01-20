@@ -1,4 +1,4 @@
-name: static analysis internal
+name: static analysis types
 
 on:
   push:
@@ -36,4 +36,4 @@ jobs:
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
 
       - name: Execute type checking
-        run: vendor/bin/phpstan --configuration="phpstan.internal.neon.dist"
+        run: vendor/bin/phpstan --configuration="phpstan.types.neon.dist"
