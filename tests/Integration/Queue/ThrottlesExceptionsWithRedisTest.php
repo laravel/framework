@@ -11,45 +11,52 @@ use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\ThrottlesExceptionsWithRedis;
 use Illuminate\Support\Str;
-use Mockery as m;
+use Mockery;
 use Orchestra\Testbench\TestCase;
 
 class ThrottlesExceptionsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->setUpRedis();
-    }
-
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->tearDownRedis();
+        Mockery::close();
 
-        m::close();
+        parent::tearDown();
     }
 
-    public function testCircuitIsOpenedForJobErrors()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testCircuitIsOpenedForJobErrors($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
         $this->assertJobWasReleasedWithDelay(CircuitBreakerWithRedisTestJob::class, $key);
     }
 
-    public function testCircuitStaysClosedForSuccessfulJobs()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testCircuitStaysClosedForSuccessfulJobs($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key = Str::random());
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
     }
 
-    public function testCircuitResetsAfterSuccess()
+    /**
+     * @dataProvider extendedRedisConnectionDataProvider
+     */
+    public function testCircuitResetsAfterSuccess($connection)
     {
+        $this->app['redis'] = $this->getRedisManager($connection);
+
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key = Str::random());
         $this->assertJobRanSuccessfully(CircuitBreakerWithRedisSuccessfulJob::class, $key);
         $this->assertJobWasReleasedImmediately(CircuitBreakerWithRedisTestJob::class, $key);
@@ -62,7 +69,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('release')->with(0)->once();
@@ -81,7 +88,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('release')->withArgs(function ($delay) {
@@ -102,7 +109,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $class::$handled = false;
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        $job = m::mock(Job::class);
+        $job = Mockery::mock(Job::class);
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);

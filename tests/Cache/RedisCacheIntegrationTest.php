@@ -11,60 +11,66 @@ class RedisCacheIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->setUpRedis();
-    }
-
     protected function tearDown(): void
     {
-        parent::tearDown();
         $this->tearDownRedis();
+
+        parent::tearDown();
     }
 
     /**
-     * @dataProvider redisDriverProvider
+     * @dataProvider extendedRedisConnectionDataProvider
      *
-     * @param  string  $driver
+     * @param  string  $connection
      */
-    public function testRedisCacheAddTwice($driver)
+    public function testRedisCacheAddTwice($connection)
     {
-        $store = new RedisStore($this->redis[$driver]);
-        $repository = new Repository($store);
+        $repository = $this->getRepository($connection);
+
         $this->assertTrue($repository->add('k', 'v', 3600));
         $this->assertFalse($repository->add('k', 'v', 3600));
-        $this->assertGreaterThan(3500, $this->redis[$driver]->connection()->ttl('k'));
+        $this->assertGreaterThan(3500, $repository->getStore()->connection()->ttl('k'));
     }
 
     /**
      * Breaking change.
      *
-     * @dataProvider redisDriverProvider
+     * @dataProvider extendedRedisConnectionDataProvider
      *
-     * @param  string  $driver
+     * @param  string  $connection
      */
-    public function testRedisCacheAddFalse($driver)
+    public function testRedisCacheAddFalse($connection)
     {
-        $store = new RedisStore($this->redis[$driver]);
-        $repository = new Repository($store);
+        $repository = $this->getRepository($connection);
+
         $repository->forever('k', false);
         $this->assertFalse($repository->add('k', 'v', 60));
-        $this->assertEquals(-1, $this->redis[$driver]->connection()->ttl('k'));
+        $this->assertEquals(-1, $repository->getStore()->connection()->ttl('k'));
     }
 
     /**
      * Breaking change.
      *
-     * @dataProvider redisDriverProvider
+     * @dataProvider extendedRedisConnectionDataProvider
      *
-     * @param  string  $driver
+     * @param  string  $connection
      */
-    public function testRedisCacheAddNull($driver)
+    public function testRedisCacheAddNull($connection)
     {
-        $store = new RedisStore($this->redis[$driver]);
-        $repository = new Repository($store);
+        $repository = $this->getRepository($connection);
+
         $repository->forever('k', null);
         $this->assertFalse($repository->add('k', 'v', 60));
+    }
+
+    /**
+     * Builds a cache repository out of a predefined redis connection name.
+     *
+     * @param  string  $connection
+     * @return \Illuminate\Cache\Repository
+     */
+    private function getRepository($connection)
+    {
+        return new Repository(new RedisStore($this->getRedisManager($connection)));
     }
 }
