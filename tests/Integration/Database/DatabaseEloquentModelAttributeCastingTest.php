@@ -364,20 +364,20 @@ class TestEloquentModelWithAttributeCast extends Model
 
     public function virtualObject(): Attribute
     {
-        return (new Attribute(
+        return new Attribute(
             function () {
                 return new AttributeCastAddress(Str::random(10), Str::random(10));
             }
-        ));
+        );
     }
 
     public function virtualDateTime(): Attribute
     {
-        return (new Attribute(
+        return new Attribute(
             function () {
                 return Date::now()->addSeconds(mt_rand(0, 10000));
             }
-        ));
+        );
     }
 
     public function virtualObjectWithoutCachingFluent(): Attribute
