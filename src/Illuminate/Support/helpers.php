@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Str;
 
 if (! function_exists('append_config')) {
     /**
@@ -253,6 +254,19 @@ if (! function_exists('retry')) {
 
             goto beginning;
         }
+    }
+}
+
+if (! function_exists('str')) {
+    /**
+     * Get a new stringable object from the given string.
+     *
+     * @param  string  $string
+     * @return \Illuminate\Support\Stringable
+     */
+    function str($string)
+    {
+        return Str::of($string);
     }
 }
 

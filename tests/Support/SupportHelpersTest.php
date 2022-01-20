@@ -7,6 +7,7 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Stringable;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
@@ -362,6 +363,14 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
         class_uses_recursive(SupportTestClassThree::class));
+    }
+
+    public function testStr()
+    {
+        $stringable = str('string-value');
+
+        $this->assertInstanceOf(Stringable::class, $stringable);
+        $this->assertSame('string-value', (string) $stringable);
     }
 
     public function testTap()
