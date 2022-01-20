@@ -373,7 +373,6 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         });
     }
 
-
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
         $this->expectException(BadMethodCallException::class);
