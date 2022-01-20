@@ -82,8 +82,8 @@ trait AuthorizesRequests
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-		$model = is_array($model) ? implode(',', $model) : $model;
-		$parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
+        $model = is_array($model) ? implode(',', $model) : $model;
+        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
 
         $parameter = $parameter ?: Str::snake(class_basename($model));
 

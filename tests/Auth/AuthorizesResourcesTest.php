@@ -18,7 +18,7 @@ class AuthorizesResourcesTest extends TestCase
 
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
 
-		$controller = new AuthorizesResourcesWithArrayController;
+        $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User,App\Post');
     }
@@ -29,7 +29,7 @@ class AuthorizesResourcesTest extends TestCase
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User');
 
-		$controller = new AuthorizesResourcesWithArrayController;
+        $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User,App\Post');
     }
@@ -40,7 +40,7 @@ class AuthorizesResourcesTest extends TestCase
 
         $this->assertHasMiddleware($controller, 'show', 'can:view,user');
 
-		$controller = new AuthorizesResourcesWithArrayController;
+        $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'show', 'can:view,user,post');
     }
@@ -51,7 +51,7 @@ class AuthorizesResourcesTest extends TestCase
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
 
-		$controller = new AuthorizesResourcesWithArrayController;
+        $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user,post');
     }
@@ -62,7 +62,7 @@ class AuthorizesResourcesTest extends TestCase
 
         $this->assertHasMiddleware($controller, 'update', 'can:update,user');
 
-		$controller = new AuthorizesResourcesWithArrayController;
+        $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'update', 'can:update,user,post');
     }
@@ -73,7 +73,7 @@ class AuthorizesResourcesTest extends TestCase
 
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
 
-		$controller = new AuthorizesResourcesWithArrayController;
+        $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user,post');
     }
@@ -195,8 +195,7 @@ class AuthorizesResourcesMiddleware
 {
     public function handle($request, Closure $next, $method, $parameter, ...$models)
     {
-
-		$params = array_merge([$parameter], $models);
+        $params = array_merge([$parameter], $models);
         return "caught can:{$method}," . implode(',', $params);
     }
 }
