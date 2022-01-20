@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class Blueprint
@@ -1656,6 +1657,19 @@ class Blueprint
     }
 
     /**
+     * @param $name
+     * @return Blueprint
+     */
+    public function removeCommand($name) {
+        foreach($this->commands as $index => $command) {
+            if($command->name === $name) {
+                unset($this->commands[$index]);
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Get the columns on the blueprint that should be added.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition[]
@@ -1689,6 +1703,19 @@ class Blueprint
         return ! is_null(collect($this->getAddedColumns())->first(function ($column) {
             return $column->autoIncrement === true;
         }));
+    }
+
+    /**
+     * Determine if the blueprint has renamed or dropped columns.
+     *
+     * @return bool
+     */
+    public function hasRenamedOrDroppedColumn() {
+        return ! is_null(collect($this->commands)->filter(function($command) {
+            if(Str::contains($command->name, ['renameColumn', 'dropColumn'])) {
+                return $command;
+            }
+        })->first());
     }
 
     /**

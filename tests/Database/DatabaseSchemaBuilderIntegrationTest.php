@@ -130,6 +130,76 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
     }
 
+    public function testAddAndRenameColumns() {
+        $this->schemaBuilder()
+            ->create('users', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->timestamps();
+            });
+        $this->schemaBuilder()->table('users', function (Blueprint $table) {
+            $table->renameColumn('name', 'first_name');
+            $table->string('last_name')->after('first_name');
+        });
+        $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'name'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'first_name'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'last_name'));
+    }
+
+    public function testAddAndDropColumns() {
+        $this->schemaBuilder()
+            ->create('users', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('first_name');
+                $table->string('last_name');
+                $table->timestamps();
+            });
+        $this->schemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+            $table->string('email');
+        });
+        $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'name'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'email'));
+    }
+
+    public function testMultipleDropColumns() {
+        $this->schemaBuilder()
+            ->create('users', function (Blueprint $table) {
+                $table->id();
+                $table->string('first_name');
+                $table->string('last_name');
+                $table->timestamps();
+            });
+        $this->schemaBuilder()->table('users', function (Blueprint $table) {
+            $table->dropColumn('first_name');
+            $table->dropColumn('last_name');
+        });
+
+        $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'first_name'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'last_name'));
+    }
+
+    public function testMultipleRenameColumns() {
+        $this->schemaBuilder()
+            ->create('users', function (Blueprint $table) {
+                $table->id();
+                $table->string('first_name');
+                $table->string('last_name');
+                $table->timestamps();
+            });
+        $this->schemaBuilder()
+            ->table('users', function (Blueprint $table) {
+                $table->renameColumn('first_name', 'firstName');
+                $table->renameColumn('last_name', 'lastName');
+            });
+
+        $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'first_name'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('users', 'last_name'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'firstName'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('users', 'lastName'));
+    }
+
     private function schemaBuilder()
     {
         return $this->db->connection()->getSchemaBuilder();

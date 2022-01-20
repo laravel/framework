@@ -325,39 +325,6 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         $this->assertEquals($expected, $queries);
     }
 
-    public function testItEnsuresDroppingMultipleColumnsIsAvailable()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
-
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
-            $table->dropColumn('name');
-            $table->dropColumn('email');
-        });
-    }
-
-    public function testItEnsuresRenamingMultipleColumnsIsAvailable()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
-
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
-            $table->renameColumn('name', 'first_name');
-            $table->renameColumn('name2', 'last_name');
-        });
-    }
-
-    public function testItEnsuresRenamingAndDroppingMultipleColumnsIsAvailable()
-    {
-        $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage("SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification.");
-
-        $this->db->connection()->getSchemaBuilder()->table('users', function (Blueprint $table) {
-            $table->dropColumn('name');
-            $table->renameColumn('name2', 'last_name');
-        });
-    }
-
     public function testItEnsuresDroppingForeignKeyIsAvailable()
     {
         $this->expectException(BadMethodCallException::class);
