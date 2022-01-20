@@ -197,8 +197,30 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $previous = null;
 
-        foreach (range(0, 10) as $i) {
+        foreach (range(0, 10) as $ignored) {
             $this->assertNotSame($previous, $previous = $model->virtualString);
+        }
+    }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsObjectAreCached()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = $model->virtualObject;
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertSame($previous, $previous = $model->virtualObject);
+        }
+    }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsDateTimeAreCached()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = $model->virtualDateTime;
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertSame($previous, $previous = $model->virtualDateTime);
         }
     }
 
@@ -206,10 +228,10 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithAttributeCast;
 
-        $previous = null;
+        $previous = $model->virtualObjectWithoutCaching;
 
-        foreach (range(0, 10) as $i) {
-            $this->assertNotSame($previous, $previous = $model->virtualObject);
+        foreach (range(0, 10) as $ignored) {
+            $this->assertNotSame($previous, $previous = $model->virtualObjectWithoutCaching);
         }
     }
 
@@ -217,10 +239,32 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentModelWithAttributeCast;
 
-        $previous = null;
+        $previous = $model->virtualDateTimeWithoutCaching;
 
-        foreach (range(0, 10) as $i) {
-            $this->assertNotSame($previous, $previous = $model->virtualDateTime);
+        foreach (range(0, 10) as $ignored) {
+            $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCaching);
+        }
+    }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsObjectAreNotCachedFluent()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = $model->virtualObjectWithoutCachingFluent;
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertNotSame($previous, $previous = $model->virtualObjectWithoutCachingFluent);
+        }
+    }
+
+    public function testCastsThatOnlyHaveGetterThatReturnsDateTimeAreNotCachedFluent()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = $model->virtualDateTimeWithoutCachingFluent;
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCachingFluent);
         }
     }
 }
@@ -320,20 +364,52 @@ class TestEloquentModelWithAttributeCast extends Model
 
     public function virtualObject(): Attribute
     {
-        return new Attribute(
+        return (new Attribute(
             function () {
                 return new AttributeCastAddress(Str::random(10), Str::random(10));
             }
-        );
+        ));
     }
 
     public function virtualDateTime(): Attribute
     {
-        return new Attribute(
+        return (new Attribute(
             function () {
                 return Date::now()->addSeconds(mt_rand(0, 10000));
             }
-        );
+        ));
+    }
+
+    public function virtualObjectWithoutCachingFluent(): Attribute
+    {
+        return (new Attribute(
+            function () {
+                return new AttributeCastAddress(Str::random(10), Str::random(10));
+            }
+        ))->disableObjectCaching();
+    }
+
+    public function virtualDateTimeWithoutCachingFluent(): Attribute
+    {
+        return (new Attribute(
+            function () {
+                return Date::now()->addSeconds(mt_rand(0, 10000));
+            }
+        ))->disableObjectCaching();
+    }
+
+    public function virtualObjectWithoutCaching(): Attribute
+    {
+        return Attribute::getWithoutCaching(function () {
+            return new AttributeCastAddress(Str::random(10), Str::random(10));
+        });
+    }
+
+    public function virtualDateTimeWithoutCaching(): Attribute
+    {
+        return Attribute::getWithoutCaching(function () {
+            return Date::now()->addSeconds(mt_rand(0, 10000));
+        });
     }
 }
 
