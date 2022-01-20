@@ -116,7 +116,7 @@ trait BroadcastsEvents
         }
 
         if (! empty($this->broadcastOn($event)) || ! empty($channels)) {
-            return broadcast($instance->onChannels(Arr::wrap($channels)));
+            return broadcast($instance->onChannels(array_merge(Arr::wrap($channels), $this->broadcastOn($event))));
         }
     }
 
