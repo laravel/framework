@@ -664,10 +664,10 @@ class HttpRequestTest extends TestCase
                 ['id' => 2],
                 ['id' => 3],
                 ['foo' => 'bar'],
-            ]
+            ],
         ]);
-        $this->assertEquals([1,2,3,null], $request->values('products.*.id'));
-        $this->assertEquals([null,null,null,'bar'], $request->values('products.*.foo'));
+        $this->assertEquals([1, 2, 3, null], $request->values('products.*.id'));
+        $this->assertEquals([null, null, null, 'bar'], $request->values('products.*.foo'));
         $this->assertSame($products, $request->values('products.*'));
 
         $request = Request::create('/', 'GET', [
@@ -677,7 +677,7 @@ class HttpRequestTest extends TestCase
                 ['reviews' => [['id' => 4], ['id' => 5], ['id' => 6]]],
             ]
         ]);
-        $this->assertEquals([1,2,3,null,4,5,6], $request->values('products.*.reviews.*.id'));
+        $this->assertEquals([1, 2, 3, null, 4, 5, 6], $request->values('products.*.reviews.*.id'));
         $this->assertSame($reviews, $request->values('products.*'));
         $this->assertSame($reviews, $request->values('products'));
     }
