@@ -19,7 +19,7 @@ class Attribute
     public $set;
 
     /**
-     * Indicates if caching of objects should be disabled for this attribute.
+     * Indicates if caching of objects is enabled for this attribute.
      *
      * @var bool
      */
