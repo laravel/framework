@@ -1,4 +1,4 @@
-name: static analysis src
+name: static analysis
 
 on:
   push:
@@ -7,15 +7,16 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  linux_tests:
+  src:
     runs-on: ubuntu-20.04
 
     strategy:
       fail-fast: true
       matrix:
         php: ['8.0']
+        directory: [src, types]
 
-    name: PHP ${{ matrix.php }}
+    name: ${{ [[ matrix.src == 'src' ]] && 'Source Code' || 'Types' }}
 
     steps:
       - name: Checkout code
@@ -33,7 +34,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
       - name: Execute type checking
-        run: vendor/bin/phpstan --configuration="phpstan.src.neon.dist"
+        run: vendor/bin/phpstan --configuration="phpstan.${{ matrix.directory }}.neon.dist"
