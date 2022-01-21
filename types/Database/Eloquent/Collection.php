@@ -5,6 +5,11 @@ use function PHPStan\Testing\assertType;
 $collection = User::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection);
 
+assertType(
+    'Illuminate\Database\Eloquent\Collection<(int|string), Illuminate\Database\Eloquent\Collection<(int|string), User>>',
+    $collection->groupBy('string')
+);
+
 assertType('Illuminate\Database\Eloquent\Collection<int, User>|User|null', $collection->find(1));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>|string|User', $collection->find(1, 'string'));
 
