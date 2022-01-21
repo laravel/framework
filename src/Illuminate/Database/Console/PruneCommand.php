@@ -115,7 +115,7 @@ class PruneCommand extends Command
     }
 
     /**
-     * Get the default path for the models.
+     * Get the default path where models are located.
      *
      * @return string
      */
