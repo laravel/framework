@@ -2148,6 +2148,15 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
+    public function testGetOrPut()
+    {
+        $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
+
+        $this->assertEquals('taylor', $data->getOrPut('name', fn () => null));
+        $this->assertEquals('foo', $data->getOrPut('email', fn () => null));
+        $this->assertEquals('male', $data->getOrPut('gender', fn () => 'male'));
+    }
+
     public function testPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
