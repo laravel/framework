@@ -74,6 +74,7 @@ class EventListCommand extends Command
     protected function getListenersOnDispatcher()
     {
         $events = [];
+
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
                 if (is_string($rawListener)) {
@@ -84,6 +85,7 @@ class EventListCommand extends Command
                     if (is_object($rawListener[0])) {
                         $rawListener[0] = get_class($rawListener[0]);
                     }
+
                     $events[$event][] = implode('@', $rawListener);
                 }
             }
