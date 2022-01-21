@@ -14,7 +14,7 @@ class PredisClusterConnection extends PredisConnection
     public function flushdb()
     {
         $this->client->executeCommandOnNodes(
-            tap(new ServerFlushDatabase)->setArguments(func_get_args());
+            tap(new ServerFlushDatabase)->setArguments(func_get_args())
         );
     }
 }
