@@ -5,6 +5,7 @@ use function PHPStan\Testing\assertType;
 $collection = User::all();
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection);
 
+// @phpstan-ignore-next-line TODO remove ignore when https://github.com/phpstan/phpstan/issues/5512 is fixed
 assertType(
     'Illuminate\Database\Eloquent\Collection<(int|string), Illuminate\Database\Eloquent\Collection<(int|string), User>>',
     $collection->groupBy('string')
