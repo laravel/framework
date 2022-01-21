@@ -261,11 +261,21 @@ if (! function_exists('str')) {
     /**
      * Get a new stringable object from the given string.
      *
-     * @param  string  $string
-     * @return \Illuminate\Support\Stringable
+     * @param  string|null  $string
+     * @return \Illuminate\Support\Stringable|mixed
      */
-    function str($string)
+    function str($string = null)
     {
+        if (func_num_args() === 0) {
+            return new class
+            {
+                public function __call($method, $parameters)
+                {
+                    return Str::$method(...$parameters);
+                }
+            };
+        }
+
         return Str::of($string);
     }
 }

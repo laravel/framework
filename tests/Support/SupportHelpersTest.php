@@ -371,6 +371,14 @@ class SupportHelpersTest extends TestCase
 
         $this->assertInstanceOf(Stringable::class, $stringable);
         $this->assertSame('string-value', (string) $stringable);
+
+        $stringable = str($name = null);
+        $this->assertInstanceOf(Stringable::class, $stringable);
+        $this->assertTrue($stringable->isEmpty());
+
+        $strAccessor = str();
+        $this->assertTrue((new \ReflectionClass($strAccessor))->isAnonymous());
+        $this->assertSame($strAccessor->limit('string-value', 3), 'str...');
     }
 
     public function testTap()
