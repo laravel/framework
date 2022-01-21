@@ -19,6 +19,13 @@ class Grammar extends BaseGrammar
     protected $operators = [];
 
     /**
+     * The grammar specific binary operators.
+     *
+     * @var array
+     */
+    protected $binaryOperators = [];
+
+    /**
      * The components that make up a select clause.
      *
      * @var string[]
@@ -253,6 +260,15 @@ class Grammar extends BaseGrammar
         $operator = str_replace('?', '??', $where['operator']);
 
         return $this->wrap($where['column']).' '.$operator.' '.$value;
+    }
+
+    protected function whereBinary(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return '('.$this->wrap($where['column']).' '.$operator.' '.$value.') != 0';
     }
 
     /**
@@ -571,7 +587,8 @@ class Grammar extends BaseGrammar
         $not = $where['not'] ? 'not ' : '';
 
         return $not.$this->compileJsonContains(
-            $where['column'], $this->parameter($where['value'])
+            $where['column'],
+            $this->parameter($where['value'])
         );
     }
 
@@ -610,7 +627,9 @@ class Grammar extends BaseGrammar
     protected function whereJsonLength(Builder $query, $where)
     {
         return $this->compileJsonLength(
-            $where['column'], $where['operator'], $this->parameter($where['value'])
+            $where['column'],
+            $where['operator'],
+            $this->parameter($where['value'])
         );
     }
 
@@ -682,6 +701,8 @@ class Grammar extends BaseGrammar
             return $having['boolean'].' '.$having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
+        } elseif ($having['type'] === 'binary') {
+            return $this->compileHavingBinary($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -719,6 +740,21 @@ class Grammar extends BaseGrammar
         $max = $this->parameter(last($having['values']));
 
         return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
+     * Compile a having clause involving a binary operator.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBinary($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        $parameter = $this->parameter($having['value']);
+
+        return $having['boolean'].' ('.$column.' '.$having['operator'].' '.$parameter.') != 0';
     }
 
     /**
@@ -1295,5 +1331,15 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
+    }
+
+    /**
+     * Get the grammar specific binary operators.
+     *
+     * @return array
+     */
+    public function getBinaryOperators()
+    {
+        return $this->binaryOperators;
     }
 }
