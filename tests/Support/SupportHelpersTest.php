@@ -391,7 +391,7 @@ class SupportHelpersTest extends TestCase
         $mock = m::mock();
         $mock->shouldReceive('foo')->times(5)->andReturn('foo');
         $this->assertEquals('foo2', tap($mock)->chain()->foo()->foo()->foo()->foo()->then(
-            fn ($target) => $object->slug = $target->foo() . $object->id,
+            fn ($target) => $object->slug = $target->foo().$object->id,
         ));
     }
 
