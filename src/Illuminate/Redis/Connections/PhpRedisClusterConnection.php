@@ -5,14 +5,14 @@ namespace Illuminate\Redis\Connections;
 class PhpRedisClusterConnection extends PhpRedisConnection
 {
     /**
-     * Flush the selected Redis database.
+     * Flush the selected Redis database on all master nodes.
      *
-     * @param  string|null  $modifier
      * @return mixed
      */
-    public function flushdb($modifier = null)
+    public function flushdb()
     {
-        $async = strtoupper($modifier) === 'ASYNC';
+        $arguments = func_get_args();
+        $async = strtoupper((string) $arguments[0] ?? null) === 'ASYNC';
 
         foreach ($this->client->_masters() as $master) {
             $async

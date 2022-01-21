@@ -494,12 +494,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Flush the selected Redis database.
      *
-     * @param  string|null  $modifier
      * @return mixed
      */
-    public function flushdb($modifier = null)
+    public function flushdb()
     {
-        if (strtoupper($modifier) === 'ASYNC') {
+        $arguments = func_get_args();
+
+        if (strtoupper((string) $arguments[0] ?? null) === 'ASYNC') {
             return $this->command('flushdb', [true]);
         }
 
