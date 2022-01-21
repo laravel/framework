@@ -7,7 +7,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     /**
      * Flush the selected Redis database.
      *
-     * @return void
+     * @return mixed
      */
     public function flushdb()
     {

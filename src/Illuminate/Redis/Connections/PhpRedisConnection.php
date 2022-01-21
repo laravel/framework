@@ -494,8 +494,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     /**
      * Flush the selected Redis database.
      *
-     * @param  string  $modifier
-     * @return void
+     * @param  string|null  $modifier
+     * @return mixed
      */
     public function flushdb($modifier = null)
     {
