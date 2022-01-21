@@ -682,7 +682,7 @@ class Blueprint
      */
     public function char($column, $length = null)
     {
-        $length = $length ?: Builder::$defaultStringLength;
+        $length = ! is_null($length) ? $length : Builder::$defaultStringLength;
 
         return $this->addColumn('char', $column, compact('length'));
     }

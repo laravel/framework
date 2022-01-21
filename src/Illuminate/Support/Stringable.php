@@ -579,6 +579,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Parse input from a string to a collection, according to a format.
+     *
+     * @param  string  $format
+     * @return \Illuminate\Support\Collection
+     */
+    public function scan($format)
+    {
+        return collect(sscanf($this->value, $format));
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $prefix
@@ -795,34 +806,24 @@ class Stringable implements JsonSerializable
      * Execute the given callback if the string is empty.
      *
      * @param  callable  $callback
+     * @param  callable|null  $default
      * @return static
      */
-    public function whenEmpty($callback)
+    public function whenEmpty($callback, $default = null)
     {
-        if ($this->isEmpty()) {
-            $result = $callback($this);
-
-            return is_null($result) ? $this : $result;
-        }
-
-        return $this;
+        return $this->when($this->isEmpty(), $callback, $default);
     }
 
     /**
      * Execute the given callback if the string is not empty.
      *
      * @param  callable  $callback
+     * @param  callable|null  $default
      * @return static
      */
-    public function whenNotEmpty($callback)
+    public function whenNotEmpty($callback, $default = null)
     {
-        if ($this->isNotEmpty()) {
-            $result = $callback($this);
-
-            return is_null($result) ? $this : $result;
-        }
-
-        return $this;
+        return $this->when($this->isNotEmpty(), $callback, $default);
     }
 
     /**
@@ -975,8 +976,7 @@ class Stringable implements JsonSerializable
      *
      * @return string
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return $this->__toString();
     }

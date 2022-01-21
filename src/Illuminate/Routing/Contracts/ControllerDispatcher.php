@@ -24,4 +24,12 @@ interface ControllerDispatcher
      * @return array
      */
     public function getMiddleware($controller, $method);
+
+    /**
+     * Determine if the dispatcher should attempt to gather middleware from a controller.
+     *
+     * @param  string  $controller
+     * @return bool
+     */
+    public function shouldGatherMiddleware($controller);
 }

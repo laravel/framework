@@ -20,6 +20,10 @@ class RouteGroup
             unset($old['domain']);
         }
 
+        if (isset($new['controller'])) {
+            unset($old['controller']);
+        }
+
         $new = array_merge(static::formatAs($new, $old), [
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),

@@ -5,11 +5,14 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use IteratorAggregate;
 use stdClass;
+use Traversable;
 
 /**
  * @template TKey of array-key
@@ -43,6 +46,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $this->source = $source;
         } elseif (is_null($source)) {
             $this->source = static::empty();
+        } elseif ($source instanceof Generator) {
+            throw new InvalidArgumentException(
+                'Generators should not be passed directly to LazyCollection. Instead, pass a generator function.'
+            );
         } else {
             $this->source = $this->getArrayableItems($source);
         }
@@ -260,7 +267,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
-     * @return static<TValue, int>
+     * @return static<array-key, int>
      */
     public function countBy($countBy = null)
     {
@@ -775,8 +782,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Recursively merge the collection with the given items.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
-     * @return static<TKey, array<int, TValue>>
+     * @template TMergeRecursiveValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TMergeRecursiveValue>|iterable<TKey, TMergeRecursiveValue>  $items
+     * @return static<TKey, TValue|TMergeRecursiveValue>
      */
     public function mergeRecursive($items)
     {
@@ -1333,6 +1342,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Sort the collection keys using a callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function sortKeysUsing(callable $callback)
+    {
+        return $this->passthru('sortKeysUsing', func_get_args());
+    }
+
+    /**
      * Take the first or last {$limit} items.
      *
      * @param  int  $limit
@@ -1542,8 +1562,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @return \Traversable<TKey, TValue>
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->makeIterator($this->source);
     }
@@ -1553,8 +1572,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @return int
      */
-    #[\ReturnTypeWillChange]
-    public function count()
+    public function count(): int
     {
         if (is_array($this->source)) {
             return count($this->source);

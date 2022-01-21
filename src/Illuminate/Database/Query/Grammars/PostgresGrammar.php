@@ -22,7 +22,7 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * {@inheritdoc}
+     * Compile a basic where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
