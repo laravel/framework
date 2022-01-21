@@ -15,7 +15,9 @@ class MatrixSequence extends Sequence
     public function __construct(...$sequences)
     {
         $matrix = array_map(
-            fn ($a) => array_merge(...$a),
+            function ($a) {
+                return array_merge(...$a);
+            },
             Arr::crossJoin(...$sequences),
         );
 
