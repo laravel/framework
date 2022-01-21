@@ -34,6 +34,13 @@ class MorphTo extends BelongsTo
     protected $dictionary = [];
 
     /**
+     * All of the dictionary items that must be excluded from eager loading.
+     *
+     * @var bool
+     */
+    protected $exclusionDictionary = [];
+
+    /**
      * A buffer of dynamic calls to query macros.
      *
      * @var array
@@ -200,6 +207,9 @@ class MorphTo extends BelongsTo
      */
     public function match(array $models, Collection $results, $relation)
     {
+        // Prune incomplete relations that have been initialized but not fully eager loaded.
+        $this->pruneIncompleteRelations($models);
+
         return $models;
     }
 
@@ -333,6 +343,75 @@ class MorphTo extends BelongsTo
         );
 
         return $this;
+    }
+
+    /**
+     * Specify morph types that should only be eager loaded.
+     *
+     * @param  array  $types
+     * @return $this
+     */
+    public function morphOnly(array $types)
+    {
+        $onlyMorphTypeKeys = array_map(function ($key) {
+            return $this->getDictionaryKey($key);
+        }, $types);
+
+        // We prevent unwanted eager loading by keeping on dictionary only given morph types.
+        foreach ($this->dictionary as $morphTypeKey => $foreignKeyKeys) {
+            if (! in_array($morphTypeKey, $onlyMorphTypeKeys, true)) {
+                $this->exclusionDictionary[$morphTypeKey] = $foreignKeyKeys;
+                unset($this->dictionary[$morphTypeKey]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Prevent the given morph types from being eager loaded.
+     *
+     * @param  array  $types
+     * @return $this
+     */
+    public function morphWithout(array $types)
+    {
+        $withoutMorphTypeKeys = array_map(function ($key) {
+            return $this->getDictionaryKey($key);
+        }, $types);
+
+        // We prevent unwanted eager loading by moving excluded morph types on exclusion dictionary.
+        foreach ($this->dictionary as $morphTypeKey => $foreignKeyKeys) {
+            if (in_array($morphTypeKey, $withoutMorphTypeKeys, true)) {
+                $this->exclusionDictionary[$morphTypeKey] = $foreignKeyKeys;
+                unset($this->dictionary[$morphTypeKey]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Prune incomplete relations on eager loaded models.
+     *
+     * @param  array  $models
+     * @return void
+     */
+    protected function pruneIncompleteRelations(array $models)
+    {
+        if (count($this->exclusionDictionary)) {
+            foreach ($models as $model) {
+                // If the morph type key is present in the exclusion dictionary, the relation must not be loaded
+                // in the model.
+                // But at this point and due to the `eagerLoadRelation()` function behavior, the relation was
+                // initialized by `initRelation()` with "null" value and must be unset to allow lazy loading.
+
+                $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
+                if (array_key_exists($morphTypeKey, $this->exclusionDictionary)) {
+                    $model->unsetRelation($this->relationName);
+                }
+            }
+        }
     }
 
     /**
