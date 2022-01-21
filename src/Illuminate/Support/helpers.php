@@ -266,7 +266,7 @@ if (! function_exists('str')) {
      */
     function str($string = null)
     {
-        if (! isset($string)) {
+        if (func_num_args() === 0) {
             return new class
             {
                 public function __call($method, $parameters)
