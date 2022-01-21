@@ -427,9 +427,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Get an item from the collection by key
-     * or add to collection if not exists
+     * or add to collection if not exists.
      *
-     * @param  mixed     $key
+     * @param  mixed  $key
      * @param  callable  $callback
      * @return mixed
      */
