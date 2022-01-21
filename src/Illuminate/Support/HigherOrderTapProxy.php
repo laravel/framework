@@ -56,12 +56,17 @@ class HigherOrderTapProxy
     }
 
     /**
-     * Return the target being tapped.
+     * Call the given Closure with the given value then return the value.
      *
+     * @param  callable|null  $callback
      * @return mixed
      */
-    public function then()
+    public function then($callback = null)
     {
-        return $this->target;
+        if (is_null($callback)) {
+            return $this->target;
+        }
+
+        return with($this->target, $callback);
     }
 }
