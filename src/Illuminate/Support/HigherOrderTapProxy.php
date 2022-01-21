@@ -12,14 +12,23 @@ class HigherOrderTapProxy
     public $target;
 
     /**
+     * If the tap proxy is chainable.
+     *
+     * @var bool
+     */
+    public $chainable;
+
+    /**
      * Create a new tap proxy instance.
      *
      * @param  mixed  $target
+     * @param  bool  $chainable
      * @return void
      */
-    public function __construct($target)
+    public function __construct($target, $chainable = false)
     {
         $this->target = $target;
+        $this->chainable = $chainable;
     }
 
     /**
@@ -33,6 +42,26 @@ class HigherOrderTapProxy
     {
         $this->target->{$method}(...$parameters);
 
+        return $this->chainable ? $this : $this->target;
+    }
+
+    /**
+     * Create a new chainable tap proxy.
+     *
+     * @return static
+     */
+    public function chain()
+    {
+        return new static($this->target, true);
+    }
+
+    /**
+     * Return the target being tapped.
+     *
+     * @return mixed
+     */
+    public function then()
+    {
         return $this->target;
     }
 }

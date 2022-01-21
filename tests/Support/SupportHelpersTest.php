@@ -381,8 +381,13 @@ class SupportHelpersTest extends TestCase
         })->id);
 
         $mock = m::mock();
-        $mock->shouldReceive('foo')->once()->andReturn('bar');
+        $mock->shouldReceive('foo')->once()->andReturn('foo');
         $this->assertEquals($mock, tap($mock)->foo());
+
+        $mock = m::mock();
+        $mock->shouldReceive('foo')->times(5)->andReturn('foo');
+
+        $this->assertEquals('foo', tap($mock)->chain()->foo()->foo()->foo()->foo()->then()->foo());
     }
 
     public function testThrow()
