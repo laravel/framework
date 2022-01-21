@@ -55,9 +55,7 @@ class EventListCommand extends Command
      */
     protected function getEvents()
     {
-        $events = [];
-
-        $events = $this->addListenersOnDispatcher($events);
+        $events = $this->getListenersOnDispatcher();
 
         if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);
@@ -69,19 +67,24 @@ class EventListCommand extends Command
     }
 
     /**
-     * Adds the event / listeners on the dispatcher object to the given list.
+     * Get the event / listeners from the dispatcher object.
      *
-     * @param  array  $events
      * @return array
      */
-    protected function addListenersOnDispatcher(array $events)
+    protected function getListenersOnDispatcher()
     {
+        $events = [];
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
                 if (is_string($rawListener)) {
                     $events[$event][] = $rawListener;
                 } elseif ($rawListener instanceof Closure) {
                     $events[$event][] = $this->stringifyClosure($rawListener);
+                } elseif (is_array($rawListener) && count($rawListener) === 2) {
+                    if (is_object($rawListener[0])) {
+                        $rawListener[0] = get_class($rawListener[0]);
+                    }
+                    $events[$event][] = implode('@', $rawListener);
                 }
             }
         }
