@@ -12,5 +12,4 @@ use Illuminate\Contracts\Database\Query\Builder as BaseContract;
  */
 interface Builder extends BaseContract
 {
-
 }
