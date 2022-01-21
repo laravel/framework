@@ -438,7 +438,7 @@ trait EnumeratesValues
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
      * @param  TValue|string|null  $operator
      * @param  TValue|null  $value
-     * @return array<int, static<TKey, TValue>>
+     * @return static<int<0, 1>, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null)
     {

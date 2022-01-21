@@ -507,7 +507,7 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make(['str
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->forPage(1, 2));
 
-assertType('array<int, Illuminate\Support\Collection<int, User>>', $collection->partition(function ($user, $int) {
+assertType('Illuminate\Support\Collection<int<0, 1>, Illuminate\Support\Collection<int, User>>', $collection->partition(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
