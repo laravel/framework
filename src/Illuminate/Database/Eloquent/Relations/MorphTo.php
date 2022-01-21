@@ -36,7 +36,7 @@ class MorphTo extends BelongsTo
     /**
      * All of the dictionary items that must be excluded from eager loading.
      *
-     * @var bool
+     * @var array
      */
     protected $exclusionDictionary = [];
 
