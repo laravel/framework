@@ -58,6 +58,6 @@ class PredisConnection extends Connection implements ConnectionContract
      */
     public function flushdb()
     {
-        return $this->command('flushdb');
+        $this->command('flushdb');
     }
 }
