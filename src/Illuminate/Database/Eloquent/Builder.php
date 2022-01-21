@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
+use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
@@ -24,7 +25,7 @@ use ReflectionMethod;
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder
+class Builder implements BuilderContract
 {
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;

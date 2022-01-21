@@ -6,6 +6,7 @@ use BackedEnum;
 use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -25,7 +26,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
-class Builder
+class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
