@@ -6,11 +6,13 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\MountManager;
+use ReflectionClass;
 
 class VendorPublishCommand extends Command
 {
@@ -24,9 +26,9 @@ class VendorPublishCommand extends Command
     /**
      * The provider to publish.
      *
-     * @var string
+     * @var array
      */
-    protected $provider = null;
+    protected $providers = [];
 
     /**
      * The tags to publish.
@@ -40,7 +42,8 @@ class VendorPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'vendor:publish {--force : Overwrite any existing files}
+    protected $signature = 'vendor:publish {package? : The package that has assets you want to publish}
+                    {--force : Overwrite any existing files}
                     {--all : Publish assets for all service providers without prompt}
                     {--provider= : The service provider that has assets you want to publish}
                     {--tag=* : One or many tags that have assets you want to publish}';
@@ -83,6 +86,10 @@ class VendorPublishCommand extends Command
     {
         $this->determineWhatShouldBePublished();
 
+        if ($this->argument('package') && ! $this->providers) {
+            return 0;
+        }
+
         foreach ($this->tags ?: [null] as $tag) {
             $this->publishTag($tag);
         }
@@ -101,13 +108,54 @@ class VendorPublishCommand extends Command
             return;
         }
 
-        [$this->provider, $this->tags] = [
-            $this->option('provider'), (array) $this->option('tag'),
+        [$this->providers, $this->tags] = [
+            (array) $this->option('provider'), (array) $this->option('tag'),
         ];
 
-        if (! $this->provider && ! $this->tags) {
+        if ($package = $this->argument('package')) {
+            $this->discoverFromPackage($package);
+        } elseif (! $this->providers && ! $this->tags) {
             $this->promptForProviderOrTag();
         }
+    }
+
+    /**
+     * Determine the provider or tag(s) to publish from the given package name.
+     *
+     * @param  string  $package
+     * @return void
+     */
+    protected function discoverFromPackage($package)
+    {
+        $this->providers = collect(ServiceProvider::publishableProviders())->map(function ($providerClass) use ($package) {
+            $currentPackageFolder = dirname((new ReflectionClass($providerClass))->getFileName());
+
+            if (! str_starts_with($currentPackageFolder, base_path('vendor'))) {
+                return;
+            }
+
+            $providerPackage = null;
+
+            while (true) {
+                if ($currentPackageFolder == base_path('vendor')) {
+                    return;
+                }
+
+                $composerFileName = "$currentPackageFolder/composer.json";
+
+                if (File::exists($composerFileName)) {
+                    $packageNameFromComposer = json_decode(File::get($composerFileName), true)['name'];
+
+                    if ($packageNameFromComposer == $package) {
+                        return $providerClass;
+                    }
+                }
+
+                $currentPackageFolder = dirname($currentPackageFolder);
+            }
+        })->filter()->values()->whenEmpty(function () use ($package) {
+            $this->comment('No publishable resources for package ['.$package.'].');
+        })->toArray();
     }
 
     /**
@@ -154,7 +202,7 @@ class VendorPublishCommand extends Command
         [$type, $value] = explode(': ', strip_tags($choice));
 
         if ($type === 'Provider') {
-            $this->provider = $value;
+            $this->providers = [$value];
         } elseif ($type === 'Tag') {
             $this->tags = [$value];
         }
@@ -163,7 +211,7 @@ class VendorPublishCommand extends Command
     /**
      * Publishes the assets for a tag.
      *
-     * @param  string  $tag
+     * @param  string|null  $tag
      * @return mixed
      */
     protected function publishTag($tag)
@@ -193,9 +241,19 @@ class VendorPublishCommand extends Command
      */
     protected function pathsToPublish($tag)
     {
-        return ServiceProvider::pathsToPublish(
-            $this->provider, $tag
-        );
+        if (! $this->providers) {
+            return ServiceProvider::pathsToPublish(null, $tag);
+        }
+
+        $pathsToPublish = collect();
+
+        foreach ($this->providers as $provider) {
+            $pathsToPublish = $pathsToPublish->merge(
+                ServiceProvider::pathsToPublish($provider, $tag)
+            );
+        }
+
+        return $pathsToPublish->toArray();
     }
 
     /**
