@@ -178,7 +178,7 @@ class ValidationNestedRulesTest extends TestCase
                 return [
                     'discounts.*.id' => 'distinct',
                     'discounts.*.type' => 'in:percent,absolute',
-                    'discounts.*' => Rule::nested(function ($attribute, $value) {
+                    'discounts.*' => Rule::nested(function ($value) {
                         return $value['type'] === 'percent'
                             ? ['discount' => 'numeric|min:0|max:100']
                             : ['discount' => 'numeric'];

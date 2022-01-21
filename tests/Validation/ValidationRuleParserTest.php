@@ -90,9 +90,9 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $results = $parser->explode([
-            'users.*.name' => Rule::nested(function ($attribute, $value, $data) {
-                $this->assertEquals('users.0.name', $attribute);
+            'users.*.name' => Rule::nested(function ($value, $attribute, $data) {
                 $this->assertEquals('Taylor Otwell', $value);
+                $this->assertEquals('users.0.name', $attribute);
                 $this->assertEquals($data['users.0.name'], 'Taylor Otwell');
 
                 return [Rule::requiredIf(true)];
@@ -110,9 +110,9 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $results = $parser->explode([
-            'name' => Rule::nested(function ($attribute, $value, $data = null) {
-                $this->assertEquals('name', $attribute);
+            'name' => Rule::nested(function ($value, $attribute, $data = null) {
                 $this->assertEquals('Taylor Otwell', $value);
+                $this->assertEquals('name', $attribute);
                 $this->assertEquals(['name' => 'Taylor Otwell'], $data);
 
                 return 'required';
@@ -134,7 +134,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => [
-                Rule::nested(function ($attribute, $value, $data) {
+                Rule::nested(function ($value, $attribute, $data) {
                     $this->assertEquals([
                         'users.0.name' => 'Taylor Otwell',
                         'users.1.name' => 'Abigail Otwell',
@@ -142,7 +142,7 @@ class ValidationRuleParserTest extends TestCase
 
                     return [Rule::requiredIf(true)];
                 }),
-                Rule::nested(function ($attribute, $value, $data) {
+                Rule::nested(function ($value, $attribute, $data) {
                     $this->assertEquals([
                         'users.0.name' => 'Taylor Otwell',
                         'users.1.name' => 'Abigail Otwell',
@@ -180,19 +180,19 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => [
-                Rule::nested(function ($attribute, $value, $data) {
-                    $this->assertEquals('users.0.name', $attribute);
+                Rule::nested(function ($value, $attribute, $data) {
                     $this->assertEquals('Taylor Otwell', $value);
+                    $this->assertEquals('users.0.name', $attribute);
                     $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
-                    return Rule::nested(function ($attribute, $value, $data) {
-                        $this->assertEquals('users.0.name', $attribute);
+                    return Rule::nested(function ($value, $attribute, $data) {
                         $this->assertNull($value);
+                        $this->assertEquals('users.0.name', $attribute);
                         $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
-                        return Rule::nested(function ($attribute, $value, $data) {
-                            $this->assertEquals('users.0.name', $attribute);
+                        return Rule::nested(function ($value, $attribute, $data) {
                             $this->assertNull($value);
+                            $this->assertEquals('users.0.name', $attribute);
                             $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                             return [Rule::requiredIf(true)];

@@ -34,7 +34,7 @@ class NestedRules
      */
     public function compile($attribute, $value, $data = null)
     {
-        $rules = call_user_func($this->callback, $attribute, $value, $data);
+        $rules = call_user_func($this->callback, $value, $attribute, $data);
 
         $parser = new ValidationRuleParser(
             Arr::undot(Arr::wrap($data))
