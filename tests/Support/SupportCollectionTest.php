@@ -2152,9 +2152,17 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
 
-        $this->assertEquals('taylor', $data->getOrPut('name', fn () => null));
-        $this->assertEquals('foo', $data->getOrPut('email', fn () => null));
-        $this->assertEquals('male', $data->getOrPut('gender', fn () => 'male'));
+        $this->assertEquals('taylor', $data->getOrPut('name', function () {
+            return null;
+        }));
+
+        $this->assertEquals('foo', $data->getOrPut('email', function () {
+            return null;
+        }));
+
+        $this->assertEquals('male', $data->getOrPut('gender', function () {
+            return 'male';
+        }));
     }
 
     public function testPut()
