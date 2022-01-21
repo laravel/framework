@@ -5,12 +5,15 @@ namespace Illuminate\Http;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @method array validate(array $rules, ...$params)
@@ -493,6 +496,24 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasSession(bool $skipIfUninitialized = false): bool
+    {
+        return ! is_null($this->session);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSession(): SessionInterface
+    {
+        return $this->hasSession()
+                    ? new SymfonySessionDecorator($this->session())
+                    : throw new SessionNotFoundException;
+    }
+
+    /**
      * Get the session associated with the request.
      *
      * @return \Illuminate\Session\Store
@@ -646,8 +667,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $offset
      * @return bool
      */
-    #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return Arr::has(
             $this->all() + $this->route()->parameters(),
@@ -661,8 +681,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $offset
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->__get($offset);
     }
@@ -674,8 +693,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  mixed  $value
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->getInputSource()->set($offset, $value);
     }
@@ -686,8 +704,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $offset
      * @return void
      */
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->getInputSource()->remove($offset);
     }

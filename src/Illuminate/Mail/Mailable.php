@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
+use Illuminate\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
 use ReflectionProperty;
@@ -903,6 +904,21 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Assert that the given text strings are present in order in the HTML email body.
+     *
+     * @param  array  $strings
+     * @return $this
+     */
+    public function assertSeeInOrderInHtml($strings)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertThat($strings, new SeeInOrder($html));
+
+        return $this;
+    }
+
+    /**
      * Assert that the given text is present in the plain-text email body.
      *
      * @param  string  $string
@@ -934,6 +950,21 @@ class Mailable implements MailableContract, Renderable
             Str::contains($text, $string),
             "Saw unexpected text [{$string}] within text email body."
         );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given text strings are present in order in the plain-text email body.
+     *
+     * @param  array  $strings
+     * @return $this
+     */
+    public function assertSeeInOrderInText($strings)
+    {
+        [$html, $text] = $this->renderForAssertions();
+
+        PHPUnit::assertThat($strings, new SeeInOrder($text));
 
         return $this;
     }

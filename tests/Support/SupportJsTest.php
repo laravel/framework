@@ -53,7 +53,7 @@ class SupportJsTest extends TestCase
 
             public $bar = 'not world';
 
-            public function jsonSerialize()
+            public function jsonSerialize(): mixed
             {
                 return ['foo' => 'hello', 'bar' => 'world'];
             }
@@ -85,7 +85,7 @@ class SupportJsTest extends TestCase
                 return json_encode(['foo' => 'hello', 'bar' => 'world'], $options);
             }
 
-            public function jsonSerialize()
+            public function jsonSerialize(): mixed
             {
                 return ['foo' => 'not hello', 'bar' => 'not world'];
             }

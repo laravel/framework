@@ -455,6 +455,19 @@ class PendingRequest
     }
 
     /**
+     * Specify the connect timeout (in seconds) for the request.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function connectTimeout(int $seconds)
+    {
+        return tap($this, function () use ($seconds) {
+            $this->options['connect_timeout'] = $seconds;
+        });
+    }
+
+    /**
      * Specify the number of times the request should be attempted.
      *
      * @param  int  $times

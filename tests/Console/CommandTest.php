@@ -120,6 +120,46 @@ class CommandTest extends TestCase
         $command->info('foo');
     }
 
+    public function testSetHidden()
+    {
+        $command = new class extends Command
+        {
+            public function parentIsHidden()
+            {
+                return parent::isHidden();
+            }
+        };
+
+        $this->assertFalse($command->isHidden());
+        $this->assertFalse($command->parentIsHidden());
+
+        $command->setHidden(true);
+
+        $this->assertTrue($command->isHidden());
+        $this->assertTrue($command->parentIsHidden());
+    }
+
+    public function testHiddenProperty()
+    {
+        $command = new class extends Command
+        {
+            protected $hidden = true;
+
+            public function parentIsHidden()
+            {
+                return parent::isHidden();
+            }
+        };
+
+        $this->assertTrue($command->isHidden());
+        $this->assertTrue($command->parentIsHidden());
+
+        $command->setHidden(false);
+
+        $this->assertFalse($command->isHidden());
+        $this->assertFalse($command->parentIsHidden());
+    }
+
     public function testChoiceIsSingleSelectByDefault()
     {
         $output = m::mock(OutputStyle::class);

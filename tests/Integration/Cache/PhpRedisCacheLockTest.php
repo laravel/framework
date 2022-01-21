@@ -224,11 +224,6 @@ class PhpRedisCacheLockTest extends TestCase
             $this->markTestSkipped('Redis extension is not configured to support the lz4 compression.');
         }
 
-        $this->markTestIncomplete(
-            'phpredis extension does not compress consistently with the php '.
-            'extension lz4. See: https://github.com/phpredis/phpredis/issues/1939'
-        );
-
         $this->app['config']->set('database.redis.client', 'phpredis');
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
