@@ -4225,6 +4225,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['start' => '31/12/2012', 'ends' => null], ['start' => 'date_format:d/m/Y|before:ends', 'ends' => 'nullable|date_format:d/m/Y|after:start']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['start' => '31/12/2012', 'ends' => null], ['start' => 'before:ends']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['start' => '31/12/2012', 'ends' => null], ['start' => 'before:ends', 'ends' => 'nullable']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['x' => date('d/m/Y')], ['x' => 'date_format:d/m/Y|after:yesterday|before:tomorrow']);
         $this->assertTrue($v->passes());
 
@@ -4354,6 +4360,27 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|after_or_equal:17:45']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2012-01-14', 'bar' => '2012-01-15'], ['foo' => 'before_or_equal:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '2012-01-15', 'bar' => '2012-01-15'], ['foo' => 'before_or_equal:bar']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '2012-01-15 13:00', 'bar' => '2012-01-15 12:00'], ['foo' => 'before_or_equal:bar']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2012-01-15 11:00', 'bar' => null], ['foo' => 'date_format:Y-m-d H:i|before_or_equal:bar', 'bar' => 'date_format:Y-m-d H:i']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2012-01-15 11:00', 'bar' => null], ['foo' => 'date_format:Y-m-d H:i|before_or_equal:bar', 'bar' => 'date_format:Y-m-d H:i|nullable']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '2012-01-15 11:00', 'bar' => null], ['foo' => 'before_or_equal:bar']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2012-01-15 11:00', 'bar' => null], ['foo' => 'before_or_equal:bar', 'bar' => 'nullable']);
         $this->assertTrue($v->fails());
     }
 
