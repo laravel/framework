@@ -430,16 +430,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * or add to collection if not exists.
      *
      * @param  mixed  $key
-     * @param  callable  $callback
+     * @param  mixed  $value
      * @return mixed
      */
-    public function getOrPut($key, callable $callback)
+    public function getOrPut($key, mixed $value)
     {
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
 
-        $this->offsetSet($key, $value = $callback());
+        $this->offsetSet($key, $value = value($value));
 
         return $value;
     }

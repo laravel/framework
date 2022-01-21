@@ -2152,6 +2152,16 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
 
+        $this->assertEquals('taylor', $data->getOrPut('name', null));
+        $this->assertEquals('foo', $data->getOrPut('email', null));
+        $this->assertEquals('male', $data->getOrPut('gender', 'male'));
+
+        $this->assertEquals('taylor', $data->get('name'));
+        $this->assertEquals('foo', $data->get('email'));
+        $this->assertEquals('male', $data->get('gender'));
+
+        $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
+
         $this->assertEquals('taylor', $data->getOrPut('name', function () {
             return null;
         }));
@@ -2163,6 +2173,10 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('male', $data->getOrPut('gender', function () {
             return 'male';
         }));
+
+        $this->assertEquals('taylor', $data->get('name'));
+        $this->assertEquals('foo', $data->get('email'));
+        $this->assertEquals('male', $data->get('gender'));
     }
 
     public function testPut()
