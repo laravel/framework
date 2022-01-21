@@ -14,6 +14,7 @@ use Illuminate\Support\HigherOrderCollectionProxy;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
+use UnexpectedValueException;
 
 /**
  * @template TKey of array-key
@@ -50,6 +51,13 @@ use Traversable;
 trait EnumeratesValues
 {
     use Conditionable;
+
+    /**
+     * Indicates that the object's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
 
     /**
      * The methods that can be proxied.
@@ -133,7 +141,7 @@ trait EnumeratesValues
     /**
      * Create a new instance with no items.
      *
-     * @return static<TKey, TValue>
+     * @return static
      */
     public static function empty()
     {
@@ -187,7 +195,7 @@ trait EnumeratesValues
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  (callable(TValue): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -262,7 +270,7 @@ trait EnumeratesValues
      * Execute a callback over each nested chunk of items.
      *
      * @param  callable(...mixed): mixed  $callback
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function eachSpread(callable $callback)
     {
@@ -370,8 +378,10 @@ trait EnumeratesValues
     /**
      * Map the values into a new class.
      *
-     * @param  class-string  $class
-     * @return static<TKey, mixed>
+     * @template TMapIntoValue
+     *
+     * @param  class-string<TMapIntoValue>  $class
+     * @return static<TKey, TMapIntoValue>
      */
     public function mapInto($class)
     {
@@ -539,7 +549,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  mixed  $operator
      * @param  mixed  $value
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function where($key, $operator = null, $value = null)
     {
@@ -550,7 +560,7 @@ trait EnumeratesValues
      * Filter items where the value for the given key is null.
      *
      * @param  string|null  $key
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNull($key = null)
     {
@@ -561,7 +571,7 @@ trait EnumeratesValues
      * Filter items where the value for the given key is not null.
      *
      * @param  string|null  $key
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotNull($key = null)
     {
@@ -574,7 +584,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  mixed  $value
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereStrict($key, $value)
     {
@@ -587,7 +597,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereIn($key, $values, $strict = false)
     {
@@ -603,7 +613,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereInStrict($key, $values)
     {
@@ -615,7 +625,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereBetween($key, $values)
     {
@@ -627,7 +637,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotBetween($key, $values)
     {
@@ -642,7 +652,7 @@ trait EnumeratesValues
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotIn($key, $values, $strict = false)
     {
@@ -658,7 +668,7 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  \Illuminate\Contracts\Support\Arrayable|iterable  $values
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereNotInStrict($key, $values)
     {
@@ -669,7 +679,7 @@ trait EnumeratesValues
      * Filter the items, removing any items that don't match the given type(s).
      *
      * @param  class-string|array<array-key, class-string>  $type
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function whereInstanceOf($type)
     {
@@ -713,6 +723,22 @@ trait EnumeratesValues
     }
 
     /**
+     * Pass the collection through a series of callable pipes and return the result.
+     *
+     * @param  array<callable>  $pipes
+     * @return mixed
+     */
+    public function pipeThrough($pipes)
+    {
+        return static::make($pipes)->reduce(
+            function ($carry, $pipe) {
+                return $pipe($carry);
+            },
+            $this,
+        );
+    }
+
+    /**
      * Reduce the collection to a single value.
      *
      * @template TReduceInitial
@@ -728,6 +754,49 @@ trait EnumeratesValues
 
         foreach ($this as $key => $value) {
             $result = $callback($result, $value, $key);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param  callable  $callback
+     * @param  mixed  ...$initial
+     * @return array
+     *
+     * @deprecated Use "reduceSpread" instead
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function reduceMany(callable $callback, ...$initial)
+    {
+        return $this->reduceSpread($callback, ...$initial);
+    }
+
+    /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param  callable  $callback
+     * @param  mixed  ...$initial
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function reduceSpread(callable $callback, ...$initial)
+    {
+        $result = $initial;
+
+        foreach ($this as $key => $value) {
+            $result = call_user_func_array($callback, array_merge($result, [$value, $key]));
+
+            if (! is_array($result)) {
+                throw new UnexpectedValueException(sprintf(
+                    "%s::reduceMany expects reducer to return an array, but got a '%s' instead.",
+                    class_basename(static::class), gettype($result)
+                ));
+            }
         }
 
         return $result;
@@ -752,7 +821,7 @@ trait EnumeratesValues
      * Create a collection of all elements that do not pass a given truth test.
      *
      * @param  (callable(TValue): bool)|bool  $callback
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function reject($callback = true)
     {
@@ -768,7 +837,7 @@ trait EnumeratesValues
     /**
      * Pass the collection to the given callback and then return it.
      *
-     * @param  callable(TValue): mixed  $callback
+     * @param  callable($this): mixed  $callback
      * @return $this
      */
     public function tap(callable $callback)
@@ -783,7 +852,7 @@ trait EnumeratesValues
      *
      * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  bool  $strict
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function unique($key = null, $strict = false)
     {
@@ -804,7 +873,7 @@ trait EnumeratesValues
      * Return only unique items from the collection array using strict comparison.
      *
      * @param  (callable(TValue, TKey): bool)|string|null  $key
-     * @return static<TKey, TValue>
+     * @return static
      */
     public function uniqueStrict($key = null)
     {
@@ -838,8 +907,7 @@ trait EnumeratesValues
      *
      * @return array<TKey, mixed>
      */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
@@ -883,7 +951,22 @@ trait EnumeratesValues
      */
     public function __toString()
     {
-        return $this->toJson();
+        return $this->escapeWhenCastingToString
+                    ? e($this->toJson())
+                    : $this->toJson();
+    }
+
+    /**
+     * Indicate that the model's string representation should be escaped when __toString is invoked.
+     *
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true)
+    {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 
     /**
@@ -918,7 +1001,7 @@ trait EnumeratesValues
      * Results array of items from Collection or Arrayable.
      *
      * @param  mixed  $items
-     * @return array
+     * @return array<TKey, TValue>
      */
     protected function getArrayableItems($items)
     {
@@ -1020,7 +1103,7 @@ trait EnumeratesValues
      * Make a function to check an item's equality.
      *
      * @param  mixed  $value
-     * @return \Closure
+     * @return \Closure(mixed): bool
      */
     protected function equality($value)
     {
@@ -1045,7 +1128,7 @@ trait EnumeratesValues
     /**
      * Make a function that returns what's passed to it.
      *
-     * @return \Closure
+     * @return \Closure(TValue): TValue
      */
     protected function identity()
     {

@@ -14,7 +14,7 @@ class ViewName
     {
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
-        if (strpos($name, $delimiter) === false) {
+        if (! str_contains($name, $delimiter)) {
             return str_replace('/', '.', $name);
         }
 

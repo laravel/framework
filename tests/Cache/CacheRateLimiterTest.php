@@ -125,4 +125,15 @@ class CacheRateLimiterTest extends TestCase
         }, 1));
         $this->assertFalse($executed);
     }
+
+    public function testKeysAreSanitizedFromUnicodeCharacters()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->once()->with('john', 0)->andReturn(1);
+        $cache->shouldReceive('has')->once()->with('john:timer')->andReturn(true);
+        $cache->shouldReceive('add')->never();
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertTrue($rateLimiter->tooManyAttempts('jôhn', 1));
+    }
 }

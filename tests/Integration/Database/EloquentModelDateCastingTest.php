@@ -9,15 +9,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentModelDateCastingTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->date('date_field')->nullable();
@@ -48,20 +43,20 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             $bindings = $query->bindings;
         });
 
-        $user = TestModel1::create([
-            'date_field' => '2019-10',
+        TestModel1::create([
+            'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',
             'immutable_date_field' => '2019-10-01',
             'immutable_datetime_field' => '2019-10-01 10:15',
         ]);
 
-        $this->assertSame(['2019-10', '2019-10-01 10:15:20', '2019-10-01', '2019-10-01 10:15'], $bindings);
+        $this->assertSame(['2019-10-01', '2019-10-01 10:15:20', '2019-10-01', '2019-10-01 10:15'], $bindings);
     }
 
     public function testDatesFormattedArrayAndJson()
     {
         $user = TestModel1::create([
-            'date_field' => '2019-10',
+            'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',
             'immutable_date_field' => '2019-10-01',
             'immutable_datetime_field' => '2019-10-01 10:15',
@@ -81,7 +76,6 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
     public function testCustomDateCastsAreComparedAsDatesForCarbonInstances()
     {
-        /** @var TestModel1 */
         $user = TestModel1::create([
             'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',
@@ -102,7 +96,6 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
     public function testCustomDateCastsAreComparedAsDatesForStringValues()
     {
-        /** @var TestModel1 */
         $user = TestModel1::create([
             'date_field' => '2019-10-01',
             'datetime_field' => '2019-10-01 10:15:20',

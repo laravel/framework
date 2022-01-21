@@ -3,12 +3,15 @@
 namespace Illuminate\Tests\Routing;
 
 use BadMethodCallException;
+use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Stringable;
 
 class RouteRegistrarTest extends TestCase
 {
@@ -58,6 +61,69 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
+    }
+
+    public function testNullNamespaceIsRespected()
+    {
+        $this->router->middleware(['one'])->namespace(null)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertNull($this->getRoute()->getAction()['namespace']);
+    }
+
+    public function testMiddlewareAsStringableObject()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware($one)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame(['one'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareAsStringableObjectOnRouteInstance()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware($one);
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame(['one'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareAsArrayWithStringables()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware([$one, 'two'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
     }
 
     public function testWithoutMiddlewareRegistration()
@@ -190,6 +256,38 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+    public function testCanRegisterGroupWithoutMiddleware()
+    {
+        $this->router->withoutMiddleware('one')->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            })->middleware(['one', 'two']);
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
+    public function testCanRegisterGroupWithStringableMiddleware()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->middleware($one)->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->seeMiddleware('one');
+    }
+
     public function testCanRegisterGroupWithNamespace()
     {
         $this->router->namespace('App\Http\Controllers')->group(function ($router) {
@@ -248,6 +346,89 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertSame('{account}.myapp.com', $this->getRoute()->getDomain());
         $this->assertSame('api.users', $this->getRoute()->getName());
+    }
+
+    public function testCanRegisterGroupWithController()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', 'index');
+        });
+
+        $this->assertSame(
+            RouteRegistrarControllerStub::class.'@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanOverrideGroupControllerWithStringSyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', 'UserController@index');
+        });
+
+        $this->assertSame(
+            'UserController@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanOverrideGroupControllerWithClosureSyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', function () {
+                return 'hello world';
+            });
+        });
+
+        $this->seeResponse('hello world', Request::create('users', 'GET'));
+    }
+
+    public function testCanOverrideGroupControllerWithInvokableControllerSyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', InvokableRouteRegistrarControllerStub::class);
+        });
+
+        $this->assertSame(
+            InvokableRouteRegistrarControllerStub::class.'@__invoke',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testWillUseTheLatestGroupController()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->group(['controller' => FooController::class], function ($router) {
+                $router->get('users', 'index');
+            });
+        });
+
+        $this->assertSame(
+            FooController::class.'@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testCanOverrideGroupControllerWithArraySyntax()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function ($router) {
+            $router->get('users', [FooController::class, 'index']);
+        });
+
+        $this->assertSame(
+            FooController::class.'@index',
+            $this->getRoute()->getAction()['uses']
+        );
+    }
+
+    public function testRouteGroupingWithoutPrefix()
+    {
+        $this->router->group([], function ($router) {
+            $router->prefix('bar')->get('baz', ['as' => 'baz', function () {
+                return 'hello';
+            }]);
+        });
+        $this->seeResponse('hello', Request::create('bar/baz', 'GET'));
     }
 
     public function testRegisteringNonApprovedAttributesThrows()
@@ -596,6 +777,27 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
     }
 
+    public function testResourceWithMiddlewareAsStringable()
+    {
+        $one = new class implements Stringable
+        {
+            public function __toString()
+            {
+                return 'one';
+            }
+        };
+
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->only('index')
+                     ->middleware([$one, 'two'])
+                     ->withoutMiddleware('one');
+
+        $this->seeResponse('controller', Request::create('users', 'GET'));
+
+        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
+        $this->assertEquals(['one'], $this->getRoute()->excludedMiddleware());
+    }
+
     public function testResourceWheres()
     {
         $wheres = [
@@ -718,6 +920,14 @@ class RouteRegistrarControllerStub
     public function destroy()
     {
         return 'deleted';
+    }
+}
+
+class InvokableRouteRegistrarControllerStub
+{
+    public function __invoke()
+    {
+        return 'controller';
     }
 }
 

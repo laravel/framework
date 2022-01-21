@@ -9,27 +9,10 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Orchestra\Testbench\TestCase;
 use Queue;
 
-/**
- * @group integration
- */
 class WorkCommandTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         $app['db']->connection()->getSchemaBuilder()->create('jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('queue');

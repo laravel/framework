@@ -63,9 +63,14 @@ trait Has
 
         $this->interactsWith($key);
 
-        if (is_int($length) && ! is_null($callback)) {
+        if (! is_null($callback)) {
             return $this->has($key, function (self $scope) use ($length, $callback) {
-                return $scope->count($length)
+                return $scope
+                    ->tap(function (self $scope) use ($length) {
+                        if (! is_null($length)) {
+                            $scope->count($length);
+                        }
+                    })
                     ->first($callback)
                     ->etc();
             });
@@ -98,6 +103,28 @@ trait Has
             } else {
                 $this->has($prop, $count);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that at least one of the given props exists.
+     *
+     * @param  array|string  $key
+     * @return $this
+     */
+    public function hasAny($key): self
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        PHPUnit::assertTrue(
+            Arr::hasAny($this->prop(), $keys),
+            sprintf('None of properties [%s] exist.', implode(', ', $keys))
+        );
+
+        foreach ($keys as $key) {
+            $this->interactsWith($key);
         }
 
         return $this;

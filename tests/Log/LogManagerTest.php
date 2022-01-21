@@ -7,12 +7,14 @@ use Illuminate\Log\LogManager;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\LogEntriesHandler;
 use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger as Monolog;
+use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
 use ReflectionProperty;
 use RuntimeException;
@@ -376,5 +378,107 @@ class LogManagerTest extends TestCase
         $manager->forgetChannel('single');
 
         $this->assertEmpty($manager->getChannels());
+    }
+
+    public function testLogManagerCanBuildOnDemandChannel()
+    {
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->build([
+            'driver' => 'single',
+            'path' => storage_path('logs/on-demand.log'),
+        ]);
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+
+        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url->setAccessible(true);
+
+        $this->assertSame(storage_path('logs/on-demand.log'), $url->getValue($handler));
+    }
+
+    public function testLogManagerCanUseOnDemandChannelInOnDemandStack()
+    {
+        $manager = new LogManager($this->app);
+        $this->app['config']->set('logging.channels.test', [
+            'driver' => 'single',
+        ]);
+
+        $factory = new class()
+        {
+            public function __invoke()
+            {
+                return new Monolog(
+                    'uuid',
+                    [new StreamHandler(storage_path('logs/custom.log'))],
+                    [new UidProcessor()]
+                );
+            }
+        };
+        $channel = $manager->build([
+            'driver' => 'custom',
+            'via' => get_class($factory),
+        ]);
+        $logger = $manager->stack(['test', $channel]);
+
+        $handler = $logger->getLogger()->getHandlers()[1];
+        $processor = $logger->getLogger()->getProcessors()[0];
+
+        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(UidProcessor::class, $processor);
+
+        $url = new ReflectionProperty(get_class($handler), 'url');
+        $url->setAccessible(true);
+
+        $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
+    }
+
+    public function testWrappingHandlerInFingersCrossedWhenActionLevelIsUsed()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.fingerscrossed', [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => 'debug',
+            'action_level' => 'critical',
+            'with' => [
+                'stream' => 'php://stderr',
+                'bubble' => false,
+            ],
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('fingerscrossed');
+        $handlers = $logger->getLogger()->getHandlers();
+
+        $this->assertInstanceOf(Logger::class, $logger);
+        $this->assertCount(1, $handlers);
+
+        $expectedFingersCrossedHandler = $handlers[0];
+        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler, );
+
+        $activationStrategyProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'activationStrategy');
+        $activationStrategyProp->setAccessible(true);
+        $activationStrategyValue = $activationStrategyProp->getValue($expectedFingersCrossedHandler);
+
+        $actionLevelProp = new ReflectionProperty(get_class($activationStrategyValue), 'actionLevel');
+        $actionLevelProp->setAccessible(true);
+        $actionLevelValue = $actionLevelProp->getValue($activationStrategyValue);
+
+        $this->assertEquals(Monolog::CRITICAL, $actionLevelValue);
+
+        if (method_exists($expectedFingersCrossedHandler, 'getHandler')) {
+            $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
+        } else {
+            $handlerProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'handler');
+            $handlerProp->setAccessible(true);
+            $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
+        }
+        $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
+        $this->assertEquals(Monolog::DEBUG, $expectedStreamHandler->getLevel());
     }
 }

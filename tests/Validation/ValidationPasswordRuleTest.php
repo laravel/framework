@@ -144,8 +144,15 @@ class ValidationPasswordRuleTest extends TestCase
             'validation.required',
         ]);
 
-        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
+            'The my password must contain at least one uppercase and one lowercase letter.',
+            'The my password must contain at least one number.',
+        ]);
+
+        $this->fails($makeRules(), ['1231231'], [
+            'validation.min.string',
+            'The my password must contain at least one uppercase and one lowercase letter.',
         ]);
 
         $this->fails($makeRules(), ['4564654564564'], [
@@ -165,8 +172,15 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->passes($makeRules(), [null]);
 
-        $this->fails($makeRules(), ['foo', 'azdazd', '1231231'], [
+        $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
+            'The my password must contain at least one symbol.',
+        ]);
+
+        $this->fails($makeRules(), ['1231231'], [
+            'validation.min.string',
+            'The my password must contain at least one letter.',
+            'The my password must contain at least one symbol.',
         ]);
 
         $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
@@ -253,6 +267,41 @@ class ValidationPasswordRuleTest extends TestCase
         );
 
         $this->assertTrue($v1->passes());
+    }
+
+    public function testPassesWithCustomRules()
+    {
+        $closureRule = function ($attribute, $value, $fail) {
+            if ($value !== 'aa') {
+                $fail('Custom rule closure failed');
+            }
+        };
+
+        $ruleObject = new class implements \Illuminate\Contracts\Validation\Rule
+        {
+            public function passes($attribute, $value)
+            {
+                return $value === 'aa';
+            }
+
+            public function message()
+            {
+                return 'Custom rule object failed';
+            }
+        };
+
+        $this->passes(Password::min(2)->rules($closureRule), ['aa']);
+        $this->passes(Password::min(2)->rules([$closureRule]), ['aa']);
+        $this->passes(Password::min(2)->rules($ruleObject), ['aa']);
+        $this->passes(Password::min(2)->rules([$closureRule, $ruleObject]), ['aa']);
+
+        $this->fails(Password::min(2)->rules($closureRule), ['ab'], [
+            'Custom rule closure failed',
+        ]);
+
+        $this->fails(Password::min(2)->rules($ruleObject), ['ab'], [
+            'Custom rule object failed',
+        ]);
     }
 
     protected function passes($rule, $values)

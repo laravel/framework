@@ -11,23 +11,10 @@ use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
-/**
- * @group integration
- */
 class QueueConnectionTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
-        parent::setUp();
-    }
-
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
         $app['config']->set('queue.default', 'sqs');
         $app['config']->set('queue.connections.sqs.after_commit', true);
     }

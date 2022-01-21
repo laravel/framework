@@ -15,6 +15,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 use Mockery as m;
 use OutOfBoundsException;
@@ -48,6 +49,28 @@ class HttpClientTest extends TestCase
         $response = $this->factory->post('http://laravel.com/test-missing-page');
 
         $this->assertTrue($response->ok());
+    }
+
+    public function testUnauthorizedRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 401),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->unauthorized());
+    }
+
+    public function testForbiddenRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 403),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->forbidden());
     }
 
     public function testResponseBodyCasting()
@@ -156,6 +179,39 @@ class HttpClientTest extends TestCase
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
         });
+    }
+
+    public function testCanSendArrayableFormData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asForm()->post('http://foo.com/form', new Fluent([
+            'name' => 'Taylor',
+            'title' => 'Laravel Developer',
+        ]));
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                   $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
+                   $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testRecordedCallsAreEmptiedWhenFakeIsCalled()
+    {
+        $this->factory->fake([
+            'http://foo.com/*' => ['page' => 'foo'],
+        ]);
+
+        $this->factory->get('http://foo.com/test');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/test';
+        });
+
+        $this->factory->fake();
+
+        $this->factory->assertNothingSent();
     }
 
     public function testSpecificRequestIsNotBeingSent()
@@ -295,6 +351,23 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testItOnlySendsOneUserAgentHeader()
+    {
+        $this->factory->fake();
+
+        $this->factory->withUserAgent('Laravel')
+            ->withUserAgent('FooBar')
+            ->post('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            $userAgent = $request->header('User-Agent');
+
+            return $request->url() === 'http://foo.com/json' &&
+                count($userAgent) === 1 &&
+                $userAgent[0] === 'FooBar';
+        });
+    }
+
     public function testSequenceBuilder()
     {
         $this->factory->fake([
@@ -389,6 +462,18 @@ class HttpClientTest extends TestCase
         $this->factory->fake();
 
         $this->factory->get('http://foo.com/get', ['foo' => 'bar']);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get?foo=bar'
+                && $request['foo'] === 'bar';
+        });
+    }
+
+    public function testGetWithArrayableQueryParam()
+    {
+        $this->factory->fake();
+
+        $this->factory->get('http://foo.com/get', new Fluent(['foo' => 'bar']));
 
         $this->factory->assertSent(function (Request $request) {
             return $request->url() === 'http://foo.com/get?foo=bar'
@@ -1010,5 +1095,31 @@ class HttpClientTest extends TestCase
         });
 
         $this->factory->get('https://example.com');
+    }
+
+    public function testRequestExceptionIsThrownWhenRetriesExhausted()
+    {
+        $this->expectException(RequestException::class);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $this->factory
+            ->retry(2, 1000, null, true)
+            ->get('http://foo.com/get');
+    }
+
+    public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $response = $this->factory
+            ->retry(2, 1000, null, false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->failed());
     }
 }

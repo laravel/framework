@@ -56,9 +56,10 @@ interface Application extends Container
     /**
      * Get the path to the storage directory.
      *
+     * @param  string  $path
      * @return string
      */
-    public function storagePath();
+    public function storagePath($path = '');
 
     /**
      * Get or check the current application environment.
@@ -81,6 +82,13 @@ interface Application extends Container
      * @return bool
      */
     public function runningUnitTests();
+
+    /**
+     * Get an instance of the maintenance mode manager implementation.
+     *
+     * @return \Illuminate\Contracts\Foundation\MaintenanceMode
+     */
+    public function maintenanceMode();
 
     /**
      * Determine if the application is currently down for maintenance.

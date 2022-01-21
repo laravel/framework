@@ -3,12 +3,17 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
-class MigrateWithRealpathTest extends DatabaseTestCase
+class MigrateWithRealpathTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
+
+        if ($this->app['config']->get('database.default') !== 'testing') {
+            $this->artisan('db:wipe', ['--drop-views' => true]);
+        }
 
         $options = [
             '--path' => realpath(__DIR__.'/stubs/'),

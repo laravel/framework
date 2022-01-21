@@ -6,6 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -469,7 +470,13 @@ class RedisConnectionTest extends TestCase
     public function testItRunsEval()
     {
         foreach ($this->connections() as $redis) {
-            $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
+            if ($redis instanceof PhpRedisConnection) {
+                // User must decide what needs to be serialized and compressed.
+                $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', ...$redis->pack(['mohamed']));
+            } else {
+                $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
+            }
+
             $this->assertSame('mohamed', $redis->get('name'));
 
             $redis->flushall();
@@ -559,10 +566,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItScansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $initialKeys = ['test:scan:1', 'test:scan:2'];
 
@@ -591,10 +594,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItZscansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $members = [100 => 'test:zscan:1', 200 => 'test:zscan:2'];
 
@@ -636,10 +635,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItHscansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $fields = ['name' => 'mohamed', 'hobby' => 'diving'];
 
@@ -677,10 +672,6 @@ class RedisConnectionTest extends TestCase
 
     public function testItSscansForKeys()
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         foreach ($this->connections() as $redis) {
             $members = ['test:sscan:1', 'test:sscan:2'];
 
@@ -793,7 +784,7 @@ class RedisConnectionTest extends TestCase
         $host = env('REDIS_HOST', '127.0.0.1');
         $port = env('REDIS_PORT', 6379);
 
-        $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
+        $connections[] = (new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
             'default' => [
                 'url' => "redis://user@$host:$port",
@@ -803,9 +794,9 @@ class RedisConnectionTest extends TestCase
                 'options' => ['prefix' => 'laravel:'],
                 'timeout' => 0.5,
             ],
-        ]);
+        ]))->connection();
 
-        $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
+        $connections['persistent'] = (new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
             'default' => [
                 'host' => $host,
@@ -816,9 +807,9 @@ class RedisConnectionTest extends TestCase
                 'persistent' => true,
                 'persistent_id' => 'laravel',
             ],
-        ]);
+        ]))->connection();
 
-        $serializerPhpRedis = new RedisManager(new Application, 'phpredis', [
+        $connections[] = (new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
             'default' => [
                 'host' => $host,
@@ -827,9 +818,9 @@ class RedisConnectionTest extends TestCase
                 'options' => ['serializer' => Redis::SERIALIZER_JSON],
                 'timeout' => 0.5,
             ],
-        ]);
+        ]))->connection();
 
-        $scanRetryPhpRedis = new RedisManager(new Application, 'phpredis', [
+        $connections[] = (new RedisManager(new Application, 'phpredis', [
             'cluster' => false,
             'default' => [
                 'host' => $host,
@@ -838,12 +829,145 @@ class RedisConnectionTest extends TestCase
                 'options' => ['scan' => Redis::SCAN_RETRY],
                 'timeout' => 0.5,
             ],
-        ]);
+        ]))->connection();
 
-        $connections[] = $prefixedPhpredis->connection();
-        $connections[] = $serializerPhpRedis->connection();
-        $connections[] = $scanRetryPhpRedis->connection();
-        $connections['persistent'] = $persistentPhpRedis->connection();
+        if (defined('Redis::COMPRESSION_LZF')) {
+            $connections['compression_lzf'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 9,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_LZF,
+                        'name' => 'compression_lzf',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+        }
+
+        if (defined('Redis::COMPRESSION_ZSTD')) {
+            $connections['compression_zstd'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 10,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_ZSTD,
+                        'name' => 'compression_zstd',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+
+            $connections['compression_zstd_default'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 11,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_ZSTD,
+                        'compression_level' => Redis::COMPRESSION_ZSTD_DEFAULT,
+                        'name' => 'compression_zstd_default',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+
+            $connections['compression_zstd_min'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 12,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_ZSTD,
+                        'compression_level' => Redis::COMPRESSION_ZSTD_MIN,
+                        'name' => 'compression_zstd_min',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+
+            $connections['compression_zstd_max'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 13,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_ZSTD,
+                        'compression_level' => Redis::COMPRESSION_ZSTD_MAX,
+                        'name' => 'compression_zstd_max',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+        }
+
+        if (defined('Redis::COMPRESSION_LZ4')) {
+            $connections['compression_lz4'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 14,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_LZ4,
+                        'name' => 'compression_lz4',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+
+            $connections['compression_lz4_default'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 15,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_LZ4,
+                        'compression_level' => 0,
+                        'name' => 'compression_lz4_default',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+
+            $connections['compression_lz4_min'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 16,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_LZ4,
+                        'compression_level' => 1,
+                        'name' => 'compression_lz4_min',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+
+            $connections['compression_lz4_max'] = (new RedisManager(new Application, 'phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 17,
+                    'options' => [
+                        'compression' => Redis::COMPRESSION_LZ4,
+                        'compression_level' => 12,
+                        'name' => 'compression_lz4_max',
+                    ],
+                    'timeout' => 0.5,
+                ],
+            ]))->connection();
+        }
 
         return $connections;
     }

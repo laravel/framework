@@ -7,16 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JobDispatchingTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-    }
-
     protected function tearDown(): void
     {
         Job::$ran = false;

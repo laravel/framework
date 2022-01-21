@@ -10,24 +10,12 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JobChainingTest extends TestCase
 {
     public static $catchCallbackRan = false;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
         $app['config']->set('queue.connections.sync1', [
             'driver' => 'sync',
         ]);

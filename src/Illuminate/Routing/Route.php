@@ -59,6 +59,13 @@ class Route
     public $controller;
 
     /**
+     * The controller instance class name.
+     *
+     * @var string
+     */
+    public $controllerClass;
+
+    /**
      * The default values for the route.
      *
      * @var array
@@ -270,12 +277,24 @@ class Route
     public function getController()
     {
         if (! $this->controller) {
-            $class = $this->parseControllerCallback()[0];
-
-            $this->controller = $this->container->make(ltrim($class, '\\'));
+            $this->controller = $this->container->make($this->getControllerClass());
         }
 
         return $this->controller;
+    }
+
+    /**
+     * Get the controller class reference for the route.
+     *
+     * @return string
+     */
+    public function getControllerClass()
+    {
+        if (! $this->controllerClass) {
+            $this->controllerClass = ltrim($this->parseControllerCallback()[0], '\\');
+        }
+
+        return $this->controllerClass;
     }
 
     /**
@@ -505,12 +524,16 @@ class Route
     /**
      * Get the parameters that are listed in the route / controller signature.
      *
-     * @param  string|null  $subClass
+     * @param  array  $conditions
      * @return array
      */
-    public function signatureParameters($subClass = null)
+    public function signatureParameters($conditions = [])
     {
-        return RouteSignatureParameters::fromAction($this->action, $subClass);
+        if (is_string($conditions)) {
+            $conditions = ['subClass' => $conditions];
+        }
+
+        return RouteSignatureParameters::fromAction($this->action, $conditions);
     }
 
     /**
@@ -910,7 +933,7 @@ class Route
     {
         $groupStack = last($this->router->getGroupStack());
 
-        if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
+        if (isset($groupStack['namespace']) && ! str_starts_with($action, '\\')) {
             return $groupStack['namespace'].'\\'.$action;
         }
 
@@ -1023,8 +1046,12 @@ class Route
             return (array) ($this->action['middleware'] ?? []);
         }
 
-        if (is_string($middleware)) {
+        if (! is_array($middleware)) {
             $middleware = func_get_args();
+        }
+
+        foreach ($middleware as $index => $value) {
+            $middleware[$index] = (string) $value;
         }
 
         $this->action['middleware'] = array_merge(
@@ -1035,6 +1062,20 @@ class Route
     }
 
     /**
+     * Specify that the "Authorize" / "can" middleware should be applied to the route with the given options.
+     *
+     * @param  string  $ability
+     * @param  array|string  $models
+     * @return $this
+     */
+    public function can($ability, $models = [])
+    {
+        return empty($models)
+                    ? $this->middleware(['can:'.$ability])
+                    : $this->middleware(['can:'.$ability.','.implode(',', Arr::wrap($models))]);
+    }
+
+    /**
      * Get the middleware for the route's controller.
      *
      * @return array
@@ -1042,6 +1083,10 @@ class Route
     public function controllerMiddleware()
     {
         if (! $this->isControllerAction()) {
+            return [];
+        }
+
+        if (! $this->controllerDispatcher()->shouldGatherMiddleware($this->getControllerClass())) {
             return [];
         }
 
@@ -1073,6 +1118,28 @@ class Route
     public function excludedMiddleware()
     {
         return (array) ($this->action['excluded_middleware'] ?? []);
+    }
+
+    /**
+     * Indicate that the route should enforce scoping of multiple implicit Eloquent bindings.
+     *
+     * @return bool
+     */
+    public function scopeBindings()
+    {
+        $this->action['scope_bindings'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the route should enforce scoping of multiple implicit Eloquent bindings.
+     *
+     * @return bool
+     */
+    public function enforcesScopedBindings()
+    {
+        return (bool) ($this->action['scope_bindings'] ?? false);
     }
 
     /**

@@ -26,7 +26,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseHas($table, array $data, $connection = null)
     {
         $this->assertThat(
-            $this->getTable($table), new HasInDatabase($this->getConnection($connection), $data)
+            $this->getTable($table), new HasInDatabase($this->getConnection($connection, $table), $data)
         );
 
         return $this;
@@ -43,7 +43,7 @@ trait InteractsWithDatabase
     protected function assertDatabaseMissing($table, array $data, $connection = null)
     {
         $constraint = new ReverseConstraint(
-            new HasInDatabase($this->getConnection($connection), $data)
+            new HasInDatabase($this->getConnection($connection, $table), $data)
         );
 
         $this->assertThat($this->getTable($table), $constraint);
@@ -62,27 +62,8 @@ trait InteractsWithDatabase
     protected function assertDatabaseCount($table, int $count, $connection = null)
     {
         $this->assertThat(
-            $this->getTable($table), new CountInDatabase($this->getConnection($connection), $count)
+            $this->getTable($table), new CountInDatabase($this->getConnection($connection, $table), $count)
         );
-
-        return $this;
-    }
-
-    /**
-     * Assert the given record has been deleted.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $table
-     * @param  array  $data
-     * @param  string|null  $connection
-     * @return $this
-     */
-    protected function assertDeleted($table, array $data = [], $connection = null)
-    {
-        if ($table instanceof Model) {
-            return $this->assertDatabaseMissing($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
-        }
-
-        $this->assertDatabaseMissing($this->getTable($table), $data, $connection);
 
         return $this;
     }
@@ -99,11 +80,16 @@ trait InteractsWithDatabase
     protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
         if ($this->isSoftDeletableModel($table)) {
-            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName(), $table->getDeletedAtColumn());
+            return $this->assertSoftDeleted(
+                $table->getTable(),
+                array_merge($data, [$table->getKeyName() => $table->getKey()]),
+                $table->getConnectionName(),
+                $table->getDeletedAtColumn()
+            );
         }
 
         $this->assertThat(
-            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
+            $this->getTable($table), new SoftDeletedInDatabase($this->getConnection($connection, $table), $data, $deletedAtColumn)
         );
 
         return $this;
@@ -121,11 +107,16 @@ trait InteractsWithDatabase
     protected function assertNotSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
         if ($this->isSoftDeletableModel($table)) {
-            return $this->assertNotSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName(), $table->getDeletedAtColumn());
+            return $this->assertNotSoftDeleted(
+                $table->getTable(),
+                array_merge($data, [$table->getKeyName() => $table->getKey()]),
+                $table->getConnectionName(),
+                $table->getDeletedAtColumn()
+            );
         }
 
         $this->assertThat(
-            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($connection), $data, $deletedAtColumn)
+            $this->getTable($table), new NotSoftDeletedInDatabase($this->getConnection($connection, $table), $data, $deletedAtColumn)
         );
 
         return $this;
@@ -196,13 +187,14 @@ trait InteractsWithDatabase
      * Get the database connection.
      *
      * @param  string|null  $connection
+     * @param  string|null  $table
      * @return \Illuminate\Database\Connection
      */
-    protected function getConnection($connection = null)
+    protected function getConnection($connection = null, $table = null)
     {
         $database = $this->app->make('db');
 
-        $connection = $connection ?: $database->getDefaultConnection();
+        $connection = $connection ?: $this->getTableConnection($table) ?: $database->getDefaultConnection();
 
         return $database->connection($connection);
     }
@@ -215,7 +207,29 @@ trait InteractsWithDatabase
      */
     protected function getTable($table)
     {
-        return is_subclass_of($table, Model::class) ? (new $table)->getTable() : $table;
+        return $this->newModelFor($table)?->getTable() ?: $table;
+    }
+
+    /**
+     * Get the table connection specified in the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @return string|null
+     */
+    protected function getTableConnection($table)
+    {
+        return $this->newModelFor($table)?->getConnectionName();
+    }
+
+    /**
+     * Get the model entity from the given model or string.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $table
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function newModelFor($table)
+    {
+        return is_subclass_of($table, Model::class) ? (new $table) : null;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -67,6 +68,17 @@ class SupportLazyCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    public function testDoesNotCreateCollectionFromGenerator()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $generateNumber = function () {
+            yield 1;
+        };
+
+        LazyCollection::make($generateNumber());
     }
 
     public function testEager()
@@ -200,5 +212,14 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4, 5], $data);
         $this->assertSame([1, 2, 3, 4, 5], $tapped);
+    }
+
+    public function testUniqueDoubleEnumeration()
+    {
+        $data = LazyCollection::times(2)->unique();
+
+        $data->all();
+
+        $this->assertSame([1, 2], $data->all());
     }
 }

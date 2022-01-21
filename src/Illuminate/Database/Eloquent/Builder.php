@@ -5,11 +5,8 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
-use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
-use Illuminate\Database\Concerns\ExplainsQueries;
-use Illuminate\Database\Eloquent\Concerns\DecoratesQueryBuilder;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -24,10 +21,12 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
+ *
+ * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder implements BuilderContract
+class Builder
 {
-    use BuildsQueries, DecoratesQueryBuilder, ExplainsQueries, ForwardsCalls, QueriesRelationships {
+    use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
     }
 
@@ -72,6 +71,44 @@ class Builder implements BuilderContract
      * @var \Closure
      */
     protected $onDelete;
+
+    /**
+     * The properties that should be returned from query builder.
+     *
+     * @var string[]
+     */
+    protected $propertyPassthru = [
+        'from',
+    ];
+
+    /**
+     * The methods that should be returned from query builder.
+     *
+     * @var string[]
+     */
+    protected $passthru = [
+        'aggregate',
+        'average',
+        'avg',
+        'count',
+        'dd',
+        'doesntExist',
+        'dump',
+        'exists',
+        'explain',
+        'getBindings',
+        'getConnection',
+        'getGrammar',
+        'insert',
+        'insertGetId',
+        'insertOrIgnore',
+        'insertUsing',
+        'max',
+        'min',
+        'raw',
+        'sum',
+        'toSql',
+    ];
 
     /**
      * Applied global scopes.
@@ -601,7 +638,7 @@ class Builder implements BuilderContract
             // For nested eager loads we'll skip loading them here and they will be set as an
             // eager load on the query to retrieve the relation so that they will be eager
             // loaded on that query, because that is where they get hydrated as models.
-            if (strpos($name, '.') === false) {
+            if (! str_contains($name, '.')) {
                 $models = $this->eagerLoadRelation($models, $name, $constraints);
             }
         }
@@ -1572,6 +1609,10 @@ class Builder implements BuilderContract
             return new HigherOrderBuilderProxy($this, $key);
         }
 
+        if (in_array($key, $this->propertyPassthru)) {
+            return $this->toBase()->{$key};
+        }
+
         throw new Exception("Property [{$key}] does not exist on the Eloquent builder instance.");
     }
 
@@ -1608,6 +1649,10 @@ class Builder implements BuilderContract
 
         if ($this->hasNamedScope($method)) {
             return $this->callNamedScope($method, $parameters);
+        }
+
+        if (in_array($method, $this->passthru)) {
+            return $this->toBase()->{$method}(...$parameters);
         }
 
         $this->forwardCallTo($this->query, $method, $parameters);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
+namespace Illuminate\Tests\Integration\Auth;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\User as FoundationUser;
@@ -15,8 +15,6 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('app.debug', 'true');
-
         // Auth configuration
         $app['config']->set('auth.defaults.guard', 'api');
         $app['config']->set('auth.providers.users.model', User::class);

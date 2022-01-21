@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class SessionPersistenceTest extends TestCase
 {
     public function testSessionIsPersistedEvenIfExceptionIsThrownFromRoute()
@@ -53,7 +50,7 @@ class FakeNullSessionHandler extends NullSessionHandler
 {
     public $written = false;
 
-    public function write($sessionId, $data)
+    public function write($sessionId, $data): bool
     {
         $this->written = true;
 

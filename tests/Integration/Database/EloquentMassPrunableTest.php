@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use LogicException;
 use Mockery as m;
 
+/** @group SkipMSSQL */
 class EloquentMassPrunableTest extends DatabaseTestCase
 {
     protected function setUp(): void
@@ -26,7 +27,10 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         });
 
         $container->alias(Dispatcher::class, 'events');
+    }
 
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         collect([
             'mass_prunable_test_models',
             'mass_prunable_soft_delete_test_models',

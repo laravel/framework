@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Date;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
@@ -54,12 +55,12 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        $position = strrpos($header, 'Bearer');
+        $position = strrpos($header, 'Bearer ');
 
         if ($position !== false) {
             $header = substr($header, $position + 7);
 
-            return strpos($header, ',') !== false ? strstr(',', $header, true) : $header;
+            return str_contains($header, ',') ? strstr($header, ',', true) : $header;
         }
     }
 
@@ -297,14 +298,35 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a Carbon instance.
+     *
+     * @param  string  $key
+     * @param  string|null  $format
+     * @param  string|null  $tz
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function date($key, $format = null, $tz = null)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        if (is_null($format)) {
+            return Date::parse($this->input($key), $tz);
+        }
+
+        return Date::createFromFormat($format, $this->input($key), $tz);
+    }
+
+    /**
      * Retrieve input from the request as a collection.
      *
-     * @param  string|null  $key
+     * @param  array|string|null  $key
      * @return \Illuminate\Support\Collection
      */
     public function collect($key = null)
     {
-        return collect($this->input($key));
+        return collect(is_array($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
@@ -491,14 +513,12 @@ trait InteractsWithInput
     /**
      * Dump the request items and end the script.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return void
      */
     public function dd(...$keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        call_user_func_array([$this, 'dump'], $keys);
+        $this->dump(...$keys);
 
         exit(1);
     }
@@ -506,7 +526,7 @@ trait InteractsWithInput
     /**
      * Dump the items.
      *
-     * @param  array  $keys
+     * @param  mixed  $keys
      * @return $this
      */
     public function dump($keys = [])

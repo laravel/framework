@@ -71,7 +71,7 @@ class Factory implements FactoryContract
      *
      * @var bool
      */
-    protected $excludeUnvalidatedArrayKeys;
+    protected $excludeUnvalidatedArrayKeys = true;
 
     /**
      * The Validator resolver instance.
@@ -249,7 +249,17 @@ class Factory implements FactoryContract
     }
 
     /**
-     * Indicate that unvalidated array keys should be excluded, even if the parent array was validated.
+     * Indicate that unvalidated array keys should be included in validated data when the parent array is validated.
+     *
+     * @return void
+     */
+    public function includeUnvalidatedArrayKeys()
+    {
+        $this->excludeUnvalidatedArrayKeys = false;
+    }
+
+    /**
+     * Indicate that unvalidated array keys should be excluded from the validated data, even if the parent array was validated.
      *
      * @return void
      */

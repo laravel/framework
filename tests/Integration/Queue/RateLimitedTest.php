@@ -14,9 +14,6 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RateLimitedTest extends TestCase
 {
     protected function tearDown(): void

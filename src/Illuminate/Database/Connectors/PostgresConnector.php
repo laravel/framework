@@ -93,8 +93,10 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function configureSearchPath($connection, $config)
     {
-        if (isset($config['search_path'])) {
-            $searchPath = $this->quoteSearchPath($this->parseSearchPath($config['search_path']));
+        if (isset($config['search_path']) || isset($config['schema'])) {
+            $searchPath = $this->quoteSearchPath(
+                $this->parseSearchPath($config['search_path'] ?? $config['schema'])
+            );
 
             $connection->prepare("set search_path to {$searchPath}")->execute();
         }
@@ -113,6 +115,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
 
             $searchPath = $matches[0];
         }
+
+        $searchPath = $searchPath ?? [];
 
         array_walk($searchPath, function (&$schema) {
             $schema = trim($schema, '\'"');
@@ -163,7 +167,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
 
         $host = isset($host) ? "host={$host};" : '';
 
-        $dsn = "pgsql:{$host}dbname={$database}";
+        $dsn = "pgsql:{$host}dbname='{$database}'";
 
         // If a port was specified, we will add it to this Postgres DSN connections
         // format. Once we have done that we are ready to return this connection

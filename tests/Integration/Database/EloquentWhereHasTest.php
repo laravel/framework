@@ -7,15 +7,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class EloquentWhereHasTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
         });
@@ -24,6 +19,12 @@ class EloquentWhereHasTest extends DatabaseTestCase
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->boolean('public');
+        });
+
+        Schema::create('texts', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('post_id');
+            $table->text('content');
         });
 
         Schema::create('comments', function (Blueprint $table) {
@@ -35,10 +36,12 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $user = User::create();
         $post = tap((new Post(['public' => true]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
+        (new Text(['content' => 'test']))->post()->associate($post)->save();
 
         $user = User::create();
         $post = tap((new Post(['public' => false]))->user()->associate($user))->save();
         (new Comment)->commentable()->associate($post)->save();
+        (new Text(['content' => 'test2']))->post()->associate($post)->save();
     }
 
     public function testWhereRelation()
@@ -53,6 +56,20 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $users = User::whereRelation('posts', 'public', true)->orWhereRelation('posts', 'public', false)->get();
 
         $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testNestedWhereRelation()
+    {
+        $texts = User::whereRelation('posts.texts', 'content', 'test')->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereRelation()
+    {
+        $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
     }
 
     public function testWhereMorphRelation()
@@ -104,9 +121,26 @@ class Post extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function texts()
+    {
+        return $this->hasMany(Text::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+}
+
+class Text extends Model
+{
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
     }
 }
 

@@ -7,12 +7,14 @@ use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
+use Illuminate\Support\Stringable;
 use IteratorAggregate;
 use LogicException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
@@ -363,6 +365,14 @@ class SupportHelpersTest extends TestCase
         class_uses_recursive(SupportTestClassThree::class));
     }
 
+    public function testStr()
+    {
+        $stringable = str('string-value');
+
+        $this->assertInstanceOf(Stringable::class, $stringable);
+        $this->assertSame('string-value', (string) $stringable);
+    }
+
     public function testTap()
     {
         $object = (object) ['id' => 1];
@@ -622,6 +632,23 @@ class SupportHelpersTest extends TestCase
         });
     }
 
+    public function testRetryWithBackoff()
+    {
+        $startTime = microtime(true);
+        $attempts = retry([50, 100, 200], function ($attempts) {
+            if ($attempts > 3) {
+                return $attempts;
+            }
+
+            throw new RuntimeException;
+        });
+
+        // Make sure we made four attempts
+        $this->assertEquals(4, $attempts);
+
+        $this->assertEqualsWithDelta(0.05 + 0.1 + 0.2, microtime(true) - $startTime, 0.02);
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
@@ -805,22 +832,22 @@ class SupportTestArrayAccess implements ArrayAccess
         $this->attributes = $attributes;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->attributes);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->attributes[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->attributes[$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->attributes[$offset]);
     }
@@ -835,7 +862,7 @@ class SupportTestArrayIterable implements IteratorAggregate
         $this->items = $items;
     }
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
     }

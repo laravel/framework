@@ -99,6 +99,13 @@ class PendingRequest
     protected $retryDelay = 100;
 
     /**
+     * Whether to throw an exception when all retries fail.
+     *
+     * @var bool
+     */
+    protected $retryThrow = true;
+
+    /**
      * The callback that will determine if the request should be retried.
      *
      * @var callable|null
@@ -161,7 +168,9 @@ class PendingRequest
         $this->asJson();
 
         $this->options = [
+            'connect_timeout' => 10,
             'http_errors' => false,
+            'timeout' => 30,
         ];
 
         $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
@@ -374,7 +383,9 @@ class PendingRequest
      */
     public function withUserAgent($userAgent)
     {
-        return $this->withHeaders(['User-Agent' => $userAgent]);
+        return tap($this, function ($request) use ($userAgent) {
+            return $this->options['headers']['User-Agent'] = trim($userAgent);
+        });
     }
 
     /**
@@ -444,17 +455,32 @@ class PendingRequest
     }
 
     /**
+     * Specify the connect timeout (in seconds) for the request.
+     *
+     * @param  int  $seconds
+     * @return $this
+     */
+    public function connectTimeout(int $seconds)
+    {
+        return tap($this, function () use ($seconds) {
+            $this->options['connect_timeout'] = $seconds;
+        });
+    }
+
+    /**
      * Specify the number of times the request should be attempted.
      *
      * @param  int  $times
      * @param  int  $sleep
      * @param  callable|null  $when
+     * @param  bool  $throw
      * @return $this
      */
-    public function retry(int $times, int $sleep = 0, ?callable $when = null)
+    public function retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
     {
         $this->tries = $times;
         $this->retryDelay = $sleep;
+        $this->retryThrow = $throw;
         $this->retryWhenCallback = $when;
 
         return $this;
@@ -568,7 +594,7 @@ class PendingRequest
      * @param  array  $data
      * @return \Illuminate\Http\Client\Response
      */
-    public function post(string $url, array $data = [])
+    public function post(string $url, $data = [])
     {
         return $this->send('POST', $url, [
             $this->bodyFormat => $data,
@@ -650,6 +676,41 @@ class PendingRequest
     {
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
 
+        $options = $this->parseHttpOptions($options);
+
+        [$this->pendingBody, $this->pendingFiles] = [null, []];
+
+        if ($this->async) {
+            return $this->makePromise($method, $url, $options);
+        }
+
+        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
+            try {
+                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) {
+                    $this->populateResponse($response);
+
+                    if ($this->tries > 1 && $this->retryThrow && ! $response->successful()) {
+                        $response->throw();
+                    }
+
+                    $this->dispatchResponseReceivedEvent($response);
+                });
+            } catch (ConnectException $e) {
+                $this->dispatchConnectionFailedEvent();
+
+                throw new ConnectionException($e->getMessage(), 0, $e);
+            }
+        }, $this->retryDelay ?? 100, $this->retryWhenCallback);
+    }
+
+    /**
+     * Parse the given HTTP options and set the appropriate additional options.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    protected function parseHttpOptions(array $options)
+    {
         if (isset($options[$this->bodyFormat])) {
             if ($this->bodyFormat === 'multipart') {
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
@@ -666,29 +727,7 @@ class PendingRequest
             $options[$this->bodyFormat] = $this->pendingBody;
         }
 
-        [$this->pendingBody, $this->pendingFiles] = [null, []];
-
-        if ($this->async) {
-            return $this->makePromise($method, $url, $options);
-        }
-
-        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
-            try {
-                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) {
-                    $this->populateResponse($response);
-
-                    if ($this->tries > 1 && ! $response->successful()) {
-                        $response->throw();
-                    }
-
-                    $this->dispatchResponseReceivedEvent($response);
-                });
-            } catch (ConnectException $e) {
-                $this->dispatchConnectionFailedEvent();
-
-                throw new ConnectionException($e->getMessage(), 0, $e);
-            }
-        }, $this->retryDelay ?? 100, $this->retryWhenCallback);
+        return collect($options)->toArray();
     }
 
     /**
@@ -893,7 +932,7 @@ class PendingRequest
                 $promise = $handler($request, $options);
 
                 return $promise->then(function ($response) use ($request, $options) {
-                    optional($this->factory)->recordRequestResponsePair(
+                    $this->factory?->recordRequestResponsePair(
                         (new Request($request))->withData($options['laravel_data']),
                         new Response($response)
                     );
@@ -1030,7 +1069,7 @@ class PendingRequest
      */
     protected function dispatchRequestSendingEvent()
     {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+        if ($dispatcher = $this->factory?->getDispatcher()) {
             $dispatcher->dispatch(new RequestSending($this->request));
         }
     }
@@ -1043,7 +1082,7 @@ class PendingRequest
      */
     protected function dispatchResponseReceivedEvent(Response $response)
     {
-        if (! ($dispatcher = optional($this->factory)->getDispatcher()) ||
+        if (! ($dispatcher = $this->factory?->getDispatcher()) ||
             ! $this->request) {
             return;
         }
@@ -1058,7 +1097,7 @@ class PendingRequest
      */
     protected function dispatchConnectionFailedEvent()
     {
-        if ($dispatcher = optional($this->factory)->getDispatcher()) {
+        if ($dispatcher = $this->factory?->getDispatcher()) {
             $dispatcher->dispatch(new ConnectionFailed($this->request));
         }
     }

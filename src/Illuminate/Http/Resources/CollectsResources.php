@@ -6,6 +6,8 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use Traversable;
 
 trait CollectsResources
 {
@@ -55,12 +57,29 @@ trait CollectsResources
     }
 
     /**
+     * Get the JSON serialization options that should be applied to the resource response.
+     *
+     * @return int
+     */
+    public function jsonOptions()
+    {
+        $collects = $this->collects();
+
+        if (! $collects) {
+            return 0;
+        }
+
+        return (new ReflectionClass($collects))
+                  ->newInstanceWithoutConstructor()
+                  ->jsonOptions();
+    }
+
+    /**
      * Get an iterator for the resource collection.
      *
      * @return \ArrayIterator
      */
-    #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->collection->getIterator();
     }

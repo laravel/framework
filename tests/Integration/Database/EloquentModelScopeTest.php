@@ -4,9 +4,6 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @group integration
- */
 class EloquentModelScopeTest extends DatabaseTestCase
 {
     public function testModelHasScope()

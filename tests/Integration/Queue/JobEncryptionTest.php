@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,9 +15,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
-/**
- * @group integration
- */
 class JobEncryptionTest extends DatabaseTestCase
 {
     protected function getEnvironmentSetUp($app)
@@ -24,16 +22,11 @@ class JobEncryptionTest extends DatabaseTestCase
         parent::getEnvironmentSetUp($app);
 
         $app['config']->set('app.key', Str::random(32));
-        $app['config']->set('app.debug', 'true');
         $app['config']->set('queue.default', 'database');
     }
 
     protected function setUp(): void
     {
-        if (\PHP_VERSION_ID >= 80100) {
-            $this->markTestSkipped('Test failing in PHP 8.1');
-        }
-
         parent::setUp();
 
         Schema::create('jobs', function (Blueprint $table) {
@@ -68,6 +61,7 @@ class JobEncryptionTest extends DatabaseTestCase
     {
         Bus::dispatch(new JobEncryptionTestNonEncryptedJob);
 
+        $this->expectException(DecryptException::class);
         $this->expectExceptionMessage('The payload is invalid');
 
         $this->assertInstanceOf(JobEncryptionTestNonEncryptedJob::class,

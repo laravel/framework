@@ -5,9 +5,6 @@ namespace Illuminate\Tests\Integration\Routing;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RouteRedirectTest extends TestCase
 {
     /**
@@ -36,5 +33,30 @@ class RouteRedirectTest extends TestCase
             'route redirect with two optional replacements' => ['users/{user?}/{repo?}', 'members/{user?}', '/users/22', '/members/22'],
             'route redirect with two optional replacements that switch position' => ['users/{user?}/{switch?}', 'members/{switch?}/{user?}', '/users/11/22', '/members/22/11'],
         ];
+    }
+
+    public function testToRouteHelper()
+    {
+        Route::get('to', function () {
+            // ..
+        })->name('to');
+
+        Route::get('from-301', function () {
+            return to_route('to', [], 301);
+        });
+
+        Route::get('from-302', function () {
+            return to_route('to');
+        });
+
+        $this->get('from-301')
+            ->assertRedirect('to')
+            ->assertStatus(301)
+            ->assertSee('Redirecting to');
+
+        $this->get('from-302')
+            ->assertRedirect('to')
+            ->assertStatus(302)
+            ->assertSee('Redirecting to');
     }
 }

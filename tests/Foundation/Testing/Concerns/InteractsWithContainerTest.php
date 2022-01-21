@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Testing\Concerns;
+namespace Illuminate\Tests\Foundation\Bootstrap\Testing\Concerns;
 
 use Illuminate\Foundation\Mix;
 use Orchestra\Testbench\TestCase;
@@ -26,5 +26,26 @@ class InteractsWithContainerTest extends TestCase
 
         $this->assertSame($handler, resolve(Mix::class));
         $this->assertSame($this, $instance);
+    }
+
+    public function testForgetMock()
+    {
+        $this->mock(IntanceStub::class)
+            ->shouldReceive('execute')
+            ->once()
+            ->andReturn('bar');
+
+        $this->assertSame('bar', $this->app->make(IntanceStub::class)->execute());
+
+        $this->forgetMock(IntanceStub::class);
+        $this->assertSame('foo', $this->app->make(IntanceStub::class)->execute());
+    }
+}
+
+class IntanceStub
+{
+    public function execute()
+    {
+        return 'foo';
     }
 }

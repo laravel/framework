@@ -16,7 +16,7 @@
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
-        "psr/log": "^1.0",
+        "psr/log": "^1.0|^2.0|^3.0",
         "illuminate/bus": "^9.0",
         "illuminate/collections": "^9.0",
         "illuminate/contracts": "^9.0",
@@ -34,7 +34,8 @@
         }
     },
     "suggest": {
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^5.0|^6.0)."
+        "ably/ably-php": "Required to use the Ably broadcast driver (^1.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0)."
     },
     "config": {
         "sort-packages": true

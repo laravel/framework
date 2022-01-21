@@ -450,6 +450,48 @@ class AssertTest extends TestCase
         $assert->whereContains('foo', ['1']);
     }
 
+    public function testAssertWhereContainsFailsWhenDoesNotSatisfyClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
+
+        $assert->whereContains('foo', [function ($actual) {
+            return $actual === 5;
+        }]);
+    }
+
+    public function testAssertWhereContainsFailsWhenHavingExpectedValueButDoesNotSatisfyClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain a value that passes the truth test within the given closure.');
+
+        $assert->whereContains('foo', [1, function ($actual) {
+            return $actual === 5;
+        }]);
+    }
+
+    public function testAssertWhereContainsFailsWhenSatisfiesClosureButDoesNotHaveExpectedValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [foo] does not contain [5].');
+
+        $assert->whereContains('foo', [5, function ($actual) {
+            return $actual === 1;
+        }]);
+    }
+
     public function testAssertWhereContainsWithNestedValue()
     {
         $assert = AssertableJson::fromArray([
@@ -502,6 +544,46 @@ class AssertTest extends TestCase
         ]);
 
         $assert->whereContains('baz', 4);
+    }
+
+    public function testAssertWhereContainsWithClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $assert->whereContains('foo', function ($actual) {
+            return $actual % 3 === 0;
+        });
+    }
+
+    public function testAssertWhereContainsWithNestedClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => 1,
+            'bar' => 2,
+            'baz' => 3,
+        ]);
+
+        $assert->whereContains('baz', function ($actual) {
+            return $actual % 3 === 0;
+        });
+    }
+
+    public function testAssertWhereContainsWithMultipleClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'foo' => [1, 2, 3, 4],
+        ]);
+
+        $assert->whereContains('foo', [
+            function ($actual) {
+                return $actual % 3 === 0;
+            },
+            function ($actual) {
+                return $actual % 2 === 0;
+            },
+        ]);
     }
 
     public function testAssertWhereContainsWithNullExpectation()
@@ -607,6 +689,24 @@ class AssertTest extends TestCase
         $this->assertTrue($called, 'The scoped query was never actually called.');
     }
 
+    public function testScopeShorthandWithoutCount()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                ['key' => 'first'],
+                ['key' => 'second'],
+            ],
+        ]);
+
+        $called = false;
+        $assert->has('bar', null, function (AssertableJson $item) use (&$called) {
+            $item->where('key', 'first');
+            $called = true;
+        });
+
+        $this->assertTrue($called, 'The scoped query was never actually called.');
+    }
+
     public function testScopeShorthandFailsWhenAssertingZeroItems()
     {
         $assert = AssertableJson::fromArray([
@@ -637,6 +737,54 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [bar] does not have the expected size.');
 
         $assert->has('bar', 1, function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testScopeShorthandFailsWhenAssertingEmptyArray()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'Cannot scope directly onto the first element of property [bar] because it is empty.'
+        );
+
+        $assert->has('bar', 0, function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testScopeShorthandFailsWhenAssertingEmptyArrayWithoutCount()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage(
+            'Cannot scope directly onto the first element of property [bar] because it is empty.'
+        );
+
+        $assert->has('bar', null, function (AssertableJson $item) {
+            $item->where('key', 'first');
+        });
+    }
+
+    public function testScopeShorthandFailsWhenSecondArgumentUnsupportedType()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => [
+                ['key' => 'first'],
+                ['key' => 'second'],
+            ],
+        ]);
+
+        $this->expectException(TypeError::class);
+
+        $assert->has('bar', 'invalid', function (AssertableJson $item) {
             $item->where('key', 'first');
         });
     }

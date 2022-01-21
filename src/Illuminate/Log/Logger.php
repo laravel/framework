@@ -49,7 +49,7 @@ class Logger implements LoggerInterface
     /**
      * Log an emergency message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -61,7 +61,7 @@ class Logger implements LoggerInterface
     /**
      * Log an alert message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -73,7 +73,7 @@ class Logger implements LoggerInterface
     /**
      * Log a critical message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -85,7 +85,7 @@ class Logger implements LoggerInterface
     /**
      * Log an error message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -97,7 +97,7 @@ class Logger implements LoggerInterface
     /**
      * Log a warning message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -109,7 +109,7 @@ class Logger implements LoggerInterface
     /**
      * Log a notice to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -121,7 +121,7 @@ class Logger implements LoggerInterface
     /**
      * Log an informational message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -133,7 +133,7 @@ class Logger implements LoggerInterface
     /**
      * Log a debug message to the logs.
      *
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -146,7 +146,7 @@ class Logger implements LoggerInterface
      * Log a message to the logs.
      *
      * @param  string  $level
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -159,7 +159,7 @@ class Logger implements LoggerInterface
      * Dynamically pass log calls into the writer.
      *
      * @param  string  $level
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
@@ -172,11 +172,11 @@ class Logger implements LoggerInterface
      * Write a message to the log.
      *
      * @param  string  $level
-     * @param  string  $message
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
      * @param  array  $context
      * @return void
      */
-    protected function writeLog($level, $message, $context)
+    protected function writeLog($level, $message, $context): void
     {
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
@@ -249,8 +249,8 @@ class Logger implements LoggerInterface
     /**
      * Format the parameters for the logger.
      *
-     * @param  mixed  $message
-     * @return mixed
+     * @param  Arrayable|Jsonable|\Stringable|array|string  $message
+     * @return string
      */
     protected function formatMessage($message)
     {
@@ -262,7 +262,7 @@ class Logger implements LoggerInterface
             return var_export($message->toArray(), true);
         }
 
-        return $message;
+        return (string) $message;
     }
 
     /**

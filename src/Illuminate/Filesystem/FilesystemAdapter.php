@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Closure;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Http\File;
@@ -15,7 +16,7 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\PathPrefixer;
-use League\Flysystem\PhpseclibV2\SftpAdapter;
+use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
@@ -69,6 +70,13 @@ class FilesystemAdapter implements CloudFilesystemContract
     protected $prefixer;
 
     /**
+     * The temporary URL builder callback.
+     *
+     * @var \Closure|null
+     */
+    protected $temporaryUrlCallback;
+
+    /**
      * Create a new filesystem adapter instance.
      *
      * @param  \League\Flysystem\FilesystemOperator  $driver
@@ -81,13 +89,14 @@ class FilesystemAdapter implements CloudFilesystemContract
         $this->driver = $driver;
         $this->adapter = $adapter;
         $this->config = $config;
+
         $this->prefixer = new PathPrefixer(
             $config['root'] ?? '', $config['directory_separator'] ?? DIRECTORY_SEPARATOR
         );
     }
 
     /**
-     * Assert that the given file exists.
+     * Assert that the given file or directory exists.
      *
      * @param  string|array  $path
      * @param  string|null  $content
@@ -95,11 +104,13 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function assertExists($path, $content = null)
     {
+        clearstatcache();
+
         $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
             PHPUnit::assertTrue(
-                $this->exists($path), "Unable to find a file at path [{$path}]."
+                $this->exists($path), "Unable to find a file or directory at path [{$path}]."
             );
 
             if (! is_null($content)) {
@@ -108,7 +119,7 @@ class FilesystemAdapter implements CloudFilesystemContract
                 PHPUnit::assertSame(
                     $content,
                     $actual,
-                    "File [{$path}] was found, but content [{$actual}] does not match [{$content}]."
+                    "File or directory [{$path}] was found, but content [{$actual}] does not match [{$content}]."
                 );
             }
         }
@@ -117,18 +128,20 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Assert that the given file does not exist.
+     * Assert that the given file or directory does not exist.
      *
      * @param  string|array  $path
      * @return $this
      */
     public function assertMissing($path)
     {
+        clearstatcache();
+
         $paths = Arr::wrap($path);
 
         foreach ($paths as $path) {
             PHPUnit::assertFalse(
-                $this->exists($path), "Found unexpected file at path [{$path}]."
+                $this->exists($path), "Found unexpected file or directory at path [{$path}]."
             );
         }
 
@@ -136,14 +149,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Determine if a file exists.
+     * Determine if a file or directory exists.
      *
      * @param  string  $path
      * @return bool
      */
     public function exists($path)
     {
-        return $this->driver->fileExists($path);
+        return $this->driver->has($path);
     }
 
     /**
@@ -155,6 +168,50 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function missing($path)
     {
         return ! $this->exists($path);
+    }
+
+    /**
+     * Determine if a file exists.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function fileExists($path)
+    {
+        return $this->driver->fileExists($path);
+    }
+
+    /**
+     * Determine if a file is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function fileMissing($path)
+    {
+        return ! $this->fileExists($path);
+    }
+
+    /**
+     * Determine if a directory exists.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function directoryExists($path)
+    {
+        return $this->driver->directoryExists($path);
+    }
+
+    /**
+     * Determine if a directory is missing.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function directoryMissing($path)
+    {
+        return ! $this->directoryExists($path);
     }
 
     /**
@@ -245,7 +302,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Write the contents of a file.
      *
      * @param  string  $path
-     * @param  string|resource  $contents
+     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
      * @return bool
      */
@@ -365,7 +422,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function prepend($path, $data, $separator = PHP_EOL)
     {
-        if ($this->exists($path)) {
+        if ($this->fileExists($path)) {
             return $this->put($path, $data.$separator.$this->get($path));
         }
 
@@ -382,7 +439,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function append($path, $data, $separator = PHP_EOL)
     {
-        if ($this->exists($path)) {
+        if ($this->fileExists($path)) {
             return $this->put($path, $this->get($path).$separator.$data);
         }
 
@@ -584,11 +641,17 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {
-        if (! method_exists($this->adapter, 'getTemporaryUrl')) {
-            throw new RuntimeException('This driver does not support creating temporary URLs.');
+        if (method_exists($this->adapter, 'getTemporaryUrl')) {
+            return $this->adapter->getTemporaryUrl($path, $expiration, $options);
         }
 
-        return $this->adapter->getTemporaryUrl($path, $expiration, $options);
+        if ($this->temporaryUrlCallback) {
+            return $this->temporaryUrlCallback->bindTo($this, static::class)(
+                $path, $expiration, $options
+            );
+        }
+
+        throw new RuntimeException('This driver does not support creating temporary URLs.');
     }
 
     /**
@@ -629,7 +692,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function files($directory = null, $recursive = false)
     {
-        return $this->driver->listContents($directory, $recursive)
+        return $this->driver->listContents($directory ?? '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isFile();
             })
@@ -659,7 +722,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directories($directory = null, $recursive = false)
     {
-        return $this->driver->listContents($directory, $recursive)
+        return $this->driver->listContents($directory ?? '', $recursive)
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isDir();
             })
@@ -670,7 +733,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Get all (recursive) of the directories within a given directory.
+     * Get all the directories within a given directory (recursive).
      *
      * @param  string|null  $directory
      * @return array
@@ -758,14 +821,22 @@ class FilesystemAdapter implements CloudFilesystemContract
             return;
         }
 
-        switch ($visibility) {
-            case FilesystemContract::VISIBILITY_PUBLIC:
-                return Visibility::PUBLIC;
-            case FilesystemContract::VISIBILITY_PRIVATE:
-                return Visibility::PRIVATE;
-        }
+        return match ($visibility) {
+            FilesystemContract::VISIBILITY_PUBLIC => Visibility::PUBLIC,
+            FilesystemContract::VISIBILITY_PRIVATE => Visibility::PRIVATE,
+            default => throw new InvalidArgumentException("Unknown visibility: {$visibility}."),
+        };
+    }
 
-        throw new InvalidArgumentException("Unknown visibility: {$visibility}.");
+    /**
+     * Define a custom temporary URL builder callback.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function buildTemporaryUrlsUsing(Closure $callback)
+    {
+        $this->temporaryUrlCallback = $callback;
     }
 
     /**
@@ -783,6 +854,6 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->macroCall($method, $parameters);
         }
 
-        return $this->driver->{$method}(...array_values($parameters));
+        return $this->driver->{$method}(...$parameters);
     }
 }

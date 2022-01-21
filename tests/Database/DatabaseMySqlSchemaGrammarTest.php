@@ -362,6 +362,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
     }
 
+    public function testAddingFulltextIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->fulltext('body');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add fulltext `users_body_fulltext`(`body`)', $statements[0]);
+    }
+
     public function testAddingSpatialIndex()
     {
         $blueprint = new Blueprint('geo');
@@ -548,6 +558,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `links` add `url` varchar(2083) character set ascii not null, add `url_hash_virtual` varchar(64) character set ascii as (sha2(url, 256)), add `url_hash_stored` varchar(64) character set ascii as (sha2(url, 256)) stored', $statements[0]);
+    }
+
+    public function testAddingInvisibleColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('secret', 64)->nullable(false)->invisible();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `secret` varchar(64) not null invisible', $statements[0]);
     }
 
     public function testAddingString()

@@ -80,7 +80,7 @@ assertType('bool', $collection->contains(function ($user) {
 }));
 assertType('bool', $collection->contains('string', '=', 'string'));
 
-assertType('array<int, mixed>', $collection->modelKeys());
+assertType('array<int, (int|string)>', $collection->modelKeys());
 
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->merge($collection));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->merge([new User]));

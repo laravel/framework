@@ -57,13 +57,20 @@ class ControllerDispatcher implements ControllerDispatcherContract
      */
     public function getMiddleware($controller, $method)
     {
-        if (! method_exists($controller, 'getMiddleware')) {
-            return [];
-        }
-
         return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
             return static::methodExcludedByOptions($method, $data['options']);
         })->pluck('middleware')->all();
+    }
+
+    /**
+     * Determine if the dispatcher should attempt to gather middleware from a controller.
+     *
+     * @param  string  $controller
+     * @return bool
+     */
+    public function shouldGatherMiddleware($controller)
+    {
+        return method_exists($controller, 'getMiddleware');
     }
 
     /**

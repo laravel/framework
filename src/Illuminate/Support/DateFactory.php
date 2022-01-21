@@ -64,7 +64,7 @@ use InvalidArgumentException;
  * @method static Carbon setHumanDiffOptions($humanDiffOptions)
  * @method static bool setLocale($locale)
  * @method static void setMidDayAt($hour)
- * @method static Carbon setTestNow($testNow = null)
+ * @method static void setTestNow($testNow = null)
  * @method static void setToStringFormat($format)
  * @method static void setTranslator(\Symfony\Component\Translation\TranslatorInterface $translator)
  * @method static Carbon setUtf8($utf8)
