@@ -444,6 +444,24 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get an item from the collection by key or add it to collection if it does not exist.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function getOrPut($key, $value)
+    {
+        if (array_key_exists($key, $this->items)) {
+            return $this->items[$key];
+        }
+
+        $this->offsetSet($key, $value = value($value));
+
+        return $value;
+    }
+
+    /**
      * Group an associative array by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): array-key)|array|string  $groupBy

@@ -430,4 +430,16 @@ class MailFake implements Factory, Mailer, MailQueue
 
         return [$mailable, $callback];
     }
+
+    /**
+     * Forget all of the resolved mailer instances.
+     *
+     * @return $this
+     */
+    public function forgetMailers()
+    {
+        $this->currentMailer = null;
+
+        return $this;
+    }
 }
