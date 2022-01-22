@@ -17,12 +17,12 @@
         "php": "^8.0.2",
         "ext-json": "*",
         "egulias/email-validator": "^3.1",
-        "illuminate/collections": "^9.0",
-        "illuminate/container": "^9.0",
-        "illuminate/contracts": "^9.0",
-        "illuminate/macroable": "^9.0",
-        "illuminate/support": "^9.0",
-        "illuminate/translation": "^9.0",
+        "illuminate/collections": "^10.0",
+        "illuminate/container": "^10.0",
+        "illuminate/contracts": "^10.0",
+        "illuminate/macroable": "^10.0",
+        "illuminate/support": "^10.0",
+        "illuminate/translation": "^10.0",
         "symfony/http-foundation": "^6.0",
         "symfony/mime": "^6.0"
     },
@@ -33,12 +33,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "suggest": {
         "ext-bcmath": "Required to use the multiple_of validation rule.",
-        "illuminate/database": "Required to use the database presence verifier (^9.0)."
+        "illuminate/database": "Required to use the database presence verifier (^10.0)."
     },
     "config": {
         "sort-packages": true
