@@ -273,6 +273,11 @@ if (! function_exists('str')) {
                 {
                     return Str::$method(...$parameters);
                 }
+
+                public function __toString()
+                {
+                    return '';
+                }
             };
         }
 
