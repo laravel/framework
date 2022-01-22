@@ -48,9 +48,6 @@ class SupportReflectorTest extends TestCase
         $this->assertSame(A::class, Reflector::getParameterClassName($method->getParameters()[0]));
     }
 
-    /**
-     * @requires PHP >= 8
-     */
     public function testUnionTypeName()
     {
         $method = (new ReflectionClass(C::class))->getMethod('f');

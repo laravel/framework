@@ -625,11 +625,13 @@ trait HasAttributes
             return $this->attributeCastCache[$key];
         }
 
-        $value = call_user_func($this->{Str::camel($key)}()->get ?: function ($value) {
+        $attribute = $this->{Str::camel($key)}();
+
+        $value = call_user_func($attribute->get ?: function ($value) {
             return $value;
         }, $value, $this->attributes);
 
-        if (! is_object($value)) {
+        if (! is_object($value) || ! $attribute->withObjectCaching) {
             unset($this->attributeCastCache[$key]);
         } else {
             $this->attributeCastCache[$key] = $value;
@@ -999,7 +1001,9 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
-        $callback = $this->{Str::camel($key)}()->set ?: function ($value) use ($key) {
+        $attribute = $this->{Str::camel($key)}();
+
+        $callback = $attribute->set ?: function ($value) use ($key) {
             $this->attributes[$key] = $value;
         };
 
@@ -1010,7 +1014,7 @@ trait HasAttributes
             )
         );
 
-        if (! is_object($value)) {
+        if (! is_object($value) || ! $attribute->withObjectCaching) {
             unset($this->attributeCastCache[$key]);
         } else {
             $this->attributeCastCache[$key] = $value;
