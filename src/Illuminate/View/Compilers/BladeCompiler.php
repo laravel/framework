@@ -292,6 +292,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             }
         });
     }
+
     /**
      * Evaluate and render a Blade markdown string to HTML.
      *
