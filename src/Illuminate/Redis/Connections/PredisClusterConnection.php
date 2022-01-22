@@ -7,7 +7,7 @@ use Predis\Command\ServerFlushDatabase;
 class PredisClusterConnection extends PredisConnection
 {
     /**
-     * Flush the selected Redis database on all custer nodes.
+     * Flush the selected Redis database on all cluster nodes.
      *
      * @return void
      */
