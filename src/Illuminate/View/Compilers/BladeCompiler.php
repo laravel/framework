@@ -283,7 +283,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $component = self::temporaryComponent($string);
         $view = Container::getInstance()
-            ->make( ViewFactory::class)
+            ->make(ViewFactory::class)
             ->make($component->resolveView(), $data);
 
         return tap($view->render(), static function () use ($view, $deleteCachedView) {
