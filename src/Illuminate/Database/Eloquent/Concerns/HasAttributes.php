@@ -613,7 +613,7 @@ trait HasAttributes
     {
         try {
             return $this->{'get'.Str::studly($key).'Attribute'}($value);
-        } catch (\BadMethodCallException $exception) {
+        } catch (BadMethodCallException $exception) {
             if (method_exists($this, Str::studly($key)) && $this->{Str::studly($key)}($value) instanceof Attribute) {
                 return $this->{Str::studly($key)};
             }
