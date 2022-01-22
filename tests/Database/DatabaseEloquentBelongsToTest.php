@@ -78,16 +78,10 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testIdsInEagerConstraintsCanBeZero()
     {
-        $keys = ['foreign.value', 0];
-
-        if (version_compare(PHP_VERSION, '8.0.0-dev', '>=')) {
-            sort($keys);
-        }
-
         $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('getKeyName')->andReturn('id');
         $relation->getRelated()->shouldReceive('getKeyType')->andReturn('int');
-        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', $keys);
+        $relation->getQuery()->shouldReceive('whereIntegerInRaw')->once()->with('relation.id', [0, 'foreign.value']);
         $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithZeroId];
         $relation->addEagerConstraints($models);
     }

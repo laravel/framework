@@ -10,7 +10,7 @@ if (PHP_VERSION_ID >= 80100) {
 }
 
 /**
- * @requires PHP 8.1
+ * @requires PHP >= 8.1
  */
 class ImplicitBackedEnumRouteBindingTest extends TestCase
 {
