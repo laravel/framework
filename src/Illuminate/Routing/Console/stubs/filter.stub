@@ -24,7 +24,7 @@ class {{ class }} extends Filter
      */
     public function apply($value, $builder)
     {
-        // return query builder which will be used to filter the query
+        // return query builder which will be used to apply on query.
         return $builder->where($this->filterParameter, $value);
     }
 }
