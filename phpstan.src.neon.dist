@@ -1,0 +1,20 @@
+parameters:
+  paths:
+    - src
+  level: 0
+  ignoreErrors:
+    - "#\\(void\\) is used#"
+    - "#Access to undefined constant#"
+    - "#Access to an undefined property#"
+    - "#Call to an undefined method#"
+    - "#but return statement is missing.#"
+    - "#Caught class [a-zA-Z0-9\\\\_]+ not found.#"
+    - "#Class [a-zA-Z0-9\\\\_]+ not found.#"
+    - "#has invalid type#"
+    - "#should always throw an exception or terminate script execution#"
+    - "#Function GuzzleHttp\\\\Psr7#"
+    - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
+    - "#Unsafe usage of new static#"
+  excludePaths:
+    - "src/Illuminate/Testing/ParallelRunner.php"
+    - "src/Illuminate/Testing/Constraints/ArraySubset.php"

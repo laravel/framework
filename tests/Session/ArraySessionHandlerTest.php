@@ -93,10 +93,10 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
-        $this->assertTrue($handler->gc(300));
+        $this->assertSame(0, $handler->gc(300));
 
         $handler->write('foo', 'bar');
-        $this->assertTrue($handler->gc(300));
+        $this->assertSame(0, $handler->gc(300));
         $this->assertSame('bar', $handler->read('foo'));
 
         Carbon::setTestNow(Carbon::now()->addSecond());
@@ -105,7 +105,7 @@ class ArraySessionHandlerTest extends TestCase
 
         Carbon::setTestNow(Carbon::now()->addMinutes(5));
 
-        $this->assertTrue($handler->gc(300));
+        $this->assertSame(1, $handler->gc(300));
         $this->assertSame('', $handler->read('foo'));
         $this->assertSame('qux', $handler->read('baz'));
 

@@ -126,7 +126,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Determine if an item exists, using strict comparison.
      *
-     * @param  (callable(TValue): bool)|TValue|string  $key
+     * @param  (callable(TValue): bool)|TValue|array-key  $key
      * @param  TValue|null  $value
      * @return bool
      */
@@ -323,7 +323,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
      *
-     * @template TWhenReturnType
+     * @template TUnlessReturnType
      *
      * @param  bool  $value
      * @param  (callable($this): TUnlessReturnType)  $callback
@@ -677,8 +677,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Recursively merge the collection with the given items.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
-     * @return static<TKey, array<int, TValue>>
+     * @template TMergeRecursiveValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TMergeRecursiveValue>|iterable<TKey, TMergeRecursiveValue>  $items
+     * @return static<TKey, TValue|TMergeRecursiveValue>
      */
     public function mergeRecursive($items);
 
@@ -1047,12 +1049,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function pad($size, $value);
 
     /**
-     * Count the number of items in the collection using a given truth test.
+     * Count the number of items in the collection by a field or using a callback.
      *
-     * @template TGroup of array-key
-     *
-     * @param  (callable(TValue, TKey): TGroup)|string|null  $callback
-     * @return static<TGroup, int>
+     * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
+     * @return static<array-key, int>
      */
     public function countBy($callback = null);
 

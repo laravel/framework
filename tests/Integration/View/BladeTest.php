@@ -2,11 +2,17 @@
 
 namespace Illuminate\Tests\Integration\View;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 
 class BladeTest extends TestCase
 {
+    public function test_rendering_blade_string()
+    {
+        $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
+    }
+
     public function test_basic_blade_rendering()
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
