@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;

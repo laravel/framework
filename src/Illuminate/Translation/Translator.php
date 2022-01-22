@@ -67,7 +67,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
     /**
      * Cast the line to the correct type.
-     * @param  string|array $line
+     *
+     * @param  string|array  $line
      * @return Stringable|array
      */
     protected function castLine($line)
