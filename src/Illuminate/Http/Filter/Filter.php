@@ -3,8 +3,8 @@
 namespace Illuminate\Http\Filter;
 
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 
 abstract class Filter
