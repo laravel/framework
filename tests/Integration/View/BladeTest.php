@@ -15,7 +15,7 @@ class BladeTest extends TestCase
 
     public function test_rendering_blade_markdown()
     {
-        $this->assertMatchesRegularExpression('/>Hello Taylor</', Blade::markdown('@component("mail::message")# Hello {{ $name }}@endcomponent', ['name' => 'Taylor']));
+        $this->assertRegExp('/>Hello Taylor</', Blade::markdown('@component("mail::message")# Hello {{ $name }}@endcomponent', ['name' => 'Taylor']));
     }
 
     public function test_basic_blade_rendering()
