@@ -8,6 +8,7 @@ use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
@@ -65,6 +66,20 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
+     * Cast the line to the correct type.
+     * @param  string|array $line
+     * @return Stringable|array
+     */
+    protected function castLine($line)
+    {
+        if (is_string($line)) {
+            return new Stringable($line);
+        }
+
+        return $line;
+    }
+
+    /**
      * Determine if a translation exists for a given locale.
      *
      * @param  string  $key
@@ -86,7 +101,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function has($key, $locale = null, $fallback = true)
     {
-        return $this->get($key, [], $locale, $fallback) !== $key;
+        return $this->get($key, [], $locale, $fallback) != $key;
     }
 
     /**
@@ -96,7 +111,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  array  $replace
      * @param  string|null  $locale
      * @param  bool  $fallback
-     * @return string|array
+     * @return Stringable|array
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
@@ -124,7 +139,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 if (! is_null($line = $this->getLine(
                     $namespace, $group, $locale, $item, $replace
                 ))) {
-                    return $line;
+                    return $this->castLine($line);
                 }
             }
         }
@@ -132,7 +147,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
-        return $this->makeReplacements($line ?: $key, $replace);
+        $result = $this->makeReplacements($line ?: $key, $replace);
+
+        // If the result is a string, we'll return an instance of the Stringable, so that
+        // developers can more easily change letter cases and do other modifications.
+        return $this->castLine($result);
     }
 
     /**
@@ -183,7 +202,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $locale
      * @param  string  $item
      * @param  array  $replace
-     * @return string|array|null
+     * @return Stringable|array|null
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
     {
@@ -192,13 +211,14 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $line = Arr::get($this->loaded[$namespace][$group][$locale], $item);
 
         if (is_string($line)) {
-            return $this->makeReplacements($line, $replace);
+            $line = $this->makeReplacements($line, $replace);
+            return $this->castLine($line);
         } elseif (is_array($line) && count($line) > 0) {
             foreach ($line as $key => $value) {
                 $line[$key] = $this->makeReplacements($value, $replace);
             }
 
-            return $line;
+            return $this->castLine($line);
         }
     }
 
