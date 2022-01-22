@@ -32,9 +32,6 @@ class DiscoverEventsTest extends TestCase
         ], $events);
     }
 
-    /**
-     * @requires PHP >= 8
-     */
     public function testUnionEventsCanBeDiscovered()
     {
         class_alias(UnionListener::class, 'Tests\Integration\Foundation\Fixtures\EventDiscovery\UnionListeners\UnionListener');

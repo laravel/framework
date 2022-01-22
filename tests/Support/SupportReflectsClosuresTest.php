@@ -64,9 +64,6 @@ class SupportReflectsClosuresTest extends TestCase
         });
     }
 
-    /**
-     * @requires PHP >= 8
-     */
     public function testItWorksWithUnionTypes()
     {
         $types = ReflectsClosuresClass::reflectFirstAll(function (ExampleParameter $a, $b) {

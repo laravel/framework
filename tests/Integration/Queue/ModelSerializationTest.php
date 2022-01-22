@@ -274,9 +274,6 @@ class ModelSerializationTest extends TestCase
         $this->assertInstanceOf(ModelSerializationTestCustomUserCollection::class, $unserialized->users);
     }
 
-    /**
-     * @requires PHP >= 7.4
-     */
     public function testItSerializesTypedProperties()
     {
         require_once __DIR__.'/typed-properties.php';
