@@ -74,6 +74,14 @@ class FilterMakeCommand extends GeneratorCommand
         return $rootNamespace.'\Http\Filter';
     }
 
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     protected function buildClass($name)
     {
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
