@@ -82,6 +82,17 @@ class Rule
     }
 
     /**
+     * Create a new nested rule set.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Validation\NestedRules
+     */
+    public static function nested($callback)
+    {
+        return new NestedRules($callback);
+    }
+
+    /**
      * Get a required_if constraint builder instance.
      *
      * @param  callable|bool  $callback
