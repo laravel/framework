@@ -823,7 +823,7 @@ if (! function_exists('trans')) {
      *
      * @param  string|null  $key
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  Stringable|null  $locale
      * @return \Illuminate\Contracts\Translation\Translator|string|array|null
      */
     function trans($key = null, $replace = [], $locale = null)
@@ -858,7 +858,7 @@ if (! function_exists('__')) {
      *
      * @param  string|null  $key
      * @param  array  $replace
-     * @param  string|null  $locale
+     * @param  Stringable|null  $locale
      * @return string|array|null
      */
     function __($key = null, $replace = [], $locale = null)
