@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -280,7 +281,45 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public static function render($string, $data = [], $deleteCachedView = false)
     {
-        $component = new class($string) extends Component
+        $component = self::temporaryComponent($string);
+        $view = Container::getInstance()
+            ->make( ViewFactory::class)
+            ->make($component->resolveView(), $data);
+
+        return tap($view->render(), static function () use ($view, $deleteCachedView) {
+            if ($deleteCachedView) {
+                unlink($view->getPath());
+            }
+        });
+    }
+    /**
+     * Evaluate and render a Blade markdown string to HTML.
+     *
+     * @param  string  $string
+     * @param  array  $data
+     * @param  bool  $deleteCachedView
+     * @return string
+     */
+    public static function markdown($string, $data = [], $deleteCachedView = false)
+    {
+        $component = self::temporaryComponent($string);
+        $view = Container::getInstance()
+            ->make(Markdown::class);
+
+        return tap($view->render($component->resolveView(), $data), static function () use ($view, $deleteCachedView) {
+            if ($deleteCachedView) {
+                unlink($view->getPath());
+            }
+        })->toHtml();
+    }
+
+    /**
+     * @param $string
+     * @return Component
+     */
+    private static function temporaryComponent($string)
+    {
+        return new class($string) extends Component
         {
             protected $template;
 
@@ -294,16 +333,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
                 return $this->template;
             }
         };
-
-        $view = Container::getInstance()
-                    ->make(ViewFactory::class)
-                    ->make($component->resolveView(), $data);
-
-        return tap($view->render(), function () use ($view, $deleteCachedView) {
-            if ($deleteCachedView) {
-                unlink($view->getPath());
-            }
-        });
     }
 
     /**

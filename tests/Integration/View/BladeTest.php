@@ -13,6 +13,11 @@ class BladeTest extends TestCase
         $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
     }
 
+    public function test_rendering_blade_markdown()
+    {
+        $this->assertMatchesRegularExpression('/>Hello Taylor</', Blade::markdown('@component("mail::message")# Hello {{ $name }}@endcomponent', ['name' => 'Taylor']));
+    }
+
     public function test_basic_blade_rendering()
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
