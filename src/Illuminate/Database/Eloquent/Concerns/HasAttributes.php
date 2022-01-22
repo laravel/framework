@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use BadMethodCallException;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
@@ -24,6 +25,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionNamedType;
 
@@ -609,7 +611,15 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
-        return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        try {
+            return $this->{'get'.Str::studly($key).'Attribute'}($value);
+        } catch (\BadMethodCallException $exception) {
+            if (method_exists($this, Str::studly($key)) && $this->{Str::studly($key)}($value) instanceof Attribute) {
+                return $this->{Str::studly($key)};
+            }
+
+            throw $exception;
+        }
     }
 
     /**
