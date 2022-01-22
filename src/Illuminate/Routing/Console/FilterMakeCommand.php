@@ -86,6 +86,7 @@ class FilterMakeCommand extends GeneratorCommand
     {
         $class = str_replace($this->getNamespace($name).'\\', '', $name);
         $filter = Str::snake($class);
+
         return str_replace('{{ filter_parameter }}', $filter, parent::buildClass($name)
         );
     }

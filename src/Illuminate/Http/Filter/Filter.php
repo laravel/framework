@@ -4,7 +4,7 @@ namespace Illuminate\Http\Filter;
 
 use Closure;
 use Illuminate\Http\Request;
-use \Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Traits\Macroable;
 
 abstract class Filter
@@ -50,7 +50,7 @@ abstract class Filter
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed  $value
      * @param $builder
      * @return Builder
      */

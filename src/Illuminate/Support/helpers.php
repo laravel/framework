@@ -406,9 +406,9 @@ if (! function_exists('with')) {
 
 if (! function_exists('filter_pipes')) {
     /**
-     * send your query into it with your filterable classes to get the filtered results back
+     * send your query into it with your filterable classes to get the filtered results back.
      *
-     * @param mixed $cause
+     * @param  mixed  $cause
      * @param  array  $classes
      * @return mixed
      */
