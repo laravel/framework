@@ -3209,7 +3209,7 @@ SQL;
         $this->assertEquals(['John Doe'], $builder->getBindings());
     }
 
-    public function testBinaryOperators()
+    public function testBitOperators()
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('bar', '&', 1);

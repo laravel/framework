@@ -204,11 +204,11 @@ class Builder
     ];
 
     /**
-     * All of the available binary operators.
+     * All of the available bit operators.
      *
      * @var string[]
      */
-    public $binaryOperators = [
+    public $bitOperators = [
         '&', '|', '^', '<<', '>>', '&~',
     ];
 
@@ -763,8 +763,8 @@ class Builder
             }
         }
 
-        if ($this->isBinaryOperator($operator)) {
-            $type = 'Binary';
+        if ($this->isBitOperator($operator)) {
+            $type = 'Bit';
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -850,10 +850,16 @@ class Builder
                ! in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
 
-    protected function isBinaryOperator($operator)
+    /**
+     * Determine if the operator is a bit operator.
+     *
+     * @param  string  $operator
+     * @return bool
+     */
+    protected function isBitOperator($operator)
     {
-        return in_array(strtolower($operator), $this->binaryOperators, true) ||
-               in_array(strtolower($operator), $this->grammar->getBinaryOperators(), true);
+        return in_array(strtolower($operator), $this->bitOperators, true) ||
+               in_array(strtolower($operator), $this->grammar->getBitOperators(), true);
     }
 
     /**
@@ -1934,8 +1940,8 @@ class Builder
             [$value, $operator] = [$operator, '='];
         }
 
-        if ($this->isBinaryOperator($operator)) {
-            $type = 'binary';
+        if ($this->isBitOperator($operator)) {
+            $type = 'bit';
         }
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');

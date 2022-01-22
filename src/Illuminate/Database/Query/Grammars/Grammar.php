@@ -19,11 +19,11 @@ class Grammar extends BaseGrammar
     protected $operators = [];
 
     /**
-     * The grammar specific binary operators.
+     * The grammar specific bit operators.
      *
      * @var array
      */
-    protected $binaryOperators = [];
+    protected $bitOperators = [];
 
     /**
      * The components that make up a select clause.
@@ -262,7 +262,14 @@ class Grammar extends BaseGrammar
         return $this->wrap($where['column']).' '.$operator.' '.$value;
     }
 
-    protected function whereBinary(Builder $query, $where)
+    /**
+     * Compile a bit operator where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBit(Builder $query, $where)
     {
         $value = $this->parameter($where['value']);
 
@@ -701,8 +708,8 @@ class Grammar extends BaseGrammar
             return $having['boolean'].' '.$having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
-        } elseif ($having['type'] === 'binary') {
-            return $this->compileHavingBinary($having);
+        } elseif ($having['type'] === 'bit') {
+            return $this->compileHavingBit($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -743,12 +750,12 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a having clause involving a binary operator.
+     * Compile a having clause involving a bit operator.
      *
      * @param  array  $having
      * @return string
      */
-    protected function compileHavingBinary($having)
+    protected function compileHavingBit($having)
     {
         $column = $this->wrap($having['column']);
 
@@ -1334,12 +1341,12 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the grammar specific binary operators.
+     * Get the grammar specific bit operators.
      *
      * @return array
      */
-    public function getBinaryOperators()
+    public function getBitOperators()
     {
-        return $this->binaryOperators;
+        return $this->bitOperators;
     }
 }

@@ -22,11 +22,11 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * The grammar specific binary operators.
+     * The grammar specific bit operators.
      *
      * @var array
      */
-    protected $binaryOperators = [
+    protected $bitOperators = [
         '~', '&', '|', '#', '<<', '>>', '<<=', '>>=',
     ];
 
