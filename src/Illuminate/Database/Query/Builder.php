@@ -296,6 +296,23 @@ class Builder
     }
 
     /**
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @param  string  $as
+     * @return $this
+     */
+    public function selectFullText($columns, $value, $as, array $options = [])
+    {
+        $columns = (array) $columns;
+
+        $query = $this->grammar->compileFullText($columns, $value, $options);
+
+        return $this->selectRaw(
+            '('.$query.') as '.$this->grammar->wrap($as), [$value]
+        );
+    }
+
+    /**
      * Makes "from" fetch from a subquery.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
@@ -411,6 +428,31 @@ class Builder
                 $this->columns[] = $column;
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Add a fulltext select to the query.
+     *
+     * @param  string|string[]  $columns
+     * @param  string  $value
+     * @param  string  $as
+     * @return $this
+     */
+    public function addSelectFullText($columns, $value, $as, array $options = [])
+    {
+        if (is_null($this->columns)) {
+            $this->select($this->from.'.*');
+        }
+
+        $columns = (array) $columns;
+
+        $query = $this->grammar->compileFullText($columns, $value, $options);
+
+        $this->selectSub($query, $as);
+
+        $this->addBinding([$value], 'select');
 
         return $this;
     }

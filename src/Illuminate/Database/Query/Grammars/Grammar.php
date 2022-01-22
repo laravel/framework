@@ -668,6 +668,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "fulltext" clause.
+     *
+     * @param  array  $columns
+     * @param  string  $value
+     * @param  array  $options
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileFullText($columns, $value, $options)
+    {
+        throw new RuntimeException('This database engine does not support fulltext search operations.');
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

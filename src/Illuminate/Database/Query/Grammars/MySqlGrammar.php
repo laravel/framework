@@ -51,7 +51,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile a "where fulltext" clause.
+     * Add a "where fulltext" clause to the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
@@ -59,15 +59,28 @@ class MySqlGrammar extends Grammar
      */
     public function whereFullText(Builder $query, $where)
     {
-        $columns = $this->columnize($where['columns']);
+        return $this->compileFullText($where['columns'], $where['value'], $where['options']);
+    }
 
-        $value = $this->parameter($where['value']);
+    /**
+     * Compile a "fulltext" clause.
+     *
+     * @param  array  $columns
+     * @param  string  $value
+     * @param  array  $options
+     * @return string
+     */
+    public function compileFullText($columns, $value, $options)
+    {
+        $columns = $this->columnize($columns);
 
-        $mode = ($where['options']['mode'] ?? []) === 'boolean'
+        $value = $this->parameter($value);
+
+        $mode = ($options['mode'] ?? []) === 'boolean'
             ? ' in boolean mode'
             : ' in natural language mode';
 
-        $expanded = ($where['options']['expanded'] ?? []) && ($where['options']['mode'] ?? []) !== 'boolean'
+        $expanded = ($options['expanded'] ?? []) && ($options['mode'] ?? []) !== 'boolean'
             ? ' with query expansion'
             : '';
 
