@@ -79,6 +79,7 @@ use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
 use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
+use Illuminate\Routing\Console\FilterMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Support\ServiceProvider;
@@ -158,6 +159,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ListenerMake' => ListenerMakeCommand::class,
         'MailMake' => MailMakeCommand::class,
         'MiddlewareMake' => MiddlewareMakeCommand::class,
+        'FilterMake' => FilterMakeCommand::class,
         'ModelMake' => ModelMakeCommand::class,
         'NotificationMake' => NotificationMakeCommand::class,
         'NotificationTable' => NotificationTableCommand::class,
@@ -529,6 +531,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(MiddlewareMakeCommand::class, function ($app) {
             return new MiddlewareMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerFilterMakeCommand()
+    {
+        $this->app->singleton(FilterMakeCommand::class, function ($app) {
+            return new FilterMakeCommand($app['files']);
         });
     }
 
