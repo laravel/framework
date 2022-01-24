@@ -422,7 +422,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Check if morphable type is excluded from dictionary.
+     * Check if morph type is excluded from dictionary.
      *
      * @param  string  $type
      * @return bool
