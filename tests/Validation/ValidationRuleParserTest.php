@@ -90,7 +90,7 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $results = $parser->explode([
-            'users.*.name' => Rule::nested(function ($value, $attribute, $data) {
+            'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
                 $this->assertEquals('Taylor Otwell', $value);
                 $this->assertEquals('users.0.name', $attribute);
                 $this->assertEquals($data['users.0.name'], 'Taylor Otwell');
@@ -110,7 +110,7 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $results = $parser->explode([
-            'name' => Rule::nested(function ($value, $attribute, $data = null) {
+            'name' => Rule::forEach(function ($value, $attribute, $data = null) {
                 $this->assertEquals('Taylor Otwell', $value);
                 $this->assertEquals('name', $attribute);
                 $this->assertEquals(['name' => 'Taylor Otwell'], $data);
@@ -134,7 +134,7 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => [
-                Rule::nested(function ($value, $attribute, $data) {
+                Rule::forEach(function ($value, $attribute, $data) {
                     $this->assertEquals([
                         'users.0.name' => 'Taylor Otwell',
                         'users.1.name' => 'Abigail Otwell',
@@ -142,7 +142,7 @@ class ValidationRuleParserTest extends TestCase
 
                     return [Rule::requiredIf(true)];
                 }),
-                Rule::nested(function ($value, $attribute, $data) {
+                Rule::forEach(function ($value, $attribute, $data) {
                     $this->assertEquals([
                         'users.0.name' => 'Taylor Otwell',
                         'users.1.name' => 'Abigail Otwell',
@@ -180,17 +180,17 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => [
-                Rule::nested(function ($value, $attribute, $data) {
+                Rule::forEach(function ($value, $attribute, $data) {
                     $this->assertEquals('Taylor Otwell', $value);
                     $this->assertEquals('users.0.name', $attribute);
                     $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
-                    return Rule::nested(function ($value, $attribute, $data) {
+                    return Rule::forEach(function ($value, $attribute, $data) {
                         $this->assertNull($value);
                         $this->assertEquals('users.0.name', $attribute);
                         $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
-                        return Rule::nested(function ($value, $attribute, $data) {
+                        return Rule::forEach(function ($value, $attribute, $data) {
                             $this->assertNull($value);
                             $this->assertEquals('users.0.name', $attribute);
                             $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
@@ -216,7 +216,7 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $rules = [
-            'items.*' => Rule::nested(function () {
+            'items.*' => Rule::forEach(function () {
                 return ['discounts.*.id' => 'distinct'];
             }),
         ];
