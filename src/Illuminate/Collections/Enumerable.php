@@ -2,11 +2,13 @@
 
 namespace Illuminate\Support;
 
+use CachingIterator;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use IteratorAggregate;
 use JsonSerializable;
+use Traversable;
 
 /**
  * @template TKey of array-key
@@ -149,6 +151,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return bool
      */
     public function contains($key, $operator = null, $value = null);
+
+    /**
+     * Determine if an item is not contained in the collection.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContain($key, $operator = null, $value = null);
 
     /**
      * Cross join with the given lists, returning all possible permutations.
@@ -526,6 +538,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function has($key);
 
     /**
+     * Determine if any of the keys exist in the collection.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function hasAny($key);
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
@@ -563,6 +583,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return bool
      */
     public function isNotEmpty();
+
+    /**
+     * Determine if the collection contains a single item.
+     *
+     * @return bool
+     */
+    public function containsOneItem();
 
     /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
@@ -785,6 +812,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function reduce(callable $callback, $initial = null);
 
     /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param  callable  $callback
+     * @param  mixed  ...$initial
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function reduceSpread(callable $callback, ...$initial);
+
+    /**
      * Replace the collection items with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
@@ -823,6 +861,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static
      */
     public function shuffle($seed = null);
+
+    /**
+     * Create chunks representing a "sliding window" view of the items in the collection.
+     *
+     * @param  int  $size
+     * @param  int  $step
+     * @return static<int, static>
+     */
+    public function sliding($size = 2, $step = 1);
 
     /**
      * Skip the first {$count} items.
@@ -879,6 +926,18 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function sole($key = null, $operator = null, $value = null);
 
     /**
+     * Get the first item in the collection but throw an exception if no matching items exist.
+     *
+     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function firstOrFail($key = null, $operator = null, $value = null);
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
@@ -893,6 +952,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static<int, static<int, TValue>>
      */
     public function chunkWhile(callable $callback);
+
+    /**
+     * Split a collection into a certain number of groups, and fill the first groups completely.
+     *
+     * @param  int  $numberOfGroups
+     * @return static<int, static>
+     */
+    public function splitIn($numberOfGroups);
 
     /**
      * Sort through each item with a callback.
@@ -947,6 +1014,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function sortKeysDesc($options = SORT_REGULAR);
 
     /**
+     * Sort the collection keys using a callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function sortKeysUsing(callable $callback);
+
+    /**
      * Get the sum of the given values.
      *
      * @param  (callable(TValue): mixed)|string|null  $callback
@@ -997,6 +1072,22 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function pipe(callable $callback);
 
     /**
+     * Pass the collection into a new class.
+     *
+     * @param  string-class  $class
+     * @return mixed
+     */
+    public function pipeInto($class);
+
+    /**
+     * Pass the collection through a series of callable pipes and return the result.
+     *
+     * @param  array<callable>  $pipes
+     * @return mixed
+     */
+    public function pipeThrough($pipes);
+
+    /**
      * Get the values of a given key.
      *
      * @param  string|array<array-key, string>  $value
@@ -1012,6 +1103,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return static
      */
     public function reject($callback = true);
+
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot();
 
     /**
      * Return only unique items from the collection array.
@@ -1049,6 +1147,20 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function pad($size, $value);
 
     /**
+     * Get the values iterator.
+     *
+     * @return \Traversable<TKey, TValue>
+     */
+    public function getIterator(): Traversable;
+
+    /**
+     * Count the number of items in the collection.
+     *
+     * @return int
+     */
+    public function count(): int;
+
+    /**
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): mixed)|string|null  $countBy
@@ -1077,11 +1189,49 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function collect();
 
     /**
+     * Get the collection of items as a plain array.
+     *
+     * @return array<TKey, mixed>
+     */
+    public function toArray();
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return array<TKey, mixed>
+     */
+    public function jsonSerialize(): array;
+
+    /**
+     * Get the collection of items as JSON.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options = 0);
+
+    /**
+     * Get a CachingIterator instance.
+     *
+     * @param  int  $flags
+     * @return \CachingIterator
+     */
+    public function getCachingIterator($flags = CachingIterator::CALL_TOSTRING);
+
+    /**
      * Convert the collection to its string representation.
      *
      * @return string
      */
     public function __toString();
+
+    /**
+     * Indicate that the model's string representation should be escaped when __toString is invoked.
+     *
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true);
 
     /**
      * Add a method to the list of proxied methods.
