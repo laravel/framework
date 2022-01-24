@@ -401,7 +401,7 @@ class MorphTo extends BelongsTo
             // Prevent relation initialization for excluded morph types.
 
             $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
-            $relationNotExcluded = !array_key_exists($morphTypeKey, $this->exclusionDictionary);
+            $relationNotExcluded = ! array_key_exists($morphTypeKey, $this->exclusionDictionary);
 
             if ($relationNotExcluded) {
                 $model->setRelation($relation, $this->getDefaultFor($model));
