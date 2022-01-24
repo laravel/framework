@@ -450,7 +450,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  mixed  $value
      * @return mixed
      */
-    public function getOrPut($key, $value)
+    public function getOrPut($key, $value = null)
     {
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
