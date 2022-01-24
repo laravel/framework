@@ -19,6 +19,13 @@ class Grammar extends BaseGrammar
     protected $operators = [];
 
     /**
+     * The grammar specific bit operators.
+     *
+     * @var array
+     */
+    protected $bitOperators = [];
+
+    /**
      * The components that make up a select clause.
      *
      * @var string[]
@@ -253,6 +260,22 @@ class Grammar extends BaseGrammar
         $operator = str_replace('?', '??', $where['operator']);
 
         return $this->wrap($where['column']).' '.$operator.' '.$value;
+    }
+
+    /**
+     * Compile a bit operator where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBit(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return '('.$this->wrap($where['column']).' '.$operator.' '.$value.') != 0';
     }
 
     /**
@@ -571,7 +594,8 @@ class Grammar extends BaseGrammar
         $not = $where['not'] ? 'not ' : '';
 
         return $not.$this->compileJsonContains(
-            $where['column'], $this->parameter($where['value'])
+            $where['column'],
+            $this->parameter($where['value'])
         );
     }
 
@@ -610,7 +634,9 @@ class Grammar extends BaseGrammar
     protected function whereJsonLength(Builder $query, $where)
     {
         return $this->compileJsonLength(
-            $where['column'], $where['operator'], $this->parameter($where['value'])
+            $where['column'],
+            $where['operator'],
+            $this->parameter($where['value'])
         );
     }
 
@@ -686,6 +712,8 @@ class Grammar extends BaseGrammar
             return $this->compileHavingNull($having);
         } elseif ($having['type'] === 'NotNull') {
             return $this->compileHavingNotNull($having);
+        } elseif ($having['type'] === 'bit') {
+            return $this->compileHavingBit($having);
         }
 
         return $this->compileBasicHaving($having);
@@ -749,6 +777,21 @@ class Grammar extends BaseGrammar
         $column = $this->wrap($having['column']);
 
         return $having['boolean'].' '.$column.' is not null';
+    }
+
+    /**
+     * Compile a having clause involving a bit operator.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBit($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        $parameter = $this->parameter($having['value']);
+
+        return $having['boolean'].' ('.$column.' '.$having['operator'].' '.$parameter.') != 0';
     }
 
     /**
@@ -1298,5 +1341,15 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
+    }
+
+    /**
+     * Get the grammar specific bit operators.
+     *
+     * @return array
+     */
+    public function getBitOperators()
+    {
+        return $this->bitOperators;
     }
 }
