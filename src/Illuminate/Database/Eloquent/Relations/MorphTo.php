@@ -424,10 +424,11 @@ class MorphTo extends BelongsTo
     /**
      * Check if morphable type is excluded from dictionary.
      *
-     * @param  string $type
+     * @param  string  $type
      * @return bool
      */
-    protected function isMorphTypeExcluded($type) {
+    protected function isMorphTypeExcluded($type)
+    {
         $morphTypeKey = $this->getDictionaryKey($type);
 
         return array_key_exists($morphTypeKey, $this->exclusionDictionary);
