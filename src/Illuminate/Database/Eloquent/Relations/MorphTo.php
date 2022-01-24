@@ -371,15 +371,15 @@ class MorphTo extends BelongsTo
      * @param  array  $types
      * @return $this
      */
-    public function morphWithout(array $types)
+    public function morphExcept(array $types)
     {
-        $withoutMorphTypeKeys = array_map(function ($key) {
+        $exceptMorphTypeKeys = array_map(function ($key) {
             return $this->getDictionaryKey($key);
         }, $types);
 
         // We prevent unwanted eager loading by moving excluded morph types on exclusion dictionary.
         foreach ($this->dictionary as $morphTypeKey => $foreignKeyKeys) {
-            if (in_array($morphTypeKey, $withoutMorphTypeKeys, true)) {
+            if (in_array($morphTypeKey, $exceptMorphTypeKeys, true)) {
                 $this->exclusionDictionary[$morphTypeKey] = $foreignKeyKeys;
                 unset($this->dictionary[$morphTypeKey]);
             }

@@ -76,10 +76,10 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         $this->assertFalse($comments[1]->relationLoaded('commentable'));
     }
 
-    public function testWithoutMorphLoading()
+    public function testExceptMorphLoading()
     {
         $comments = Comment::with(['commentable' => function (MorphTo $morphTo) {
-            $morphTo->morphWithout([Post::class]);
+            $morphTo->morphExcept([Post::class]);
         }])->get();
 
         $this->assertFalse($comments[0]->relationLoaded('commentable'));
