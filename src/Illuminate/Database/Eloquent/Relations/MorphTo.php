@@ -398,12 +398,7 @@ class MorphTo extends BelongsTo
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
-            // Prevent relation initialization for excluded morph types.
-
-            $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
-            $isRelationExcluded = array_key_exists($morphTypeKey, $this->exclusionDictionary);
-
-            if (! $isRelationExcluded) {
+            if (! $this->isMorphTypeExcluded($model->{$this->morphType})) {
                 $model->setRelation($relation, $this->getDefaultFor($model));
             }
         }
@@ -424,6 +419,18 @@ class MorphTo extends BelongsTo
         );
 
         return $this;
+    }
+
+    /**
+     * Check if morphable type is excluded from dictionary.
+     *
+     * @param  string $type
+     * @return bool
+     */
+    protected function isMorphTypeExcluded($type) {
+        $morphTypeKey = $this->getDictionaryKey($type);
+
+        return array_key_exists($morphTypeKey, $this->exclusionDictionary);
     }
 
     /**
