@@ -205,6 +205,15 @@ class Builder
     ];
 
     /**
+     * All of the available bit operators.
+     *
+     * @var string[]
+     */
+    public $bitOperators = [
+        '&', '|', '^', '<<', '>>', '&~',
+    ];
+
+    /**
      * Whether to use write pdo for the select.
      *
      * @var bool
@@ -757,6 +766,10 @@ class Builder
             }
         }
 
+        if ($this->isBitOperator($operator)) {
+            $type = 'Bit';
+        }
+
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
@@ -838,6 +851,18 @@ class Builder
     {
         return ! in_array(strtolower($operator), $this->operators, true) &&
                ! in_array(strtolower($operator), $this->grammar->getOperators(), true);
+    }
+
+    /**
+     * Determine if the operator is a bit operator.
+     *
+     * @param  string  $operator
+     * @return bool
+     */
+    protected function isBitOperator($operator)
+    {
+        return in_array(strtolower($operator), $this->bitOperators, true) ||
+               in_array(strtolower($operator), $this->grammar->getBitOperators(), true);
     }
 
     /**
@@ -1920,6 +1945,10 @@ class Builder
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
             [$value, $operator] = [$operator, '='];
+        }
+
+        if ($this->isBitOperator($operator)) {
+            $type = 'bit';
         }
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
