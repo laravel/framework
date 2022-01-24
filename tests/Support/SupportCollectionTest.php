@@ -3966,20 +3966,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testReduceWithKeys($collection)
-    {
-        $data = new $collection([
-            'foo' => 'bar',
-            'baz' => 'qux',
-        ]);
-        $this->assertSame('foobarbazqux', $data->reduceWithKeys(function ($carry, $element, $key) {
-            return $carry .= $key.$element;
-        }));
-    }
-
-    /**
-     * @dataProvider collectionClassProvider
-     */
     public function testReduceSpread($collection)
     {
         $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
