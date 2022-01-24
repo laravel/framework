@@ -40,6 +40,13 @@ class Store implements Session
     protected $handler;
 
     /**
+     * The session store's serialization strategy.
+     *
+     * @var string
+     */
+    protected $serialization = 'php';
+
+    /**
      * Session store started status.
      *
      * @var bool
@@ -52,13 +59,15 @@ class Store implements Session
      * @param  string  $name
      * @param  \SessionHandlerInterface  $handler
      * @param  string|null  $id
+     * @param  string  $serialization
      * @return void
      */
-    public function __construct($name, SessionHandlerInterface $handler, $id = null)
+    public function __construct($name, SessionHandlerInterface $handler, $id = null, $serialization = 'php')
     {
         $this->setId($id);
         $this->name = $name;
         $this->handler = $handler;
+        $this->serialization = $serialization;
     }
 
     /**
@@ -95,7 +104,11 @@ class Store implements Session
     protected function readFromHandler()
     {
         if ($data = $this->handler->read($this->getId())) {
-            $data = @unserialize($this->prepareForUnserialize($data));
+            if ($this->serialization === 'json') {
+                $data = json_decode($this->prepareForUnserialize($data), true);
+            } else {
+                $data = @unserialize($this->prepareForUnserialize($data));
+            }
 
             if ($data !== false && ! is_null($data) && is_array($data)) {
                 return $data;
@@ -126,7 +139,7 @@ class Store implements Session
         $this->ageFlashData();
 
         $this->handler->write($this->getId(), $this->prepareForStorage(
-            serialize($this->attributes)
+            $this->serialization === 'json' ? json_encode($this->attributes) : serialize($this->attributes)
         ));
 
         $this->started = false;
