@@ -399,7 +399,7 @@ class RouteListCommand extends Command
     /**
      * Set a callback that should be used when resolving the terminal width.
      *
-     * @param  \Closure|null  $callback
+     * @param  \Closure|null  $resolver
      * @return void
      */
     public static function resolveTerminalWidthUsing($resolver)

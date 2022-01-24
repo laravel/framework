@@ -583,7 +583,6 @@ trait EnumeratesValues
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @param  bool  $strict
      * @return static
      */
     public function whereStrict($key, $value)

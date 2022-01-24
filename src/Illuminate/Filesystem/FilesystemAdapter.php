@@ -245,7 +245,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array|null  $headers
+     * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
@@ -279,7 +279,6 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array|null  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download($path, $name = null, array $headers = [])

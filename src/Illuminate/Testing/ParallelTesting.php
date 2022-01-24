@@ -77,7 +77,7 @@ class ParallelTesting
     /**
      * Set a callback that should be used when resolving options.
      *
-     * @param  \Closure|null  $callback
+     * @param  \Closure|null  $resolver
      * @return void
      */
     public function resolveOptionsUsing($resolver)
@@ -88,7 +88,7 @@ class ParallelTesting
     /**
      * Set a callback that should be used when resolving the unique process token.
      *
-     * @param  \Closure|null  $callback
+     * @param  \Closure|null  $resolver
      * @return void
      */
     public function resolveTokenUsing($resolver)

@@ -243,7 +243,7 @@ class ControllerMakeCommand extends GeneratorCommand
     /**
      * Generate the form requests for the given model and classes.
      *
-     * @param  string  $modelName
+     * @param  string  $modelClass
      * @param  string  $storeRequestClass
      * @param  string  $updateRequestClass
      * @return array

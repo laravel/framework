@@ -462,11 +462,11 @@ trait QueriesRelationships
      * Add a "belongs to" relationship where clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $related
-     * @param  string  $relationship
+     * @param  string|null  $relationshipName
      * @param  string  $boolean
      * @return $this
      *
-     * @throws \RuntimeException
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
@@ -498,7 +498,7 @@ trait QueriesRelationships
      * Add an "BelongsTo" relationship with an "or where" clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $related
-     * @param  string  $relationship
+     * @param  string|null  $relationshipName
      * @return $this
      *
      * @throws \RuntimeException
