@@ -128,17 +128,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function globalAddressesDataProvider()
-    {
-        return [
-            'from' => ['setter' => 'alwaysFrom', 'getter' => 'getFrom'],
-            'reply_to' => ['setter' => 'alwaysReplyTo', 'getter' => 'getReplyTo'],
-            'to' => ['setter' => 'alwaysTo', 'getter' => 'getTo'],
-        ];
-    }
-
-    /** @dataProvider globalAddressesDataProvider */
-    public function testGlobalAddressesAreRespectedOnAllMessages(string $setter, string $getter)
+    public function testGlobalFromIsRespectedOnAllMessages()
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMailer();
@@ -146,9 +136,43 @@ class MailMailerTest extends TestCase
         $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
         $this->setSwiftMailer($mailer);
-        $mailer->{$setter}('taylorotwell@gmail.com', 'Taylor Otwell');
-        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) use ($getter) {
-            $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->{$getter}());
+        $mailer->alwaysFrom('taylorotwell@gmail.com', 'Taylor Otwell');
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+            $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
+        });
+        $mailer->send('foo', ['data'], function ($m) {
+            //
+        });
+    }
+
+    public function testGlobalReplyToIsRespectedOnAllMessages()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMailer();
+        $view = m::mock(stdClass::class);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->alwaysReplyTo('taylorotwell@gmail.com', 'Taylor Otwell');
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+            $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getReplyTo());
+        });
+        $mailer->send('foo', ['data'], function ($m) {
+            //
+        });
+    }
+
+    public function testGlobalToIsRespectedOnAllMessages()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMailer();
+        $view = m::mock(stdClass::class);
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->alwaysTo('taylorotwell@gmail.com', 'Taylor Otwell');
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), [])->andReturnUsing(function ($message) {
+            $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getTo());
         });
         $mailer->send('foo', ['data'], function ($m) {
             //
