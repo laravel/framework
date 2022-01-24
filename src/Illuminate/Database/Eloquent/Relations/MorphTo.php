@@ -410,9 +410,7 @@ class MorphTo extends BelongsTo
      */
     protected function isMorphTypeAllowed($type)
     {
-        $morphTypeKey = $this->getDictionaryKey($type);
-
-        return array_key_exists($morphTypeKey, $this->dictionary);
+        return array_key_exists($this->getDictionaryKey($type), $this->dictionary);
     }
 
     /**
