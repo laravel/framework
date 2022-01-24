@@ -70,8 +70,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::with(['commentable' => function (MorphTo $morphTo) {
             $morphTo->morphOnly([Post::class]);
-        }])
-            ->get();
+        }])->get();
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertFalse($comments[1]->relationLoaded('commentable'));
@@ -81,8 +80,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::with(['commentable' => function (MorphTo $morphTo) {
             $morphTo->morphWithout([Post::class]);
-        }])
-            ->get();
+        }])->get();
 
         $this->assertFalse($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));
