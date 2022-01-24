@@ -207,9 +207,6 @@ class MorphTo extends BelongsTo
      */
     public function match(array $models, Collection $results, $relation)
     {
-        // Prune incomplete relations that have been initialized but not fully eager loaded.
-        $this->pruneIncompleteRelations($models);
-
         return $models;
     }
 
@@ -392,26 +389,26 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Prune incomplete relations on eager loaded models.
+     * Initialize the relation on a set of models.
      *
      * @param  array  $models
-     * @return void
+     * @param  string  $relation
+     * @return array
      */
-    protected function pruneIncompleteRelations(array $models)
+    public function initRelation(array $models, $relation)
     {
-        if (count($this->exclusionDictionary)) {
-            foreach ($models as $model) {
-                // If the morph type key is present in the exclusion dictionary, the relation must not be loaded
-                // in the model.
-                // But at this point and due to the `eagerLoadRelation()` function behavior, the relation was
-                // initialized by `initRelation()` with "null" value and must be unset to allow lazy loading.
+        foreach ($models as $model) {
+            // Prevent relation initialization for excluded morph types.
 
-                $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
-                if (array_key_exists($morphTypeKey, $this->exclusionDictionary)) {
-                    $model->unsetRelation($this->relationName);
-                }
+            $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
+            $relationNotExcluded = !array_key_exists($morphTypeKey, $this->exclusionDictionary);
+
+            if ($relationNotExcluded) {
+                $model->setRelation($relation, $this->getDefaultFor($model));
             }
         }
+
+        return $models;
     }
 
     /**
