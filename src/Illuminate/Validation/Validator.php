@@ -667,7 +667,6 @@ class Validator implements ValidatorContract
      * Replace each field parameter which has an escaped dot with the dot placeholder.
      *
      * @param  array  $parameters
-     * @param  array  $keys
      * @return array
      */
     protected function replaceDotInParameters(array $parameters)

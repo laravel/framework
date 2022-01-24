@@ -1530,7 +1530,6 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibited($attribute, $value)
