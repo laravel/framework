@@ -22,7 +22,7 @@
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^3.1",
         "laravel/serializable-closure": "^1.0",
-        "league/commonmark": "^2.0.2",
+        "league/commonmark": "^2.2",
         "league/flysystem": "^3.0",
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.53.1",
