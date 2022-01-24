@@ -13,7 +13,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     {
         $arguments = func_get_args();
 
-        $async = strtoupper((string) $arguments[0] ?? null) === 'ASYNC';
+        $async = strtoupper((string) ($arguments[0] ?? null)) === 'ASYNC';
 
         foreach ($this->client->_masters() as $master) {
             $async

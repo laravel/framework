@@ -467,6 +467,28 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    public function testItFlushes()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->set('name', 'Till');
+            $this->assertSame(1, $redis->exists('name'));
+
+            $redis->flushdb();
+            $this->assertSame(0, $redis->exists('name'));
+        }
+    }
+
+    public function testItFlushesAsynchronous()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->set('name', 'Till');
+            $this->assertSame(1, $redis->exists('name'));
+
+            $redis->flushdb('ASYNC');
+            $this->assertSame(0, $redis->exists('name'));
+        }
+    }
+
     public function testItRunsEval()
     {
         foreach ($this->connections() as $redis) {
