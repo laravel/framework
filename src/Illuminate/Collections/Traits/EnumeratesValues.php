@@ -765,22 +765,6 @@ trait EnumeratesValues
      * @param  mixed  ...$initial
      * @return array
      *
-     * @deprecated Use "reduceSpread" instead
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function reduceMany(callable $callback, ...$initial)
-    {
-        return $this->reduceSpread($callback, ...$initial);
-    }
-
-    /**
-     * Reduce the collection to multiple aggregate values.
-     *
-     * @param  callable  $callback
-     * @param  mixed  ...$initial
-     * @return array
-     *
      * @throws \UnexpectedValueException
      */
     public function reduceSpread(callable $callback, ...$initial)
