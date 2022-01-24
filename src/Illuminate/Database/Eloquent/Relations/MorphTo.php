@@ -34,13 +34,6 @@ class MorphTo extends BelongsTo
     protected $dictionary = [];
 
     /**
-     * All of the dictionary items that must be excluded from eager loading.
-     *
-     * @var array
-     */
-    protected $exclusionDictionary = [];
-
-    /**
      * A buffer of dynamic calls to query macros.
      *
      * @var array
@@ -348,19 +341,13 @@ class MorphTo extends BelongsTo
      * @param  array  $types
      * @return $this
      */
-    public function morphOnly(array $types)
+    public function only(array $types)
     {
-        $onlyMorphTypeKeys = array_map(function ($key) {
+        $morphTypeKeys = array_map(function ($key) {
             return $this->getDictionaryKey($key);
         }, $types);
 
-        // We prevent unwanted eager loading by keeping on dictionary only given morph types.
-        foreach ($this->dictionary as $morphTypeKey => $foreignKeyKeys) {
-            if (! in_array($morphTypeKey, $onlyMorphTypeKeys, true)) {
-                $this->exclusionDictionary[$morphTypeKey] = $foreignKeyKeys;
-                unset($this->dictionary[$morphTypeKey]);
-            }
-        }
+        $this->dictionary = array_intersect_key($this->dictionary, array_flip($morphTypeKeys));
 
         return $this;
     }
@@ -371,19 +358,13 @@ class MorphTo extends BelongsTo
      * @param  array  $types
      * @return $this
      */
-    public function morphExcept(array $types)
+    public function except(array $types)
     {
-        $exceptMorphTypeKeys = array_map(function ($key) {
+        $morphTypeKeys = array_map(function ($key) {
             return $this->getDictionaryKey($key);
         }, $types);
 
-        // We prevent unwanted eager loading by moving excluded morph types on exclusion dictionary.
-        foreach ($this->dictionary as $morphTypeKey => $foreignKeyKeys) {
-            if (in_array($morphTypeKey, $exceptMorphTypeKeys, true)) {
-                $this->exclusionDictionary[$morphTypeKey] = $foreignKeyKeys;
-                unset($this->dictionary[$morphTypeKey]);
-            }
-        }
+        $this->dictionary = array_diff_key($this->dictionary, array_flip($morphTypeKeys));
 
         return $this;
     }
@@ -398,7 +379,7 @@ class MorphTo extends BelongsTo
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
-            if (! $this->isMorphTypeExcluded($model->{$this->morphType})) {
+            if ($this->isMorphTypeAllowed($model->{$this->morphType})) {
                 $model->setRelation($relation, $this->getDefaultFor($model));
             }
         }
@@ -422,16 +403,16 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Check if morph type is excluded from dictionary.
+     * Check if morph type is present on dictionary.
      *
      * @param  string  $type
      * @return bool
      */
-    protected function isMorphTypeExcluded($type)
+    protected function isMorphTypeAllowed($type)
     {
         $morphTypeKey = $this->getDictionaryKey($type);
 
-        return array_key_exists($morphTypeKey, $this->exclusionDictionary);
+        return array_key_exists($morphTypeKey, $this->dictionary);
     }
 
     /**
