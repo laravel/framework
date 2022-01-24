@@ -114,7 +114,7 @@ class Markdown
 
         $converter = new MarkdownConverter($environment);
 
-        return new HtmlString((string) $converter->convertToHtml($text));
+        return new HtmlString($converter->convert($text)->getContent());
     }
 
     /**
