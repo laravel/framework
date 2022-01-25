@@ -127,11 +127,11 @@ class Message
     }
 
     /**
-     * Clear the carbon copy to the message.
+     * Remove all carbon copy addresses from the message.
      *
      * @return $this
      */
-    public function clearCc()
+    public function forgetCc()
     {
         if ($header = $this->message->getHeaders()->get('Cc')) {
             $header->setAddresses([]);
@@ -162,11 +162,11 @@ class Message
     }
 
     /**
-     * Clear the blind carbon copy to the message.
+     * Remove all of the blind carbon copy addresses from the message.
      *
      * @return $this
      */
-    public function clearBcc()
+    public function forgetBcc()
     {
         if ($header = $this->message->getHeaders()->get('Bcc')) {
             $header->setAddresses([]);
