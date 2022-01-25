@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use BadMethodCallException;
+use Illuminate\Contracts\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
@@ -19,10 +20,10 @@ class SymfonySessionDecorator implements SessionInterface
     /**
      * Create a new session decorator.
      *
-     * @param  \Illuminate\Session\Store  $store
+     * @param  \Illuminate\Contracts\Session\Session  $store
      * @return void
      */
-    public function __construct(Store $store)
+    public function __construct(Session $store)
     {
         $this->store = $store;
     }
