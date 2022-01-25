@@ -127,6 +127,20 @@ class Message
     }
 
     /**
+     * Remove all carbon copy addresses from the message.
+     *
+     * @return $this
+     */
+    public function forgetCc()
+    {
+        if ($header = $this->message->getHeaders()->get('Cc')) {
+            $header->setAddresses([]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a blind carbon copy to the message.
      *
      * @param  string|array  $address
@@ -145,6 +159,20 @@ class Message
         }
 
         return $this->addAddresses($address, $name, 'Bcc');
+    }
+
+    /**
+     * Remove all of the blind carbon copy addresses from the message.
+     *
+     * @return $this
+     */
+    public function forgetBcc()
+    {
+        if ($header = $this->message->getHeaders()->get('Bcc')) {
+            $header->setAddresses([]);
+        }
+
+        return $this;
     }
 
     /**
