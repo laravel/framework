@@ -175,7 +175,7 @@ class VendorPublishCommand extends Command
             $composerFileName = "$currentPackageFolder/composer.json";
 
             if (File::exists($composerFileName)) {
-                return json_decode(File::get($composerFileName), true)['name'];
+                return json_decode(File::get($composerFileName), true)['name'] ?? null;
             }
 
             $currentPackageFolder = dirname($currentPackageFolder);
@@ -288,9 +288,11 @@ class VendorPublishCommand extends Command
      */
     protected function publishableProviders()
     {
-        return collect(ServiceProvider::publishableProviders())->groupBy(function ($provider) {
-            return $this->packageFromProvider($provider);
-        })->map->toArray()->toArray();
+        return collect(ServiceProvider::publishableProviders())->groupBy(
+            fn ($provider) => $this->packageFromProvider($provider)
+        )->filter(
+            fn ($description, $package) => ! empty($package)
+        )->map->toArray()->toArray();
     }
 
     /**
