@@ -29,6 +29,20 @@ class HandleExceptions
     protected $app;
 
     /**
+     * An error handler instance.
+     *
+     * @var callable|null
+     */
+    protected $previousErrorHandler;
+
+    /**
+     * An exception handler instance.
+     *
+     * @var callable|null
+     */
+    protected $previousExceptionHandler;
+
+    /**
      * Bootstrap the given application.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -36,17 +50,20 @@ class HandleExceptions
      */
     public function bootstrap(Application $app)
     {
-        self::$reservedMemory = str_repeat('x', 10240);
+        if (null === self::$reservedMemory) {
+            self::$reservedMemory = str_repeat('x', 10240);
+
+            register_shutdown_function([$this, 'handleShutdown']);
+        }
 
         $this->app = $app;
 
         error_reporting(-1);
 
-        set_error_handler([$this, 'handleError']);
+        $this->previousErrorHandler = set_error_handler([$this, 'handleError']);
+        $this->previousExceptionHandler = set_exception_handler([$this, 'handleException']);
 
-        set_exception_handler([$this, 'handleException']);
-
-        register_shutdown_function([$this, 'handleShutdown']);
+        $app->terminating([$this, 'restoreHandlers']);
 
         if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
@@ -168,6 +185,22 @@ class HandleExceptions
             $this->renderForConsole($e);
         } else {
             $this->renderHttpResponse($e);
+        }
+    }
+
+    /**
+     * Restore the error and exception handler to the ones that were set before the bootstrap method was called.
+     *
+     * @return void
+     */
+    public function restoreHandlers(): void
+    {
+        if (null !== $this->previousErrorHandler) {
+            restore_error_handler();
+        }
+
+        if (null !== $this->previousExceptionHandler) {
+            restore_exception_handler();
         }
     }
 
