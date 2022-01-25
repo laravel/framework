@@ -676,6 +676,12 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Bob', $request->query('foo', 'Bob'));
         $all = $request->query(null);
         $this->assertSame('Taylor', $all['name']);
+
+        $request = Request::create('/', 'GET', ['user' => ['Taylor', 'Mohamed Said']]);
+        $this->assertSame(['Taylor', 'Mohamed Said'], $request->query('user'));
+
+        $request = Request::create('/?user[]=Taylor&user[]=Mohamed%20Said', 'GET', []);
+        $this->assertSame(['Taylor', 'Mohamed Said'], $request->query('user'));
     }
 
     public function testPostMethod()
