@@ -216,7 +216,7 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $path
      * @param  array  $parameters
-     * @param  array  $extra
+     * @param  array|bool  $extra
      * @param  bool|null  $secure
      * @return string
      */
@@ -228,7 +228,9 @@ class UrlGenerator implements UrlGeneratorContract
 
         $query = $this->makeQueryString(array_merge($output, $parameters));
 
-        return $this->to($path.$query, $extra, $secure);
+        $args = is_bool($extra) ? [[], $extra] : [$extra, $secure];
+
+        return $this->to($path.$query, ...$args);
     }
 
     /**

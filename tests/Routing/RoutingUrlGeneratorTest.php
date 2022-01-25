@@ -58,6 +58,8 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $this->assertSame('http://www.foo.com/foo/bar', $url->query('foo/bar'));
+        $this->assertSame('http://www.foo.com/foo/bar', $url->query('foo/bar', [], false));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->query('foo/bar', [], true));
         $this->assertSame('https://www.foo.com/foo/bar', $url->query('foo/bar', [], [], true));
         $this->assertSame('https://www.foo.com/foo/bar/baz/boom', $url->query('foo/bar', [], ['baz', 'boom'], true));
         $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar&baz=boom', $url->query('foo/bar?foo=bar', ['baz' => 'boom'], ['baz'], true));
