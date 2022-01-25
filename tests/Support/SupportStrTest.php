@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
+use ReflectionClass;
 
 class SupportStrTest extends TestCase
 {
@@ -258,6 +259,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('/test/string', Str::start('test/string', '/'));
         $this->assertSame('/test/string', Str::start('/test/string', '/'));
         $this->assertSame('/test/string', Str::start('//test/string', '/'));
+    }
+
+    public function testFlushCache()
+    {
+        $reflection = new ReflectionClass(Str::class);
+        $property = $reflection->getProperty('snakeCache');
+        $property->setAccessible(true);
+
+        Str::flushCache();
+        $this->assertEmpty($property->getValue());
+
+        Str::snake('Taylor Otwell');
+        $this->assertNotEmpty($property->getValue());
+
+        Str::flushCache();
+        $this->assertEmpty($property->getValue());
     }
 
     public function testFinish()
