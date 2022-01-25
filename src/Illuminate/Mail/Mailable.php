@@ -1028,7 +1028,7 @@ class Mailable implements MailableContract, Renderable
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
         }
-        
+
         if (Str::startsWith($method, 'with')) {
             return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
