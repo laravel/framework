@@ -349,7 +349,7 @@ class ComponentTagCompiler
 
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
-        if (Str::contains($name, $delimiter)) {
+        if (str_contains($name, $delimiter)) {
             return Str::replaceFirst($delimiter, $delimiter.$prefix, $name);
         }
 
@@ -498,7 +498,7 @@ class ComponentTagCompiler
 
             $value = $this->stripQuotes($value);
 
-            if (Str::startsWith($attribute, 'bind:')) {
+            if (str_starts_with($attribute, 'bind:')) {
                 $attribute = Str::after($attribute, 'bind:');
 
                 $this->boundAttributes[$attribute] = true;
@@ -506,7 +506,7 @@ class ComponentTagCompiler
                 $value = "'".$this->compileAttributeEchos($value)."'";
             }
 
-            if (Str::startsWith($attribute, '::')) {
+            if (str_starts_with($attribute, '::')) {
                 $attribute = substr($attribute, 1);
             }
 

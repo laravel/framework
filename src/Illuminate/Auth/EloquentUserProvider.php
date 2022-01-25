@@ -7,7 +7,6 @@ use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Str;
 
 class EloquentUserProvider implements UserProvider
 {
@@ -108,7 +107,7 @@ class EloquentUserProvider implements UserProvider
     {
         if (empty($credentials) ||
            (count($credentials) === 1 &&
-            Str::contains($this->firstCredentialKey($credentials), 'password'))) {
+            str_contains($this->firstCredentialKey($credentials), 'password'))) {
             return;
         }
 
@@ -118,7 +117,7 @@ class EloquentUserProvider implements UserProvider
         $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
-            if (Str::contains($key, 'password')) {
+            if (str_contains($key, 'password')) {
                 continue;
             }
 

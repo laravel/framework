@@ -111,7 +111,7 @@ abstract class AbstractCursorPaginator implements Htmlable
         }
 
         return $this->path()
-            .(Str::contains($this->path(), '?') ? '&' : '?')
+            .(str_contains($this->path(), '?') ? '&' : '?')
             .Arr::query($parameters)
             .$this->buildFragment();
     }

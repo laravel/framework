@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Str;
 use LogicException;
 
 /**
@@ -195,7 +194,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
             $segments = explode('.', explode(':', $key)[0]);
 
-            if (Str::contains($key, ':')) {
+            if (str_contains($key, ':')) {
                 $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
             }
 

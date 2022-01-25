@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use ReflectionFunction;
 
 class EventListCommand extends Command
@@ -122,7 +121,7 @@ class EventListCommand extends Command
         }
 
         return collect($events)->filter(function ($listeners, $event) use ($eventName) {
-            return Str::contains($event, $eventName);
+            return str_contains($event, $eventName);
         })->toArray();
     }
 

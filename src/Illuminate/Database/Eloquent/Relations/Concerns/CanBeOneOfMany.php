@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait CanBeOneOfMany
@@ -276,7 +275,7 @@ trait CanBeOneOfMany
      */
     protected function qualifyRelatedColumn($column)
     {
-        return Str::contains($column, '.') ? $column : $this->query->getModel()->getTable().'.'.$column;
+        return str_contains($column, '.') ? $column : $this->query->getModel()->getTable().'.'.$column;
     }
 
     /**

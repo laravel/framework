@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Foundation\Bootstrap\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -114,11 +113,11 @@ class ManipulateArrayInput extends TransformsRequest
 {
     protected function transform($key, $value)
     {
-        if (Str::contains($key, 'beers')) {
+        if (str_contains($key, 'beers')) {
             $value++;
         }
 
-        if (Str::contains($key, 'age')) {
+        if (str_contains($key, 'age')) {
             $value--;
         }
 
