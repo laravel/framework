@@ -675,7 +675,9 @@ abstract class Factory
     public function modelName()
     {
         $resolver = static::$modelNameResolver ?: function (self $factory) {
-            $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
+            $factoryBasename = Str::replaceLast(
+                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+            );
 
             $appNamespace = static::appNamespace();
 
