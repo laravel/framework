@@ -42,11 +42,7 @@ class HandleExceptions
 
         error_reporting(-1);
 
-        set_error_handler([$this, 'handleError']);
-
-        set_exception_handler([$this, 'handleException']);
-
-        register_shutdown_function([$this, 'handleShutdown']);
+        HandleExceptionsGlobal::register($this);
 
         if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
