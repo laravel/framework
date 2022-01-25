@@ -23,7 +23,7 @@
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
         "nesbot/carbon": "^2.53.1",
-        "voku/portable-ascii": "^1.4.8"
+        "voku/portable-ascii": "^1.6.1"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
