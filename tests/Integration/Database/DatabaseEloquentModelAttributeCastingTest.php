@@ -188,7 +188,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $model->getAttributes();
 
-        $this->assertTrue(empty($model->getDirty()));
+        $this->assertEmpty($model->getDirty());
     }
 
     public function testCastsThatOnlyHaveGetterThatReturnsPrimitivesAreNotCached()

@@ -88,7 +88,7 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
 
         Carbon::setTestNow('2021-07-20 19:13:14');
         $result = $article->users()->sync([1, 2]);
-        $this->assertTrue(collect($result['detached'])->count() === 1);
+        $this->assertCount(1, collect($result['detached']));
         $this->assertSame('3', collect($result['detached'])->first());
 
         $article->refresh();

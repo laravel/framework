@@ -241,7 +241,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->hasOldInput('boom'));
 
         $this->assertSame('default', $session->getOldInput('input', 'default'));
-        $this->assertSame(null, $session->getOldInput('name', 'default'));
+        $this->assertNull($session->getOldInput('name', 'default'));
     }
 
     public function testDataFlashing()

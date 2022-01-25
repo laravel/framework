@@ -72,8 +72,8 @@ class EloquentModelCustomCastingTest extends TestCase
         $this->assertSame('address_line_two_value', $model->getOriginal('address_line_two'));
         $this->assertSame('address_line_two_value', $model->getAttribute('address_line_two'));
 
-        $this->assertSame(null, $model->getOriginal('string_field'));
-        $this->assertSame(null, $model->getAttribute('string_field'));
+        $this->assertNull($model->getOriginal('string_field'));
+        $this->assertNull($model->getAttribute('string_field'));
         $this->assertSame('', $model->getRawOriginal('string_field'));
 
         /** @var \Illuminate\Tests\Integration\Database\CustomCasts $another_model */
