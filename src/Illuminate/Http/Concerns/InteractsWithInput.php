@@ -35,6 +35,25 @@ trait InteractsWithInput
     }
 
     /**
+     * Determine if a headers is set on the request.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function hasHeaders($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $key) {
+            if (!$this->hasHeader($key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Retrieve a header from the request.
      *
      * @param  string|null  $key
