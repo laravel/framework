@@ -686,9 +686,11 @@ class Grammar extends BaseGrammar
      * @param  array  $havings
      * @return string
      */
-    protected function compileHavings(Builder $query, $havings)
+    protected function compileHavings(Builder $query)
     {
-        $sql = implode(' ', array_map([$this, 'compileHaving'], $havings));
+        $sql = collect($query->havings)->map(function ($having) {
+            return $having['boolean'].' '.$this->compileHaving($having);
+        })->implode(' ');
 
         return 'having '.$this->removeLeadingBoolean($sql);
     }
@@ -696,6 +698,7 @@ class Grammar extends BaseGrammar
     /**
      * Compile a single having clause.
      *
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $having
      * @return string
      */
@@ -705,7 +708,7 @@ class Grammar extends BaseGrammar
         // without doing any more processing on it. Otherwise, we will compile the
         // clause into SQL based on the components that make it up from builder.
         if ($having['type'] === 'Raw') {
-            return $having['boolean'].' '.$having['sql'];
+            return $having['sql'];
         } elseif ($having['type'] === 'between') {
             return $this->compileHavingBetween($having);
         } elseif ($having['type'] === 'Null') {
@@ -714,9 +717,22 @@ class Grammar extends BaseGrammar
             return $this->compileHavingNotNull($having);
         } elseif ($having['type'] === 'bit') {
             return $this->compileHavingBit($having);
+        } elseif ($having['type'] === 'Nested') {
+            return $this->compileNestedHavings($having);
         }
 
         return $this->compileBasicHaving($having);
+    }
+
+    /**
+     * Compile a nested having clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileNestedHavings($having)
+    {
+        return '('.substr($this->compileHavings($having['query']), 7).')';
     }
 
     /**
@@ -731,7 +747,7 @@ class Grammar extends BaseGrammar
 
         $parameter = $this->parameter($having['value']);
 
-        return $having['boolean'].' '.$column.' '.$having['operator'].' '.$parameter;
+        return $column.' '.$having['operator'].' '.$parameter;
     }
 
     /**
@@ -750,7 +766,7 @@ class Grammar extends BaseGrammar
 
         $max = $this->parameter(last($having['values']));
 
-        return $having['boolean'].' '.$column.' '.$between.' '.$min.' and '.$max;
+        return $column.' '.$between.' '.$min.' and '.$max;
     }
 
     /**
@@ -763,7 +779,7 @@ class Grammar extends BaseGrammar
     {
         $column = $this->wrap($having['column']);
 
-        return $having['boolean'].' '.$column.' is null';
+        return $column.' is null';
     }
 
     /**
@@ -776,7 +792,7 @@ class Grammar extends BaseGrammar
     {
         $column = $this->wrap($having['column']);
 
-        return $having['boolean'].' '.$column.' is not null';
+        return $column.' is not null';
     }
 
     /**
@@ -791,7 +807,7 @@ class Grammar extends BaseGrammar
 
         $parameter = $this->parameter($having['value']);
 
-        return $having['boolean'].' ('.$column.' '.$having['operator'].' '.$parameter.') != 0';
+        return '('.$column.' '.$having['operator'].' '.$parameter.') != 0';
     }
 
     /**
