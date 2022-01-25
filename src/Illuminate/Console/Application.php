@@ -267,7 +267,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolve($command)
     {
-        if (class_exists($command) && ($commandName = $command::getDefaultName())) {
+        if (is_subclass_of($command, SymfonyCommand::class) && ($commandName = $command::getDefaultName())) {
             $this->commandMap[$commandName] = $command;
 
             return null;
