@@ -88,6 +88,7 @@ abstract class TestCase extends BaseTestCase
             ParallelTesting::callSetUpTestCaseCallbacks($this);
         }
 
+        $this->deprecationHandling();
         $this->setUpTraits();
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
@@ -97,6 +98,16 @@ abstract class TestCase extends BaseTestCase
         Model::setEventDispatcher($this->app['events']);
 
         $this->setUpHasRun = true;
+    }
+
+    /**
+     * Hook to setup whether or not to handle deprecations.
+     *
+     * @return void
+     */
+    protected function deprecationHandling(): void
+    {
+        $this->withoutDeprecationHandling();
     }
 
     /**
