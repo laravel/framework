@@ -203,7 +203,7 @@ class VendorPublishCommand extends Command
             if (! $this->option('all') && count($tagChoices = $this->tagChoices()) > 1) {
                 $tagChoice = $this->choice(
                     'Would you like to publish any tag in particular?',
-                    collect(['all' => 'everything'] + $tagChoices)->sortKeys()->toArray(),
+                    collect(['all' => 'Publish all files'] + $tagChoices)->sortKeys()->toArray(),
                     'all',
                 );
             }
