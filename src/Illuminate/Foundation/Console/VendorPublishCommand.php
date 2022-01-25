@@ -168,7 +168,7 @@ class VendorPublishCommand extends Command
         $providerPackage = null;
 
         while (true) {
-            if ($currentPackageFolder == dirname(base_path())) {
+            if ($currentPackageFolder == '/' || $currentPackageFolder == dirname(base_path())) {
                 return;
             }
 
