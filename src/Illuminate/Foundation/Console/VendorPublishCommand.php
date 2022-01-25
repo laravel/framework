@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -16,6 +15,23 @@ use ReflectionClass;
 
 class VendorPublishCommand extends Command
 {
+    /**
+     * The directory descriptions.
+     *
+     * @var array
+     */
+    protected $directoryDescriptions = [
+        'app/Providers' => 'providers',
+        'config' => 'config',
+        'database/migrations' => 'migrations',
+        'database' => 'database files',
+        'docker' => 'docker files',
+        'public' => 'assets',
+        'resources/views' => 'views',
+        'resources/lang' => 'resources',
+        'sail' => 'binary',
+    ];
+
     /**
      * The filesystem instance.
      *
@@ -104,7 +120,7 @@ class VendorPublishCommand extends Command
      */
     protected function determineWhatShouldBePublished()
     {
-        if ($this->option('all')) {
+        if (! $this->argument('package') && $this->option('all')) {
             return;
         }
 
@@ -114,67 +130,154 @@ class VendorPublishCommand extends Command
 
         if ($package = $this->argument('package')) {
             $this->discoverFromPackage($package);
-        } elseif (! $this->providers && ! $this->tags) {
-            $this->promptForProviderOrTag();
+
+            $this->promptForPackageAndTag();
+        }
+        if (! $this->providers && ! $this->tags) {
+            $this->promptForPackageAndTag();
         }
     }
 
     /**
-     * Determine the provider or tag(s) to publish from the given package name.
+     * Determine the provider to publish from the given package name.
      *
      * @param  string  $package
      * @return void
      */
     protected function discoverFromPackage($package)
     {
-        $this->providers = collect(ServiceProvider::publishableProviders())->map(function ($providerClass) use ($package) {
-            $currentPackageFolder = dirname((new ReflectionClass($providerClass))->getFileName());
+        $this->providers = collect(ServiceProvider::publishableProviders())->map(function ($provider) use ($package) {
+            $providerPackage = $this->packageFromProvider($provider);
 
-            if (! str_starts_with($currentPackageFolder, base_path('vendor'))) {
-                return;
-            }
-
-            $providerPackage = null;
-
-            while (true) {
-                if ($currentPackageFolder == base_path('vendor')) {
-                    return;
-                }
-
-                $composerFileName = "$currentPackageFolder/composer.json";
-
-                if (File::exists($composerFileName)) {
-                    $packageNameFromComposer = json_decode(File::get($composerFileName), true)['name'];
-
-                    if ($packageNameFromComposer == $package) {
-                        return $providerClass;
-                    }
-                }
-
-                $currentPackageFolder = dirname($currentPackageFolder);
-            }
+            return $providerPackage == $package ? $provider : null;
         })->filter()->values()->whenEmpty(function () use ($package) {
             $this->comment('No publishable resources for package ['.$package.'].');
         })->toArray();
     }
 
     /**
-     * Prompt for which provider or tag to publish.
+     * Get the package name from the provider class.
+     *
+     * @return string
+     */
+    protected function packageFromProvider($provider)
+    {
+        $currentPackageFolder = dirname((new ReflectionClass($provider))->getFileName());
+
+        $providerPackage = null;
+
+        while (true) {
+            if ($currentPackageFolder == dirname(base_path())) {
+                return;
+            }
+
+            $composerFileName = "$currentPackageFolder/composer.json";
+
+            if (File::exists($composerFileName)) {
+                return json_decode(File::get($composerFileName), true)['name'];
+            }
+
+            $currentPackageFolder = dirname($currentPackageFolder);
+        }
+    }
+
+    /**
+     * Prompt for which package or tag to publish.
      *
      * @return void
      */
-    protected function promptForProviderOrTag()
+    protected function promptForPackageAndTag()
     {
-        $choice = $this->choice(
-            "Which provider or tag's files would you like to publish?",
-            $choices = $this->publishableChoices()
-        );
+        if (! $this->providers) {
+            $packageChoice = $this->choice(
+                'Which packages would you like to publish?',
+                $this->packageChoices()
+            );
 
-        if ($choice == $choices[0] || is_null($choice)) {
-            return;
+            $this->parsePackageChoice($packageChoice);
         }
 
-        $this->parseChoice($choice);
+        if (! $this->tags) {
+            $tagChoice = 'all';
+
+            if (! $this->option('all') && count($tagChoices = $this->tagChoices()) > 1) {
+                $tagChoice = $this->choice(
+                    'Would you like to publish any tag in particular?',
+                    collect(['all' => 'everything'] + $tagChoices)->sortKeys()->toArray(),
+                    'all',
+                );
+            }
+
+            $this->parseTagChoice($tagChoice);
+        }
+    }
+
+    /**
+     * Finds a description from the given provider.
+     *
+     * @return array
+     */
+    protected function providerDescription($provider)
+    {
+        return collect(ServiceProvider::pathsToPublish($provider, null))
+            ->map(fn ($to) => $this->directoryDescription($to))
+            ->toArray();
+    }
+
+    /**
+     * Finds a description from the given directory.
+     *
+     * @return string
+     */
+    protected function directoryDescription($directory)
+    {
+        return collect($this->directoryDescriptions)->first(
+            fn ($description, $directoryWithDescription) => str($directory)->startsWith(base_path($directoryWithDescription)),
+            'miscellaneous files',
+        );
+    }
+
+    /**
+     * The package choices available via the prompt.
+     *
+     * @return array
+     */
+    protected function packageChoices()
+    {
+        return collect($this->publishableProviders())->map(function ($providers) {
+            return str(collect($providers)
+                ->map(fn ($provider) => $this->providerDescription($provider))
+                ->flatten()
+                ->unique()
+                ->sort()
+                ->implode(', '))->ucfirst();
+        })->sortKeys()->toArray();
+    }
+
+    /**
+     * The tag choices available via the prompt.
+     *
+     * @return array
+     */
+    protected function tagChoices()
+    {
+        $tags = collect();
+
+        foreach ($this->providers as $provider) {
+            $pathsToPublish = $provider::$publishes[$provider] ?? [];
+
+            $tags = $tags->merge(collect(ServiceProvider::$publishGroups)->filter(
+                fn ($paths, $tag) => collect($paths)->filter(
+                    fn ($to, $from) => isset($pathsToPublish[$from]),
+                )->isNotEmpty()
+            )->map(
+                fn ($paths) => collect($paths)->map(
+                    fn ($to) => str($to)->replace(base_path().'/', '')
+                )->filter()->unique()->implode(', ')
+            )->toArray());
+        }
+
+        return $tags->unique()->toArray();
     }
 
     /**
@@ -182,29 +285,34 @@ class VendorPublishCommand extends Command
      *
      * @return array
      */
-    protected function publishableChoices()
+    protected function publishableProviders()
     {
-        return array_merge(
-            ['<comment>Publish files from all providers and tags listed below</comment>'],
-            preg_filter('/^/', '<comment>Provider: </comment>', Arr::sort(ServiceProvider::publishableProviders())),
-            preg_filter('/^/', '<comment>Tag: </comment>', Arr::sort(ServiceProvider::publishableGroups()))
-        );
+        return collect(ServiceProvider::publishableProviders())->groupBy(function ($provider) {
+            return $this->packageFromProvider($provider);
+        })->map->toArray()->toArray();
     }
 
     /**
-     * Parse the answer that was given via the prompt.
+     * Parse the package answer that was given via the prompt.
      *
      * @param  string  $choice
      * @return void
      */
-    protected function parseChoice($choice)
+    protected function parsePackageChoice($choice)
     {
-        [$type, $value] = explode(': ', strip_tags($choice));
+        $this->providers = $this->publishableProviders()[$choice];
+    }
 
-        if ($type === 'Provider') {
-            $this->providers = [$value];
-        } elseif ($type === 'Tag') {
-            $this->tags = [$value];
+    /**
+     * Parse the tag answer that was given via the prompt.
+     *
+     * @param  string  $choice
+     * @return void
+     */
+    protected function parseTagChoice($choice)
+    {
+        if ($choice != 'all') {
+            $this->tags = [$choice];
         }
     }
 
