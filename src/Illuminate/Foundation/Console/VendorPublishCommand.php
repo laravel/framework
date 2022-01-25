@@ -134,7 +134,7 @@ class VendorPublishCommand extends Command
             if ($this->providers) {
                 $this->promptForPackageAndTag();
             }
-        } else if (! $this->providers && ! $this->tags) {
+        } elseif (! $this->providers && ! $this->tags) {
             $this->promptForPackageAndTag();
         }
     }
