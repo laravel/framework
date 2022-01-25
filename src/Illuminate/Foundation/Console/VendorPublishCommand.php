@@ -28,7 +28,7 @@ class VendorPublishCommand extends Command
         'docker' => 'docker files',
         'public' => 'assets',
         'resources/views' => 'views',
-        'resources/lang' => 'resources',
+        'resources/lang' => 'translations',
         'sail' => 'binary',
     ];
 
