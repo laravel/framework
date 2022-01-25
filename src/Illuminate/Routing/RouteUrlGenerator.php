@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 
 class RouteUrlGenerator
 {
+    use GeneratesQueryStrings;
+
     /**
      * The URL generator instance.
      *
@@ -259,51 +261,7 @@ class RouteUrlGenerator
      */
     protected function getRouteQueryString(array $parameters)
     {
-        // First we will get all of the string parameters that are remaining after we
-        // have replaced the route wildcards. We'll then build a query string from
-        // these string parameters then use it as a starting point for the rest.
-        if (count($parameters) === 0) {
-            return '';
-        }
-
-        $query = Arr::query(
-            $keyed = $this->getStringParameters($parameters)
-        );
-
-        // Lastly, if there are still parameters remaining, we will fetch the numeric
-        // parameters that are in the array and add them to the query string or we
-        // will make the initial query string if it wasn't started with strings.
-        if (count($keyed) < count($parameters)) {
-            $query .= '&'.implode(
-                '&', $this->getNumericParameters($parameters)
-            );
-        }
-
-        $query = trim($query, '&');
-
-        return $query === '' ? '' : "?{$query}";
-    }
-
-    /**
-     * Get the string parameters from a given list.
-     *
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function getStringParameters(array $parameters)
-    {
-        return array_filter($parameters, 'is_string', ARRAY_FILTER_USE_KEY);
-    }
-
-    /**
-     * Get the numeric parameters from a given list.
-     *
-     * @param  array  $parameters
-     * @return array
-     */
-    protected function getNumericParameters(array $parameters)
-    {
-        return array_filter($parameters, 'is_numeric', ARRAY_FILTER_USE_KEY);
+        return $this->makeQueryString($parameters);
     }
 
     /**

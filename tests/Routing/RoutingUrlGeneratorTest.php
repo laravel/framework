@@ -50,6 +50,20 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
+    public function testBasicQueryGeneration()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $this->assertSame('http://www.foo.com/foo/bar', $url->query('foo/bar'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->query('foo/bar', [], [], true));
+        $this->assertSame('https://www.foo.com/foo/bar/baz/boom', $url->query('foo/bar', [], ['baz', 'boom'], true));
+        $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar&baz=boom', $url->query('foo/bar?foo=bar', ['baz' => 'boom'], ['baz'], true));
+        $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar&baz=boom&zal', $url->query('foo/bar?foo=bar', ['baz' => 'boom', 'zal'], ['baz'], true));
+    }
+
     public function testBasicGenerationWithHostFormatting()
     {
         $url = new UrlGenerator(

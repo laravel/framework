@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class UrlGenerator implements UrlGeneratorContract
 {
-    use InteractsWithTime, Macroable;
+    use InteractsWithTime, GeneratesQueryStrings, Macroable;
 
     /**
      * The route collection.
@@ -209,6 +209,26 @@ class UrlGenerator implements UrlGeneratorContract
         return $this->format(
             $root, '/'.trim($path.'/'.$tail, '/')
         ).$query;
+    }
+
+    /**
+     * Generate an absolute URL with query parameters.
+     *
+     * @param  string  $path
+     * @param  array  $parameters
+     * @param  array  $extra
+     * @param  bool|null  $secure
+     * @return string
+     */
+    public function query($path, $parameters = [], $extra = [], $secure = null)
+    {
+        [$path, $query] = $this->extractQueryString($path);
+
+        parse_str(Str::remove('?', $query), $output);
+
+        $query = $this->makeQueryString(array_merge($output, $parameters));
+
+        return $this->to($path.$query, $extra, $secure);
     }
 
     /**
