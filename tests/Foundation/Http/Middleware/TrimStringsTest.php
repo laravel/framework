@@ -35,12 +35,20 @@ class TrimStringsTest extends TestCase
         $symfonyRequest = new SymfonyRequest([
             // Here has some NBSP, but it still display to space.
             'abc' => '   123    ',
+            'xyz' => 'だ',
+            'foo' => 'ム',
+            'bar' => '   だ    ',
+            'baz' => '   ム    ',
         ]);
         $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
             $this->assertSame('123', $request->get('abc'));
+            $this->assertSame('だ', $request->get('xyz'));
+            $this->assertSame('ム', $request->get('foo'));
+            $this->assertSame('だ', $request->get('bar'));
+            $this->assertSame('ム', $request->get('baz'));
         });
     }
 }
