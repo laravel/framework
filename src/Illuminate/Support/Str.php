@@ -987,7 +987,7 @@ class Str
     }
 
     /**
-     * Remove all items from the cache.
+     * Remove all strings from the casing caches.
      *
      * @return void
      */
