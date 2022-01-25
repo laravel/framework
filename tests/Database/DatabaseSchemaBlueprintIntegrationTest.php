@@ -86,7 +86,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             ],
         ];
 
-        $this->assertTrue(in_array($queries, $expected));
+        $this->assertContains($queries, $expected);
     }
 
     public function testChangingColumnWithCollationWorks()
