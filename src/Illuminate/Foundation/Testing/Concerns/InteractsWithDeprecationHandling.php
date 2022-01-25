@@ -21,9 +21,17 @@ trait InteractsWithDeprecationHandling
     protected function withDeprecationHandling()
     {
         if ($this->originalDeprecationHandler) {
-            set_error_handler(tap($this->originalDeprecationHandler, function () {
+            $previousHandler = set_error_handler(tap($this->originalDeprecationHandler, function () {
                 $this->originalDeprecationHandler = null;
             }));
+
+            if (method_exists($this, 'beforeApplicationDestroyed')) {
+                $this->beforeApplicationDestroyed(function () use ($previousHandler) {
+                    if (null !== $previousHandler) {
+                        restore_error_handler();
+                    }
+                });
+            }
         }
 
         return $this;
@@ -42,6 +50,14 @@ trait InteractsWithDeprecationHandling
                     throw new ErrorException($message, 0, $level, $file, $line);
                 }
             });
+
+            if (method_exists($this, 'beforeApplicationDestroyed')) {
+                $this->beforeApplicationDestroyed(function () {
+                    if (null !== $this->originalDeprecationHandler) {
+                        restore_error_handler();
+                    }
+                });
+            }
         }
 
         return $this;
