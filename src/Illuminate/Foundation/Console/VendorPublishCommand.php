@@ -131,9 +131,10 @@ class VendorPublishCommand extends Command
         if ($package = $this->argument('package')) {
             $this->discoverFromPackage($package);
 
-            $this->promptForPackageAndTag();
-        }
-        if (! $this->providers && ! $this->tags) {
+            if ($this->providers) {
+                $this->promptForPackageAndTag();
+            }
+        } else if (! $this->providers && ! $this->tags) {
             $this->promptForPackageAndTag();
         }
     }
