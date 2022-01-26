@@ -724,14 +724,14 @@ trait EnumeratesValues
     /**
      * Pass the collection through a series of callable pipes and return the result.
      *
-     * @param  array<callable>  $pipes
+     * @param  array<callable>  $callbacks
      * @return mixed
      */
-    public function pipeThrough($pipes)
+    public function pipeThrough($callbacks)
     {
-        return static::make($pipes)->reduce(
-            function ($carry, $pipe) {
-                return $pipe($carry);
+        return Collection::make($callbacks)->reduce(
+            function ($carry, $callback) {
+                return $callback($carry);
             },
             $this,
         );
