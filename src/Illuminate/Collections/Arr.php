@@ -751,7 +751,6 @@ class Arr
      * @param      $array
      * @param      $key
      * @param null $default
-     *
      * @return int
      */
     public static function getInt($array, $key, $default = null): int
@@ -765,7 +764,6 @@ class Arr
      * @param      $array
      * @param      $key
      * @param null $default
-     *
      * @return float
      */
     public static function getFloat($array, $key, $default = null): float
