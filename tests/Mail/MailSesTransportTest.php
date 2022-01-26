@@ -25,6 +25,6 @@ class MailSesTransportTest extends TestCase
 
         $transport = $manager->createSymfonyTransport(['transport' => 'ses']);
 
-        $this->assertSame('ses+api://@us-east-1', $transport->__toString());
+        $this->assertSame('ses+api://random_key@us-east-1', $transport->__toString());
     }
 }
