@@ -478,7 +478,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function compileStatement($match)
     {
-        if (Str::contains($match[1], '@')) {
+        if (str_contains($match[1], '@')) {
             $match[0] = isset($match[3]) ? $match[1].$match[3] : $match[1];
         } elseif (isset($this->customDirectives[$match[1]])) {
             $match[0] = $this->callCustomDirective($match[1], Arr::get($match, 3));
@@ -500,7 +500,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $value = $value ?? '';
 
-        if (Str::startsWith($value, '(') && Str::endsWith($value, ')')) {
+        if (str_starts_with($value, '(') && str_ends_with($value, ')')) {
             $value = Str::substr($value, 1, -1);
         }
 
@@ -599,12 +599,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function component($class, $alias = null, $prefix = '')
     {
-        if (! is_null($alias) && Str::contains($alias, '\\')) {
+        if (! is_null($alias) && str_contains($alias, '\\')) {
             [$class, $alias] = [$alias, $class];
         }
 
         if (is_null($alias)) {
-            $alias = Str::contains($class, '\\View\\Components\\')
+            $alias = str_contains($class, '\\View\\Components\\')
                             ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {
                                 return Str::kebab($segment);
                             })->implode(':')

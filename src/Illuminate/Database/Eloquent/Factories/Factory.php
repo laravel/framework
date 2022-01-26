@@ -810,9 +810,9 @@ abstract class Factory
             $factory = static::factoryForModel($relatedModel);
         }
 
-        if (Str::startsWith($method, 'for')) {
+        if (str_starts_with($method, 'for')) {
             return $this->for($factory->state($parameters[0] ?? []), $relationship);
-        } elseif (Str::startsWith($method, 'has')) {
+        } elseif (str_starts_with($method, 'has')) {
             return $this->has(
                 $factory
                     ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : 1)

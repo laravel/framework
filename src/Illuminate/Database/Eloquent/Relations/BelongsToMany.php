@@ -164,7 +164,7 @@ class BelongsToMany extends Relation
      */
     protected function resolveTableName($table)
     {
-        if (! Str::contains($table, '\\') || ! class_exists($table)) {
+        if (! str_contains($table, '\\') || ! class_exists($table)) {
             return $table;
         }
 
@@ -1445,7 +1445,7 @@ class BelongsToMany extends Relation
      */
     public function qualifyPivotColumn($column)
     {
-        return Str::contains($column, '.')
+        return str_contains($column, '.')
                     ? $column
                     : $this->table.'.'.$column;
     }

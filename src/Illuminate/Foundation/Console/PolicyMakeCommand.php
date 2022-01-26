@@ -114,7 +114,7 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         $model = str_replace('/', '\\', $model);
 
-        if (Str::startsWith($model, '\\')) {
+        if (str_starts_with($model, '\\')) {
             $namespacedModel = trim($model, '\\');
         } else {
             $namespacedModel = $this->qualifyModel($model);

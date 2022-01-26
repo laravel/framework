@@ -5,7 +5,6 @@ namespace Illuminate\Validation\Rules;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 trait DatabaseRule
 {
@@ -59,14 +58,14 @@ trait DatabaseRule
      */
     public function resolveTableName($table)
     {
-        if (! Str::contains($table, '\\') || ! class_exists($table)) {
+        if (! str_contains($table, '\\') || ! class_exists($table)) {
             return $table;
         }
 
         if (is_subclass_of($table, Model::class)) {
             $model = new $table;
 
-            if (Str::contains($model->getTable(), '.')) {
+            if (str_contains($model->getTable(), '.')) {
                 return $table;
             }
 
