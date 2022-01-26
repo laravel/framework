@@ -281,4 +281,15 @@ class RouteCollectionTest extends TestCase
         );
         $this->routeCollection->match($request);
     }
+
+    public function testRouteCollectionDuplicateControllerAction()
+    {
+        $routeA = new Route('GET', 'foo', ['controller' => 'View@view', 'as' => 'routeA']);
+        $routeB = new Route('GET', 'foo.csv', ['controller' => 'View@view', 'as' => 'routeB']);
+
+        $this->routeCollection->add($routeA);
+        $this->routeCollection->add($routeB);
+
+        $this->assertEquals($routeA, $this->routeCollection->getByAction('View@view'));
+    }
 }

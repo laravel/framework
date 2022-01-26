@@ -539,6 +539,26 @@ class CompiledRouteCollectionTest extends TestCase
         ], $this->collection()->getRoutesByMethod());
     }
 
+    public function testRouteCollectionDuplicateControllerAction()
+    {
+        $routeA = $this->newRoute('GET', 'foo', [
+            'uses' => 'View@view',
+            'as' => 'routeA',
+        ]);
+
+        $routeB = $this->newRoute('GET', 'foo.csv', [
+            'uses' => 'View@view',
+            'as' => 'routeB',
+        ]);
+
+        $this->routeCollection->add($routeA);
+        $this->routeCollection->add($routeB);
+
+        $routes = $this->collection();
+
+        $this->assertEquals($routeA, $routes->getByAction('View@view'));
+    }
+
     /**
      * Create a new Route object.
      *
