@@ -748,9 +748,9 @@ class Arr
     /**
      * Returns the item value converted to integer.
      *
-     * @param      $array
-     * @param      $key
-     * @param null $default
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $default
      * @return int
      */
     public static function getInt($array, $key, $default = null): int
@@ -761,9 +761,9 @@ class Arr
     /**
      * Returns the item value converted to float.
      *
-     * @param      $array
-     * @param      $key
-     * @param null $default
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $default
      * @return float
      */
     public static function getFloat($array, $key, $default = null): float
