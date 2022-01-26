@@ -16,8 +16,6 @@ class MailSesTransportTest extends TestCase
         $container->singleton('config', function () {
             return new Repository([
                 'services.ses' => [
-                    'key' => 'foo',
-                    'secret' => 'bar',
                     'region' => 'us-east-1',
                 ],
             ]);
@@ -27,6 +25,6 @@ class MailSesTransportTest extends TestCase
 
         $transport = $manager->createSymfonyTransport(['transport' => 'ses']);
 
-        $this->assertSame('ses+api://foo@us-east-1', $transport->__toString());
+        $this->assertSame('ses+api://@us-east-1', $transport->__toString());
     }
 }
