@@ -215,6 +215,14 @@ interface Application extends Container
     public function shouldSkipMiddleware();
 
     /**
+     * Register a terminating callback with the application.
+     *
+     * @param  callable|string  $callback
+     * @return \Illuminate\Contracts\Foundation\Application
+     */
+    public function terminating($callback);
+
+    /**
      * Terminate the application.
      *
      * @return void
