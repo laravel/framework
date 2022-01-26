@@ -729,7 +729,7 @@ trait EnumeratesValues
      */
     public function pipeThrough($pipes)
     {
-        return static::make($pipes)->reduce(
+        return Collection::make($pipes)->reduce(
             function ($carry, $pipe) {
                 return $pipe($carry);
             },
