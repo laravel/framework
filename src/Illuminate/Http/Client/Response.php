@@ -111,6 +111,16 @@ class Response implements ArrayAccess
     }
 
     /**
+     * Determine if header exists.
+     *
+     * @return bool
+     */
+    public function hasHeader(string $header)
+    {
+        return $this->response->hasHeader($header);
+    }
+
+    /**
      * Get the status code of the response.
      *
      * @return int
@@ -188,6 +198,16 @@ class Response implements ArrayAccess
     public function forbidden()
     {
         return $this->status() === 403;
+    }
+
+    /**
+     * Determine if the response was a 422 "Validation" response.
+     *
+     * @return bool
+     */
+    public function unprocessable()
+    {
+        return $this->status() === 422;
     }
 
     /**

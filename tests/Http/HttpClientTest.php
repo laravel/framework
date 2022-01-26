@@ -74,6 +74,17 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->forbidden());
     }
 
+    public function testUnprocessableRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', 422),
+        ]);
+
+        $response = $this->factory->post('http://laravel.com');
+
+        $this->assertTrue($response->unprocessable());
+    }
+
     public function testResponseBodyCasting()
     {
         $this->factory->fake([
