@@ -243,8 +243,8 @@ class MailManager implements FactoryContract
         return $factory->create(new Dsn(
             'ses+api',
             'default',
-            $config['key'],
-            $config['secret'],
+            $config['key'] ?? null,
+            $config['secret'] ?? null,
             $config['port'] ?? null,
             $config
         ));
