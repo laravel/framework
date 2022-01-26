@@ -29,6 +29,7 @@ trait InteractsWithDeprecationHandling
                 $this->beforeApplicationDestroyed(function () use ($previousHandler) {
                     if (null !== $previousHandler) {
                         restore_error_handler();
+                        $this->originalDeprecationHandler = null;
                     }
                 });
             }
@@ -55,6 +56,7 @@ trait InteractsWithDeprecationHandling
                 $this->beforeApplicationDestroyed(function () {
                     if (null !== $this->originalDeprecationHandler) {
                         restore_error_handler();
+                        $this->originalDeprecationHandler = null;
                     }
                 });
             }
