@@ -31,7 +31,7 @@ abstract class Factory
     /**
      * The number of models that should be generated.
      *
-     * @var int|null
+     * @var int|\Closure|null
      */
     protected $count;
 
@@ -108,7 +108,7 @@ abstract class Factory
     /**
      * Create a new factory instance.
      *
-     * @param  int|null  $count
+     * @param  int|\Closure|null  $count
      * @param  \Illuminate\Support\Collection|null  $states
      * @param  \Illuminate\Support\Collection|null  $has
      * @param  \Illuminate\Support\Collection|null  $for
@@ -189,7 +189,7 @@ abstract class Factory
 
         return array_map(function () use ($attributes, $parent) {
             return $this->state($attributes)->getExpandedAttributes($parent);
-        }, range(1, $this->count));
+        }, range(1, is_callable($this->count) ? ($this->count)($parent) : $this->count));
     }
 
     /**
@@ -362,13 +362,15 @@ abstract class Factory
             });
         }
 
-        if ($this->count < 1) {
+        $count = is_callable($this->count) ? ($this->count)($parent) : $this->count;
+
+        if ($count < 1) {
             return $this->newModel()->newCollection();
         }
 
         $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
             return $this->makeInstance($parent);
-        }, range(1, $this->count)));
+        }, range(1, $count)));
 
         $this->callAfterMaking($instances);
 
@@ -616,10 +618,10 @@ abstract class Factory
     /**
      * Specify how many models should be generated.
      *
-     * @param  int|null  $count
+     * @param  int|\Closure|null  $count
      * @return static
      */
-    public function count(?int $count)
+    public function count($count)
     {
         return $this->newInstance(['count' => $count]);
     }
