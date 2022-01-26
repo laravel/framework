@@ -744,4 +744,32 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Returns the item value converted to integer.
+     *
+     * @param      $array
+     * @param      $key
+     * @param null $default
+     *
+     * @return int
+     */
+    public static function getInt($array, $key, $default = null): int
+    {
+        return (int) self::get($array, $key, $default);
+    }
+
+    /**
+     * Returns the item value converted to float.
+     *
+     * @param      $array
+     * @param      $key
+     * @param null $default
+     *
+     * @return float
+     */
+    public static function getFloat($array, $key, $default = null): float
+    {
+        return (float) self::get($array, $key, $default);
+    }
 }
