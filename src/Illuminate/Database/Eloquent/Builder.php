@@ -126,6 +126,13 @@ class Builder implements BuilderContract
     protected $removedScopes = [];
 
     /**
+     * Indicates whether to apply any default ordering.
+     *
+     * @var bool
+     */
+    protected $useDefaultOrderBy = true;
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -211,6 +218,18 @@ class Builder implements BuilderContract
     public function removedScopes()
     {
         return $this->removedScopes;
+    }
+
+    /**
+     * Remove any default ordering.
+     *
+     * @return $this
+     */
+    public function withoutDefaultOrderBy()
+    {
+        $this->useDefaultOrderBy = false;
+
+        return $this;
     }
 
     /**
@@ -608,7 +627,7 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $builder = $this->applyScopes();
+        $builder = $this->applyScopes()->applyDefaultOrderBy();
 
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
@@ -753,7 +772,7 @@ class Builder implements BuilderContract
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
+        return $this->applyScopes()->applyDefaultOrderBy()->query->cursor()->map(function ($record) {
             return $this->newModelInstance()->newFromBuilder($record);
         });
     }
@@ -1141,6 +1160,41 @@ class Builder implements BuilderContract
             $builder = $builder->callNamedScope(
                 $scope, Arr::wrap($parameters)
             );
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Apply the default sorting to the Eloquent builder instance and return it.
+     *
+     * @return static
+     */
+    public function applyDefaultOrderBy()
+    {
+        if (! empty($this->orders)) {
+            return $this;
+        }
+
+        if (empty($this->model->defaultOrderBy)) {
+            return $this;
+        }
+
+        if (! $this->useDefaultOrderBy) {
+            return $this;
+        }
+
+        $builder = clone $this;
+
+        foreach ($builder->model->defaultOrderBy as $column => $direction) {
+            // If the column is an integer, the user has not defined a key/value pair
+            // of column/direction. Treat direction as the column name using the
+            // default ascending sort to apply to the new builder instance.
+            if (is_int($column)) {
+                [$column, $direction] = [$direction, 'asc'];
+            }
+
+            $builder->orderBy($column, $direction);
         }
 
         return $builder;

@@ -84,6 +84,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $withCount = [];
 
     /**
+     * The columns to order by when none were specified in the query.
+     *
+     * @var string[]|null
+     */
+    public $defaultOrderBy;
+
+    /**
      * Indicates whether lazy loading will be prevented on this model.
      *
      * @var bool
