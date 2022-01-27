@@ -533,10 +533,6 @@ abstract class Factory
                         $args = $element;
                     }
 
-                    if (is_array($state)) {
-                        throw new \Exception('aaa');
-                    }
-
                     // Call the state on a new instance to prevent pollution of
                     // states on the current instance.
                     return call_user_func_array([$this->newInstance(), $state], $args)
