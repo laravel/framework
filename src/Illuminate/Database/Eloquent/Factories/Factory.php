@@ -481,6 +481,16 @@ abstract class Factory
     }
 
     /**
+     * Returns the current applied states.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getStates()
+    {
+        return $this->states;
+    }
+
+    /**
      * Add a new sequenced state transformation to the model definition.
      *
      * @param  array  $sequence
@@ -500,6 +510,45 @@ abstract class Factory
     public function crossJoinSequence(...$sequence)
     {
         return $this->state(new CrossJoinSequence(...$sequence));
+    }
+
+    /**
+     * Add a new state sequenced state transformation to the model definition.
+     *
+     * @param  array  $sequence
+     * @return static
+     */
+    public function stateSequence(...$sequences)
+    {
+        return $this->sequence(
+            ...array_map(
+                function ($element) {
+                    $state = $element;
+
+                    $args = [];
+
+                    if (is_array($element)) {
+                        $state = array_shift($element);
+
+                        $args = $element;
+                    }
+
+                    if (is_array($state)) {
+                        throw new \Exception('aaa');
+                    }
+
+                    // Call the state on a new instance to prevent pollution of
+                    // states on the current instance.
+                    return call_user_func_array([$this->newInstance(), $state], $args)
+                        ->getStates()
+                        // Calling `newInstance` will eventually result in a
+                        // state of its own attributes. Use `last` to get the
+                        // newly added state.
+                        ->last();
+                },
+                $sequences,
+            ),
+        );
     }
 
     /**

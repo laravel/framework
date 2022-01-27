@@ -454,6 +454,29 @@ class DatabaseEloquentFactoryTest extends TestCase
         $assert($usersByMethod);
     }
 
+    public function test_state_sequences()
+    {
+        $posts = FactoryTestPostFactory::times(3)
+            ->stateSequence(
+                ['laravel', 9],
+                'symfony',
+            )
+            ->make();
+
+        $assertions = [
+            ['title' => 'Laravel 9 is cool'],
+            ['title' => 'Symfony is cool'],
+            ['title' => 'Laravel 9 is cool'],
+        ];
+
+        foreach ($assertions as $key => $assertion) {
+            $this->assertSame(
+                $assertion,
+                $posts[$key]->only('title'),
+            );
+        }
+    }
+
     public function test_resolve_nested_model_factories()
     {
         Factory::useNamespace('Factories\\');
@@ -623,6 +646,20 @@ class FactoryTestPostFactory extends Factory
             'user_id' => FactoryTestUserFactory::new(),
             'title' => $this->faker->name,
         ];
+    }
+
+    public function laravel(int $version)
+    {
+        return $this->state(fn () => [
+            'title' => "Laravel $version is cool",
+        ]);
+    }
+
+    public function symfony()
+    {
+        return $this->state(fn () => [
+            'title' => 'Symfony is cool',
+        ]);
     }
 }
 
