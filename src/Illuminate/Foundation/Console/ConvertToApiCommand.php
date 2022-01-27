@@ -30,6 +30,10 @@ class ConvertToApiCommand extends Command
     {
         $files = new Filesystem;
 
+        // Remove unnecessary middleware...
+        $files->delete(app_path('Http/Middleware/Authenticate.php'));
+        $files->delete(app_path('Http/Middleware/RedirectIfAuthenticated.php'));
+
         // Remove frontend asset related files and directories...
         $files->delete(base_path('package.json'));
         $files->delete(base_path('webpack.mix.js'));
@@ -43,6 +47,12 @@ class ConvertToApiCommand extends Command
         // Adjust "views" directory...
         $files->delete(resource_path('views/welcome.blade.php'));
         $files->put(resource_path('views/.gitkeep'), PHP_EOL);
+
+        // Fix tests...
+        $files->put(
+            base_path('tests/Feature/ExampleTest.php'),
+            str_replace("'/'", "'/api'", $files->get(base_path('tests/Feature/ExampleTest.php')))
+        );
 
         // Install stubs...
         $files->copy(__DIR__.'/stubs/convert-to-api/AlwaysAcceptJsonResponses.stub', app_path('Http/Middleware/AlwaysAcceptJsonResponses.php'));
