@@ -337,7 +337,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function path($path = '')
     {
-        $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
+        $appPath = $this->appPath ?: $this->basePath('app');
 
         return $appPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
@@ -376,7 +376,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->basePath('bootstrap').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -387,7 +387,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->basePath('config').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -398,7 +398,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function databasePath($path = '')
     {
-        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return ($this->databasePath ?: $this->basePath('database')).($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -449,7 +449,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function publicPath()
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'public';
+        return $this->basePath('public');
     }
 
     /**
@@ -460,8 +460,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function storagePath($path = '')
     {
-        return ($this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage')
-                            .($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return ($this->storagePath ?: $this->basePath('storage')).($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -487,7 +486,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->basePath('resources').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
