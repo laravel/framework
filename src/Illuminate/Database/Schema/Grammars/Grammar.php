@@ -297,6 +297,14 @@ abstract class Grammar extends BaseGrammar
             return $value;
         }
 
+        // Test if the object is "enum" - at this moment we have not found a method to
+        // check if a valid enum
+        if (is_object($value) &&
+            method_exists($value, '__toString') === false
+            && property_exists($value, 'value')) {
+            $value = $value->value;
+        }
+
         return is_bool($value)
                     ? "'".(int) $value."'"
                     : "'".(string) $value."'";
