@@ -10,16 +10,16 @@ interface Repository extends CacheInterface
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @param  string  $key
+     * @param  string|array  $keys
      * @param  mixed  $default
      * @return mixed
      */
-    public function pull($key, $default = null);
+    public function pull($keys, $default = null);
 
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool

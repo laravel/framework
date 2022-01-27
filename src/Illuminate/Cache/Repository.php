@@ -16,6 +16,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Arr;
 
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
@@ -84,7 +85,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -175,21 +176,25 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache and delete it.
      *
-     * @param  string  $key
+     * @param  string  $keys
      * @param  mixed  $default
      * @return mixed
      */
-    public function pull($key, $default = null)
+    public function pull($keys, $default = null)
     {
-        return tap($this->get($key, $default), function () use ($key) {
-            $this->forget($key);
-        });
+        foreach (Arr::wrap($keys) as $key) {
+            tap($this->get($key, $default), function () use ($key) {
+                $this->forget($key);
+            });
+        };
+
+        return true;
     }
 
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
+     * @param  string|array  $key
      * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
@@ -197,7 +202,7 @@ class Repository implements ArrayAccess, CacheContract
     public function put($key, $value, $ttl = null)
     {
         if (is_array($key)) {
-            return $this->putMany($key, $value);
+            return $this->putMany($key, $ttl);
         }
 
         if ($ttl === null) {
