@@ -23,7 +23,8 @@ class DatabaseAbstractSchemaGrammarDefaultValueTest extends TestCase
         parent::setUp();
 
         $this->grammar = new class extends Grammar {
-            public function testGetDefaultValue ($value) {
+            public function testGetDefaultValue($value)
+            {
                 return $this->getDefaultValue($value);
             }
         };
@@ -42,7 +43,7 @@ class DatabaseAbstractSchemaGrammarDefaultValueTest extends TestCase
     public function testExpression(): void
     {
         $result = $this->grammar->testGetDefaultValue(new Expression('it'));
-        $this->assertEquals("it", $result);
+        $this->assertEquals('it', $result);
     }
 
     public function testObjectWithToString(): void
@@ -57,11 +58,17 @@ class DatabaseAbstractSchemaGrammarDefaultValueTest extends TestCase
         $this->assertValue('just', $value);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testEnumWithString(): void
     {
         $this->assertValue('test', TestEnum::test);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testEnumWithInt(): void
     {
         $this->assertValue('1', TestIntEnum::test);
@@ -69,12 +76,12 @@ class DatabaseAbstractSchemaGrammarDefaultValueTest extends TestCase
 
     public function testCarbon(): void
     {
-        $this->assertValue('2022-01-27 00:00:00', Carbon::create(2022, 1,27));
+        $this->assertValue('2022-01-27 00:00:00', Carbon::create(2022, 1, 27));
     }
 
     public function testObjectWithoutToStringMethodFails(): void
     {
-        $this->expectExceptionMessage('bject of class stdClass could not be converted to string');
+        $this->expectExceptionMessage('Object of class stdClass could not be converted to string');
         $this->grammar->testGetDefaultValue(new stdClass());
     }
 
@@ -82,6 +89,6 @@ class DatabaseAbstractSchemaGrammarDefaultValueTest extends TestCase
     {
         $result = $this->grammar->testGetDefaultValue($value);
 
-        $this->assertEquals("'".$expected."'", $result);
+        $this->assertEquals("'" . $expected . "'", $result);
     }
 }
