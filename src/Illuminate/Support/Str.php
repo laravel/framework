@@ -990,13 +990,13 @@ class Str
      * Transliterate a string into it's closest ASCII representation.
      *
      * @param  string  $string
-     * @param  string|null  $unkown
+     * @param  string|null  $unknown
      * @param  bool|null  $strict
      * @return string
      */
-    public static function transliterate($string, $unkown = '?', $strict = false)
+    public static function transliterate($string, $unknown = '?', $strict = false)
     {
-        return ASCII::to_transliterate($string, $unkown, $strict);
+        return ASCII::to_transliterate($string, $unknown, $strict);
     }
 
     /**
