@@ -22,6 +22,13 @@ class ConvertToApiCommand extends Command
     protected $description = 'Prepare the application for API usage';
 
     /**
+     * Indicates whether the command should be shown in the Artisan command list.
+     *
+     * @var bool
+     */
+    protected $hidden = true;
+
+    /**
      * Execute the console command.
      *
      * @return int|null
