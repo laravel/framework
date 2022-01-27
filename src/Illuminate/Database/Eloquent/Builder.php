@@ -602,7 +602,7 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $builder = $this->applyScopes();
+        $builder = $this->applyOrderBy()->applyScopes();
 
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
@@ -747,7 +747,7 @@ class Builder implements BuilderContract
      */
     public function cursor()
     {
-        return $this->applyScopes()->query->cursor()->map(function ($record) {
+        return $this->applyOrderBy()->applyScopes()->query->cursor()->map(function ($record) {
             return $this->newModelInstance()->newFromBuilder($record);
         });
     }
@@ -1133,6 +1133,37 @@ class Builder implements BuilderContract
             $builder = $builder->callNamedScope(
                 $scope, Arr::wrap($parameters)
             );
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Apply the default sorting to the Eloquent builder instance and return it.
+     *
+     * @return static
+     */
+    public function applyOrderBy()
+    {
+        if (! empty($this->orders)) {
+            return $this;
+        }
+
+        if (empty($this->model->orderBy)) {
+            return $this;
+        }
+
+        $builder = clone $this;
+
+        foreach ($builder->model->orderBy as $column => $direction) {
+            // If the column is an integer, the user has not defined a key/value pair
+            // of column/direction. Treat direction as the column name using the
+            // default ascending sort to apply to the new builder instance.
+            if (is_int($column)) {
+                [$column, $direction] = [$direction, 'asc'];
+            }
+
+            $builder->orderBy($column, $direction);
         }
 
         return $builder;
