@@ -4,23 +4,23 @@ namespace Illuminate\Database\Eloquent\Factories;
 
 use Illuminate\Support\Arr;
 
-class MatrixSequence extends Sequence
+class CrossJoinSequence extends Sequence
 {
     /**
-     * Create a new matrix sequence instance.
+     * Create a new cross join sequence instance.
      *
      * @param  array  $sequences
      * @return void
      */
     public function __construct(...$sequences)
     {
-        $matrix = array_map(
+        $crossJoined = array_map(
             function ($a) {
                 return array_merge(...$a);
             },
             Arr::crossJoin(...$sequences),
         );
 
-        parent::__construct(...$matrix);
+        parent::__construct(...$crossJoined);
     }
 }

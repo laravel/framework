@@ -9,7 +9,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Factories\MatrixSequence;
+use Illuminate\Database\Eloquent\Factories\CrossJoinSequence;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Mockery;
@@ -414,30 +414,43 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('index: 1', $users[1]->name);
     }
 
-    public function test_matrix_sequence()
+    public function test_cross_join_sequences()
     {
-        $users = FactoryTestUserFactory::times(4)
+        $assert = function ($users) {
+            $assertions = [
+                ['first_name' => 'Thomas', 'last_name' => 'Anderson'],
+                ['first_name' => 'Thomas', 'last_name' => 'Smith'],
+                ['first_name' => 'Agent', 'last_name' => 'Anderson'],
+                ['first_name' => 'Agent', 'last_name' => 'Smith'],
+            ];
+
+            foreach ($assertions as $key => $assertion) {
+                $this->assertSame(
+                    $assertion,
+                    $users[$key]->only('first_name', 'last_name'),
+                );
+            }
+        };
+
+        $usersByClass = FactoryTestUserFactory::times(4)
             ->state(
-                new MatrixSequence(
+                new CrossJoinSequence(
                     [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
                     [['last_name' => 'Anderson'], ['last_name' => 'Smith']],
                 ),
             )
             ->make();
 
-        $assertions = [
-            ['first_name' => 'Thomas', 'last_name' => 'Anderson'],
-            ['first_name' => 'Thomas', 'last_name' => 'Smith'],
-            ['first_name' => 'Agent', 'last_name' => 'Anderson'],
-            ['first_name' => 'Agent', 'last_name' => 'Smith'],
-        ];
+        $assert($usersByClass);
 
-        foreach ($assertions as $key => $assertion) {
-            $this->assertSame(
-                $assertion,
-                $users[$key]->only('first_name', 'last_name'),
-            );
-        }
+        $usersByMethod = FactoryTestUserFactory::times(4)
+            ->crossJoinSequence(
+                [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
+                [['last_name' => 'Anderson'], ['last_name' => 'Smith']],
+            )
+            ->make();
+
+        $assert($usersByMethod);
     }
 
     public function test_resolve_nested_model_factories()
