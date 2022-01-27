@@ -647,10 +647,10 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy([
     ['string', 'string'],
 ]));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortBy([function ($user, $int) {
-   // assertType('User', $user);
-   // assertType('int', $int);
+    // assertType('User', $user);
+    // assertType('int', $int);
 
-   return 1;
+    return 1;
 }]));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc(function ($user, $int) {
@@ -665,10 +665,10 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc([
     ['string', 'string'],
 ]));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sortByDesc([function ($user, $int) {
-   // assertType('User', $user);
-   // assertType('int', $int);
+    // assertType('User', $user);
+    // assertType('int', $int);
 
-   return 1;
+    return 1;
 }]));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->sortKeys());
