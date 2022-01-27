@@ -106,6 +106,8 @@ class ServeCommand extends Command
                 'PHP_CLI_SERVER_WORKERS',
                 'XDEBUG_CONFIG',
                 'XDEBUG_MODE',
+                'PHP_IDE_CONFIG',
+                'XDEBUG_SESSION',
             ]) ? [$key => $value] : [$key => false];
         })->all());
 
