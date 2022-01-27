@@ -1,6 +1,30 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.80.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.81.0...8.x)
+
+
+## [v8.81.0 (2022-01-25)](https://github.com/laravel/framework/compare/v8.80.0...v8.81.0)
+
+### Added
+- Added `Illuminate/Support/Stringable::scan()` ([#40472](https://github.com/laravel/framework/pull/40472))
+- Allow caching to be disabled for virtual attributes accessors that return an object ([#40519](https://github.com/laravel/framework/pull/40519))
+- Added better bitwise operators support ([#40529](https://github.com/laravel/framework/pull/40529), [def671d](https://github.com/laravel/framework/commit/def671d4902d9cdd315aee8249199b45fcc2186b))
+- Added getOrPut on Collection ([#40535](https://github.com/laravel/framework/pull/40535))
+- Improve PhpRedis flushing ([#40544](https://github.com/laravel/framework/pull/40544))
+- Added `Illuminate/Support/Str::flushCache()` ([#40620](https://github.com/laravel/framework/pull/40620))
+
+### Fixed
+- Fixed Str::headline/Str::studly with unicode and add Str::ucsplit method ([#40499](https://github.com/laravel/framework/pull/40499))
+- Fixed forgetMailers with MailFake ([#40495](https://github.com/laravel/framework/pull/40495))
+- Pruning Models: Get the default path for the models from a method instead ([#40539](https://github.com/laravel/framework/pull/40539))
+- Fix flushdb for predis cluste ([#40446](https://github.com/laravel/framework/pull/40446))
+- Avoid undefined array key 0 error ([#40571](https://github.com/laravel/framework/pull/40571))
+
+### Changed
+- Allow whitespace in PDO dbname for PostgreSQL ([#40483](https://github.com/laravel/framework/pull/40483))
+- Allows authorizeResource method to receive arrays of models and parameters ([#40516](https://github.com/laravel/framework/pull/40516))
+- Inverse morphable type and id filter statements to prevent SQL errors ([#40523](https://github.com/laravel/framework/pull/40523))
+- Bump voku/portable-ascii to v1.6.1 ([#40588](https://github.com/laravel/framework/pull/40588), [#40610](https://github.com/laravel/framework/pull/40610))
 
 
 ## [v8.80.0 (2022-01-18)](https://github.com/laravel/framework/compare/v8.79.0...v8.80.0)

@@ -3209,6 +3209,25 @@ SQL;
         $this->assertEquals(['John Doe'], $builder->getBindings());
     }
 
+    public function testBitOperators()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from "users" where ("bar" & ?) != 0', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('bar', '#', 1);
+        $this->assertSame('select * from "users" where ("bar" # ?) != 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from "users" having ("bar" & ?) != 0', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('bar', '#', 1);
+        $this->assertSame('select * from "users" having ("bar" # ?) != 0', $builder->toSql());
+    }
+
     public function testMergeWheresCanMergeWheresAndBindings()
     {
         $builder = $this->getBuilder();

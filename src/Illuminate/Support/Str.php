@@ -985,4 +985,16 @@ class Str
     {
         static::$uuidFactory = null;
     }
+
+    /**
+     * Remove all strings from the casing caches.
+     *
+     * @return void
+     */
+    public static function flushCache()
+    {
+        static::$snakeCache = [];
+        static::$camelCache = [];
+        static::$studlyCache = [];
+    }
 }
