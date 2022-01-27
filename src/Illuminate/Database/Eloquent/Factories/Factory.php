@@ -686,12 +686,16 @@ abstract class Factory
     public function modelName()
     {
         $resolver = static::$modelNameResolver ?: function (self $factory) {
+            $namespacedFactoryBasename = Str::replaceLast(
+                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+            );
+
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
 
             $appNamespace = static::appNamespace();
 
-            return class_exists($appNamespace.'Models\\'.$factoryBasename)
-                        ? $appNamespace.'Models\\'.$factoryBasename
+            return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
+                        ? $appNamespace.'Models\\'.$namespacedFactoryBasename
                         : $appNamespace.$factoryBasename;
         };
 

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -467,6 +468,18 @@ class DatabaseEloquentFactoryTest extends TestCase
         foreach ($resolves as $model => $factory) {
             $this->assertEquals($factory, Factory::resolveFactoryName($model));
         }
+    }
+
+    public function test_resolve_nested_model_name_from_factory()
+    {
+        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
+
+        Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
+
+        $factory = Price::factory();
+
+        $this->assertSame(Price::class, $factory->modelName());
     }
 
     public function test_resolve_non_app_nested_model_factories()
