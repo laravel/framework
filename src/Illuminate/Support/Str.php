@@ -999,7 +999,6 @@ class Str
         return ASCII::to_transliterate($string, $unkown, $strict);
     }
 
-
     /**
      * Remove all strings from the casing caches.
      *
