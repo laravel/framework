@@ -218,7 +218,7 @@ class HandleExceptions
     }
 
     /**
-     * Forward a method call to the given method, if an app instance exists.
+     * Forward a method call to the given method if an application instance exists.
      *
      * @return callable
      */
@@ -262,7 +262,7 @@ class HandleExceptions
     }
 
     /**
-     * Clears the app instance.
+     * Clear the local application instance from memory.
      *
      * @return void
      */

@@ -201,9 +201,7 @@ abstract class TestCase extends BaseTestCase
         $this->beforeApplicationDestroyedCallbacks = [];
 
         Artisan::forgetBootstrappers();
-
         Queue::createPayloadUsing(null);
-
         HandleExceptions::forgetApp();
 
         if ($this->callbackException) {
