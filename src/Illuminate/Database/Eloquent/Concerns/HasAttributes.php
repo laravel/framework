@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Events\RelationLoadedEvent;
 use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -542,9 +543,13 @@ trait HasAttributes
             ));
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
+        $results = tap($relation->getResults(), function ($results) use ($method) {
             $this->setRelation($method, $results);
         });
+
+        static::$dispatcher->dispatch(new RelationLoadedEvent($this, $method, $results));
+
+        return $results;
     }
 
     /**
