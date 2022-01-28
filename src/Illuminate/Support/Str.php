@@ -100,6 +100,19 @@ class Str
     }
 
     /**
+     * Transliterate a string to its closest ASCII representation.
+     *
+     * @param  string  $string
+     * @param  string|null  $unknown
+     * @param  bool|null  $strict
+     * @return string
+     */
+    public static function transliterate($string, $unknown = '?', $strict = false)
+    {
+        return ASCII::to_transliterate($string, $unknown, $strict);
+    }
+
+    /**
      * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $subject
@@ -984,19 +997,6 @@ class Str
     public static function createUuidsNormally()
     {
         static::$uuidFactory = null;
-    }
-
-    /**
-     * Transliterate a string into it's closest ASCII representation.
-     *
-     * @param  string  $string
-     * @param  string|null  $unknown
-     * @param  bool|null  $strict
-     * @return string
-     */
-    public static function transliterate($string, $unknown = '?', $strict = false)
-    {
-        return ASCII::to_transliterate($string, $unknown, $strict);
     }
 
     /**
