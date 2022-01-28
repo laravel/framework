@@ -1550,6 +1550,33 @@ class Builder implements BuilderContract
         return $this;
     }
 
+    public function havingNested(Closure $callback, $boolean = 'and')
+    {
+        call_user_func($callback, $query = $this->forNestedWhere());
+
+        return $this->addNestedHavingQuery($query, $boolean);
+    }
+
+    /**
+     * Add another query builder as a nested where to the query builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function addNestedHavingQuery($query, $boolean = 'and')
+    {
+        if (count($query->havings)) {
+            $type = 'Nested';
+
+            $this->havings[] = compact('type', 'query', 'boolean');
+
+            $this->addBinding($query->getRawBindings()['having'], 'having');
+        }
+
+        return $this;
+    }
+
     /**
      * Add a full sub-select to the query.
      *
@@ -1924,7 +1951,7 @@ class Builder implements BuilderContract
     /**
      * Add a "having" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  string|null  $operator
      * @param  string|null  $value
      * @param  string  $boolean
@@ -1940,6 +1967,13 @@ class Builder implements BuilderContract
         [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        // If the columns is actually a Closure instance, we will assume the developer
+        // wants to begin a nested having statement which is wrapped in parenthesis.
+        // We'll add that Closure to the query then return back out immediately.
+        if ($column instanceof Closure && is_null($operator)) {
+            return $this->havingNested($column, $boolean);
+        }
 
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
@@ -1964,7 +1998,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or having" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  string|null  $operator
      * @param  string|null  $value
      * @return $this
