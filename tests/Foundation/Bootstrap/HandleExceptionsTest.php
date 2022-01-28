@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 use ErrorException;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Log\LogManager;
 use Mockery as m;
@@ -207,6 +208,39 @@ class HandleExceptionsTest extends TestCase
             '/home/user/laravel/routes/web.php',
             17
         );
+    }
+
+    public function testForgetApp()
+    {
+        $appResolver = fn () => with(new ReflectionClass($this->handleExceptions), function ($reflection) {
+            $property = tap($reflection->getProperty('app'))->setAccessible(true);
+
+            return $property->getValue($this->handleExceptions);
+        });
+
+        $this->assertNotNull($appResolver());
+
+        handleExceptions::forgetApp();
+
+        $this->assertNull($appResolver());
+    }
+
+    public function testHandlerForgetsPreviousApp()
+    {
+        $appResolver = fn () => with(new ReflectionClass($this->handleExceptions), function ($reflection) {
+            $property = tap($reflection->getProperty('app'))->setAccessible(true);
+
+            return $property->getValue($this->handleExceptions);
+        });
+
+        $this->assertSame($this->container, $appResolver());
+
+        $this->handleExceptions->bootstrap($newApp = tap(m::mock(Application::class), function ($app) {
+            $app->shouldReceive('environment')->once()->andReturn(true);
+        }));
+
+        $this->assertNotSame($this->container, $appResolver());
+        $this->assertSame($newApp, $appResolver());
     }
 }
 
