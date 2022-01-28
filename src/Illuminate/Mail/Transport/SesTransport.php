@@ -8,7 +8,6 @@ use Exception;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Email;
 
 class SesTransport extends AbstractTransport implements TransportInterface
 {
