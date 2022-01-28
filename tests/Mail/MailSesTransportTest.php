@@ -43,6 +43,8 @@ class MailSesTransportTest extends TestCase
         $ses = $transport->ses();
 
         $this->assertSame('us-east-1', $ses->getRegion());
+
+        $this->assertSame('ses', (string) $transport);
     }
 
     public function testSend()

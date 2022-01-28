@@ -66,16 +66,7 @@ class SesTransport extends AbstractTransport implements TransportInterface
      */
     public function __toString(): string
     {
-        $configuration = $this->ses->getConfig();
-
-        if (! $configuration->isDefault('endpoint')) {
-            $endpoint = parse_url($configuration->get('endpoint'));
-            $host = $endpoint['host'].($endpoint['port'] ?? null ? ':'.$endpoint['port'] : '');
-        } else {
-            $host = $configuration->get('region');
-        }
-
-        return sprintf('ses+api://%s@%s', $configuration->get('accessKeyId'), $host);
+        return 'ses';
     }
 
     /**
