@@ -36,6 +36,8 @@ class SesTransport extends AbstractTransport implements TransportInterface
     {
         $this->ses = $ses;
         $this->options = $options;
+
+        parent::__construct();
     }
 
     /**
