@@ -369,10 +369,8 @@ class Handler implements ExceptionHandlerContract
      */
     protected function mapException(Throwable $e)
     {
-        if (
-            method_exists($e, 'getInnerException') &&
-            ($inner = $e->getInnerException()) instanceof Throwable
-        ) {
+        if (method_exists($e, 'getInnerException') &&
+            ($inner = $e->getInnerException()) instanceof Throwable) {
             return $inner;
         }
 
