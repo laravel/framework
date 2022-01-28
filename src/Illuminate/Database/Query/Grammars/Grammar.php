@@ -688,11 +688,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileHavings(Builder $query)
     {
-        $sql = collect($query->havings)->map(function ($having) {
+        return 'having '.$this->removeLeadingBoolean(collect($query->havings)->map(function ($having) {
             return $having['boolean'].' '.$this->compileHaving($having);
-        })->implode(' ');
-
-        return 'having '.$this->removeLeadingBoolean($sql);
+        })->implode(' '));
     }
 
     /**
@@ -722,17 +720,6 @@ class Grammar extends BaseGrammar
         }
 
         return $this->compileBasicHaving($having);
-    }
-
-    /**
-     * Compile a nested having clause.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileNestedHavings($having)
-    {
-        return '('.substr($this->compileHavings($having['query']), 7).')';
     }
 
     /**
@@ -808,6 +795,17 @@ class Grammar extends BaseGrammar
         $parameter = $this->parameter($having['value']);
 
         return '('.$column.' '.$having['operator'].' '.$parameter.') != 0';
+    }
+
+    /**
+     * Compile a nested having clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileNestedHavings($having)
+    {
+        return '('.substr($this->compileHavings($having['query']), 7).')';
     }
 
     /**
