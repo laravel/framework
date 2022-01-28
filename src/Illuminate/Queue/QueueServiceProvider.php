@@ -235,7 +235,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton('queue.failer', function ($app) {
             $config = $app['config']['queue.failed'];
 
-            if (! isset($config['driver']) || $config['driver'] === 'null') {
+            if (array_key_exists('driver', $config) &&
+                (is_null($config['driver']) || $config['driver'] === 'null')) {
                 return new NullFailedJobProvider;
             }
 
