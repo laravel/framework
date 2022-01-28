@@ -35,9 +35,6 @@ class StreamedResponseException extends RuntimeException
      */
     public function render()
     {
-        // Since we are in the process of streaming a file download,
-        // we don't actually want it to render anything into the
-        // file being downloaded. We return an empty response.
         return new Response('');
     }
 
