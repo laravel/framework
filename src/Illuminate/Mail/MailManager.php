@@ -7,6 +7,7 @@ use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -240,14 +241,14 @@ class MailManager implements FactoryContract
             $config['session_token'] = $config['token'];
         }
 
-        return $factory->create(new Dsn(
+        return new SesTransport($factory->create(new Dsn(
             'ses+api',
             'default',
             $config['key'] ?? null,
             $config['secret'] ?? null,
             $config['port'] ?? null,
             $config
-        ));
+        )), $config['options'] ?? []);
     }
 
     /**
