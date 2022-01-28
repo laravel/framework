@@ -20,6 +20,7 @@ use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\WipeCommand;
+use Illuminate\Foundation\Console\CachePurgeCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -135,6 +136,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Up' => 'command.up',
         'ViewCache' => 'command.view.cache',
         'ViewClear' => 'command.view.clear',
+        'PurgeFileCache' => CachePurgeCommand::class,
     ];
 
     /**
@@ -1111,6 +1113,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton('command.view.clear', function ($app) {
             return new ViewClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerPurgeFileCacheCommand()
+    {
+        $this->app->singleton(CachePurgeCommand::class, function ($app) {
+            return new CachePurgeCommand();
         });
     }
 
