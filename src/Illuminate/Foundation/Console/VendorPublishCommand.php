@@ -26,6 +26,7 @@ class VendorPublishCommand extends Command
         'database/migrations' => 'migrations',
         'database' => 'database files',
         'docker' => 'docker files',
+        'lang' => 'translations',
         'public' => 'assets',
         'resources/views' => 'views',
         'resources/lang' => 'translations',
