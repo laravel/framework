@@ -779,11 +779,11 @@ class Stringable implements JsonSerializable
     /**
      * Split a string by uppercase characters.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function ucsplit()
     {
-        return Str::ucsplit($this->value);
+        return collect(Str::ucsplit($this->value));
     }
 
     /**
