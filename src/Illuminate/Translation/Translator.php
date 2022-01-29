@@ -134,6 +134,24 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // from the application's language files. Otherwise we can return the line.
         return $this->makeReplacements($line ?: $key, $replace);
     }
+    
+    /**
+     * Get the translation for the given key or fail
+     * 
+     * @param  $key
+     * @param  array $replace
+     * @param  null $locale
+     * @param  bool $fallback
+     * @return array|string|null
+     */
+    public function getOrFail($key, array $replace = [], $locale = null, $fallback = true)
+    {
+        if (! $this->has($key)) {
+            throw new InvalidArgumentException("Lang Key '$key' Not Defined");
+        }
+
+        return $this->get($key, $replace, $locale, $fallback);
+    }
 
     /**
      * Get a translation according to an integer value.
