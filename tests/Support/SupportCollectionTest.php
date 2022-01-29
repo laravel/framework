@@ -1673,8 +1673,12 @@ class SupportCollectionTest extends TestCase
      */
     public function testCollapse($collection)
     {
-        $data = new $collection([[$object1 = new stdClass], [$object2 = new stdClass]]);
-        $this->assertEquals([$object1, $object2], $data->collapse()->all());
+        $data = new $collection([
+            ['one' => $object1 = new stdClass],
+            ['two' => $object2 = new stdClass],
+        ]);
+
+        $this->assertEquals(['one' => $object1, 'two' => $object2], $data->collapse()->all());
     }
 
     /**
