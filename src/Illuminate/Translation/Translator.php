@@ -105,7 +105,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // For JSON translations, there is only one file per locale, so we will simply load
         // that file and then we will be ready to check the array for the key.
         $this->load('*', '*', $locale);
-        
+
         $line = $this->getLineLoaded($this->loaded['*']['*'][$locale], $key);
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
@@ -135,23 +135,23 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
     
     /**
-	 * Get the translation of the key.
-	 *
-	 * @param array $lineLoaded
-	 * @param string|null $key
-	 * @return string|null
-	 */
-	private function getLineLoaded( $lineLoaded, $key ) {
-		$key = explode(".", $key, 2);
+     * Get the translation of the key.
+     *
+     * @param array $lineLoaded
+     * @param string|null $key
+     * @return string|null
+     */
+    private function getLineLoaded( $lineLoaded, $key ) {
+        $key = explode(".", $key, 2);
 
-		if ( !isset($lineLoaded[$key[0]]) ) {
-			return null;
-		} elseif ( is_array($lineLoaded[$key[0]]) ) {
-			return $this->getLineLoaded($lineLoaded[$key[0]], $key[1]);
-		} else {
-			return $lineLoaded[$key[0]];
-		}
-	}
+        if ( !isset($lineLoaded[$key[0]]) ) {
+            return null;
+        } elseif ( is_array($lineLoaded[$key[0]]) ) {
+            return $this->getLineLoaded($lineLoaded[$key[0]], $key[1]);
+        } else {
+            return $lineLoaded[$key[0]];
+        }
+    }
 
     /**
      * Get a translation according to an integer value.
