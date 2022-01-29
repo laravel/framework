@@ -133,20 +133,21 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // from the application's language files. Otherwise we can return the line.
         return $this->makeReplacements($line ?: $key, $replace);
     }
-    
+
     /**
      * Get the translation of the key.
      *
-     * @param array $lineLoaded
-     * @param string|null $key
+     * @param  array $lineLoaded
+     * @param  string|null $key
      * @return string|null
      */
-    private function getLineLoaded( $lineLoaded, $key ) {
-        $key = explode(".", $key, 2);
+    private function getLineLoaded( $lineLoaded, $key )
+    {
+        $key = explode('.', $key, 2);
 
-        if ( !isset($lineLoaded[$key[0]]) ) {
+        if (! isset($lineLoaded[$key[0]])) {
             return null;
-        } elseif ( is_array($lineLoaded[$key[0]]) ) {
+        } elseif (is_array($lineLoaded[$key[0]])) {
             return $this->getLineLoaded($lineLoaded[$key[0]], $key[1]);
         } else {
             return $lineLoaded[$key[0]];
