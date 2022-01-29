@@ -137,11 +137,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Get the translation of the key.
      *
-     * @param  array $lineLoaded
-     * @param  string|null $key
+     * @param  array  $lineLoaded
+     * @param  string|null  $key
      * @return string|null
      */
-    private function getLineLoaded( $lineLoaded, $key )
+    private function getLineLoaded($lineLoaded, $key)
     {
         $key = explode('.', $key, 2);
 
