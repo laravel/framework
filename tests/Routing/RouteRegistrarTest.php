@@ -7,8 +7,9 @@ use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
+use Illuminate\Routing\Redirector;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Redirect;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Stringable;
@@ -531,6 +532,23 @@ class RouteRegistrarTest extends TestCase
         $this->assertNull($this->router->getRoutes()->getByName('users.index')->getMissing());
         $this->assertNull($this->router->getRoutes()->getByName('users.create')->getMissing());
         $this->assertNull($this->router->getRoutes()->getByName('users.store')->getMissing());
+    }
+
+    public function testRedirectionOnMissingModel()
+    {
+        Redirect::swap($redirector = m::mock(Redirector::class));
+
+        $redirector
+            ->shouldReceive('route')
+            ->with('redirection', ['foo' => 'bar'], 301, ['header' => 'zzz'])
+            ->andReturn('redirected');
+
+        $this->router->get('foo')->redirectMissing('redirection', ['foo' => 'bar'], ['header' => 'zzz']);
+
+        $missing = $this->getRoute()->getMissing();
+
+        $this->assertIsCallable($missing);
+        $this->assertSame('redirected', $missing());
     }
 
     public function testCanAccessRegisteredResourceRoutesAsRouteCollection()

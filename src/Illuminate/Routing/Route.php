@@ -12,6 +12,7 @@ use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -980,6 +981,21 @@ class Route
                 'C:32:"Opis\\Closure\\SerializableClosure',
                 'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
             ]) ? unserialize($missing) : $missing;
+    }
+
+    /**
+     * Define the redirection that should be performed on a missing model exception.
+     *
+     * @param  string  $route
+     * @param  mixed  $parameters
+     * @param  array  $headers
+     * @return $this
+     */
+    public function redirectMissing($route, $parameters = [], $headers = [])
+    {
+        return $this->missing(function () use ($route, $parameters, $headers) {
+            return Redirect::route($route, $parameters, 301, $headers);
+        });
     }
 
     /**
