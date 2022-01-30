@@ -7019,6 +7019,112 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
     }
 
+	public function testArrayContainsValidationPassedWhenHasKeys()
+	{
+		$trans = $this->getIlluminateArrayTranslator();
+
+		$data = [
+			'baz' => [
+				'foo' => 'bar',
+				'fee' => 'faa',
+				'laa' => 'lee',
+			],
+		];
+
+		$rules = [
+			'baz' => [
+				'array',
+				'containsAll:foo,fee,laa'
+			],
+		];
+
+		$validator = new Validator($trans, $data, $rules, [], []);
+		$this->assertTrue($validator->passes());
+	}
+
+	public function testArrayContainsValidationPassedWithPartialMatch()
+	{
+		$trans = $this->getIlluminateArrayTranslator();
+
+		$data = [
+			'baz' => [
+				'foo' => 'bar',
+				'fee' => 'faa',
+				'laa' => 'lee',
+			],
+		];
+
+		$rules = [
+			'baz' => [
+				'array',
+				'containsAll:foo,fee'
+			],
+		];
+
+		$validator = new Validator($trans, $data, $rules, [], []);
+		$this->assertTrue($validator->passes());
+	}
+
+	public function testArrayContainsValidationFailsWithMissingKey()
+	{
+		$trans = $this->getIlluminateArrayTranslator();
+		$trans->addLines(['validation.contains_all' => 'The :attribute field must contain entries for :values'], 'en');
+
+		$data = [
+			'baz' => [
+				'foo' => 'bar',
+				'fee' => 'faa',
+				'laa' => 'lee',
+			],
+		];
+
+		$rules = [
+			'baz' => [
+				'array',
+				'containsAll:foo,fee,boo,bar'
+			],
+		];
+
+		$validator = new Validator($trans, $data, $rules, [], []);
+		$this->assertFalse($validator->passes());
+		$this->assertSame(
+			'The baz field must contain entries for foo, fee, boo, bar',
+			$validator->messages()->first('baz')
+		);
+	}
+
+	public function testContainsValidationPassesWithStrings() {
+		$trans = $this->getIlluminateArrayTranslator();
+
+		$data = ['invoice_number' => 'INV-123456789'];
+
+		$rules = [
+			'invoice_number' => [
+				'required',
+				'containsAll:INV',
+			],
+		];
+
+		$validator = new Validator($trans, $data, $rules, [], []);
+		$this->assertTrue($validator->passes());
+	}
+
+	public function testContainsValidationFailsWithInvalidStrings() {
+		$trans = $this->getIlluminateArrayTranslator();
+
+		$data = ['invoice_number' => 'PO-987654321'];
+
+		$rules = [
+			'invoice_number' => [
+				'required',
+				'containsAll:INV',
+			],
+		];
+
+		$validator = new Validator($trans, $data, $rules, [], []);
+		$this->assertFalse($validator->passes());
+	}
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
