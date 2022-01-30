@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Bus;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\TestCase;
 use Throwable;
@@ -18,19 +16,9 @@ class ChainingTest extends TestCase
     public function testItCanFailedTheChainUsingFailMethod()
     {
         Bus::chain([
-            new FailingJob(),
+            new Jobs\FailingJob(),
         ])->catch(function (Throwable $e) {
             //
         })->dispatch();
-    }
-}
-
-class FailingJob
-{
-    use InteractsWithQueue, Queueable;
-
-    public function handle()
-    {
-        $this->fail();
     }
 }
