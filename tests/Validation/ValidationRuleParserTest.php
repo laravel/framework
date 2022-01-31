@@ -20,6 +20,12 @@ class ValidationRuleParserTest extends TestCase
             'city' => ['required', Rule::when(function (Fluent $input) {
                 return true;
             }, ['min:2'])],
+            'state' => ['required', Rule::when(true, function (Fluent $input) {
+                return 'min:2';
+            })],
+            'zip' => ['required', Rule::when(false, [], function (Fluent $input) {
+                return ['min:2'];
+            })],
         ]);
 
         $this->assertEquals([
@@ -29,6 +35,8 @@ class ValidationRuleParserTest extends TestCase
             'username' => ['required', 'min:2'],
             'address' => ['required'],
             'city' => ['required', 'min:2'],
+            'state' => ['required', 'min:2'],
+            'zip' => ['required', 'min:2'],
         ], $rules);
     }
 
