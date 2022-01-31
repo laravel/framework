@@ -207,7 +207,18 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Get the Pusher instance associated to the config.
+     * Create an instance of the driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     */
+    protected function createPusherDriver(array $config)
+    {
+        return new PusherBroadcaster($this->pusher($config));
+    }
+
+    /**
+     * Get a Pusher instance for the given configuration.
      *
      * @param  array  $config
      * @return \Pusher\Pusher
@@ -237,13 +248,13 @@ class BroadcastManager implements FactoryContract
      * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
-    protected function createPusherDriver(array $config)
+    protected function createAblyDriver(array $config)
     {
-        return new PusherBroadcaster($this->pusher($config));
+        return new AblyBroadcaster($this->ably($config));
     }
 
     /**
-     * Get the Ably instance associated to the config.
+     * Get an Ably instance for the given configuration.
      *
      * @param  array  $config
      * @return \Ably\AblyRest
@@ -251,17 +262,6 @@ class BroadcastManager implements FactoryContract
     public function ably(array $config)
     {
         return new AblyRest($config);
-    }
-
-    /**
-     * Create an instance of the driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
-     */
-    protected function createAblyDriver(array $config)
-    {
-        return new AblyBroadcaster($this->ably($config));
     }
 
     /**
