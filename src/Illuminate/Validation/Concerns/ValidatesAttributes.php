@@ -371,20 +371,26 @@ trait ValidatesAttributes
         return empty(array_diff_key($value, array_fill_keys($parameters, '')));
     }
 
-	public function validateContainsAll($attribute, $value, $parameters)
-	{
-		if (is_array($value)) {
-			foreach($parameters as $param) {
-				if (!Arr::exists($value, $param)) {
-					return false;
-				}
-			}
+    /**
+     * @param string $attribute
+     * @param mixed $value
+     * @param array $parameters
+     * @return bool
+     */
+    public function validateContainsAll($attribute, $value, $parameters)
+    {
+        if (is_array($value)) {
+            foreach ($parameters as $param) {
+                if (!Arr::exists($value, $param)) {
+                    return false;
+                }
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		return Str::containsAll($value, $parameters);
-	}
+        return Str::containsAll($value, $parameters);
+    }
 
     /**
      * Validate the size of an attribute is between a set of values.
