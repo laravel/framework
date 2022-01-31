@@ -18,6 +18,7 @@
         "ext-json": "*",
         "egulias/email-validator": "^3.1",
         "illuminate/collections": "^9.0",
+        "illuminate/conditionable": "^9.0",
         "illuminate/container": "^9.0",
         "illuminate/contracts": "^9.0",
         "illuminate/macroable": "^9.0",
