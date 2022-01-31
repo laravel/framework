@@ -677,6 +677,21 @@ if (! function_exists('rescue')) {
     }
 }
 
+if (! function_exists('attempt')) {
+    /**
+     * Attempt a callable, ignore any exceptions and return a default value.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $rescue
+     * @param  bool  $report
+     * @return mixed
+     */
+    function attempt(callable $callback, $rescue = null)
+    {
+        return rescue($callback, $rescue, false);
+    }
+}
+
 if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.

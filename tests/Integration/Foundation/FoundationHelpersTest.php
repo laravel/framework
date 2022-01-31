@@ -51,6 +51,47 @@ class FoundationHelpersTest extends TestCase
         );
     }
 
+    public function testAttempt()
+    {
+        $this->assertEquals(
+            'attempted!',
+            attempt(function () {
+                throw new Exception;
+            }, 'attempted!')
+        );
+
+        $this->assertEquals(
+            'attempted!',
+            attempt(function () {
+                throw new Exception;
+            }, function () {
+                return 'attempted!';
+            })
+        );
+
+        $this->assertEquals(
+            'no need to rescue',
+            attempt(function () {
+                return 'no need to rescue';
+            }, 'attempted!')
+        );
+
+        $testClass = new class
+        {
+            public function test(int $a)
+            {
+                return $a;
+            }
+        };
+
+        $this->assertEquals(
+            'attempted!',
+            attempt(function () use ($testClass) {
+                $testClass->test([]);
+            }, 'attempted!')
+        );
+    }
+
     public function testMixReportsExceptionWhenAssetIsMissingFromManifest()
     {
         $handler = new FakeHandler;
