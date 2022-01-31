@@ -338,7 +338,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals($statements, $blueprint->toSql($connection, new MySqlGrammar));
     }
-    
+
     public function testGenerateRelationshipColumnWithUuidModel()
     {
         require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
