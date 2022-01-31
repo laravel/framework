@@ -462,7 +462,7 @@ abstract class Relation
      */
     public static function getMorphedModel($alias)
     {
-        $key = is_string($alias) ? $alias : (isset($alias->value) ? $alias->value : '');
+        $key = $alias instanceof \BackedEnum ? $alias->value : $alias;
         return static::$morphMap[$key] ?? null;
     }
 
