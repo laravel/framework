@@ -375,13 +375,13 @@ trait ValidatesAttributes
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  array  $parameters
-     * @return  bool
+     * @return bool
      */
     public function validateArrayKeys($attribute, $value, $parameters)
     {
-		if (! is_array($value)) {
-			return false;
-		}
+        if (! is_array($value)) {
+            return false;
+        }
 
         foreach ($parameters as $param) {
             if (! Arr::exists($value, $param)) {

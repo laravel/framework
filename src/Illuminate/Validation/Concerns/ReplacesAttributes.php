@@ -617,7 +617,7 @@ trait ReplacesAttributes
      * @param  string  $attribute
      * @param  string  $rule
      * @param  array  $parameters
-     * @return  string
+     * @return string
      */
     protected function replaceArrayKeys($message, $attribute, $rule, $parameters)
     {
