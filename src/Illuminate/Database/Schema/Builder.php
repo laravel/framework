@@ -385,19 +385,6 @@ class Builder
     }
 
     /**
-     * Register a custom Doctrine mapping type.
-     *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  string  $type
-     * @return void
-     */
-    public function registerCustomDoctrineType($class, $name, $type)
-    {
-        $this->connection->registerDoctrineType($class, $name, $type);
-    }
-
-    /**
      * Get the database connection instance.
      *
      * @return \Illuminate\Database\Connection
