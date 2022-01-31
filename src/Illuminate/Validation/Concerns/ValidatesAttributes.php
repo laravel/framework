@@ -372,16 +372,16 @@ trait ValidatesAttributes
     }
 
     /**
-     * @param string $attribute
-     * @param mixed $value
-     * @param array $parameters
+     * @param string  $attribute
+     * @param mixed  $value
+     * @param array  $parameters
      * @return bool
      */
     public function validateContainsAll($attribute, $value, $parameters)
     {
         if (is_array($value)) {
             foreach ($parameters as $param) {
-                if (!Arr::exists($value, $param)) {
+                if (! Arr::exists($value, $param)) {
                     return false;
                 }
             }

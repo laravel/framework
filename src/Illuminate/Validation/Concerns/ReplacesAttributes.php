@@ -613,10 +613,10 @@ trait ReplacesAttributes
     /**
      * Replace all place-holders for the contains_all rule.
      *
-     * @param string $message
-     * @param string $attribute
-     * @param string $rule
-     * @param array $parameters
+     * @param string  $message
+     * @param string  $attribute
+     * @param string  $rule
+     * @param array  $parameters
      * @return string
      */
     protected function replaceContainsAll($message, $attribute, $rule, $parameters)
@@ -626,7 +626,5 @@ trait ReplacesAttributes
         }
 
         return str_replace(':values', implode(', ', $parameters), $message);
-
-
     }
 }
