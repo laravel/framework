@@ -20,16 +20,15 @@ class DatabaseEloquentRelationTest extends TestCase
         m::close();
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testGetMorphedModelWithEnum()
     {
-        if (version_compare(PHP_VERSION, '8.1') < 0) {
-            $this->markTestSkipped('PHP 8.1 is required');
-        } else {
-            Relation::morphMap(['test' => 'TestModel']);
-            $enumKey = TestEnum::test;
-            $this->assertEquals('TestModel',Relation::getMorphedModel('test'));
-            $this->assertEquals('TestModel',Relation::getMorphedModel($enumKey));
-        }
+        Relation::morphMap(['test' => 'TestModel']);
+        $enumKey = TestEnum::test;
+        $this->assertEquals('TestModel',Relation::getMorphedModel('test'));
+        $this->assertEquals('TestModel',Relation::getMorphedModel($enumKey));
     }
 
     public function testSetRelationFail()
