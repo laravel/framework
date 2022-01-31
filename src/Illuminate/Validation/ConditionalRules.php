@@ -57,7 +57,7 @@ class ConditionalRules
 
     /**
      * Get the rules.
-     * 
+     *
      * @param  array  $data
      * @return array
      */
