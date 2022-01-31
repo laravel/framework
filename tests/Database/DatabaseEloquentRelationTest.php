@@ -25,7 +25,7 @@ class DatabaseEloquentRelationTest extends TestCase
         if (version_compare(PHP_VERSION, '8.1') < 0) {
             $this->markTestSkipped('PHP 8.1 is required');
         } else {
-            Relation::$morphMap['test'] = 'TestModel';
+            Relation::morphMap(['test' => 'TestModel']);
             $enumKey = TestEnum::test;
             $this->assertEquals('TestModel',Relation::getMorphedModel('test'));
             $this->assertEquals('TestModel',Relation::getMorphedModel($enumKey));
@@ -227,7 +227,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testSettingMorphMapWithNumericArrayUsesTheTableNames()
     {
-        Relation::morphMap([EloquentRelationResetModelStub::class]);
+        Relation::morphMap([EloquentRelationResetModelStub::class], false);
 
         $this->assertEquals([
             'reset' => EloquentRelationResetModelStub::class,
@@ -238,7 +238,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testSettingMorphMapWithNumericKeys()
     {
-        Relation::morphMap([1 => 'App\User']);
+        Relation::morphMap([1 => 'App\User'], false);
 
         $this->assertEquals([
             1 => 'App\User',
