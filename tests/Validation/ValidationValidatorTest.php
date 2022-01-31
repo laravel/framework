@@ -7019,7 +7019,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
     }
 
-    public function testArrayContainsValidationPassedWhenHasKeys()
+    public function testArrayKeysValidationPassedWhenHasKeys()
     {
         $trans = $this->getIlluminateArrayTranslator();
 
@@ -7034,7 +7034,7 @@ class ValidationValidatorTest extends TestCase
         $rules = [
             'baz' => [
                 'array',
-                'containsAll:foo,fee,laa',
+                'array_keys:foo,fee,laa',
             ],
         ];
 
@@ -7042,7 +7042,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function testArrayContainsValidationPassedWithPartialMatch()
+    public function testArrayKeysValidationPassedWithPartialMatch()
     {
         $trans = $this->getIlluminateArrayTranslator();
 
@@ -7057,7 +7057,7 @@ class ValidationValidatorTest extends TestCase
         $rules = [
             'baz' => [
                 'array',
-                'containsAll:foo,fee',
+                'array_keys:foo,fee',
             ],
         ];
 
@@ -7065,10 +7065,10 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function testArrayContainsValidationFailsWithMissingKey()
+    public function testArrayKeysValidationFailsWithMissingKey()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.contains_all' => 'The :attribute field must contain entries for :values'], 'en');
+        $trans->addLines(['validation.array_keys' => 'The :attribute field must contain entries for :values'], 'en');
 
         $data = [
             'baz' => [
@@ -7081,7 +7081,7 @@ class ValidationValidatorTest extends TestCase
         $rules = [
             'baz' => [
                 'array',
-                'containsAll:foo,fee,boo,bar',
+                'array_keys:foo,fee,boo,bar',
             ],
         ];
 
@@ -7093,38 +7093,27 @@ class ValidationValidatorTest extends TestCase
         );
     }
 
-    public function testContainsValidationPassesWithStrings()
+    public function testArrayKeysValidationFailsWithNotAnArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.array_keys' => 'The :attribute field must contain entries for :values'], 'en');
 
-        $data = ['invoice_number' => 'INV-123456789'];
-
-        $rules = [
-            'invoice_number' => [
-                'required',
-                'containsAll:INV',
-            ],
+        $data = [
+            'baz' => 'no an array',
         ];
 
-        $validator = new Validator($trans, $data, $rules, [], []);
-        $this->assertTrue($validator->passes());
-    }
-
-    public function testContainsValidationFailsWithInvalidStrings()
-    {
-        $trans = $this->getIlluminateArrayTranslator();
-
-        $data = ['invoice_number' => 'PO-987654321'];
-
         $rules = [
-            'invoice_number' => [
-                'required',
-                'containsAll:INV',
+            'baz' => [
+                'array_keys:foo,fee,boo,bar',
             ],
         ];
 
         $validator = new Validator($trans, $data, $rules, [], []);
         $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'The baz field must contain entries for foo, fee, boo, bar',
+            $validator->messages()->first('baz')
+        );
     }
 
     protected function getTranslator()
