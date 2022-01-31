@@ -5,10 +5,13 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Notifications\DatabaseNotification;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -274,6 +277,59 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table `posts` add `user_id` bigint unsigned not null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testGenerateMultipleRelationshipColumns()
+    {
+        $this->runBlueprintAssertions('some_table', function (Blueprint $table) {
+            $table->foreignIdsFor([
+                User::class,
+                User::class => 'author_id',
+            ]);
+        }, [
+            'alter table `some_table` add `user_id` bigint unsigned not null, add `author_id` bigint unsigned not null',
+        ]);
+    }
+
+    public function testGenerateMultipleRelationshipColumnsWithCallback()
+    {
+        $this->runBlueprintAssertions('some_table', function (Blueprint $table) {
+            $table->foreignIdsFor([
+                DatabaseNotification::class => function (ForeignIdColumnDefinition $definition) {
+                    $definition->nullable();
+                }
+            ]);
+        }, [
+            'alter table `some_table` add `database_notification_id` char(36) null',
+        ]);
+    }
+
+    public function testGenerateMultipleRelationshipColumnsWithCallbackAndColumnDefinition()
+    {
+        $this->runBlueprintAssertions('some_table', function (Blueprint $table) {
+            $table->foreignIdsFor([
+                User::class,
+                User::class => [
+                    'author_id',
+                    function (ForeignIdColumnDefinition $definition) {
+                        $definition->nullable();
+                    }
+                ]
+            ]);
+        }, [
+            'alter table `some_table` add `user_id` bigint unsigned not null, add `author_id` bigint unsigned null',
+        ]);
+    }
+
+    private function runBlueprintAssertions(string $table, \Closure $closure, array $statements)
+    {
+        $base = new Blueprint($table, $closure);
+
+        $connection = m::mock(Connection::class);
+        $blueprint = clone $base;
+
+        $this->assertEquals($statements, $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
 
     public function testGenerateRelationshipColumnWithUuidModel()
     {

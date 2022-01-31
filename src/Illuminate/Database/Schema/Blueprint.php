@@ -886,6 +886,33 @@ class Blueprint
         ]));
     }
 
+    public function foreignIdsFor($models) {
+        if (!is_array($models))
+            $models = [$models];
+
+        $definitions = collect();
+        foreach($models as $index => $value) {
+            $model = is_int($index) ? $value : $index;
+
+            if (is_array($value)) {
+                $column = $value[0];
+                $callback = $value[1];
+            }
+            else {
+                $column = !is_int($index) && is_string($value) ? $value : null;
+                $callback = $value instanceof Closure ? $value : null;
+            }
+
+            $definitions->add($definition = $this->foreignIdFor($model, $column));
+
+            if ($callback) {
+                $callback($definition);
+            }
+        }
+
+        return $definitions;
+    }
+
     /**
      * Create a foreign ID column for the given model.
      *
