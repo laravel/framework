@@ -296,7 +296,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->foreignIdsFor([
                 DatabaseNotification::class => function (ForeignIdColumnDefinition $definition) {
                     $definition->nullable();
-                }
+                },
             ]);
         }, [
             'alter table `some_table` add `database_notification_id` char(36) null',
@@ -321,8 +321,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
                     'author_id',
                     function (ForeignIdColumnDefinition $definition) {
                         $definition->nullable();
-                    }
-                ]
+                    },
+                ],
             ]);
         }, [
             'alter table `some_table` add `user_id` bigint unsigned not null, add `author_id` bigint unsigned null',
