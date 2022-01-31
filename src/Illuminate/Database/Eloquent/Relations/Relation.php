@@ -457,12 +457,13 @@ abstract class Relation
     /**
      * Get the model associated with a custom polymorphic type.
      *
-     * @param  string  $alias
+     * @param  string|object  $alias
      * @return string|null
      */
     public static function getMorphedModel($alias)
     {
-        return static::$morphMap[$alias] ?? null;
+        $key = is_string($alias) ? $alias : (isset($alias->value) ? $alias->value : '');
+        return static::$morphMap[$key] ?? null;
     }
 
     /**

@@ -11,12 +11,25 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\Database\stubs\TestEnum;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    public function testGetMorphedModelWithEnum()
+    {
+        if (version_compare(PHP_VERSION, '8.1') < 0) {
+            $this->markTestSkipped('PHP 8.1 is required');
+        } else {
+            Relation::$morphMap['test'] = 'TestModel';
+            $enumKey = TestEnum::test;
+            $this->assertEquals('TestModel',Relation::getMorphedModel('test'));
+            $this->assertEquals('TestModel',Relation::getMorphedModel($enumKey));
+        }
     }
 
     public function testSetRelationFail()
