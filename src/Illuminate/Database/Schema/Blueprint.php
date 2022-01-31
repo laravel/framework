@@ -886,6 +886,55 @@ class Blueprint
         ]));
     }
 
+    /**
+     * Creates a collection of foreign ID columns for the given array of models. A convenient shorthand for when you
+     * need to reference a number of foreign models from this table. Where necessary, you may also specify the
+     * column name, and / or a closure to process the resulting ForeignIdColumnDefinition.
+     *
+     * E.g. Array of models - conventional column names will be used.
+     * $table->foreignIdsFor([
+     *      User::model,
+     *      Post::model
+     * ]);
+     *
+     * E.g. Since the method returns a Collection, you can use the HigherOrderCollectionProxy methods to set defaults
+     * that will apply to all columns (individual column definitions can also be configured - see below).
+     * $table->foreignIdsFor([
+     *      User::model,
+     *      Post::model
+     * ])->each->nullable();
+     *
+     * E.g. Use the array key to specify the model, and the value for the column name.
+     *
+     * $table->foreignIdsFor([
+     *      User::model => 'author_id',
+     *      Post::model
+     * ]);
+     *
+     * E.g. Use the array value as a callback function to modify the column definition.
+     *
+     * $table->foreignIdsFor([
+     *      User::model => 'author_id',
+     *      Post::model => function(ForeignIdColumnDefinition $def) {
+     *          $def->nullable()
+     *      })
+     * ]);
+     *
+     * E.g. If you need to provide a specific column name for the foreign ID, and handle the column definition, set the
+     * value in the array to an array where the first item is the string column name, and the second is the callback
+     * $table->foreignIdsFor([
+     *      User::model,
+     *      Post::model => [
+     *         'featured_post_id',
+     *         function(ForeignIdColumnDefinition $def) {
+     *              $def->nullable()
+     *         }
+     *      ]
+     * ]);
+     *
+     * @param string[] $models|
+     * @return \Illuminate\Support\Collection|\Illuminate\Database\Schema\ForeignIdColumnDefinition[]
+     */
     public function foreignIdsFor($models) {
         if (!is_array($models))
             $models = [$models];

@@ -303,6 +303,15 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ]);
     }
 
+    public function testGenerateMultipleRelationshipColumnsWithHigherOrderCallback()
+    {
+        $this->runBlueprintAssertions('some_table', function (Blueprint $table) {
+            $table->foreignIdsFor([User::class])->each->nullable();
+        }, [
+            'alter table `some_table` add `user_id` bigint unsigned null',
+        ]);
+    }
+
     public function testGenerateMultipleRelationshipColumnsWithCallbackAndColumnDefinition()
     {
         $this->runBlueprintAssertions('some_table', function (Blueprint $table) {
