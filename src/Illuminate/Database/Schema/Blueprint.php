@@ -938,7 +938,8 @@ class Blueprint
      * @param  string[]  $models
      * @return \Illuminate\Support\Collection|\Illuminate\Database\Schema\ForeignIdColumnDefinition[]
      */
-    public function foreignIdsFor($models) {
+    public function foreignIdsFor($models)
+    {
         if (! is_array($models)) {
             $models = [$models];
         }
