@@ -21,7 +21,7 @@ test
 test
 @endpushOnce';
 
-        $expected = '<?php \$__env->startPush(\'foo\');
+        $expected = '<?php $__env->startPush(\'foo\');
 if (! $__env->hasRenderedOnce(\'bar\')):
 $__env->markAsRenderedOnce(\'bar\'); ?>
 test

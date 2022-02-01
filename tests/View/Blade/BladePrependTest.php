@@ -22,7 +22,7 @@ bar
 test
 @endprependOnce';
 
-        $expected = '<?php \$__env->startPrepend(\'foo\');
+        $expected = '<?php $__env->startPrepend(\'foo\');
 if (! $__env->hasRenderedOnce(\'bar\')):
 $__env->markAsRenderedOnce(\'bar\'); ?>
 test

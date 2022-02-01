@@ -43,7 +43,7 @@ trait CompilesStacks
 
         $id = trim($id) ?: "'".(string) Str::uuid()."'";
 
-        return '<?php \$__env->startPush('.$stack.');
+        return '<?php $__env->startPush('.$stack.');
 if (! $__env->hasRenderedOnce('.$id.')):
 $__env->markAsRenderedOnce('.$id.'); ?>';
     }
@@ -94,7 +94,7 @@ $__env->markAsRenderedOnce('.$id.'); ?>';
 
         $id = trim($id) ?: "'".(string) Str::uuid()."'";
 
-        return '<?php \$__env->startPrepend('.$stack.');
+        return '<?php $__env->startPrepend('.$stack.');
 if (! $__env->hasRenderedOnce('.$id.')):
 $__env->markAsRenderedOnce('.$id.'); ?>';
     }
