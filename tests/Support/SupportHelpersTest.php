@@ -50,7 +50,7 @@ class SupportHelpersTest extends TestCase
 
         $foo = new class
         {
-            function bar($arg)
+            public function bar($arg)
             {
                 return $arg;
             }
