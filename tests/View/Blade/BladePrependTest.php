@@ -22,11 +22,10 @@ bar
 test
 @endprependOnce';
 
-        $expected = '<?php $__env->startPrepend(\'foo\');
-if (! $__env->hasRenderedOnce(\'bar\')):
-$__env->markAsRenderedOnce(\'bar\'); ?>
+        $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
+$__env->startPrepend(\'foo\'); ?>
 test
-<?php endif; $__env->stopPrepend(); ?>';
+<?php $__env->stopPrepend(); endif; ?>';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }

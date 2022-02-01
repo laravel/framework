@@ -43,9 +43,8 @@ trait CompilesStacks
 
         $id = trim($id) ?: "'".(string) Str::uuid()."'";
 
-        return '<?php $__env->startPush('.$stack.');
-if (! $__env->hasRenderedOnce('.$id.')):
-$__env->markAsRenderedOnce('.$id.'); ?>';
+        return '<?php if (! $__env->hasRenderedOnce('.$id.')): $__env->markAsRenderedOnce('.$id.');
+$__env->startPush('.$stack.'); ?>';
     }
 
     /**
@@ -65,7 +64,7 @@ $__env->markAsRenderedOnce('.$id.'); ?>';
      */
     protected function compileEndpushOnce()
     {
-        return '<?php endif; $__env->stopPush(); ?>';
+        return '<?php $__env->stopPush(); endif; ?>';
     }
 
     /**
@@ -94,9 +93,8 @@ $__env->markAsRenderedOnce('.$id.'); ?>';
 
         $id = trim($id) ?: "'".(string) Str::uuid()."'";
 
-        return '<?php $__env->startPrepend('.$stack.');
-if (! $__env->hasRenderedOnce('.$id.')):
-$__env->markAsRenderedOnce('.$id.'); ?>';
+        return '<?php if (! $__env->hasRenderedOnce('.$id.')): $__env->markAsRenderedOnce('.$id.');
+$__env->startPrepend('.$stack.'); ?>';
     }
 
     /**
@@ -116,6 +114,6 @@ $__env->markAsRenderedOnce('.$id.'); ?>';
      */
     protected function compileEndprependOnce()
     {
-        return '<?php endif; $__env->stopPrepend(); ?>';
+        return '<?php $__env->stopPrepend(); endif; ?>';
     }
 }

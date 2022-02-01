@@ -21,11 +21,10 @@ test
 test
 @endpushOnce';
 
-        $expected = '<?php $__env->startPush(\'foo\');
-if (! $__env->hasRenderedOnce(\'bar\')):
-$__env->markAsRenderedOnce(\'bar\'); ?>
+        $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
+$__env->startPush(\'foo\'); ?>
 test
-<?php endif; $__env->stopPush(); ?>';
+<?php $__env->stopPush(); endif; ?>';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
