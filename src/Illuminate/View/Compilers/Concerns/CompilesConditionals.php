@@ -308,7 +308,7 @@ trait CompilesConditionals
     /**
      * Compile a checked block into valid PHP.
      *
-     * @param string $condition
+     * @param  string  $condition
      * @return string
      */
     protected function compileChecked($condition)
