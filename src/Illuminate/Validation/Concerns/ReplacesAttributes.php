@@ -201,6 +201,24 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the array_keys rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function replaceArrayKeys($message, $attribute, $rule, $parameters)
+    {
+        foreach ($parameters as &$parameter) {
+            $parameter = $this->getDisplayableValue($attribute, $parameter);
+        }
+
+        return str_replace(':values', implode(', ', $parameters), $message);
+    }
+
+    /**
      * Replace all place-holders for the mimetypes rule.
      *
      * @param  string  $message
@@ -602,24 +620,6 @@ trait ReplacesAttributes
      * @return string
      */
     protected function replaceStartsWith($message, $attribute, $rule, $parameters)
-    {
-        foreach ($parameters as &$parameter) {
-            $parameter = $this->getDisplayableValue($attribute, $parameter);
-        }
-
-        return str_replace(':values', implode(', ', $parameters), $message);
-    }
-
-    /**
-     * Replace all place-holders for the contains_all rule.
-     *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array  $parameters
-     * @return string
-     */
-    protected function replaceArrayKeys($message, $attribute, $rule, $parameters)
     {
         foreach ($parameters as &$parameter) {
             $parameter = $this->getDisplayableValue($attribute, $parameter);
