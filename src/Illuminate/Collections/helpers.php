@@ -188,7 +188,7 @@ if (! function_exists('value')) {
             return $value(...$args);
         }
 
-        if (is_callable($value)) {
+        if (is_array($value) && is_callable($value)) {
             return value(Closure::fromCallable($value), ...$args);
         }
 
