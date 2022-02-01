@@ -37,7 +37,7 @@ trait CompilesStacks
     protected function compilePushOnce($expression)
     {
         $parts = explode(',', $this->stripParentheses($expression));
-        
+
         $stack = $parts[0];
         $id = $parts[1] ?? null;
 
@@ -88,7 +88,7 @@ $__env->markAsRenderedOnce('.$id.'); ?>';
     protected function compilePrependOnce($expression)
     {
         $parts = explode(',', $this->stripParentheses($expression));
-        
+
         $stack = $parts[0];
         $id = $parts[1] ?? null;
 
@@ -108,7 +108,7 @@ $__env->markAsRenderedOnce('.$id.'); ?>';
     {
         return '<?php $__env->stopPrepend(); ?>';
     }
-    
+
     /**
      * Compile the end-prepend-once statements into valid PHP.
      *
