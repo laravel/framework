@@ -59,7 +59,7 @@ class RefreshCommand extends Command
         // the migration commands and just provides a convenient wrapper to execute
         // them in succession. We'll also see if we need to re-seed the database.
         $this->call('migrate', array_filter([
-            '--database' => $database,
+            '--connection' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
@@ -89,7 +89,7 @@ class RefreshCommand extends Command
     protected function runRollback($database, $path, $step)
     {
         $this->call('migrate:rollback', array_filter([
-            '--database' => $database,
+            '--connection' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--step' => $step,
@@ -107,7 +107,7 @@ class RefreshCommand extends Command
     protected function runReset($database, $path)
     {
         $this->call('migrate:reset', array_filter([
-            '--database' => $database,
+            '--connection' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
@@ -133,7 +133,7 @@ class RefreshCommand extends Command
     protected function runSeeder($database)
     {
         $this->call('db:seed', array_filter([
-            '--database' => $database,
+            '--connection' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
             '--force' => true,
         ]));

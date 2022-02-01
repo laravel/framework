@@ -18,7 +18,7 @@ class DumpCommand extends Command
      * @var string
      */
     protected $signature = 'schema:dump
-                {--database= : The database connection to use}
+                {--connection= : The database connection to use}
                 {--path= : The path where the schema dump file should be stored}
                 {--prune : Delete all existing migration files}';
 

@@ -49,7 +49,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('reset')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
-        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
+        $this->runCommand($command, ['--pretend' => true, '--connection' => 'foo']);
     }
 
     protected function runCommand($command, $input = [])

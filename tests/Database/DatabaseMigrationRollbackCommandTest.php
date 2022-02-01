@@ -62,7 +62,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], true);
 
-        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
+        $this->runCommand($command, ['--pretend' => true, '--connection' => 'foo']);
     }
 
     public function testRollbackCommandCanBePretendedWithStepOption()
@@ -78,7 +78,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
         $migrator->shouldReceive('rollback')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => true, 'step' => 2]);
 
-        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
+        $this->runCommand($command, ['--pretend' => true, '--connection' => 'foo', '--step' => 2]);
     }
 
     protected function runCommand($command, $input = [])

@@ -21,7 +21,7 @@ class SeedCommandTest extends TestCase
 {
     public function testHandle()
     {
-        $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
+        $input = new ArrayInput(['--force' => true, '--connection' => 'sqlite']);
         $output = new NullOutput;
 
         $seeder = m::mock(Seeder::class);
@@ -55,7 +55,7 @@ class SeedCommandTest extends TestCase
     {
         $input = new ArrayInput([
             '--force' => true,
-            '--database' => 'sqlite',
+            '--connection' => 'sqlite',
             '--class' => UserWithoutModelEventsSeeder::class,
         ]);
         $output = new NullOutput;

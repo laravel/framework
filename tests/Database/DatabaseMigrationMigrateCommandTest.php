@@ -118,7 +118,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
 
-        $this->runCommand($command, ['--database' => 'foo']);
+        $this->runCommand($command, ['--connection' => 'foo']);
     }
 
     public function testStepMayBeSet()

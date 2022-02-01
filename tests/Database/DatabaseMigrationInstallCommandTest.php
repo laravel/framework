@@ -24,7 +24,7 @@ class DatabaseMigrationInstallCommandTest extends TestCase
         $repo->shouldReceive('setSource')->once()->with('foo');
         $repo->shouldReceive('createRepository')->once();
 
-        $this->runCommand($command, ['--database' => 'foo']);
+        $this->runCommand($command, ['--connection' => 'foo']);
     }
 
     protected function runCommand($command, $options = [])
