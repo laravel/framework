@@ -71,7 +71,7 @@ interface Repository extends CacheInterface
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure(): TCached  $callback
-     * @return mixed
+     * @return TCached
      */
     public function remember($key, $ttl, Closure $callback);
 
@@ -91,7 +91,7 @@ interface Repository extends CacheInterface
      * @template TCached of mixed
      * @param  string  $key
      * @param  \Closure(): TCached  $callback
-     * @return mixed
+     * @return TCached
      */
     public function rememberForever($key, Closure $callback);
 
