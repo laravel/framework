@@ -1,6 +1,25 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.81.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.82.0...8.x)
+
+
+## [v8.82.0 (2022-02-01)](https://github.com/laravel/framework/compare/v8.81.0...v8.82.0)
+
+### Added
+- Added class and method to create cross joined sequences for factories ([#40542](https://github.com/laravel/framework/pull/40542))
+- Added Transliterate shortcut to the Str helper ([#40681](https://github.com/laravel/framework/pull/40681))
+- Added array_keys validation rule ([#40720](https://github.com/laravel/framework/pull/40720))
+
+### Fixed
+- Prevent job serialization error in Queue ([#40625](https://github.com/laravel/framework/pull/40625))
+- Fixed autoresolving model name from factory ([#40616](https://github.com/laravel/framework/pull/40616))
+- Fixed : strtotime Epoch doesn't fit in PHP int ([#40690](https://github.com/laravel/framework/pull/40690))
+- Fixed Stringable ucsplit ([#40694](https://github.com/laravel/framework/pull/40694), [#40699](https://github.com/laravel/framework/pull/40699))
+
+### Changed
+- Server command: Allow xdebug auto-connect to listener feature ([#40673](https://github.com/laravel/framework/pull/40673))
+- respect null driver in `QueueServiceProvider` ([9435827](https://github.com/laravel/framework/commit/9435827014ca289213f2bcf64847f5c5959bb652), [56d433a](https://github.com/laravel/framework/commit/56d433aaec40e8383f28e8f0e835cd977845fcde))
+- Allow to push and prepend config values on new keys ([#40723](https://github.com/laravel/framework/pull/40723))
 
 
 ## [v8.81.0 (2022-01-25)](https://github.com/laravel/framework/compare/v8.80.0...v8.81.0)
