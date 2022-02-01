@@ -201,7 +201,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace all place-holders for the array_keys rule.
+     * Replace all place-holders for the required_array_keys rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -209,7 +209,7 @@ trait ReplacesAttributes
      * @param  array  $parameters
      * @return string
      */
-    protected function replaceArrayKeys($message, $attribute, $rule, $parameters)
+    protected function replaceRequiredArrayKeys($message, $attribute, $rule, $parameters)
     {
         foreach ($parameters as &$parameter) {
             $parameter = $this->getDisplayableValue($attribute, $parameter);

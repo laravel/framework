@@ -379,7 +379,7 @@ trait ValidatesAttributes
      * @param  array  $parameters
      * @return bool
      */
-    public function validateArrayKeys($attribute, $value, $parameters)
+    public function validateRequiredArrayKeys($attribute, $value, $parameters)
     {
         if (! is_array($value)) {
             return false;

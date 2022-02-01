@@ -7034,7 +7034,7 @@ class ValidationValidatorTest extends TestCase
         $rules = [
             'baz' => [
                 'array',
-                'array_keys:foo,fee,laa',
+                'required_array_keys:foo,fee,laa',
             ],
         ];
 
@@ -7057,7 +7057,7 @@ class ValidationValidatorTest extends TestCase
         $rules = [
             'baz' => [
                 'array',
-                'array_keys:foo,fee',
+                'required_array_keys:foo,fee',
             ],
         ];
 
@@ -7068,7 +7068,7 @@ class ValidationValidatorTest extends TestCase
     public function testArrayKeysValidationFailsWithMissingKey()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.array_keys' => 'The :attribute field must contain entries for :values'], 'en');
+        $trans->addLines(['validation.required_array_keys' => 'The :attribute field must contain entries for :values'], 'en');
 
         $data = [
             'baz' => [
@@ -7081,7 +7081,7 @@ class ValidationValidatorTest extends TestCase
         $rules = [
             'baz' => [
                 'array',
-                'array_keys:foo,fee,boo,bar',
+                'required_array_keys:foo,fee,boo,bar',
             ],
         ];
 
@@ -7096,7 +7096,7 @@ class ValidationValidatorTest extends TestCase
     public function testArrayKeysValidationFailsWithNotAnArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.array_keys' => 'The :attribute field must contain entries for :values'], 'en');
+        $trans->addLines(['validation.required_array_keys' => 'The :attribute field must contain entries for :values'], 'en');
 
         $data = [
             'baz' => 'no an array',
@@ -7104,7 +7104,7 @@ class ValidationValidatorTest extends TestCase
 
         $rules = [
             'baz' => [
-                'array_keys:foo,fee,boo,bar',
+                'required_array_keys:foo,fee,boo,bar',
             ],
         ];
 
