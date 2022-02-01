@@ -11,6 +11,7 @@ interface Repository extends CacheInterface
      * Retrieve an item from the cache and delete it.
      *
      * @template TCached of mixed
+     *
      * @param  string  $key
      * @param  null|TCached  $default
      * @return null|TCached
@@ -68,6 +69,7 @@ interface Repository extends CacheInterface
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @template TCached of mixed
+     *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure(): TCached  $callback
@@ -79,6 +81,7 @@ interface Repository extends CacheInterface
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCached of mixed
+     *
      * @param  string  $key
      * @param  \Closure(): TCached  $callback
      * @return TCached
@@ -89,6 +92,7 @@ interface Repository extends CacheInterface
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCached of mixed
+     *
      * @param  string  $key
      * @param  \Closure(): TCached  $callback
      * @return TCached
