@@ -15,4 +15,19 @@ bar
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testPushOnceIsCompiled()
+    {
+        $string = '@prependOnce(\'foo\', \'bar\')
+test
+@endprependOnce';
+
+        $expected = '<?php \$__env->startPrepend(\'foo\');
+if (! $__env->hasRenderedOnce(\'bar\')):
+$__env->markAsRenderedOnce(\'bar\'); ?>
+test
+<?php endif; $__env->stopPrepend(); ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
