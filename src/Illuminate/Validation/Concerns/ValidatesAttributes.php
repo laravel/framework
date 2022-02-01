@@ -372,6 +372,8 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an array has all of the given keys.
+     *
      * @param  string  $attribute
      * @param  mixed  $value
      * @param  array  $parameters
