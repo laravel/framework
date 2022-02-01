@@ -169,7 +169,8 @@ class FilesystemManager implements FactoryContract
     public function createLocalDriver(array $config)
     {
         $visibility = PortableVisibilityConverter::fromArray(
-            $config['permissions'] ?? []
+            $config['permissions'] ?? [],
+            $config['visibility'] ?? Visibility::PRIVATE
         );
 
         $links = ($config['links'] ?? null) === 'skip'
