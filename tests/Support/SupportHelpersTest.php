@@ -47,6 +47,16 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('foo', value(function ($arg) {
             return $arg;
         }, 'foo'));
+
+        $foo = new class {
+            function bar($arg) {
+                return $arg;
+            }
+        };
+        
+        $this->assertSame('baz', value([$foo, 'bar'], 'baz'));
+
+        $this->assertSame([$foo, 'baz'], value([$foo, 'baz']));
     }
 
     public function testObjectGet()

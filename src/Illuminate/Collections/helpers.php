@@ -184,6 +184,14 @@ if (! function_exists('value')) {
      */
     function value($value, ...$args)
     {
-        return $value instanceof Closure ? $value(...$args) : $value;
+        if ($value instanceof Closure) {
+            return $value(...$args);
+        }
+
+        if (is_callable($value)) {
+            return value(Closure::fromCallable($value), ...$args);
+        }
+
+        return $value;
     }
 }
