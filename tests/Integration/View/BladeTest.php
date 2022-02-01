@@ -121,7 +121,7 @@ class BladeTest extends TestCase
 
 class HelloComponent extends Component
 {
-    private $name;
+    public $name;
 
     public function __construct(string $name)
     {
