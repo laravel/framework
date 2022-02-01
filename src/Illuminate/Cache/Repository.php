@@ -84,9 +84,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
+     * @template TCached of mixed
+     *
      * @param  array|string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  null|TCached  $default
+     * @return null|TCached
      */
     public function get($key, $default = null): mixed
     {
@@ -175,9 +177,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache and delete it.
      *
+     * @template TCached of mixed
+     *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @param  TCached  $default
+     * @return null|TCached
      */
     public function pull($key, $default = null)
     {
@@ -372,10 +376,12 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get an item from the cache, or execute the given Closure and store the result.
      *
+     * @template TCached of mixed
+     *
      * @param  string  $key
      * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCached  $callback
+     * @return TCached
      */
     public function remember($key, $ttl, Closure $callback)
     {
@@ -396,9 +402,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCached of mixed
+     *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCached  $callback
+     * @return TCached
      */
     public function sear($key, Closure $callback)
     {
@@ -408,9 +416,11 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
+     * @template TCached of mixed
+     *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
+     * @param  \Closure(): TCached  $callback
+     * @return TCached
      */
     public function rememberForever($key, Closure $callback)
     {

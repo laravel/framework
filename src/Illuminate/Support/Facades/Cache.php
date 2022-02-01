@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @template TCached of mixed
+ *
  * @method static \Illuminate\Cache\TaggedCache tags(array|mixed $names)
  * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, mixed $owner = null)
  * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
@@ -17,11 +19,11 @@ namespace Illuminate\Support\Facades;
  * @method static bool put(array|string $key, $value, \DateTimeInterface|\DateInterval|int $ttl = null)
  * @method static int|bool decrement(string $key, $value = 1)
  * @method static int|bool increment(string $key, $value = 1)
- * @method static mixed get(array|string $key, mixed $default = null)
- * @method static mixed pull(string $key, mixed $default = null)
- * @method static mixed remember(string $key, \DateTimeInterface|\DateInterval|int $ttl, \Closure $callback)
- * @method static mixed rememberForever(string $key, \Closure $callback)
- * @method static mixed sear(string $key, \Closure $callback)
+ * @method static null|TCached get(array|string $key, TCached $default = null)
+ * @method static null|TCached pull(string $key, TCached $default = null)
+ * @method static TCached remember(string $key, \DateTimeInterface|\DateInterval|int $ttl, \Closure(): TCached $callback)
+ * @method static TCached rememberForever(string $key, \Closure(): TCached $callback)
+ * @method static TCached sear(string $key, \Closure(): TCached $callback)
  *
  * @see \Illuminate\Cache\CacheManager
  * @see \Illuminate\Cache\Repository
