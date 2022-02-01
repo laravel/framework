@@ -53,7 +53,7 @@ class ComponentMakeCommand extends GeneratorCommand
 
             return;
         }
-        
+
         if (parent::handle() === false && ! $this->option('force')) {
             return false;
         }
@@ -66,7 +66,7 @@ class ComponentMakeCommand extends GeneratorCommand
     /**
      * Write the view for the component.
      *
-     * @param  callable|null $onSuccess
+     * @param  callable|null  $onSuccess
      * @return void
      */
     protected function writeView($onSuccess = null)
