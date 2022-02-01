@@ -16,7 +16,7 @@ bar
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testPushOnceIsCompiled()
+    public function testPrependOnceIsCompiled()
     {
         $string = '@prependOnce(\'foo\', \'bar\')
 test
