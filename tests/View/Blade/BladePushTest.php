@@ -19,7 +19,7 @@ test
     {
         $string = '@pushOnce(\'foo\', \'bar\')
 test
-@endpushOnce';
+@endPushOnce';
 
         $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
 $__env->startPush(\'foo\'); ?>

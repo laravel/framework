@@ -20,7 +20,7 @@ bar
     {
         $string = '@prependOnce(\'foo\', \'bar\')
 test
-@endprependOnce';
+@endPrependOnce';
 
         $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
 $__env->startPrepend(\'foo\'); ?>
