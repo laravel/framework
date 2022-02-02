@@ -438,9 +438,7 @@ class ComponentTagCompiler
         /x";
 
         $value = preg_replace_callback($pattern, function ($matches) {
-            $name = $matches['inlineName'] !== ''
-                ? $matches['inlineName']
-                : $this->stripQuotes($matches['name']);
+            $name = $this->stripQuotes($matches['inlineName'] ?? $matches['name']);
 
             if ($matches[1] !== ':') {
                 $name = "'{$name}'";
