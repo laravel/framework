@@ -683,7 +683,6 @@ class Grammar extends BaseGrammar
      * Compile the "having" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $havings
      * @return string
      */
     protected function compileHavings(Builder $query)
@@ -696,7 +695,6 @@ class Grammar extends BaseGrammar
     /**
      * Compile a single having clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $having
      * @return string
      */
