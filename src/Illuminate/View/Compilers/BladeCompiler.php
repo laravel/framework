@@ -116,7 +116,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $footer = [];
 
     /**
-     * Array to temporary store the raw blocks found in the template.
+     * Array to temporarily store the raw blocks found in the template.
      *
      * @var array
      */
@@ -425,7 +425,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Get a placeholder to temporary mark the position of raw blocks.
+     * Get a placeholder to temporarily mark the position of raw blocks.
      *
      * @param  int|string  $replace
      * @return string
