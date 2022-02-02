@@ -663,7 +663,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Register all of the local only configured providers.
      *
      * @return void
-     **/
+     */
     public function registerLocalProviders()
     {
         $providers = Collection::make($this->config['app.local_providers']);
@@ -671,7 +671,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             $this->register($provider, true);
         });
     }
-    
+
     /**
      * Register a service provider with the application.
      *
