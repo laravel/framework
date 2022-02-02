@@ -401,6 +401,31 @@ class DatabaseEloquentModelTest extends TestCase
         $closure($builder);
     }
 
+    public function testEagerLoadingWithArrayNotation()
+    {
+        $model = new EloquentModelWithoutRelationStub;
+        $instance = $model->newInstance()->newQuery()->with([
+            'foo',
+            'bar' => [
+                'baz.qux' => [
+                    'quux',
+                ],
+            ],
+        ]);
+        $this->assertInstanceOf(\Closure::class, $instance->getEagerLoads()['foo']);
+        $this->assertInstanceOf(\Closure::class, $instance->getEagerLoads()['bar']);
+        $builder = new class () {
+            public $with = [];
+
+            public function with($with)
+            {
+                $this->with = $with;
+            }
+        };
+        $instance->getEagerLoads()['bar']($builder);
+        $this->assertSame(['baz.qux' => ['quux']], $builder->with);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
     {
         $result = EloquentModelWithStub::with(['foo', 'bar']);
