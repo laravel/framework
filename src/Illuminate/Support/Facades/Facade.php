@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use RuntimeException;
@@ -258,6 +259,23 @@ abstract class Facade
             throw new RuntimeException('A facade root has not been set.');
         }
 
+        if (! static::passesAuthorization()) {
+            throw new AuthorizationException();
+        }
+
         return $instance->$method(...$args);
+    }
+
+    /**
+     * Determine if the request passes the authorization check.
+     * If authorize method is present in the child class and its return false , it will not allow the user access.
+     */
+    public static function passesAuthorization(): bool
+    {
+        if (method_exists(static::class, 'authorize')) {
+            return static::$app->call([static::class, 'authorize']);
+        }
+
+        return true;
     }
 }
