@@ -658,7 +658,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
                     ->load($providers->collapse()->toArray());
     }
+    /**
+     * Register all of the local only configured providers.
+     *
+     * @return void
+     **/
+    public function registerLocalProviders()
+    {
 
+        $providers = Collection::make($this->config['app.local_providers']);
+        $providers->each(function ($p) {
+            $this->register($p, true);
+        });
+    }
     /**
      * Register a service provider with the application.
      *

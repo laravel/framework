@@ -15,5 +15,9 @@ class RegisterProviders
     public function bootstrap(Application $app)
     {
         $app->registerConfiguredProviders();
+
+        if ($app->isLocal()) {
+            $app->registerLocalProviders();
+        }
     }
 }
