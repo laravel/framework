@@ -80,7 +80,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $token
      * @return void
      */
@@ -88,6 +88,7 @@ class EloquentUserProvider implements UserProvider
     {
         $user->setRememberToken($token);
 
+        /** @var \Illuminate\Database\Eloquent\Model $user */
         $timestamps = $user->timestamps;
 
         $user->timestamps = false;
