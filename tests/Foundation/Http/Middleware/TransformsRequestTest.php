@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Bootstrap\Http\Middleware;
+namespace Illuminate\Tests\Foundation\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 use Illuminate\Http\Request;
