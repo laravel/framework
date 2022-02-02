@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Bootstrap\Testing\Concerns;
+namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithViews;
 use Illuminate\View\Component;
