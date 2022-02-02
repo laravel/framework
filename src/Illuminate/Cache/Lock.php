@@ -113,7 +113,11 @@ abstract class Lock implements LockContract
     {
         $starting = $this->currentTime();
 
+        // We will wait here and priodically check for the lock to be
+        // released by an other process, so that we can acquire it
+        // and execute the callback before the time-out reaches.
         while (! $this->acquire()) {
+            // We sleep a bit to be less CPU-intensive.
             usleep($this->sleepMilliseconds * 1000);
 
             if ($this->currentTime() - $seconds >= $starting) {
