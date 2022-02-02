@@ -180,31 +180,59 @@ trait EnumeratesValues
     }
 
     /**
-     * Reduce the collection using an aggregate value.
+     * Retrieves items from the collection using an aggregate value.
      *
-     * @param  callable(int|float|\Countable, TValue, TKey): \Countable|int|float|bool|null|void  $callback
-     * @param  \Countable|int|float||null  $initial
+     * @param  callable(mixed, TValue, TKey): mixed  $callback
+     * @param  mixed  $initial
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
     public function carry(callable $callback, $initial = null)
     {
-        $cumulative = $initial;
-
         $collection = new Collection();
 
         foreach ($this as $key => $value) {
-            $result = $callback($cumulative, $value, $key);
+            $result = $callback($initial, $value, $key);
 
-            if ($result === null || $result === false) {
+            if ($result === false) {
                 break;
             }
 
-            $cumulative = $result;
+            $initial = $result;
 
             $collection->put($key, $value);
         }
 
         return $collection;
+    }
+
+    /**
+     * Retrieves items from the collection until an aggregate value is reached.
+     *
+     * @param  string  $key
+     * @param  int|float|null  $value
+     * @return \Illuminate\Support\Collection<TKey, TValue>
+     */
+    public function carryUntil($key, $value = null)
+    {
+        return $this->carry(function ($carry, $item) use ($key, $value) {
+            if (is_null($value)) {
+                [$comparable, $value] = [$item, $key];
+            } else {
+                $comparable = data_get($item, $key);
+            }
+
+            if (is_null($comparable)) {
+                return false;
+            }
+
+            if (is_countable($comparable)) {
+                $comparable = count($comparable);
+            }
+
+            $carry += $comparable;
+
+            return is_null($carry) || $carry > $value ? false : $carry;
+        });
     }
 
     /**

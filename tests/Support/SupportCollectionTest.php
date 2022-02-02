@@ -798,9 +798,7 @@ class SupportCollectionTest extends TestCase
         $new = $data->carry(function ($sum, $value, $key) {
             $sum += $value;
 
-            if ($sum < 6) {
-                return $sum;
-            }
+            return $sum < 6 ? $sum : false;
         });
         $this->assertNotEquals($data, $new);
         $this->assertCount(5, $new);
@@ -819,6 +817,68 @@ class SupportCollectionTest extends TestCase
         $new = $data->carry(function () {
             return false;
         });
+        $this->assertEmpty($new);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testCarryUntil($collection)
+    {
+        $data = new $collection([
+            ['value' => -1],
+            ['value' => 0],
+            ['value' => 1],
+            ['value' => 2],
+            ['value' => 3],
+            ['value' => 4],
+            ['value' => 5],
+        ]);
+
+        $new = $data->carryUntil('value', PHP_INT_MAX);
+
+        $this->assertCount(7, $new);
+        $this->assertEquals(14, $new->sum('value'));
+
+        $new = $data->carryUntil('value', 9);
+
+        $this->assertCount(6, $new);
+        $this->assertEquals(9, $new->sum('value'));
+
+        $new = $data->carryUntil('value', 0);
+
+        $this->assertCount(3, $new);
+
+        $new = $data->carryUntil('value', -10);
+
+        $this->assertEmpty($new);
+
+        $new = $data->carryUntil('not-found', 10);
+
+        $this->assertEmpty($new);
+
+        $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
+
+        $new = $data->carryUntil(PHP_INT_MAX);
+
+        $this->assertCount(7, $new);
+        $this->assertEquals(14, $new->sum());
+
+        $new = $data->carryUntil(9);
+
+        $this->assertCount(6, $new);
+        $this->assertEquals(9, $new->sum());
+
+        $new = $data->carryUntil(0);
+
+        $this->assertCount(3, $new);
+
+        $new = $data->carryUntil(-10);
+
+        $this->assertEmpty($new);
+
+        $new = $data->carryUntil('doesnt-exists', PHP_INT_MAX);
+
         $this->assertEmpty($new);
     }
 

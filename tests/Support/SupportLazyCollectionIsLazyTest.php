@@ -64,6 +64,21 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testCarryUntilIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->carryUntil(10);
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->carryUntil(1);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->carryUntil(PHP_INT_MAX);
+        });
+    }
+
     public function testChunkIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
