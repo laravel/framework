@@ -88,7 +88,6 @@ class EloquentUserProvider implements UserProvider
     {
         $user->setRememberToken($token);
 
-        /** @var \Illuminate\Database\Eloquent\Model $user */
         $timestamps = $user->timestamps;
 
         $user->timestamps = false;
