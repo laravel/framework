@@ -20,6 +20,9 @@ use Illuminate\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
 use ReflectionProperty;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mime\Email;
 
 class Mailable implements MailableContract, Renderable
 {
@@ -1019,6 +1022,33 @@ class Mailable implements MailableContract, Renderable
         $this->mailer = $mailer;
 
         return $this;
+    }
+
+    /**
+     * Add a tag to the email (for drivers that support).
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($value) {
+            $message->getHeaders()->add(new TagHeader($value));
+        });
+    }
+
+    /**
+     * Add metadata to the email (for drivers that support).
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
+            $message->getHeaders()->add(new MetadataHeader($key, $value));
+        });
     }
 
     /**
