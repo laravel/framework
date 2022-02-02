@@ -180,31 +180,50 @@ trait EnumeratesValues
     }
 
     /**
-     * Reduce the collection using an aggregate value.
+     * Retrieve items until an aggregate value is reached.
      *
-     * @param  callable(int|float|\Countable, TValue, TKey): \Countable|int|float|bool|null|void  $callback
-     * @param  \Countable|int|float||null  $initial
-     * @return \Illuminate\Support\Collection<TKey, TValue>
+     * @param  callable|string  $key
+     * @param  int|float|null  $value
+     * @param  mixed  $initial
+     * @return static
      */
-    public function carry(callable $callback, $initial = null)
+    public function carry($key, $value = null, $initial = null)
     {
-        $cumulative = $initial;
+        $extractor = $key;
 
-        $collection = new Collection();
-
-        foreach ($this as $key => $value) {
-            $result = $callback($cumulative, $value, $key);
-
-            if ($result === null || $result === false) {
-                break;
+        if (! $this->useAsCallable($extractor)) {
+            if (is_null($value)) {
+                [$key, $value] = [null, $key];
             }
 
-            $cumulative = $result;
+            $extractor = function ($carry, $item) use ($key, $value) {
+                $adding = data_get($item, $key);
 
-            $collection->put($key, $value);
+                if (is_null($adding) || $adding === false) {
+                    return false;
+                }
+
+                if (is_countable($adding)) {
+                    $adding = count($adding);
+                }
+
+                if (($carry += $adding) > $value) {
+                    return false;
+                }
+
+                return $carry;
+            };
+        } else {
+            $initial = $value;
         }
 
-        return $collection;
+        $cumulative = $initial;
+
+        return $this->takeUntil(function ($item) use ($extractor, &$cumulative) {
+            $cumulative = $extractor($cumulative, $item);
+
+            return $cumulative === false;
+        });
     }
 
     /**

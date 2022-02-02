@@ -793,33 +793,51 @@ class SupportCollectionTest extends TestCase
      */
     public function testCarry($collection)
     {
+        $data = new $collection([
+            ['value' => -1],
+            ['value' => 0],
+            ['value' => 1],
+            ['value' => 2],
+            ['value' => 3],
+            ['value' => 4],
+            ['value' => 5],
+        ]);
+
+        $this->assertCount(7, $data->carry('value', PHP_INT_MAX));
+        $this->assertEquals(14, $data->carry('value', PHP_INT_MAX)->sum('value'));
+
+        $this->assertCount(6, $data->carry('value', 9));
+        $this->assertEquals(9, $data->carry('value', 9)->sum('value'));
+
+        $this->assertCount(3, $data->carry('value', 0));
+
+        $this->assertEmpty($data->carry('value', -10));
+
+        $this->assertEmpty($data->carry('not-found', 10));
+
+        $this->assertCount(5, $data->carry('value', 9, 1));
+
+        $this->assertCount(4, $data->carry(function ($carry, $item) {
+            return $item['value'] < 3
+                ? $item['value']
+                : false;
+        }));
+
         $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
 
-        $new = $data->carry(function ($sum, $value, $key) {
-            $sum += $value;
+        $this->assertCount(7, $data->carry(PHP_INT_MAX));
+        $this->assertEquals(14, $data->carry(PHP_INT_MAX)->sum());
 
-            if ($sum < 6) {
-                return $sum;
-            }
-        });
-        $this->assertNotEquals($data, $new);
-        $this->assertCount(5, $new);
-        $this->assertEquals(5, $new->sum());
+        $this->assertCount(6, $data->carry(9));
+        $this->assertEquals(9, $data->carry(9)->sum());
 
-        $new = $data->carry(function ($sum) {
-            return $sum !== 0;
-        }, 0);
-        $this->assertEmpty($new);
+        $this->assertCount(3, $data->carry(0));
 
-        $new = $data->carry(function () {
-            return true;
-        });
-        $this->assertEquals(14, $new->sum());
+        $this->assertEmpty($data->carry(-10));
 
-        $new = $data->carry(function () {
-            return false;
-        });
-        $this->assertEmpty($new);
+        $this->assertEmpty($data->carry('doesnt-exists', PHP_INT_MAX));
+
+        $this->assertCount(5, $data->carry(9, null, 1));
     }
 
     /**

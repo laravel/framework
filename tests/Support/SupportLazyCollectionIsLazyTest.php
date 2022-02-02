@@ -41,23 +41,21 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
     public function testCarryIsLazy()
     {
-        $this->assertEnumerates(5, function ($collection) {
-            $collection->carry(function ($sum, $value, $key) {
-                $sum += $key;
-
-                if ($sum < 10) {
-                    return $sum + $key;
-                }
-            });
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->carry(20);
         });
 
-        $this->assertEnumerates(1, function ($collection) {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->carry('value', 20);
+        });
+
+        $this->assertDoesNotEnumerate(function ($collection) {
             $collection->carry(function () {
                 return false;
             });
         });
 
-        $this->assertEnumeratesOnce(function ($collection) {
+        $this->assertDoesNotEnumerate(function ($collection) {
             $collection->carry(function () {
                 return true;
             });
