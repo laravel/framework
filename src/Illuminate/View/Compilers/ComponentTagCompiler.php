@@ -406,8 +406,8 @@ class ComponentTagCompiler
             <
                 \s*
                 x[\-\:]slot
-                \s+
-                (:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))
+                (?:\:(?<inlineName>\w+))?
+                (?:\s+(:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+)))?
                 (?<attributes>
                     (?:
                         \s+
@@ -438,7 +438,9 @@ class ComponentTagCompiler
         /x";
 
         $value = preg_replace_callback($pattern, function ($matches) {
-            $name = $this->stripQuotes($matches['name']);
+            $name = $matches['inlineName'] !== ''
+                ? $matches['inlineName']
+                : $this->stripQuotes($matches['name']);
 
             if ($matches[1] !== ':') {
                 $name = "'{$name}'";
