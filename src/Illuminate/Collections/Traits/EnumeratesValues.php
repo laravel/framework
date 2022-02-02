@@ -180,6 +180,34 @@ trait EnumeratesValues
     }
 
     /**
+     * Reduce the collection using an aggregate value.
+     *
+     * @param  callable(int|float|\Countable, TValue, TKey): \Countable|int|float|bool|null|void  $callback
+     * @param  \Countable|int|float||null  $initial
+     * @return \Illuminate\Support\Collection<TKey, TValue>
+     */
+    public function carry(callable $callback, $initial = null)
+    {
+        $cumulative = $initial;
+
+        $collection = new Collection();
+
+        foreach ($this as $key => $value) {
+            $result = $callback($cumulative, $value, $key);
+
+            if ($result === null || $result === false) {
+                break;
+            }
+
+            $cumulative = $result;
+
+            $collection->put($key, $value);
+        }
+
+        return $collection;
+    }
+
+    /**
      * Alias for the "contains" method.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key

@@ -39,6 +39,31 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testCarryIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->carry(function ($sum, $value, $key) {
+                $sum += $key;
+
+                if ($sum < 10) {
+                    return $sum + $key;
+                }
+            });
+        });
+
+        $this->assertEnumerates(1, function ($collection) {
+            $collection->carry(function () {
+                return false;
+            });
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->carry(function () {
+                return true;
+            });
+        });
+    }
+
     public function testChunkIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

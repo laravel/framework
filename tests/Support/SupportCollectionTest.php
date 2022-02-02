@@ -791,6 +791,40 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testCarry($collection)
+    {
+        $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
+
+        $new = $data->carry(function ($sum, $value, $key) {
+            $sum += $value;
+
+            if ($sum < 6) {
+                return $sum;
+            }
+        });
+        $this->assertNotEquals($data, $new);
+        $this->assertCount(5, $new);
+        $this->assertEquals(5, $new->sum());
+
+        $new = $data->carry(function ($sum) {
+            return $sum !== 0;
+        }, 0);
+        $this->assertEmpty($new);
+
+        $new = $data->carry(function () {
+            return true;
+        });
+        $this->assertEquals(14, $new->sum());
+
+        $new = $data->carry(function () {
+            return false;
+        });
+        $this->assertEmpty($new);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCountByWithKey($collection)
     {
         $c = new $collection([
