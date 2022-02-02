@@ -700,6 +700,42 @@ class SupportStrTest extends TestCase
         $this->assertSame('aaaaa', Str::repeat('a', 5));
         $this->assertSame('', Str::repeat('', 5));
     }
+
+    /**
+     * @dataProvider specialCharacterProvider
+     */
+    public function testTransliterate(string $value, string $expected): void
+    {
+        $this->assertSame($expected, Str::transliterate($value));
+    }
+
+    public function specialCharacterProvider(): array
+    {
+        return [
+            ['ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz'],
+            ['⓪①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳', '01234567891011121314151617181920'],
+            ['⓵⓶⓷⓸⓹⓺⓻⓼⓽⓾', '12345678910'],
+            ['⓿⓫⓬⓭⓮⓯⓰⓱⓲⓳⓴', '011121314151617181920'],
+            ['ⓣⓔⓢⓣ@ⓛⓐⓡⓐⓥⓔⓛ.ⓒⓞⓜ', 'test@laravel.com'],
+            ['🎂', '?'],
+            ['abcdefghijklmnopqrstuvwxyz', 'abcdefghijklmnopqrstuvwxyz'],
+            ['0123456789', '0123456789'],
+        ];
+    }
+
+    public function testTransliterateOverrideUnknown(): void
+    {
+        $this->assertSame('HHH', Str::transliterate('🎂🚧🏆', 'H'));
+        $this->assertSame('Hello', Str::transliterate('🎂', 'Hello'));
+    }
+
+    /**
+     * @dataProvider specialCharacterProvider
+     */
+    public function testTransliterateStrict(string $value, string $expected): void
+    {
+        $this->assertSame($expected, Str::transliterate($value, '?', true));
+    }
 }
 
 class StringableObjectStub
