@@ -665,7 +665,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      **/
     public function registerLocalProviders()
     {
-
         $providers = Collection::make($this->config['app.local_providers']);
         $providers->each(function ($provider) {
             $this->register($provider, true);
