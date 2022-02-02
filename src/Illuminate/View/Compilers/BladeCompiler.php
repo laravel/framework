@@ -311,7 +311,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Render a component instance to HTML.
      *
-     * @param  Component  $component
+     * @param  \Illuminate\View\Component  $component
      * @return string
      */
     public static function renderComponent(Component $component)
