@@ -170,7 +170,7 @@ class FilesystemManager implements FactoryContract
     {
         $visibility = PortableVisibilityConverter::fromArray(
             $config['permissions'] ?? [],
-            $config['visibility'] ?? Visibility::PRIVATE
+            $config['directory_visibility'] ?? $config['visibility'] ?? Visibility::PRIVATE
         );
 
         $links = ($config['links'] ?? null) === 'skip'
