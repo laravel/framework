@@ -46,7 +46,7 @@ class RefreshDatabaseTest extends TestCase
     public function testRefreshTestDatabaseDefault()
     {
         $this->traitObject
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('artisan')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
@@ -64,7 +64,7 @@ class RefreshDatabaseTest extends TestCase
         $this->traitObject->dropViews = true;
 
         $this->traitObject
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('artisan')
             ->with('migrate:fresh', [
                 '--drop-views' => true,
@@ -82,7 +82,7 @@ class RefreshDatabaseTest extends TestCase
         $this->traitObject->dropTypes = true;
 
         $this->traitObject
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('artisan')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
