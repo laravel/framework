@@ -67,7 +67,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
 
         $instance->call($job, [
-            'command' => serialize( new RateLimitedTestJob),
+            'command' => serialize(new RateLimitedTestJob),
         ]);
 
         $this->assertFalse(RateLimitedTestJob::$handled);
@@ -145,7 +145,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
-            'command' => serialize( new $class),
+            'command' => serialize(new $class),
         ]);
 
         $this->assertTrue($class::$handled);
@@ -164,7 +164,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
 
         $instance->call($job, [
-            'command' => serialize( new $class),
+            'command' => serialize(new $class),
         ]);
 
         $this->assertFalse($class::$handled);
@@ -183,7 +183,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
-            'command' => serialize( new $class),
+            'command' => serialize(new $class),
         ]);
 
         $this->assertFalse($class::$handled);

@@ -10,7 +10,7 @@ class CursorPaginatorTest extends TestCase
 {
     public function testReturnsRelevantContextInformation()
     {
-        $p = new CursorPaginator( [['id' => 1], ['id' => 2], ['id' => 3]], 2, null, [
+        $p = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3]], 2, null, [
             'parameters' => ['id'],
         ]);
 
@@ -31,7 +31,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testPaginatorRemovesTrailingSlashes()
     {
-        $p = new CursorPaginator( [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator([['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
             ['path' => 'http://website.com/test/', 'parameters' => ['id']]);
 
         $this->assertSame('http://website.com/test?cursor='.$this->getCursor(['id' => 5]), $p->nextPageUrl());
@@ -39,7 +39,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
-        $p = new CursorPaginator( [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator([['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
             ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $this->assertSame('http://website.com/test?cursor='.$this->getCursor(['id' => 5]), $p->nextPageUrl());
@@ -47,7 +47,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testItRetrievesThePaginatorOptions()
     {
-        $p = new CursorPaginator( [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator([['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
             $options = ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $this->assertSame($p->getOptions(), $options);
@@ -55,7 +55,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testPaginatorReturnsPath()
     {
-        $p = new CursorPaginator( [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator([['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
              ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $this->assertSame($p->path(), 'http://website.com/test');
@@ -63,7 +63,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testCanTransformPaginatorItems()
     {
-        $p = new CursorPaginator( [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator([['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
              ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $p->through(function ($item) {

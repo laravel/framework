@@ -82,13 +82,13 @@ class RouteCollectionTest extends TestCase
 
     public function testRouteCollectionCanGetIteratorWhenRouteAreAdded()
     {
-        $this->routeCollection->add( new Route('GET', 'foo/index', [
+        $this->routeCollection->add(new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
         $this->assertCount(1, $this->routeCollection);
 
-        $this->routeCollection->add( new Route('GET', 'bar/show', [
+        $this->routeCollection->add(new Route('GET', 'bar/show', [
             'uses' => 'BarController@show',
             'as' => 'bar_show',
         ]));

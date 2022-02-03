@@ -45,7 +45,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
             $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
             $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 
-            Carbon::setTestNow( $now->addSeconds(58));
+            Carbon::setTestNow($now->addSeconds(58));
 
             try {
                 $this->withoutExceptionHandling()->get('/');

@@ -373,7 +373,7 @@ class SupportHelpersTest extends TestCase
         $this->assertInstanceOf(Stringable::class, $stringable);
         $this->assertSame('string-value', (string) $stringable);
 
-        $stringable = str( null);
+        $stringable = str(null);
         $this->assertInstanceOf(Stringable::class, $stringable);
         $this->assertTrue($stringable->isEmpty());
 

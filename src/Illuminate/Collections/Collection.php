@@ -1369,7 +1369,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $ascending = Arr::get($comparison, 1, true) === true ||
                              Arr::get($comparison, 1, true) === 'asc';
 
-
                 if (! is_string($prop) && is_callable($prop)) {
                     $result = $prop($a, $b);
                 } else {

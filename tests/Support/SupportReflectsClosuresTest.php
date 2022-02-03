@@ -88,7 +88,7 @@ class SupportReflectsClosuresTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-         ReflectsClosuresClass::reflectFirstAll(function ($a, $b) {
+        ReflectsClosuresClass::reflectFirstAll(function ($a, $b) {
             //
         });
     }
@@ -97,7 +97,7 @@ class SupportReflectsClosuresTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-         ReflectsClosuresClass::reflectFirstAll(function () {
+        ReflectsClosuresClass::reflectFirstAll(function () {
             //
         });
     }

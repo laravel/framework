@@ -9,7 +9,7 @@ class PaginatorTest extends TestCase
 {
     public function testSimplePaginatorReturnsRelevantContextInformation()
     {
-        $p = new Paginator( ['item3', 'item4', 'item5'], 2, 2);
+        $p = new Paginator(['item3', 'item4', 'item5'], 2, 2);
 
         $this->assertEquals(2, $p->currentPage());
         $this->assertTrue($p->hasPages());
@@ -33,7 +33,7 @@ class PaginatorTest extends TestCase
 
     public function testPaginatorRemovesTrailingSlashes()
     {
-        $p = new Paginator( ['item1', 'item2', 'item3'], 2, 2,
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test/']);
 
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
@@ -41,7 +41,7 @@ class PaginatorTest extends TestCase
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
-        $p = new Paginator( ['item1', 'item2', 'item3'], 2, 2,
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test']);
 
         $this->assertSame('http://website.com/test?page=1', $p->previousPageUrl());
@@ -49,7 +49,7 @@ class PaginatorTest extends TestCase
 
     public function testItRetrievesThePaginatorOptions()
     {
-        $p = new Paginator( ['item1', 'item2', 'item3'], 2, 2,
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2,
             $options = ['path' => 'http://website.com/test']);
 
         $this->assertSame($p->getOptions(), $options);
@@ -57,7 +57,7 @@ class PaginatorTest extends TestCase
 
     public function testPaginatorReturnsPath()
     {
-        $p = new Paginator( ['item1', 'item2', 'item3'], 2, 2,
+        $p = new Paginator(['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test']);
 
         $this->assertSame($p->path(), 'http://website.com/test');
@@ -65,7 +65,7 @@ class PaginatorTest extends TestCase
 
     public function testCanTransformPaginatorItems()
     {
-        $p = new Paginator( ['item1', 'item2', 'item3'], 3, 1,
+        $p = new Paginator(['item1', 'item2', 'item3'], 3, 1,
                                     ['path' => 'http://website.com/test']);
 
         $p->through(function ($item) {

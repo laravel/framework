@@ -153,7 +153,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     public function testItGetsCorrectResults()
     {
         $user = HasOneOfManyTestUser::create();
-         $user->logins()->create();
+        $user->logins()->create();
         $latestLogin = $user->logins()->create();
 
         $result = $user->latest_login()->getResults();
@@ -174,7 +174,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
     public function testItGetsCorrectResultsUsingShortcutMethod()
     {
         $user = HasOneOfManyTestUser::create();
-         $user->logins()->create();
+        $user->logins()->create();
         $latestLogin = $user->logins()->create();
 
         $result = $user->latest_login_with_shortcut()->getResults();
@@ -408,7 +408,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
     public function testWithExists()
     {
-         HasOneOfManyTestUser::create();
+        HasOneOfManyTestUser::create();
 
         $user = HasOneOfManyTestUser::withExists('latest_login')->first();
         $this->assertFalse($user->latest_login_exists);
@@ -420,7 +420,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
 
     public function testWithExistsWithConstraintsInJoinSubSelect()
     {
-         HasOneOfManyTestUser::create();
+        HasOneOfManyTestUser::create();
 
         $user = HasOneOfManyTestUser::withExists('foo_state')->first();
 

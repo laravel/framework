@@ -198,7 +198,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testValuesAreNotStoredByReference()
     {
-        $store = new ArrayStore( true);
+        $store = new ArrayStore(true);
         $object = new stdClass;
         $object->foo = true;
 

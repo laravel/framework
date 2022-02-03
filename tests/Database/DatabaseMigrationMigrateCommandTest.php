@@ -22,7 +22,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class),  m::mock(Dispatcher::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -87,7 +87,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testTheCommandMayBePretended()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class),  m::mock(Dispatcher::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -105,7 +105,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testTheDatabaseMayBeSet()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class),  m::mock(Dispatcher::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
@@ -123,7 +123,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
 
     public function testStepMayBeSet()
     {
-        $command = new MigrateCommand($migrator = m::mock(Migrator::class),  m::mock(Dispatcher::class));
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), m::mock(Dispatcher::class));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);

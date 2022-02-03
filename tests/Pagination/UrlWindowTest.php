@@ -10,14 +10,14 @@ class UrlWindowTest extends TestCase
 {
     public function testPresenterCanDetermineIfThereAreAnyPagesToShow()
     {
-        $p = new LengthAwarePaginator( ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+        $p = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
         $window = new UrlWindow($p);
         $this->assertTrue($window->hasPages());
     }
 
     public function testPresenterCanGetAUrlRangeForASmallNumberOfUrls()
     {
-        $p = new LengthAwarePaginator( ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
+        $p = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
         $window = new UrlWindow($p);
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
     }

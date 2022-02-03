@@ -131,7 +131,7 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
 
     public function testWithExistsWithConstraintsInJoinSubSelect()
     {
-         MorphOneOfManyTestProduct::create();
+        MorphOneOfManyTestProduct::create();
 
         $product = MorphOneOfManyTestProduct::withExists('current_foo_state')->first();
         $this->assertFalse($product->current_foo_state_exists);

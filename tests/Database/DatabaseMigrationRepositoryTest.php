@@ -36,7 +36,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
         $repo = $this->getMockBuilder(DatabaseMigrationRepository::class)->onlyMethods(['getLastBatchNumber'])->setConstructorArgs([
-             m::mock(ConnectionResolverInterface::class), 'migrations',
+            m::mock(ConnectionResolverInterface::class), 'migrations',
         ])->getMock();
         $repo->expects($this->once())->method('getLastBatchNumber')->willReturn(1);
         $query = m::mock(stdClass::class);

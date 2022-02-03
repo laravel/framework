@@ -816,7 +816,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('from');
         $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'bar');
-        $builder->setModel( new EloquentBuilderTestScopeStub);
+        $builder->setModel(new EloquentBuilderTestScopeStub);
         $result = $builder->approved();
 
         $this->assertEquals($builder, $result);

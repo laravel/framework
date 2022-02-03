@@ -41,7 +41,7 @@ class AuthTokenGuardTest extends TestCase
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => hash('sha256', 'foo')])->andReturn($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
 
-        $guard = new TokenGuard($provider, $request, 'api_token', 'api_token',  true);
+        $guard = new TokenGuard($provider, $request, 'api_token', 'api_token', true);
 
         $user = $guard->user();
 

@@ -235,10 +235,10 @@ class UrlSigningTest extends TestCase
     public function testSignedMiddlewareWithRelativePath()
     {
         Route::get('/foo/relative', function (Request $request) {
-            return $request->hasValidSignature( false) ? 'valid' : 'invalid';
+            return $request->hasValidSignature(false) ? 'valid' : 'invalid';
         })->name('foo')->middleware('signed:relative');
 
-        $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', [], null,  false));
+        $this->assertIsString($url = 'https://fake.test'.URL::signedRoute('foo', [], null, false));
         $this->assertSame('valid', $this->get($url)->original);
 
         $response = $this->get('/foo/relative');

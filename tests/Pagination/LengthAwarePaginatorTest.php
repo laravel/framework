@@ -20,7 +20,7 @@ class LengthAwarePaginatorTest extends TestCase
     protected function setUp(): void
     {
         $this->options = ['onEachSide' => 5];
-        $this->p = new LengthAwarePaginator( ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, $this->options);
+        $this->p = new LengthAwarePaginator(['item1', 'item2', 'item3', 'item4'], 4, 2, 2, $this->options);
     }
 
     protected function tearDown(): void

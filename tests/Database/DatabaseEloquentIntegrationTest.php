@@ -1773,7 +1773,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->updated_at));
         $this->assertTrue($before->isSameDay($post->updated_at));
 
-        Carbon::setTestNow( $before->copy()->addDays(3));
+        Carbon::setTestNow($before->copy()->addDays(3));
 
         EloquentTouchingUser::withoutTouching(function () use ($post) {
             $post->delete();
@@ -1838,7 +1838,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->updated_at));
         $this->assertTrue($before->isSameDay($post->updated_at));
 
-        Carbon::setTestNow( $before->copy()->addDays(3));
+        Carbon::setTestNow($before->copy()->addDays(3));
 
         EloquentTouchingUser::withoutTouching(function () {
             EloquentTouchingPost::withoutTouching(function () {
@@ -1862,7 +1862,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->updated_at));
         $this->assertTrue($before->isSameDay($post->updated_at));
 
-        Carbon::setTestNow( $before->copy()->addDays(3));
+        Carbon::setTestNow($before->copy()->addDays(3));
 
         Model::withoutTouchingOn([EloquentTouchingUser::class, EloquentTouchingPost::class], function () {
             EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
