@@ -53,7 +53,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test the next most typical usage of TrustedProxies:
-     * Trusted X-Forwarded-For header, wilcard for TrustedProxies.
+     * Trusted X-Forwarded-For header, wildcard for TrustedProxies.
      */
     public function test_trusted_proxy_sets_trusted_proxies_with_wildcard()
     {
@@ -67,7 +67,7 @@ class TrustProxiesTest extends TestCase
 
     /**
      * Test the next most typical usage of TrustedProxies:
-     * Trusted X-Forwarded-For header, wilcard for TrustedProxies.
+     * Trusted X-Forwarded-For header, wildcard for TrustedProxies.
      */
     public function test_trusted_proxy_sets_trusted_proxies_with_double_wildcard_for_backwards_compat()
     {

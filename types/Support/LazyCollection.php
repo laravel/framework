@@ -706,8 +706,8 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->takeWhil
     return true;
 }));
 
-assertType('Illuminate\Support\LazyCollection<int, User>', $collection->tap(function ($colection) {
-    assertType('Illuminate\Support\LazyCollection<int, User>', $colection);
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection->tap(function ($collection) {
+    assertType('Illuminate\Support\LazyCollection<int, User>', $collection);
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->pipe(function ($collection) {
