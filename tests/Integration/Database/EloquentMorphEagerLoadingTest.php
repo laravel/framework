@@ -19,6 +19,7 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('post_id');
             $table->unsignedInteger('user_id');
+            $table->string('secret_comment')->nullable();
         });
 
         Schema::create('videos', function (Blueprint $table) {
@@ -64,6 +65,23 @@ class EloquentMorphEagerLoadingTest extends DatabaseTestCase
 
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
+    }
+
+    public function testMorphOnlyColumns()
+    {
+        $comments = Comment::query()
+            ->with(['commentable' => function (MorphTo $morphTo) {
+                $morphTo->morphColumns([Post::class => ['post_id', 'user_id']]);
+                $morphTo->morphWith([Post::class => 'user']);
+            }])
+            ->get();
+
+        $this->assertTrue($comments[0]->relationLoaded('commentable'));
+        $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
+
+        $morphColumns = collect($comments[0]->commentable->getAttributes())->keys();
+        $this->assertEquals($morphColumns->intersect(['post_id', 'user_id'])->count(), 2);
+        $this->assertTrue($morphColumns->doesntContain('secret_comment'));
     }
 }
 

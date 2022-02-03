@@ -48,6 +48,13 @@ class MorphTo extends BelongsTo
     protected $morphableEagerLoads = [];
 
     /**
+     * A map of columns to load for each individual morph type.
+     *
+     * @var array
+     */
+    protected $morphableColumns = [];
+
+    /**
      * A map of relationship counts to load for each individual morph type.
      *
      * @var array
@@ -151,6 +158,10 @@ class MorphTo extends BelongsTo
         }
 
         $whereIn = $this->whereInMethod($instance, $ownerKey);
+
+        if(!empty($this->morphableColumns[get_class($instance)])) {
+            $query->select($this->morphableColumns[get_class($instance)]);
+        }
 
         return $query->{$whereIn}(
             $instance->getTable().'.'.$ownerKey, $this->gatherKeysByType($type, $instance->getKeyType())
@@ -330,6 +341,21 @@ class MorphTo extends BelongsTo
     {
         $this->morphableEagerLoadCounts = array_merge(
             $this->morphableEagerLoadCounts, $withCount
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify which columns to return for a given morph type.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function morphColumns(array $columns)
+    {
+        $this->morphableColumns = array_merge(
+            $this->morphableColumns, $columns
         );
 
         return $this;
