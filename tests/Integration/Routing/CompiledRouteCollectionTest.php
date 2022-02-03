@@ -114,7 +114,7 @@ class CompiledRouteCollectionTest extends TestCase
 
     public function testRouteCollectionCanGetIteratorWhenRoutesAreAdded()
     {
-        $this->routeCollection->add($routeIndex = $this->newRoute('GET', 'foo/index', [
+        $this->routeCollection->add( $this->newRoute('GET', 'foo/index', [
             'uses' => 'FooController@index',
             'as' => 'foo_index',
         ]));
@@ -123,7 +123,7 @@ class CompiledRouteCollectionTest extends TestCase
 
         $this->assertCount(1, $routes);
 
-        $this->routeCollection->add($routeShow = $this->newRoute('GET', 'bar/show', [
+        $this->routeCollection->add( $this->newRoute('GET', 'bar/show', [
             'uses' => 'BarController@show',
             'as' => 'bar_show',
         ]));
@@ -306,7 +306,7 @@ class CompiledRouteCollectionTest extends TestCase
     public function testMatchingRouteWithSameDynamicallyAddedRouteAlwaysMatchesCachedOneFirst()
     {
         $this->routeCollection->add(
-            $route = $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+             $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
         );
 
         $routes = $this->collection();
@@ -330,7 +330,7 @@ class CompiledRouteCollectionTest extends TestCase
     public function testMatchingWildcardFromCompiledRoutesAlwaysTakesPrecedent()
     {
         $this->routeCollection->add(
-            $route = $this->newRoute('GET', '{wildcard}', ['uses' => 'FooController@index', 'as' => 'foo'])
+             $this->newRoute('GET', '{wildcard}', ['uses' => 'FooController@index', 'as' => 'foo'])
                 ->where('wildcard', '.*')
         );
 
@@ -424,7 +424,7 @@ class CompiledRouteCollectionTest extends TestCase
     public function testGroupGenerateNameForDuplicateRouteNamesThatEndWithDot()
     {
         $this->routeCollection->add($this->newRoute('GET', 'foo', ['uses' => 'FooController@index'])->name('foo.'));
-        $this->routeCollection->add($route = $this->newRoute('GET', 'bar', ['uses' => 'BarController@index'])->name('foo.'));
+        $this->routeCollection->add( $this->newRoute('GET', 'bar', ['uses' => 'BarController@index'])->name('foo.'));
 
         $routes = $this->collection();
 
@@ -448,7 +448,7 @@ class CompiledRouteCollectionTest extends TestCase
     public function testMatchingSlashedRoutes()
     {
         $this->routeCollection->add(
-            $route = $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+             $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
         );
 
         $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/'))->getName());
@@ -457,7 +457,7 @@ class CompiledRouteCollectionTest extends TestCase
     public function testMatchingUriWithQuery()
     {
         $this->routeCollection->add(
-            $route = $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
+             $this->newRoute('GET', 'foo/bar', ['uses' => 'FooController@index', 'as' => 'foo'])
         );
 
         $this->assertSame('foo', $this->collection()->match(Request::create('/foo/bar/?foo=bar'))->getName());
@@ -466,7 +466,7 @@ class CompiledRouteCollectionTest extends TestCase
     public function testMatchingRootUri()
     {
         $this->routeCollection->add(
-            $route = $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
+             $this->newRoute('GET', '/', ['uses' => 'FooController@index', 'as' => 'foo'])
         );
 
         $this->assertSame('foo', $this->collection()->match(Request::create('http://example.com'))->getName());

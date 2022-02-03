@@ -58,7 +58,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
-            'command' => serialize($command = new $class),
+            'command' => serialize( new $class),
         ]);
 
         $this->assertTrue($class::$handled);
@@ -80,7 +80,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
-            'command' => serialize($command = new $class),
+            'command' => serialize( new $class),
         ]);
 
         $this->assertFalse($class::$handled);
@@ -100,7 +100,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
         $instance->call($job, [
-            'command' => serialize($command = new $class),
+            'command' => serialize( new $class),
         ]);
 
         $this->assertTrue($class::$handled);

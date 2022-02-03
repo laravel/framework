@@ -237,7 +237,7 @@ class Handler implements ExceptionHandlerContract
 
         try {
             $logger = $this->container->make(LoggerInterface::class);
-        } catch (Exception $ex) {
+        } catch (Exception) {
             throw $e;
         }
 
@@ -304,7 +304,7 @@ class Handler implements ExceptionHandlerContract
                 'userId' => Auth::id(),
                 // 'email' => optional(Auth::user())->email,
             ]);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
     }

@@ -424,7 +424,7 @@ class Migrator
 
                 $this->note("<info>{$name}:</info> {$query['query']}");
             }
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             $name = get_class($migration);
 
             $this->note("<info>{$name}:</info> failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.");

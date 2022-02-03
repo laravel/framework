@@ -76,7 +76,7 @@ class ViewBladeCompilerTest extends TestCase
 
     public function testCompileSetAndGetThePath()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler( $this->getFiles(), __DIR__);
         $compiler->setPath('foo');
         $this->assertSame('foo', $compiler->getPath());
     }
@@ -189,7 +189,7 @@ class ViewBladeCompilerTest extends TestCase
 
     public function testShouldStartFromStrictTypesDeclaration()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler( $this->getFiles(), __DIR__);
         $strictTypeDecl = "<?php\ndeclare(strict_types = 1);";
         $this->assertSame(substr($compiler->compileString("<?php\ndeclare(strict_types = 1);\nHello World"),
             0, strlen($strictTypeDecl)), $strictTypeDecl);
@@ -197,22 +197,22 @@ class ViewBladeCompilerTest extends TestCase
 
     public function testComponentAliasesCanBeConventionallyDetermined()
     {
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler( $this->getFiles(), __DIR__);
 
         $compiler->component('App\Foo\Bar');
         $this->assertEquals(['bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
 
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler( $this->getFiles(), __DIR__);
 
         $compiler->component('App\Foo\Bar', null, 'prefix');
         $this->assertEquals(['prefix-bar' => 'App\Foo\Bar'], $compiler->getClassComponentAliases());
 
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler( $this->getFiles(), __DIR__);
 
         $compiler->component('App\View\Components\Forms\Input');
         $this->assertEquals(['forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
 
-        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $compiler = new BladeCompiler( $this->getFiles(), __DIR__);
 
         $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
         $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());

@@ -181,7 +181,7 @@ trait HasAttributes
         // to a DateTime / Carbon instance. This is so we will get some consistent
         // formatting while accessing attributes vs. arraying / JSONing a model.
         $attributes = $this->addDateAttributesToArray(
-            $attributes = $this->getArrayableAttributes()
+            $this->getArrayableAttributes()
         );
 
         $attributes = $this->addMutatedAttributesToArray(
@@ -1296,7 +1296,7 @@ trait HasAttributes
         // that is returned back out to the developers after we convert it here.
         try {
             $date = Date::createFromFormat($format, $value);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $date = false;
         }
 
@@ -1712,7 +1712,7 @@ trait HasAttributes
     public function getOriginal($key = null, $default = null)
     {
         return (new static)->setRawAttributes(
-            $this->original, $sync = true
+            $this->original, true
         )->getOriginalWithoutRewindingModel($key, $default);
     }
 

@@ -1215,7 +1215,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                     $user->save();
                     throw new Exception;
                 });
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
             $user = EloquentTestUser::first();
@@ -1230,7 +1230,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             try {
                 $user->email = 'otwell@laravel.com';
                 $user->saveOrFail();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
 
@@ -1248,7 +1248,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $user->id = 'invalid';
                 $user->email = 'otwell@laravel.com';
                 $user->saveOrFail();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // ignore the exception
             }
 
@@ -1365,7 +1365,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
         try {
             $item = EloquentTestOrder::first()->item;
-        } catch (Exception $e) {
+        } catch (Exception) {
             // ignore the exception
         }
 
@@ -1773,7 +1773,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->updated_at));
         $this->assertTrue($before->isSameDay($post->updated_at));
 
-        Carbon::setTestNow($future = $before->copy()->addDays(3));
+        Carbon::setTestNow( $before->copy()->addDays(3));
 
         EloquentTouchingUser::withoutTouching(function () use ($post) {
             $post->delete();
@@ -1838,7 +1838,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->updated_at));
         $this->assertTrue($before->isSameDay($post->updated_at));
 
-        Carbon::setTestNow($future = $before->copy()->addDays(3));
+        Carbon::setTestNow( $before->copy()->addDays(3));
 
         EloquentTouchingUser::withoutTouching(function () {
             EloquentTouchingPost::withoutTouching(function () {
@@ -1862,7 +1862,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->updated_at));
         $this->assertTrue($before->isSameDay($post->updated_at));
 
-        Carbon::setTestNow($future = $before->copy()->addDays(3));
+        Carbon::setTestNow( $before->copy()->addDays(3));
 
         Model::withoutTouchingOn([EloquentTouchingUser::class, EloquentTouchingPost::class], function () {
             EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);

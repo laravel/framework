@@ -609,7 +609,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testForceRootUrl()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+             new RouteCollection,
             Request::create('http://www.foo.com/')
         );
 
@@ -671,7 +671,7 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+             Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
             return 'secret';
@@ -695,7 +695,7 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+             Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
             return 'secret';
@@ -717,7 +717,7 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+             Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
             return 'secret';
@@ -743,7 +743,7 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+             Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
             return 'secret';
@@ -764,7 +764,7 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
-            $request = Request::create('http://www.foo.com/')
+             Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
             return 'secret';

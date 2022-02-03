@@ -57,7 +57,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
-            'command' => serialize($command = new CallQueuedHandlerTestJobWithMiddleware),
+            'command' => serialize( new CallQueuedHandlerTestJobWithMiddleware),
         ]);
 
         $this->assertInstanceOf(CallQueuedHandlerTestJobWithMiddleware::class, CallQueuedHandlerTestJobWithMiddleware::$middlewareCommand);
@@ -79,7 +79,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
         $job->shouldReceive('delete')->once();
 
-        $command = $command = new CallQueuedHandlerTestJobWithMiddleware;
+        $command =  new CallQueuedHandlerTestJobWithMiddleware;
         $command->through([new TestJobMiddleware]);
 
         $instance->call($job, [

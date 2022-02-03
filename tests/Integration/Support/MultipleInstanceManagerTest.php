@@ -29,6 +29,6 @@ class MultipleInstanceManagerTest extends TestCase
 
         $manager = new MultipleInstanceManager($this->app);
 
-        $instance = $manager->instance('missing');
+         $manager->instance('missing');
     }
 }

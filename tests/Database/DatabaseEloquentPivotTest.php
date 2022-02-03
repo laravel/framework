@@ -25,8 +25,8 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
         $resolver->shouldReceive('connection')->andReturn($connection = m::mock(Connection::class));
-        $connection->shouldReceive('getQueryGrammar')->andReturn($grammar = m::mock(Grammar::class));
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor = m::mock(Processor::class));
+        $connection->shouldReceive('getQueryGrammar')->andReturn( m::mock(Grammar::class));
+        $connection->shouldReceive('getPostProcessor')->andReturn( m::mock(Processor::class));
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);

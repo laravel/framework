@@ -35,7 +35,7 @@ class ValidationNotPwnedVerifierTest extends TestCase
 
     public function testApiResponseGoesWrong()
     {
-        $httpFactory = m::mock(HttpFactory::class);
+         m::mock(HttpFactory::class);
         $response = m::mock(Response::class);
 
         $httpFactory = m::mock(HttpFactory::class);

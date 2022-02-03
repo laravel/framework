@@ -32,20 +32,20 @@ class ValidationRequiredIfTest extends TestCase
 
     public function testItOnlyCallableAndBooleanAreAcceptableArgumentsOfTheRule()
     {
-        $rule = new RequiredIf(false);
+         new RequiredIf(false);
 
-        $rule = new RequiredIf(true);
+         new RequiredIf(true);
 
         $this->expectException(\InvalidArgumentException::class);
 
-        $rule = new RequiredIf('phpinfo');
+         new RequiredIf('phpinfo');
     }
 
     public function testItReturnedRuleIsNotSerializable()
     {
         $this->expectException(\Exception::class);
 
-        $rule = serialize(new RequiredIf(function () {
+         serialize(new RequiredIf(function () {
             return true;
         }));
     }

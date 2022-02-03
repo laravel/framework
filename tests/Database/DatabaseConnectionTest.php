@@ -146,7 +146,7 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection([], $pdo);
         try {
             $connection->beginTransaction();
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->assertEquals(0, $connection->transactionLevel());
         }
     }
@@ -189,7 +189,7 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(1, $connection->transactionLevel());
         try {
             $connection->beginTransaction();
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->assertEquals(1, $connection->transactionLevel());
         }
     }

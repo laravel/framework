@@ -60,7 +60,7 @@ trait InteractsWithRedis
 
         try {
             $this->redis['phpredis']->connection()->flushdb();
-        } catch (Exception $e) {
+        } catch (Exception) {
             if ($host === '127.0.0.1' && $port === 6379 && Env::get('REDIS_HOST') === null) {
                 static::$connectionFailedOnceWithDefaultsSkip = true;
 

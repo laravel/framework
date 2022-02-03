@@ -51,7 +51,7 @@ class QueueSyncQueueTest extends TestCase
 
         try {
             $sync->push(FailingSyncQueueTestHandler::class, ['foo' => 'bar']);
-        } catch (Exception $e) {
+        } catch (Exception) {
             $this->assertTrue($_SERVER['__sync.failed']);
         }
 

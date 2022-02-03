@@ -53,8 +53,8 @@ class ConsoleApplicationTest extends TestCase
     public function testCallFullyStringCommandLine()
     {
         $app = new Application(
-            $app = m::mock(ApplicationContract::class, ['version' => '6.0']),
-            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            m::mock(ApplicationContract::class, ['version' => '6.0']),
+            m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
             'testing'
         );
 

@@ -222,7 +222,7 @@ class ComponentTagCompiler
         if (! class_exists($class)) {
             $parameters = [
                 'view' => "'$class'",
-                'data' => '['.$this->attributesToString($data->all(), $escapeBound = false).']',
+                'data' => '['.$this->attributesToString($data->all(), false).']',
             ];
 
             $class = AnonymousComponent::class;
@@ -230,11 +230,11 @@ class ComponentTagCompiler
             $parameters = $data->all();
         }
 
-        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, $escapeBound = false).'])
+        return "##BEGIN-COMPONENT-CLASS##@component('{$class}', '{$component}', [".$this->attributesToString($parameters, false).'])
 <?php if (isset($attributes) && $constructor = (new ReflectionClass('.$class.'::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
+<?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $class !== DynamicComponent::class).']); ?>';
     }
 
     /**

@@ -56,7 +56,7 @@ class DiscoverEvents
                 $listener = new ReflectionClass(
                     static::classFromFile($listener, $basePath)
                 );
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException) {
                 continue;
             }
 

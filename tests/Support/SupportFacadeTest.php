@@ -37,7 +37,7 @@ class SupportFacadeTest extends TestCase
         $app->setAttributes(['foo' => new stdClass]);
         FacadeStub::setFacadeApplication($app);
 
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
+        $this->assertInstanceOf(MockInterface::class,  FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
     }
 
@@ -59,8 +59,8 @@ class SupportFacadeTest extends TestCase
         $app->setAttributes(['foo' => new stdClass]);
         FacadeStub::setFacadeApplication($app);
 
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
+        $this->assertInstanceOf(MockInterface::class,  FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
+        $this->assertInstanceOf(MockInterface::class,  FacadeStub::shouldReceive('foo2')->once()->with('bar2')->andReturn('baz2')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
         $this->assertSame('baz2', $app['foo']->foo2('bar2'));
     }
@@ -77,7 +77,7 @@ class SupportFacadeTest extends TestCase
         $app->setAttributes(['foo' => new stdClass]);
         FacadeStub::setFacadeApplication($app);
 
-        $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
+        $this->assertInstanceOf(MockInterface::class,  FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
     }
 }

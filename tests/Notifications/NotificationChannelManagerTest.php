@@ -29,7 +29,7 @@ class NotificationChannelManagerTest extends TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Bus::class, m::mock());
         $container->instance(Dispatcher::class, $events = m::mock());
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
@@ -45,7 +45,7 @@ class NotificationChannelManagerTest extends TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Bus::class, m::mock());
         $container->instance(Dispatcher::class, $events = m::mock());
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
@@ -62,7 +62,7 @@ class NotificationChannelManagerTest extends TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Bus::class, m::mock());
         $container->instance(Dispatcher::class, $events = m::mock());
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
@@ -77,7 +77,7 @@ class NotificationChannelManagerTest extends TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Bus::class, m::mock());
         $container->instance(Dispatcher::class, $events = m::mock());
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
@@ -93,7 +93,7 @@ class NotificationChannelManagerTest extends TestCase
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
-        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Dispatcher::class, m::mock());
         $container->instance(Bus::class, $bus = m::mock());
         $bus->shouldReceive('dispatch')->with(m::type(SendQueuedNotifications::class));
         Container::setInstance($container);

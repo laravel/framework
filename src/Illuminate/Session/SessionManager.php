@@ -189,7 +189,7 @@ class SessionManager extends Manager
                 : new Store(
                     $this->config->get('session.cookie'),
                     $handler,
-                    $id = null,
+                    null,
                     $this->config->get('session.serialization', 'php')
                 );
     }
@@ -206,7 +206,7 @@ class SessionManager extends Manager
             $this->config->get('session.cookie'),
             $handler,
             $this->container['encrypter'],
-            $id = null,
+            null,
             $this->config->get('session.serialization', 'php'),
         );
     }

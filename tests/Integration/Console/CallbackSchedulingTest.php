@@ -54,7 +54,7 @@ class CallbackSchedulingTest extends TestCase
 
     public function testExecutionOrder()
     {
-        $event = $this->app->make(Schedule::class)
+        $this->app->make(Schedule::class)
             ->call($this->logger('call'))
             ->after($this->logger('after 1'))
             ->before($this->logger('before 1'))

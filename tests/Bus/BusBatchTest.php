@@ -172,7 +172,7 @@ class BusBatchTest extends TestCase
     {
         $queue = m::mock(Factory::class);
 
-        $batch = $this->createTestBatch($queue, $allowFailures = false);
+        $batch = $this->createTestBatch($queue,  false);
 
         $job = new class
         {
@@ -213,7 +213,7 @@ class BusBatchTest extends TestCase
     {
         $queue = m::mock(Factory::class);
 
-        $batch = $this->createTestBatch($queue, $allowFailures = true);
+        $batch = $this->createTestBatch($queue,  true);
 
         $job = new class
         {
@@ -378,7 +378,7 @@ class BusBatchTest extends TestCase
         $connection = m::spy(PostgresConnection::class);
 
         $connection->shouldReceive('table->where->first')
-            ->andReturn($m = (object) [
+            ->andReturn( (object) [
                 'id' => '',
                 'name' => '',
                 'total_jobs' => '',

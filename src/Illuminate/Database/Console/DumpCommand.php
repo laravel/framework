@@ -47,7 +47,7 @@ class DumpCommand extends Command
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
-        $connection = $connections->connection($database = $this->input->getOption('database'));
+        $connection = $connections->connection($this->input->getOption('database'));
 
         $this->schemaState($connection)->dump(
             $connection, $path = $this->path($connection)
@@ -59,7 +59,7 @@ class DumpCommand extends Command
 
         if ($this->option('prune')) {
             (new Filesystem)->deleteDirectory(
-                database_path('migrations'), $preserve = false
+                database_path('migrations'), false
             );
 
             $this->info('Migrations pruned successfully.');

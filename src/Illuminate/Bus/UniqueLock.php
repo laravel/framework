@@ -41,7 +41,7 @@ class UniqueLock
                     : $this->cache;
 
         return (bool) $cache->lock(
-            $key = 'laravel_unique_job:'.get_class($job).$uniqueId,
+            'laravel_unique_job:'.get_class($job).$uniqueId,
             $job->uniqueFor ?? 0
         )->get();
     }

@@ -27,7 +27,7 @@ class DatabaseEloquentMorphToTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->addEagerConstraints([
-            $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test],
+             (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test],
         ]);
         $dictionary = $relation->getDictionary();
         $relation->getDictionary();

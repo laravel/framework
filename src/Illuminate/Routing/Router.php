@@ -621,7 +621,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $route->setAction($this->mergeWithLastGroup(
             $route->getAction(),
-            $prependExistingPrefix = false
+            false
         ));
     }
 

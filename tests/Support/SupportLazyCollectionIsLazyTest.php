@@ -285,7 +285,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
 
         $this->assertEnumerates(5, function ($collection) {
-            foreach ($collection as $key => $value) {
+            foreach ($collection as  $value) {
                 if ($value == 5) {
                     return false;
                 }
@@ -293,7 +293,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
 
         $this->assertEnumeratesOnce(function ($collection) {
-            foreach ($collection as $key => $value) {
+            foreach ($collection as  $value) {
                 // Silence is golden!
             }
         });
@@ -1040,7 +1040,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                 $collection->firstOrFail(function ($item) {
                     return $item === 101;
                 });
-            } catch (ItemNotFoundException $e) {
+            } catch (ItemNotFoundException) {
                 //
             }
         });
@@ -1072,7 +1072,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertEnumerates(2, function ($collection) {
             try {
                 $collection->sole();
-            } catch (MultipleItemsFoundException $e) {
+            } catch (MultipleItemsFoundException) {
                 //
             }
         });
@@ -1088,7 +1088,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                 $collection->sole(function ($item) {
                     return $item % 2 === 0;
                 });
-            } catch (MultipleItemsFoundException $e) {
+            } catch (MultipleItemsFoundException) {
                 //
             }
         });
@@ -1595,7 +1595,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         try {
             $callback();
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Silence is golden
         }
     }

@@ -235,7 +235,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             return $this->driver->read($path);
-        } catch (UnableToReadFile $e) {
+        } catch (UnableToReadFile) {
             //
         }
     }
@@ -329,7 +329,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             is_resource($contents)
                 ? $this->driver->writeStream($path, $contents, $options)
                 : $this->driver->write($path, $contents, $options);
-        } catch (UnableToWriteFile $e) {
+        } catch (UnableToWriteFile) {
             return false;
         }
 
@@ -404,7 +404,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->setVisibility($path, $this->parseVisibility($visibility));
-        } catch (UnableToSetVisibility $e) {
+        } catch (UnableToSetVisibility) {
             return false;
         }
 
@@ -460,7 +460,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         foreach ($paths as $path) {
             try {
                 $this->driver->delete($path);
-            } catch (UnableToDeleteFile $e) {
+            } catch (UnableToDeleteFile) {
                 $success = false;
             }
         }
@@ -479,7 +479,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->copy($from, $to);
-        } catch (UnableToCopyFile $e) {
+        } catch (UnableToCopyFile) {
             return false;
         }
 
@@ -497,7 +497,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->move($from, $to);
-        } catch (UnableToMoveFile $e) {
+        } catch (UnableToMoveFile) {
             return false;
         }
 
@@ -544,7 +544,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             return $this->driver->readStream($path);
-        } catch (UnableToReadFile $e) {
+        } catch (UnableToReadFile) {
             //
         }
     }
@@ -556,7 +556,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->writeStream($path, $resource, $options);
-        } catch (UnableToWriteFile $e) {
+        } catch (UnableToWriteFile) {
             return false;
         }
 
@@ -752,7 +752,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->createDirectory($path);
-        } catch (UnableToCreateDirectory $e) {
+        } catch (UnableToCreateDirectory) {
             return false;
         }
 
@@ -769,7 +769,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->deleteDirectory($directory);
-        } catch (UnableToDeleteDirectory $e) {
+        } catch (UnableToDeleteDirectory) {
             return false;
         }
 

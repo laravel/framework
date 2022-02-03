@@ -52,7 +52,7 @@ class BusPendingBatchTest extends TestCase
 
         $repository = m::mock(BatchRepository::class);
         $repository->shouldReceive('store')->once()->with($pendingBatch)->andReturn($batch = m::mock(stdClass::class));
-        $batch->shouldReceive('add')->once()->with(m::type(Collection::class))->andReturn($batch = m::mock(Batch::class));
+        $batch->shouldReceive('add')->once()->with(m::type(Collection::class))->andReturn( m::mock(Batch::class));
 
         $container->instance(BatchRepository::class, $repository);
 

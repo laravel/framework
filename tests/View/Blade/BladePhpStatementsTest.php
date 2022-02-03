@@ -48,7 +48,8 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     {
         $string = "@php(\$data = ['test' => ')'])";
 
-        $expected = "<?php (\$data = ['test' => ')']); ?>";
+        //
+        /*$expected = "<?php (\$data = ['test' => ')']); ?>";*/
 
         $actual = "<?php (\$data = ['test' => '); ?>'])";
 

@@ -888,7 +888,7 @@ class SQLiteGrammar extends Grammar
             return " as ({$storedAs}) stored";
         }
 
-        if (! is_null($storedAs = $column->storedAs)) {
+        if (! is_null($column->storedAs)) {
             return " as ({$column->storedAs}) stored";
         }
     }

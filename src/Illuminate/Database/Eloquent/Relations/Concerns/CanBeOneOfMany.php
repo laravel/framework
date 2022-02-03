@@ -76,7 +76,7 @@ trait CanBeOneOfMany
 
         $keyName = $this->query->getModel()->getKeyName();
 
-        $columns = is_string($columns = $column) ? [
+        $columns = is_string($column) ? [
             $column => $aggregate,
             $keyName => $aggregate,
         ] : $column;

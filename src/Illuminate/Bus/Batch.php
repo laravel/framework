@@ -188,7 +188,7 @@ class Batch implements Arrayable, JsonSerializable
 
             $this->queue->connection($this->options['connection'] ?? null)->bulk(
                 $jobs->all(),
-                $data = '',
+                '',
                 $this->options['queue'] ?? null
             );
         });
