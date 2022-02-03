@@ -843,6 +843,52 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testCarryOverCountable($collection)
+    {
+        $data = new $collection([
+            [1, 2, 3],
+            [1, 2, 3],
+            [1, 2, 3],
+            [1, 2, 3],
+        ]);
+
+        $this->assertCount(2, $data->carry(8));
+        $this->assertCount(3, $data->carry(9));
+        $this->assertCount(3, $data->carry(10));
+
+        $data = new $collection([
+            ['array' => [1, 2, 3]],
+            ['array' => [1, 2, 3]],
+            ['array' => [1, 2, 3]],
+            ['array' => [1, 2, 3]],
+        ]);
+
+        $this->assertCount(2, $data->carry('array', 8));
+        $this->assertCount(3, $data->carry('array', 9));
+        $this->assertCount(3, $data->carry('array', 10));
+
+        $data = new $collection([
+            ['array' => [1, 2, 3]],
+            ['array' => [1, 2, 3]],
+            ['array' => false],
+            ['array' => [1, 2, 3]],
+        ]);
+
+        $this->assertCount(2, $data->carry('array', PHP_INT_MAX));
+
+        $data = new $collection([
+            ['array' => [1, 2, 3]],
+            ['array' => [1, 2, 3]],
+            ['array' => null],
+            ['array' => [1, 2, 3]],
+        ]);
+
+        $this->assertCount(2, $data->carry('array', PHP_INT_MAX));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCountByWithKey($collection)
     {
         $c = new $collection([
