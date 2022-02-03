@@ -33,6 +33,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $this->getDsn($config), $config, $this->getOptions($config)
         );
 
+        $this->configureIsolationLevel($connection, $config);
+
         $this->configureEncoding($connection, $config);
 
         // Next, we will check to see if a timezone has been specified in this config
@@ -50,6 +52,20 @@ class PostgresConnector extends Connector implements ConnectorInterface
         $this->configureSynchronousCommit($connection, $config);
 
         return $connection;
+    }
+
+    /**
+     * Set the connection transaction isolation level.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return void
+     */
+    protected function configureIsolationLevel($connection, array $config)
+    {
+        if (isset($config['isolation_level'])) {
+            $connection->prepare("set session characteristics as transaction isolation level {$config['isolation_level']}")->execute();
+        }
     }
 
     /**
