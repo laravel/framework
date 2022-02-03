@@ -1010,7 +1010,7 @@ trait HasAttributes
         $this->attributes = array_merge(
             $this->attributes,
             $this->normalizeCastClassResponse(
-                $key, call_user_func($callback, $value, $this->attributes)
+                $key, $callback($value, $this->attributes)
             )
         );
 
@@ -1640,7 +1640,7 @@ trait HasAttributes
             $this->attributes = array_merge(
                 $this->attributes,
                 $this->normalizeCastClassResponse(
-                    $key, call_user_func($callback, $value, $this->attributes)
+                    $key, $callback($value, $this->attributes)
                 )
             );
         }

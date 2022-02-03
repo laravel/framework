@@ -239,7 +239,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         );
 
         foreach ($this->precompilers as $precompiler) {
-            $value = call_user_func($precompiler, $value);
+            $value = $precompiler($value);
         }
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
