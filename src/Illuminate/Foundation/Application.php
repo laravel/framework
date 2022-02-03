@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -652,7 +651,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function registerConfiguredProviders()
     {
-        $providers = Collection::make($this->make('config')->get('app.providers'))
+        $providers = collect($this->make('config')->get('app.providers'))
                         ->partition(function ($provider) {
                             return str_starts_with($provider, 'Illuminate\\');
                         });

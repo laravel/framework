@@ -11,7 +11,6 @@ use GuzzleHttp\HandlerStack;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Message\MessageInterface;
@@ -163,7 +162,7 @@ class PendingRequest
     public function __construct(Factory $factory = null)
     {
         $this->factory = $factory;
-        $this->middleware = new Collection;
+        $this->middleware = collect();
 
         $this->asJson();
 

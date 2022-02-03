@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\InputOption;
 
 class StatusCommand extends BaseCommand
@@ -77,7 +76,7 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
-        return Collection::make($this->getAllMigrationFiles())
+        return collect($this->getAllMigrationFiles())
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 

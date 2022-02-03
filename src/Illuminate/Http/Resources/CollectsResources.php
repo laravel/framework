@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources;
 
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Traversable;
@@ -24,7 +23,7 @@ trait CollectsResources
         }
 
         if (is_array($resource)) {
-            $resource = new Collection($resource);
+            $resource = collect($resource);
         }
 
         $collects = $this->collects();

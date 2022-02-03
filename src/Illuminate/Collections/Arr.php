@@ -650,7 +650,7 @@ class Arr
      */
     public static function sort($array, $callback = null)
     {
-        return Collection::make($array)->sortBy($callback)->all();
+        return collect($array)->sortBy($callback)->all();
     }
 
     /**

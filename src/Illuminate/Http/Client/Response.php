@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -86,7 +85,7 @@ class Response implements ArrayAccess
      */
     public function collect($key = null)
     {
-        return Collection::make($this->json($key));
+        return collect($this->json($key));
     }
 
     /**

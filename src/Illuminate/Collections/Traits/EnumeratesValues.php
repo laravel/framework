@@ -729,7 +729,7 @@ trait EnumeratesValues
      */
     public function pipeThrough($callbacks)
     {
-        return Collection::make($callbacks)->reduce(
+        return collect($callbacks)->reduce(
             function ($carry, $callback) {
                 return $callback($carry);
             },

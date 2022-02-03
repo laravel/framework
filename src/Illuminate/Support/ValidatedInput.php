@@ -87,7 +87,7 @@ class ValidatedInput implements ValidatedData
      */
     public function collect()
     {
-        return new Collection($this->input);
+        return collect($this->input);
     }
 
     /**

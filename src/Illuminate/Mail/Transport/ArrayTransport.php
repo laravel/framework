@@ -2,7 +2,6 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Illuminate\Support\Collection;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -24,7 +23,7 @@ class ArrayTransport implements TransportInterface
      */
     public function __construct()
     {
-        $this->messages = new Collection;
+        $this->messages = collect();
     }
 
     /**
@@ -52,7 +51,7 @@ class ArrayTransport implements TransportInterface
      */
     public function flush()
     {
-        return $this->messages = new Collection;
+        return $this->messages = collect();
     }
 
     /**

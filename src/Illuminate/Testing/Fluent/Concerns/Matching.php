@@ -4,7 +4,6 @@ namespace Illuminate\Testing\Fluent\Concerns;
 
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 trait Matching
@@ -24,7 +23,7 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertTrue(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? collect($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
@@ -112,11 +111,11 @@ trait Matching
      */
     public function whereContains(string $key, $expected)
     {
-        $actual = Collection::make(
+        $actual = collect(
             $this->prop($key) ?? $this->prop()
         );
 
-        $missing = Collection::make($expected)->reject(function ($search) use ($key, $actual) {
+        $missing = collect($expected)->reject(function ($search) use ($key, $actual) {
             if ($actual->containsStrict($key, $search)) {
                 return true;
             }
