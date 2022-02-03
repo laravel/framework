@@ -164,6 +164,19 @@ class CacheFileStoreTest extends TestCase
         $this->assertSame('Hello World', $store->get('foo'));
     }
 
+    public function testIncrementCanAtomicallyJump()
+    {
+        $files = $this->mockFilesystem();
+        $initialValue = '9999999999'.serialize(1);
+        $valueAfterIncrement = '9999999999'.serialize(4);
+        $store = new FileStore($files, __DIR__);
+        $files->expects($this->once())->method('get')->willReturn($initialValue);
+        $hash = sha1('foo');
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
+        $store->increment('foo', 3);
+    }
+
     public function testIncrementDoesNotExtendCacheLife()
     {
         $files = $this->mockFilesystem();
