@@ -7,9 +7,8 @@ use Aws\Ses\SesClient;
 use Exception;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 
-class SesTransport extends AbstractTransport implements TransportInterface
+class SesTransport extends AbstractTransport
 {
     /**
      * The Amazon SES instance.
