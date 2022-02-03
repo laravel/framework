@@ -8,6 +8,7 @@ use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 class EloquentStrictLoadingTest extends DatabaseTestCase
 {
@@ -134,7 +135,7 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
 
     public function testStrictModeWithOverriddenHandlerOnLazyLoading()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Violated');
 
         EloquentStrictLoadingTestModel1WithCustomHandler::create();
@@ -171,7 +172,7 @@ class EloquentStrictLoadingTestModel1WithCustomHandler extends Model
 
     protected function handleLazyLoadingViolation($key)
     {
-        throw new \RuntimeException("Violated {$key}");
+        throw new RuntimeException("Violated {$key}");
     }
 }
 

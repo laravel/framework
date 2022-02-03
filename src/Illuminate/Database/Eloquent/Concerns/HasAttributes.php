@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
@@ -1345,7 +1346,7 @@ trait HasAttributes
      */
     protected function serializeDate(DateTimeInterface $date)
     {
-        return $date instanceof \DateTimeImmutable ?
+        return $date instanceof DateTimeImmutable ?
             CarbonImmutable::instance($date)->toJSON() :
             Carbon::instance($date)->toJSON();
     }
