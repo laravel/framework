@@ -18,7 +18,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     protected function setUp(): void
     {
-        Carbon::setTestNow(Carbon::now());
+        parent::setUp();
 
         $db = new DB;
 

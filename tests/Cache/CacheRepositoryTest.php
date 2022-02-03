@@ -23,7 +23,8 @@ class CacheRepositoryTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-        Carbon::setTestNow();
+
+        Carbon::setTestNow(null);
     }
 
     public function testGetReturnsValueFromCache()
@@ -95,11 +96,6 @@ class CacheRepositoryTest extends TestCase
             return 'bar';
         });
         $this->assertSame('bar', $result);
-
-        /*
-         * Use Carbon object...
-         */
-        Carbon::setTestNow(Carbon::now());
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);

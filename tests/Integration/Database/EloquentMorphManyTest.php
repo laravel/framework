@@ -26,8 +26,6 @@ class EloquentMorphManyTest extends DatabaseTestCase
             $table->string('commentable_type');
             $table->timestamps();
         });
-
-        Carbon::setTestNow(null);
     }
 
     public function testUpdateModelWithDefaultWithCount()

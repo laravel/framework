@@ -37,8 +37,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksCanBlockForSeconds()
     {
-        Carbon::setTestNow();
-
         Cache::lock('foo')->forceRelease();
         $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function () {
             return 'taylor';

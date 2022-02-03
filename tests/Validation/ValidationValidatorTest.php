@@ -36,7 +36,8 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
+        parent::tearDown();
+
         m::close();
     }
 
@@ -4019,6 +4020,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => new Carbon('2018-01-01')], ['x' => 'date_equals:tomorrow']);
         $this->assertTrue($v->fails());
+
+        Carbon::setTestNow(null);
     }
 
     public function testBeforeAndAfter()

@@ -13,19 +13,11 @@ use stdClass;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
     protected function tearDown(): void
     {
         parent::tearDown();
 
         m::close();
-        Carbon::setTestNow(null);
     }
 
     public function testCreateInsertsNewRecordIntoTable()

@@ -36,7 +36,6 @@ class CookieTest extends TestCase
             return 'hello world';
         })->middleware('web');
 
-        Carbon::setTestNow(Carbon::now());
         $response = $this->get('/');
         $this->assertCount(2, $response->headers->getCookies());
         $this->assertEquals(Carbon::now()->getTimestamp() + 60, ($response->headers->getCookies()[1])->getExpiresTime());
