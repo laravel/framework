@@ -22,15 +22,6 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * The grammar specific bit operators.
-     *
-     * @var array
-     */
-    protected $bitOperators = [
-        '~', '&', '|', '#', '<<', '>>', '<<=', '>>=',
-    ];
-
-    /**
      * {@inheritdoc}
      *
      * @param  \Illuminate\Database\Query\Builder  $query
