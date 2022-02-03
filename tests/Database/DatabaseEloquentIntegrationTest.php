@@ -1631,7 +1631,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
     }
 
     public function testMultiLevelTouchingWorks()
@@ -1650,7 +1649,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching models related timestamps.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
     }
 
     public function testDeletingChildModelTouchesParentTimestamps()
@@ -1668,7 +1666,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post->delete();
 
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
     }
 
     public function testTouchingChildModelUpdatesParentsTimestamps()
@@ -1687,7 +1684,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
-
     }
 
     public function testTouchingChildModelRespectsParentNoTouching()
@@ -1715,7 +1711,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $before->isSameDay($user->fresh()->updated_at),
             'It is touching model own timestamps in withoutTouching scope, when it should not.'
         );
-
     }
 
     public function testUpdatingChildPostRespectsNoTouchingDefinition()
@@ -1736,7 +1731,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps when it should.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models relationships when it should be disabled.');
-
     }
 
     public function testUpdatingModelInTheDisabledScopeTouchesItsOwnTimestamps()
@@ -1757,7 +1751,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
     }
 
     public function testDeletingChildModelRespectsTheNoTouchingRule()
@@ -1777,7 +1770,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
 
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
     }
 
     public function testRespectedMultiLevelTouchingChain()
@@ -1798,7 +1790,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
     }
 
     public function testTouchesGreatParentEvenWhenParentIsInNoTouchScope()
@@ -1819,7 +1810,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
     }
 
     public function testCanNestCallsOfNoTouching()
@@ -1842,7 +1832,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
     }
 
     public function testCanPassArrayOfModelsToIgnore()
@@ -1863,7 +1852,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-
     }
 
     public function testWhenBaseModelIsIgnoredAllChildModelsAreIgnored()

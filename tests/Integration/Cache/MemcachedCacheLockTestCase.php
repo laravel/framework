@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Contracts\Cache\LockTimeoutException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 /**

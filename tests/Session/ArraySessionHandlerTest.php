@@ -113,6 +113,5 @@ class ArraySessionHandlerTest extends TestCase
         $this->assertSame(1, $handler->gc(300));
         $this->assertSame('', $handler->read('foo'));
         $this->assertSame('qux', $handler->read('baz'));
-
     }
 }

@@ -2051,7 +2051,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
 
-
         $scopes = [
             'published',
             'category' => 'Laravel',

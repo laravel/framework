@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 
