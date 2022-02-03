@@ -129,8 +129,8 @@ class DatabaseConnectorTest extends TestCase
         $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => 'public, "user"', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('stdClass');
-        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
-        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
         $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($connection);
         $connection->shouldReceive('execute')->twice();
@@ -145,8 +145,8 @@ class DatabaseConnectorTest extends TestCase
         $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => '"$user", public, user', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('stdClass');
-        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
-        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
         $connection->shouldReceive('prepare')->once()->with('set search_path to "$user", "public", "user"')->andReturn($connection);
         $connection->shouldReceive('execute')->twice();
