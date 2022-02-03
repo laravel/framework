@@ -6672,7 +6672,7 @@ class ValidationValidatorTest extends TestCase
                         ['type' => 'boat', 'wheels' => 'should be excluded'],
                     ],
                 ], [
-                    // The blue wheels are excluded and are therefor not validated against the "in:square,round" rule
+                    // The blue wheels are excluded and are therefore not validated against the "in:square,round" rule
                     'vehicles.0.wheels.2.shape' => ['validation.in'],
                 ],
             ],
