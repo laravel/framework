@@ -42,13 +42,6 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -2057,8 +2050,6 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
-
-        Carbon::setTestNow();
 
         $scopes = [
             'published',
