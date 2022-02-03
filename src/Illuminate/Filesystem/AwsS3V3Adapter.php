@@ -11,7 +11,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
     /**
      * The AWS S3 client.
      *
-     * @var S3Client
+     * @var \Aws\S3\S3Client
      */
     protected $client;
 

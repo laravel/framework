@@ -60,7 +60,7 @@ trait CanBeOneOfMany
      * Indicate that the relation is a single result of a larger one-to-many relationship.
      *
      * @param  string|array|null  $column
-     * @param  string|Closure|null  $aggregate
+     * @param  string|\Closure|null  $aggregate
      * @param  string|null  $relation
      * @return $this
      *
