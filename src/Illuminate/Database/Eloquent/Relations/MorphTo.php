@@ -159,7 +159,7 @@ class MorphTo extends BelongsTo
 
         $whereIn = $this->whereInMethod($instance, $ownerKey);
 
-        if(! empty($this->morphableColumns[get_class($instance)])) {
+        if (! empty($this->morphableColumns[get_class($instance)])) {
             $query->select($this->morphableColumns[get_class($instance)]);
         }
 
