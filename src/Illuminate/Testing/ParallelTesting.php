@@ -251,7 +251,7 @@ class ParallelTesting
             return $_SERVER[$option] ?? false;
         };
 
-        return call_user_func($optionsResolver, $option);
+        return $optionsResolver($option);
     }
 
     /**
