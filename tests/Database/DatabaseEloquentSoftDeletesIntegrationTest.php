@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
+use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -212,7 +213,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             public function newModelQuery()
             {
                 return Mockery::spy(parent::newModelQuery(), function (Mockery\MockInterface $mock) {
-                    $mock->shouldReceive('forceDelete')->andThrow(new \Exception());
+                    $mock->shouldReceive('forceDelete')->andThrow(new Exception());
                 });
             }
         };
@@ -221,7 +222,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         try {
             $user->forceDelete();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
         }
 
         $this->assertTrue($user->exists);
