@@ -33,10 +33,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $this->getDsn($config), $config, $this->getOptions($config)
         );
 
-        // Now, we will add the isolation level for transaction
-        // Which can be set in database config file with 'isolation_level' key
-        // There are 4 level of isolation: SERIALIZABLE, REPEATABLE READ, READ COMMITTED, READ UNCOMMITTED
-        $this->configureIsolationLevels($connection, $config);
+        $this->configureIsolationLevel($connection, $config);
 
         $this->configureEncoding($connection, $config);
 
@@ -58,6 +55,20 @@ class PostgresConnector extends Connector implements ConnectorInterface
     }
 
     /**
+     * Set the connection transaction isolation level.
+     *
+     * @param  \PDO  $connection
+     * @param  array  $config
+     * @return void
+     */
+    protected function configureIsolationLevel($connection, array $config)
+    {
+        if (isset($config['isolation_level'])) {
+            $connection->prepare("set session characteristics as transaction isolation level {$config['isolation_level']}")->execute();
+        }
+    }
+
+    /**
      * Set the connection character set and collation.
      *
      * @param  \PDO  $connection
@@ -71,20 +82,6 @@ class PostgresConnector extends Connector implements ConnectorInterface
         }
 
         $connection->prepare("set names '{$config['charset']}'")->execute();
-    }
-
-    /**
-     * Set the isolation level for transactions.
-     *
-     * @param  \PDO  $connection
-     * @param  array  $config
-     * @return void
-     */
-    protected function configureIsolationLevels($connection, $config)
-    {
-        if (isset($config['isolation_level'])) {
-            $connection->prepare("set session characteristics as transaction isolation level {$config['isolation_level']}")->execute();
-        }
     }
 
     /**
