@@ -4,14 +4,13 @@ namespace Illuminate\Tests\Integration\Migration;
 
 use Illuminate\Support\Facades\DB;
 use Mockery;
-use Mockery\Mock;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigratorTest extends TestCase
 {
     /**
-     * @var Mock
+     * @var \Mockery\Mock
      */
     private $output;
 

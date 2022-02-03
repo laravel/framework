@@ -797,7 +797,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @template TCombineValue
      *
-     * @param  IteratorAggregate<array-key, TCombineValue>|array<array-key, TCombineValue>|(callable(): \Generator<array-key, TCombineValue>)  $values
+     * @param  \IteratorAggregate<array-key, TCombineValue>|array<array-key, TCombineValue>|(callable(): \Generator<array-key, TCombineValue>)  $values
      * @return static<TKey, TCombineValue>
      */
     public function combine($values)
@@ -1587,7 +1587,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @template TIteratorKey of array-key
      * @template TIteratorValue
      *
-     * @param  IteratorAggregate<TIteratorKey, TIteratorValue>|array<TIteratorKey, TIteratorValue>|(callable(): \Generator<TIteratorKey, TIteratorValue>)  $source
+     * @param  \IteratorAggregate<TIteratorKey, TIteratorValue>|array<TIteratorKey, TIteratorValue>|(callable(): \Generator<TIteratorKey, TIteratorValue>)  $source
      * @return \Traversable<TIteratorKey, TIteratorValue>
      */
     protected function makeIterator($source)
