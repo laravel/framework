@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
@@ -39,13 +40,19 @@ class ViewCacheCommand extends Command
      */
     public function handle()
     {
-        $this->call('view:clear');
+        try {
+            $this->call('view:clear');
 
-        $this->paths()->each(function ($path) {
-            $this->compileViews($this->bladeFilesIn([$path]));
-        });
+            $this->paths()->each(function ($path) {
+                $this->compileViews($this->bladeFilesIn([$path]));
+            });
 
-        $this->info('Blade templates cached successfully!');
+            $this->info('Blade templates cached successfully!');
+        } catch (Exception $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
     }
 
     /**
