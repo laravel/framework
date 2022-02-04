@@ -147,6 +147,19 @@ class Builder
     }
 
     /**
+     * Create and return an un-saved model instance. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function forceMake(array $attributes = [])
+    {
+        return $this->model->unguarded(function () use ($attributes) {
+            return $this->newModelInstance($attributes);
+        });
+    }
+
+    /**
      * Register a new global scope.
      *
      * @param  string  $identifier

@@ -338,6 +338,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(21, $model->id);
     }
 
+    public function testForceMakeMethodSavesNewModelWithGuardedAttributes()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = EloquentModelSaveStub::forceMake(['id' => 21]);
+        $this->assertFalse($_SERVER['__eloquent.saved']);
+        $this->assertEquals(21, $model->id);
+    }
+
     public function testFindMethodUseWritePdo()
     {
         EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
