@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
@@ -64,7 +65,7 @@ trait CollectsResources
     {
         $collects = $this->collects();
 
-        if (! $collects) {
+        if (! $collects || ! is_subclass_of($collects, JsonResource::class)) {
             return 0;
         }
 
