@@ -7,6 +7,9 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Traits\Conditionable;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mime\Email;
 
 class MailMessage extends SimpleMessage implements Renderable
 {
@@ -251,6 +254,33 @@ class MailMessage extends SimpleMessage implements Renderable
         $this->rawAttachments[] = compact('data', 'name', 'options');
 
         return $this;
+    }
+
+    /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($value) {
+            $message->getHeaders()->add(new TagHeader($value));
+        });
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
+            $message->getHeaders()->add(new MetadataHeader($key, $value));
+        });
     }
 
     /**
