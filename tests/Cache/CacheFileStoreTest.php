@@ -62,7 +62,43 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testExpiredItemsReturnNull()
+    public function testPutWillConsiderZeroAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $hash = sha1('O--L / key');
+        $filePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+        $exclusiveLock = true;
+
+        $files->expects($this->once())->method('put')->with(
+            $this->equalTo($filePath),
+            $this->equalTo($fileContents),
+            $this->equalTo($exclusiveLock) // Ensure we do lock the file while putting.
+        )->willReturn(strlen($fileContents));
+
+        (new FileStore($files, __DIR__))->put('O--L / key', 'gold', 0);
+    }
+
+    public function testPutWillConsiderBigValuesAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $hash = sha1('O--L / key');
+        $filePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+
+        $files->expects($this->once())->method('put')->with(
+            $this->equalTo($filePath),
+            $this->equalTo($fileContents),
+        );
+
+        (new FileStore($files, __DIR__))->put('O--L / key', 'gold', (int) $ten9s + 1);
+    }
+
+    public function testExpiredItemsReturnNullAndGetDeleted()
     {
         $files = $this->mockFilesystem();
         $contents = '0000000000';
