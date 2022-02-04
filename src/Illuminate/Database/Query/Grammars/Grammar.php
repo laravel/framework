@@ -1366,9 +1366,9 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a SQL query to set isolation level for current transaction
+     * Compile a SQL query to set isolation level for current transaction.
      *
-     * @param string $isolationLevel
+     * @param  string  $isolationLevel
      * @return string
      */
     public function compileIsolationLevel($isolationLevel)

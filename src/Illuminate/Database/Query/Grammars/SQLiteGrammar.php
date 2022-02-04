@@ -341,12 +341,11 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a SQL query to set isolation level for current transaction
+     * Compile a SQL query to set isolation level for current transaction.
      *
-     * @param string $isolationLevel
+     * @param  string  $isolationLevel
      *
      * @throws \RuntimeException
-     *
      */
     public function compileIsolationLevel($isolationLevel)
     {

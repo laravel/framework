@@ -65,7 +65,7 @@ trait ManagesTransactions
     }
 
     /**
-     * Execute a transaction using isolation level
+     * Execute a transaction using isolation level.
      *
      * @param  string  $isolationLevel
      * @param  \Closure  $callback
@@ -349,16 +349,15 @@ trait ManagesTransactions
         throw new RuntimeException('Transactions Manager has not been set.');
     }
 
-
     /**
-     * Set isolation level for current transaction
+     * Set isolation level for current transaction.
      *
-     * @param string $isolationLevel
+     * @param  string  $isolationLevel
      * @return void
      */
     protected function prepareIsolationLevel($isolationLevel)
     {
-        if($this->getDriverName() == 'sqlite'){
+        if ($this->getDriverName() == 'sqlite') {
             return;
         }
 
