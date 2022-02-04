@@ -20,6 +20,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceCollectingModel;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
@@ -572,6 +573,25 @@ class ResourceTest extends TestCase
 
         $this->assertEquals(
             '{"data":{"id":5,"title":"Test Title","reading_time":3.0}}',
+            $response->baseResponse->content()
+        );
+    }
+
+    public function testResourcesCollectionMayCollectModels()
+    {
+        Route::get('/', function () {
+            return new PostCollectionResourceCollectingModel(collect([
+                new Post(['id' => 5]),
+                new Post(['id' => 7]),
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $this->assertEquals(
+            '{"data":{"ids":[5,7]}}',
             $response->baseResponse->content()
         );
     }
