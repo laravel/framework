@@ -1364,4 +1364,15 @@ class Grammar extends BaseGrammar
     {
         return $this->bitOperators;
     }
+
+    /**
+     * Compile a SQL query to set isolation level for current transaction
+     *
+     * @param string $isolationLevel
+     * @return string
+     */
+    public function compileIsolationLevel($isolationLevel)
+    {
+        return "SET TRANSACTION ISOLATION LEVEL {$isolationLevel}";
+    }
 }

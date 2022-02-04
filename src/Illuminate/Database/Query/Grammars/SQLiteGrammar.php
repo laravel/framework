@@ -339,4 +339,17 @@ class SQLiteGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+
+    /**
+     * Compile a SQL query to set isolation level for current transaction
+     *
+     * @param string $isolationLevel
+     *
+     * @throws \RuntimeException
+     *
+     */
+    public function compileIsolationLevel($isolationLevel)
+    {
+        throw new \RuntimeException('SQLite database engine does not support isolation level.');
+    }
 }

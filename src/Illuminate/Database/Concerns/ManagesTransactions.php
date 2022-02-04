@@ -65,6 +65,23 @@ trait ManagesTransactions
     }
 
     /**
+     * Execute a transaction using isolation level
+     *
+     * @param  string  $isolationLevel
+     * @param  \Closure  $callback
+     * @param  int  $attempts
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public function isolatedTransaction($isolationLevel, Closure $callback, $attempts = 1)
+    {
+        $this->prepareIsolationLevel($isolationLevel);
+
+        return $this->transaction($callback, $attempts);
+    }
+
+    /**
      * Handle an exception encountered when running a transacted statement.
      *
      * @param  \Throwable  $e
@@ -330,5 +347,23 @@ trait ManagesTransactions
         }
 
         throw new RuntimeException('Transactions Manager has not been set.');
+    }
+
+
+    /**
+     * Set isolation level for current transaction
+     *
+     * @param string $isolationLevel
+     * @return void
+     */
+    protected function prepareIsolationLevel($isolationLevel)
+    {
+        if($this->getDriverName() == 'sqlite'){
+            return;
+        }
+
+        $query = $this->getQueryGrammar()->compileIsolationLevel($isolationLevel);
+
+        $this->getPdo()->prepare($query)->execute();
     }
 }
