@@ -126,6 +126,7 @@ class RouteListCommand extends Command
             'name' => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
+            'route' => $route,
         ]);
     }
 
