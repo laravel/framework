@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -188,16 +189,31 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Filter the route by URI and / or name.
+     * Filter the route according to options given.
      *
      * @param  array  $route
      * @return array|void
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
+        if (
+            ($this->option('name') && !Str::contains($route['name'], $this->option('name'))) ||
+            ($this->option('path') && !Str::contains($route['uri'], $this->option('path'))) ||
+            ($this->option('method') && !Str::contains($route['method'], strtoupper($this->option('method'))))
+        ) {
+            return;
+        }
+        //The domain option behaves differently depending on whether the uri option is also provided
+        if ($this->option('uri')) {
+            if (!$route['route']->matches(
+                Request::create(
+                    ($this->option('domain') ? 'https://' . $this->option('domain') : '') . $this->option('uri'),
+                    $this->option('method') ?: 'GET'
+                )
+            )) {
+                return;
+            }
+        } elseif ($this->option('domain') && !Str::contains($route['domain'], $this->option('domain'))) {
             return;
         }
 
@@ -294,7 +310,9 @@ class RouteListCommand extends Command
             ['json', null, InputOption::VALUE_NONE, 'Output the route list as JSON'],
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
-            ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],
+            ['domain', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by domain'],
+            ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
+            ['uri', null, InputOption::VALUE_OPTIONAL, 'Evaluate a URI against routing rules'],
             ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (precedence, domain, method, uri, name, action, middleware) to sort by', 'uri'],
