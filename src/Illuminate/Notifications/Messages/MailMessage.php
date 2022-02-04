@@ -257,6 +257,33 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($value) {
+            $message->getHeaders()->add(new TagHeader($value));
+        });
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
+            $message->getHeaders()->add(new MetadataHeader($key, $value));
+        });
+    }
+
+    /**
      * Set the priority of this message.
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
@@ -322,33 +349,6 @@ class MailMessage extends SimpleMessage implements Renderable
 
         return $markdown->theme($this->theme ?: $markdown->getTheme())
                 ->render($this->markdown, $this->data());
-    }
-
-    /**
-     * Add a tag to the email (for drivers that support).
-     *
-     * @param  string  $value
-     * @return $this
-     */
-    public function tag($value)
-    {
-        return $this->withSymfonyMessage(function (Email $message) use ($value) {
-            $message->getHeaders()->add(new TagHeader($value));
-        });
-    }
-
-    /**
-     * Add metadata to the email (for drivers that support).
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return $this
-     */
-    public function metadata($key, $value)
-    {
-        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
-            $message->getHeaders()->add(new MetadataHeader($key, $value));
-        });
     }
 
     /**
