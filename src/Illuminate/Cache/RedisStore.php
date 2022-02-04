@@ -335,11 +335,11 @@ class RedisStore extends TaggableStore implements LockProvider
             return $value;
         }
 
-        if (is_float($value) && !in_array($value, [\INF, -\INF], true) && !is_nan($value)) {
+        if (is_float($value) && ! in_array($value, [\INF, -\INF], true) && ! is_nan($value)) {
             // Note that float like "1.0" will be converted to string "1"
             $value = (string) $value;
             // Append missing ".", because we use "." to detect float (trailing 0 could be ignored)
-            return str_contains($value, '.') ? $value : ($value . '.');
+            return str_contains($value, '.') ? $value : ($value.'.');
         }
 
         return serialize($value);
@@ -356,6 +356,7 @@ class RedisStore extends TaggableStore implements LockProvider
         if (is_numeric($value)) {
             return str_contains($value, '.') ? (float) $value : (int) $value;
         }
+
         return unserialize($value);
     }
 }

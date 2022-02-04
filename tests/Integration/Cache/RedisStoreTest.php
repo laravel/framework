@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
+use const INF;
 use Orchestra\Testbench\TestCase;
 use stdClass;
-use const INF;
 
 class RedisStoreTest extends TestCase
 {
@@ -63,7 +63,7 @@ class RedisStoreTest extends TestCase
             ['bool', true],
             ['bool-false', false],
             ['int', 1],
-            ['float', 1.2,],
+            ['float', 1.2],
             ['float-int', 1.0],
             ['float-e', 7E+20],
             ['float-ne', 7E-20],
