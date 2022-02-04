@@ -327,11 +327,22 @@ class RedisStore extends TaggableStore implements LockProvider
      * Serialize the value.
      *
      * @param  mixed  $value
-     * @return mixed
+     * @return int|string
      */
     protected function serialize($value)
     {
-        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value) ? $value : serialize($value);
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_float($value) && !in_array($value, [\INF, -\INF], true) && !is_nan($value)) {
+            // Note that float like "1.0" will be converted to string "1"
+            $value = (string) $value;
+            // Append missing ".", because we use "." to detect float (trailing 0 could be ignored)
+            return str_contains($value, '.') ? $value : ($value . '.');
+        }
+
+        return serialize($value);
     }
 
     /**
@@ -342,6 +353,9 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function unserialize($value)
     {
-        return is_numeric($value) ? $value : unserialize($value);
+        if (is_numeric($value)) {
+            return str_contains($value, '.') ? (float) $value : (int) $value;
+        }
+        return unserialize($value);
     }
 }
