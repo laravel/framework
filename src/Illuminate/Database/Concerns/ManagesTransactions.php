@@ -357,7 +357,7 @@ trait ManagesTransactions
      */
     protected function prepareIsolationLevel($isolationLevel)
     {
-        if ($this->getDriverName() === 'sqlite') {
+        if (! in_array($this->getDriverName(), ['mysql', 'pgsql', 'sqlsrv'])) {
             return;
         }
 
