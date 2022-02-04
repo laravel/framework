@@ -874,6 +874,33 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($value) {
+            $message->getHeaders()->add(new TagHeader($value));
+        });
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
+            $message->getHeaders()->add(new MetadataHeader($key, $value));
+        });
+    }
+
+    /**
      * Assert that the given text is present in the HTML email body.
      *
      * @param  string  $string
@@ -1022,33 +1049,6 @@ class Mailable implements MailableContract, Renderable
         $this->mailer = $mailer;
 
         return $this;
-    }
-
-    /**
-     * Add a tag to the email (for drivers that support).
-     *
-     * @param  string  $value
-     * @return $this
-     */
-    public function tag($value)
-    {
-        return $this->withSymfonyMessage(function (Email $message) use ($value) {
-            $message->getHeaders()->add(new TagHeader($value));
-        });
-    }
-
-    /**
-     * Add metadata to the email (for drivers that support).
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return $this
-     */
-    public function metadata($key, $value)
-    {
-        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
-            $message->getHeaders()->add(new MetadataHeader($key, $value));
-        });
     }
 
     /**
