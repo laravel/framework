@@ -197,15 +197,15 @@ class RouteListCommand extends Command
     protected function filterRoute(array $route)
     {
         if (
-            ($this->option('name') && !Str::contains($route['name'], $this->option('name'))) ||
-            ($this->option('path') && !Str::contains($route['uri'], $this->option('path'))) ||
-            ($this->option('method') && !Str::contains($route['method'], strtoupper($this->option('method'))))
+            ($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
+            ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
+            ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method'))))
         ) {
             return;
         }
         //The domain option behaves differently depending on whether the uri option is also provided
         if ($this->option('uri')) {
-            if (!$route['route']->matches(
+            if (! $route['route']->matches(
                 Request::create(
                     ($this->option('domain') ? 'https://' . $this->option('domain') : '') . $this->option('uri'),
                     $this->option('method') ?: 'GET'
@@ -213,7 +213,7 @@ class RouteListCommand extends Command
             )) {
                 return;
             }
-        } elseif ($this->option('domain') && !Str::contains($route['domain'], $this->option('domain'))) {
+        } elseif ($this->option('domain') && ! Str::contains($route['domain'], $this->option('domain'))) {
             return;
         }
 
