@@ -4273,7 +4273,7 @@ SQL;
 
     public function testIsolationLevelIsNotSupportedInSQLite()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $builder = $this->getSQLiteBuilder();
         $builder->getGrammar()->compileIsolationLevel('SERIALIZABLE');
     }

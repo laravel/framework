@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class SQLiteGrammar extends Grammar
 {
@@ -345,10 +346,10 @@ class SQLiteGrammar extends Grammar
      *
      * @param  string  $isolationLevel
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function compileIsolationLevel($isolationLevel)
     {
-        throw new \RuntimeException('SQLite database engine does not support isolation level.');
+        throw new RuntimeException('SQLite database engine does not support isolation level.');
     }
 }
