@@ -4264,6 +4264,20 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testIsolationLevelCompiled()
+    {
+        $builder = $this->getBuilder();
+        $result = $builder->getGrammar()->compileIsolationLevel('SERIALIZABLE');
+        $this->assertEquals('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', $result);
+    }
+
+    public function testIsolationLevelIsNotSupportedInSQLite()
+    {
+        $this->expectException(\RuntimeException::class);
+        $builder = $this->getSQLiteBuilder();
+        $builder->getGrammar()->compileIsolationLevel('SERIALIZABLE');
+    }
+
     public function testWhereJsonLengthMySql()
     {
         $builder = $this->getMySqlBuilder();

@@ -98,6 +98,25 @@ class DatabaseTransactionsTest extends TestCase
         $this->connection()->commit();
     }
 
+    public function testIsolatedTransactionWorksProperly()
+    {
+        $transactionManager = m::mock(new DatabaseTransactionsManager);
+        $transactionManager->shouldReceive('begin')->once()->with('default', 1);
+        $transactionManager->shouldReceive('commit')->once()->with('default');
+
+        $this->connection()->setTransactionManager($transactionManager);
+
+        $this->connection()->table('users')->insert([
+            'name' => 'Reza', 'value' => 1,
+        ]);
+
+        $this->connection()->isolatedTransaction('SERIALIZABLE', function () {
+            $this->connection()->table('users')->where(['name' => 'Reza'])->update([
+                'value' => 2,
+            ]);
+        });
+    }
+
     public function testNestedTransactionIsRecordedAndCommitted()
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
