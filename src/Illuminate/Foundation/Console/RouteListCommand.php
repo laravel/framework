@@ -207,7 +207,7 @@ class RouteListCommand extends Command
         if ($this->option('uri')) {
             if (! $route['route']->matches(
                 Request::create(
-                    ($this->option('domain') ? 'https://' . $this->option('domain') : '') . $this->option('uri'),
+                    ($this->option('domain') ? 'https://'.$this->option('domain') : '').$this->option('uri'),
                     $this->option('method') ?: 'GET'
                 )
             )) {
