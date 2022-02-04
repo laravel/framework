@@ -62,6 +62,49 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testGoodPathForFilesIsCalculated()
+    {
+        $files = new Filesystem();
+        $cache = new class($files, __DIR__) extends FileStore
+        {
+            public function path($key)
+            {
+                return parent::path($key);
+            }
+        };
+
+        // ensure spaces do not find their way in the file path.
+        $this->assertStringNotContainsString(' ', $cache->path('0--LL / key'));
+        // ensure slashes do not find their way in the file path.
+        $this->assertEquals(substr_count($cache->path('0--LL / key'), '/'), substr_count($cache->path('0--LL /// key'), '/'));
+    }
+
+    public function testPutWillConsiderZeroAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $cache = new class($files, __DIR__) extends FileStore
+        {
+            public function path($key)
+            {
+                return parent::path($key);
+            }
+        };
+
+        $filePath = $cache->path('0--LL / key');
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+        $exclusiveLock = true;
+
+        $files->expects($this->once())->method('put')->with(
+            static::equalTo($filePath), // ensure the exact output of the path method is used save the contents
+            static::equalTo($fileContents),
+            static::equalTo($exclusiveLock) // We do lock the file while putting.
+        )->willReturn(strlen('(-_-)zzz'));
+
+        (new FileStore($files, __DIR__))->put('0--LL / key', 'gold', 0);
+    }
+
     public function testExpiredItemsReturnNull()
     {
         $files = $this->mockFilesystem();
