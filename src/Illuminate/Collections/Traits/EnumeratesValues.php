@@ -744,7 +744,7 @@ trait EnumeratesValues
      * @template TReduceInitial
      * @template TReduceReturnType
      *
-     * @param  callable(TReduceInitial|TReduceReturnType, TValue): TReduceReturnType  $callback
+     * @param  callable(TReduceInitial|TReduceReturnType, TValue, TKey): TReduceReturnType  $callback
      * @param  TReduceInitial  $initial
      * @return TReduceReturnType
      */
@@ -808,7 +808,7 @@ trait EnumeratesValues
      * @template TReduceWithKeysInitial
      * @template TReduceWithKeysReturnType
      *
-     * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue): TReduceWithKeysReturnType  $callback
+     * @param  callable(TReduceWithKeysInitial|TReduceWithKeysReturnType, TValue, TKey): TReduceWithKeysReturnType  $callback
      * @param  TReduceWithKeysInitial  $initial
      * @return TReduceWithKeysReturnType
      */

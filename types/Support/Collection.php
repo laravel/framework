@@ -546,6 +546,14 @@ assertType('int', $collection
 
         return 1;
     }, 0));
+assertType('int', $collection
+    ->reduce(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('int', $int);
+        assertType('int', $key);
+
+        return 1;
+    }, 0));
 
 assertType('int', $collection
     ->reduceWithKeys(function ($null, $user) {
@@ -558,6 +566,14 @@ assertType('int', $collection
     ->reduceWithKeys(function ($int, $user) {
         assertType('User', $user);
         assertType('int', $int);
+
+        return 1;
+    }, 0));
+assertType('int', $collection
+    ->reduceWithKeys(function ($int, $user, $key) {
+        assertType('User', $user);
+        assertType('int', $int);
+        assertType('int', $key);
 
         return 1;
     }, 0));
