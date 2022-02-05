@@ -21,7 +21,7 @@
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0",
         "illuminate/support": "^10.0",
-        "league/commonmark": "^2.0.2",
+        "league/commonmark": "^2.2",
         "psr/log": "^1.0|^2.0|^3.0",
         "symfony/mailer": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2"
@@ -37,7 +37,7 @@
         }
     },
     "suggest": {
-        "symfony/amazon-mailer": "Required to enable support for the SES mail transport (^6.0).",
+        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.198.1).",
         "symfony/http-client": "Required to use the Symfony API mail transports (^6.0).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^6.0).",
         "symfony/postmark-mailer": "Required to enable support for the Postmark mail transport (^6.0)."

@@ -102,7 +102,7 @@ abstract class Queue
             $job = CallQueuedClosure::create($job);
         }
 
-        $payload = json_encode($this->createPayloadArray($job, $queue, $data));
+        $payload = json_encode($this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new InvalidPayloadException(
@@ -282,9 +282,7 @@ abstract class Queue
     {
         if (! empty(static::$createPayloadCallbacks)) {
             foreach (static::$createPayloadCallbacks as $callback) {
-                $payload = array_merge($payload, call_user_func(
-                    $callback, $this->getConnectionName(), $queue, $payload
-                ));
+                $payload = array_merge($payload, $callback($this->getConnectionName(), $queue, $payload));
             }
         }
 

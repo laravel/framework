@@ -461,7 +461,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function qualifyColumn($column)
     {
-        if (Str::contains($column, '.')) {
+        if (str_contains($column, '.')) {
             return $column;
         }
 
@@ -1948,7 +1948,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
      * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation

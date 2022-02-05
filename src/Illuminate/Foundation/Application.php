@@ -339,7 +339,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
 
-        return $appPath.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $appPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -365,7 +365,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function basePath($path = '')
     {
-        return $this->basePath.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -376,7 +376,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -387,7 +387,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -398,7 +398,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function databasePath($path = '')
     {
-        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -424,7 +424,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function langPath($path = '')
     {
-        return $this->langPath.($path ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->langPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -487,7 +487,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**
@@ -502,7 +502,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $basePath = $this['config']->get('view.paths')[0];
 
-        return rtrim($basePath, DIRECTORY_SEPARATOR).($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return rtrim($basePath, DIRECTORY_SEPARATOR).($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**

@@ -4,7 +4,6 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Pusher\ApiErrorException;
 use Pusher\Pusher;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -63,7 +62,7 @@ class PusherBroadcaster extends Broadcaster
      */
     public function validAuthenticationResponse($request, $result)
     {
-        if (Str::startsWith($request->channel_name, 'private')) {
+        if (str_starts_with($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
                 $request, $this->pusher->socket_auth($request->channel_name, $request->socket_id)
             );

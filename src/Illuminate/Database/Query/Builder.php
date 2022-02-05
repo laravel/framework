@@ -6,6 +6,7 @@ use BackedEnum;
 use Carbon\CarbonPeriod;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
@@ -25,7 +26,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
-class Builder
+class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
@@ -202,15 +203,6 @@ class Builder
         'rlike', 'not rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to', 'not ilike', '~~*', '!~~*',
-    ];
-
-    /**
-     * All of the available bit operators.
-     *
-     * @var string[]
-     */
-    public $bitOperators = [
-        '&', '|', '^', '<<', '>>', '&~',
     ];
 
     /**
@@ -758,16 +750,12 @@ class Builder
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
-        if (Str::contains($column, '->') && is_bool($value)) {
+        if (str_contains($column, '->') && is_bool($value)) {
             $value = new Expression($value ? 'true' : 'false');
 
             if (is_string($column)) {
                 $type = 'JsonBoolean';
             }
-        }
-
-        if ($this->isBitOperator($operator)) {
-            $type = 'Bit';
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -851,18 +839,6 @@ class Builder
     {
         return ! in_array(strtolower($operator), $this->operators, true) &&
                ! in_array(strtolower($operator), $this->grammar->getOperators(), true);
-    }
-
-    /**
-     * Determine if the operator is a bit operator.
-     *
-     * @param  string  $operator
-     * @return bool
-     */
-    protected function isBitOperator($operator)
-    {
-        return in_array(strtolower($operator), $this->bitOperators, true) ||
-               in_array(strtolower($operator), $this->grammar->getBitOperators(), true);
     }
 
     /**
@@ -1514,7 +1490,7 @@ class Builder
      */
     public function whereNested(Closure $callback, $boolean = 'and')
     {
-        call_user_func($callback, $query = $this->forNestedWhere());
+        $callback($query = $this->forNestedWhere());
 
         return $this->addNestedWhereQuery($query, $boolean);
     }
@@ -1565,7 +1541,7 @@ class Builder
         // Once we have the query instance we can simply execute it so it can add all
         // of the sub-select's conditions to itself, and then we can cache it off
         // in the array of where clauses for the "main" parent query instance.
-        call_user_func($callback, $query = $this->forSubQuery());
+        $callback($query = $this->forSubQuery());
 
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'query', 'boolean'
@@ -1591,7 +1567,7 @@ class Builder
         // Similar to the sub-select clause, we will create a new query instance so
         // the developer may cleanly specify the entire exists query and we will
         // compile the whole thing in the grammar and insert it into the SQL.
-        call_user_func($callback, $query);
+        $callback($query);
 
         return $this->addWhereExistsQuery($query, $boolean, $not);
     }
@@ -1923,7 +1899,7 @@ class Builder
     /**
      * Add a "having" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  string|null  $operator
      * @param  string|null  $value
      * @param  string  $boolean
@@ -1940,15 +1916,15 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($column instanceof Closure && is_null($operator)) {
+            return $this->havingNested($column, $boolean);
+        }
+
         // If the given operator is not found in the list of valid operators we will
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
             [$value, $operator] = [$operator, '='];
-        }
-
-        if ($this->isBitOperator($operator)) {
-            $type = 'bit';
         }
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
@@ -1963,7 +1939,7 @@ class Builder
     /**
      * Add an "or having" clause to the query.
      *
-     * @param  string  $column
+     * @param  \Closure|string  $column
      * @param  string|null  $operator
      * @param  string|null  $value
      * @return $this
@@ -1975,6 +1951,40 @@ class Builder
         );
 
         return $this->having($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a nested having statement to the query.
+     *
+     * @param  \Closure  $callback
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingNested(Closure $callback, $boolean = 'and')
+    {
+        $callback($query = $this->forNestedWhere());
+
+        return $this->addNestedHavingQuery($query, $boolean);
+    }
+
+    /**
+     * Add another query builder as a nested having to the query builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function addNestedHavingQuery($query, $boolean = 'and')
+    {
+        if (count($query->havings)) {
+            $type = 'Nested';
+
+            $this->havings[] = compact('type', 'query', 'boolean');
+
+            $this->addBinding($query->getRawBindings()['having'], 'having');
+        }
+
+        return $this;
     }
 
     /**
@@ -2328,7 +2338,7 @@ class Builder
     public function union($query, $all = false)
     {
         if ($query instanceof Closure) {
-            call_user_func($query, $query = $this->newQuery());
+            $query($query = $this->newQuery());
         }
 
         $this->unions[] = compact('query', 'all');
@@ -3591,7 +3601,7 @@ class Builder
             return $this->macroCall($method, $parameters);
         }
 
-        if (Str::startsWith($method, 'where')) {
+        if (str_starts_with($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
         }
 

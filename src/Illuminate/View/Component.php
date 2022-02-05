@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View as ViewContract;
-use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -223,7 +222,7 @@ abstract class Component
      */
     protected function shouldIgnore($name)
     {
-        return Str::startsWith($name, '__') ||
+        return str_starts_with($name, '__') ||
                in_array($name, $this->ignoredMethods());
     }
 

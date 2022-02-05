@@ -212,15 +212,15 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
-            $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-            $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
+        if (($this->option('name') && ! str_contains($route['name'], $this->option('name'))) ||
+            $this->option('path') && ! str_contains($route['uri'], $this->option('path')) ||
+            $this->option('method') && ! str_contains($route['method'], strtoupper($this->option('method')))) {
             return;
         }
 
         if ($this->option('except-path')) {
             foreach (explode(',', $this->option('except-path')) as $path) {
-                if (Str::contains($route['uri'], $path)) {
+                if (str_contains($route['uri'], $path)) {
                     return;
                 }
             }
@@ -260,7 +260,7 @@ class RouteListCommand extends Command
         $results = [];
 
         foreach ($columns as $i => $column) {
-            if (Str::contains($column, ',')) {
+            if (str_contains($column, ',')) {
                 $results = array_merge($results, explode(',', $column));
             } else {
                 $results[] = $column;
@@ -399,7 +399,7 @@ class RouteListCommand extends Command
     /**
      * Set a callback that should be used when resolving the terminal width.
      *
-     * @param  \Closure|null  $callback
+     * @param  \Closure|null  $resolver
      * @return void
      */
     public static function resolveTerminalWidthUsing($resolver)

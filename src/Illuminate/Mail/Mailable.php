@@ -15,14 +15,20 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Localizable;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionClass;
 use ReflectionProperty;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mime\Email;
 
 class Mailable implements MailableContract, Renderable
 {
-    use Conditionable, ForwardsCalls, Localizable;
+    use Conditionable, ForwardsCalls, Localizable, Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The locale of the message.
@@ -868,6 +874,33 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($value) {
+            $message->getHeaders()->add(new TagHeader($value));
+        });
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
+            $message->getHeaders()->add(new MetadataHeader($key, $value));
+        });
+    }
+
+    /**
      * Assert that the given text is present in the HTML email body.
      *
      * @param  string  $string
@@ -878,7 +911,7 @@ class Mailable implements MailableContract, Renderable
         [$html, $text] = $this->renderForAssertions();
 
         PHPUnit::assertTrue(
-            Str::contains($html, $string),
+            str_contains($html, $string),
             "Did not see expected text [{$string}] within email body."
         );
 
@@ -896,7 +929,7 @@ class Mailable implements MailableContract, Renderable
         [$html, $text] = $this->renderForAssertions();
 
         PHPUnit::assertFalse(
-            Str::contains($html, $string),
+            str_contains($html, $string),
             "Saw unexpected text [{$string}] within email body."
         );
 
@@ -929,7 +962,7 @@ class Mailable implements MailableContract, Renderable
         [$html, $text] = $this->renderForAssertions();
 
         PHPUnit::assertTrue(
-            Str::contains($text, $string),
+            str_contains($text, $string),
             "Did not see expected text [{$string}] within text email body."
         );
 
@@ -947,7 +980,7 @@ class Mailable implements MailableContract, Renderable
         [$html, $text] = $this->renderForAssertions();
 
         PHPUnit::assertFalse(
-            Str::contains($text, $string),
+            str_contains($text, $string),
             "Saw unexpected text [{$string}] within text email body."
         );
 
@@ -1053,7 +1086,11 @@ class Mailable implements MailableContract, Renderable
      */
     public function __call($method, $parameters)
     {
-        if (Str::startsWith($method, 'with')) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if (str_starts_with($method, 'with')) {
             return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 

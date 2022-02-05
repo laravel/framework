@@ -8,7 +8,6 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Support\Str;
 
 class DatabaseUserProvider implements UserProvider
 {
@@ -36,7 +35,7 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $conn
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $table
      * @return void
@@ -112,7 +111,7 @@ class DatabaseUserProvider implements UserProvider
         $query = $this->connection->table($this->table);
 
         foreach ($credentials as $key => $value) {
-            if (Str::contains($key, 'password')) {
+            if (str_contains($key, 'password')) {
                 continue;
             }
 

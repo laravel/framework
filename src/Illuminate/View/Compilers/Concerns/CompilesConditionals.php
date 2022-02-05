@@ -304,4 +304,26 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+
+    /**
+     * Compile a selected block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileSelected($condition)
+    {
+        return "<?php if{$condition}: echo 'selected'; endif; ?>";
+    }
+
+    /**
+     * Compile a checked block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileChecked($condition)
+    {
+        return "<?php if{$condition}: echo 'checked'; endif; ?>";
+    }
 }

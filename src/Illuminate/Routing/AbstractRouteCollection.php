@@ -205,7 +205,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
 
         if (
             ! is_null($name)
-            && Str::endsWith($name, '.')
+            && str_ends_with($name, '.')
             && ! is_null($symfonyRoutes->get($name))
         ) {
             $name = null;

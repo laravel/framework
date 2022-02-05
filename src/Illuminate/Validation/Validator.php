@@ -667,7 +667,6 @@ class Validator implements ValidatorContract
      * Replace each field parameter which has an escaped dot with the dot placeholder.
      *
      * @param  array  $parameters
-     * @param  array  $keys
      * @return array
      */
     protected function replaceDotInParameters(array $parameters)
@@ -1149,7 +1148,7 @@ class Validator implements ValidatorContract
             $this->implicitAttributes = array_merge($response->implicitAttributes, $this->implicitAttributes);
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
-                if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! Str::endsWith($key, '.*')))) {
+                if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! str_ends_with($key, '.*')))) {
                     $this->addRules([$ruleKey => $ruleValue]);
                 }
             }

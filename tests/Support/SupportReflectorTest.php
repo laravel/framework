@@ -48,6 +48,13 @@ class SupportReflectorTest extends TestCase
         $this->assertSame(A::class, Reflector::getParameterClassName($method->getParameters()[0]));
     }
 
+    public function testParameterSubclassOfInterface()
+    {
+        $method = (new ReflectionClass(TestClassWithInterfaceSubclassParameter::class))->getMethod('f');
+
+        $this->assertTrue(Reflector::isParameterSubclassOf($method->getParameters()[0], IA::class));
+    }
+
     public function testUnionTypeName()
     {
         $method = (new ReflectionClass(C::class))->getMethod('f');
@@ -92,8 +99,7 @@ class C
     {
         //
     }
-}'
-    );
+}');
 }
 
 class TestClassWithCall
@@ -107,6 +113,22 @@ class TestClassWithCall
 class TestClassWithCallStatic
 {
     public static function __callStatic($method, $parameters)
+    {
+        //
+    }
+}
+
+interface IA
+{
+}
+
+interface IB extends IA
+{
+}
+
+class TestClassWithInterfaceSubclassParameter
+{
+    public function f(IB $x)
     {
         //
     }

@@ -9,6 +9,13 @@ use stdClass;
 
 class CacheArrayStoreTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     public function testItemsCanBeSetAndRetrieved()
     {
         $store = new ArrayStore;
@@ -37,7 +44,6 @@ class CacheArrayStoreTest extends TestCase
 
     public function testItemsCanExpire()
     {
-        Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
 
         $store->put('foo', 'bar', 10);
@@ -45,7 +51,6 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->get('foo');
 
         $this->assertNull($result);
-        Carbon::setTestNow(null);
     }
 
     public function testStoreItemForeverProperlyStoresInArray()
@@ -77,7 +82,6 @@ class CacheArrayStoreTest extends TestCase
 
     public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
     {
-        Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
 
         $store->put('foo', 999, 10);
@@ -85,7 +89,6 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->increment('foo');
 
         $this->assertEquals(1, $result);
-        Carbon::setTestNow(null);
     }
 
     public function testValuesCanBeDecremented()
@@ -134,7 +137,6 @@ class CacheArrayStoreTest extends TestCase
 
     public function testCanAcquireLockAgainAfterExpiry()
     {
-        Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
         $lock = $store->lock('foo', 10);
         $lock->acquire();
@@ -146,6 +148,7 @@ class CacheArrayStoreTest extends TestCase
     public function testLockExpirationLowerBoundary()
     {
         Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
         $lock = $store->lock('foo', 10);
         $lock->acquire();
@@ -156,7 +159,6 @@ class CacheArrayStoreTest extends TestCase
 
     public function testLockWithNoExpirationNeverExpires()
     {
-        Carbon::setTestNow(Carbon::now());
         $store = new ArrayStore;
         $lock = $store->lock('foo');
         $lock->acquire();

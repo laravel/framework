@@ -13,13 +13,14 @@ use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Psr\Http\Message\MessageInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 class PendingRequest
 {
-    use Macroable;
+    use Conditionable, Macroable;
 
     /**
      * The factory instance.
@@ -898,11 +899,12 @@ class PendingRequest
         return tap($handlerStack, function ($stack) {
             $stack->push($this->buildBeforeSendingHandler());
             $stack->push($this->buildRecorderHandler());
-            $stack->push($this->buildStubHandler());
 
             $this->middleware->each(function ($middleware) use ($stack) {
                 $stack->push($middleware);
             });
+
+            $stack->push($this->buildStubHandler());
         });
     }
 

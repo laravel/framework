@@ -214,6 +214,17 @@ class BroadcastManager implements FactoryContract
      */
     protected function createPusherDriver(array $config)
     {
+        return new PusherBroadcaster($this->pusher($config));
+    }
+
+    /**
+     * Get a Pusher instance for the given configuration.
+     *
+     * @param  array  $config
+     * @return \Pusher\Pusher
+     */
+    public function pusher(array $config)
+    {
         $pusher = new Pusher(
             $config['key'],
             $config['secret'],
@@ -228,7 +239,7 @@ class BroadcastManager implements FactoryContract
             $pusher->setLogger($this->app->make(LoggerInterface::class));
         }
 
-        return new PusherBroadcaster($pusher);
+        return $pusher;
     }
 
     /**
@@ -239,7 +250,18 @@ class BroadcastManager implements FactoryContract
      */
     protected function createAblyDriver(array $config)
     {
-        return new AblyBroadcaster(new AblyRest($config));
+        return new AblyBroadcaster($this->ably($config));
+    }
+
+    /**
+     * Get an Ably instance for the given configuration.
+     *
+     * @param  array  $config
+     * @return \Ably\AblyRest
+     */
+    public function ably(array $config)
+    {
+        return new AblyRest($config);
     }
 
     /**

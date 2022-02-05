@@ -563,7 +563,7 @@ class Router implements BindingRegistrar, RegistrarContract
             return $class;
         }
 
-        if (strpos($class, '@') !== false) {
+        if (str_contains($class, '@')) {
             return $class;
         }
 

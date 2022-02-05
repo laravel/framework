@@ -121,7 +121,7 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function guessModelName($name)
     {
-        if (Str::endsWith($name, 'Factory')) {
+        if (str_ends_with($name, 'Factory')) {
             $name = substr($name, 0, -7);
         }
 

@@ -1392,6 +1392,25 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select "category", count(*) as "total" from "item" where "department" = ? group by "category" having "total" > ?', $builder->toSql());
     }
 
+    public function testNestedHavings()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('email', '=', 'foo')->orHaving(function ($q) {
+            $q->having('name', '=', 'bar')->having('age', '=', 25);
+        });
+        $this->assertSame('select * from "users" having "email" = ? or ("name" = ? and "age" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
+    }
+
+    public function testNestedHavingBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->having('email', '=', 'foo')->having(function ($q) {
+            $q->selectRaw('?', ['ignore'])->having('name', '=', 'bar');
+        });
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
     public function testHavingBetweens()
     {
         $builder = $this->getBuilder();
@@ -3311,25 +3330,6 @@ SQL;
         $builder->select('*')->from('users')->where('name', 'sounds like', 'John Doe');
         $this->assertSame('select * from `users` where `name` sounds like ?', $builder->toSql());
         $this->assertEquals(['John Doe'], $builder->getBindings());
-    }
-
-    public function testBitOperators()
-    {
-        $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->where('bar', '&', 1);
-        $this->assertSame('select * from "users" where ("bar" & ?) != 0', $builder->toSql());
-
-        $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->where('bar', '#', 1);
-        $this->assertSame('select * from "users" where ("bar" # ?) != 0', $builder->toSql());
-
-        $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->having('bar', '&', 1);
-        $this->assertSame('select * from "users" having ("bar" & ?) != 0', $builder->toSql());
-
-        $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->having('bar', '#', 1);
-        $this->assertSame('select * from "users" having ("bar" # ?) != 0', $builder->toSql());
     }
 
     public function testMergeWheresCanMergeWheresAndBindings()

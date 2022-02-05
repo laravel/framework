@@ -9,9 +9,9 @@ use Illuminate\Validation\Validator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class ValidationNestedRulesTest extends TestCase
+class ValidationForEachTest extends TestCase
 {
-    public function testNestedCallbacksCanProperlySegmentRules()
+    public function testForEachCallbacksCanProperlySegmentRules()
     {
         $data = [
             'items' => [
@@ -22,7 +22,7 @@ class ValidationNestedRulesTest extends TestCase
         ];
 
         $rules = [
-            'items.*' => Rule::nested(function () {
+            'items.*' => Rule::forEach(function () {
                 return ['discounts.*.id' => 'distinct'];
             }),
         ];
@@ -39,7 +39,7 @@ class ValidationNestedRulesTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    public function testNestedCallbacksCanBeRecursivelyNested()
+    public function testForEachCallbacksCanBeRecursivelyNested()
     {
         $data = [
             'items' => [
@@ -50,9 +50,9 @@ class ValidationNestedRulesTest extends TestCase
         ];
 
         $rules = [
-            'items.*' => Rule::nested(function () {
+            'items.*' => Rule::forEach(function () {
                 return [
-                    'discounts.*.id' => Rule::nested(function () {
+                    'discounts.*.id' => Rule::forEach(function () {
                         return 'distinct';
                     }),
                 ];
@@ -71,7 +71,7 @@ class ValidationNestedRulesTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    public function testNestedCallbacksCanReturnMultipleValidationRules()
+    public function testForEachCallbacksCanReturnMultipleValidationRules()
     {
         $data = [
             'items' => [
@@ -92,10 +92,10 @@ class ValidationNestedRulesTest extends TestCase
             ],
         ];
         $rules = [
-            'items.*' => Rule::nested(function () {
+            'items.*' => Rule::forEach(function () {
                 return [
                     'discounts.*.id' => 'distinct',
-                    'discounts.*' => Rule::nested(function () {
+                    'discounts.*' => Rule::forEach(function () {
                         return [
                             'id' => 'distinct',
                             'percent' => 'numeric|min:0|max:100',
@@ -124,7 +124,7 @@ class ValidationNestedRulesTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    public function testNestedCallbacksCanReturnArraysOfValidationRules()
+    public function testForEachCallbacksCanReturnArraysOfValidationRules()
     {
         $data = [
             'items' => [
@@ -135,7 +135,7 @@ class ValidationNestedRulesTest extends TestCase
         ];
 
         $rules = [
-            'items.*' => Rule::nested(function () {
+            'items.*' => Rule::forEach(function () {
                 return ['discounts.*.id' => ['distinct', 'numeric']];
             }),
         ];
@@ -153,7 +153,7 @@ class ValidationNestedRulesTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
-    public function testNestedCallbacksCanReturnDifferentRules()
+    public function testForEachCallbacksCanReturnDifferentRules()
     {
         $data = [
             'items' => [
@@ -174,11 +174,11 @@ class ValidationNestedRulesTest extends TestCase
         ];
 
         $rules = [
-            'items.*' => Rule::nested(function () {
+            'items.*' => Rule::forEach(function () {
                 return [
                     'discounts.*.id' => 'distinct',
                     'discounts.*.type' => 'in:percent,absolute',
-                    'discounts.*' => Rule::nested(function ($value) {
+                    'discounts.*' => Rule::forEach(function ($value) {
                         return $value['type'] === 'percent'
                             ? ['discount' => 'numeric|min:0|max:100']
                             : ['discount' => 'numeric'];

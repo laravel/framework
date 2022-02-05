@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class DatabaseMigrationsTest extends TestCase
 {
@@ -20,7 +22,7 @@ class DatabaseMigrationsTest extends TestCase
             'beforeApplicationDestroyed',
         ]);
 
-        $kernelObj = \Mockery::mock();
+        $kernelObj = Mockery::mock();
         $kernelObj->shouldReceive('setArtisan')
             ->with(null);
 
@@ -31,7 +33,7 @@ class DatabaseMigrationsTest extends TestCase
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
     {
-        $migrateFreshUsingReflection = new \ReflectionMethod(
+        $migrateFreshUsingReflection = new ReflectionMethod(
             get_class($this->traitObject),
             $methodName
         );
@@ -44,7 +46,7 @@ class DatabaseMigrationsTest extends TestCase
     public function testRefreshTestDatabaseDefault()
     {
         $this->traitObject
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('artisan')
             ->with('migrate:fresh', [
                 '--drop-views' => false,
@@ -62,7 +64,7 @@ class DatabaseMigrationsTest extends TestCase
         $this->traitObject->dropViews = true;
 
         $this->traitObject
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('artisan')
             ->with('migrate:fresh', [
                 '--drop-views' => true,
@@ -80,7 +82,7 @@ class DatabaseMigrationsTest extends TestCase
         $this->traitObject->dropTypes = true;
 
         $this->traitObject
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('artisan')
             ->with('migrate:fresh', [
                 '--drop-views' => false,

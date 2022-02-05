@@ -36,7 +36,8 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Carbon::setTestNow();
+        parent::tearDown();
+
         m::close();
     }
 
@@ -4019,6 +4020,8 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => new Carbon('2018-01-01')], ['x' => 'date_equals:tomorrow']);
         $this->assertTrue($v->fails());
+
+        Carbon::setTestNow(null);
     }
 
     public function testBeforeAndAfter()
@@ -6672,7 +6675,7 @@ class ValidationValidatorTest extends TestCase
                         ['type' => 'boat', 'wheels' => 'should be excluded'],
                     ],
                 ], [
-                    // The blue wheels are excluded and are therefor not validated against the "in:square,round" rule
+                    // The blue wheels are excluded and are therefore not validated against the "in:square,round" rule
                     'vehicles.0.wheels.2.shape' => ['validation.in'],
                 ],
             ],
@@ -6949,6 +6952,103 @@ class ValidationValidatorTest extends TestCase
         $failOnFirstErrorEnable->stopOnFirstFailure();
         $this->assertFalse($failOnFirstErrorEnable->passes());
         $this->assertEquals($expectedFailOnFirstErrorEnableResult, $failOnFirstErrorEnable->getMessageBag()->getMessages());
+    }
+
+    public function testArrayKeysValidationPassedWhenHasKeys()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $data = [
+            'baz' => [
+                'foo' => 'bar',
+                'fee' => 'faa',
+                'laa' => 'lee',
+            ],
+        ];
+
+        $rules = [
+            'baz' => [
+                'array',
+                'required_array_keys:foo,fee,laa',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testArrayKeysValidationPassedWithPartialMatch()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $data = [
+            'baz' => [
+                'foo' => 'bar',
+                'fee' => 'faa',
+                'laa' => 'lee',
+            ],
+        ];
+
+        $rules = [
+            'baz' => [
+                'array',
+                'required_array_keys:foo,fee',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testArrayKeysValidationFailsWithMissingKey()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_array_keys' => 'The :attribute field must contain entries for :values'], 'en');
+
+        $data = [
+            'baz' => [
+                'foo' => 'bar',
+                'fee' => 'faa',
+                'laa' => 'lee',
+            ],
+        ];
+
+        $rules = [
+            'baz' => [
+                'array',
+                'required_array_keys:foo,fee,boo,bar',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'The baz field must contain entries for foo, fee, boo, bar',
+            $validator->messages()->first('baz')
+        );
+    }
+
+    public function testArrayKeysValidationFailsWithNotAnArray()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_array_keys' => 'The :attribute field must contain entries for :values'], 'en');
+
+        $data = [
+            'baz' => 'no an array',
+        ];
+
+        $rules = [
+            'baz' => [
+                'required_array_keys:foo,fee,boo,bar',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'The baz field must contain entries for foo, fee, boo, bar',
+            $validator->messages()->first('baz')
+        );
     }
 
     protected function getTranslator()

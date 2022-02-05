@@ -1315,7 +1315,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using the given callback.
      *
-     * @param  (callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static
@@ -1332,7 +1332,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         // First we will loop through the items and get the comparator from a callback
         // function which we were given. Then, we will sort the returned values and
-        // and grab the corresponding values for the sorted keys from this array.
+        // grab all the corresponding values for the sorted keys from this array.
         foreach ($this->items as $key => $value) {
             $results[$key] = $callback($value, $key);
         }
@@ -1353,7 +1353,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using multiple comparisons.
      *
-     * @param  array  $comparisons
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>  $comparisons
      * @return static
      */
     protected function sortByMany(array $comparisons = [])
@@ -1397,7 +1397,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection in descending order using the given callback.
      *
-     * @param  (callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
      * @return static
      */

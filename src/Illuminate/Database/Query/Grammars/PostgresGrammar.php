@@ -4,7 +4,6 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class PostgresGrammar extends Grammar
 {
@@ -39,7 +38,7 @@ class PostgresGrammar extends Grammar
      */
     protected function whereBasic(Builder $query, $where)
     {
-        if (Str::contains(strtolower($where['operator']), 'like')) {
+        if (str_contains(strtolower($where['operator']), 'like')) {
             return sprintf(
                 '%s::text %s %s',
                 $this->wrap($where['column']),

@@ -91,7 +91,7 @@ class Dispatcher implements DispatcherContract
         }
 
         foreach ((array) $events as $event) {
-            if (Str::contains($event, '*')) {
+            if (str_contains($event, '*')) {
                 $this->setupWildcardListen($event, $listener);
             } else {
                 $this->listeners[$event][] = $listener;
@@ -641,7 +641,7 @@ class Dispatcher implements DispatcherContract
      */
     public function forget($event)
     {
-        if (Str::contains($event, '*')) {
+        if (str_contains($event, '*')) {
             unset($this->wildcards[$event]);
         } else {
             unset($this->listeners[$event]);
@@ -662,7 +662,7 @@ class Dispatcher implements DispatcherContract
     public function forgetPushed()
     {
         foreach ($this->listeners as $key => $value) {
-            if (Str::endsWith($key, '_pushed')) {
+            if (str_ends_with($key, '_pushed')) {
                 $this->forget($key);
             }
         }

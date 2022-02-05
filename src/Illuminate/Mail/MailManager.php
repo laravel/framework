@@ -2,16 +2,17 @@
 
 namespace Illuminate\Mail;
 
+use Aws\Ses\SesClient;
 use Closure;
 use Illuminate\Contracts\Mail\Factory as FactoryContract;
 use Illuminate\Log\LogManager;
 use Illuminate\Mail\Transport\ArrayTransport;
 use Illuminate\Mail\Transport\LogTransport;
+use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -234,20 +235,25 @@ class MailManager implements FactoryContract
 
         $config = Arr::except($config, ['transport']);
 
-        $factory = new SesTransportFactory();
+        return new SesTransport(
+            new SesClient($this->addSesCredentials($config)),
+            $config['options'] ?? []
+        );
+    }
 
-        if (! isset($config['session_token']) && isset($config['token'])) {
-            $config['session_token'] = $config['token'];
+    /**
+     * Add the SES credentials to the configuration array.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function addSesCredentials(array $config)
+    {
+        if (! empty($config['key']) && ! empty($config['secret'])) {
+            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
-        return $factory->create(new Dsn(
-            'ses+api',
-            'default',
-            $config['key'],
-            $config['secret'],
-            $config['port'] ?? null,
-            $config
-        ));
+        return $config;
     }
 
     /**

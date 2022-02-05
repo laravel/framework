@@ -11,7 +11,7 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
-use League\Flysystem\Ftp\FtpAdapter as FtpAdapter;
+use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
@@ -169,7 +169,8 @@ class FilesystemManager implements FactoryContract
     public function createLocalDriver(array $config)
     {
         $visibility = PortableVisibilityConverter::fromArray(
-            $config['permissions'] ?? []
+            $config['permissions'] ?? [],
+            $config['directory_visibility'] ?? $config['visibility'] ?? Visibility::PRIVATE
         );
 
         $links = ($config['links'] ?? null) === 'skip'
@@ -270,9 +271,13 @@ class FilesystemManager implements FactoryContract
      */
     protected function createFlysystem(FlysystemAdapter $adapter, array $config)
     {
-        $config = Arr::only($config, ['visibility', 'disable_asserts', 'url', 'temporary_url']);
-
-        return new Flysystem($adapter, $config);
+        return new Flysystem($adapter, Arr::only($config, [
+            'directory_visibility',
+            'disable_asserts',
+            'temporary_url',
+            'url',
+            'visibility',
+        ]));
     }
 
     /**

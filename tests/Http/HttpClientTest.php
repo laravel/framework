@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -1121,5 +1122,28 @@ class HttpClientTest extends TestCase
             ->get('http://foo.com/get');
 
         $this->assertTrue($response->failed());
+    }
+
+    public function testMiddlewareRunsWhenFaked()
+    {
+        $this->factory->fake(function (Request $request) {
+            return $this->factory->response('Fake');
+        });
+
+        $history = [];
+
+        $pendingRequest = $this->factory->withMiddleware(
+            Middleware::history($history)
+        );
+
+        $response = $pendingRequest->post('https://example.com', ['hyped-for' => 'laravel-movie']);
+
+        $this->assertSame('Fake', $response->body());
+
+        $this->assertCount(1, $history);
+
+        $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
+
+        $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
     }
 }

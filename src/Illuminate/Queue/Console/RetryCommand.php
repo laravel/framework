@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class RetryCommand extends Command
@@ -173,7 +172,7 @@ class RetryCommand extends Command
             return json_encode($payload);
         }
 
-        if (Str::startsWith($payload['data']['command'], 'O:')) {
+        if (str_starts_with($payload['data']['command'], 'O:')) {
             $instance = unserialize($payload['data']['command']);
         } elseif ($this->laravel->bound(Encrypter::class)) {
             $instance = unserialize($this->laravel->make(Encrypter::class)->decrypt($payload['data']['command']));

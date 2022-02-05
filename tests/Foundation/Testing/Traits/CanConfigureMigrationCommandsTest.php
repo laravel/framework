@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation\Testing\Traits;
 
 use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class CanConfigureMigrationCommandsTest extends TestCase
 {
@@ -16,7 +17,7 @@ class CanConfigureMigrationCommandsTest extends TestCase
 
     private function __reflectAndSetupAccessibleForProtectedTraitMethod($methodName)
     {
-        $migrateFreshUsingReflection = new \ReflectionMethod(
+        $migrateFreshUsingReflection = new ReflectionMethod(
             get_class($this->traitObject),
             $methodName
         );

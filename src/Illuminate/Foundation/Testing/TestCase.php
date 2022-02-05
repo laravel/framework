@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
@@ -200,8 +201,8 @@ abstract class TestCase extends BaseTestCase
         $this->beforeApplicationDestroyedCallbacks = [];
 
         Artisan::forgetBootstrappers();
-
         Queue::createPayloadUsing(null);
+        HandleExceptions::forgetApp();
 
         if ($this->callbackException) {
             throw $this->callbackException;

@@ -444,7 +444,7 @@ class Stringable implements JsonSerializable
      */
     public function pipe(callable $callback)
     {
-        return new static(call_user_func($callback, $this));
+        return new static($callback($this));
     }
 
     /**
@@ -510,7 +510,7 @@ class Stringable implements JsonSerializable
      */
     public function repeat(int $times)
     {
-        return new static(Str::repeat($this->value, $times));
+        return new static(str_repeat($this->value, $times));
     }
 
     /**
@@ -522,7 +522,7 @@ class Stringable implements JsonSerializable
      */
     public function replace($search, $replace)
     {
-        return new static(Str::replace($search, $replace, $this->value));
+        return new static(str_replace($search, $replace, $this->value));
     }
 
     /**
@@ -779,11 +779,11 @@ class Stringable implements JsonSerializable
     /**
      * Split a string by uppercase characters.
      *
-     * @return static
+     * @return \Illuminate\Support\Collection
      */
     public function ucsplit()
     {
-        return new static(Str::ucsplit($this->value));
+        return collect(Str::ucsplit($this->value));
     }
 
     /**

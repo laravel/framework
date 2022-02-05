@@ -11,6 +11,8 @@ class DatabaseEloquentTimestampsTest extends TestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
+
         $db = new DB;
 
         $db->addConnection([
@@ -22,7 +24,6 @@ class DatabaseEloquentTimestampsTest extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
-        Carbon::setTestNow(Carbon::now());
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use BadMethodCallException;
 use Closure;
 use Exception;
+use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
@@ -24,7 +25,7 @@ use ReflectionMethod;
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder
+class Builder implements BuilderContract
 {
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
@@ -736,7 +737,7 @@ class Builder
      */
     protected function isNestedUnder($relation, $name)
     {
-        return Str::contains($name, '.') && Str::startsWith($name, $relation.'.');
+        return str_contains($name, '.') && str_starts_with($name, $relation.'.');
     }
 
     /**
@@ -1359,7 +1360,7 @@ class Builder
             if (is_numeric($name)) {
                 $name = $constraints;
 
-                [$name, $constraints] = Str::contains($name, ':')
+                [$name, $constraints] = str_contains($name, ':')
                             ? $this->createSelectWithConstraint($name)
                             : [$name, static function () {
                                 //
@@ -1387,7 +1388,7 @@ class Builder
     {
         return [explode(':', $name)[0], static function ($query) use ($name) {
             $query->select(array_map(static function ($column) use ($query) {
-                if (Str::contains($column, '.')) {
+                if (str_contains($column, '.')) {
                     return $column;
                 }
 
