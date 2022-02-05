@@ -19,13 +19,6 @@ class Grammar extends BaseGrammar
     protected $operators = [];
 
     /**
-     * The grammar specific bit operators.
-     *
-     * @var array
-     */
-    protected $bitOperators = [];
-
-    /**
      * The components that make up a select clause.
      *
      * @var string[]
@@ -260,22 +253,6 @@ class Grammar extends BaseGrammar
         $operator = str_replace('?', '??', $where['operator']);
 
         return $this->wrap($where['column']).' '.$operator.' '.$value;
-    }
-
-    /**
-     * Compile a bit operator where clause.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBit(Builder $query, $where)
-    {
-        $value = $this->parameter($where['value']);
-
-        $operator = str_replace('?', '??', $where['operator']);
-
-        return '('.$this->wrap($where['column']).' '.$operator.' '.$value.') != 0';
     }
 
     /**
@@ -1353,15 +1330,5 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
-    }
-
-    /**
-     * Get the grammar specific bit operators.
-     *
-     * @return array
-     */
-    public function getBitOperators()
-    {
-        return $this->bitOperators;
     }
 }
