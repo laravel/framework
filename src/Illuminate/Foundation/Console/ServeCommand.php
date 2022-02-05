@@ -112,6 +112,7 @@ class ServeCommand extends Command
                 'LARAVEL_SAIL',
                 'PHP_CLI_SERVER_WORKERS',
                 'PHP_IDE_CONFIG',
+                'SYSTEMROOT',
                 'XDEBUG_CONFIG',
                 'XDEBUG_MODE',
                 'XDEBUG_SESSION',

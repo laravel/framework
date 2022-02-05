@@ -172,6 +172,23 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testPostgresConnectorReadsIsolationLevelFromConfig()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111';
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'isolation_level' => 'SERIALIZABLE'];
+        $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $statement = m::mock(PDOStatement::class);
+        $connection->shouldReceive('prepare')->once()->with('set session characteristics as transaction isolation level SERIALIZABLE')->andReturn($statement);
+        $statement->shouldReceive('execute')->zeroOrMoreTimes();
+        $connection->shouldReceive('exec')->zeroOrMoreTimes();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testSQLiteMemoryDatabasesMayBeConnectedTo()
     {
         $dsn = 'sqlite::memory:';
