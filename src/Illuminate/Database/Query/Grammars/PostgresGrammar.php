@@ -590,4 +590,15 @@ class PostgresGrammar extends Grammar
                         : "'$attribute'";
         }, $path);
     }
+
+    /**
+     * Compile a SQL query to set isolation level for current transaction.
+     *
+     * @param  string  $isolationLevel
+     * @return string
+     */
+    public function compileIsolationLevel($isolationLevel)
+    {
+        return "START TRANSACTION ISOLATION LEVEL {$isolationLevel}";
+    }
 }
