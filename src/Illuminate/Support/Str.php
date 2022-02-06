@@ -956,8 +956,8 @@ class Str
     /**
      * Swap multiple keywords in a string with other keywords.
      *
-     * @param array $map
-     * @param string $subject
+     * @param  array  $map
+     * @param  string  $subject
      * @return string
      */
     public static function swap($map, $subject)

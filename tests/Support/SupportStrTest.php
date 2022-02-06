@@ -626,15 +626,15 @@ class SupportStrTest extends TestCase
     public function testSwapKeywords(): void
     {
         $this->assertSame(
-            'PHP 8 is fantastic', 
+            'PHP 8 is fantastic',
             Str::swap([
                 'PHP' => 'PHP 8',
-                'awesome' => 'fantastic'
+                'awesome' => 'fantastic',
             ], 'PHP is awesome')
         );
 
         $this->assertSame(
-            'foo bar baz', 
+            'foo bar baz',
             Str::swap([
                 'ⓐⓑ' => 'baz',
             ], 'foo bar ⓐⓑ')
