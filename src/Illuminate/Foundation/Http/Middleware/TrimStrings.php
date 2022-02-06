@@ -64,6 +64,8 @@ class TrimStrings extends TransformsRequest
      */
     public static function skipWhen(Closure $callback)
     {
-        static::$skipCallbacks[] = $callback;
+        if (! in_array($callback, static::$skipCallbacks)) {
+            static::$skipCallbacks[] = $callback;
+        }
     }
 }
