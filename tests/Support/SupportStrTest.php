@@ -640,7 +640,7 @@ class SupportStrTest extends TestCase
             ], 'foo bar ⓐⓑ')
         );
     }
-  
+
     public function testWordCount()
     {
         $this->assertEquals(2, Str::wordCount('Hello, world!'));
