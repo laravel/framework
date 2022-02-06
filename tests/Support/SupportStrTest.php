@@ -480,6 +480,24 @@ class SupportStrTest extends TestCase
         $this->assertSame('Alien     ', Str::padRight('Alien', 10));
     }
 
+    public function testSwapKeywords(): void
+    {
+        $this->assertSame(
+            'PHP 8 is fantastic', 
+            Str::swap([
+                'PHP' => 'PHP 8',
+                'awesome' => 'fantastic'
+            ], 'PHP is awesome')
+        );
+
+        $this->assertSame(
+            'foo bar baz', 
+            Str::swap([
+                'ⓐⓑ' => 'baz',
+            ], 'foo bar ⓐⓑ')
+        );
+    }
+
     public function validUuidList()
     {
         return [

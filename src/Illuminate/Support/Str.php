@@ -735,6 +735,18 @@ class Str
     }
 
     /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param array $map
+     * @param string $subject
+     * @return string
+     */
+    public static function swap($map, $subject)
+    {
+        return str_replace(array_keys($map), array_values($map), $subject);
+    }
+
+    /**
      * Generate a time-ordered UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
