@@ -130,10 +130,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKey')->andReturn(1);
+
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $builder->setModel($model);
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail([1, 2], ['column']);
     }
 
@@ -141,10 +144,13 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
 
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKey')->andReturn(1);
+
         $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $builder->setModel($this->getMockModel());
+        $builder->setModel($model);
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
+        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model]));
         $builder->findOrFail(new Collection([1, 2]), ['column']);
     }
 
