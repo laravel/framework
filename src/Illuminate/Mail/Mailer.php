@@ -197,7 +197,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function html($html, $callback)
     {
-        return $this->send(['html' => new HtmlString($html)], [], $callback);
+        $this->send(['html' => new HtmlString($html)], [], $callback);
     }
 
     /**
@@ -209,7 +209,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function raw($text, $callback)
     {
-        return $this->send(['raw' => $text], [], $callback);
+        $this->send(['raw' => $text], [], $callback);
     }
 
     /**
@@ -222,7 +222,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     public function plain($view, array $data, $callback)
     {
-        return $this->send(['text' => $view], $data, $callback);
+        $this->send(['text' => $view], $data, $callback);
     }
 
     /**
@@ -352,7 +352,7 @@ class Mailer implements MailerContract, MailQueueContract
     protected function addContent($message, $view, $plain, $raw, $data)
     {
         if (isset($view)) {
-            $message->setBody($this->renderView($view, $data), 'text/html');
+            $message->setBody($this->renderView($view, $data) ?: ' ', 'text/html');
         }
 
         if (isset($plain)) {
@@ -398,7 +398,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new e-mail message for sending.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
      * @return mixed
      *

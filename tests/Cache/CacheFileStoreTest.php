@@ -34,6 +34,21 @@ class CacheFileStoreTest extends TestCase
         $this->assertNull($value);
     }
 
+    public function testUnserializableFileContentGetDeleted()
+    {
+        $files = $this->mockFilesystem();
+        $hash = sha1('foo');
+        $cachePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+
+        $files->expects($this->once())->method('get')->willReturn('9999999999-I_am_unserializableee: \(~_~)/');
+        $files->expects($this->once())->method('exists')->with($this->equalTo($cachePath))->willReturn(true);
+        $files->expects($this->once())->method('delete')->with($this->equalTo($cachePath));
+
+        $value = (new FileStore($files, __DIR__))->get('foo');
+
+        $this->assertNull($value);
+    }
+
     public function testPutCreatesMissingDirectories()
     {
         $files = $this->mockFilesystem();
@@ -47,7 +62,43 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testExpiredItemsReturnNull()
+    public function testPutWillConsiderZeroAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $hash = sha1('O--L / key');
+        $filePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+        $exclusiveLock = true;
+
+        $files->expects($this->once())->method('put')->with(
+            $this->equalTo($filePath),
+            $this->equalTo($fileContents),
+            $this->equalTo($exclusiveLock) // Ensure we do lock the file while putting.
+        )->willReturn(strlen($fileContents));
+
+        (new FileStore($files, __DIR__))->put('O--L / key', 'gold', 0);
+    }
+
+    public function testPutWillConsiderBigValuesAsEternalTime()
+    {
+        $files = $this->mockFilesystem();
+
+        $hash = sha1('O--L / key');
+        $filePath = __DIR__.'/'.substr($hash, 0, 2).'/'.substr($hash, 2, 2).'/'.$hash;
+        $ten9s = '9999999999'; // The "forever" time value.
+        $fileContents = $ten9s.serialize('gold');
+
+        $files->expects($this->once())->method('put')->with(
+            $this->equalTo($filePath),
+            $this->equalTo($fileContents),
+        );
+
+        (new FileStore($files, __DIR__))->put('O--L / key', 'gold', (int) $ten9s + 1);
+    }
+
+    public function testExpiredItemsReturnNullAndGetDeleted()
     {
         $files = $this->mockFilesystem();
         $contents = '0000000000';
@@ -101,6 +152,31 @@ class CacheFileStoreTest extends TestCase
         m::close();
     }
 
+    public function testStoreItemDirectoryProperlySetsPermissions()
+    {
+        $files = m::mock(Filesystem::class);
+        $files->shouldIgnoreMissing();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, 0606])->getMock();
+        $hash = sha1('foo');
+        $cache_parent_dir = substr($hash, 0, 2);
+        $cache_dir = $cache_parent_dir.'/'.substr($hash, 2, 2);
+
+        $files->shouldReceive('put')->withArgs([__DIR__.'/'.$cache_dir.'/'.$hash, m::any(), m::any()])->andReturnUsing(function ($name, $value) {
+            return strlen($value);
+        });
+
+        $files->shouldReceive('exists')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(false)->once();
+        $files->shouldReceive('makeDirectory')->withArgs([__DIR__.'/'.$cache_dir, 0777, true, true])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_parent_dir])->andReturn(['0600'])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_parent_dir, 0606])->andReturn([true])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir])->andReturn(['0600'])->once();
+        $files->shouldReceive('chmod')->withArgs([__DIR__.'/'.$cache_dir, 0606])->andReturn([true])->once();
+
+        $result = $store->put('foo', 'foo', 10);
+        $this->assertTrue($result);
+        m::close();
+    }
+
     public function testForeversAreStoredWithHighTimestamp()
     {
         $files = $this->mockFilesystem();
@@ -122,6 +198,19 @@ class CacheFileStoreTest extends TestCase
         $store->increment('foo');
         $files->expects($this->once())->method('get')->willReturn($contents);
         $this->assertSame('Hello World', $store->get('foo'));
+    }
+
+    public function testIncrementCanAtomicallyJump()
+    {
+        $files = $this->mockFilesystem();
+        $initialValue = '9999999999'.serialize(1);
+        $valueAfterIncrement = '9999999999'.serialize(4);
+        $store = new FileStore($files, __DIR__);
+        $files->expects($this->once())->method('get')->willReturn($initialValue);
+        $hash = sha1('foo');
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
+        $store->increment('foo', 3);
     }
 
     public function testIncrementDoesNotExtendCacheLife()

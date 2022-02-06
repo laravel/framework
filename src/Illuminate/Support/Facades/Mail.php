@@ -6,6 +6,10 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 
 /**
  * @method static \Illuminate\Mail\Mailer mailer(string|null $name = null)
+ * @method static void alwaysFrom(string $address, string|null $name = null)
+ * @method static void alwaysReplyTo(string $address, string|null $name = null)
+ * @method static void alwaysReturnPath(string $address)
+ * @method static void alwaysTo(string $address, string|null $name = null)
  * @method static \Illuminate\Mail\PendingMail bcc($users)
  * @method static \Illuminate\Mail\PendingMail to($users)
  * @method static \Illuminate\Support\Collection queued(string $mailable, \Closure|string $callback = null)
@@ -21,8 +25,8 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void assertNotSent(string $mailable, callable|int $callback = null)
  * @method static void assertNothingQueued()
  * @method static void assertNothingSent()
- * @method static void assertQueued(string $mailable, callable|int $callback = null)
- * @method static void assertSent(string $mailable, callable|int $callback = null)
+ * @method static void assertQueued(string|\Closure $mailable, callable|int $callback = null)
+ * @method static void assertSent(string|\Closure $mailable, callable|int $callback = null)
  * @method static void raw(string $text, $callback)
  * @method static void plain(string $view, array $data, $callback)
  * @method static void html(string $html, $callback)

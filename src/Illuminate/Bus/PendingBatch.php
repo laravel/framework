@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
-use Illuminate\Queue\SerializableClosure;
+use Illuminate\Queue\SerializableClosureFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -55,6 +55,21 @@ class PendingBatch
     }
 
     /**
+     * Add jobs to the batch.
+     *
+     * @param  iterable  $jobs
+     * @return $this
+     */
+    public function add($jobs)
+    {
+        foreach ($jobs as $job) {
+            $this->jobs->push($job);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a callback to be executed after all jobs in the batch have executed successfully.
      *
      * @param  callable  $callback
@@ -63,7 +78,7 @@ class PendingBatch
     public function then($callback)
     {
         $this->options['then'][] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
+                        ? SerializableClosureFactory::make($callback)
                         : $callback;
 
         return $this;
@@ -88,7 +103,7 @@ class PendingBatch
     public function catch($callback)
     {
         $this->options['catch'][] = $callback instanceof Closure
-                    ? new SerializableClosure($callback)
+                    ? SerializableClosureFactory::make($callback)
                     : $callback;
 
         return $this;
@@ -113,7 +128,7 @@ class PendingBatch
     public function finally($callback)
     {
         $this->options['finally'][] = $callback instanceof Closure
-                    ? new SerializableClosure($callback)
+                    ? SerializableClosureFactory::make($callback)
                     : $callback;
 
         return $this;
@@ -209,6 +224,20 @@ class PendingBatch
     public function queue()
     {
         return $this->options['queue'] ?? null;
+    }
+
+    /**
+     * Add additional data into the batch's options array.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function withOption(string $key, $value)
+    {
+        $this->options[$key] = $value;
+
+        return $this;
     }
 
     /**

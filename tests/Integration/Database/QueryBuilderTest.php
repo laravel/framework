@@ -3,20 +3,17 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class QueryBuilderTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
@@ -30,17 +27,42 @@ class QueryBuilderTest extends DatabaseTestCase
         ]);
     }
 
+    public function testSole()
+    {
+        $expected = ['id' => '1', 'title' => 'Foo Post'];
+
+        $this->assertEquals($expected, (array) DB::table('posts')->where('title', 'Foo Post')->select('id', 'title')->sole());
+    }
+
+    public function testSoleFailsForMultipleRecords()
+    {
+        DB::table('posts')->insert([
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        DB::table('posts')->where('title', 'Foo Post')->sole();
+    }
+
+    public function testSoleFailsIfNoRecords()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        DB::table('posts')->where('title', 'Baz Post')->sole();
+    }
+
     public function testSelect()
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->select('id', 'title')->first());
-        $this->assertSame($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id', 'title')->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select(['id', 'title'])->first());
     }
 
     public function testSelectReplacesExistingSelects()
     {
-        $this->assertSame(
+        $this->assertEquals(
             ['id' => '1', 'title' => 'Foo Post'],
             (array) DB::table('posts')->select('content')->select(['id', 'title'])->first()
         );
@@ -48,10 +70,10 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testSelectWithSubQuery()
     {
-        $this->assertSame(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+        $this->assertEquals(
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->select(['id', 'title', 'foo' => function ($query) {
-                $query->select('bar');
+                $query->select('content');
             }])->first()
         );
     }
@@ -60,24 +82,24 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $expected = ['id' => '1', 'title' => 'Foo Post', 'content' => 'Lorem Ipsum.'];
 
-        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
-        $this->assertSame($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
-        $this->assertSame($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect('title', 'content')->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->select('id')->addSelect(['title', 'content'])->first());
+        $this->assertEquals($expected, (array) DB::table('posts')->addSelect(['id', 'title', 'content'])->first());
     }
 
     public function testAddSelectWithSubQuery()
     {
-        $this->assertSame(
-            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'bar'],
+        $this->assertEquals(
+            ['id' => '1', 'title' => 'Foo Post', 'foo' => 'Lorem Ipsum.'],
             (array) DB::table('posts')->addSelect(['id', 'title', 'foo' => function ($query) {
-                $query->select('bar');
+                $query->select('content');
             }])->first()
         );
     }
 
     public function testFromWithAlias()
     {
-        $this->assertSame('select * from "posts" as "alias"', DB::table('posts', 'alias')->toSql());
+        $this->assertCount(2, DB::table('posts', 'alias')->select('alias.*')->get());
     }
 
     public function testFromWithSubQuery()
@@ -103,7 +125,7 @@ class QueryBuilderTest extends DatabaseTestCase
 
     public function testWhereValueSubQueryBuilder()
     {
-        $subQuery = DB::table('posts')->selectRaw("'Sub query value'");
+        $subQuery = DB::table('posts')->selectRaw("'Sub query value'")->limit(1);
 
         $this->assertTrue(DB::table('posts')->where($subQuery, 'Sub query value')->exists());
         $this->assertFalse(DB::table('posts')->where($subQuery, 'Does not match')->exists());
@@ -185,5 +207,19 @@ class QueryBuilderTest extends DatabaseTestCase
             (object) ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.'],
             (object) ['title' => 'Bar Post', 'content' => 'Lorem Ipsum.'],
         ]);
+    }
+
+    public function testChunkMap()
+    {
+        DB::enableQueryLog();
+
+        $results = DB::table('posts')->orderBy('id')->chunkMap(function ($post) {
+            return $post->title;
+        }, 1);
+
+        $this->assertCount(2, $results);
+        $this->assertSame('Foo Post', $results[0]);
+        $this->assertSame('Bar Post', $results[1]);
+        $this->assertCount(3, DB::getQueryLog());
     }
 }

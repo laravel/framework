@@ -303,7 +303,7 @@ class ResolvingCallbackTest extends TestCase
         $this->assertEquals(3, $callCounter);
 
         $container->bind(ResolvingContractStub::class, function () {
-            return new ResolvingImplementationStubTwo();
+            return new ResolvingImplementationStubTwo;
         });
         $this->assertEquals(4, $callCounter);
 
@@ -440,6 +440,45 @@ class ResolvingCallbackTest extends TestCase
 
         $container->make(ResolvingContractStub::class);
         $this->assertEquals(2, $callCounter);
+    }
+
+    public function testBeforeResolvingCallbacksAreCalled()
+    {
+        // Given a call counter initialized to zero.
+        $container = new Container;
+        $callCounter = 0;
+
+        // And a contract/implementation stub binding.
+        $container->bind(ResolvingContractStub::class, ResolvingImplementationStub::class);
+
+        // When we add a before resolving callback that increment the counter by one.
+        $container->beforeResolving(ResolvingContractStub::class, function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        // Then resolving the implementation stub increases the counter by one.
+        $container->make(ResolvingImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
+
+        // And resolving the contract stub increases the counter by one.
+        $container->make(ResolvingContractStub::class);
+        $this->assertEquals(2, $callCounter);
+    }
+
+    public function testGlobalBeforeResolvingCallbacksAreCalled()
+    {
+        // Given a call counter initialized to zero.
+        $container = new Container;
+        $callCounter = 0;
+
+        // When we add a global before resolving callback that increment that counter by one.
+        $container->beforeResolving(function () use (&$callCounter) {
+            $callCounter++;
+        });
+
+        // Then resolving anything increases the counter by one.
+        $container->make(ResolvingImplementationStub::class);
+        $this->assertEquals(1, $callCounter);
     }
 }
 

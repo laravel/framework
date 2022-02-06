@@ -101,7 +101,7 @@ if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|string  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|string|null  $value
      * @param  bool  $doubleEncode
      * @return string
      */
@@ -115,7 +115,7 @@ if (! function_exists('e')) {
             return $value->toHtml();
         }
 
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+        return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8', $doubleEncode);
     }
 }
 
@@ -157,7 +157,7 @@ if (! function_exists('object_get')) {
      */
     function object_get($object, $key, $default = null)
     {
-        if (is_null($key) || trim($key) == '') {
+        if (is_null($key) || trim($key) === '') {
             return $object;
         }
 
@@ -216,13 +216,13 @@ if (! function_exists('retry')) {
      *
      * @param  int  $times
      * @param  callable  $callback
-     * @param  int  $sleep
+     * @param  int|\Closure  $sleepMilliseconds
      * @param  callable|null  $when
      * @return mixed
      *
      * @throws \Exception
      */
-    function retry($times, callable $callback, $sleep = 0, $when = null)
+    function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
     {
         $attempts = 0;
 
@@ -237,8 +237,8 @@ if (! function_exists('retry')) {
                 throw $e;
             }
 
-            if ($sleep) {
-                usleep($sleep * 1000);
+            if ($sleepMilliseconds) {
+                usleep(value($sleepMilliseconds, $attempts) * 1000);
             }
 
             goto beginning;
@@ -272,15 +272,19 @@ if (! function_exists('throw_if')) {
      *
      * @param  mixed  $condition
      * @param  \Throwable|string  $exception
-     * @param  array  ...$parameters
+     * @param  mixed  ...$parameters
      * @return mixed
      *
      * @throws \Throwable
      */
-    function throw_if($condition, $exception, ...$parameters)
+    function throw_if($condition, $exception = 'RuntimeException', ...$parameters)
     {
         if ($condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+            if (is_string($exception) && class_exists($exception)) {
+                $exception = new $exception(...$parameters);
+            }
+
+            throw is_string($exception) ? new RuntimeException($exception) : $exception;
         }
 
         return $condition;
@@ -293,16 +297,14 @@ if (! function_exists('throw_unless')) {
      *
      * @param  mixed  $condition
      * @param  \Throwable|string  $exception
-     * @param  array  ...$parameters
+     * @param  mixed  ...$parameters
      * @return mixed
      *
      * @throws \Throwable
      */
-    function throw_unless($condition, $exception, ...$parameters)
+    function throw_unless($condition, $exception = 'RuntimeException', ...$parameters)
     {
-        if (! $condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
-        }
+        throw_if(! $condition, $exception, ...$parameters);
 
         return $condition;
     }
@@ -317,7 +319,7 @@ if (! function_exists('trait_uses_recursive')) {
      */
     function trait_uses_recursive($trait)
     {
-        $traits = class_uses($trait);
+        $traits = class_uses($trait) ?: [];
 
         foreach ($traits as $trait) {
             $traits += trait_uses_recursive($trait);

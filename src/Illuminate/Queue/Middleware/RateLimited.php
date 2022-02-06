@@ -99,7 +99,7 @@ class RateLimited
     }
 
     /**
-     * Do not release the job back to the queue if limit is exceeded.
+     * Do not release the job back to the queue if the limit is exceeded.
      *
      * @return $this
      */
@@ -119,5 +119,28 @@ class RateLimited
     protected function getTimeUntilNextRetry($key)
     {
         return $this->limiter->availableIn($key) + 3;
+    }
+
+    /**
+     * Prepare the object for serialization.
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [
+            'limiterName',
+            'shouldRelease',
+        ];
+    }
+
+    /**
+     * Prepare the object after unserialization.
+     *
+     * @return void
+     */
+    public function __wakeup()
+    {
+        $this->limiter = Container::getInstance()->make(RateLimiter::class);
     }
 }

@@ -47,8 +47,8 @@ abstract class SchemaState
      * Create a new dumper instance.
      *
      * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  callable  $processFactory
+     * @param  \Illuminate\Filesystem\Filesystem|null  $files
+     * @param  callable|null  $processFactory
      * @return void
      */
     public function __construct(Connection $connection, Filesystem $files = null, callable $processFactory = null)
@@ -58,7 +58,7 @@ abstract class SchemaState
         $this->files = $files ?: new Filesystem;
 
         $this->processFactory = $processFactory ?: function (...$arguments) {
-            return Process::fromShellCommandline(...$arguments);
+            return Process::fromShellCommandline(...$arguments)->setTimeout(null);
         };
 
         $this->handleOutputUsing(function () {

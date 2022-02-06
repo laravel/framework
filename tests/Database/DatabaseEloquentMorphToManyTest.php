@@ -48,9 +48,9 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation = $this->getMockBuilder(MorphToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock(stdClass::class);
         $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('taggable_id', 1)->andReturn($query);
+        $query->shouldReceive('where')->once()->with('taggables.taggable_id', 1)->andReturn($query);
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
-        $query->shouldReceive('whereIn')->once()->with('tag_id', [1, 2, 3]);
+        $query->shouldReceive('whereIn')->once()->with('taggables.tag_id', [1, 2, 3]);
         $query->shouldReceive('delete')->once()->andReturn(true);
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock(stdClass::class));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
@@ -64,7 +64,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation = $this->getMockBuilder(MorphToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock(stdClass::class);
         $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('taggable_id', 1)->andReturn($query);
+        $query->shouldReceive('where')->once()->with('taggables.taggable_id', 1)->andReturn($query);
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->never();
         $query->shouldReceive('delete')->once()->andReturn(true);
@@ -98,6 +98,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
 
         $related->shouldReceive('getTable')->andReturn('tags');
         $related->shouldReceive('getKeyName')->andReturn('id');
+        $related->shouldReceive('qualifyColumn')->with('id')->andReturn('tags.id');
         $related->shouldReceive('getMorphClass')->andReturn(get_class($related));
 
         $builder->shouldReceive('join')->once()->with('taggables', 'tags.id', '=', 'taggables.tag_id');

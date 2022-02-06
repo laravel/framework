@@ -113,6 +113,19 @@ class CacheRepositoryTest extends TestCase
             return 'qux';
         });
         $this->assertSame('qux', $result);
+
+        /*
+         * Use a callable...
+         */
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
+        $result = $repo->remember('foo', function () {
+            return 10;
+        }, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
@@ -192,6 +205,36 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repository->add('k', 'v', 60));
     }
 
+    public function testAddMethodCanAcceptDateIntervals()
+    {
+        $storeWithAdd = m::mock(RedisStore::class);
+        $storeWithAdd->shouldReceive('add')->once()->with('k', 'v', 61)->andReturn(true);
+        $repository = new Repository($storeWithAdd);
+        $this->assertTrue($repository->add('k', 'v', DateInterval::createFromDateString('61 seconds')));
+
+        $storeWithoutAdd = m::mock(ArrayStore::class);
+        $this->assertFalse(method_exists(ArrayStore::class, 'add'), 'This store should not have add method on it.');
+        $storeWithoutAdd->shouldReceive('get')->once()->with('k')->andReturn(null);
+        $storeWithoutAdd->shouldReceive('put')->once()->with('k', 'v', 60)->andReturn(true);
+        $repository = new Repository($storeWithoutAdd);
+        $this->assertTrue($repository->add('k', 'v', DateInterval::createFromDateString('60 seconds')));
+    }
+
+    public function testAddMethodCanAcceptDateTimeInterface()
+    {
+        $withAddStore = m::mock(RedisStore::class);
+        $withAddStore->shouldReceive('add')->once()->with('k', 'v', 61)->andReturn(true);
+        $repository = new Repository($withAddStore);
+        $this->assertTrue($repository->add('k', 'v', Carbon::now()->addSeconds(61)));
+
+        $noAddStore = m::mock(ArrayStore::class);
+        $this->assertFalse(method_exists(ArrayStore::class, 'add'), 'This store should not have add method on it.');
+        $noAddStore->shouldReceive('get')->once()->with('k')->andReturn(null);
+        $noAddStore->shouldReceive('put')->once()->with('k', 'v', 62)->andReturn(true);
+        $repository = new Repository($noAddStore);
+        $this->assertTrue($repository->add('k', 'v', Carbon::now()->addSeconds(62)));
+    }
+
     public function testAddWithNullTTLRemembersItemForever()
     {
         $repo = $this->getRepository();
@@ -207,6 +250,8 @@ class CacheRepositoryTest extends TestCase
         $result = $repo->add('foo', 'bar', Carbon::now()->subMinutes(10));
         $this->assertFalse($result);
         $result = $repo->add('foo', 'bar', Carbon::now());
+        $this->assertFalse($result);
+        $result = $repo->add('foo', 'bar', -1);
         $this->assertFalse($result);
     }
 
@@ -225,6 +270,7 @@ class CacheRepositoryTest extends TestCase
 
     /**
      * @dataProvider dataProviderTestGetSeconds
+     *
      * @param  mixed  $duration
      */
     public function testGetSeconds($duration)

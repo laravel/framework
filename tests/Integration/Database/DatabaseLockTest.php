@@ -7,20 +7,23 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @group integration
- */
 class DatabaseLockTest extends DatabaseTestCase
 {
-    protected function setUp(): void
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        parent::setUp();
-
         Schema::create('cache_locks', function (Blueprint $table) {
             $table->string('key')->primary();
             $table->string('owner');
             $table->integer('expiration');
         });
+    }
+
+    public function testLockCanHaveASeparateConnection()
+    {
+        $this->app['config']->set('cache.stores.database.lock_connection', 'test');
+        $this->app['config']->set('database.connections.test', $this->app['config']->get('database.connections.mysql'));
+
+        $this->assertSame('test', Cache::driver('database')->lock('foo')->getConnectionName());
     }
 
     public function testLockCanBeAcquired()

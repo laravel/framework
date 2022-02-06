@@ -119,7 +119,7 @@ class EventServiceProvider extends ServiceProvider
                     ->reduce(function ($discovered, $directory) {
                         return array_merge_recursive(
                             $discovered,
-                            DiscoverEvents::within($directory, base_path())
+                            DiscoverEvents::within($directory, $this->eventDiscoveryBasePath())
                         );
                     }, []);
     }
@@ -134,5 +134,15 @@ class EventServiceProvider extends ServiceProvider
         return [
             $this->app->path('Listeners'),
         ];
+    }
+
+    /**
+     * Get the base path to be used during event discovery.
+     *
+     * @return string
+     */
+    protected function eventDiscoveryBasePath()
+    {
+        return base_path();
     }
 }

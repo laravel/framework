@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use Carbon\Carbon;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -262,6 +263,11 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->assertExists($storagePath);
 
         $this->assertSame('uploaded file content', $filesystemAdapter->read($storagePath));
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
     }
 
     public function testPutFileAsWithAbsoluteFilePath()
@@ -290,6 +296,11 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFileExists($filePath);
 
         $filesystemAdapter->assertExists($storagePath);
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
     }
 
     public function testPutFileWithAbsoluteFilePath()
@@ -303,5 +314,40 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
 
         $filesystemAdapter->assertExists($storagePath);
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
+    }
+
+    public function testMacroable()
+    {
+        $this->filesystem->write('foo.txt', 'Hello World');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->macro('getFoo', function () {
+            return $this->get('foo.txt');
+        });
+
+        $this->assertSame('Hello World', $filesystemAdapter->getFoo());
+    }
+
+    public function testTemporaryUrlWithCustomCallback()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+
+        $filesystemAdapter->buildTemporaryUrlsUsing(function ($path, Carbon $expiration, $options) {
+            return $path.$expiration->toString().implode('', $options);
+        });
+
+        $path = 'foo';
+        $expiration = Carbon::create(2021, 18, 12, 13);
+        $options = ['bar' => 'baz'];
+
+        $this->assertSame(
+            $path.$expiration->toString().implode('', $options),
+            $filesystemAdapter->temporaryUrl($path, $expiration, $options)
+        );
     }
 }

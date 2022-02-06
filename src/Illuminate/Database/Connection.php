@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
+use Doctrine\DBAL\Types\Type;
 use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
@@ -21,6 +22,7 @@ use Illuminate\Support\Arr;
 use LogicException;
 use PDO;
 use PDOStatement;
+use RuntimeException;
 
 class Connection implements ConnectionInterface
 {
@@ -48,6 +50,13 @@ class Connection implements ConnectionInterface
      * @var string
      */
     protected $database;
+
+    /**
+     * The type of the connection.
+     *
+     * @var string|null
+     */
+    protected $readWriteType;
 
     /**
      * The table prefix for the connection.
@@ -113,11 +122,25 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
+     * The transaction manager instance.
+     *
+     * @var \Illuminate\Database\DatabaseTransactionsManager
+     */
+    protected $transactionsManager;
+
+    /**
      * Indicates if changes have been made to the database.
      *
-     * @var int
+     * @var bool
      */
     protected $recordsModified = false;
+
+    /**
+     * Indicates if the connection should use the "write" PDO connection.
+     *
+     * @var bool
+     */
+    protected $readOnWriteConnection = false;
 
     /**
      * All of the queries run against the connection.
@@ -141,11 +164,25 @@ class Connection implements ConnectionInterface
     protected $pretending = false;
 
     /**
+     * All of the callbacks that should be invoked before a query is executed.
+     *
+     * @var array
+     */
+    protected $beforeExecutingCallbacks = [];
+
+    /**
      * The instance of Doctrine connection.
      *
      * @var \Doctrine\DBAL\Connection
      */
     protected $doctrineConnection;
+
+    /**
+     * Type mappings that should be registered with new Doctrine connections.
+     *
+     * @var array
+     */
+    protected $doctrineTypeMappings = [];
 
     /**
      * The connection resolvers.
@@ -620,6 +657,10 @@ class Connection implements ConnectionInterface
      */
     protected function run($query, $bindings, Closure $callback)
     {
+        foreach ($this->beforeExecutingCallbacks as $beforeExecutingCallback) {
+            $beforeExecutingCallback($query, $bindings, $this);
+        }
+
         $this->reconnectIfMissingConnection();
 
         $start = microtime(true);
@@ -661,7 +702,7 @@ class Connection implements ConnectionInterface
         // run the SQL against the PDO connection. Then we can calculate the time it
         // took to execute and log the query SQL, bindings and time in our memory.
         try {
-            $result = $callback($query, $bindings);
+            return $callback($query, $bindings);
         }
 
         // If an exception occurs when attempting to run a query, we'll format the error
@@ -672,8 +713,6 @@ class Connection implements ConnectionInterface
                 $query, $this->prepareBindings($bindings), $e
             );
         }
-
-        return $result;
     }
 
     /**
@@ -789,6 +828,19 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Register a hook to be run just before a database query is executed.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function beforeExecuting(Closure $callback)
+    {
+        $this->beforeExecutingCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Register a database query listener with the connection.
      *
      * @param  \Closure  $callback
@@ -848,6 +900,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Determine if the database connection has modified any database records.
+     *
+     * @return bool
+     */
+    public function hasModifiedRecords()
+    {
+        return $this->recordsModified;
+    }
+
+    /**
      * Indicate if any records have been modified.
      *
      * @param  bool  $value
@@ -858,6 +920,42 @@ class Connection implements ConnectionInterface
         if (! $this->recordsModified) {
             $this->recordsModified = $value;
         }
+    }
+
+    /**
+     * Set the record modification state.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function setRecordModificationState(bool $value)
+    {
+        $this->recordsModified = $value;
+
+        return $this;
+    }
+
+    /**
+     * Reset the record modification state.
+     *
+     * @return void
+     */
+    public function forgetRecordModificationState()
+    {
+        $this->recordsModified = false;
+    }
+
+    /**
+     * Indicate that the connection should use the write PDO connection for reads.
+     *
+     * @param  bool  $value
+     * @return $this
+     */
+    public function useWriteConnectionWhenReading($value = true)
+    {
+        $this->readOnWriteConnection = $value;
+
+        return $this;
     }
 
     /**
@@ -891,7 +989,13 @@ class Connection implements ConnectionInterface
      */
     public function getDoctrineSchemaManager()
     {
-        return $this->getDoctrineDriver()->getSchemaManager($this->getDoctrineConnection());
+        $connection = $this->getDoctrineConnection();
+
+        // Doctrine v2 expects one parameter while v3 expects two. 2nd will be ignored on v2...
+        return $this->getDoctrineDriver()->getSchemaManager(
+            $connection,
+            $connection->getDatabasePlatform()
+        );
     }
 
     /**
@@ -907,12 +1011,44 @@ class Connection implements ConnectionInterface
             $this->doctrineConnection = new DoctrineConnection(array_filter([
                 'pdo' => $this->getPdo(),
                 'dbname' => $this->getDatabaseName(),
-                'driver' => $driver->getName(),
+                'driver' => method_exists($driver, 'getName') ? $driver->getName() : null,
                 'serverVersion' => $this->getConfig('server_version'),
             ]), $driver);
+
+            foreach ($this->doctrineTypeMappings as $name => $type) {
+                $this->doctrineConnection
+                    ->getDatabasePlatform()
+                    ->registerDoctrineTypeMapping($type, $name);
+            }
         }
 
         return $this->doctrineConnection;
+    }
+
+    /**
+     * Register a custom Doctrine mapping type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \RuntimeException
+     */
+    public function registerDoctrineType(string $class, string $name, string $type): void
+    {
+        if (! $this->isDoctrineAvailable()) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
+        }
+
+        if (! Type::hasType($name)) {
+            Type::addType($name, $class);
+        }
+
+        $this->doctrineTypeMappings[$name] = $type;
     }
 
     /**
@@ -950,7 +1086,8 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        if ($this->recordsModified && $this->getConfig('sticky')) {
+        if ($this->readOnWriteConnection ||
+            ($this->recordsModified && $this->getConfig('sticky'))) {
             return $this->getPdo();
         }
 
@@ -1020,6 +1157,16 @@ class Connection implements ConnectionInterface
     public function getName()
     {
         return $this->getConfig('name');
+    }
+
+    /**
+     * Get the database connection full name.
+     *
+     * @return string|null
+     */
+    public function getNameWithReadWriteType()
+    {
+        return $this->getName().($this->readWriteType ? '::'.$this->readWriteType : '');
     }
 
     /**
@@ -1146,6 +1293,29 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Set the transaction manager instance on the connection.
+     *
+     * @param  \Illuminate\Database\DatabaseTransactionsManager  $manager
+     * @return $this
+     */
+    public function setTransactionManager($manager)
+    {
+        $this->transactionsManager = $manager;
+
+        return $this;
+    }
+
+    /**
+     * Unset the transaction manager for this connection.
+     *
+     * @return void
+     */
+    public function unsetTransactionManager()
+    {
+        $this->transactionsManager = null;
+    }
+
+    /**
      * Determine if the connection is in a "dry run".
      *
      * @return bool
@@ -1224,6 +1394,19 @@ class Connection implements ConnectionInterface
     public function setDatabaseName($database)
     {
         $this->database = $database;
+
+        return $this;
+    }
+
+    /**
+     * Set the read / write type of the connection.
+     *
+     * @param  string|null  $readWriteType
+     * @return $this
+     */
+    public function setReadWriteType($readWriteType)
+    {
+        $this->readWriteType = $readWriteType;
 
         return $this;
     }

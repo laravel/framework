@@ -3,6 +3,7 @@
 namespace Illuminate\View\Concerns;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait ManagesLayouts
@@ -27,6 +28,13 @@ trait ManagesLayouts
      * @var mixed
      */
     protected static $parentPlaceholder = [];
+
+    /**
+     * The parent placeholder salt for the request.
+     *
+     * @var string
+     */
+    protected static $parentPlaceholderSalt;
 
     /**
      * Start injecting content into a section.
@@ -168,10 +176,26 @@ trait ManagesLayouts
     public static function parentPlaceholder($section = '')
     {
         if (! isset(static::$parentPlaceholder[$section])) {
-            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($section).'##';
+            $salt = static::parentPlaceholderSalt();
+
+            static::$parentPlaceholder[$section] = '##parent-placeholder-'.sha1($salt.$section).'##';
         }
 
         return static::$parentPlaceholder[$section];
+    }
+
+    /**
+     * Get the parent placeholder salt.
+     *
+     * @return string
+     */
+    protected static function parentPlaceholderSalt()
+    {
+        if (! static::$parentPlaceholderSalt) {
+            return static::$parentPlaceholderSalt = Str::random(40);
+        }
+
+        return static::$parentPlaceholderSalt;
     }
 
     /**

@@ -2,32 +2,22 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Bus;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class UniqueJobTest extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         $app['db']->connection()->getSchemaBuilder()->create('jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('queue');
@@ -45,8 +35,6 @@ class UniqueJobTest extends TestCase
         $this->app['db']->connection()->getSchemaBuilder()->drop('jobs');
 
         parent::tearDown();
-
-        m::close();
     }
 
     public function testUniqueJobsAreNotDispatched()
@@ -82,7 +70,7 @@ class UniqueJobTest extends TestCase
     {
         UniqueTestFailJob::$handled = false;
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         try {
             dispatch($job = new UniqueTestFailJob);
@@ -143,6 +131,23 @@ class UniqueJobTest extends TestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockCanBeReleasedBeforeProcessing()
+    {
+        UniqueUntilStartTestJob::$handled = false;
+
+        dispatch($job = new UniqueUntilStartTestJob);
+
+        $this->assertFalse($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+
+        $this->artisan('queue:work', [
+            'connection' => 'database',
+            '--once' => true,
+        ]);
+
+        $this->assertTrue($job::$handled);
+        $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
@@ -173,7 +178,7 @@ class UniqueTestFailJob implements ShouldQueue, ShouldBeUnique
     {
         static::$handled = true;
 
-        throw new \Exception;
+        throw new Exception;
     }
 }
 
@@ -192,6 +197,13 @@ class UniqueTestReleasedJob extends UniqueTestFailJob
 }
 
 class UniqueTestRetryJob extends UniqueTestFailJob
+{
+    public $tries = 2;
+
+    public $connection = 'database';
+}
+
+class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
 

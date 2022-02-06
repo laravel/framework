@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Event;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class CallQueuedHandlerTest extends TestCase
 {
     protected function tearDown(): void
@@ -149,7 +146,8 @@ abstract class AbstractCallQueuedHandlerTestJobWithMiddleware
     public function middleware()
     {
         return [
-            new class {
+            new class
+            {
                 public function handle($command, $next)
                 {
                     AbstractCallQueuedHandlerTestJobWithMiddleware::$middlewareCommand = $command;

@@ -87,8 +87,8 @@ class RouteUrlGenerator
             $route
         ), $parameters);
 
-        if (preg_match('/\{.*?\}/', $uri)) {
-            throw UrlGenerationException::forMissingParameters($route);
+        if (preg_match_all('/{(.*?)}/', $uri, $matchedMissingParameters)) {
+            throw UrlGenerationException::forMissingParameters($route, $matchedMissingParameters[1]);
         }
 
         // Once we have ensured that there are no missing parameters in the URI we will encode

@@ -16,28 +16,30 @@ class EventsSubscriberTest extends TestCase
 
     public function testEventSubscribers()
     {
+        $this->expectNotToPerformAssertions();
+
         $d = new Dispatcher($container = m::mock(Container::class));
         $subs = m::mock(ExampleSubscriber::class);
         $subs->shouldReceive('subscribe')->once()->with($d);
         $container->shouldReceive('make')->once()->with(ExampleSubscriber::class)->andReturn($subs);
 
         $d->subscribe(ExampleSubscriber::class);
-        $this->assertTrue(true);
     }
 
     public function testEventSubscribeCanAcceptObject()
     {
-        $d = new Dispatcher();
+        $this->expectNotToPerformAssertions();
+
+        $d = new Dispatcher;
         $subs = m::mock(ExampleSubscriber::class);
         $subs->shouldReceive('subscribe')->once()->with($d);
 
         $d->subscribe($subs);
-        $this->assertTrue(true);
     }
 
     public function testEventSubscribeCanReturnMappings()
     {
-        $d = new Dispatcher();
+        $d = new Dispatcher;
         $d->subscribe(DeclarativeSubscriber::class);
 
         $d->dispatch('myEvent1');

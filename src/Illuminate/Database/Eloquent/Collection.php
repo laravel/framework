@@ -158,6 +158,17 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Load a set of related existences onto the collection.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadExists($relations)
+    {
+        return $this->loadAggregate($relations, '*', 'exists');
+    }
+
+    /**
      * Load a set of relationships onto the collection if they are not already eager loaded.
      *
      * @param  array|string  $relations
@@ -221,7 +232,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $models = $models->pluck($name);
+        $models = $models->pluck($name)->whereNotNull();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
@@ -335,6 +346,23 @@ class Collection extends BaseCollection implements QueueableCollection
     public function map(callable $callback)
     {
         $result = parent::map($callback);
+
+        return $result->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $result->toBase() : $result;
+    }
+
+    /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key / value pair.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function mapWithKeys(callable $callback)
+    {
+        $result = parent::mapWithKeys($callback);
 
         return $result->contains(function ($item) {
             return ! $item instanceof Model;
@@ -664,7 +692,7 @@ class Collection extends BaseCollection implements QueueableCollection
         } elseif (count($relations) === 1) {
             return reset($relations);
         } else {
-            return array_intersect(...$relations);
+            return array_intersect(...array_values($relations));
         }
     }
 

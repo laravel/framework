@@ -7,30 +7,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
-class EloquentUpdateTest extends TestCase
+class EloquentUpdateTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
@@ -65,13 +46,14 @@ class EloquentUpdateTest extends TestCase
         $this->assertCount(0, TestUpdateModel1::all());
     }
 
+    /** @group SkipMSSQL */
     public function testUpdateWithLimitsAndOrders()
     {
         for ($i = 1; $i <= 10; $i++) {
             TestUpdateModel1::create();
         }
 
-        TestUpdateModel1::latest('id')->limit(3)->update(['title'=>'Dr.']);
+        TestUpdateModel1::latest('id')->limit(3)->update(['title' => 'Dr.']);
 
         $this->assertSame('Dr.', TestUpdateModel1::find(8)->title);
         $this->assertNotSame('Dr.', TestUpdateModel1::find(7)->title);
@@ -91,7 +73,7 @@ class EloquentUpdateTest extends TestCase
         TestUpdateModel2::join('test_model1', function ($join) {
             $join->on('test_model1.id', '=', 'test_model2.id')
                 ->where('test_model1.title', '=', 'Mr.');
-        })->update(['test_model2.name' => 'Abdul', 'job'=>'Engineer']);
+        })->update(['test_model2.name' => 'Abdul', 'job' => 'Engineer']);
 
         $record = TestUpdateModel2::find(1);
 
@@ -129,7 +111,7 @@ class EloquentUpdateTest extends TestCase
 
         TestUpdateModel3::increment('counter');
 
-        $models = TestUpdateModel3::withoutGlobalScopes()->get();
+        $models = TestUpdateModel3::withoutGlobalScopes()->orderBy('id')->get();
         $this->assertEquals(1, $models[0]->counter);
         $this->assertEquals(0, $models[1]->counter);
     }

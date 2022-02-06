@@ -27,6 +27,9 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('font-bold', $bag->get('class'));
         $this->assertSame('bar', $bag->get('foo', 'bar'));
         $this->assertSame('font-bold', $bag['class']);
+        $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->class('mt-4'));
+        $this->assertSame('class="mt-4 font-bold" name="test"', (string) $bag->class(['mt-4']));
+        $this->assertSame('class="mt-4 ml-2 font-bold" name="test"', (string) $bag->class(['mt-4', 'ml-2' => true, 'mr-2' => false]));
 
         $bag = new ComponentAttributeBag([]);
 

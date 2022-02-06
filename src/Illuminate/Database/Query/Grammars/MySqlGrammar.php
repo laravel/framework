@@ -17,10 +17,9 @@ class MySqlGrammar extends Grammar
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
      */
     protected function whereNull(Builder $query, $where)
     {
@@ -36,9 +35,9 @@ class MySqlGrammar extends Grammar
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @return $this
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
      */
     protected function whereNotNull(Builder $query, $where)
     {
@@ -49,6 +48,30 @@ class MySqlGrammar extends Grammar
         }
 
         return parent::whereNotNull($query, $where);
+    }
+
+    /**
+     * Compile a "where fulltext" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    public function whereFullText(Builder $query, $where)
+    {
+        $columns = $this->columnize($where['columns']);
+
+        $value = $this->parameter($where['value']);
+
+        $mode = ($where['options']['mode'] ?? []) === 'boolean'
+            ? ' in boolean mode'
+            : ' in natural language mode';
+
+        $expanded = ($where['options']['expanded'] ?? []) && ($where['options']['mode'] ?? []) !== 'boolean'
+            ? ' with query expansion'
+            : '';
+
+        return "match ({$columns}) against (".$value."{$mode}{$expanded})";
     }
 
     /**

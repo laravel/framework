@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -19,13 +20,43 @@ class DatabaseEloquentMorphToTest extends TestCase
         m::close();
     }
 
+    public function testLookupDictionaryIsProperlyConstructedForEnums()
+    {
+        if (version_compare(PHP_VERSION, '8.1') < 0) {
+            $this->markTestSkipped('PHP 8.1 is required');
+        } else {
+            $relation = $this->getRelation();
+            $relation->addEagerConstraints([
+                $one = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => TestEnum::test],
+            ]);
+            $dictionary = $relation->getDictionary();
+            $relation->getDictionary();
+            $enumKey = TestEnum::test;
+            if (isset($enumKey->value)) {
+                $value = $dictionary['morph_type_2'][$enumKey->value][0]->foreign_key;
+                $this->assertEquals(TestEnum::test, $value);
+            } else {
+                $this->fail('An enum should contain value property');
+            }
+        }
+    }
+
     public function testLookupDictionaryIsProperlyConstructed()
     {
+        $stringish = new class
+        {
+            public function __toString()
+            {
+                return 'foreign_key_2';
+            }
+        };
+
         $relation = $this->getRelation();
         $relation->addEagerConstraints([
             $one = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
             $two = (object) ['morph_type' => 'morph_type_1', 'foreign_key' => 'foreign_key_1'],
             $three = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => 'foreign_key_2'],
+            $four = (object) ['morph_type' => 'morph_type_2', 'foreign_key' => $stringish],
         ]);
 
         $dictionary = $relation->getDictionary();
@@ -40,6 +71,7 @@ class DatabaseEloquentMorphToTest extends TestCase
             'morph_type_2' => [
                 'foreign_key_2' => [
                     $three,
+                    $four,
                 ],
             ],
         ], $dictionary);
@@ -90,6 +122,26 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->assertSame('taylor', $result->username);
     }
 
+    public function testMorphToWithZeroMorphType()
+    {
+        $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
+        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn(0);
+        $parent->expects($this->once())->method('morphInstanceTo');
+        $parent->expects($this->never())->method('morphEagerTo');
+
+        $parent->relation();
+    }
+
+    public function testMorphToWithEmptyStringMorphType()
+    {
+        $parent = $this->getMockBuilder(EloquentMorphToModelStub::class)->onlyMethods(['getAttributeFromArray', 'morphEagerTo', 'morphInstanceTo'])->getMock();
+        $parent->method('getAttributeFromArray')->with('relation_type')->willReturn('');
+        $parent->expects($this->once())->method('morphEagerTo');
+        $parent->expects($this->never())->method('morphInstanceTo');
+
+        $parent->relation();
+    }
+
     public function testMorphToWithSpecifiedClassDefault()
     {
         $parent = new EloquentMorphToModelStub;
@@ -107,13 +159,13 @@ class DatabaseEloquentMorphToTest extends TestCase
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
         $parent = m::mock(Model::class);
-        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+        $parent->shouldReceive('getAttribute')->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelationAssociate($parent);
 
         $associate = m::mock(Model::class);
-        $associate->shouldReceive('getKey')->once()->andReturn(1);
-        $associate->shouldReceive('getMorphClass')->once()->andReturn('Model');
+        $associate->shouldReceive('getAttribute')->andReturn(1);
+        $associate->shouldReceive('getMorphClass')->andReturn('Model');
 
         $parent->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
         $parent->shouldReceive('setAttribute')->once()->with('morph_type', 'Model');

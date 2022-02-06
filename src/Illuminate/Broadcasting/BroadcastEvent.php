@@ -3,7 +3,7 @@
 namespace Illuminate\Broadcasting;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
@@ -46,23 +46,37 @@ class BroadcastEvent implements ShouldQueue
         $this->event = $event;
         $this->tries = property_exists($event, 'tries') ? $event->tries : null;
         $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
+        $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
     }
 
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
+     * @param  \Illuminate\Contracts\Broadcasting\Factory  $manager
      * @return void
      */
-    public function handle(Broadcaster $broadcaster)
+    public function handle(BroadcastingFactory $manager)
     {
         $name = method_exists($this->event, 'broadcastAs')
                 ? $this->event->broadcastAs() : get_class($this->event);
 
-        $broadcaster->broadcast(
-            Arr::wrap($this->event->broadcastOn()), $name,
-            $this->getPayloadFromEvent($this->event)
-        );
+        $channels = Arr::wrap($this->event->broadcastOn());
+
+        if (empty($channels)) {
+            return;
+        }
+
+        $connections = method_exists($this->event, 'broadcastConnections')
+                            ? $this->event->broadcastConnections()
+                            : [null];
+
+        $payload = $this->getPayloadFromEvent($this->event);
+
+        foreach ($connections as $connection) {
+            $manager->connection($connection)->broadcast(
+                $channels, $name, $payload
+            );
+        }
     }
 
     /**
@@ -73,10 +87,9 @@ class BroadcastEvent implements ShouldQueue
      */
     protected function getPayloadFromEvent($event)
     {
-        if (method_exists($event, 'broadcastWith')) {
-            return array_merge(
-                $event->broadcastWith(), ['socket' => data_get($event, 'socket')]
-            );
+        if (method_exists($event, 'broadcastWith') &&
+            ! is_null($payload = $event->broadcastWith())) {
+            return array_merge($payload, ['socket' => data_get($event, 'socket')]);
         }
 
         $payload = [];

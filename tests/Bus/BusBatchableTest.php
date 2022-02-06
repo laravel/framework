@@ -17,7 +17,8 @@ class BusBatchableTest extends TestCase
 
     public function test_batch_may_be_retrieved()
     {
-        $class = new class {
+        $class = new class
+        {
             use Batchable;
         };
 

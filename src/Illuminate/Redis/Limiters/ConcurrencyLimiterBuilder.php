@@ -58,7 +58,7 @@ class ConcurrencyLimiterBuilder
     }
 
     /**
-     * Set the maximum number of locks that can obtained per time window.
+     * Set the maximum number of locks that can be obtained per time window.
      *
      * @param  int  $maxLocks
      * @return $this

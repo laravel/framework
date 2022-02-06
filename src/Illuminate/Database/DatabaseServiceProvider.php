@@ -41,9 +41,7 @@ class DatabaseServiceProvider extends ServiceProvider
         Model::clearBootedModels();
 
         $this->registerConnectionServices();
-
         $this->registerEloquentFactory();
-
         $this->registerQueueableEntityResolver();
     }
 
@@ -70,6 +68,10 @@ class DatabaseServiceProvider extends ServiceProvider
 
         $this->app->bind('db.connection', function ($app) {
             return $app['db']->connection();
+        });
+
+        $this->app->singleton('db.transactions', function ($app) {
+            return new DatabaseTransactionsManager;
         });
     }
 

@@ -8,6 +8,8 @@ namespace Illuminate\Support\Facades;
  * @method static array getExtensions()
  * @method static bool check(string $name, array ...$parameters)
  * @method static string compileString(string $value)
+ * @method static string render(string $string, array $data = [], bool $deleteCachedView = false)
+ * @method static string renderComponent(\Illuminate\View\Component $component)
  * @method static string getPath()
  * @method static string stripParentheses(string $expression)
  * @method static void aliasComponent(string $path, string|null $alias = null)
@@ -26,6 +28,7 @@ namespace Illuminate\Support\Facades;
  * @method static void withDoubleEncoding()
  * @method static void withoutComponentTags()
  * @method static void withoutDoubleEncoding()
+ * @method static void stringable(string|callable $class, callable|null $handler = null)
  *
  * @see \Illuminate\View\Compilers\BladeCompiler
  */

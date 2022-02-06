@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,9 +16,6 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RateLimitedWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
@@ -109,6 +107,23 @@ class RateLimitedWithRedisTest extends TestCase
 
         $this->assertJobRanSuccessfully($nonAdminJob);
         $this->assertJobWasReleased($nonAdminJob);
+    }
+
+    public function testMiddlewareSerialization()
+    {
+        $rateLimited = new RateLimitedWithRedis('limiterName');
+        $rateLimited->shouldRelease = false;
+
+        $restoredRateLimited = unserialize(serialize($rateLimited));
+
+        $fetch = (function (string $name) {
+            return $this->{$name};
+        })->bindTo($restoredRateLimited, RateLimitedWithRedis::class);
+
+        $this->assertFalse($restoredRateLimited->shouldRelease);
+        $this->assertSame('limiterName', $fetch('limiterName'));
+        $this->assertInstanceOf(RateLimiter::class, $fetch('limiter'));
+        $this->assertInstanceOf(Redis::class, $fetch('redis'));
     }
 
     protected function assertJobRanSuccessfully($testJob)

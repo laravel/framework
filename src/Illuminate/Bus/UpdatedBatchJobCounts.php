@@ -32,7 +32,7 @@ class UpdatedBatchJobCounts
     }
 
     /**
-     * Determine if all jobs have ran exactly once.
+     * Determine if all jobs have run exactly once.
      *
      * @return bool
      */

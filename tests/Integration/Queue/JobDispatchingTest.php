@@ -7,16 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class JobDispatchingTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-    }
-
     protected function tearDown(): void
     {
         Job::$ran = false;
@@ -27,7 +19,7 @@ class JobDispatchingTest extends TestCase
         Job::dispatch('test')->replaceValue('new-test');
 
         $this->assertTrue(Job::$ran);
-        $this->assertEquals('new-test', Job::$value);
+        $this->assertSame('new-test', Job::$value);
     }
 }
 

@@ -22,7 +22,7 @@ class MimeType
     public static function getMimeTypes()
     {
         if (self::$mime === null) {
-            self::$mime = new MimeTypes();
+            self::$mime = new MimeTypes;
         }
 
         return self::$mime;

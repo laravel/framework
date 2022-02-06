@@ -131,6 +131,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable
      */
     public function getMultiple($keys, $default = null)
     {
@@ -219,6 +221,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function set($key, $value, $ttl = null)
     {
@@ -276,6 +280,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function setMultiple($values, $ttl = null)
     {
@@ -292,8 +298,12 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function add($key, $value, $ttl = null)
     {
+        $seconds = null;
+
         if ($ttl !== null) {
-            if ($this->getSeconds($ttl) <= 0) {
+            $seconds = $this->getSeconds($ttl);
+
+            if ($seconds <= 0) {
                 return false;
             }
 
@@ -301,8 +311,6 @@ class Repository implements ArrayAccess, CacheContract
             // has a chance to override this logic. Some drivers better support the way
             // this operation should work with a total "atomic" implementation of it.
             if (method_exists($this->store, 'add')) {
-                $seconds = $this->getSeconds($ttl);
-
                 return $this->store->add(
                     $this->itemKey($key), $value, $seconds
                 );
@@ -313,7 +321,7 @@ class Repository implements ArrayAccess, CacheContract
         // so it exists for subsequent requests. Then, we will return true so it is
         // easy to know if the value gets added. Otherwise, we will return false.
         if (is_null($this->get($key))) {
-            return $this->put($key, $value, $ttl);
+            return $this->put($key, $value, $seconds);
         }
 
         return false;
@@ -365,7 +373,7 @@ class Repository implements ArrayAccess, CacheContract
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -380,7 +388,7 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $ttl);
+        $this->put($key, $value = $callback(), value($ttl));
 
         return $value;
     }
@@ -437,6 +445,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function delete($key)
     {
@@ -445,6 +455,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function deleteMultiple($keys)
     {
@@ -461,6 +473,8 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function clear()
     {
@@ -564,7 +578,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Fire an event for this cache instance.
      *
-     * @param  string  $event
+     * @param  object|string  $event
      * @return void
      */
     protected function event($event)
@@ -601,6 +615,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  string  $key
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return $this->has($key);
@@ -612,6 +627,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  string  $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->get($key);
@@ -624,6 +640,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  mixed  $value
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $this->put($key, $value, $this->default);
@@ -635,6 +652,7 @@ class Repository implements ArrayAccess, CacheContract
      * @param  string  $key
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         $this->forget($key);

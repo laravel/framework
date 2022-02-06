@@ -81,7 +81,7 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * Queuable jobs will be dispatched to the "sync" queue.
+     * Queueable jobs will be dispatched to the "sync" queue.
      *
      * @param  mixed  $command
      * @param  mixed  $handler
@@ -209,6 +209,8 @@ class Dispatcher implements QueueingDispatcher
      *
      * @param  mixed  $command
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function dispatchToQueue($command)
     {

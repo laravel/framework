@@ -29,5 +29,14 @@ class ValidationDimensionsRuleTest extends TestCase
         $rule = Rule::dimensions()->minWidth(300)->minHeight(400);
 
         $this->assertSame('dimensions:min_width=300,min_height=400', (string) $rule);
+
+        $rule = Rule::dimensions()
+            ->when(true, function ($rule) {
+                $rule->height('100');
+            })
+            ->unless(true, function ($rule) {
+                $rule->width('200');
+            });
+        $this->assertSame('dimensions:height=100', (string) $rule);
     }
 }

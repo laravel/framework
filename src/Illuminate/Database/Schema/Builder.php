@@ -3,11 +3,10 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use Doctrine\DBAL\Types\Type;
+use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use InvalidArgumentException;
 use LogicException;
-use RuntimeException;
 
 class Builder
 {
@@ -74,6 +73,8 @@ class Builder
      *
      * @param  string  $type
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public static function defaultMorphKeyType(string $type)
     {
@@ -92,6 +93,32 @@ class Builder
     public static function morphUsingUuids()
     {
         return static::defaultMorphKeyType('uuid');
+    }
+
+    /**
+     * Create a database in the schema.
+     *
+     * @param  string  $name
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    public function createDatabase($name)
+    {
+        throw new LogicException('This database driver does not support creating databases.');
+    }
+
+    /**
+     * Drop a database from the schema if the database exists.
+     *
+     * @param  string  $name
+     * @return bool
+     *
+     * @throws \LogicException
+     */
+    public function dropDatabaseIfExists($name)
+    {
+        throw new LogicException('This database driver does not support dropping databases.');
     }
 
     /**
@@ -354,7 +381,7 @@ class Builder
             return call_user_func($this->resolver, $table, $callback, $prefix);
         }
 
-        return new Blueprint($table, $callback, $prefix);
+        return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));
     }
 
     /**
@@ -364,26 +391,10 @@ class Builder
      * @param  string  $name
      * @param  string  $type
      * @return void
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \RuntimeException
      */
     public function registerCustomDoctrineType($class, $name, $type)
     {
-        if (! $this->connection->isDoctrineAvailable()) {
-            throw new RuntimeException(
-                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
-            );
-        }
-
-        if (! Type::hasType($name)) {
-            Type::addType($name, $class);
-
-            $this->connection
-                ->getDoctrineSchemaManager()
-                ->getDatabasePlatform()
-                ->registerDoctrineTypeMapping($type, $name);
-        }
+        $this->connection->registerDoctrineType($class, $name, $type);
     }
 
     /**

@@ -2,8 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -223,7 +226,7 @@ trait QueriesRelationships
                         };
                     }
 
-                    $query->where($this->query->from.'.'.$relation->getMorphType(), '=', (new $type)->getMorphClass())
+                    $query->where($this->qualifyColumn($relation->getMorphType()), '=', (new $type)->getMorphClass())
                                 ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
@@ -349,6 +352,163 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a basic where clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add an "or where" clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereRelation($relation, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a where clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->whereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with an "or where" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
+    {
+        return $this->orWhereHasMorph($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a morph-to relationship condition to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereMorphedTo($relation, $model, $boolean = 'and')
+    {
+        if (is_string($relation)) {
+            $relation = $this->getRelationWithoutConstraints($relation);
+        }
+
+        if (is_string($model)) {
+            $morphMap = Relation::morphMap();
+
+            if (! empty($morphMap) && in_array($model, $morphMap)) {
+                $model = array_search($model, $morphMap, true);
+            }
+
+            return $this->where($relation->getMorphType(), $model, null, $boolean);
+        }
+
+        return $this->where(function ($query) use ($relation, $model) {
+            $query->where($relation->getMorphType(), $model->getMorphClass())
+                ->where($relation->getForeignKeyName(), $model->getKey());
+        }, null, null, $boolean);
+    }
+
+    /**
+     * Add a morph-to relationship condition to the query with an "or where" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereMorphedTo($relation, $model)
+    {
+        return $this->whereMorphedTo($relation, $model, 'or');
+    }
+
+    /**
+     * Add a "belongs to" relationship where clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string  $relationship
+     * @param  string  $boolean
+     * @return $this
+     *
+     * @throws \RuntimeException
+     */
+    public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
+    {
+        if ($relationshipName === null) {
+            $relationshipName = Str::camel(class_basename($related));
+        }
+
+        try {
+            $relationship = $this->model->{$relationshipName}();
+        } catch (BadMethodCallException $exception) {
+            throw RelationNotFoundException::make($this->model, $relationshipName);
+        }
+
+        if (! $relationship instanceof BelongsTo) {
+            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
+        }
+
+        $this->where(
+            $relationship->getQualifiedForeignKeyName(),
+            '=',
+            $related->getAttributeValue($relationship->getOwnerKeyName()),
+            $boolean,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add an "BelongsTo" relationship with an "or where" clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string  $relationship
+     * @return $this
+     *
+     * @throws \RuntimeException
+     */
+    public function orWhereBelongsTo($related, $relationshipName = null)
+    {
+        return $this->whereBelongsTo($related, $relationshipName, 'or');
+    }
+
+    /**
      * Add subselect queries to include an aggregate value for a relationship.
      *
      * @param  mixed  $relations
@@ -383,9 +543,15 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                $expression = sprintf('%s(%s)', $function, $this->getQuery()->getGrammar()->wrap(
-                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($column)
-                ));
+                $hashedColumn = $this->getQuery()->from === $relation->getQuery()->getQuery()->from
+                                            ? "{$relation->getRelationCountHash(false)}.$column"
+                                            : $column;
+
+                $wrappedColumn = $this->getQuery()->getGrammar()->wrap(
+                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
+                );
+
+                $expression = $function === 'exists' ? $wrappedColumn : sprintf('%s(%s)', $function, $wrappedColumn);
             } else {
                 $expression = $column;
             }
@@ -419,10 +585,17 @@ trait QueriesRelationships
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
             );
 
-            $this->selectSub(
-                $function ? $query : $query->limit(1),
-                $alias
-            );
+            if ($function === 'exists') {
+                $this->selectRaw(
+                    sprintf('exists(%s) as %s', $query->toSql(), $this->getQuery()->grammar->wrap($alias)),
+                    $query->getBindings()
+                )->withCasts([$alias => 'bool']);
+            } else {
+                $this->selectSub(
+                    $function ? $query : $query->limit(1),
+                    $alias
+                );
+            }
         }
 
         return $this;
@@ -442,7 +615,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the max of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
@@ -454,7 +627,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the min of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
@@ -466,7 +639,7 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the sum of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
@@ -478,13 +651,24 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the average of the relation's column.
      *
-     * @param  string  $relation
+     * @param  string|array  $relation
      * @param  string  $column
      * @return $this
      */
     public function withAvg($relation, $column)
     {
         return $this->withAggregate($relation, $column, 'avg');
+    }
+
+    /**
+     * Add subselect queries to include the existence of related models.
+     *
+     * @param  string|array  $relation
+     * @return $this
+     */
+    public function withExists($relation)
+    {
+        return $this->withAggregate($relation, '*', 'exists');
     }
 
     /**

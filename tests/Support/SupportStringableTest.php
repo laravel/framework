@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -17,10 +18,24 @@ class SupportStringableTest extends TestCase
         return new Stringable($string);
     }
 
+    public function testClassBasename()
+    {
+        $this->assertEquals(
+            class_basename(static::class),
+            $this->stringable(static::class)->classBasename()
+        );
+    }
+
     public function testIsAscii()
     {
         $this->assertTrue($this->stringable('A')->isAscii());
         $this->assertFalse($this->stringable('ù')->isAscii());
+    }
+
+    public function testIsUuid()
+    {
+        $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
+        $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
     }
 
     public function testIsEmpty()
@@ -54,6 +69,14 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
     }
 
+    public function testTest()
+    {
+        $stringable = $this->stringable('foo bar');
+
+        $this->assertTrue($stringable->test('/bar/'));
+        $this->assertTrue($stringable->test('/foo (.*)/'));
+    }
+
     public function testTrim()
     {
         $this->assertSame('foo', (string) $this->stringable(' foo ')->trim());
@@ -76,6 +99,206 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Taylor Otwell', (string) $this->stringable('Taylor Otwell')->words(3));
     }
 
+    public function testUnless()
+    {
+        $this->assertSame('unless false', (string) $this->stringable('unless')->unless(false, function ($stringable, $value) {
+            return $stringable->append(' false');
+        }));
+
+        $this->assertSame('unless true fallbacks to default', (string) $this->stringable('unless')->unless(true, function ($stringable, $value) {
+            return $stringable->append($value);
+        }, function ($stringable) {
+            return $stringable->append(' true fallbacks to default');
+        }));
+    }
+
+    public function testWhenContains()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('stark')->whenContains('tar', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+
+        $this->assertSame('stark', (string) $this->stringable('stark')->whenContains('xxx', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }));
+
+        $this->assertSame('Arno Stark', (string) $this->stringable('stark')->whenContains('xxx', function ($stringable) {
+            return $stringable->prepend('Tony ')->title();
+        }, function ($stringable) {
+            return $stringable->prepend('Arno ')->title();
+        }));
+    }
+
+    public function testWhenContainsAll()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenContainsAll(['tony', 'stark'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+
+        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenContainsAll(['xxx'], function ($stringable) {
+            return $stringable->title();
+        }));
+
+        $this->assertSame('TonyStark', (string) $this->stringable('tony stark')->whenContainsAll(['tony', 'xxx'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+    }
+
+    public function testWhenEndsWith()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith(['kra', 'ark'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+
+        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenEndsWith(['xxx'], function ($stringable) {
+            return $stringable->title();
+        }));
+
+        $this->assertSame('TonyStark', (string) $this->stringable('tony stark')->whenEndsWith(['tony', 'xxx'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+    }
+
+    public function testWhenExactly()
+    {
+        $this->assertSame('Nailed it...!', (string) $this->stringable('Tony Stark')->whenExactly('Tony Stark', function ($stringable) {
+            return 'Nailed it...!';
+        }, function ($stringable) {
+            return 'Swing and a miss...!';
+        }));
+
+        $this->assertSame('Swing and a miss...!', (string) $this->stringable('Tony Stark')->whenExactly('Iron Man', function ($stringable) {
+            return 'Nailed it...!';
+        }, function ($stringable) {
+            return 'Swing and a miss...!';
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('Tony Stark')->whenExactly('Iron Man', function ($stringable) {
+            return 'Nailed it...!';
+        }));
+    }
+
+    public function testWhenIs()
+    {
+        $this->assertSame('Winner: /', (string) $this->stringable('/')->whenIs('/', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }, function ($stringable) {
+            return 'Try again';
+        }));
+
+        $this->assertSame('/', (string) $this->stringable('/')->whenIs(' /', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }));
+
+        $this->assertSame('Try again', (string) $this->stringable('/')->whenIs(' /', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }, function ($stringable) {
+            return 'Try again';
+        }));
+
+        $this->assertSame('Winner: foo/bar/baz', (string) $this->stringable('foo/bar/baz')->whenIs('foo/*', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }));
+    }
+
+    public function testWhenIsAscii()
+    {
+        $this->assertSame('Ascii: A', (string) $this->stringable('A')->whenIsAscii(function ($stringable) {
+            return $stringable->prepend('Ascii: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Ascii: ');
+        }));
+
+        $this->assertSame('ù', (string) $this->stringable('ù')->whenIsAscii(function ($stringable) {
+            return $stringable->prepend('Ascii: ');
+        }));
+
+        $this->assertSame('Not Ascii: ù', (string) $this->stringable('ù')->whenIsAscii(function ($stringable) {
+            return $stringable->prepend('Ascii: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Ascii: ');
+        }));
+    }
+
+    public function testWhenIsUuid()
+    {
+        $this->assertSame('Uuid: 2cdc7039-65a6-4ac7-8e5d-d554a98e7b15', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->whenIsUuid(function ($stringable) {
+            return $stringable->prepend('Uuid: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Uuid: ');
+        }));
+
+        $this->assertSame('2cdc7039-65a6-4ac7-8e5d-d554a98', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->whenIsUuid(function ($stringable) {
+            return $stringable->prepend('Uuid: ');
+        }));
+
+        $this->assertSame('Not Uuid: 2cdc7039-65a6-4ac7-8e5d-d554a98', (string) $this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->whenIsUuid(function ($stringable) {
+            return $stringable->prepend('Uuid: ');
+        }, function ($stringable) {
+            return $stringable->prepend('Not Uuid: ');
+        }));
+    }
+
+    public function testWhenTest()
+    {
+        $this->assertSame('Winner: foo bar', (string) $this->stringable('foo bar')->whenTest('/bar/', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }, function ($stringable) {
+            return 'Try again';
+        }));
+
+        $this->assertSame('Try again', (string) $this->stringable('foo bar')->whenTest('/link/', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }, function ($stringable) {
+            return 'Try again';
+        }));
+
+        $this->assertSame('foo bar', (string) $this->stringable('foo bar')->whenTest('/link/', function ($stringable) {
+            return $stringable->prepend('Winner: ');
+        }));
+    }
+
+    public function testWhenStartsWith()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenStartsWith('ton', function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenStartsWith(['ton', 'not'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+
+        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenStartsWith(['xxx'], function ($stringable) {
+            return $stringable->title();
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenStartsWith(['tony', 'xxx'], function ($stringable) {
+            return $stringable->title();
+        }, function ($stringable) {
+            return $stringable->studly();
+        }));
+    }
+
     public function testWhenEmpty()
     {
         tap($this->stringable(), function ($stringable) {
@@ -90,6 +313,23 @@ class SupportStringableTest extends TestCase
 
         $this->assertSame('not-empty', (string) $this->stringable('not-empty')->whenEmpty(function () {
             return 'empty';
+        }));
+    }
+
+    public function testWhenNotEmpty()
+    {
+        tap($this->stringable(), function ($stringable) {
+            $this->assertSame($stringable, $stringable->whenNotEmpty(function ($stringable) {
+                return $stringable.'.';
+            }));
+        });
+
+        $this->assertSame('', (string) $this->stringable()->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
+        }));
+
+        $this->assertSame('Not empty.', (string) $this->stringable('Not empty')->whenNotEmpty(function ($stringable) {
+            return $stringable.'.';
         }));
     }
 
@@ -117,6 +357,34 @@ class SupportStringableTest extends TestCase
         }, function ($stringable) {
             return $stringable->append('fallbacks to default');
         }));
+    }
+
+    public function testUnlessTruthy()
+    {
+        $this->assertSame('unless', (string) $this->stringable('unless')->unless(1, function ($stringable, $value) {
+            return $stringable->append($value)->append('true');
+        }));
+
+        $this->assertSame('unless true fallbacks to default with value 1',
+            (string) $this->stringable('unless true ')->unless(1, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable, $value) {
+                return $stringable->append('fallbacks to default with value ')->append($value);
+            }));
+    }
+
+    public function testUnlessFalsy()
+    {
+        $this->assertSame('unless 0', (string) $this->stringable('unless ')->unless(0, function ($stringable, $value) {
+            return $stringable->append($value);
+        }));
+
+        $this->assertSame('gets the value 0',
+            (string) $this->stringable('gets the value ')->unless(0, function ($stringable, $value) {
+                return $stringable->append($value);
+            }, function ($stringable) {
+                return $stringable->append('fallbacks to default');
+            }));
     }
 
     public function testTrimmedOnlyWhereNecessary()
@@ -401,6 +669,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame(11, $this->stringable('foo bar baz')->length('UTF-8'));
     }
 
+    public function testReplace()
+    {
+        $this->assertSame('foo/foo/foo', (string) $this->stringable('?/?/?')->replace('?', 'foo'));
+        $this->assertSame('bar/bar', (string) $this->stringable('?/?')->replace('?', 'bar'));
+        $this->assertSame('?/?/?', (string) $this->stringable('? ? ?')->replace(' ', '/'));
+        $this->assertSame('foo/bar/baz/bam', (string) $this->stringable('?1/?2/?3/?4')->replace(['?1', '?2', '?3', '?4'], ['foo', 'bar', 'baz', 'bam']));
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', (string) $this->stringable('?/?/?')->replaceArray('?', ['foo', 'bar', 'baz']));
@@ -434,6 +710,27 @@ class SupportStringableTest extends TestCase
         // Test for multibyte string support
         $this->assertSame('Malmö Jönkxxxping', (string) $this->stringable('Malmö Jönköping')->replaceLast('ö', 'xxx'));
         $this->assertSame('Malmö Jönköping', (string) $this->stringable('Malmö Jönköping')->replaceLast('', 'yyy'));
+    }
+
+    public function testRemove()
+    {
+        $this->assertSame('Fbar', (string) $this->stringable('Foobar')->remove('o'));
+        $this->assertSame('Foo', (string) $this->stringable('Foobar')->remove('bar'));
+        $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('F'));
+        $this->assertSame('Foobar', (string) $this->stringable('Foobar')->remove('f'));
+        $this->assertSame('oobar', (string) $this->stringable('Foobar')->remove('f', false));
+
+        $this->assertSame('Fbr', (string) $this->stringable('Foobar')->remove(['o', 'a']));
+        $this->assertSame('Fooar', (string) $this->stringable('Foobar')->remove(['f', 'b']));
+        $this->assertSame('ooar', (string) $this->stringable('Foobar')->remove(['f', 'b'], false));
+        $this->assertSame('Foobar', (string) $this->stringable('Foo|bar')->remove(['f', '|']));
+    }
+
+    public function testReverse()
+    {
+        $this->assertSame('FooBar', (string) $this->stringable('raBooF')->reverse());
+        $this->assertSame('Teniszütő', (string) $this->stringable('őtüzsineT')->reverse());
+        $this->assertSame('❤MultiByte☆', (string) $this->stringable('☆etyBitluM❤')->reverse());
     }
 
     public function testSnake()
@@ -512,6 +809,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame(1, $this->stringable('laravelPHPFramework')->substrCount('a', -10, -3));
     }
 
+    public function testSubstrReplace()
+    {
+        $this->assertSame('12:00', (string) $this->stringable('1200')->substrReplace(':', 2, 0));
+        $this->assertSame('The Laravel Framework', (string) $this->stringable('The Framework')->substrReplace('Laravel ', 4, 0));
+        $this->assertSame('Laravel – The PHP Framework for Web Artisans', (string) $this->stringable('Laravel Framework')->substrReplace('– The PHP Framework for Web Artisans', 8));
+    }
+
     public function testPadBoth()
     {
         $this->assertSame('__Alien___', (string) $this->stringable('Alien')->padBoth(10, '_'));
@@ -536,5 +840,96 @@ class SupportStringableTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $chunks);
         $this->assertSame(['foo', 'bar', 'baz'], $chunks->all());
+    }
+
+    public function testJsonSerialize()
+    {
+        $this->assertSame('"foo"', json_encode($this->stringable('foo')));
+    }
+
+    public function testTap()
+    {
+        $stringable = $this->stringable('foobarbaz');
+
+        $fromTheTap = '';
+
+        $stringable = $stringable->tap(function (Stringable $string) use (&$fromTheTap) {
+            $fromTheTap = $string->substr(0, 3);
+        });
+
+        $this->assertSame('foo', (string) $fromTheTap);
+        $this->assertSame('foobarbaz', (string) $stringable);
+    }
+
+    public function testPipe()
+    {
+        $callback = function ($stringable) {
+            return 'bar';
+        };
+
+        $this->assertInstanceOf(Stringable::class, $this->stringable('foo')->pipe($callback));
+        $this->assertSame('bar', (string) $this->stringable('foo')->pipe($callback));
+    }
+
+    public function testMarkdown()
+    {
+        $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
+        $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+    }
+
+    public function testMask()
+    {
+        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', 3));
+        $this->assertEquals('******@email.com', $this->stringable('taylor@email.com')->mask('*', 0, 6));
+        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', -13));
+        $this->assertEquals('tay***@email.com', $this->stringable('taylor@email.com')->mask('*', -13, 3));
+
+        $this->assertEquals('****************', $this->stringable('taylor@email.com')->mask('*', -17));
+        $this->assertEquals('*****r@email.com', $this->stringable('taylor@email.com')->mask('*', -99, 5));
+
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16));
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16, 99));
+
+        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('', 3));
+
+        $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->mask('something', 3));
+
+        $this->assertEquals('这是一***', $this->stringable('这是一段中文')->mask('*', 3));
+        $this->assertEquals('**一段中文', $this->stringable('这是一段中文')->mask('*', 0, 2));
+    }
+
+    public function testRepeat()
+    {
+        $this->assertSame('aaaaa', (string) $this->stringable('a')->repeat(5));
+        $this->assertSame('', (string) $this->stringable('')->repeat(5));
+    }
+
+    public function testWordCount()
+    {
+        $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
+        $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testToHtmlString()
+    {
+        $this->assertEquals(
+            new HtmlString('<h1>Test String</h1>'),
+            $this->stringable('<h1>Test String</h1>')->toHtmlString()
+        );
+    }
+
+    public function testStripTags()
+    {
+        $this->assertSame('beforeafter', (string) $this->stringable('before<br>after')->stripTags());
+        $this->assertSame('before<br>after', (string) $this->stringable('before<br>after')->stripTags('<br>'));
+        $this->assertSame('before<br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br>'));
+        $this->assertSame('<strong>before</strong><br>after', (string) $this->stringable('<strong>before</strong><br>after')->stripTags('<br><strong>'));
+    }
+
+    public function testScan()
+    {
+        $this->assertSame([123456], $this->stringable('SN/123456')->scan('SN/%d')->toArray());
+        $this->assertSame(['Otwell', 'Taylor'], $this->stringable('Otwell, Taylor')->scan('%[^,],%s')->toArray());
+        $this->assertSame(['filename', 'jpg'], $this->stringable('filename.jpg')->scan('%[^.].%s')->toArray());
     }
 }

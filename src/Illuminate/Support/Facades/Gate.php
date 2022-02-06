@@ -8,6 +8,8 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static \Illuminate\Auth\Access\Gate guessPolicyNamesUsing(callable $callback)
  * @method static \Illuminate\Auth\Access\Response authorize(string $ability, array|mixed $arguments = [])
  * @method static \Illuminate\Auth\Access\Response inspect(string $ability, array|mixed $arguments = [])
+ * @method static \Illuminate\Auth\Access\Response allowIf(\Closure|bool $condition, string|null $message = null, mixed $code = null)
+ * @method static \Illuminate\Auth\Access\Response denyIf(\Closure|bool $condition, string|null $message = null, mixed $code = null)
  * @method static \Illuminate\Contracts\Auth\Access\Gate after(callable $callback)
  * @method static \Illuminate\Contracts\Auth\Access\Gate before(callable $callback)
  * @method static \Illuminate\Contracts\Auth\Access\Gate define(string $ability, callable|string $callback)

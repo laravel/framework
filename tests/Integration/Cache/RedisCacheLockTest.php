@@ -8,9 +8,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 
-/**
- * @group integration
- */
 class RedisCacheLockTest extends TestCase
 {
     use InteractsWithRedis;
@@ -42,6 +39,13 @@ class RedisCacheLockTest extends TestCase
         $this->assertTrue($lock->get());
         $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
         Cache::store('redis')->lock('foo')->release();
+    }
+
+    public function testRedisLockCanHaveASeparateConnection()
+    {
+        $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
+
+        $this->assertSame('default', Cache::store('redis')->lock('foo')->getConnectionName());
     }
 
     public function testRedisLocksCanBlockForSeconds()

@@ -102,6 +102,26 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertSame('taylor', $user->name);
     }
 
+    public function testRetrieveByCredentialsAcceptsCallback()
+    {
+        $conn = m::mock(Connection::class);
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('where')->once()->with('username', 'dayle');
+        $conn->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
+        $conn->shouldReceive('first')->once()->andReturn(['id' => 1, 'name' => 'taylor']);
+        $hasher = m::mock(Hasher::class);
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+
+        $user = $provider->retrieveByCredentials([function ($builder) {
+            $builder->where('username', 'dayle');
+            $builder->whereIn('group', ['one', 'two']);
+        }]);
+
+        $this->assertInstanceOf(GenericUser::class, $user);
+        $this->assertSame(1, $user->getAuthIdentifier());
+        $this->assertSame('taylor', $user->name);
+    }
+
     public function testRetrieveByCredentialsReturnsNullWhenUserIsFound()
     {
         $conn = m::mock(Connection::class);

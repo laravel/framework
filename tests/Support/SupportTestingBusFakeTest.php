@@ -55,7 +55,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched after sending the response.'));
         }
 
         $this->fake->dispatchAfterResponse(new BusJobStub);
@@ -71,7 +71,42 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched after sending the response.'));
+        }
+    }
+
+    public function testAssertDispatchedSync()
+    {
+        try {
+            $this->fake->assertDispatchedSync(BusJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched synchronously.'));
+        }
+
+        $this->fake->dispatch(new BusJobStub);
+
+        try {
+            $this->fake->assertDispatchedSync(BusJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched synchronously.'));
+        }
+
+        $this->fake->dispatchSync(new BusJobStub);
+
+        $this->fake->assertDispatchedSync(BusJobStub::class);
+    }
+
+    public function testAssertDispatchedSyncClosure()
+    {
+        try {
+            $this->fake->assertDispatchedSync(function (BusJobStub $job) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched synchronously.'));
         }
     }
 
@@ -112,6 +147,21 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake->assertDispatchedAfterResponse(BusJobStub::class, 2);
     }
 
+    public function testAssertDispatchedSyncWithCallbackInt()
+    {
+        $this->fake->dispatchSync(new BusJobStub);
+        $this->fake->dispatchSync(new BusJobStub);
+
+        try {
+            $this->fake->assertDispatchedSync(BusJobStub::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was synchronously pushed 2 times instead of 1 times.'));
+        }
+
+        $this->fake->assertDispatchedSync(BusJobStub::class, 2);
+    }
+
     public function testAssertDispatchedWithCallbackFunction()
     {
         $this->fake->dispatch(new OtherBusJobStub);
@@ -146,7 +196,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched after sending the response.'));
         }
 
         $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, function ($job) {
@@ -154,6 +204,29 @@ class SupportTestingBusFakeTest extends TestCase
         });
 
         $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, function ($job) {
+            return $job->id === 1;
+        });
+    }
+
+    public function testAssertDispatchedSyncWithCallbackFunction()
+    {
+        $this->fake->dispatchSync(new OtherBusJobStub);
+        $this->fake->dispatchSync(new OtherBusJobStub(1));
+
+        try {
+            $this->fake->assertDispatchedSync(OtherBusJobStub::class, function ($job) {
+                return $job->id === 0;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched synchronously.'));
+        }
+
+        $this->fake->assertDispatchedSync(OtherBusJobStub::class, function ($job) {
+            return $job->id === null;
+        });
+
+        $this->fake->assertDispatchedSync(OtherBusJobStub::class, function ($job) {
             return $job->id === 1;
         });
     }
@@ -186,6 +259,21 @@ class SupportTestingBusFakeTest extends TestCase
         }
 
         $this->fake->assertDispatchedAfterResponseTimes(BusJobStub::class, 2);
+    }
+
+    public function testAssertDispatchedSyncTimes()
+    {
+        $this->fake->dispatchSync(new BusJobStub);
+        $this->fake->dispatchSync(new BusJobStub);
+
+        try {
+            $this->fake->assertDispatchedSyncTimes(BusJobStub::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was synchronously pushed 2 times instead of 1 times.'));
+        }
+
+        $this->fake->assertDispatchedSyncTimes(BusJobStub::class, 2);
     }
 
     public function testAssertNotDispatched()
@@ -228,7 +316,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fake->assertNotDispatchedAfterResponse(BusJobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched after sending the response.'));
         }
     }
 
@@ -242,7 +330,49 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched after sending the response.'));
+        }
+    }
+
+    public function testAssertNotDispatchedSync()
+    {
+        $this->fake->assertNotDispatchedSync(BusJobStub::class);
+
+        $this->fake->dispatchSync(new BusJobStub);
+
+        try {
+            $this->fake->assertNotDispatchedSync(BusJobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched synchronously.'));
+        }
+    }
+
+    public function testAssertNotDispatchedSyncClosure()
+    {
+        $this->fake->dispatchSync(new BusJobStub);
+
+        try {
+            $this->fake->assertNotDispatchedSync(function (BusJobStub $job) {
+                return true;
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched synchronously.'));
+        }
+    }
+
+    public function testAssertNothingDispatched()
+    {
+        $this->fake->assertNothingDispatched();
+
+        $this->fake->dispatch(new BusJobStub);
+
+        try {
+            $this->fake->assertNothingDispatched();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Jobs were dispatched unexpectedly.'));
         }
     }
 

@@ -36,7 +36,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
         $identifier = new ModelIdentifier(NotifiableUser::class, [null], [], null);
         $serializedIdentifier = serialize($identifier);
 
-        $job = new SendQueuedNotifications(new NotifiableUser(), 'notification');
+        $job = new SendQueuedNotifications(new NotifiableUser, 'notification');
         $serialized = serialize($job);
 
         $this->assertStringContainsString($serializedIdentifier, $serialized);
@@ -44,7 +44,7 @@ class NotificationSendQueuedNotificationTest extends TestCase
 
     public function testSerializationOfNormalNotifiable()
     {
-        $notifiable = new AnonymousNotifiable();
+        $notifiable = new AnonymousNotifiable;
         $serializedNotifiable = serialize($notifiable);
 
         $job = new SendQueuedNotifications($notifiable, 'notification');

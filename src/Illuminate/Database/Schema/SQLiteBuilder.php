@@ -2,8 +2,34 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Support\Facades\File;
+
 class SQLiteBuilder extends Builder
 {
+    /**
+     * Create a database in the schema.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function createDatabase($name)
+    {
+        return File::put($name, '') !== false;
+    }
+
+    /**
+     * Drop a database from the schema if the database exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function dropDatabaseIfExists($name)
+    {
+        return File::exists($name)
+            ? File::delete($name)
+            : true;
+    }
+
     /**
      * Drop all tables from the database.
      *

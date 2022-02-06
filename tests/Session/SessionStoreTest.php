@@ -452,6 +452,22 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->exists(['hulk.two']));
     }
 
+    public function testKeyMissing()
+    {
+        $session = $this->getSession();
+        $session->put('foo', 'bar');
+        $this->assertFalse($session->missing('foo'));
+        $session->put('baz', null);
+        $session->put('hulk', ['one' => true]);
+        $this->assertFalse($session->has('baz'));
+        $this->assertFalse($session->missing('baz'));
+        $this->assertTrue($session->missing('bogus'));
+        $this->assertFalse($session->missing(['foo', 'baz']));
+        $this->assertTrue($session->missing(['foo', 'baz', 'bogus']));
+        $this->assertFalse($session->missing(['hulk.one']));
+        $this->assertTrue($session->missing(['hulk.two']));
+    }
+
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $session = $this->getSession();

@@ -5,8 +5,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-</head>
-<body>
 <style>
 @media only screen and (max-width: 600px) {
 .inner-body {
@@ -24,6 +22,8 @@ width: 100% !important;
 }
 }
 </style>
+</head>
+<body>
 
 <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
 <tr>

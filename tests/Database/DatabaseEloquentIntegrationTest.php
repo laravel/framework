@@ -10,12 +10,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
@@ -35,13 +38,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $db = new DB;
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ]);
 
         $db->addConnection([
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
         ], 'second_connection');
 
         $db->bootEloquent();
@@ -125,6 +128,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->string('email');
                 $table->timestamps();
                 $table->softDeletes();
+            });
+
+            $this->schema($connection)->create('tags', function ($table) {
+                $table->increments('id');
+                $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('taggables', function ($table) {
+                $table->integer('tag_id');
+                $table->morphs('taggable');
+                $table->string('taxonomy')->nullable();
             });
         }
 
@@ -306,6 +321,96 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(4, $query->getCountForPagination());
     }
 
+    public function testCursorPaginatedModelCollectionRetrieval()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create($secondParams = ['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+        $this->assertTrue($models->hasMorePages());
+        $this->assertTrue($models->hasPages());
+
+        CursorPaginator::currentCursorResolver(function () use ($secondParams) {
+            return new Cursor($secondParams);
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(1, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertSame('foo@gmail.com', $models[0]->email);
+        $this->assertFalse($models->hasMorePages());
+        $this->assertTrue($models->hasPages());
+    }
+
+    public function testPreviousCursorPaginatedModelCollectionRetrieval()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create($thirdParams = ['id' => 3, 'email' => 'foo@gmail.com']);
+
+        CursorPaginator::currentCursorResolver(function () use ($thirdParams) {
+            return new Cursor($thirdParams, false);
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+        $this->assertTrue($models->hasMorePages());
+        $this->assertTrue($models->hasPages());
+    }
+
+    public function testCursorPaginatedModelCollectionRetrievalWhenNoElements()
+    {
+        CursorPaginator::currentCursorResolver(function () {
+            return null;
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(0, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+
+        Paginator::currentPageResolver(function () {
+            return new Cursor(['id' => 1]);
+        });
+        $models = EloquentTestUser::oldest('id')->cursorPaginate(2);
+
+        $this->assertCount(0, $models);
+    }
+
+    public function testCursorPaginatedModelCollectionRetrievalWhenNoElementsAndDefaultPerPage()
+    {
+        $models = EloquentTestUser::oldest('id')->cursorPaginate();
+
+        $this->assertCount(0, $models);
+        $this->assertInstanceOf(CursorPaginator::class, $models);
+    }
+
+    public function testFirstOrNew()
+    {
+        $user1 = EloquentTestUser::firstOrNew(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro']
+        );
+
+        $this->assertSame('Nuno Maduro', $user1->name);
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
@@ -330,6 +435,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotEquals($user3->id, $user1->id);
         $this->assertSame('abigailotwell@gmail.com', $user3->email);
         $this->assertSame('Abigail Otwell', $user3->name);
+
+        $user4 = EloquentTestUser::firstOrCreate(
+            ['name' => 'Dries Vints'],
+            ['name' => 'Nuno Maduro', 'email' => 'nuno@laravel.com']
+        );
+
+        $this->assertSame('Nuno Maduro', $user4->name);
     }
 
     public function testUpdateOrCreate()
@@ -583,6 +695,36 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertCount(1, $models);
     }
 
+    public function testFirstOrNewOnHasOneRelationShip()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post1 = $user1->post()->firstOrNew(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('New Post', $post1->name);
+
+        $user2 = EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        $post = $user2->post()->create(['name' => 'First Post']);
+        $post2 = $user2->post()->firstOrNew(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('First Post', $post2->name);
+        $this->assertSame($post->id, $post2->id);
+    }
+
+    public function testFirstOrCreateOnHasOneRelationShip()
+    {
+        $user1 = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $post1 = $user1->post()->firstOrCreate(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('New Post', $post1->name);
+
+        $user2 = EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);
+        $post = $user2->post()->create(['name' => 'First Post']);
+        $post2 = $user2->post()->firstOrCreate(['name' => 'First Post'], ['name' => 'New Post']);
+
+        $this->assertSame('First Post', $post2->name);
+        $this->assertSame($post->id, $post2->id);
+    }
+
     public function testHasOnSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -790,6 +932,27 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $photos = EloquentTestPhoto::has('imageable')->get();
 
         $this->assertEquals(1, $photos->count());
+    }
+
+    public function testBelongsToManyRelationshipModelsAreProperlyHydratedWithSoleQuery()
+    {
+        $user = EloquentTestUserWithCustomFriendPivot::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        $user->friends()->get()->each(function ($friend) {
+            $this->assertInstanceOf(EloquentTestFriendPivot::class, $friend->pivot);
+        });
+
+        $soleFriend = $user->friends()->where('email', 'abigailotwell@gmail.com')->sole();
+
+        $this->assertInstanceOf(EloquentTestFriendPivot::class, $soleFriend->pivot);
+    }
+
+    public function testBelongsToManyRelationshipMissingModelExceptionWithSoleQueryWorks()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $user = EloquentTestUserWithCustomFriendPivot::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->where('email', 'abigailotwell@gmail.com')->sole();
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
@@ -1343,14 +1506,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
 
         $this->assertCount(3, $users);
-        $this->assertNotEquals('Mathieu TUDISCO', $users[0]->name);
-        $this->assertNotEquals('dev@mathieutu.ovh', $users[1]->email);
+        $this->assertNotSame('Mathieu TUDISCO', $users[0]->name);
+        $this->assertNotSame('dev@mathieutu.ovh', $users[1]->email);
 
         $refreshedUsers = $users->fresh();
 
         $this->assertCount(2, $refreshedUsers);
-        $this->assertEquals('Mathieu TUDISCO', $refreshedUsers[0]->name);
-        $this->assertEquals('dev@mathieutu.ovh', $refreshedUsers[1]->email);
+        $this->assertSame('Mathieu TUDISCO', $refreshedUsers[0]->name);
+        $this->assertSame('dev@mathieutu.ovh', $refreshedUsers[1]->email);
     }
 
     public function testTimestampsUsingDefaultDateFormat()
@@ -1742,6 +1905,53 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Model::isIgnoringTouch());
     }
 
+    public function testPivotsCanBeRefreshed()
+    {
+        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
+        EloquentTestFriendLevel::create(['id' => 2, 'level' => 'friend']);
+
+        $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['id' => 2, 'email' => 'abigailotwell@gmail.com'], ['friend_level_id' => 1]);
+
+        $pivot = $user->friends[0]->pivot;
+
+        // Simulate a change that happened externally
+        DB::table('friends')->where('user_id', 1)->where('friend_id', 2)->update([
+            'friend_level_id' => 2,
+        ]);
+
+        $this->assertInstanceOf(Pivot::class, $freshPivot = $pivot->fresh());
+        $this->assertEquals(2, $freshPivot->friend_level_id);
+
+        $this->assertSame($pivot, $pivot->refresh());
+        $this->assertEquals(2, $pivot->friend_level_id);
+    }
+
+    public function testMorphPivotsCanBeRefreshed()
+    {
+        $post = EloquentTestPost::create(['name' => 'MorphToMany Post', 'user_id' => 1]);
+        $post->tags()->create(['id' => 1, 'name' => 'News']);
+
+        $pivot = $post->tags[0]->pivot;
+
+        // Simulate a change that happened externally
+        DB::table('taggables')
+            ->where([
+                'taggable_type' => EloquentTestPost::class,
+                'taggable_id' => 1,
+                'tag_id' => 1,
+            ])
+            ->update([
+                'taxonomy' => 'primary',
+            ]);
+
+        $this->assertInstanceOf(MorphPivot::class, $freshPivot = $pivot->fresh());
+        $this->assertSame('primary', $freshPivot->taxonomy);
+
+        $this->assertSame($pivot, $pivot->refresh());
+        $this->assertSame('primary', $pivot->taxonomy);
+    }
+
     /**
      * Helpers...
      */
@@ -1908,6 +2118,17 @@ class EloquentTestPost extends Eloquent
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
+
+    public function tags()
+    {
+        return $this->morphToMany(EloquentTestTag::class, 'taggable', null, null, 'tag_id')->withPivot('taxonomy');
+    }
+}
+
+class EloquentTestTag extends Eloquent
+{
+    protected $table = 'tags';
+    protected $guarded = [];
 }
 
 class EloquentTestFriendLevel extends Eloquent

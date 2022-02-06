@@ -30,21 +30,17 @@ trait InteractsWithRedis
      */
     public function setUpRedis()
     {
-        $app = $this->app ?? new Application;
-        $host = Env::get('REDIS_HOST', '127.0.0.1');
-        $port = Env::get('REDIS_PORT', 6379);
-
         if (! extension_loaded('redis')) {
             $this->markTestSkipped('The redis extension is not installed. Please install the extension to enable '.__CLASS__);
-
-            return;
         }
 
         if (static::$connectionFailedOnceWithDefaultsSkip) {
             $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
-
-            return;
         }
+
+        $app = $this->app ?? new Application;
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
 
         foreach ($this->redisDriverProvider() as $driver) {
             $this->redis[$driver[0]] = new RedisManager($app, $driver[0], [
@@ -57,6 +53,7 @@ trait InteractsWithRedis
                     'port' => $port,
                     'database' => 5,
                     'timeout' => 0.5,
+                    'name' => 'default',
                 ],
             ]);
         }
@@ -66,6 +63,7 @@ trait InteractsWithRedis
         } catch (Exception $e) {
             if ($host === '127.0.0.1' && $port === 6379 && Env::get('REDIS_HOST') === null) {
                 static::$connectionFailedOnceWithDefaultsSkip = true;
+
                 $this->markTestSkipped('Trying default host/port failed, please set environment variable REDIS_HOST & REDIS_PORT to enable '.__CLASS__);
             }
         }

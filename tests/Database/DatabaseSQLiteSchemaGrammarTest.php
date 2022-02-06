@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Doctrine\DBAL\Schema\SqliteSchemaManager;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -98,10 +97,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testDropColumn()
     {
-        if (! class_exists(SqliteSchemaManager::class)) {
-            $this->markTestSkipped('Doctrine should be installed to run dropColumn tests');
-        }
-
         $db = new Manager;
 
         $db->addConnection([
@@ -149,10 +144,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testRenameIndex()
     {
-        if (! class_exists(SqliteSchemaManager::class)) {
-            $this->markTestSkipped('Doctrine should be installed to run renameIndex tests');
-        }
-
         $db = new Manager;
 
         $db->addConnection([
@@ -361,7 +352,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" varchar null default \'bar\'', $statements[0]);
+        $this->assertSame('alter table "users" add column "foo" varchar default \'bar\'', $statements[0]);
     }
 
     public function testAddingText()
@@ -663,8 +654,8 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(2, $statements);
         $this->assertEquals([
-            'alter table "users" add column "created_at" datetime null',
-            'alter table "users" add column "updated_at" datetime null',
+            'alter table "users" add column "created_at" datetime',
+            'alter table "users" add column "updated_at" datetime',
         ], $statements);
     }
 
@@ -675,8 +666,8 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(2, $statements);
         $this->assertEquals([
-            'alter table "users" add column "created_at" datetime null',
-            'alter table "users" add column "updated_at" datetime null',
+            'alter table "users" add column "created_at" datetime',
+            'alter table "users" add column "updated_at" datetime',
         ], $statements);
     }
 
@@ -687,7 +678,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "remember_token" varchar null', $statements[0]);
+        $this->assertSame('alter table "users" add column "remember_token" varchar', $statements[0]);
     }
 
     public function testAddingBinary()

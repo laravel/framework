@@ -139,6 +139,10 @@ class AuthManager implements FactoryContract
             $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
         }
 
+        if (isset($config['remember'])) {
+            $guard->setRememberDuration($config['remember']);
+        }
+
         return $guard;
     }
 
@@ -293,6 +297,31 @@ class AuthManager implements FactoryContract
     public function hasResolvedGuards()
     {
         return count($this->guards) > 0;
+    }
+
+    /**
+     * Forget all of the resolved guard instances.
+     *
+     * @return $this
+     */
+    public function forgetGuards()
+    {
+        $this->guards = [];
+
+        return $this;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
+
+        return $this;
     }
 
     /**
