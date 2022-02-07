@@ -7,8 +7,8 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LogicException;
 use ReflectionClass;
-use RuntimeException;
 use Traversable;
 
 trait CollectsResources
@@ -61,7 +61,7 @@ trait CollectsResources
             return $collects;
         }
 
-        throw new RuntimeException('ResourceCollection must collect JsonResources.');
+        throw new LogicException('ResourceCollection must collect JsonResources.');
     }
 
     /**

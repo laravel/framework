@@ -37,9 +37,9 @@ use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use LogicException;
 use Mockery;
 use Orchestra\Testbench\TestCase;
-use RuntimeException;
 
 class ResourceTest extends TestCase
 {
@@ -1052,7 +1052,7 @@ class ResourceTest extends TestCase
             new Post(['id' => 2, 'title' => 'Test title 2']),
         ]);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('ResourceCollection must collect JsonResources.');
 
         new PostModelCollectionResource($posts);
