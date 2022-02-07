@@ -72,6 +72,30 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testFirstKeyWhereValue($collection)
+    {
+        $data = new $collection(['foo' => 'bar']);
+        $result = $data->firstKeyWhereValue(function ($value) {
+            return $value === 'bar';
+        }, 'default');
+        $this->assertSame('foo', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testFirstKeyWhereValueAndDefault($collection)
+    {
+        $data = new $collection(['foo' => 'bar']);
+        $result = $data->firstKeyWhereValue(function ($value) {
+            return $value === 'baz';
+        }, 'default');
+        $this->assertSame('default', $result);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSoleReturnsFirstItemInCollectionIfOnlyOneExists($collection)
     {
         $collection = new $collection([

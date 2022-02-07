@@ -390,6 +390,26 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the first key from the collection where the value passes the given truth test.
+     *
+     * @template TFirstDefault
+     *
+     * @param  (callable(TValue, TKey): bool)  $callback
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
+     * @return TValue|TFirstDefault
+     */
+    public function firstKeyWhereValue(callable $callback, $default = null)
+    {
+        foreach ($this->items as $key => $value) {
+            if ($callback($value)) {
+                return $key;
+            }
+        }
+
+        return value($default);
+    }
+
+    /**
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth

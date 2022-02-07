@@ -449,6 +449,28 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the first key from the collection where the value passes the given truth test.
+     *
+     * @template TFirstDefault
+     *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
+     * @return TValue|TFirstDefault
+     */
+    public function firstKeyWhereValue(callable $callback, $default = null)
+    {
+        $iterator = $this->getIterator();
+
+        foreach ($iterator as $key => $value) {
+            if ($callback($value, $key)) {
+                return $key;
+            }
+        }
+
+        return value($default);
+    }
+
+    /**
      * Get a flattened list of the items in the collection.
      *
      * @param  int  $depth
