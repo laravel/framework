@@ -917,6 +917,7 @@ class Str
      */
     public static function swap(array $map, $subject)
     {
+        return strtr($subject, $map);
         return str_replace(array_keys($map), array_values($map), $subject);
     }
 
