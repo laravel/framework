@@ -1506,6 +1506,35 @@ class Builder implements BuilderContract
         return $this;
     }
 
+    public function whereDistinctFrom($column, $value, $boolean = 'and')
+    {
+        $type = 'distinctFrom';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    public function orWhereDistinctFrom($column, $value)
+    {
+        return $this->whereDistinctFrom($column, $value, 'or');
+    }
+
+    public function whereDistinctFromColumn($first, $second, $boolean = 'and')
+    {
+        $type = 'distinctFromColumn';
+
+        $this->wheres[] = compact('type', 'first', 'second', 'boolean');
+
+        return $this;
+    }
+
+    public function orWhereDistinctFromColumn($first, $second)
+    {
+        return $this->whereDistinctFromColumn($first, $second, 'or');
+    }
+
     /**
      * Add a nested where statement to the query.
      *
