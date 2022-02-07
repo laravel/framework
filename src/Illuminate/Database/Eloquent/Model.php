@@ -1376,8 +1376,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function newQueryWithoutScopes()
     {
         return $this->newModelQuery()
-                    ->with($this->with)
-                    ->withCount($this->withCount);
+                    ->with($this->getWith())
+                    ->withCount($this->getWithCount());
     }
 
     /**
