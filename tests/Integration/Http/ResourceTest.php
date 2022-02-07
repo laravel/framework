@@ -21,6 +21,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\ObjectResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResourceWithPaginationInformation;
+use Illuminate\Tests\Integration\Http\Fixtures\PostModelCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithAnonymousResourceCollectionWithPaginationInformation;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
@@ -38,6 +39,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use Mockery;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class ResourceTest extends TestCase
 {
@@ -1041,6 +1043,19 @@ class ResourceTest extends TestCase
 
         $this->assertCount(2, $collection);
         $this->assertCount(2, $collection);
+    }
+
+    public function testCollectionResourcesMustCollectResources()
+    {
+        $posts = collect([
+            new Post(['id' => 1, 'title' => 'Test title']),
+            new Post(['id' => 2, 'title' => 'Test title 2']),
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('ResourceCollection must collect JsonResources.');
+
+        new PostModelCollectionResource($posts);
     }
 
     public function testKeysArePreservedIfTheResourceIsFlaggedToPreserveKeys()
