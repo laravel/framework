@@ -1997,7 +1997,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         return static::$modelsShouldPreventLazyLoading;
     }
-    
+
     /**
      * Get the relations to eager load on every query.
      *
