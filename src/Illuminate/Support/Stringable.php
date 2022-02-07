@@ -741,7 +741,7 @@ class Stringable implements JsonSerializable
      */
     public function swap(array $map)
     {
-        return new static(str_replace(array_keys($map), array_values($map), $this->value));
+        return new static(strtr($this->value, $map));
     }
 
     /**
