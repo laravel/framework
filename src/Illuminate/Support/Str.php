@@ -909,6 +909,18 @@ class Str
     }
 
     /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param  array  $map
+     * @param  string  $subject
+     * @return string
+     */
+    public static function swap($map, $subject)
+    {
+        return str_replace(array_keys($map), array_values($map), $subject);
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
@@ -951,18 +963,6 @@ class Str
         return static::$uuidFactory
                     ? call_user_func(static::$uuidFactory)
                     : Uuid::uuid4();
-    }
-
-    /**
-     * Swap multiple keywords in a string with other keywords.
-     *
-     * @param  array  $map
-     * @param  string  $subject
-     * @return string
-     */
-    public static function swap($map, $subject)
-    {
-        return str_replace(array_keys($map), array_values($map), $subject);
     }
 
     /**
