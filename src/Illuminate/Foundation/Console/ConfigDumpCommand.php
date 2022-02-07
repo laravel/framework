@@ -12,7 +12,7 @@ class ConfigDumpCommand extends Command
     /**
      * @var string
      */
-    protected $signature = 'config:dump {id?}';
+    protected $signature = 'config:dump {key?}';
 
     /**
      * @var string
@@ -30,7 +30,7 @@ class ConfigDumpCommand extends Command
 
     public function handle(): int
     {
-        $rawConfig = $this->argument('id') ? $this->config->get($this->argument('id')) : $this->config->all();
+        $rawConfig = $this->argument('key') ? $this->config->get($this->argument('key')) : $this->config->all();
 
         if (is_array($rawConfig)) {
             $rows = Collection::make(Arr::dot($rawConfig));
