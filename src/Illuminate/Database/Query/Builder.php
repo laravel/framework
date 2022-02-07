@@ -1473,6 +1473,44 @@ class Builder
         return $this;
     }
 
+    public function whereDistinctFrom($column, $value, $boolean = 'and')
+    {
+        $type = 'distinctFrom';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    public function orWhereDistinctFrom($column, $value, $boolean = 'or')
+    {
+        $type = 'distinctFrom';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    public function whereDistinctFromColumn($first, $second, $boolean = 'and')
+    {
+        $type = 'distinctFromColumn';
+
+        $this->wheres[] = compact('type', 'first', 'second', 'boolean');
+
+        return $this;
+    }
+
+    public function orWhereDistinctFromColumn($first, $second, $boolean = 'or')
+    {
+        $type = 'distinctFromColumn';
+
+        $this->wheres[] = compact('type', 'first', 'second', 'boolean');
+
+        return $this;
+    }
+
     /**
      * Add a nested where statement to the query.
      *
