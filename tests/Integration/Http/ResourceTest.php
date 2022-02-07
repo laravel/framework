@@ -1053,7 +1053,7 @@ class ResourceTest extends TestCase
         ]);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('ResourceCollection must collect JsonResources.');
+        $this->expectExceptionMessage('must collect');
 
         new PostModelCollectionResource($posts);
     }

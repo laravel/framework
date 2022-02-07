@@ -61,7 +61,7 @@ trait CollectsResources
             return $collects;
         }
 
-        throw new LogicException('ResourceCollection must collect JsonResources.');
+        throw new LogicException('Resource collections must collect instances of '.JsonResource::class.'.');
     }
 
     /**
