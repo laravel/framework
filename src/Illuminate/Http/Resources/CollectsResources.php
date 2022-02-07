@@ -50,14 +50,14 @@ trait CollectsResources
         $collects = null;
 
         if ($this->collects) {
-            $collects =  $this->collects;
+            $collects = $this->collects;
         } elseif (str_ends_with(class_basename($this), 'Collection') &&
             (class_exists($class = Str::replaceLast('Collection', '', get_class($this))) ||
              class_exists($class = Str::replaceLast('Collection', 'Resource', get_class($this))))) {
             $collects = $class;
         }
 
-        if (!$collects || is_subclass_of($collects, JsonResource::class)) {
+        if (! $collects || is_subclass_of($collects, JsonResource::class)) {
             return $collects;
         }
 
