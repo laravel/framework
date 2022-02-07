@@ -2,10 +2,12 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LogicException;
 use ReflectionClass;
 use Traversable;
 
@@ -45,15 +47,21 @@ trait CollectsResources
      */
     protected function collects()
     {
-        if ($this->collects) {
-            return $this->collects;
-        }
+        $collects = null;
 
-        if (str_ends_with(class_basename($this), 'Collection') &&
+        if ($this->collects) {
+            $collects = $this->collects;
+        } elseif (str_ends_with(class_basename($this), 'Collection') &&
             (class_exists($class = Str::replaceLast('Collection', '', get_class($this))) ||
              class_exists($class = Str::replaceLast('Collection', 'Resource', get_class($this))))) {
-            return $class;
+            $collects = $class;
         }
+
+        if (! $collects || is_subclass_of($collects, JsonResource::class)) {
+            return $collects;
+        }
+
+        throw new LogicException('Resource collections must collect instances of '.JsonResource::class.'.');
     }
 
     /**
