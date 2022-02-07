@@ -915,7 +915,7 @@ class Str
      * @param  string  $subject
      * @return string
      */
-    public static function swap($map, $subject)
+    public static function swap(array $map, $subject)
     {
         return str_replace(array_keys($map), array_values($map), $subject);
     }
