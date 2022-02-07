@@ -627,17 +627,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame(
             'PHP 8 is fantastic',
-            Str::swap([
+            Str::swap('PHP is awesome', [
                 'PHP' => 'PHP 8',
                 'awesome' => 'fantastic',
-            ], 'PHP is awesome')
+            ])
         );
 
         $this->assertSame(
             'foo bar baz',
-            Str::swap([
+            Str::swap('foo bar ⓐⓑ', [
                 'ⓐⓑ' => 'baz',
-            ], 'foo bar ⓐⓑ')
+            ])
         );
     }
 

@@ -911,11 +911,11 @@ class Str
     /**
      * Swap multiple keywords in a string with other keywords.
      *
-     * @param  array  $map
      * @param  string  $subject
+     * @param  array  $map
      * @return string
      */
-    public static function swap(array $map, $subject)
+    public static function swap($subject, array $map)
     {
         return str_replace(array_keys($map), array_values($map), $subject);
     }
