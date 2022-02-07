@@ -1997,6 +1997,52 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         return static::$modelsShouldPreventLazyLoading;
     }
+    
+    /**
+     * Get the relations to eager load on every query.
+     *
+     * @return array
+     */
+    public function getWith()
+    {
+        return $this->with;
+    }
+
+    /**
+     * Set the relations to eager load on every query.
+     *
+     * @param  array  $with
+     * @return $this
+     */
+    public function setWith($with)
+    {
+        $this->with = $with;
+
+        return $this;
+    }
+
+    /**
+     * Get the relationship counts that should be eager loaded on every query.
+     *
+     * @return array
+     */
+    public function getWithCount()
+    {
+        return $this->withCount;
+    }
+
+    /**
+     * Set the relationship counts that should be eager loaded on every query.
+     *
+     * @param  array  $withCount
+     * @return $this
+     */
+    public function setWithCount($withCount)
+    {
+        $this->withCount = $withCount;
+
+        return $this;
+    }
 
     /**
      * Get the broadcast channel route definition that is associated with the given entity.
