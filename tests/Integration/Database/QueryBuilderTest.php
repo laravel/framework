@@ -18,6 +18,7 @@ class QueryBuilderTest extends DatabaseTestCase
             $table->increments('id');
             $table->string('title');
             $table->text('content');
+            $table->string('og')->nullable();
             $table->timestamp('created_at');
         });
 
@@ -196,6 +197,46 @@ class QueryBuilderTest extends DatabaseTestCase
     {
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', '03:04:05')->count());
         $this->assertSame(2, DB::table('posts')->where('id', 1)->orWhereTime('created_at', new Carbon('2018-01-02 03:04:05'))->count());
+    }
+
+    public function testWhereDistinctFrom()
+    {
+        DB::table('posts')->insert([
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'foo',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'bar',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $this->assertSame(3, DB::table('posts')->whereDistinctFrom('og', 'foo')->count());
+    }
+
+    public function testOrWhereDistinctFrom()
+    {
+        DB::table('posts')->insert([
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'foo',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'bar',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $this->assertSame(4, DB::table('posts')->where('id', 3)->orWhereDistinctFrom('og', 'foo')->count());
+    }
+
+    public function testWhereDistinctFromColumn()
+    {
+        DB::table('posts')->insert([
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'foo',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'Lorem Ipsum.',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $this->assertSame(3, DB::table('posts')->whereDistinctFromColumn('og', 'content')->count());
+    }
+
+    public function testOrWhereDistinctFromColumn()
+    {
+        DB::table('posts')->insert([
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'Lorem Ipsum.',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+            ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'og' => 'bar',  'created_at' => new Carbon('2017-11-12 13:14:15')],
+        ]);
+
+        $this->assertSame(4, DB::table('posts')->where('id', 3)->orWhereDistinctFromColumn('og', 'content')->count());
     }
 
     public function testPaginateWithSpecificColumns()

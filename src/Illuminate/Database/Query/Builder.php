@@ -1507,6 +1507,65 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "is distinct from" (not equals or is null) statement to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereDistinctFrom($column, $value, $boolean = 'and')
+    {
+        $type = 'distinctFrom';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+        $this->addBinding($value);
+
+        return $this;
+    }
+
+    /**
+     * Add an or "is distinct from" (not equals or is null) statement to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereDistinctFrom($column, $value)
+    {
+        return $this->whereDistinctFrom($column, $value, 'or');
+    }
+
+    /**
+     * Add an "is distinct from" (not equals or is null) column statement to the query.
+     *
+     * @param  string  $first
+     * @param  string  $second
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereDistinctFromColumn($first, $second, $boolean = 'and')
+    {
+        $type = 'distinctFromColumn';
+
+        $this->wheres[] = compact('type', 'first', 'second', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an or "is distinct from" (not equals or is null) column statement to the query.
+     *
+     * @param  string  $first
+     * @param  string  $second
+     * @return $this
+     */
+    public function orWhereDistinctFromColumn($first, $second)
+    {
+        return $this->whereDistinctFromColumn($first, $second, 'or');
+    }
+
+    /**
      * Add a nested where statement to the query.
      *
      * @param  \Closure  $callback

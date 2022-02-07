@@ -600,6 +600,34 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile an "is distinct from" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDistinctFrom(Builder $query, $where)
+    {
+        $column = $this->wrap($where['column']);
+
+        return '('.$column.' != '.$this->parameter($where['value']).' or '.$column.' is null)';
+    }
+
+    /**
+     * Compile an "is distinct from column" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDistinctFromColumn(Builder $query, $where)
+    {
+        $first = $this->wrap($where['first']);
+
+        return '('.$first.' != '.$this->wrap($where['second']).' or '.$first.' is null)';
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column

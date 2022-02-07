@@ -126,6 +126,30 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile an "is distinct from" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDistinctFrom(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' is distinct from '.$this->parameter($where['value']);
+    }
+
+    /**
+     * Compile an "is distinct from column" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDistinctFromColumn(Builder $query, $where)
+    {
+        return $this->wrap($where['first']).' is distinct from '.$this->wrap($where['second']);
+    }
+
+    /**
      * Get an array of valid full text languages.
      *
      * @return array
