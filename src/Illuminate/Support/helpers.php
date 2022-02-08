@@ -76,7 +76,7 @@ if (! function_exists('class_basename')) {
 
 if (! function_exists('class_namespace')) {
     /**
-     * Get the class "basename" of the given object / class.
+     * Get the class "namespace" of the given object / class.
      *
      * @param  string|object  $class
      * @return string
