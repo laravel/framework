@@ -26,6 +26,14 @@ class SupportStringableTest extends TestCase
         );
     }
 
+    public function testClassNamespace()
+    {
+        $this->assertEquals(
+            class_namespace(static::class),
+            $this->stringable(static::class)->classNamespace()
+        );
+    }
+
     public function testIsAscii()
     {
         $this->assertTrue($this->stringable('A')->isAscii());
