@@ -250,6 +250,21 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Create a redirect from one URI to a route.
+     *
+     * @param  string  $uri
+     * @param  string  $route
+     * @param  int  $status
+     * @return \Illuminate\Routing\Route
+     */
+    public function redirectToRoute($uri, $route, $status = 302)
+    {
+        return $this->any($uri, '\Illuminate\Routing\RedirectController')
+                ->defaults('route', $route)
+                ->defaults('status', $status);
+    }
+
+    /**
      * Create a permanent redirect from one URI to another.
      *
      * @param  string  $uri
