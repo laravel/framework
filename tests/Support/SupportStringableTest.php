@@ -795,6 +795,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame('', (string) $this->stringable('Б')->substr(2));
     }
 
+    public function testSwap()
+    {
+        $this->assertSame('PHP 8 is fantastic', (string) $this->stringable('PHP is awesome')->swap([
+            'PHP' => 'PHP 8',
+            'awesome' => 'fantastic',
+        ]));
+    }
+
     public function testSubstrCount()
     {
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a'));
