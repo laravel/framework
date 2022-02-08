@@ -943,4 +943,10 @@ class SupportStringableTest extends TestCase
         $this->assertSame(['Otwell', 'Taylor'], $this->stringable('Otwell, Taylor')->scan('%[^,],%s')->toArray());
         $this->assertSame(['filename', 'jpg'], $this->stringable('filename.jpg')->scan('%[^.].%s')->toArray());
     }
+
+    public function testGet()
+    {
+        $this->assertSame('foo', $this->stringable('foo')->value());
+        $this->assertSame('foo', $this->stringable('foo')->toString());
+    }
 }

@@ -993,6 +993,26 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function value()
+    {
+        return $this->toString();
+    }
+
+    /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        return $this->value;
+    }
+
+    /**
      * Convert the object to a string when JSON encoded.
      *
      * @return string
