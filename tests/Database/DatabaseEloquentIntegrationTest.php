@@ -616,6 +616,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $this->expectException(ModelNotFoundException::class);
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1');
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [1]),
+        );
 
         EloquentTestUser::findOrFail(1);
     }
@@ -623,19 +626,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2');
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
+        );
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::findOrFail([1, 2]);
+        EloquentTestUser::findOrFail([1, 2, 3]);
     }
 
     public function testFindOrFailWithMultipleIdsUsingCollectionThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2');
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 2, 3');
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [2, 3]),
+        );
 
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::findOrFail(new Collection([1, 2]));
+        EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
     }
 
     public function testOneToOneRelationship()

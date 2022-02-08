@@ -435,16 +435,22 @@ class Builder implements BuilderContract
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
-            if (count($result) === count(array_unique($id))) {
-                return $result;
+            if (count($result) !== count(array_unique($id))) {
+                throw (new ModelNotFoundException)->setModel(
+                    get_class($this->model), array_diff($id, $result->modelKeys())
+                );
             }
-        } elseif (! is_null($result)) {
+
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(
-            get_class($this->model), $id
-        );
+        if (is_null($result)) {
+            throw (new ModelNotFoundException)->setModel(
+                get_class($this->model), $id
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -866,9 +872,7 @@ class Builder implements BuilderContract
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
-        $orders = collect($this->query->orders);
-
-        if ($orders->count() === 0) {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
             $this->enforceOrderBy();
         }
 
@@ -878,6 +882,10 @@ class Builder implements BuilderContract
 
                 return $order;
             })->toArray();
+        }
+
+        if ($this->query->unionOrders) {
+            return collect($this->query->unionOrders);
         }
 
         return collect($this->query->orders);

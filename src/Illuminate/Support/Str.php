@@ -923,6 +923,18 @@ class Str
     }
 
     /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param  array  $map
+     * @param  string  $subject
+     * @return string
+     */
+    public static function swap(array $map, $subject)
+    {
+        return strtr($subject, $map);
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string

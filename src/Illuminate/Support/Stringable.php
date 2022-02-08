@@ -726,11 +726,22 @@ class Stringable implements JsonSerializable
      * @param  string|array  $replace
      * @param  array|int  $offset
      * @param  array|int|null  $length
-     * @return string|array
+     * @return static
      */
     public function substrReplace($replace, $offset = 0, $length = null)
     {
         return new static(Str::substrReplace($this->value, $replace, $offset, $length));
+    }
+
+    /**
+     * Swap multiple keywords in a string with other keywords.
+     *
+     * @param  array  $map
+     * @return static
+     */
+    public function swap(array $map)
+    {
+        return new static(strtr($this->value, $map));
     }
 
     /**
@@ -979,6 +990,26 @@ class Stringable implements JsonSerializable
         $this->dump();
 
         exit(1);
+    }
+
+    /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function value()
+    {
+        return $this->toString();
+    }
+
+    /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        return $this->value;
     }
 
     /**
