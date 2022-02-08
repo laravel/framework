@@ -75,6 +75,30 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile an "is distinct from" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDistinctFrom(Builder $query, $where)
+    {
+        return 'not '.$this->wrap($where['column']).' <=> '.$this->parameter($where['value']);
+    }
+
+    /**
+     * Compile an "is distinct from column" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereDistinctFromColumn(Builder $query, $where)
+    {
+        return 'not '.$this->wrap($where['first']).' <=> '.$this->wrap($where['second']);
+    }
+
+    /**
      * Compile an insert ignore statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
