@@ -22,6 +22,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
 class Mailable implements MailableContract, Renderable
@@ -675,6 +676,8 @@ class Mailable implements MailableContract, Renderable
             return (object) $recipient;
         } elseif (is_string($recipient)) {
             return (object) ['email' => $recipient];
+        } elseif ($recipient instanceof Address) {
+            return (object) ['email' => $recipient->getAddress(), 'name' => $recipient->getName()];
         }
 
         return $recipient;
