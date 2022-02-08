@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\InteractsWithQueue;
+
+class {{ class }}
+{
+    public function subscribe(Dispatcher $events): array
+    {
+        return [
+            //
+        ];
+    }
+}
