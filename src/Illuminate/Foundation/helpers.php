@@ -820,6 +820,19 @@ if (! function_exists('to_route')) {
     }
 }
 
+if (! function_exists('controller')) {
+    /**
+     * Return controller action that mapped to route name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    function controller($name)
+    {
+        return app('url')->controller($name);
+    }
+}
+
 if (! function_exists('today')) {
     /**
      * Create a new Carbon instance for the current date.

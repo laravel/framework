@@ -1956,6 +1956,27 @@ class RoutingRouteTest extends TestCase
 
         return $router;
     }
+
+    public function testItCanReturnRelatedControllerActionForRouteName()
+    {
+        $router = $this->getRouter();
+
+        $router->get('foo/bar', RouteTestControllerStub::class.'@index')->name('foo.bar');
+
+        $collection = new RouteCollection();
+
+        foreach ($router->getRoutes()->getRoutes() as $route) {
+            $collection->add($route);
+        }
+
+        $urlGenerator = new UrlGenerator($collection, new Request());
+
+        $this->assertEquals(__NAMESPACE__.'\\RouteTestControllerStub@index', $urlGenerator->controller('foo.bar'));
+
+        app()->instance('url', $urlGenerator);
+
+        $this->assertEquals(__NAMESPACE__.'\\RouteTestControllerStub@index', controller('foo.bar'));
+    }
 }
 
 class RouteTestControllerStub extends Controller

@@ -477,6 +477,23 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Get the route name to a controller action.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function controller($name)
+    {
+        if (! is_null($route = $this->routes->getByName($name))) {
+            return $route->action['controller'];
+        }
+
+        throw new RouteNotFoundException("Route [{$name}] not defined.");
+    }
+
+    /**
      * Get the URL to a controller action.
      *
      * @param  string|array  $action
