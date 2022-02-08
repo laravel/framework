@@ -28,21 +28,21 @@ class RouteListCommandTest extends TestCase
 
         $this->router = $this->app->make(Registrar::class);
 
-        RouteListCommand::resolveTerminalWidthUsing(function () {
+        RouteListCommand::resolveTerminalWidthUsing(function() {
             return 70;
         });
     }
 
     public function testDisplayRoutesForCli()
     {
-        $this->router->get('closure', function () {
+        $this->router->get('closure', function() {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
         });
 
         $this->router->get('controller-method/{user}', [FooController::class, 'show']);
         $this->router->post('controller-invokable', FooController::class);
-        $this->router->domain('{account}.example.com')->group(function () {
-            $this->router->get('user/{id}', function ($account, $id) {
+        $this->router->domain('{account}.example.com')->group(function() {
+            $this->router->get('user/{id}', function($account, $id) {
                 //
             })->name('user.show')->middleware('web');
         });
@@ -57,16 +57,43 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
-    public function testDisplayRoutesForCliInVerboseMode()
+    public function testDisplayRoutesForCliOnWidescreen()
     {
-        $this->router->get('closure', function () {
+        RouteListCommand::resolveTerminalWidthUsing(function() {
+            return 700;
+        });
+        $this->router->get('closure', function() {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
         });
 
         $this->router->get('controller-method/{user}', [FooController::class, 'show']);
         $this->router->post('controller-invokable', FooController::class);
-        $this->router->domain('{account}.example.com')->group(function () {
-            $this->router->get('user/{id}', function ($account, $id) {
+        $this->router->domain('{account}.example.com')->group(function() {
+            $this->router->get('user/{id}', function($account, $id) {
+                //
+            })->name('user.show')->middleware('web');
+        });
+
+        $this->artisan(RouteListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD   closure ........................................................................ ')
+            ->expectsOutput('  POST       controller-invokable ............ Illuminate\Tests\Testing\Console\FooController')
+            ->expectsOutput('  GET|HEAD   controller-method/{user} ... Illuminate\Tests\Testing\Console\FooController@show')
+            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ...................................... user.show')
+            ->expectsOutput('');
+    }
+
+    public function testDisplayRoutesForCliInVerboseMode()
+    {
+        $this->router->get('closure', function() {
+            return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
+        });
+
+        $this->router->get('controller-method/{user}', [FooController::class, 'show']);
+        $this->router->post('controller-invokable', FooController::class);
+        $this->router->domain('{account}.example.com')->group(function() {
+            $this->router->get('user/{id}', function($account, $id) {
                 //
             })->name('user.show')->middleware('web');
         });

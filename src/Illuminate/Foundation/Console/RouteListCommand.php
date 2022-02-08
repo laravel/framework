@@ -308,7 +308,20 @@ class RouteListCommand extends Command
 
         $terminalWidth = $this->getTerminalWidth();
 
-        return $routes->map(function ($route) use ($maxMethod, $terminalWidth) {
+        $maxWidth = 0;
+        foreach ($routes as $route) {
+            [
+                'action' => $action,
+                'method' => $method,
+                'uri' => $uri,
+            ] = $route;
+            $thisWidth = max($maxMethod + 6 - mb_strlen($method), 0) + mb_strlen($method.$uri.$action) + 10;
+            $maxWidth = max($maxWidth, $thisWidth);
+        }
+
+        $maxWidth = min($maxWidth, $terminalWidth);
+
+        return $routes->map(function ($route) use ($maxMethod, $terminalWidth, $maxWidth) {
             [
                 'action' => $action,
                 'domain' => $domain,
@@ -326,7 +339,7 @@ class RouteListCommand extends Command
             $spaces = str_repeat(' ', max($maxMethod + 6 - mb_strlen($method), 0));
 
             $dots = str_repeat('.', max(
-                $terminalWidth - mb_strlen($method.$spaces.$uri.$action) - 6 - ($action ? 1 : 0), 0
+                $maxWidth - mb_strlen($method.$spaces.$uri.$action) - 6 - ($action ? 1 : 0), 0
             ));
 
             $dots = empty($dots) ? $dots : " $dots";
