@@ -32,16 +32,6 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Retrieve the underlying string value.
-     *
-     * @return string
-     */
-    public function get()
-    {
-        return $this->value;
-    }
-
-    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $search
@@ -989,6 +979,26 @@ class Stringable implements JsonSerializable
         $this->dump();
 
         exit(1);
+    }
+
+    /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function value()
+    {
+        return $this->toString();
+    }
+
+    /**
+     * Get the underlying string value.
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        return $this->value;
     }
 
     /**

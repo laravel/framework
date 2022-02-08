@@ -938,6 +938,7 @@ class SupportStringableTest extends TestCase
 
     public function testGet()
     {
-        $this->assertSame('foo', $this->stringable('foo')->get());
+        $this->assertSame('foo', $this->stringable('foo')->value());
+        $this->assertSame('foo', $this->stringable('foo')->toString());
     }
 }
