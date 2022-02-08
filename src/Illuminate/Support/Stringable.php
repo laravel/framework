@@ -97,6 +97,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the namespace of the class path.
+     *
+     * @return static
+     */
+    public function classNamespace()
+    {
+        return new static(class_namespace($this->value));
+    }
+
+    /**
      * Get the portion of a string before the first occurrence of a given value.
      *
      * @param  string  $search

@@ -34,6 +34,12 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('Baz', class_basename('Baz'));
     }
 
+    public function testClassNamespace()
+    {
+        $this->assertSame('Foo\Bar', class_namespace('Foo\Bar\Baz'));
+        $this->assertSame('', class_namespace('Baz'));
+    }
+
     public function testValue()
     {
         $this->assertSame('foo', value('foo'));
