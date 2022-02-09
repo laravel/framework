@@ -252,7 +252,7 @@ trait EnumeratesValues
     /**
      * Execute a callback over each item.
      *
-     * @param  callable(TValue): mixed  $callback
+     * @param  callable(TValue, TKey): mixed  $callback
      * @return $this
      */
     public function each(callable $callback)
