@@ -1099,7 +1099,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  (callable(TValue): bool)|bool  $callback
+     * @param  (callable(TValue, TKey): bool)|bool  $callback
      * @return static
      */
     public function reject($callback = true);
