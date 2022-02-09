@@ -226,12 +226,18 @@ class TestResponse implements ArrayAccess
     {
         $exception = (string) $exception;
 
+        $message = explode("\n", $exception)[0];
+
         return <<<EOF
 Expected response status code [$expected] but received $actual.
 
 The following exception occurred during the request:
 
 $exception
+
+----------------------------------------------------------------------------------
+$message
+
 EOF;
     }
 
