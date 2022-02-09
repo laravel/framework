@@ -26,7 +26,7 @@ class RedirectController extends Controller
 
             $parameters->forget('status')->forget('route');
 
-            $route = \Route::getRoutes()->getByName($route)->bind($request);
+            $route = Route::getRoutes()->getByName($route)->bind($request);
         } else {
             $destination = $parameters->get('destination');
 
