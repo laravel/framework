@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 if (! function_exists('collect')) {
     /**
@@ -51,6 +52,7 @@ if (! function_exists('data_get')) {
 
         $key = is_array($key) ? $key : explode('.', $key);
 
+        $accessor = PropertyAccess::createPropertyAccessor();
         foreach ($key as $i => $segment) {
             unset($key[$i]);
 
@@ -78,6 +80,8 @@ if (! function_exists('data_get')) {
                 $target = $target[$segment];
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
+            } elseif (is_object($target) && $accessor->isReadable($target, $segment)) {
+                $target = $accessor->getValue($target, $segment);
             } else {
                 return value($default);
             }
@@ -101,6 +105,7 @@ if (! function_exists('data_set')) {
     {
         $segments = is_array($key) ? $key : explode('.', $key);
 
+        $accessor = PropertyAccess::createPropertyAccessor();
         if (($segment = array_shift($segments)) === '*') {
             if (! Arr::accessible($target)) {
                 $target = [];
@@ -126,7 +131,9 @@ if (! function_exists('data_set')) {
                 $target[$segment] = $value;
             }
         } elseif (is_object($target)) {
-            if ($segments) {
+            if ($accessor->isWritable($target, $key)) {
+                $accessor->setValue($target, $key, $value);
+            } elseif ($segments) {
                 if (! isset($target->{$segment})) {
                     $target->{$segment} = [];
                 }

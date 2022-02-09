@@ -38,6 +38,7 @@
         "symfony/mailer": "^6.0",
         "symfony/mime": "^6.0",
         "symfony/process": "^6.0",
+        "symfony/property-access": "^6.0",
         "symfony/routing": "^6.0",
         "symfony/var-dumper": "^6.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
