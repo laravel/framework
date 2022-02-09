@@ -747,13 +747,13 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->unique(funct
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->id;
 }));
 assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->unique(function ($stringA, $stringB) {
     assertType('string', $stringA);
-    assertType('string', $stringA);
+    assertType('string', $stringB);
 
-    return false;
+    return $stringA;
 }, true));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->uniqueStrict());
@@ -761,7 +761,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->uniqueStrict
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->id;
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->values());
