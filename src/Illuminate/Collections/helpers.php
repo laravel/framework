@@ -131,8 +131,9 @@ if (! function_exists('data_set')) {
                 $target[$segment] = $value;
             }
         } elseif (is_object($target)) {
-            if ($accessor->isWritable($target, $key)) {
-                $accessor->setValue($target, $key, $value);
+            $path = implode('.', $segments);
+            if ($path && $accessor->isWritable($target, $path)) {
+                $accessor->setValue($target, $path, $value);
             } elseif ($segments) {
                 if (! isset($target->{$segment})) {
                     $target->{$segment} = [];
