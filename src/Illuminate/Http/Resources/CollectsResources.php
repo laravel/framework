@@ -57,7 +57,7 @@ trait CollectsResources
             $collects = $class;
         }
 
-        if (! $collects || is_subclass_of($collects, JsonResource::class)) {
+        if (! $collects || $collects === JsonResource::class || is_subclass_of($collects, JsonResource::class)) {
             return $collects;
         }
 
