@@ -23,7 +23,7 @@ enum ArrayableStatus: string implements Arrayable
 
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::pending => 'pending status description',
             self::done => 'done status description'
         };
@@ -34,7 +34,7 @@ enum ArrayableStatus: string implements Arrayable
         return [
             'name' => $this->name,
             'value' => $this->value,
-            'description' => $this->description()
+            'description' => $this->description(),
         ];
     }
 }

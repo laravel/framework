@@ -70,7 +70,7 @@ class EloquentModelEnumCastingTest extends DatabaseTestCase
             'arrayable_status' => [
                 'name' => 'pending',
                 'value' => 'pending',
-                'description' => 'pending status description'
+                'description' => 'pending status description',
             ],
         ], $model->toArray());
     }
