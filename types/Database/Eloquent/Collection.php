@@ -135,7 +135,7 @@ assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->un
     assertType('User', $user);
     assertType('int', $int);
 
-    return $user->id;
+    return $user->primaryKey;
 }));
 assertType('Illuminate\Database\Eloquent\Collection<int, User>', $collection->unique('string'));
 

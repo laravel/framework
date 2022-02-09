@@ -745,7 +745,7 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->unique(f
     assertType('User', $user);
     assertType('int', $int);
 
-    return $user->id;
+    return $user->primaryKey;
 }));
 assertType('Illuminate\Support\LazyCollection<string, string>', $collection->make(['string' => 'string'])->unique(function ($stringA, $stringB) {
     assertType('string', $stringA);
@@ -759,7 +759,7 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->uniqueSt
     assertType('User', $user);
     assertType('int', $int);
 
-    return $user->id;
+    return $user->primaryKey;
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->values());
