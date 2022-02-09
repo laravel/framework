@@ -735,6 +735,12 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->reject(funct
 
     return true;
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->reject(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return true;
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->unique());
 assertType('Illuminate\Support\Collection<int, User>', $collection->unique(function ($user, $int) {
