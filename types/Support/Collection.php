@@ -189,6 +189,10 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->each(functio
 assertType('Illuminate\Support\Collection<int, User>', $collection->each(function ($user) {
     assertType('User', $user);
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->each(function ($user, $int) {
+    assertType('int', $int);
+    assertType('User', $user);
+}));
 
 assertType('Illuminate\Support\Collection<int, array{string}>', $collection::make([['string']])
     ->eachSpread(function ($int, $string) {
