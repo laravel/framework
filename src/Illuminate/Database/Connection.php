@@ -869,6 +869,7 @@ class Connection implements ConnectionInterface
             'beganTransaction' => new TransactionBeginning($this),
             'committed' => new TransactionCommitted($this),
             'rollingBack' => new TransactionRolledBack($this),
+            default => null,
         });
     }
 
