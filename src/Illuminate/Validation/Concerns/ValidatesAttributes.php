@@ -409,7 +409,7 @@ trait ValidatesAttributes
         }
 
         foreach (array_keys($value) as $key) {
-            if (!in_array($key, $parameters)) {
+            if (! in_array($key, $parameters)) {
                 return false;
             }
         }
