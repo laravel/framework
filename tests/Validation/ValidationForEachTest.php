@@ -205,7 +205,7 @@ class ValidationForEachTest extends TestCase
     {
         $data = [
             'items' => [
-                ['users' => [['type' => 'super'], ['type' => 'admin']]],
+                ['users' => [['type' => 'super'], ['type' => 'invalid']]],
             ],
         ];
 
@@ -222,7 +222,6 @@ class ValidationForEachTest extends TestCase
         $this->assertFalse($v->passes());
 
         $this->assertEquals([
-            'items.0.users.0.type' => ['validation.regex'],
             'items.0.users.1.type' => ['validation.regex'],
         ], $v->getMessageBag()->toArray());
     }

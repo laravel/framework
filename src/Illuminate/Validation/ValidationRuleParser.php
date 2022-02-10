@@ -156,7 +156,7 @@ class ValidationRuleParser
                     } else {
                         $this->implicitAttributes[$attribute][] = $key;
 
-                        $results = $this->mergeRules($results, $key, $rule);
+                        $results = $this->mergeRules($results, $key, Arr::wrap($rule));
                     }
                 }
             }
