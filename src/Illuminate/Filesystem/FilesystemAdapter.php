@@ -640,6 +640,10 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {
+        if (method_exists($this->adapter, 'temporaryUrl')) {
+            return $this->adapter->temporaryUrl($path, $expiration, $options);
+        }
+
         if (method_exists($this->adapter, 'getTemporaryUrl')) {
             return $this->adapter->getTemporaryUrl($path, $expiration, $options);
         }
