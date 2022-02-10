@@ -768,6 +768,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testAllowingBackedEnumDefinition()
     {
         $blueprint = new Blueprint('users');

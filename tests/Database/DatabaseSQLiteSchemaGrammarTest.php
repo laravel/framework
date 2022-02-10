@@ -501,6 +501,9 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testAllowingBackedEnumDefinition()
     {
         $blueprint = new Blueprint('users');
