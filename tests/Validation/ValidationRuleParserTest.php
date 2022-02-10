@@ -89,6 +89,42 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testExplodeProperlyParsesSingleRegexRule()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'regex:/^(super|admin)$/i']
+        );
+
+        $this->assertEquals('regex:/^(super|admin)$/i', $exploded->rules['items.0.type'][0]);
+    }
+
+    public function testExplodeProperlyParsesRegexWithArrayOfRules()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => ['in:foo', 'regex:/^(super|admin)$/i']]
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(super|admin)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
+    public function testExplodeFailsParsingRegexWithOtherRulesInSingleString()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'in:foo|regex:/^(super|admin)$/i']
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(super', $exploded->rules['items.0.type'][1]);
+        $this->assertEquals('admin)$/i', $exploded->rules['items.0.type'][2]);
+    }
+
     public function testExplodeGeneratesNestedRules()
     {
         $parser = (new ValidationRuleParser([
