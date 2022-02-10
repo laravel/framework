@@ -22,4 +22,21 @@ class Pivot extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * The pivot table additional columns to retrieve.
+     *
+     * @var array
+     */
+    protected $withPivot = [];
+
+    /**
+     * Get the additional columns on the pivot table to retrieve.
+     *
+     * @return array
+     */
+    public function getWithPivot()
+    {
+        return $this->withPivot;
+    }
 }

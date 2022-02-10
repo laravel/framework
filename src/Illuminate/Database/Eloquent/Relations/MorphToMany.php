@@ -172,6 +172,10 @@ class MorphToMany extends BelongsToMany
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey, $this->morphType];
 
+        if (! is_null($this->using)) {
+            $defaults = array_merge($defaults, (new $this->using)->getWithPivot());
+        }
+
         return collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
             return $this->qualifyPivotColumn($column).' as pivot_'.$column;
         })->unique()->all();
