@@ -488,7 +488,7 @@ class Mailable implements MailableContract, Renderable
     public function priority($level = 3)
     {
         $this->callbacks[] = function ($message) use ($level) {
-            $message->setPriority($level);
+            $message->priority($level);
         };
 
         return $this;
