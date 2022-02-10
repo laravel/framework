@@ -326,4 +326,15 @@ trait CompilesConditionals
     {
         return "<?php if{$condition}: echo 'checked'; endif; ?>";
     }
+
+    /**
+     * Compile a disabled block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileDisabled($condition)
+    {
+        return "<?php if{$condition}: echo 'disabled'; endif; ?>";
+    }
 }
