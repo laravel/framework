@@ -85,7 +85,7 @@ class ValidationRuleParser
     protected function explodeExplicitRule($rule, $attribute)
     {
         if (is_string($rule)) {
-            return explode('|', $rule);
+            return explode('|', $rule, ...array_filter([str_contains($rule, 'regex')]));
         } elseif (is_object($rule)) {
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
@@ -156,7 +156,7 @@ class ValidationRuleParser
                     } else {
                         $this->implicitAttributes[$attribute][] = $key;
 
-                        $results = $this->mergeRules($results, $key, Arr::wrap($rule));
+                        $results = $this->mergeRules($results, $key, $rule);
                     }
                 }
             }
