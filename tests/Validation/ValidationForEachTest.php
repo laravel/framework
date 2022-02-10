@@ -200,7 +200,7 @@ class ValidationForEachTest extends TestCase
             'items.1.discounts.0.discount' => ['validation.numeric'],
         ], $v->getMessageBag()->toArray());
     }
-    
+
     public function testNestedCallbacksDoNotBreakRegexRules()
     {
         $data = [
