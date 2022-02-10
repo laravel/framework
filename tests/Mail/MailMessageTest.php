@@ -41,8 +41,11 @@ class MailMessageTest extends TestCase
 
     public function testToMethod()
     {
-        $this->assertInstanceOf(Message::class, $message = $this->message->to('foo@bar.baz', 'Foo', false));
+        $this->assertInstanceOf(Message::class, $message = $this->message->to('foo@bar.baz', 'Foo'));
         $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getTo()[0]);
+
+        $this->assertInstanceOf(Message::class, $message = $this->message->to(['bar@bar.baz' => 'Bar']));
+        $this->assertEquals(new Address('bar@bar.baz', 'Bar'), $message->getSymfonyMessage()->getTo()[0]);
     }
 
     public function testToMethodWithOverride()
