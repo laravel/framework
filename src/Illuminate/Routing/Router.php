@@ -369,10 +369,28 @@ class Router implements BindingRegistrar, RegistrarContract
      * Create a route group with shared attributes.
      *
      * @param  array  $attributes
-     * @param  \Closure|string  $routes
+     * @param  \Closure|array|string  $routes
      * @return void
      */
     public function group(array $attributes, $routes)
+    { 
+        if (is_array($routes)) {
+            foreach ($routes as $route) {
+                $this->applyGroup($attributes, $route);
+            }
+        } else {
+            $this->applyGroup($attributes, $routes);
+        }
+    }
+
+    /**
+     * Apply the given group.
+     * 
+     * @param  array  $attributes
+     * @param  \Closure|string  $routes
+     * @return void
+     */
+    protected function applyGroup(array $attributes, $routes)
     {
         $this->updateGroupStack($attributes);
 
