@@ -200,6 +200,32 @@ class ValidationForEachTest extends TestCase
             'items.1.discounts.0.discount' => ['validation.numeric'],
         ], $v->getMessageBag()->toArray());
     }
+    
+    public function testNestedCallbacksDoNotBreakRegexRules()
+    {
+        $data = [
+            'items' => [
+                ['users' => [['type' => 'super'], ['type' => 'admin']]],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::forEach(function () {
+                return ['users.*.type' => 'regex:/^(super|admin)$/i'];
+            }),
+        ];
+
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, $data, $rules);
+
+        $this->assertFalse($v->passes());
+
+        $this->assertEquals([
+            'items.0.users.0.type' => ['validation.regex'],
+            'items.0.users.1.type' => ['validation.regex'],
+        ], $v->getMessageBag()->toArray());
+    }
 
     protected function getTranslator()
     {
