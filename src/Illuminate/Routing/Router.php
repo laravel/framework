@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Events\RouteMatched;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -374,32 +375,16 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function group(array $attributes, $routes)
     { 
-        if (is_array($routes)) {
-            foreach ($routes as $route) {
-                $this->applyGroup($attributes, $route);
-            }
-        } else {
-            $this->applyGroup($attributes, $routes);
+        foreach (Arr::wrap($routes) as $groupRoutes) {
+            $this->updateGroupStack($attributes);
+
+            // Once we have updated the group stack, we'll load the provided routes and
+            // merge in the group's attributes when the routes are created. After we
+            // have created the routes, we will pop the attributes off the stack.
+            $this->loadRoutes($groupRoutes);
+
+            array_pop($this->groupStack);
         }
-    }
-
-    /**
-     * Apply the given group.
-     * 
-     * @param  array  $attributes
-     * @param  \Closure|string  $routes
-     * @return void
-     */
-    protected function applyGroup(array $attributes, $routes)
-    {
-        $this->updateGroupStack($attributes);
-
-        // Once we have updated the group stack, we'll load the provided routes and
-        // merge in the group's attributes when the routes are created. After we
-        // have created the routes, we will pop the attributes off the stack.
-        $this->loadRoutes($routes);
-
-        array_pop($this->groupStack);
     }
 
     /**
