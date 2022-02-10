@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Tests\Database\Fixtures\Enums\Roles;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -494,6 +495,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $blueprint->enum('role', ['member', 'admin']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
+    }
+
+    public function testAllowingBackedEnumDefinition()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('role', Roles::class);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
