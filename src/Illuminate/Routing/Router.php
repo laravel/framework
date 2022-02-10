@@ -374,7 +374,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @return void
      */
     public function group(array $attributes, $routes)
-    { 
+    {
         foreach (Arr::wrap($routes) as $groupRoutes) {
             $this->updateGroupStack($attributes);
 
