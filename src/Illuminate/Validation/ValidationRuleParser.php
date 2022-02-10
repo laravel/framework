@@ -276,11 +276,7 @@ class ValidationRuleParser
      */
     protected static function parseParameters($rule, $parameter)
     {
-        if (static::ruleIsRegex($rule)) {
-            return [$parameter];
-        }
-
-        return str_getcsv($parameter);
+        return static::ruleIsRegex($rule) ? [$parameter] : str_getcsv($parameter);
     }
 
     /**
