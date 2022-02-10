@@ -50,8 +50,24 @@ class Filesystem
      */
     public function get($path, $lock = false)
     {
+        return $this->getChunk($path, $lock);
+    }
+
+    /**
+     * Get the contents of a file.
+     *
+     * @param  string  $path
+     * @param  bool  $lock
+     * @param  int  $offset
+     * @param  int|null  $length
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function getChunk($path, $lock = false, $offset = 0, $length = null)
+    {
         if ($this->isFile($path)) {
-            return $lock ? $this->sharedGet($path) : file_get_contents($path);
+            return $lock ? $this->sharedGet($path) : file_get_contents($path, false, null, $offset, $length);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}.");
