@@ -88,7 +88,9 @@ class ValidationRuleParser
             [$name] = static::parseStringRule($rule);
 
             return explode('|', $rule, ...array_filter([static::ruleIsRegex($name)]));
-        } elseif (is_object($rule)) {
+        }
+
+        if (is_object($rule)) {
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
