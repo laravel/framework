@@ -1464,7 +1464,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Return only unique items from the collection array.
      *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|null  $key
      * @param  bool  $strict
      * @return static
      */
