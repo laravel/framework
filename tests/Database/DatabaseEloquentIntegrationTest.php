@@ -1424,6 +1424,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
     }
 
+    public function testBelongsToManyWithPivotAttributesSpecifiedInCustomPivot()
+    {
+        $john = EloquentTestUserWithCustomFriendPivotWithoutWithPivot::create(['id' => 1, 'name' => 'John Doe', 'email' => 'johndoe@example.com']);
+        $jack = EloquentTestUserWithCustomFriendPivotWithoutWithPivot::create(['id' => 2, 'name' => 'Jack Doe', 'email' => 'jackdoe@example.com']);
+
+        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
+
+        $john->friends()->attach($jack, ['friend_level_id' => 1]);
+
+        $johnWithFriends = EloquentTestUserWithCustomFriendPivotWithoutWithPivot::with('friends')->find(1);
+
+        $pivot = $johnWithFriends->friends->find(2)->pivot;
+
+        $this->assertArrayHasKey('user_id', $pivot);
+        $this->assertArrayHasKey('friend_id', $pivot);
+        $this->assertArrayHasKey('friend_level_id', $pivot);
+    }
+
     public function testIsAfterRetrievingTheSameModel()
     {
         $saved = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -2023,6 +2041,15 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
     }
 }
 
+class EloquentTestUserWithCustomFriendPivotWithoutWithPivot extends EloquentTestUser
+{
+    public function friends()
+    {
+        return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
+            ->using(EloquentTestFriendPivot::class);
+    }
+}
+
 class EloquentTestUserWithSpaceInColumnName extends EloquentTestUser
 {
     protected $table = 'users_with_space_in_colum_name';
@@ -2185,6 +2212,7 @@ class EloquentTestFriendPivot extends Pivot
 {
     protected $table = 'friends';
     protected $guarded = [];
+    protected $withPivot = ['user_id', 'friend_id', 'friend_level_id'];
 
     public function user()
     {
