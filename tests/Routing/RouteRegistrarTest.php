@@ -731,7 +731,7 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
         
         $this->assertEquals(
-            RouteRegistrarControllerStub::class . '@index',
+            RouteRegistrarControllerStub::class.'@index',
             $this->router->getRoutes()->getRouteAction('users.index')['controller']
         );
     }

@@ -361,7 +361,7 @@ class Router implements BindingRegistrar, RegistrarContract
             $only = array_diff($only, (array) $options['except']);
         }
         
-        if (!$controller) {
+        if (! $controller) {
             $group = end($this->groupStack);
 
             $controller = $group['controller'] ?? null;
