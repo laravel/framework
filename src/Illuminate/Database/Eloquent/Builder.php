@@ -7,6 +7,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -25,7 +26,7 @@ use ReflectionMethod;
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder implements BuilderContract
+class Builder implements BuilderContract, Responsable
 {
     use BuildsQueries, ForwardsCalls, QueriesRelationships {
         BuildsQueries::sole as baseSole;
@@ -1558,6 +1559,17 @@ class Builder implements BuilderContract
     public function qualifyColumns($columns)
     {
         return $this->model->qualifyColumns($columns);
+    }
+
+    /**
+     * Return the results of the query as a response
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function toResponse($request)
+    {
+        return $this->get();
     }
 
     /**
