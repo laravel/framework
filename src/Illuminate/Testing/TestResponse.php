@@ -236,7 +236,8 @@ The following exception occurred during the request:
 $exception
 
 ----------------------------------------------------------------------------------
-$message
+
+Message: $message
 
 EOF;
     }
