@@ -86,6 +86,20 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
+    public function testNestedWhereRelation()
+    {
+        $texts = User::whereRelation('posts.texts', 'content', 'test')->get();
+
+        $this->assertEquals([1], $texts->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereRelation()
+    {
+        $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
+
+        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+    }
+
     public function testNestedWhereRelationIn()
     {
         $users = User::whereRelationIn('posts.texts', 'content', ['test', 'something'])->get();
@@ -100,18 +114,18 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
-    public function testNestedWhereRelation()
+    public function testNestedWhereRelationNotIn()
     {
-        $texts = User::whereRelation('posts.texts', 'content', 'test')->get();
+        $users = User::whereRelationNotIn('posts.texts', 'content', ['something'])->get();
 
-        $this->assertEquals([1], $texts->pluck('id')->all());
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
-    public function testNestedOrWhereRelation()
+    public function testNestedOrWhereRelationNotIn()
     {
-        $texts = User::whereRelation('posts.texts', 'content', 'test')->orWhereRelation('posts.texts', 'content', 'test2')->get();
+        $users = User::whereRelationIn('posts.texts', 'content', ['test', 'something'])->orWhereRelationNotIn('posts.texts', 'content', ['something'])->get();
 
-        $this->assertEquals([1, 2], $texts->pluck('id')->all());
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
     public function testWhereMorphRelation()
