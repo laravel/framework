@@ -187,7 +187,7 @@ class Redirector
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function secureRoute($route, $parameters = [], $status = 302, $headers = [])
+    public function securedRoute($route, $parameters = [], $status = 302, $headers = [])
     {
         return $this->to($this->generator->route($route, $parameters), $status, $headers, true);
     }
