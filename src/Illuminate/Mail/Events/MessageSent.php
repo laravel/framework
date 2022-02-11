@@ -29,8 +29,8 @@ class MessageSent
      */
     public function __construct(SentMessage $message, array $data = [])
     {
-        $this->data = $data;
         $this->message = $message;
+        $this->data = $data;
     }
 
     /**
