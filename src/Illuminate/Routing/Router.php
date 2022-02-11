@@ -353,12 +353,18 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function apiResource($name, $controller, array $options = [])
+    public function apiResource($name, $controller = null, array $options = [])
     {
         $only = ['index', 'show', 'store', 'update', 'destroy'];
 
         if (isset($options['except'])) {
             $only = array_diff($only, (array) $options['except']);
+        }
+        
+        if (!$controller) {
+            $group = end($this->groupStack);
+
+            $controller = $group['controller'] ?? null;
         }
 
         return $this->resource($name, $controller, array_merge([
