@@ -945,9 +945,13 @@ class HttpClientTest extends TestCase
     {
         $request = new PendingRequest($this->factory);
 
-        $request = $request->withOptions(['http_errors' => true]);
+        $request = $request->withOptions(['http_errors' => true, 'connect_timeout' => 10]);
 
-        $this->assertSame(['http_errors' => true], $request->getOptions());
+        $this->assertSame(['http_errors' => true, 'connect_timeout' => 10], $request->getOptions());
+
+        $request = $request->withOptions(['connect_timeout' => 20]);
+
+        $this->assertSame(['http_errors' => true, 'connect_timeout' => 20], $request->getOptions());
     }
 
     public function testMultipleRequestsAreSentInThePool()
