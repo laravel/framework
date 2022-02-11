@@ -139,9 +139,23 @@ class EloquentWhereHasTest extends DatabaseTestCase
 
     public function testOrWhereMorphRelationIn()
     {
-        $comments = Comment::whereMorphRelation('commentable', Text::class, 'content', '')->orWhereMorphRelationIn('commentable', '*', 'public', [true])->get();
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)->orWhereMorphRelationIn('commentable', '*', 'public', [false])->get();
+
+        $this->assertEquals([1, 2], $comments->pluck('id')->all());
+    }
+
+    public function testWhereMorphRelationNotIn()
+    {
+        $comments = Comment::whereMorphRelationNotIn('commentable', '*', 'public', [false])->get();
 
         $this->assertEquals([1], $comments->pluck('id')->all());
+    }
+
+    public function testOrWhereMorphRelationNotIn()
+    {
+        $comments = Comment::whereMorphRelation('commentable', '*', 'public', true)->orWhereMorphRelationNotIn('commentable', '*', 'public', [true])->get();
+
+        $this->assertEquals([1, 2], $comments->pluck('id')->all());
     }
 
     public function testWithCount()
