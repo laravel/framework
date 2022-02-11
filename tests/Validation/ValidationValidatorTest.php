@@ -502,6 +502,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('type must be included in Short, Long.', $v->messages()->first('type'));
+        $valueWithTrailingBackslash = 'foo\\';
+        $v = new Validator(
+            $trans,
+            ['type' => $valueWithTrailingBackslash],
+            ['type' => \Illuminate\Validation\Rule::in($valueWithTrailingBackslash)]
+        );
+        $this->assertTrue($v->passes());
 
         // date_equals:tomorrow
         $trans = $this->getIlluminateArrayTranslator();
