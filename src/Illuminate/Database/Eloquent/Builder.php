@@ -114,14 +114,14 @@ class Builder implements BuilderContract
     protected $dynamicWhereRelations = [
         'whereRelation',
         'orWhereRelation',
-        'whereMorphRelation',
-        'orWhereMorphRelation',
         'whereRelationIn',
         'orWhereRelationIn',
-        'whereMorphRelationIn',
-        'orWhereMorphRelationIn',
         'whereRelationNotIn',
         'orWhereRelationNotIn',
+        'whereMorphRelation',
+        'orWhereMorphRelation',
+        'whereMorphRelationIn',
+        'orWhereMorphRelationIn',
         'whereMorphRelationNotIn',
         'orWhereMorphRelationNotIn',
     ];
@@ -1241,11 +1241,24 @@ class Builder implements BuilderContract
         }, $parameters);
     }
 
+    /**
+     * Determine if method is a dynamic where relation.
+     *
+     * @param  string  $method
+     * @return bool
+     */
     protected function isDynamicWhereRelation($method)
     {
         return in_array($method, $this->dynamicWhereRelations);
     }
 
+    /**
+     * Apply the correct dynamic where relation on the current builder instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
     protected function callDynamicWhereRelation($method, $parameters)
     {
         return match ($method) {
