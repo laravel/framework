@@ -58,6 +58,34 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
+    public function testWhereRelationIn()
+    {
+        $users = User::whereRelationIn('posts', 'id', [1])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationIn()
+    {
+        $users = User::whereRelationIn('posts', 'id', [1])->orWhereRelationIn('posts', 'id', [2])->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testNestedWhereRelationIn()
+    {
+        $users = User::whereRelationIn('posts.texts', 'content', ['test', 'something'])->get();
+
+        $this->assertEquals([1], $users->pluck('id')->all());
+    }
+
+    public function testNestedOrWhereRelationIn()
+    {
+        $users = User::whereRelationIn('posts.texts', 'content', ['test', 'something'])->orWhereRelationIn('posts.texts', 'content', ['test2', 'something'])->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
     public function testNestedWhereRelation()
     {
         $texts = User::whereRelation('posts.texts', 'content', 'test')->get();
