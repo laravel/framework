@@ -188,6 +188,20 @@ class RouteCollectionTest extends TestCase
         $this->assertSame($routesByName, $this->routeCollection->getRoutesByName());
     }
 
+    public function testRouteCollectionCanGetRouteActionByName()
+    {
+        $routesByName = [
+            'foo_index' => new Route('GET', 'foo/index', [
+                'uses' => 'FooController@index',
+                'as' => 'foo_index',
+            ]),
+        ];
+
+        $this->routeCollection->add($routesByName['foo_index']);
+
+        $this->assertSame($routesByName['foo_index']->action, $this->routeCollection->getRouteAction('foo_index'));
+    }
+
     public function testRouteCollectionCanGetRoutesByMethod()
     {
         $routes = [

@@ -277,6 +277,16 @@ class CompiledRouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Get the route action by route name.
+     *
+     * @return array
+     */
+    public function getRouteAction($name)
+    {
+        return $this->routes->getRouteAction($name);
+    }
+
+    /**
      * Resolve an array of attributes to a Route instance.
      *
      * @param  array  $attributes
