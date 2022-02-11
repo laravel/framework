@@ -137,6 +137,18 @@ class ValidationRuleParserTest extends TestCase
         $this->assertEquals('bar)$/i', $exploded->rules['items.0.type'][2]);
     }
 
+    public function testExplodeProperlyFlattensRuleArraysOfArrays()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => ['in:foo', [[['regex:/^(foo|bar)$/i']]]]]
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
     public function testExplodeGeneratesNestedRules()
     {
         $parser = (new ValidationRuleParser([
