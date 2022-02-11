@@ -2,11 +2,20 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailer;
+use Illuminate\Mail\Transport\ArrayTransport;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
     public function testMailableSetsRecipientsCorrectly()
     {
         $mailable = new WelcomeMailableStub;
@@ -416,6 +425,25 @@ class MailMailableTest extends TestCase
         $mailable = unserialize(serialize($mailable));
 
         $this->assertSame('array', $mailable->mailer);
+    }
+
+    public function testMailablePriorityGetsSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->priority(1);
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertStringContainsString('X-Priority: 1 (Highest)', $sentMessage->toString());
     }
 }
 

@@ -1528,7 +1528,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Return only unique items from the collection array.
      *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|null  $key
      * @param  bool  $strict
      * @return static
      */

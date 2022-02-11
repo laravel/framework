@@ -259,7 +259,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Execute a callback over each item.
      *
-     * @param  callable(TValue): mixed  $callback
+     * @param  callable(TValue, TKey): mixed  $callback
      * @return $this
      */
     public function each(callable $callback);
@@ -1099,7 +1099,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Create a collection of all elements that do not pass a given truth test.
      *
-     * @param  (callable(TValue): bool)|bool  $callback
+     * @param  (callable(TValue, TKey): bool)|bool  $callback
      * @return static
      */
     public function reject($callback = true);
@@ -1114,7 +1114,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Return only unique items from the collection array.
      *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|null  $key
      * @param  bool  $strict
      * @return static
      */
@@ -1123,7 +1123,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Return only unique items from the collection array using strict comparison.
      *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  (callable(TValue, TKey): mixed)|string|null  $key
      * @return static
      */
     public function uniqueStrict($key = null);

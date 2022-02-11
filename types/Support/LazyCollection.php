@@ -745,13 +745,13 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->unique(f
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 assertType('Illuminate\Support\LazyCollection<string, string>', $collection->make(['string' => 'string'])->unique(function ($stringA, $stringB) {
     assertType('string', $stringA);
-    assertType('string', $stringA);
+    assertType('string', $stringB);
 
-    return false;
+    return $stringA;
 }, true));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->uniqueStrict());
@@ -759,7 +759,7 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->uniqueSt
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->values());

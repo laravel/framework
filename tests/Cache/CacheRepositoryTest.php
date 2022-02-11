@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Cache;
 
 use ArrayIterator;
+use BadMethodCallException;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -11,9 +12,11 @@ use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
+use Illuminate\Cache\TaggedCache;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -354,6 +357,56 @@ class CacheRepositoryTest extends TestCase
         $taggedCache->shouldReceive('setDefaultCacheTime');
         $store->shouldReceive('tags')->once()->with(['foo', 'bar', 'baz'])->andReturn($taggedCache);
         $repo->tags('foo', 'bar', 'baz');
+    }
+
+    public function testItThrowsExceptionWhenStoreDoesNotSupportTags()
+    {
+        $this->expectException(BadMethodCallException::class);
+
+        $store = new FileStore(new Filesystem, '/usr');
+        $this->assertFalse(method_exists($store, 'tags'), 'Store should not support tagging.');
+        (new Repository($store))->tags('foo');
+    }
+
+    public function testTagMethodReturnsTaggedCache()
+    {
+        $store = (new Repository(new ArrayStore()))->tags('foo');
+
+        $this->assertInstanceOf(TaggedCache::class, $store);
+    }
+
+    public function testPossibleInputTypesToTags()
+    {
+        $repo = new Repository(new ArrayStore());
+
+        $store = $repo->tags('foo');
+        $this->assertEquals(['foo'], $store->getTags()->getNames());
+
+        $store = $repo->tags(['foo!', 'Kangaroo']);
+        $this->assertEquals(['foo!', 'Kangaroo'], $store->getTags()->getNames());
+
+        $store = $repo->tags('r1', 'r2', 'r3');
+        $this->assertEquals(['r1', 'r2', 'r3'], $store->getTags()->getNames());
+    }
+
+    public function testEventDispatcherIsPassedToStoreFromRepository()
+    {
+        $repo = new Repository(new ArrayStore());
+        $repo->setEventDispatcher(new Dispatcher());
+
+        $store = $repo->tags('foo');
+
+        $this->assertSame($store->getEventDispatcher(), $repo->getEventDispatcher());
+    }
+
+    public function testDefaultCacheLifeTimeIsSetOnTaggableStore()
+    {
+        $repo = new Repository(new ArrayStore());
+        $repo->setDefaultCacheTime(random_int(1, 100));
+
+        $store = $repo->tags('foo');
+
+        $this->assertSame($store->getDefaultCacheTime(), $repo->getDefaultCacheTime());
     }
 
     public function testTaggableRepositoriesSupportTags()

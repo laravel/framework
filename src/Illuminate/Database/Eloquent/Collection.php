@@ -458,7 +458,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Return only unique items from the collection.
      *
-     * @param  (callable(TModel, TKey): bool)|string|null  $key
+     * @param  (callable(TModel, TKey): mixed)|string|null  $key
      * @param  bool  $strict
      * @return static<int, TModel>
      */

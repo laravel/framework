@@ -189,6 +189,10 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->each(functio
 assertType('Illuminate\Support\Collection<int, User>', $collection->each(function ($user) {
     assertType('User', $user);
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->each(function ($user, $int) {
+    assertType('int', $int);
+    assertType('User', $user);
+}));
 
 assertType('Illuminate\Support\Collection<int, array{string}>', $collection::make([['string']])
     ->eachSpread(function ($int, $string) {
@@ -762,19 +766,25 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->reject(funct
 
     return true;
 }));
+assertType('Illuminate\Support\Collection<int, User>', $collection->reject(function ($user, $int) {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return true;
+}));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->unique());
 assertType('Illuminate\Support\Collection<int, User>', $collection->unique(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->unique(function ($stringA, $stringB) {
     assertType('string', $stringA);
-    assertType('string', $stringA);
+    assertType('string', $stringB);
 
-    return false;
+    return $stringA;
 }, true));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->uniqueStrict());
@@ -782,7 +792,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->uniqueStrict
     assertType('User', $user);
     assertType('int', $int);
 
-    return true;
+    return $user->getTable();
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->values());
