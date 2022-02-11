@@ -34,7 +34,7 @@ class MessageSent
     }
 
     /**
-     * Get the original sent email message.
+     * Get the original email message.
      *
      * @return \Symfony\Component\Mime\Email
      */
