@@ -941,6 +941,15 @@ class HttpClientTest extends TestCase
         $this->assertSame($client, $request->buildClient());
     }
 
+    public function testRequestsCanReplaceOptions()
+    {
+        $request = new PendingRequest($this->factory);
+
+        $request = $request->withOptions(['http_errors' => true]);
+
+        $this->assertSame(['http_errors' => true], $request->getOptions());
+    }
+
     public function testMultipleRequestsAreSentInThePool()
     {
         $this->factory->fake([
