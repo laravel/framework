@@ -501,13 +501,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('type must be included in Short, Long.', $v->messages()->first('type'));
-        $valueWithTrailingBackslash = 'foo\\';
-        $v = new Validator(
-            $trans,
-            ['type' => $valueWithTrailingBackslash],
-            ['type' => \Illuminate\Validation\Rule::in($valueWithTrailingBackslash)]
-        );
-        $this->assertTrue($v->passes());
 
         // date_equals:tomorrow
         $trans = $this->getIlluminateArrayTranslator();
@@ -2752,6 +2745,14 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|In:foo,bar']);
         $this->assertFalse($v->passes());
+
+        $valueWithTrailingBackslash = 'foo\\';
+        $v = new Validator(
+            $trans,
+            ['name' => $valueWithTrailingBackslash],
+            ['name' => \Illuminate\Validation\Rule::in([$valueWithTrailingBackslash])]
+        );
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateNotIn()
