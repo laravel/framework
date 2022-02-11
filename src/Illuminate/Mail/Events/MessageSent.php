@@ -2,14 +2,14 @@
 
 namespace Illuminate\Mail\Events;
 
-use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\SentMessage;
 
 class MessageSent
 {
     /**
      * The Symfony Email instance.
      *
-     * @var \Symfony\Component\Mime\Email
+     * @var \Symfony\Component\Mailer\SentMessage
      */
     public $message;
 
@@ -23,11 +23,11 @@ class MessageSent
     /**
      * Create a new event instance.
      *
-     * @param  \Symfony\Component\Mime\Email  $message
+     * @param  \Symfony\Component\Mailer\SentMessage  $message
      * @param  array  $data
      * @return void
      */
-    public function __construct(Email $message, array $data = [])
+    public function __construct(SentMessage $message, array $data = [])
     {
         $this->data = $data;
         $this->message = $message;

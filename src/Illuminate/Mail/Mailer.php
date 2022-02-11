@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\SentMessage;
 
 class Mailer implements MailerContract, MailQueueContract
 {
@@ -284,9 +285,13 @@ class Mailer implements MailerContract, MailQueueContract
         if ($this->shouldSendMessage($symfonyMessage, $data)) {
             $sentMessage = $this->sendSymfonyMessage($symfonyMessage);
 
-            $this->dispatchSentEvent($message, $data);
+            if ($sentMessage === null) {
+                return null;
+            }
 
-            return $sentMessage === null ? null : new SentMessage($sentMessage);
+            $this->dispatchSentEvent($sentMessage, $data);
+
+            return new SentMessage($sentMessage);
         }
     }
 
@@ -539,17 +544,15 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Dispatch the message sent event.
      *
-     * @param  \Illuminate\Mail\Message  $message
-     * @param  array  $data
+     * @param  \Symfony\Component\Mailer\SentMessage  $message
+     * @param array $data
      * @return void
      */
-    protected function dispatchSentEvent($message, $data = [])
+    protected function dispatchSentEvent(SentMessage $message, array $data = [])
     {
-        if ($this->events) {
-            $this->events->dispatch(
-                new MessageSent($message->getSymfonyMessage(), $data)
-            );
-        }
+        $this->events?->dispatch(
+            new MessageSent($message, $data)
+        );
     }
 
     /**
