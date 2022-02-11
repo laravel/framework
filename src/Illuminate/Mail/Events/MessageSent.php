@@ -11,7 +11,7 @@ use Illuminate\Mail\SentMessage;
 class MessageSent
 {
     /**
-     * The Illuminate SentMessage instance.
+     * The message that was sent.
      *
      * @var \Illuminate\Mail\SentMessage
      */
@@ -33,8 +33,8 @@ class MessageSent
      */
     public function __construct(SentMessage $message, array $data = [])
     {
-        $this->data = $data;
         $this->sent = $message;
+        $this->data = $data;
     }
 
     /**
@@ -88,6 +88,6 @@ class MessageSent
             return $this->sent->getOriginalMessage();
         }
 
-        throw new Exception('Undefined property on '.__CLASS__.': '.$key);
+        throw new Exception('Unable to access undefined property on '.__CLASS__.': '.$key);
     }
 }
