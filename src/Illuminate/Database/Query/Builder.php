@@ -8,6 +8,7 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
@@ -26,7 +27,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
-class Builder implements BuilderContract
+class Builder implements BuilderContract, Responsable
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
@@ -3584,6 +3585,17 @@ class Builder implements BuilderContract
     public function dd()
     {
         dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Return the results of the query as a response
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function toResponse($request)
+    {
+        return $this->get();
     }
 
     /**
