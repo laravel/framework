@@ -464,7 +464,7 @@ class PendingRequest
     }
 
     /**
-     * Replace new options into the client.
+     * Replace the specified options on the request.
      *
      * @param  array  $options
      * @return $this
