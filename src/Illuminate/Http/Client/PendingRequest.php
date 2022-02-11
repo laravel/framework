@@ -464,7 +464,7 @@ class PendingRequest
     }
 
     /**
-     * Merge new options into the client.
+     * Replace the specified options on the request.
      *
      * @param  array  $options
      * @return $this
@@ -472,7 +472,7 @@ class PendingRequest
     public function withOptions(array $options)
     {
         return tap($this, function ($request) use ($options) {
-            return $this->options = array_merge_recursive($this->options, $options);
+            return $this->options = array_replace_recursive($this->options, $options);
         });
     }
 
@@ -980,14 +980,14 @@ class PendingRequest
     }
 
     /**
-     * Merge the given options with the current request options.
+     * Replace the given options with the current request options.
      *
      * @param  array  $options
      * @return array
      */
     public function mergeOptions(...$options)
     {
-        return array_merge_recursive($this->options, ...$options);
+        return array_replace_recursive($this->options, ...$options);
     }
 
     /**
@@ -1092,5 +1092,15 @@ class PendingRequest
         );
 
         return $this;
+    }
+
+    /**
+     * Get the pending request options.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }
