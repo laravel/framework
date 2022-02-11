@@ -23,8 +23,8 @@
         "illuminate/macroable": "^10.0",
         "illuminate/support": "^10.0",
         "illuminate/translation": "^10.0",
-        "symfony/http-foundation": "^6.0",
-        "symfony/mime": "^6.0"
+        "symfony/http-foundation": "^6.1",
+        "symfony/mime": "^6.1"
     },
     "autoload": {
         "psr-4": {

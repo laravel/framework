@@ -24,9 +24,9 @@
         "illuminate/pipeline": "^10.0",
         "illuminate/session": "^10.0",
         "illuminate/support": "^10.0",
-        "symfony/http-foundation": "^6.0",
-        "symfony/http-kernel": "^6.0",
-        "symfony/routing": "^6.0"
+        "symfony/http-foundation": "^6.1",
+        "symfony/http-kernel": "^6.1",
+        "symfony/routing": "^6.1"
     },
     "autoload": {
         "psr-4": {
