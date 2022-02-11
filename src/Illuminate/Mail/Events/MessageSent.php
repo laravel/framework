@@ -7,7 +7,7 @@ use Illuminate\Mail\SentMessage;
 class MessageSent
 {
     /**
-     * The Illuminate SentMessage instance.
+     * The sent message instance.
      *
      * @var \Illuminate\Mail\SentMessage
      */
