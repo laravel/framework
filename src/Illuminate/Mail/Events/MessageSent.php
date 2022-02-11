@@ -2,14 +2,14 @@
 
 namespace Illuminate\Mail\Events;
 
-use Symfony\Component\Mime\Email;
+use Illuminate\Mail\SentMessage;
 
 class MessageSent
 {
     /**
-     * The Symfony Email instance.
+     * The Illuminate SentMessage instance.
      *
-     * @var \Symfony\Component\Mime\Email
+     * @var \Illuminate\Mail\SentMessage
      */
     public $message;
 
@@ -23,14 +23,24 @@ class MessageSent
     /**
      * Create a new event instance.
      *
-     * @param  \Symfony\Component\Mime\Email  $message
+     * @param  \Illuminate\Mail\SentMessage  $message
      * @param  array  $data
      * @return void
      */
-    public function __construct(Email $message, array $data = [])
+    public function __construct(SentMessage $message, array $data = [])
     {
         $this->data = $data;
         $this->message = $message;
+    }
+
+    /**
+     * Get the original sent email message.
+     *
+     * @return \Symfony\Component\Mime\Email
+     */
+    public function original()
+    {
+        return $this->message->getOriginalMessage();
     }
 
     /**
@@ -40,7 +50,7 @@ class MessageSent
      */
     public function __serialize()
     {
-        $hasAttachments = collect($this->message->getAttachments())->isNotEmpty();
+        $hasAttachments = collect($this->original()->getAttachments())->isNotEmpty();
 
         return $hasAttachments ? [
             'message' => base64_encode(serialize($this->message)),
