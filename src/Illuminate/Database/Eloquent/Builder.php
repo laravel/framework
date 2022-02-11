@@ -111,6 +111,21 @@ class Builder implements BuilderContract
         'toSql',
     ];
 
+    protected $dynamicWhereRelations = [
+        'whereRelation',
+        'orWhereRelation',
+        'whereMorphRelation',
+        'orWhereMorphRelation',
+        'whereRelationIn',
+        'orWhereRelationIn',
+        'whereMorphRelationIn',
+        'orWhereMorphRelationIn',
+        'whereRelationNotIn',
+        'orWhereRelationNotIn',
+        'whereMorphRelationNotIn',
+        'orWhereMorphRelationNotIn',
+    ];
+
     /**
      * Applied global scopes.
      *
@@ -1226,6 +1241,29 @@ class Builder implements BuilderContract
         }, $parameters);
     }
 
+    protected function isDynamicWhereRelation($method)
+    {
+        return in_array($method, $this->dynamicWhereRelations);
+    }
+
+    protected function callDynamicWhereRelation($method, $parameters)
+    {
+        return match ($method) {
+            'whereRelation' => $this->dynamicWhereRelation(...$parameters),
+            'orWhereRelation' => $this->dynamicWhereRelation(...array_merge($parameters, ['or' => true])),
+            'whereRelationIn' => $this->dynamicWhereRelationIn(...$parameters),
+            'orWhereRelationIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true])),
+            'whereRelationNotIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['not' => true])),
+            'orWhereRelationNotIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true, 'not' => true])),
+            'whereMorphRelation' => $this->dynamicWhereMorphRelation(...$parameters),
+            'orWhereMorphRelation' => $this->dynamicWhereMorphRelation(...array_merge($parameters, ['or' => true])),
+            'whereMorphRelationIn' => $this->dynamicWhereMorphRelationIn(...$parameters),
+            'orWhereMorphRelationIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['or' => true])),
+            'whereMorphRelationNotIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['not' => true])),
+            'orWhereMorphRelationNotIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['or' => true, 'not' => true])),
+        };
+    }
+
     /**
      * Nest where conditions by slicing them at the given where count.
      *
@@ -1660,26 +1698,8 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, ['whereRelation', 'orWhereRelation', 'whereMorphRelation', 'orWhereMorphRelation', 'whereRelationIn', 'orWhereRelationIn', 'whereMorphRelationIn', 'orWhereMorphRelationIn', 'whereRelationNotIn', 'orWhereRelationNotIn', 'whereMorphRelationNotIn', 'orWhereMorphRelationNotIn'])) {
-            return match ($method) {
-                'whereRelation' => $this->dynamicWhereRelation(...$parameters),
-                'orWhereRelation' => $this->dynamicWhereRelation(...array_merge($parameters, ['or' => true])),
-
-                'whereMorphRelation' => $this->dynamicWhereMorphRelation(...$parameters),
-                'orWhereMorphRelation' => $this->dynamicWhereMorphRelation(...array_merge($parameters, ['or' => true])),
-
-                'whereRelationIn' => $this->dynamicWhereRelationIn(...$parameters),
-                'orWhereRelationIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true])),
-
-                'whereMorphRelationIn' => $this->dynamicWhereMorphRelationIn(...$parameters),
-                'orWhereMorphRelationIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['or' => true])),
-
-                'whereRelationNotIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['not' => true])),
-                'orWhereRelationNotIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true, 'not' => true])),
-
-                'whereMorphRelationNotIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['not' => true])),
-                'orWhereMorphRelationNotIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['or' => true, 'not' => true])),
-            };
+        if ($this->isDynamicWhereRelation($method)) {
+            return $this->callDynamicWhereRelation($method, $parameters);
         }
 
         if (in_array($method, $this->passthru)) {
