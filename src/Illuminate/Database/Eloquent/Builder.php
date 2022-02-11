@@ -1660,6 +1660,17 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
+        if (in_array($method, ['whereRelation', 'orWhereRelation', 'whereMorphRelation', 'orWhereMorphRelation', 'whereRelationIn', 'orWhereRelationIn'])) {
+            return match ($method) {
+                'whereRelation' => $this->dynamicWhereRelation(...$parameters),
+                'orWhereRelation' => $this->dynamicWhereRelation(...array_merge($parameters, ['or' => true])),
+                'whereMorphRelation' => $this->dynamicWhereMorphRelation(...$parameters),
+                'orWhereMorphRelation' => $this->dynamicWhereMorphRelation(...array_merge($parameters, ['or' => true])),
+                'whereRelationIn' => $this->dynamicWhereRelationIn(...$parameters),
+                'orWhereRelationIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true])),
+            };
+        }
+
         if (in_array($method, $this->passthru)) {
             return $this->toBase()->{$method}(...$parameters);
         }
