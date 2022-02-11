@@ -524,7 +524,7 @@ class Mailer implements MailerContract, MailQueueContract
 
     /**
      * Determines if the email can be sent.
-    *
+     *
      * @param  \Symfony\Component\Mime\Email  $message
      * @param  array  $data
      * @return bool
