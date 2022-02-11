@@ -89,6 +89,66 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testExplodeProperlyParsesSingleRegexRule()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'regex:/^(foo|bar)$/i']
+        );
+
+        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][0]);
+    }
+
+    public function testExplodeProperlyParsesRegexWithArrayOfRules()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => ['in:foo', 'regex:/^(foo|bar)$/i']]
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
+    public function testExplodeProperlyParsesRegexThatDoesNotContainPipe()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'in:foo|regex:/^(bar)$/i']
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
+    public function testExplodeFailsParsingRegexWithOtherRulesInSingleString()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'in:foo|regex:/^(foo|bar)$/i']
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(foo', $exploded->rules['items.0.type'][1]);
+        $this->assertEquals('bar)$/i', $exploded->rules['items.0.type'][2]);
+    }
+
+    public function testExplodeProperlyFlattensRuleArraysOfArrays()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => ['in:foo', [[['regex:/^(foo|bar)$/i']]]]]
+        );
+
+        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
     public function testExplodeGeneratesNestedRules()
     {
         $parser = (new ValidationRuleParser([
