@@ -309,7 +309,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testDropRelationshipColumnWithUuidModel()
     {
-        require_once __DIR__ . '/stubs/EloquentModelUuidStub.php';
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
 
         $base = new Blueprint('posts', function ($table) {
             $table->dropForeignIdFor('EloquentModelUuidStub');
