@@ -72,6 +72,20 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $this->assertEquals([1, 2], $users->pluck('id')->all());
     }
 
+    public function testWhereRelationNotIn()
+    {
+        $users = User::whereRelationNotIn('posts', 'id', [42])->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
+    public function testOrWhereRelationNotIn()
+    {
+        $users = User::whereRelationIn('posts', 'id', [1])->orWhereRelationNotIn('posts', 'id', [42])->get();
+
+        $this->assertEquals([1, 2], $users->pluck('id')->all());
+    }
+
     public function testNestedWhereRelationIn()
     {
         $users = User::whereRelationIn('posts.texts', 'content', ['test', 'something'])->get();
@@ -114,6 +128,20 @@ class EloquentWhereHasTest extends DatabaseTestCase
             ->get();
 
         $this->assertEquals([1, 2], $comments->pluck('id')->all());
+    }
+
+    public function testWhereMorphRelationIn()
+    {
+        $comments = Comment::whereMorphRelationIn('commentable', '*', 'public', [true])->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
+    }
+
+    public function testOrWhereMorphRelationIn()
+    {
+        $comments = Comment::whereMorphRelation('commentable', Text::class, 'content', '')->orWhereMorphRelationIn('commentable', '*', 'public', [true])->get();
+
+        $this->assertEquals([1], $comments->pluck('id')->all());
     }
 
     public function testWithCount()

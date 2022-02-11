@@ -1660,14 +1660,22 @@ class Builder implements BuilderContract
             return $this->callNamedScope($method, $parameters);
         }
 
-        if (in_array($method, ['whereRelation', 'orWhereRelation', 'whereMorphRelation', 'orWhereMorphRelation', 'whereRelationIn', 'orWhereRelationIn'])) {
+        if (in_array($method, ['whereRelation', 'orWhereRelation', 'whereMorphRelation', 'orWhereMorphRelation', 'whereRelationIn', 'orWhereRelationIn', 'whereMorphRelationIn', 'orWhereMorphRelationIn', 'whereRelationNotIn', 'orWhereRelationNotIn'])) {
             return match ($method) {
                 'whereRelation' => $this->dynamicWhereRelation(...$parameters),
                 'orWhereRelation' => $this->dynamicWhereRelation(...array_merge($parameters, ['or' => true])),
+
                 'whereMorphRelation' => $this->dynamicWhereMorphRelation(...$parameters),
                 'orWhereMorphRelation' => $this->dynamicWhereMorphRelation(...array_merge($parameters, ['or' => true])),
+
                 'whereRelationIn' => $this->dynamicWhereRelationIn(...$parameters),
                 'orWhereRelationIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true])),
+
+                'whereMorphRelationIn' => $this->dynamicWhereMorphRelationIn(...$parameters),
+                'orWhereMorphRelationIn' => $this->dynamicWhereMorphRelationIn(...array_merge($parameters, ['or' => true])),
+
+                'whereRelationNotIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['not' => true])),
+                'orWhereRelationNotIn' => $this->dynamicWhereRelationIn(...array_merge($parameters, ['or' => true, 'not' => true])),
             };
         }
 

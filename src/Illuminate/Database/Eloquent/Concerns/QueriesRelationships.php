@@ -385,9 +385,7 @@ trait QueriesRelationships
         $method = $or ? 'orWhereHas' : 'whereHas';
 
         return $this->$method($relation, function ($query) use ($column, $values, $not) {
-            $method = $not ? 'whereNotIn' : 'whereIn';
-
-            $query->$method($column, $values);
+            $query->whereIn($column, $values, not:$not);
         });
     }
 
