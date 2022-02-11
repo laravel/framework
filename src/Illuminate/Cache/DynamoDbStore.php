@@ -211,7 +211,7 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
-     * Store multiple items in the cache for a given number of $seconds.
+     * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
      * @param  int  $seconds
