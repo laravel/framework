@@ -319,7 +319,7 @@ class PendingRequest
     public function withHeaders(array $headers)
     {
         return tap($this, function ($request) use ($headers) {
-            return $this->options = array_replace_recursive($this->options, [
+            return $this->options = array_merge_recursive($this->options, [
                 'headers' => $headers,
             ]);
         });
@@ -390,7 +390,7 @@ class PendingRequest
     public function withCookies(array $cookies, string $domain)
     {
         return tap($this, function ($request) use ($cookies, $domain) {
-            return $this->options = array_replace_recursive($this->options, [
+            return $this->options = array_merge_recursive($this->options, [
                 'cookies' => CookieJar::fromArray($cookies, $domain),
             ]);
         });
