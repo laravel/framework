@@ -7,11 +7,18 @@ use Illuminate\Mail\SentMessage;
 class MessageSent
 {
     /**
+     * The Symfony Email instance.
+     *
+     * @var \Symfony\Component\Mime\Email
+     */
+    public $message;
+
+    /**
      * The Illuminate SentMessage instance.
      *
      * @var \Illuminate\Mail\SentMessage
      */
-    public $message;
+    public $sent;
 
     /**
      * The message data.
@@ -30,17 +37,8 @@ class MessageSent
     public function __construct(SentMessage $message, array $data = [])
     {
         $this->data = $data;
-        $this->message = $message;
-    }
-
-    /**
-     * Get the original sent email message.
-     *
-     * @return \Symfony\Component\Mime\Email
-     */
-    public function original()
-    {
-        return $this->message->getOriginalMessage();
+        $this->sent = $message;
+        $this->message = $message->getOriginalMessage();
     }
 
     /**
@@ -50,14 +48,16 @@ class MessageSent
      */
     public function __serialize()
     {
-        $hasAttachments = collect($this->original()->getAttachments())->isNotEmpty();
+        $hasAttachments = collect($this->message->getAttachments())->isNotEmpty();
 
         return $hasAttachments ? [
             'message' => base64_encode(serialize($this->message)),
+            'sent' => base64_encode(serialize($this->sent)),
             'data' => base64_encode(serialize($this->data)),
             'hasAttachments' => true,
         ] : [
             'message' => $this->message,
+            'sent' => $this->sent,
             'data' => $this->data,
             'hasAttachments' => false,
         ];
@@ -73,9 +73,11 @@ class MessageSent
     {
         if (isset($data['hasAttachments']) && $data['hasAttachments'] === true) {
             $this->message = unserialize(base64_decode($data['message']));
+            $this->sent = unserialize(base64_decode($data['sent']));
             $this->data = unserialize(base64_decode($data['data']));
         } else {
             $this->message = $data['message'];
+            $this->sent = $data['sent'];
             $this->data = $data['data'];
         }
     }
