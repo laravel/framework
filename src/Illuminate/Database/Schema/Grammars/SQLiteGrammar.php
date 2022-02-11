@@ -77,7 +77,7 @@ class SQLiteGrammar extends Grammar
         return collect($foreigns)->reduce(function ($sql, $foreign) {
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
-            // are building, since SQLite needs foreign keys on the tables creation.
+            // are building, since SQLite needs foreign keys on the table's creation.
             $sql .= $this->getForeignKey($foreign);
 
             if (! is_null($foreign->onDelete)) {

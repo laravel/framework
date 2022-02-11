@@ -1262,7 +1262,7 @@ class Builder implements BuilderContract
     {
         $whereBooleans = collect($whereSlice)->pluck('boolean');
 
-        // Here we'll check if the given subset of where clauses contains any "or"
+        // Here we'll check if the given subset of where clauses contain any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {

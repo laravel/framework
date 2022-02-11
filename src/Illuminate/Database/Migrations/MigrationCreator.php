@@ -139,7 +139,7 @@ class MigrationCreator
     protected function populateStub($stub, $table)
     {
         // Here we will replace the table place-holders with the table specified by
-        // the developer, which is useful for quickly creating a tables creation
+        // the developer, which is useful for quickly creating a table creation
         // or update migration from the console instead of typing it manually.
         if (! is_null($table)) {
             $stub = str_replace(

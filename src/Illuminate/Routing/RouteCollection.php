@@ -156,7 +156,7 @@ class RouteCollection extends AbstractRouteCollection
 
         // First, we will see if we can find a matching route for this current request
         // method. If we can, great, we can just return it so that it can be called
-        // by the consumer. Otherwise we will check for routes with another verb.
+        // by the consumer. Otherwise, we will check for routes with another verb.
         $route = $this->matchAgainstRoutes($routes, $request);
 
         return $this->handleMatchedRoute($request, $route);
