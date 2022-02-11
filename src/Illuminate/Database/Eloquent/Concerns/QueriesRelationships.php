@@ -371,20 +371,23 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a basic "where in" or an "or where in " clause to a relationship query.
+     * Add a basic "where in" or an "or where in" clause to a relationship query.
      *
      * @param  string  $relation
      * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
      * @param  mixed  $values
      * @param  bool  $or
+     * @param  bool  $not
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function dynamicWhereRelationIn($relation, $column, $values, $or = false)
+    public function dynamicWhereRelationIn($relation, $column, $values, $or = false, $not = false)
     {
         $method = $or ? 'orWhereHas' : 'whereHas';
 
-        return $this->$method($relation, function ($query) use ($column, $values) {
-            $query->whereIn($column, $values);
+        return $this->$method($relation, function ($query) use ($column, $values, $not) {
+            $method = $not ? 'whereNotIn' : 'whereIn';
+
+            $query->$method($column, $values);
         });
     }
 
@@ -398,12 +401,34 @@ trait QueriesRelationships
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function dynamicWhereMorphRelation($relation, $types, $column, $operator = null, $value = null, $or = false, $in = false)
+    public function dynamicWhereMorphRelation($relation, $types, $column, $operator = null, $value = null, $or = false)
     {
         $method = $or ? 'orWhereHasMorph' : 'whereHasMorph';
 
-        return $this->$method($relation, $types, function ($query) use ($column, $operator, $value, $in) {
-            $in ? $query->whereIn($column, $value) : $query->where($column, $operator, $value);
+        return $this->$method($relation, $types, function ($query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    /**
+     * Add a polymorphic relationship condition to the query with a where or an "or where" clause.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
+     * @param  string|array  $types
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $values
+     * @param  bool  $or
+     * @param  bool  $not
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function dynamicWhereMorphRelationIn($relation, $types, $column, $values, $or = false, $not = false)
+    {
+        $method = $or ? 'orWhereHasMorph' : 'whereHasMorph';
+
+        return $this->$method($relation, $types, function ($query) use ($column, $values, $not) {
+            $method = $not ? 'whereNotIn' : 'whereIn';
+
+            $query->$method($column, $values);
         });
     }
 
