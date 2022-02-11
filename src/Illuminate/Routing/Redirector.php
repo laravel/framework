@@ -179,6 +179,20 @@ class Redirector
     }
 
     /**
+     * Create a new secure redirect response to a named route.
+     *
+     * @param  string  $route
+     * @param  mixed  $parameters
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function ecureRoute($route, $parameters = [], $status = 302, $headers = [])
+    {
+        return $this->to($this->generator->route($route, $parameters), $status, $headers, true);
+    }
+
+    /**
      * Create a new redirect response to a signed named route.
      *
      * @param  string  $route
