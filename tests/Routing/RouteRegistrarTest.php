@@ -720,6 +720,22 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
     }
 
+    public function testUserCanRegisterApiResourceWithGroupController()
+    {
+        $this->router->controller(RouteRegistrarControllerStub::class)->group(function () {
+            $this->router->apiResource('users')->only('index');
+        });
+
+        $this->assertCount(1, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        
+        $this->assertEquals(
+            RouteRegistrarControllerStub::class . '@index',
+            $this->router->getRoutes()->getRouteAction('users.index')['controller']
+        );
+    }
+
     public function testCanNameRoutesOnRegisteredResource()
     {
         $this->router->resource('comments', RouteRegistrarControllerStub::class)

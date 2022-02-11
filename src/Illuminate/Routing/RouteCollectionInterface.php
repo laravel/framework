@@ -95,4 +95,11 @@ interface RouteCollectionInterface
      * @return \Illuminate\Routing\Route[]
      */
     public function getRoutesByName();
+
+    /**
+     * Get the route action by route name.
+     *
+     * @return array
+     */
+    public function getRouteAction($name);
 }

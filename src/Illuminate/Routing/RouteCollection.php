@@ -237,6 +237,16 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Get the route action by route name.
+     *
+     * @return array
+     */
+    public function getRouteAction($name)
+    {
+        return $this->getByName($name)->action ?? [];
+    }
+
+    /**
      * Convert the collection to a Symfony RouteCollection instance.
      *
      * @return \Symfony\Component\Routing\RouteCollection
