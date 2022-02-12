@@ -3820,6 +3820,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 12], ['x' => 'Regex:/^12$/i']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ['y' => ['z' => 'james']]], ['x.*.z' => ['Regex:/^(taylor|james)$/i']]);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateNotRegex()

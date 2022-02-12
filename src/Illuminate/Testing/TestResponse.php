@@ -224,6 +224,8 @@ class TestResponse implements ArrayAccess
      */
     protected function statusMessageWithException($expected, $actual, $exception)
     {
+        $message = $exception->getMessage();
+
         $exception = (string) $exception;
 
         return <<<EOF
@@ -232,6 +234,11 @@ Expected response status code [$expected] but received $actual.
 The following exception occurred during the request:
 
 $exception
+
+----------------------------------------------------------------------------------
+
+$message
+
 EOF;
     }
 
