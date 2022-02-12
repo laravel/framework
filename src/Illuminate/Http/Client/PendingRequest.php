@@ -11,6 +11,7 @@ use GuzzleHttp\HandlerStack;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -147,6 +148,20 @@ class PendingRequest
      * @var \Illuminate\Http\Client\Request|null
      */
     protected $request;
+
+    /**
+     * The Guzzle request options that are mergable via array_merge_recursive.
+     *
+     * @var array
+     */
+    protected $mergableOptions = [
+        'cookies',
+        'form_params',
+        'headers',
+        'json',
+        'multipart',
+        'query',
+    ];
 
     /**
      * Create a new HTTP Client instance.
@@ -472,7 +487,10 @@ class PendingRequest
     public function withOptions(array $options)
     {
         return tap($this, function ($request) use ($options) {
-            return $this->options = array_replace_recursive($this->options, $options);
+            return $this->options = array_replace_recursive(
+                array_merge_recursive($this->options, Arr::only($options, $this->mergableOptions)),
+                $options
+            );
         });
     }
 
@@ -987,7 +1005,10 @@ class PendingRequest
      */
     public function mergeOptions(...$options)
     {
-        return array_replace_recursive($this->options, ...$options);
+        return array_replace_recursive(
+            array_merge_recursive($this->options, Arr::only($options, $this->mergableOptions)),
+            ...$options
+        );
     }
 
     /**
