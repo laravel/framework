@@ -500,6 +500,10 @@ trait HasAttributes
      */
     public function isRelation($key)
     {
+        if ($this->hasAttributeMutator($key)) {
+            return false;
+        }
+
         return method_exists($this, $key) ||
             (static::$relationResolvers[get_class($this)][$key] ?? null);
     }
