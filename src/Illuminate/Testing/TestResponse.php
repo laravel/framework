@@ -126,6 +126,21 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has a client error status code.
+     *
+     * @return $this
+     */
+    public function assertClientError()
+    {
+        PHPUnit::assertTrue(
+            $this->isClientError(),
+            $this->statusMessageWithDetails('>=400, <500', $this->getStatusCode())
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a not found status code.
      *
      * @return $this
