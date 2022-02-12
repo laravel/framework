@@ -401,6 +401,19 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given column and foreign key should be dropped.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropConstrainedForeignId($column)
+    {
+        $this->dropForeign([$column]);
+
+        return $this->dropColumn($column);
+    }
+
+    /**
      * Indicate that the given foreign key should be dropped.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
@@ -430,19 +443,6 @@ class Blueprint
         }
 
         return $this->dropConstrainedForeignId($column ?: $model->getForeignKey());
-    }
-
-    /**
-     * Indicate that the given column and foreign key should be dropped.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropConstrainedForeignId($column)
-    {
-        $this->dropForeign([$column]);
-
-        return $this->dropColumn($column);
     }
 
     /**
