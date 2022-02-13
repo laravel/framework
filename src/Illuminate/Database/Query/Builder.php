@@ -3588,7 +3588,7 @@ class Builder implements BuilderContract, Responsable
     }
 
     /**
-     * Return the results of the query as a response
+     * Return the results of the query as a response.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Collection|static[]
