@@ -76,7 +76,9 @@ trait AsPivot
 
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
 
-        $instance->setRawAttributes($attributes, $exists);
+        $instance->setRawAttributes(
+            array_merge($instance->getRawOriginal(), $attributes), $exists
+        );
 
         return $instance;
     }
