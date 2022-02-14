@@ -85,6 +85,16 @@ class HasInDatabase extends Constraint
 
         if ($similarResults->isNotEmpty()) {
             $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT);
+
+            if ($similarResults->count() === 1) {
+                $firstData = (array)$similarResults->first();
+
+                array_walk_recursive($firstData, fn(&$value) => $value = $value ?? '<NULL>');
+
+                $diff = array_diff_assoc($this->data, $firstData);
+
+                $description .= sprintf("\n\nYou might want to check these:\n%s", json_encode($diff, JSON_PRETTY_PRINT));
+            }
         } else {
             $query = $this->database->table($table);
 
