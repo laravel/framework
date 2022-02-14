@@ -3906,7 +3906,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
-                'select * from "foobar" where ("test" > ?) order by "test" asc limit 17',
+                'select * from "foobar" where (test > ?) order by "test" asc limit 17',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
 
@@ -3944,7 +3944,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
-                'select * from "foobar" where ("test" > ? or ("test" = ? and ("another" > ?))) order by "test" asc, "another" asc limit 17',
+                'select * from "foobar" where (test > ? or (test = ? and (another > ?))) order by "test" asc, "another" asc limit 17',
                 $builder->toSql()
             );
             $this->assertEquals(['bar', 'bar', 'foo'], $builder->bindings['where']);
@@ -3982,7 +3982,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
-                'select * from "foobar" where ("test" > ?) order by "test" asc limit 16',
+                'select * from "foobar" where (test > ?) order by "test" asc limit 16',
                 $builder->toSql());
             $this->assertEquals(['bar'], $builder->bindings['where']);
 
@@ -4052,7 +4052,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
-                'select * from "foobar" where ("id" > ?) order by "id" asc limit 17',
+                'select * from "foobar" where (id > ?) order by "id" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([2], $builder->bindings['where']);
 
@@ -4090,7 +4090,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
-                'select * from "foobar" where ("foo" > ? or ("foo" = ? and ("bar" < ? or ("bar" = ? and ("baz" > ?))))) order by "foo" asc, "bar" desc, "baz" asc limit 17',
+                'select * from "foobar" where (foo > ? or (foo = ? and (bar < ? or (bar = ? and (baz > ?))))) order by "foo" asc, "bar" desc, "baz" asc limit 17',
                 $builder->toSql()
             );
             $this->assertEquals([1, 1, 2, 2, 3], $builder->bindings['where']);
