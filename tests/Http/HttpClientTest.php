@@ -15,6 +15,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
@@ -1158,5 +1159,27 @@ class HttpClientTest extends TestCase
         $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
 
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+    }
+
+    public function testDefaultOptionsAreSet()
+    {
+        $this->factory->defaultOptions([
+            'proxy' => 'localhost:9090',
+            'verify' => false,
+        ]);
+
+        $request = $this->factory->withOptions(['allow_redirects' => true]);
+
+        $this->assertSame(
+            ['proxy' => 'localhost:9090', 'verify' => false, 'allow_redirects' => true],
+            Arr::only($request->getOptions(), ['proxy', 'verify', 'allow_redirects'])
+        );
+
+        $request = $request->withOptions(['proxy' => 'http://foo.com:9090', 'allow_redirects' => false]);
+
+        $this->assertSame(
+            ['proxy' => 'http://foo.com:9090', 'verify' => false, 'allow_redirects' => false],
+            Arr::only($request->getOptions(), ['proxy', 'verify', 'allow_redirects'])
+        );
     }
 }
