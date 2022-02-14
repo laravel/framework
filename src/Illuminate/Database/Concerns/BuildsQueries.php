@@ -5,6 +5,7 @@ namespace Illuminate\Database\Concerns;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -341,7 +342,7 @@ trait BuildsQueries
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 if (! is_null($previousColumn)) {
                     $builder->where(
-                        $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                        new Expression($this->getOriginalColumnNameForCursorPagination($this, $previousColumn)),
                         '=',
                         $cursor->parameter($previousColumn)
                     );
@@ -351,7 +352,7 @@ trait BuildsQueries
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
                     $builder->where(
-                        $this->getOriginalColumnNameForCursorPagination($this, $column),
+                        new Expression($this->getOriginalColumnNameForCursorPagination($this, $column)),
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
