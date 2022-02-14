@@ -254,7 +254,7 @@ class Str
     }
 
     /**
-     * Extracts an excerpt from text that matches the first instance of phrase.
+     * Extracts an excerpt from text that matches the first instance of a phrase.
      *
      * @param  string  $text
      * @param  string  $phrase
