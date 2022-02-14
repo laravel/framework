@@ -40,7 +40,7 @@ class ConvertStringBooleansToBoolean extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        return match($value) {
+        return match ($value) {
             'true' => true,
             'false' => false,
             default => $value
