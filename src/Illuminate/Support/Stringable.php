@@ -196,7 +196,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Extracts an excerpt from text that matches the first instance of phrase.
+     * Extracts an excerpt from text that matches the first instance of a phrase.
      *
      * @param  string  $phrase
      * @param  array  $options
