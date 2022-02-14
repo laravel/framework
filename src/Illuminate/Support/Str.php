@@ -254,6 +254,42 @@ class Str
     }
 
     /**
+     * Extracts an excerpt from text that matches the first instance of phrase.
+     *
+     * @param  string  $text
+     * @param  string  $phrase
+     * @param  array  $options
+     * @return string|null
+     */
+    public static function excerpt($text, $phrase = '', $options = [])
+    {
+        $radius = $options['radius'] ?? 100;
+        $omission = $options['omission'] ?? '...';
+
+        preg_match_all("/^(\W*|.*)(".preg_quote((string) $phrase).")(.*\W*)$/i", (string) $text, $matches);
+
+        if (is_null($middle = collect($matches[2])->first())) {
+            return null;
+        }
+
+        $start = ltrim((string) collect($matches[1])->first());
+
+        $start = str(substr($start, max(mb_strlen($start) - $radius, 0), $radius))->ltrim()->unless(
+            fn ($startWithRadius) => $startWithRadius->exactly($start),
+            fn ($startWithRadius) => $startWithRadius->prepend($omission),
+        );
+
+        $end = rtrim((string) collect($matches[3])->first());
+
+        $end = str(substr($end, 0, $radius))->rtrim()->unless(
+            fn ($endWithRadius) => $endWithRadius->exactly($end),
+            fn ($endWithRadius) => $endWithRadius->append($omission),
+        );
+
+        return $start->append($middle, $end)->toString();
+    }
+
+    /**
      * Cap a string with a single instance of a given value.
      *
      * @param  string  $value
