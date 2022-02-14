@@ -341,8 +341,10 @@ trait BuildsQueries
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 if (! is_null($previousColumn)) {
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
+
                     $builder->where(
-                        new Expression($this->getOriginalColumnNameForCursorPagination($this, $previousColumn)),
+                        str_starts_with($originalColumn, '(') && str_ends_with($originalColumn, ')') ? new Expression($originalColumn) : $originalColumn,
                         '=',
                         $cursor->parameter($previousColumn)
                     );
@@ -351,8 +353,10 @@ trait BuildsQueries
                 $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
+
                     $builder->where(
-                        new Expression($this->getOriginalColumnNameForCursorPagination($this, $column)),
+                        str_starts_with($originalColumn, '(') && str_ends_with($originalColumn, ')') ? new Expression($originalColumn) : $originalColumn,
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
@@ -395,7 +399,7 @@ trait BuildsQueries
 
                     [$original, $alias] = explode($as, $column);
 
-                    if ($parameter === $alias) {
+                    if ($parameter === $alias || $builder->getGrammar()->wrap($parameter) === $alias) {
                         return $original;
                     }
                 }
