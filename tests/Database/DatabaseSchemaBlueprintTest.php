@@ -292,6 +292,72 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testDropRelationshipColumnWithIncrementalModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->dropForeignIdFor('Illuminate\Foundation\Auth\User');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_user_id_foreign`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDropRelationshipColumnWithUuidModel()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->dropForeignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_eloquent_model_uuid_stub_id_foreign`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDropConstrainedRelationshipColumnWithIncrementalModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->dropConstrainedForeignIdFor('Illuminate\Foundation\Auth\User');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_user_id_foreign`',
+            'alter table `posts` drop `user_id`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDropConstrainedRelationshipColumnWithUuidModel()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->dropConstrainedForeignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_eloquent_model_uuid_stub_id_foreign`',
+            'alter table `posts` drop `eloquent_model_uuid_stub_id`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testTinyTextColumn()
     {
         $base = new Blueprint('posts', function ($table) {

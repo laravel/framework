@@ -85,8 +85,12 @@ class ValidationRuleParser
     protected function explodeExplicitRule($rule, $attribute)
     {
         if (is_string($rule)) {
-            return explode('|', $rule);
-        } elseif (is_object($rule)) {
+            [$name] = static::parseStringRule($rule);
+
+            return static::ruleIsRegex($name) ? [$rule] : explode('|', $rule);
+        }
+
+        if (is_object($rule)) {
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
@@ -272,13 +276,18 @@ class ValidationRuleParser
      */
     protected static function parseParameters($rule, $parameter)
     {
-        $rule = strtolower($rule);
+        return static::ruleIsRegex($rule) ? [$parameter] : str_getcsv($parameter);
+    }
 
-        if (in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
-            return [$parameter];
-        }
-
-        return str_getcsv($parameter);
+    /**
+     * Determine if the rule is a regular expression.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected static function ruleIsRegex($rule)
+    {
+        return in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
     }
 
     /**
