@@ -7,6 +7,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -92,6 +93,27 @@ class Factory
      * @var array
      */
     protected $responseSequences = [];
+
+    /**
+     * Default request options.
+     *
+     * @var array
+     */
+    protected $defaultOptions = [];
+
+    /**
+     * The Guzzle request options that are mergable via array_merge_recursive.
+     *
+     * @var array
+     */
+    protected $mergableOptions = [
+        'cookies',
+        'form_params',
+        'headers',
+        'json',
+        'multipart',
+        'query',
+    ];
 
     /**
      * Create a new factory instance.
@@ -362,7 +384,8 @@ class Factory
      */
     protected function newPendingRequest()
     {
-        return new PendingRequest($this);
+        return (new PendingRequest($this))
+            ->withOptions($this->defaultOptions);
     }
 
     /**
@@ -373,6 +396,22 @@ class Factory
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Replace the specified options for every upcoming request.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function defaultOptions(array $options)
+    {
+        return tap($this, function ($request) use ($options) {
+            return $this->defaultOptions = array_replace_recursive(
+                array_merge_recursive($this->defaultOptions, Arr::only($options, $this->mergableOptions)),
+                $options
+            );
+        });
     }
 
     /**
