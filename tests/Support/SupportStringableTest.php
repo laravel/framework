@@ -474,6 +474,11 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Malmö')->endsWith('mo'));
     }
 
+    public function testExcerpt()
+    {
+        $this->assertSame('...is a beautiful morn...', (string) $this->stringable('This is a beautiful morning')->excerpt('beautiful', ['radius' => 5]));
+    }
+
     public function testBefore()
     {
         $this->assertSame('han', (string) $this->stringable('hannah')->before('nah'));
