@@ -155,11 +155,11 @@ class SupportStrTest extends TestCase
         $this->assertSame('This is a...', Str::excerpt('This is a beautiful morning', 'this', ['radius' => 5]));
         $this->assertSame('...iful morning', Str::excerpt('This is a beautiful morning', 'morning', ['radius' => 5]));
         $this->assertNull(Str::excerpt('This is a beautiful morning', 'day'));
-        $this->assertSame('...is a beautiful! mor...', Str::excerpt('This is a beautiful! morning', 'beautiful', ['radius' => 5]));
+        $this->assertSame('...is a beautiful! mor...', Str::excerpt('This is a beautiful! morning', 'Beautiful', ['radius' => 5]));
         $this->assertSame('...is a beautiful? mor...', Str::excerpt('This is a beautiful? morning', 'beautiful', ['radius' => 5]));
         $this->assertSame('', Str::excerpt('', '', ['radius' => 0]));
         $this->assertSame('a', Str::excerpt('a', 'a', ['radius' => 0]));
-        $this->assertSame('...b...', Str::excerpt('abc', 'b', ['radius' => 0]));
+        $this->assertSame('...b...', Str::excerpt('abc', 'B', ['radius' => 0]));
         $this->assertSame('abc', Str::excerpt('abc', 'b', ['radius' => 1]));
         $this->assertSame('abc...', Str::excerpt('abcd', 'b', ['radius' => 1]));
         $this->assertSame('...abc', Str::excerpt('zabc', 'b', ['radius' => 1]));
@@ -175,7 +175,7 @@ class SupportStrTest extends TestCase
         ));
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
-        $this->assertSame('...ayl...', Str::excerpt('taylor', 'y', ['radius' => 1]));
+        $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
         $this->assertSame('<div> The article description </div>', Str::excerpt('<div> The article description </div>', 'article'));
         $this->assertSame('...The article desc...', Str::excerpt('<div> The article description </div>', 'article', ['radius' => 5]));
         $this->assertSame('The article description', Str::excerpt(strip_tags('<div> The article description </div>'), 'article'));
