@@ -296,7 +296,7 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
             }
 
-            if ($this->isEnumCastable($key)) {
+            if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
                 $attributes[$key] = isset($attributes[$key]) ? $attributes[$key]->value : null;
             }
 
