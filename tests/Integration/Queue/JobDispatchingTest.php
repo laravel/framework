@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Orchestra\Testbench\TestCase;
 
 class JobDispatchingTest extends TestCase
@@ -20,6 +21,13 @@ class JobDispatchingTest extends TestCase
 
         $this->assertTrue(Job::$ran);
         $this->assertSame('new-test', Job::$value);
+    }
+
+    public function testJobCanFailManuallyAfterDispatchNow()
+    {
+        JobDispatchingTestFailingJob::dispatchNow();
+
+        $this->assertTrue(JobDispatchingTestFailingJob::$failed);
     }
 }
 
@@ -45,5 +53,22 @@ class Job implements ShouldQueue
     public function replaceValue($value)
     {
         static::$value = $value;
+    }
+}
+
+class JobDispatchingTestFailingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public static $failed = false;
+
+    public function handle(): void
+    {
+        $this->fail();
+    }
+
+    public function failed()
+    {
+        static::$failed = true;
     }
 }
