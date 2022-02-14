@@ -185,10 +185,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('T...', Str::excerpt('The article description', null, ['radius' => 1]));
         $this->assertSame('The arti...', Str::excerpt('The article description', '', ['radius' => 8]));
         $this->assertSame('', Str::excerpt(' '));
-        $this->assertSame('...icle desc...', Str::excerpt('The article description', ' ', ['radius' => 4]));
+        $this->assertSame('The arti...', Str::excerpt('The article description', ' ', ['radius' => 4]));
         $this->assertSame('...cle description', Str::excerpt('The article description', 'description', ['radius' => 4]));
         $this->assertSame('T...', Str::excerpt('The article description', 'T', ['radius' => 0]));
         $this->assertSame('What i?', Str::excerpt('What is the article?', 'What', ['radius' => 2, 'omission' => '?']));
+
+        $this->assertSame('...ö - 二 sān 大åè...', Str::excerpt('åèö - 二 sān 大åèö', '二 sān', ['radius' => 4]));
     }
 
     public function testStrBefore()
