@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Exceptions\Whoops;
 
-use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use function tap;
+use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Whoops\Run as Whoops;
 
 class WhoopsExceptionRenderer implements ExceptionRenderer
