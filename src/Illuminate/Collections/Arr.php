@@ -757,7 +757,6 @@ class Arr
         $results = [];
 
         foreach ($array as $item) {
-
             $keyValue = data_get($item, $key);
 
             if (is_null($keyValue)) {
