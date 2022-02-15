@@ -47,10 +47,7 @@ class Attribute
      */
     public static function make(callable $get = null, callable $set = null): static
     {
-        return new static(
-            get: $get,
-            set: $set
-        );
+        return new static($get, $set);
     }
 
     /**
