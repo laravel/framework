@@ -62,8 +62,8 @@ trait EnumeratesValues
     protected static $proxies = [
         'average',
         'avg',
-        'doesntContain',
         'contains',
+        'doesntContain',
         'each',
         'every',
         'filter',
