@@ -83,6 +83,20 @@ class MailMessage extends SimpleMessage implements Renderable
     public $rawAttachments = [];
 
     /**
+     * The tags for the message.
+     *
+     * @var array
+     */
+    public $tags = [];
+
+    /**
+     * The metadata for the message.
+     *
+     * @var array
+     */
+    public $metadata = [];
+
+    /**
      * Priority level of the message.
      *
      * @var int
@@ -95,20 +109,6 @@ class MailMessage extends SimpleMessage implements Renderable
      * @var array
      */
     public $callbacks = [];
-
-    /**
-     * The metadata for the message.
-     *
-     * @var array
-     */
-    public $metadata = [];
-
-    /**
-     * The tags for the message.
-     *
-     * @var array
-     */
-    public $tags = [];
 
     /**
      * Set the view for the mail message.
