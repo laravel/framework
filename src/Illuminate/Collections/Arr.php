@@ -424,6 +424,18 @@ class Arr
     }
 
     /**
+     * Key an associative array by a field or using a callback.
+     *
+     * @param  array  $array
+     * @param  callable|array|string
+     * @return array
+     */
+    public static function keyBy($array, $keyBy)
+    {
+        return Collection::make($array)->keyBy($keyBy)->all();
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
