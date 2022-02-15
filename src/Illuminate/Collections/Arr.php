@@ -748,8 +748,8 @@ class Arr
     /**
      * Indexes the array according to a specified key.
      *
-     * @param iterable $array
-     * @param string|int|null $key
+     * @param  iterable  $array
+     * @param  string|int|null  $key
      * @return array the indexed array
      */
     public static function index($array, $key)
@@ -766,7 +766,7 @@ class Arr
             }
 
             if (is_object($keyValue) && method_exists($keyValue, '__toString')) {
-                $keyValue = (string)$keyValue;
+                $keyValue = (string) $keyValue;
             }
 
             $results[$keyValue] = $item;
