@@ -6,6 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Tests\Database\stubs\TestEnum;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -543,6 +544,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
+    }
+
+    public function testAddingNativeEnum()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('role', TestEnum::class);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'test\', N\'test2\')) not null', $statements[0]);
     }
 
     public function testAddingJson()
