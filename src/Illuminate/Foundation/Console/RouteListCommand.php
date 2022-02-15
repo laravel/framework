@@ -122,7 +122,7 @@ class RouteListCommand extends Command
 
         if (($sort = $this->option('sort')) !== null) {
             $routes = $this->sortRoutes($sort, $routes);
-        }else {
+        } else {
             $routes = $this->sortRoutes('uri', $routes);
         }
 
