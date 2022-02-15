@@ -744,4 +744,34 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Indexes the array according to a specified key.
+     *
+     * @param iterable $array
+     * @param string|int|null $key
+     * @return array the indexed array
+     */
+    public static function index($array, $key)
+    {
+        $results = [];
+
+        foreach ($array as $item) {
+
+            $keyValue = data_get($item, $key);
+
+            if (is_null($keyValue)) {
+                $results[] = $item;
+                continue;
+            }
+
+            if (is_object($keyValue) && method_exists($keyValue, '__toString')) {
+                $keyValue = (string)$keyValue;
+            }
+
+            $results[$keyValue] = $item;
+        }
+
+        return $results;
+    }
 }
