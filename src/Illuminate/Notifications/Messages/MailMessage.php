@@ -276,6 +276,7 @@ class MailMessage extends SimpleMessage implements Renderable
     public function tag($value)
     {
         array_push($this->tags, $value);
+
         return $this;
     }
 
@@ -289,6 +290,7 @@ class MailMessage extends SimpleMessage implements Renderable
     public function metadata($key, $value)
     {
         $this->metadata[$key] = $value;
+
         return $this;
     }
 

@@ -935,6 +935,7 @@ class Mailable implements MailableContract, Renderable
     public function tag($value)
     {
         array_push($this->tags, $value);
+
         return $this;
     }
 
@@ -948,6 +949,7 @@ class Mailable implements MailableContract, Renderable
     public function metadata($key, $value)
     {
         $this->metadata[$key] = $value;
+
         return $this;
     }
 
