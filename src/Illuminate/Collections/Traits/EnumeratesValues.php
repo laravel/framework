@@ -20,6 +20,7 @@ use UnexpectedValueException;
 /**
  * @property-read HigherOrderCollectionProxy $average
  * @property-read HigherOrderCollectionProxy $avg
+ * @property-read HigherOrderCollectionProxy $doesntContain
  * @property-read HigherOrderCollectionProxy $contains
  * @property-read HigherOrderCollectionProxy $each
  * @property-read HigherOrderCollectionProxy $every
@@ -61,6 +62,7 @@ trait EnumeratesValues
     protected static $proxies = [
         'average',
         'avg',
+        'doesntContain',
         'contains',
         'each',
         'every',
