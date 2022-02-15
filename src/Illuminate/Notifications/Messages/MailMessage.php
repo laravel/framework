@@ -104,11 +104,11 @@ class MailMessage extends SimpleMessage implements Renderable
     public $metadata = [];
 
     /**
-     * The tag for the message.
+     * The tags for the message.
      *
-     * @var string
+     * @var array
      */
-    public $tag;
+    public $tags = [];
 
     /**
      * Set the view for the mail message.
@@ -275,7 +275,7 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function tag($value)
     {
-        $this->tag = $value;
+        array_push($this->tags, $value);
         return $this;
     }
 

@@ -138,7 +138,7 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->tag('test');
 
-        $this->assertSame('test', $message->tag);
+        $this->assertContains('test', $message->tags);
     }
 
     public function testCallbackIsSetCorrectly()

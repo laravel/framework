@@ -146,8 +146,10 @@ class MailChannel
             $mailMessage->setPriority($message->priority);
         }
 
-        if ($message->tag) {
-            $mailMessage->getHeaders()->add(new TagHeader($this->tag));
+        if ($message->tags) {
+            foreach ($message->tags as $tag) {
+                $mailMessage->getHeaders()->add(new TagHeader($tag));
+            }
         }
 
         if ($message->metadata) {

@@ -172,11 +172,11 @@ class Mailable implements MailableContract, Renderable
     protected $metadata = [];
 
     /**
-     * The tag for the message.
+     * The tags for the message.
      *
-     * @var string
+     * @var array
      */
-    protected $tag;
+    protected $tags = [];
 
     /**
      * The callback that should be invoked while building the view data.
@@ -204,7 +204,7 @@ class Mailable implements MailableContract, Renderable
                 $this->buildFrom($message)
                      ->buildRecipients($message)
                      ->buildSubject($message)
-                     ->buildTag($message)
+                     ->buildTags($message)
                      ->buildMetadata($message)
                      ->runCallbacks($message)
                      ->buildAttachments($message);
@@ -422,15 +422,17 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Set the tag for the message.
+     * Set the tags for the message.
      *
      * @param  \Illuminate\Mail\Message  $message
      * @return $this
      */
-    protected function buildTag($message)
+    protected function buildTags($message)
     {
-        if ($this->tag) {
-            $message->getHeaders()->add(new TagHeader($this->tag));
+        if ($this->tags) {
+            foreach ($this->tags as $tag) {
+                $message->getHeaders()->add(new TagHeader($tag));
+            }
         }
 
         return $this;
@@ -932,7 +934,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function tag($value)
     {
-        $this->tag = $value;
+        array_push($this->tags, $value);
         return $this;
     }
 

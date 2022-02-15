@@ -479,11 +479,13 @@ class MailMailableTest extends TestCase
         $mailable->html('test content');
 
         $mailable->tag('test');
+        $mailable->tag('foo');
 
         $sentMessage = $mailer->send($mailable);
 
         $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
         $this->assertStringContainsString('X-Tag: test', $sentMessage->toString());
+        $this->assertStringContainsString('X-Tag: foo', $sentMessage->toString());
     }
 }
 
