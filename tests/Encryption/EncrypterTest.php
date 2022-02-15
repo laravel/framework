@@ -25,6 +25,14 @@ class EncrypterTest extends TestCase
         $this->assertSame('foo', $e->decryptString($encrypted));
     }
 
+    public function testEncryptionMakeMethod()
+    {
+        $e = Encrypter::make(str_repeat('a', 16));
+        $encrypted = $e->encryptString('foo');
+        $this->assertNotSame('foo', $encrypted);
+        $this->assertSame('foo', $e->decryptString($encrypted));
+    }
+
     public function testEncryptionUsingBase64EncodedKey()
     {
         $e = new Encrypter(random_bytes(16));

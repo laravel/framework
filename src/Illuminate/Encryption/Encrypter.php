@@ -60,6 +60,20 @@ class Encrypter implements EncrypterContract, StringEncrypter
     }
 
     /**
+     * Create a new encrypter instance.
+     *
+     * @param  string  $key
+     * @param  string  $cipher
+     * @return static
+     *
+     * @throws \RuntimeException
+     */
+    public static function make($key, $cipher = 'aes-128-cbc')
+    {
+        return new static($key, $cipher);
+    }
+
+    /**
      * Determine if the given key and cipher combination is valid.
      *
      * @param  string  $key
