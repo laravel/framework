@@ -640,6 +640,24 @@ class Blueprint
     }
 
     /**
+     * Create an ID column for the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function idFor($model, $column = null)
+    {
+        if (is_string($model)) {
+            $model = new $model;
+        }
+
+        return $model->getKeyType() === 'int' && $model->getIncrementing()
+            ? $this->id($column ?: $model->getKeyName())
+            : $this->uuid($column ?: $model->getKeyName());
+    }
+
+    /**
      * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
