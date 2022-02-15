@@ -1365,6 +1365,9 @@ class Container implements ArrayAccess, ContainerContract
         $this->aliases = [];
         $this->resolved = [];
         $this->bindings = [];
+        $this->contextual = [];
+        $this->tags = [];
+        $this->with = [];
         $this->instances = [];
         $this->abstractAliases = [];
         $this->scopedInstances = [];
