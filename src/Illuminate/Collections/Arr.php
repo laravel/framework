@@ -746,31 +746,13 @@ class Arr
     }
 
     /**
-     * Indexes the array according to a specified key.
+     * Key an associative array by a field or using a callback.
      *
-     * @param  iterable  $array
-     * @param  string|int|null  $key
-     * @return array the indexed array
+     * @param  (callable(TValue, TKey): array-key)|array|string  $keyBy
+     * @return array
      */
-    public static function index($array, $key)
+    public static function keyBy($array, $keyBy)
     {
-        $results = [];
-
-        foreach ($array as $item) {
-            $keyValue = data_get($item, $key);
-
-            if (is_null($keyValue)) {
-                $results[] = $item;
-                continue;
-            }
-
-            if (is_object($keyValue) && method_exists($keyValue, '__toString')) {
-                $keyValue = (string) $keyValue;
-            }
-
-            $results[$keyValue] = $item;
-        }
-
-        return $results;
+        return Collection::make($array)->keyBy($keyBy)->all();
     }
 }

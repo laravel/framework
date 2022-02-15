@@ -1022,7 +1022,7 @@ class SupportArrTest extends TestCase
         ], $sortedWithCallable);
     }
 
-    public function testIndex()
+    public function testKeyBy()
     {
         $array = [
             ['id' => '123', 'data' => 'abc'],
@@ -1034,6 +1034,6 @@ class SupportArrTest extends TestCase
             '123' => ['id' => '123', 'data' => 'abc'],
             '345' => ['id' => '345', 'data' => 'def'],
             '498' => ['id' => '498', 'data' => 'hgi'],
-        ], Arr::index($array, 'id'));
+        ], Arr::keyBy($array, 'id'));
     }
 }
