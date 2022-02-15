@@ -5002,7 +5002,8 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testInstantiate($collection) {
+    public function testInstantiate($collection)
+    {
         $data = new $collection([Collection::class]);
 
         $object = $data->instantiate()->first();

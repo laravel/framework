@@ -1226,7 +1226,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function instantiate()
     {
-        return $this->map(function($item) {
+        return $this->map(function ($item) {
             return new $item;
         });
     }

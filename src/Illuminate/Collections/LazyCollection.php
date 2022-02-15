@@ -1167,7 +1167,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function instantiate()
     {
-        return $this->map(function($item) {
+        return $this->map(function ($item) {
             return new $item;
         });
     }
