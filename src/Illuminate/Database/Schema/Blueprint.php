@@ -1036,7 +1036,7 @@ class Blueprint
      * Create a new enum column on the table.
      *
      * @param  string  $column
-     * @param  array|class-string  $allowed List of allowed cases or the class-string of a backed enum
+     * @param  array|class-string  $allowed  List of allowed cases or the class-string of a backed enum
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function enum($column, array|string $allowed)
@@ -1051,18 +1051,18 @@ class Blueprint
     /**
      * Returns a list of all values of a backed enum.
      * 
-     * @param class-string $enum_class_name
+     * @param  class-string  $enum_class_name
      * @return int[]|string[]
      */
     protected function getEnumValues(string $enum_class_name): array
     {
         $enum = new ReflectionEnum($enum_class_name);
-        if (!$enum->isBacked()) {
-            throw new BadMethodCallException("An enum needs to be backed in order to be used in a Blueprint");
+        if (! $enum->isBacked()) {
+            throw new BadMethodCallException('An enum needs to be backed in order to be used in a Blueprint');
         }
 
         return array_map(
-            fn(ReflectionEnumBackedCase $case) => $case->getBackingValue(),
+            fn (ReflectionEnumBackedCase $case) => $case->getBackingValue(),
             $enum->getCases()
         );
     }
