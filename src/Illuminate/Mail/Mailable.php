@@ -137,6 +137,20 @@ class Mailable implements MailableContract, Renderable
     public $diskAttachments = [];
 
     /**
+     * The tags for the message.
+     *
+     * @var array
+     */
+    protected $tags = [];
+
+    /**
+     * The metadata for the message.
+     *
+     * @var array
+     */
+    protected $metadata = [];
+
+    /**
      * The callbacks for the message.
      *
      * @var array
@@ -190,6 +204,8 @@ class Mailable implements MailableContract, Renderable
                 $this->buildFrom($message)
                      ->buildRecipients($message)
                      ->buildSubject($message)
+                     ->buildTags($message)
+                     ->buildMetadata($message)
                      ->runCallbacks($message)
                      ->buildAttachments($message);
             });
@@ -447,6 +463,40 @@ class Mailable implements MailableContract, Renderable
                 array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
             );
         }
+    }
+
+    /**
+     * Add all defined tags to the message.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @return $this
+     */
+    protected function buildTags($message)
+    {
+        if ($this->tags) {
+            foreach ($this->tags as $tag) {
+                $message->getHeaders()->add(new TagHeader($tag));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add all defined metadata to the message.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @return $this
+     */
+    protected function buildMetadata($message)
+    {
+        if ($this->metadata) {
+            foreach ($this->metadata as $key => $value) {
+                $message->getHeaders()->add(new MetadataHeader($key, $value));
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -884,9 +934,9 @@ class Mailable implements MailableContract, Renderable
      */
     public function tag($value)
     {
-        return $this->withSymfonyMessage(function (Email $message) use ($value) {
-            $message->getHeaders()->add(new TagHeader($value));
-        });
+        array_push($this->tags, $value);
+
+        return $this;
     }
 
     /**
@@ -898,9 +948,9 @@ class Mailable implements MailableContract, Renderable
      */
     public function metadata($key, $value)
     {
-        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
-            $message->getHeaders()->add(new MetadataHeader($key, $value));
-        });
+        $this->metadata[$key] = $value;
+
+        return $this;
     }
 
     /**
