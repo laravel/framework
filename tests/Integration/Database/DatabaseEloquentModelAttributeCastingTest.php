@@ -280,7 +280,7 @@ class TestEloquentModelWithAttributeCast extends Model
 
     public function uppercase(): Attribute
     {
-        return Attribute::with(
+        return Attribute::make(
             function ($value) {
                 return strtoupper($value);
             },
