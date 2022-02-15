@@ -1220,6 +1220,20 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Turns class names into objects of that class.
+     *
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function instantiate()
+    {
+        return $this->map(function($item) {
+            return new $item;
+        });
+    }
+
+    /**
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
      * @param  (callable(TValue, TKey): bool)|string  $key
