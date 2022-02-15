@@ -1223,8 +1223,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Turns class names into objects of that class.
      *
      * @return TValue
-     *
-     * @throws \Illuminate\Support\ItemNotFoundException
      */
     public function instantiate()
     {
