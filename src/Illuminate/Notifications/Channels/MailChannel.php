@@ -9,6 +9,8 @@ use Illuminate\Mail\Markdown;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 
 class MailChannel
 {
@@ -142,6 +144,16 @@ class MailChannel
 
         if (! is_null($message->priority)) {
             $mailMessage->setPriority($message->priority);
+        }
+
+        if ($message->tag) {
+            $mailMessage->getHeaders()->add(new TagHeader($this->tag));
+        }
+
+        if ($message->metadata) {
+            foreach ($message->metadata as $key => $value) {
+                $mailMessage->getHeaders()->add(new MetadataHeader($key, $value));
+            }
         }
 
         $this->runCallbacks($mailMessage, $message);

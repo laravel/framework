@@ -7,9 +7,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Traits\Conditionable;
-use Symfony\Component\Mailer\Header\MetadataHeader;
-use Symfony\Component\Mailer\Header\TagHeader;
-use Symfony\Component\Mime\Email;
 
 class MailMessage extends SimpleMessage implements Renderable
 {
@@ -98,6 +95,20 @@ class MailMessage extends SimpleMessage implements Renderable
      * @var array
      */
     public $callbacks = [];
+
+    /**
+     * The metadata for the message.
+     *
+     * @var array
+     */
+    public $metadata = [];
+
+    /**
+     * The tag for the message.
+     *
+     * @var string
+     */
+    public $tag;
 
     /**
      * Set the view for the mail message.
@@ -264,9 +275,8 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function tag($value)
     {
-        return $this->withSymfonyMessage(function (Email $message) use ($value) {
-            $message->getHeaders()->add(new TagHeader($value));
-        });
+        $this->tag = $value;
+        return $this;
     }
 
     /**
@@ -278,9 +288,8 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     public function metadata($key, $value)
     {
-        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
-            $message->getHeaders()->add(new MetadataHeader($key, $value));
-        });
+        $this->metadata[$key] = $value;
+        return $this;
     }
 
     /**
