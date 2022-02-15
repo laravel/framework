@@ -8,8 +8,12 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionEnum;
+use ReflectionEnumBackedCase;
+use UnitEnum;
 
 class Blueprint
 {
@@ -1032,12 +1036,35 @@ class Blueprint
      * Create a new enum column on the table.
      *
      * @param  string  $column
-     * @param  array  $allowed
+     * @param  array|class-string  $allowed List of allowed cases or the class-string of a backed enum
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, array $allowed)
+    public function enum($column, array|string $allowed)
     {
+        if (is_string($allowed)) {
+            $allowed = $this->getEnumValues($allowed);
+        }
+
         return $this->addColumn('enum', $column, compact('allowed'));
+    }
+
+    /**
+     * Returns a list of all values of a backed enum.
+     * 
+     * @param class-string $enum_class_name
+     * @return int[]|string[]
+     */
+    protected function getEnumValues(string $enum_class_name): array
+    {
+        $enum = new ReflectionEnum($enum_class_name);
+        if (!$enum->isBacked()) {
+            throw new BadMethodCallException("An enum needs to be backed in order to be used in a Blueprint");
+        }
+
+        return array_map(
+            fn(ReflectionEnumBackedCase $case) => $case->getBackingValue(),
+            $enum->getCases()
+        );
     }
 
     /**
