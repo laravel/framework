@@ -799,6 +799,8 @@ class ResourceTest extends TestCase
             'meta' => [
                 'path' => '/',
                 'per_page' => 1,
+                'next_cursor' => (new Cursor(['id' => 5]))->encode(),
+                'prev_cursor' => null,
             ],
         ]);
     }
