@@ -103,10 +103,12 @@ abstract class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function compileDropFullText(Blueprint $blueprint, Fluent $command)
     {
-        throw new RuntimeException('This database driver does not support fulltext index creation.');
+        throw new RuntimeException('This database driver does not support fulltext index removal.');
     }
 
     /**
