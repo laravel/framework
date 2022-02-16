@@ -11,7 +11,7 @@
 - Add doesntContain to higher order proxies ([#41034](https://github.com/laravel/framework/pull/41034))
 
 ### Fixed
-- Fix replacing request options ([#40954](https://github.com/laravel/framework/pull/40954))
+- Fix replacing request options ([#40954](https://github.com/laravel/framework/pull/40954), [30e341b](https://github.com/laravel/framework/commit/30e341b7fe4e4d9019df42b7eff6c7dfa5ea30e5))
 - Fix isRelation() failing to check an Attribute ([#40967](https://github.com/laravel/framework/pull/40967))
 - Fix enum casts arrayable behaviour ([#40999](https://github.com/laravel/framework/pull/40999))
 
