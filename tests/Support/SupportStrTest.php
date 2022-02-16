@@ -202,6 +202,28 @@ class SupportStrTest extends TestCase
         $this->assertSame('João Antô...', Str::excerpt('João Antônio', 'JOÃO', ['radius' => 5]));
     }
 
+    public function testStrHighlight()
+    {
+        $this->assertSame('Laravel PHP <mark>framework</mark>', Str::highlight('Laravel PHP framework', 'framework'));
+        $this->assertSame('Laravel PHP framework', Str::highlight('Laravel PHP framework', 'laravel'));
+        $this->assertSame('Laravel PHP framework', Str::highlight('Laravel PHP framework', 'xxx'));
+
+        $this->assertSame('Laravel <mark>PHP</mark> <mark>framework</mark>', Str::highlight('Laravel PHP framework', ['PHP', 'framework']));
+        $this->assertSame('Laravel PHP <mark>framework</mark>', Str::highlight('Laravel PHP framework', ['framework', 'xxx']));
+
+        $this->assertSame('Laravel PHP <b>framework</b>', Str::highlight('Laravel PHP framework', 'framework', 'b'));
+        $this->assertSame('Laravel <b>PHP</b> <b>framework</b>', Str::highlight('Laravel PHP framework', ['PHP', 'framework'], 'b'));
+        $this->assertSame('Laravel PHP framework', Str::highlight('Laravel PHP framework', 'Laravel', ''));
+
+        $this->assertSame('Laravel PHP framework', Str::highlight('Laravel PHP framework', ''));
+        $this->assertSame('Laravel PHP framework', Str::highlight('Laravel PHP framework', []));
+
+        $this->assertSame('', Str::highlight('', 'Laravel'));
+
+        $this->assertSame('Laravel PHP framework', Str::highlight('Laravel PHP framework', 'Laravél'));
+        $this->assertSame('<mark>Laravél</mark> PHP framework', Str::highlight('Laravél PHP framework', 'Laravél'));
+    }
+
     public function testStrBefore()
     {
         $this->assertSame('han', Str::before('hannah', 'nah'));
