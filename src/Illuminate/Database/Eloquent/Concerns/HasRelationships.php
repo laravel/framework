@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -784,6 +785,19 @@ trait HasRelationships
     public function relationLoaded($key)
     {
         return array_key_exists($key, $this->relations);
+    }
+
+    /**
+     * Assert that the given relation is loaded.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function assertRelationLoaded($key)
+    {
+        if (! $this->relationLoaded($key)) {
+            throw new LazyLoadingViolationException($this, $key);
+        }
     }
 
     /**

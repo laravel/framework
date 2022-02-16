@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -289,6 +290,26 @@ class DatabaseEloquentRelationTest extends TestCase
 
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
+    }
+
+    public function testAssertRelationLoadedThrowsIfNotLoaded()
+    {
+        $this->expectException(LazyLoadingViolationException::class);
+
+        $model = new EloquentRelationResetModelStub;
+
+        $model->assertRelationLoaded('foo');
+    }
+
+    public function testAssertRelationLoadedDoesNotThrowIfLoaded()
+    {
+        $this->expectNotToPerformAssertions();
+
+        $model = new EloquentRelationResetModelStub;
+
+        $model->setRelation('foo', []);
+
+        $model->assertRelationLoaded('foo');
     }
 }
 
