@@ -290,18 +290,18 @@ class Str
     }
 
     /**
-     * @param  string $text
-     * @param  string|array $highlight
-     * @param  string $tag
+     * @param  string  $text
+     * @param  string|array  $highlight
+     * @param  string  $tag
      * @return string
      */
     public static function highlight($text, $highlight, $tag = 'mark')
     {
-        if(empty($highlight) || $tag === '') {
+        if (empty($highlight) || $tag === '') {
             return $text;
         }
 
-        return preg_replace('/(?:'.implode('|', (array)$highlight).')/', "<$tag>$0</$tag>", $text);
+        return preg_replace('/(?:'.implode('|', (array) $highlight).')/', "<$tag>$0</$tag>", $text);
     }
 
     /**
