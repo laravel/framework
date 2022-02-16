@@ -37,24 +37,22 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     protected function createSchema()
     {
+        $this->schema()->create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email')->unique();
+        });
 
-            $this->schema()->create('users', function ($table) {
-                $table->increments('id');
-                $table->string('email')->unique();
-            });
+        $this->schema()->create('articles', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->string('title');
+        });
 
-            $this->schema()->create('articles', function ($table) {
-                $table->increments('id');
-                $table->integer('user_id');
-                $table->string('title');
-            });
-
-            $this->schema()->create('comments', function ($table) {
-                $table->increments('id');
-                $table->integer('article_id');
-                $table->string('content');
-            });
-
+        $this->schema()->create('comments', function ($table) {
+            $table->increments('id');
+            $table->integer('article_id');
+            $table->string('content');
+        });
     }
 
     protected function tearDown(): void
@@ -588,9 +586,9 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $this->seedData();
         $user = EloquentTestUserModel::with('articles')->first();
-        $user->articles->loadExists("comments");
+        $user->articles->loadExists('comments');
         $commentsExists = $user->articles->pluck('comments_exists')->toArray();
-        $this->assertContainsOnly('bool',$commentsExists);
+        $this->assertContainsOnly('bool', $commentsExists);
     }
 
     /**
@@ -610,7 +608,6 @@ class DatabaseEloquentCollectionTest extends TestCase
             ['article_id' => 1, 'content' => 'Another comment'],
             ['article_id' => 2, 'content' => 'Another comment'],
         ]);
-
     }
 
     /**
@@ -632,7 +629,6 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         return $this->connection()->getSchemaBuilder();
     }
-
 }
 
 class TestEloquentCollectionModel extends Model
@@ -654,7 +650,7 @@ class EloquentTestUserModel extends Model
 
     public function articles()
     {
-        return $this->hasMany(EloquentTestArticleModel::class,'user_id');
+        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
     }
 }
 
@@ -666,7 +662,7 @@ class EloquentTestArticleModel extends Model
 
     public function comments()
     {
-        return $this->hasMany(EloquentTestCommentModel::class,'article_id');
+        return $this->hasMany(EloquentTestCommentModel::class, 'article_id');
     }
 }
 
