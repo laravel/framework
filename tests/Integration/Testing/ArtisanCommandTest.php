@@ -32,6 +32,10 @@ class ArtisanCommandTest extends TestCase
             $this->line($this->ask('What?'));
             $this->line($this->ask('Huh?'));
         });
+
+        Artisan::command('contains', function () {
+            $this->line('My name is Taylor Otwell');
+        });
     }
 
     public function test_console_command_that_passes()
@@ -106,6 +110,25 @@ class ArtisanCommandTest extends TestCase
                  ->expectsOutput('Taylor')
                  ->expectsOutput('Otwell')
                  ->expectsOutput('Danger')
+                 ->assertExitCode(0);
+        });
+    }
+
+    public function test_console_command_that_passes_if_the_output_contains()
+    {
+        $this->artisan('contains')
+             ->expectsOutputToContain('Taylor Otwell')
+             ->assertExitCode(0);
+    }
+
+    public function test_console_command_that_fails_if_the_output_does_not_contain()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output does not contain "Otwell Taylor".');
+
+        $this->ignoringMockOnceExceptions(function () {
+            $this->artisan('contains')
+                 ->expectsOutputToContain('Otwell Taylor')
                  ->assertExitCode(0);
         });
     }
