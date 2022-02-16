@@ -27,7 +27,7 @@ trait InteractsWithConsole
      *
      * @var array
      */
-    public $expectedOutputToContain = [];
+    public $expectedOutputSubstrings = [];
 
     /**
      * All of the output lines that aren't expected to be displayed.
