@@ -832,6 +832,10 @@ class PendingRequest
             $laravelData = is_array($parsedData) ? $parsedData : [];
         }
 
+        if (!is_array($laravelData)) {
+            $laravelData = [];
+        }
+
         return $laravelData;
     }
 

@@ -18,6 +18,7 @@ use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
+use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
@@ -195,6 +196,28 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/form' &&
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testCanSendJsonSerializableData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable
+        {
+            public function jsonSerialize()
+            {
+                return [
+                    'name' => 'Taylor',
+                    'title' => 'Laravel Developer',
+                ];
+            }
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request->hasHeader('Content-Type', 'application/json') &&
+                $request['name'] === 'Taylor';
         });
     }
 
