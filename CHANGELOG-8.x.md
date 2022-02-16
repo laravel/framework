@@ -1,6 +1,19 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.82.0...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.1...8.x)
+
+
+## [v8.83.1 (2022-02-15)](https://github.com/laravel/framework/compare/v8.83.0...v8.83.1)
+
+### Added
+- Add firstOr() function to BelongsToMany relation ([#40828](https://github.com/laravel/framework/pull/40828))
+- Catch suppressed deprecation logs ([#40942](https://github.com/laravel/framework/pull/40942))
+- Add doesntContain to higher order proxies ([#41034](https://github.com/laravel/framework/pull/41034))
+
+### Fixed
+- Fix replacing request options ([#40954](https://github.com/laravel/framework/pull/40954), [30e341b](https://github.com/laravel/framework/commit/30e341b7fe4e4d9019df42b7eff6c7dfa5ea30e5))
+- Fix isRelation() failing to check an Attribute ([#40967](https://github.com/laravel/framework/pull/40967))
+- Fix enum casts arrayable behaviour ([#40999](https://github.com/laravel/framework/pull/40999))
 
 
 ## [v8.82.0 (2022-02-01)](https://github.com/laravel/framework/compare/v8.81.0...v8.82.0)
