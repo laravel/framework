@@ -13,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
@@ -344,7 +345,7 @@ trait BuildsQueries
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
 
                     $builder->where(
-                        str_starts_with($originalColumn, '(') && str_ends_with($originalColumn, ')') ? new Expression($originalColumn) : $originalColumn,
+                        Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                         '=',
                         $cursor->parameter($previousColumn)
                     );
@@ -356,7 +357,7 @@ trait BuildsQueries
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
 
                     $builder->where(
-                        str_starts_with($originalColumn, '(') && str_ends_with($originalColumn, ')') ? new Expression($originalColumn) : $originalColumn,
+                        Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
