@@ -805,7 +805,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         $related1 = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock(Builder::class);
-        $query->shouldReceive('insertGetId')->once()->with(['relation_one_id' => 1] ,'id')->andReturn(2);
+        $query->shouldReceive('insertGetId')->once()->with(['relation_one_id' => 1], 'id')->andReturn(2);
         $query->shouldReceive('getConnection')->once();
         $related1->expects($this->once())->method('newModelQuery')->willReturn($query);
         $related1->expects($this->once())->method('updateTimestamps');
