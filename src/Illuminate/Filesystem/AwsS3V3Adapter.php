@@ -83,7 +83,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
     }
 
     /**
-     * Get the S3 client.
+     * Get the underlying S3 client.
      *
      * @return \Aws\S3\S3Client
      */
