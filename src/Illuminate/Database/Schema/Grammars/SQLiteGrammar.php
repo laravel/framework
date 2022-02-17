@@ -55,12 +55,13 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('%s table %s (%s%s%s)',
+        return sprintf('%s table %s (%s%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
             (string) $this->addForeignKeys($blueprint),
-            (string) $this->addPrimaryKeys($blueprint)
+            (string) $this->addPrimaryKeys($blueprint),
+            (string) $this->addChecks($blueprint),
         );
     }
 
@@ -124,6 +125,24 @@ class SQLiteGrammar extends Grammar
         if (! is_null($primary = $this->getCommandByName($blueprint, 'primary'))) {
             return ", primary key ({$this->columnize($primary->columns)})";
         }
+    }
+
+    /**
+     * Get the check constraint syntax for a table creation statement.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function addChecks(Blueprint $blueprint)
+    {
+        $commands = $this->getCommandsByName($blueprint, 'check');
+
+        return collect($commands)
+            ->map(fn($commands) => sprintf(', constraint %s check (%s)',
+                $this->wrap($commands->constraint),
+                $commands->expression,
+            ))
+            ->join('');
     }
 
     /**
@@ -200,6 +219,38 @@ class SQLiteGrammar extends Grammar
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation...
+    }
+
+    /**
+     * Compile a check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
+    {
+        if(! $blueprint->creating()) {
+            throw new RuntimeException('This database driver does not support adding check constraints to existing tables.');
+        }
+
+        // Handled on table creation...
+    }
+
+    /**
+     * Compile a drop check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+
+     * @throws \RuntimeException
+     */
+    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('This database driver does not support dropping check constraints.');
     }
 
     /**

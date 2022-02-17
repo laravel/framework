@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class Blueprint
@@ -446,6 +447,19 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given check constraints should be dropped.
+     *
+     * @param  string|array  $constraints
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropCheck($constraints)
+    {
+        $constraints = is_array($constraints) ? $constraints : func_get_args();
+
+        return $this->addCommand('dropCheck', compact('constraints'));
+    }
+
+    /**
      * Indicate that the given indexes should be renamed.
      *
      * @param  string  $from
@@ -626,6 +640,35 @@ class Blueprint
         $this->commands[count($this->commands) - 1] = $command;
 
         return $command;
+    }
+
+    /**
+     * Specify a check constraint for the table.
+     *
+     * @param  string  $expression
+     * @param  string|null  $constraint
+     * @return \Illuminate\Support\Fluent
+     */
+    public function check($expression, $constraint = null)
+    {
+        $constraint = $constraint ?: $this->createCheckName($expression);
+
+        return $this->addCommand('check', compact('expression', 'constraint'));
+    }
+
+    /**
+     * Create a default check constraint name for the table.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function createCheckName($expression)
+    {
+        return Str::of("{$this->prefix}{$this->table}_{$expression}_check")
+            ->replaceMatches('#[\W_]+#', '_')
+            ->trim('_')
+            ->lower()
+            ->value();
     }
 
     /**

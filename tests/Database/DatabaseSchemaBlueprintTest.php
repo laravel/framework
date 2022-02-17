@@ -11,6 +11,7 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
@@ -414,5 +415,158 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table "posts" add "note" nvarchar(255) null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testCheckDefaultNames()
+    {
+        $blueprint = new Blueprint('events');
+        $blueprint->check('date_end>=date_start');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('events_date_end_date_start_check', $commands[0]->constraint);
+
+        $blueprint = new Blueprint('events');
+        $blueprint->check('date_end>date_start OR is_single_day=true');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('events_date_end_date_start_or_is_single_day_true_check', $commands[0]->constraint);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->check('(age < 21) OR (email IS NOT NULL)');
+        $commands = $blueprint->getCommands();
+        $this->assertSame('users_age_21_or_email_is_not_null_check', $commands[0]->constraint);
+    }
+
+    public function testCreateTableWithChecks()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
+        $connection->shouldReceive('getConfig')->once()->with('collation')->andReturn('utf8_unicode_ci');
+        $connection->shouldReceive('getConfig')->once()->with('engine')->andReturn(null);
+
+        $base = new Blueprint('users');
+        $base->create();
+        $base->unsignedInteger('age');
+        $base->check('age>21', 'min_age_check');
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'create table `users` (`age` int unsigned not null) default character set utf8 collate \'utf8_unicode_ci\'',
+            'alter table `users` add constraint `min_age_check` check (age>21)'
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'create table "users" ("age" integer not null, constraint "min_age_check" check (age>21))',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'create table "users" ("age" integer not null)',
+            'alter table "users" add constraint "min_age_check" check (age>21)',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'create table "users" ("age" int not null)',
+            'alter table "users" add constraint "min_age_check" check (age>21)',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testAlterTableWithChecks()
+    {
+        $connection = m::mock(Connection::class);
+
+        $base = new Blueprint('users');
+        $base->check('age>21', 'min_age_check');
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `users` add constraint `min_age_check` check (age>21)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        // SQLite does not support adding check constraints to existing tables.
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" add constraint "min_age_check" check (age>21)',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" add constraint "min_age_check" check (age>21)',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testAlterTableWithChecksThrowsForSQLite()
+    {
+        $connection = m::mock(Connection::class);
+
+        $base = new Blueprint('users');
+        $base->check('age>21', 'min_age_check');
+
+        $this->expectException(RuntimeException::class);
+
+        $base->toSql($connection, new SQLiteGrammar);
+    }
+
+    public function testDropChecks()
+    {
+        $connection = m::mock(Connection::class);
+
+        $base = new Blueprint('users');
+        $base->dropCheck('min_age_check');
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `users` drop constraint `min_age_check`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        // SQLite does not support dropping check constraints.
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" drop constraint "min_age_check"',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" drop constraint "min_age_check"',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testDropMultipleChecks()
+    {
+        $connection = m::mock(Connection::class);
+
+        $base = new Blueprint('users');
+        $base->dropCheck('min_age_check', 'max_age_check');
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `users` drop constraint `min_age_check`, drop constraint `max_age_check`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        // SQLite does not support dropping check constraints.
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" drop constraint "min_age_check", drop constraint "max_age_check"',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table "users" drop constraint "min_age_check", drop constraint "max_age_check"',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testDropChecksThrowsForSQLite()
+    {
+        $connection = m::mock(Connection::class);
+
+        $base = new Blueprint('users');
+        $base->dropCheck('min_age_check');
+
+        $this->expectException(RuntimeException::class);
+
+        $base->toSql($connection, new SQLiteGrammar);
     }
 }
