@@ -627,7 +627,7 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sort(fun
     assertType('User', $userA);
     assertType('User', $userB);
 
-    return true;
+    return 1;
 }));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->sort());
 

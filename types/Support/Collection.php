@@ -632,7 +632,7 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->sort(functio
     assertType('User', $userA);
     assertType('User', $userB);
 
-    return true;
+    return 1;
 }));
 assertType('Illuminate\Support\Collection<int, User>', $collection->sort());
 
