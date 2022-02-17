@@ -5,7 +5,7 @@ namespace DummyNamespace;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \DummyTarget
+ * @mixin \DummyTarget
  */
 class DummyClass extends Facade
 {
@@ -16,6 +16,6 @@ class DummyClass extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'DummyTarget';
+        return \DummyTarget::class;
     }
 }
