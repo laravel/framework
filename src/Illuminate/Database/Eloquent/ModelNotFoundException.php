@@ -10,22 +10,22 @@ class ModelNotFoundException extends RecordsNotFoundException
     /**
      * Name of the affected Eloquent model.
      *
-     * @var string
+     * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
     protected $model;
 
     /**
      * The affected model IDs.
      *
-     * @var int|array
+     * @var array<int>|array<string>
      */
     protected $ids;
 
     /**
      * Set the affected Eloquent model and instance ids.
      *
-     * @param  string  $model
-     * @param  int|array  $ids
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  int|array<int>|string|array<string>  $ids
      * @return $this
      */
     public function setModel($model, $ids = [])
@@ -47,7 +47,7 @@ class ModelNotFoundException extends RecordsNotFoundException
     /**
      * Get the affected Eloquent model.
      *
-     * @return string
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
     public function getModel()
     {
@@ -57,7 +57,7 @@ class ModelNotFoundException extends RecordsNotFoundException
     /**
      * Get the affected Eloquent model IDs.
      *
-     * @return int|array
+     * @return array<int>|array<string>
      */
     public function getIds()
     {
