@@ -291,17 +291,19 @@ class Str
 
     /**
      * @param  string  $text
-     * @param  string|array  $highlight
+     * @param  string|array  $highlights
      * @param  string  $tag
      * @return string
      */
-    public static function highlight($text, $highlight, $tag = 'mark')
+    public static function highlight($text, $highlights, $tag = 'mark')
     {
-        if (empty($highlight) || $tag === '') {
+        if (empty($highlights) || $tag === '') {
             return $text;
         }
 
-        return preg_replace('/(?:'.implode('|', (array) $highlight).')/', "<$tag>$0</$tag>", $text);
+        $highlights = array_map(fn($value) => preg_quote($value, '/'), (array)$highlights);
+
+        return preg_replace('/(?<![\w+])('.implode('|', $highlights).')(?![\w?+:.*^$()\[{\\}\]|])/', "<$tag>$0</$tag>", $text);
     }
 
     /**
