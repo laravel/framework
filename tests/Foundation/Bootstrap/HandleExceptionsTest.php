@@ -16,7 +16,7 @@ class HandleExceptionsTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->app = Application::setInstance(new Application);
+        $this->app = m::mock(Application::setInstance(new Application));
 
         $this->config = new Config();
 
@@ -31,7 +31,7 @@ class HandleExceptionsTest extends TestCase
 
             $property->setValue(
                 $this->handleExceptions,
-                tap(m::mock($this->app), function ($app) {
+                tap($this->app, function ($app) {
                     $app->shouldReceive('runningUnitTests')->andReturn(false);
                     $app->shouldReceive('hasBeenBootstrapped')->andReturn(true);
                 })
