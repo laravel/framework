@@ -303,7 +303,7 @@ class Str
 
         $highlights = array_map(fn ($value) => preg_quote($value, '/'), (array) $highlights);
 
-        return preg_replace('/(?<![\w+])('.implode('|', $highlights).')(?![\w?+:.*^$()\[{\\}\]|])/', "<$tag>$0</$tag>", $text);
+        return preg_replace('/(?<![\w?+:.*^$()\[\{\}\]|\\])('.implode('|', $highlights).')(?![\w?+:.*^$()\[{\\}\]|])/', "<$tag>$0</$tag>", $text);
     }
 
     /**
