@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -747,7 +748,13 @@ class PendingRequest
             $options[$this->bodyFormat] = $this->pendingBody;
         }
 
-        return collect($options)->toArray();
+        return collect($options)->map(function ($value, $key) {
+            if ($key === 'json' && $value instanceof JsonSerializable) {
+                return $value;
+            }
+
+            return $value instanceof Arrayable ? $value->toArray() : $value;
+        })->all();
     }
 
     /**

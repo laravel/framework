@@ -6,6 +6,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
@@ -218,6 +219,34 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/form' &&
                 $request->hasHeader('Content-Type', 'application/json') &&
                 $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testPrefersJsonSerializableOverArrayableData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable, Arrayable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return [
+                    'attributes' => (object) [],
+                ];
+            }
+
+            public function toArray(): array
+            {
+                return [
+                    'attributes' => [],
+                ];
+            }
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request->hasHeader('Content-Type', 'application/json') &&
+                $request->body() === '{"attributes":{}}';
         });
     }
 
