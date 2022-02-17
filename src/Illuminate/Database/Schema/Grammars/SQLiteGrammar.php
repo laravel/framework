@@ -138,7 +138,7 @@ class SQLiteGrammar extends Grammar
         $commands = $this->getCommandsByName($blueprint, 'check');
 
         return collect($commands)
-            ->map(fn($commands) => sprintf(', constraint %s check (%s)',
+            ->map(fn ($commands) => sprintf(', constraint %s check (%s)',
                 $this->wrap($commands->constraint),
                 $commands->expression,
             ))
@@ -232,7 +232,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCheck(Blueprint $blueprint, Fluent $command)
     {
-        if(! $blueprint->creating()) {
+        if (! $blueprint->creating()) {
             throw new RuntimeException('This database driver does not support adding check constraints to existing tables.');
         }
 
@@ -245,7 +245,7 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @return string
-
+     *
      * @throws \RuntimeException
      */
     public function compileDropCheck(Blueprint $blueprint, Fluent $command)

@@ -450,7 +450,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals([
             'create table `users` (`age` int unsigned not null) default character set utf8 collate \'utf8_unicode_ci\'',
-            'alter table `users` add constraint `min_age_check` check (age>21)'
+            'alter table `users` add constraint `min_age_check` check (age>21)',
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
