@@ -37,7 +37,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
             $this->{$key} = $value;
         }
 
-        $this->perPage = $perPage;
+        $this->perPage = (int) $perPage;
         $this->cursor = $cursor;
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 
