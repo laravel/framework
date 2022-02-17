@@ -793,6 +793,33 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($related1->exists);
     }
 
+    public function testPushWithoutIdFromParent()
+    {
+        $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('insertGetId')->once()->andReturn(1);
+        $query->shouldReceive('getConnection')->once();
+        $model->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $model->expects($this->once())->method('updateTimestamps');
+        $model->exists = false;
+
+        $related1 = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
+        $query = m::mock(Builder::class);
+        $query->shouldReceive('insertGetId')->once()->with(['relation_one_id' => 1] ,'id')->andReturn(2);
+        $query->shouldReceive('getConnection')->once();
+        $related1->expects($this->once())->method('newModelQuery')->willReturn($query);
+        $related1->expects($this->once())->method('updateTimestamps');
+        $related1->exists = false;
+        $related1->relation_one_id = function () use ($model) {
+            return $model->id;
+        };
+
+        $model->setRelation('relationOne', $related1);
+
+        $this->assertTrue($model->push());
+        $this->assertEquals(1, $model->relationOne->relation_one_id);
+    }
+
     public function testPushEmptyManyRelation()
     {
         $model = $this->getMockBuilder(EloquentModelStub::class)->onlyMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();

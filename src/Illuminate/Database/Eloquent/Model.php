@@ -938,6 +938,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                         ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
+
+                // Attributes with a callback are only available after saving the linked model
+                $model->attributes = array_map('value', $model->attributes);
+
                 if (! $model->push()) {
                     return false;
                 }
