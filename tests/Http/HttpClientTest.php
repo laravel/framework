@@ -205,7 +205,7 @@ class HttpClientTest extends TestCase
 
         $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable
         {
-            public function jsonSerialize()
+            public function jsonSerialize(): mixed
             {
                 return [
                     'name' => 'Taylor',
