@@ -4,7 +4,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use function PHPStan\Testing\assertType;
 
-class Foo extends Model {}
+class Foo extends Model
+{
+}
 
 $modelNotFound = new ModelNotFoundException();
 
