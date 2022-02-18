@@ -1198,7 +1198,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         return $this->current() && $this->current()->named(...$patterns);
     }
-    
+
     /**
      * Alias for the "isWithParameters" method.
      *
@@ -1229,6 +1229,7 @@ class Router implements BindingRegistrar, RegistrarContract
                 }
             }
         }
+
         return false;
     }
 
