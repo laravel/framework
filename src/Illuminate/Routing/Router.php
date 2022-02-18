@@ -1198,6 +1198,39 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         return $this->current() && $this->current()->named(...$patterns);
     }
+    
+    /**
+     * Alias for the "isWithParameters" method.
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function isWith(...$patterns)
+    {
+        return $this->isWithParameters(...$patterns);
+    }
+
+    /**
+     * Determine if the current route matches a pattern (named routes, with or without parameters).
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function isWithParameters(...$patterns)
+    {
+        foreach ($patterns as $pattern) {
+            if (is_string($pattern)) {
+                if ($this->currentRouteNamed([$pattern])) {
+                    return true;
+                }
+            } else {
+                if (url()->current() == route($pattern[0], $pattern[1] ?? [])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Get the current route action.
