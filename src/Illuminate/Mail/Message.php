@@ -241,7 +241,7 @@ class Message
      * Adds a debug header for a list of recipients.
      *
      * @param  string  $header
-     * @param  Address[]  $addresses
+     * @param  \Symfony\Component\Mime\Address[]  $addresses
      * @return $this
      */
     protected function addAddressesDebugHeader(string $header, array $addresses)
