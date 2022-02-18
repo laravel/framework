@@ -1224,7 +1224,7 @@ class Router implements BindingRegistrar, RegistrarContract
                     return true;
                 }
             } else {
-                if (url()->current() == route($pattern[0], $pattern[1] ?? [])) {
+                if ($this->getCurrentRequest()->url() == route($pattern[0], $pattern[1] ?? [])) {
                     return true;
                 }
             }
