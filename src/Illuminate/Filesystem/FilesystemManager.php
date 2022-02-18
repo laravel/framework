@@ -234,8 +234,6 @@ class FilesystemManager implements FactoryContract
 
         $root = (string) ($s3Config['root'] ?? '');
 
-        $options = $config['options'] ?? [];
-
         $visibility = new AwsS3PortableVisibilityConverter(
             $config['visibility'] ?? Visibility::PUBLIC
         );
@@ -244,7 +242,7 @@ class FilesystemManager implements FactoryContract
 
         $client = new S3Client($s3Config);
 
-        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $options, $streamReads);
+        $adapter = new S3Adapter($client, $s3Config['bucket'], $root, $visibility, null, $config['options'] ?? [], $streamReads);
 
         return new AwsS3V3Adapter(
             $this->createFlysystem($adapter, $config), $adapter, $s3Config, $client
