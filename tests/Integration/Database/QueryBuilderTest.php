@@ -132,6 +132,25 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertTrue(DB::table('posts')->where($subQuery, '!=', 'Does not match')->exists());
     }
 
+    public function testWhereNot()
+    {
+        $results = DB::table('posts')->whereNot(function ($query) {
+            $query->where('title', 'Foo Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Bar Post', $results[0]->title);
+    }
+
+    public function testOrWhereNot()
+    {
+        $results = DB::table('posts')->where('id', 1)->orWhereNot(function ($query) {
+            $query->where('title', 'Foo Post');
+        })->get();
+
+        $this->assertCount(2, $results);
+    }
+
     public function testWhereDate()
     {
         $this->assertSame(1, DB::table('posts')->whereDate('created_at', '2018-01-02')->count());
