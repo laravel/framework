@@ -106,14 +106,15 @@ class Message
     }
 
     /**
-     * Remove all to addresses from the message.
+     * Remove all "to" addresses from the message.
      *
      * @return $this
      */
     public function forgetTo()
     {
         if ($header = $this->message->getHeaders()->get('To')) {
-            $this->addAddressesDebugHeader('X-To', $this->message->getTo());
+            $this->addAddressDebugHeader('X-To', $this->message->getTo());
+
             $header->setAddresses([]);
         }
 
@@ -149,7 +150,8 @@ class Message
     public function forgetCc()
     {
         if ($header = $this->message->getHeaders()->get('Cc')) {
-            $this->addAddressesDebugHeader('X-Cc', $this->message->getCC());
+            $this->addAddressDebugHeader('X-Cc', $this->message->getCC());
+
             $header->setAddresses([]);
         }
 
@@ -185,7 +187,8 @@ class Message
     public function forgetBcc()
     {
         if ($header = $this->message->getHeaders()->get('Bcc')) {
-            $this->addAddressesDebugHeader('X-Bcc', $this->message->getBcc());
+            $this->addAddressDebugHeader('X-Bcc', $this->message->getBcc());
+
             $header->setAddresses([]);
         }
 
@@ -238,13 +241,13 @@ class Message
     }
 
     /**
-     * Adds a debug header for a list of recipients.
+     * Add an address debug header for a list of recipients.
      *
      * @param  string  $header
      * @param  \Symfony\Component\Mime\Address[]  $addresses
      * @return $this
      */
-    protected function addAddressesDebugHeader(string $header, array $addresses)
+    protected function addAddressDebugHeader(string $header, array $addresses)
     {
         $this->message->getHeaders()->addTextHeader(
             $header,
