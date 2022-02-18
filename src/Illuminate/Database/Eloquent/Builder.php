@@ -325,7 +325,7 @@ class Builder implements BuilderContract
      */
     public function whereNot($callback, $boolean = 'and')
     {
-        return $this->where($callback, null, null, $boolean . ' not');
+        return $this->where($callback, null, null, $boolean.' not');
     }
 
     /**
