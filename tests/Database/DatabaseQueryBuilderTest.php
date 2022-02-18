@@ -3209,6 +3209,41 @@ SQL;
         $this->assertEquals(['John Doe'], $builder->getBindings());
     }
 
+    public function testBitwiseOperators()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from "users" where "bar" & ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('bar', '#', 1);
+        $this->assertSame('select * from "users" where ("bar" # ?)::bool', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('range', '>>', '[2022-01-08 00:00:00,2022-01-09 00:00:00)');
+        $this->assertSame('select * from "users" where ("range" >> ?)::bool', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from [users] where ([bar] & ?) != 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from "users" having "bar" & ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('bar', '#', 1);
+        $this->assertSame('select * from "users" having ("bar" # ?)::bool', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('range', '>>', '[2022-01-08 00:00:00,2022-01-09 00:00:00)');
+        $this->assertSame('select * from "users" having ("range" >> ?)::bool', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from [users] having ([bar] & ?) != 0', $builder->toSql());
+    }
+
     public function testMergeWheresCanMergeWheresAndBindings()
     {
         $builder = $this->getBuilder();
