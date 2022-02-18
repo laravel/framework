@@ -210,9 +210,11 @@ class MailMailerTest extends TestCase
         });
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
-        $this->assertStringContainsString('X-To: nuno@laravel.com', $sentMessage->toString());
-        $this->assertStringContainsString('X-Cc: dries@laravel.com', $sentMessage->toString());
-        $this->assertStringContainsString('X-Bcc: james@laravel.com', $sentMessage->toString());
+        $this->assertDoesNotMatchRegularExpression('/^To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertDoesNotMatchRegularExpression('/^Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-To: nuno@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Cc: dries@laravel.com/m', $sentMessage->toString());
+        $this->assertMatchesRegularExpression('/^X-Bcc: james@laravel.com/m', $sentMessage->toString());
         $this->assertFalse($recipients->contains('nuno@laravel.com'));
         $this->assertFalse($recipients->contains('dries@laravel.com'));
         $this->assertFalse($recipients->contains('james@laravel.com'));
