@@ -229,6 +229,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('<mark>Laravel:</mark> a PHP framework', Str::highlight('Laravel: a PHP framework', 'Laravel:'));
         $this->assertSame('?Laravel: a PHP framework', Str::highlight('?Laravel: a PHP framework', 'Laravel'));
         $this->assertSame('<mark>?Laravel:</mark> a PHP framework', Str::highlight('?Laravel: a PHP framework', '?Laravel:'));
+
+        $this->assertSame('Laravel PHP/framework', Str::highlight('Laravel PHP/framework', 'PHP'));
+        $this->assertSame('Laravel <mark>PHP/framework</mark>', Str::highlight('Laravel PHP/framework', 'PHP/framework'));
     }
 
     public function testStrBefore()
