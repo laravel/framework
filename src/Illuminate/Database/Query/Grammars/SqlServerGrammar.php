@@ -181,6 +181,36 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHaving(array $having)
+    {
+        if ($having['type'] === 'Bitwise') {
+            return $this->compileHavingBitwise($having);
+        }
+
+        return parent::compileHaving($having);
+    }
+
+    /**
+     * Compile a having clause involving a bitwise operator.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBitwise($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        $parameter = $this->parameter($having['value']);
+
+        return $having['boolean'].' ('.$column.' '.$having['operator'].' '.$parameter.') != 0';
+    }
+
+    /**
      * Create a full ANSI offset clause for the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -475,36 +505,6 @@ class SqlServerGrammar extends Grammar
     public function compileSavepointRollBack($name)
     {
         return 'ROLLBACK TRANSACTION '.$name;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHaving(array $having)
-    {
-        if ($having['type'] === 'Bitwise') {
-            return $this->compileHavingBitwise($having);
-        }
-
-        return parent::compileHaving($having);
-    }
-
-    /**
-     * Compile a having clause involving a bitwise operator.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHavingBitwise($having)
-    {
-        $column = $this->wrap($having['column']);
-
-        $parameter = $this->parameter($having['value']);
-
-        return $having['boolean'].' ('.$column.' '.$having['operator'].' '.$parameter.') != 0';
     }
 
     /**
