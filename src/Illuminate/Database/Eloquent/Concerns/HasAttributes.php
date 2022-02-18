@@ -204,6 +204,26 @@ trait HasAttributes
 
         return $attributes;
     }
+    
+    /**
+     * Convert the model's attributes to an databse result array.
+     *
+     * @return array
+     */
+    public function attributesToDatabaseArray()
+    {
+        $attributes = $this->getRawOriginal();
+
+        // As database store boolean value as "0" or "1", so we convert boolean value
+        // to "0" or "1" 
+        foreach ($attributes as $key => $value) {
+            if (is_bool($value)) {
+                $attributes[$key] = $value ? "1" : "0";
+            }
+        }
+
+        return $attributes;
+    }
 
     /**
      * Add the date attributes to the attributes array.
