@@ -389,6 +389,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function setGlobalToAndRemoveCcAndBcc($message)
     {
+        $message->forgetTo();
         $message->to($this->to['address'], $this->to['name'], true);
 
         $message->forgetCc();

@@ -200,6 +200,7 @@ class MailMailerTest extends TestCase
 
         $sentMessage = $mailer->send('foo', ['data'], function (Message $message) {
             $message->from('hello@laravel.com');
+            $message->to('nuno@laravel.com');
             $message->cc('dries@laravel.com');
             $message->bcc('james@laravel.com');
         });
@@ -209,8 +210,11 @@ class MailMailerTest extends TestCase
         });
 
         $this->assertSame('taylor@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
-        $this->assertStringNotContainsString('dries@laravel.com', $sentMessage->toString());
-        $this->assertStringNotContainsString('james@laravel.com', $sentMessage->toString());
+        $this->assertStringContainsString('X-To: nuno@laravel.com', $sentMessage->toString());
+        $this->assertStringContainsString('X-Cc: dries@laravel.com', $sentMessage->toString());
+        $this->assertStringContainsString('X-Bcc: james@laravel.com', $sentMessage->toString());
+        $this->assertFalse($recipients->contains('nuno@laravel.com'));
+        $this->assertFalse($recipients->contains('dries@laravel.com'));
         $this->assertFalse($recipients->contains('james@laravel.com'));
     }
 
