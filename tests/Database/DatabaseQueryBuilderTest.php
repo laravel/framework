@@ -26,6 +26,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
@@ -292,6 +293,28 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->tap($callback)->where('email', 'foo');
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+    }
+
+    public function testSimpleSelectExceptColumns()
+    {
+        Schema::shouldReceive('getColumnListing')->andReturn([
+            'id', 'name'
+        ]);
+
+        $builder = $this->getBuilder();
+        $builder->selectAllExcept('name')->from('users');
+        $this->assertSame('select "id" from "users"', $builder->toSql());
+    }
+
+    public function testSelectExceptWithMultipleColumns()
+    {
+        Schema::shouldReceive('getColumnListing')->andReturn([
+            'id', 'name', 'body'
+        ]);
+
+        $builder = $this->getBuilder();
+        $builder->selectAllExcept(['name', 'body'])->from('users');
+        $this->assertSame('select "id" from "users"', $builder->toSql());
     }
 
     public function testBasicWheres()
