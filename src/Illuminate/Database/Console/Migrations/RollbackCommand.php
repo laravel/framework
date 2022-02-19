@@ -88,7 +88,7 @@ class RollbackCommand extends BaseCommand
 
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted'],
 
-            ['batch', null, InputOption::VALUE_REQUIRED, 'The batch of migrations (identified by their batch number) to be reverted'],
+            ['batch', null, InputOption::VALUE_OPTIONAL, 'The batch of migrations (identified by their batch number) to be reverted'],
         ];
     }
 }
