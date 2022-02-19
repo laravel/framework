@@ -230,6 +230,10 @@ trait FormatsMessages
 
         $message = $this->replaceInputPlaceholder($message, $attribute);
 
+        $message = $this->replaceIndexPlaceholder($message, $attribute);
+
+        $message = $this->replacePositionPlaceholder($message, $attribute);
+
         if (isset($this->replacers[Str::snake($rule)])) {
             return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {
@@ -305,6 +309,33 @@ trait FormatsMessages
             [$value, Str::upper($value), Str::ucfirst($value)],
             $message
         );
+    }
+
+    /**
+     * Replace the :index placeholder in the given message.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function replaceIndexPlaceholder($message, $attribute)
+    {
+        $index = explode('.', $attribute);
+        return str_ireplace(':index', $index[1], $message);
+    }
+
+    /**
+     * Replace the :pos placeholder in the given message.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @return string
+     */
+    protected function replacePositionPlaceholder($message, $attribute)
+    {
+        $index = explode('.', $attribute);
+        $index[1]++;
+        return str_ireplace(':pos', $index[1], $message);
     }
 
     /**
