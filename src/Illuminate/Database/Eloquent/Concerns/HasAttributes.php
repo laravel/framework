@@ -204,7 +204,7 @@ trait HasAttributes
 
         return $attributes;
     }
-    
+
     /**
      * Convert the model's attributes to an databse result array.
      *
@@ -215,10 +215,10 @@ trait HasAttributes
         $attributes = $this->getRawOriginal();
 
         // As database store boolean value as "0" or "1", so we convert boolean value
-        // to "0" or "1" 
+        // to "0" or "1"
         foreach ($attributes as $key => $value) {
             if (is_bool($value)) {
-                $attributes[$key] = $value ? "1" : "0";
+                $attributes[$key] = $value ? '1' : '0';
             }
         }
 
