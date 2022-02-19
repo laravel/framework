@@ -320,9 +320,7 @@ trait FormatsMessages
      */
     protected function replaceIndexPlaceholder($message, $attribute)
     {
-        $index = explode('.', $attribute);
-
-        return str_ireplace(':index', $index[1] ?? 0, $message);
+        return str_ireplace(':index', explode('.', $attribute)[1] ?? 0, $message);
     }
 
     /**
@@ -334,10 +332,7 @@ trait FormatsMessages
      */
     protected function replacePositionPlaceholder($message, $attribute)
     {
-        $index = explode('.', $attribute);
-        $i = ($index[1] ?? 0) + 1;
-
-        return str_ireplace(':pos', $i, $message);
+        return str_ireplace(':pos', (int)(explode('.', $attribute)[1] ?? 0) + 1, $message);
     }
 
     /**
