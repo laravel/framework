@@ -25,6 +25,7 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
+use Illuminate\Support\Facades\Schema;
 
 class Builder implements BuilderContract
 {
@@ -251,6 +252,23 @@ class Builder implements BuilderContract
         }
 
         return $this;
+    }
+
+
+    /**
+     * Set the all columns to be selected except columns passed.
+     *
+     * @param  array|string  $columns
+     * @return $this
+     */
+    public function selectAllExcept($columns)
+    {
+        $columns = is_array($columns) ? $columns : [$columns];
+
+        $allColumns = Schema::getColumnListing($this->from);
+        $allColumnsExcept = collect($allColumns)->diff($columns)->toArray();
+
+        return $this->select($allColumnsExcept);
     }
 
     /**
