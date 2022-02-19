@@ -588,6 +588,10 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
+        $v = new Validator($trans, ['name' => ''], ['name' => 'required'], ['name.required' => 'Name :index is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 0 is required.', $v->messages()->first('name'));
+
         $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :index is required.']);
         $this->assertFalse($v->passes());
         $this->assertSame('Name 0 is required.', $v->messages()->first('input.*.name'));
@@ -615,6 +619,10 @@ class ValidationValidatorTest extends TestCase
     public function testPositionValuesAreReplaced()
     {
         $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['name' => ''], ['name' => 'required'], ['name.required' => 'Name :pos is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 1 is required.', $v->messages()->first('name'));
 
         $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :pos is required.']);
         $this->assertFalse($v->passes());
