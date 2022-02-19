@@ -206,7 +206,7 @@ trait HasAttributes
     }
 
     /**
-     * Convert the model's attributes to an databse result array.
+     * Convert the model's attributes to a database result array.
      *
      * @return array
      */
