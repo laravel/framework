@@ -332,7 +332,7 @@ trait FormatsMessages
      */
     protected function replacePositionPlaceholder($message, $attribute)
     {
-        return str_ireplace(':pos', (int)(explode('.', $attribute)[1] ?? 0) + 1, $message);
+        return str_ireplace(':pos', (int) (explode('.', $attribute)[1] ?? 0) + 1, $message);
     }
 
     /**
