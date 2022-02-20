@@ -98,7 +98,7 @@ class RouteListCommand extends Command
     {
         $this->router->flushMiddlewareGroups();
 
-        if (empty($this->router->getRoutes())) {
+        if (! $this->router->getRoutes()->count()) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -120,8 +120,10 @@ class RouteListCommand extends Command
             return $this->getRouteInformation($route);
         })->filter()->all();
 
-        if (($sort = $this->option('sort')) !== 'precedence') {
+        if (($sort = $this->option('sort')) !== null) {
             $routes = $this->sortRoutes($sort, $routes);
+        } else {
+            $routes = $this->sortRoutes('uri', $routes);
         }
 
         if ($this->option('reverse')) {

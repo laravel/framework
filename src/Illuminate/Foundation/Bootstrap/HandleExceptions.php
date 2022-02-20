@@ -86,7 +86,10 @@ class HandleExceptions
      */
     public function handleDeprecation($message, $file, $line)
     {
-        if (! class_exists(LogManager::class)) {
+        if (! class_exists(LogManager::class)
+            || ! static::$app->hasBeenBootstrapped()
+            || static::$app->runningUnitTests()
+        ) {
             return;
         }
 

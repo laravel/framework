@@ -171,9 +171,15 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('pivot')
-                    ? $this->resolveStubPath('/stubs/model.pivot.stub')
-                    : $this->resolveStubPath('/stubs/model.stub');
+        if ($this->option('pivot')) {
+            return $this->resolveStubPath('/stubs/model.pivot.stub');
+        }
+
+        if ($this->option('morph-pivot')) {
+            return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
+        }
+
+        return $this->resolveStubPath('/stubs/model.stub');
     }
 
     /**
@@ -213,6 +219,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
+            ['morph-pivot', null, InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom polymorphic intermediate table model'],
             ['policy', null, InputOption::VALUE_NONE, 'Create a new policy for the model'],
             ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder for the model'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],

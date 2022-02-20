@@ -60,7 +60,7 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, Pruna
             'connection' => $connection,
             'queue' => $queue,
             'payload' => $payload,
-            'exception' => (string) $exception,
+            'exception' => (string) mb_convert_encoding($exception, 'UTF-8'),
             'failed_at' => Date::now(),
         ]);
 
