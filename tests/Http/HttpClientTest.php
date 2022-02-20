@@ -6,6 +6,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Http\Client\Factory;
@@ -18,6 +19,7 @@ use Illuminate\Http\Client\ResponseSequence;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
+use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
@@ -195,6 +197,56 @@ class HttpClientTest extends TestCase
             return $request->url() === 'http://foo.com/form' &&
                    $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded') &&
                    $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testCanSendJsonSerializableData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return [
+                    'name' => 'Taylor',
+                    'title' => 'Laravel Developer',
+                ];
+            }
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request->hasHeader('Content-Type', 'application/json') &&
+                $request['name'] === 'Taylor';
+        });
+    }
+
+    public function testPrefersJsonSerializableOverArrayableData()
+    {
+        $this->factory->fake();
+
+        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable, Arrayable
+        {
+            public function jsonSerialize(): mixed
+            {
+                return [
+                    'attributes' => (object) [],
+                ];
+            }
+
+            public function toArray(): array
+            {
+                return [
+                    'attributes' => [],
+                ];
+            }
+        });
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/form' &&
+                $request->hasHeader('Content-Type', 'application/json') &&
+                $request->body() === '{"attributes":{}}';
         });
     }
 
@@ -977,11 +1029,11 @@ class HttpClientTest extends TestCase
 
         $request = $request->withOptions(['http_errors' => true, 'connect_timeout' => 10]);
 
-        $this->assertSame(['http_errors' => true, 'connect_timeout' => 10], $request->getOptions());
+        $this->assertSame(['connect_timeout' => 10, 'http_errors' => true, 'timeout' => 30], $request->getOptions());
 
         $request = $request->withOptions(['connect_timeout' => 20]);
 
-        $this->assertSame(['http_errors' => true, 'connect_timeout' => 20], $request->getOptions());
+        $this->assertSame(['connect_timeout' => 20, 'http_errors' => true, 'timeout' => 30], $request->getOptions());
     }
 
     public function testMultipleRequestsAreSentInThePool()

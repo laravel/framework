@@ -81,4 +81,14 @@ class AwsS3V3Adapter extends FilesystemAdapter
 
         return (string) $uri;
     }
+
+    /**
+     * Get the underlying S3 client.
+     *
+     * @return \Aws\S3\S3Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
 }

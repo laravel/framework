@@ -18,7 +18,7 @@ class ImplicitRouteBinding
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
     public static function resolveForRoute($container, $route)

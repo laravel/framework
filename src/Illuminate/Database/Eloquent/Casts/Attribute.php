@@ -39,6 +39,18 @@ class Attribute
     }
 
     /**
+     * Create a new attribute accessor / mutator.
+     *
+     * @param  callable|null  $get
+     * @param  callable|null  $set
+     * @return static
+     */
+    public static function make(callable $get = null, callable $set = null): static
+    {
+        return new static($get, $set);
+    }
+
+    /**
      * Create a new attribute accessor.
      *
      * @param  callable  $get
