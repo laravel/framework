@@ -20,8 +20,8 @@ class Faker extends Factory
      * Here we can choose to use our own method,
      * Or call a faker method.
      *
-     * @param string $name
-     * @param array $arguments
+     * @param  string  $name
+     * @param  array  $arguments
      * @return mixed
      */
     public function __call(string $name, array $arguments)
@@ -33,7 +33,7 @@ class Faker extends Factory
     }
 
     /**
-     * Returns a random picture from Lorem Picsum
+     * Returns a random picture from Lorem Picsum.
      *
      * @return string
      */
@@ -49,7 +49,7 @@ class Faker extends Factory
     }
 
     /**
-     * Return a faker sentence to use for our random img
+     * Return a faker sentence to use for our random img.
      * @return string
      */
     public function alt(): string

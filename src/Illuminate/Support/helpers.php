@@ -424,7 +424,7 @@ if (! function_exists('faker')) {
      * Called without a parameter gives a Faker instance.
      * Called with an integer parameter gives a collection of Faker instances.
      *
-     * @param int|null $count
+     * @param  int|null  $count
      * @return \Illuminate\Support\Collection|\Illuminate\Support\Faker
      */
     function faker(int $count = null): \Illuminate\Support\Collection|\Illuminate\Support\Faker
