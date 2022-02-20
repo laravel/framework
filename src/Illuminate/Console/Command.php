@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Reflections\ArgumentReflection;
+use Illuminate\Console\Reflections\CommandReflection;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,6 +14,7 @@ class Command extends SymfonyCommand
     use Concerns\CallsCommands,
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
+        Concerns\HasAttributeSyntax,
         Macroable;
 
     /**
@@ -57,33 +60,47 @@ class Command extends SymfonyCommand
     protected $hidden = false;
 
     /**
+     * The Reflection of the Command.
+     *
+     * @var CommandReflection
+     */
+    protected CommandReflection $reflection;
+
+    /**
      * Create a new console command instance.
      *
      * @return void
      */
     public function __construct()
     {
-        // We will go ahead and set the name, description, and parameters on console
-        // commands just to make things a little easier on the developer. This is
-        // so they don't have to all be manually specified in the constructors.
+        $this->reflection = new CommandReflection($this);
+        $this->intiCommandData();
+        $this->configureCommand();
+    }
+
+    /**
+     * Configure the console command using a fluent or attribute definition.
+     *
+     *  We will go ahead and set the name, description, and parameters on console
+     * commands just to make things a little easier on the developer. This is
+     * so they don't have to all be manually specified in the constructors.
+     *
+     * @return void
+     */
+    protected function configureCommand(): void
+    {
         if (isset($this->signature)) {
             $this->configureUsingFluentDefinition();
-        } else {
-            parent::__construct($this->name);
+            return;
         }
 
-        // Once we have constructed the command, we'll set the description and other
-        // related properties of the command. If a signature wasn't used to build
-        // the command we'll set the arguments and the options on this command.
-        $this->setDescription((string) $this->description);
-
-        $this->setHelp((string) $this->help);
-
-        $this->setHidden($this->isHidden());
-
-        if (! isset($this->signature)) {
-            $this->specifyParameters();
+        if ($this->reflection->usesInputAttributes()) {
+            $this->configureUsingAttributeDefinition();
+            return;
         }
+
+        parent::__construct($this->name);
+        $this->specifyParameters();
     }
 
     /**
@@ -131,6 +148,9 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->hydrateArguments();
+        $this->hydrateOptions();
+
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
 
         return (int) $this->laravel->call([$this, $method]);
@@ -159,6 +179,33 @@ class Command extends SymfonyCommand
         }
 
         return $command;
+    }
+
+    /**
+     * Once we have constructed the command, we'll set the description and other
+     * related properties of the command ether by the command attribute or by command properties
+     * them self.
+     *
+     * @return void
+     */
+    protected function intiCommandData(): void
+    {
+        if ($this->reflection->usesCommandAttribute()) {
+            parent::__construct($this->name = $this->reflection->getName());
+            $this->setDescription($this->reflection->getDescription());
+            $this->setHelp($this->reflection->getHelp());
+            $this->setHidden($this->reflection->isHidden());
+
+            return;
+        }
+
+        if(!isset($this->signature)) {
+            parent::__construct($this->name);
+        }
+
+        $this->setDescription((string) $this->description);
+        $this->setHelp((string) $this->help);
+        $this->setHidden($this->isHidden());
     }
 
     /**
