@@ -6,6 +6,7 @@ use Illuminate\Console\Attributes\Argument;
 use Illuminate\Console\Attributes\Option;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Tests\Console\fixtures\AttributeCommand;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -19,13 +20,13 @@ class CommandAttributesTest extends TestCase
 {
     public function testAttributeWillBeUsed()
     {
-        $this->makeCommand(meta: 'name: "test:basic", description: "Basic Command description!", help: "Some Help.", hidden: true')
-        (function (Command $command) {
-            $this->assertSame('test:basic', $command->getName());
-            $this->assertSame('Basic Command description!', $command->getDescription());
-            $this->assertSame('Some Help.', $command->getHelp());
-            $this->assertTrue($command->isHidden());
-        });
+        $command  = new AttributeCommand();
+        $command= $this->callCommand($command);
+
+        $this->assertSame('test:basic', $command->getName());
+        $this->assertSame('Basic Command description!', $command->getDescription());
+        $this->assertSame('Some Help.', $command->getHelp());
+        $this->assertTrue($command->isHidden());
     }
 
     public function testArgumentsWillBeRegisteredWithAttributeSyntax()
@@ -406,44 +407,7 @@ class CommandAttributesTest extends TestCase
         $this->assertSame(StringEnum::B, $command->enumDefaultOption);
     }
 
-    protected function makeCommand(string $properties = '', ?string $meta = null)
-    {
-        return function (callable $testScenario) use ($properties, $meta) {
-            $name = 'Test'.Str::random();
-            $meta ??= "name: '{$name}'";
-            $filePath = __DIR__."/Temp/{$name}.php";
-            $namespace = '\\Illuminate\\Tests\\Console\\Temp\\'.$name;
-
-            try {
-                $file = new Filesystem();
-                $file->put(
-                    $filePath,
-                    <<<EOT
-<?php
-namespace Illuminate\Tests\Console\Temp;
-use Illuminate\Console\Command;
-use Illuminate\Console\Attributes\CommandAttribute;
-#[CommandAttribute($meta)]
-class $name extends Command {
-$properties
-public function handle(){
-
-}
-}
-EOT
-                );
-
-                $class = new $namespace();
-
-                $testScenario($class, $name);
-
-            } finally {
-                $file->delete($filePath);
-            }
-        };
-    }
-
-    protected function callCommand(Command $command, array $input): Command
+    protected function callCommand(Command $command, array $input = []): Command
     {
         $application = app();
         $command->setLaravel($application);
