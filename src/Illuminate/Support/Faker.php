@@ -50,6 +50,7 @@ class Faker extends Factory
 
     /**
      * Return a faker sentence to use for our random img.
+     * 
      * @return string
      */
     public function alt(): string

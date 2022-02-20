@@ -14,7 +14,7 @@ class SupportFakerTest extends TestCase
 
         $this->assertInstanceOf(Factory::class, $faker);
     }
-    
+
     public function testAFakerHelperIsGloballyAvailable()
     {
         $faker = faker();
