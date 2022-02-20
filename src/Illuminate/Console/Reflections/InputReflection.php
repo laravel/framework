@@ -54,7 +54,7 @@ abstract class InputReflection
     {
         return match (gettype($value)) {
             'integer', 'NULL', 'boolean', 'double', 'string', 'array' => $value,
-            'object' => enum_exists($value::class) ?  $this->castEnum($value) : $value,
+            'object' => function_exists('enum_exists') && enum_exists($value::class) ?  $this->castEnum($value) : $value,
             default => $value,
         };
 
@@ -74,6 +74,10 @@ abstract class InputReflection
         }
 
         if (! $type instanceof \ReflectionNamedType) {
+            return $value;
+        }
+
+        if (!function_exists('enum_exists')){
             return $value;
         }
 
