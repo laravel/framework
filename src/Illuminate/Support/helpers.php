@@ -418,3 +418,27 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('faker')) {
+    /**
+     * Called without a parameter gives a Faker instance.
+     * Called with an integer parameter gives a collection of Faker instances.
+     *
+     * @param int|null $count
+     * @return \Illuminate\Support\Collection|\Illuminate\Support\Faker
+     */
+    function faker(int $count = null): \Illuminate\Support\Collection|\Illuminate\Support\Faker
+    {
+        if (! $count) {
+            return new \Illuminate\Support\Faker();
+        }
+
+        $collection = collect([]);
+
+        for ($i = 0; $i < 10; $i++) {
+            $collection->push(new \Illuminate\Support\Faker());
+        }
+
+        return $collection;
+    }
+}
