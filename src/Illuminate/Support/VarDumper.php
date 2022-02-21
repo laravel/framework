@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support;
 
-use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\VarDumper\VarDumper as SymfonyVarDumper;
 
 class VarDumper
 {
@@ -18,6 +18,10 @@ class VarDumper
      */
     public static function ddt(int $times, ...$vars)
     {
+        if (! $times) {
+            exit(1);
+        }
+        
         if (!in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
         }
@@ -27,7 +31,7 @@ class VarDumper
         }
 
         foreach ($vars as $v) {
-            VarDumper::dump($v);
+            SymfonyVarDumper::dump($v);
         }
 
         self::$times --;
@@ -42,7 +46,7 @@ class VarDumper
     /**
      * Determines is there more time to dump.
      */
-    private function moreTimes(): bool
+    private static function moreTimes(): bool
     {
         return self::$times !== 0;
     }

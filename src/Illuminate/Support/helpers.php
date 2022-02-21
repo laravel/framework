@@ -7,6 +7,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Str;
+use Illuminate\Support\VarDumper;
 
 if (! function_exists('append_config')) {
     /**
