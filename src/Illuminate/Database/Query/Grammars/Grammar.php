@@ -6,6 +6,7 @@ use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -56,6 +57,11 @@ class Grammar extends BaseGrammar
 
         if (is_null($query->columns)) {
             $query->columns = ['*'];
+        }
+
+        if (! is_null($query->except)) {
+            $allColumns = Schema::getColumnListing($query->from);
+            $query->columns = collect($allColumns)->diff($query->except)->toArray();
         }
 
         // To compile the query, we'll spin through each component of the query and

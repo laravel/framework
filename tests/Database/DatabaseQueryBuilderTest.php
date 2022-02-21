@@ -21,12 +21,12 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
-use Illuminate\Support\Facades\Schema;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
@@ -298,7 +298,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSimpleSelectExceptColumns()
     {
         Schema::shouldReceive('getColumnListing')->andReturn([
-            'id', 'name'
+            'id', 'name',
         ]);
 
         $builder = $this->getBuilder();
@@ -309,7 +309,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSelectExceptWithMultipleColumns()
     {
         Schema::shouldReceive('getColumnListing')->andReturn([
-            'id', 'name', 'body'
+            'id', 'name', 'body',
         ]);
 
         $builder = $this->getBuilder();

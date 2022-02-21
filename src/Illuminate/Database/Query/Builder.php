@@ -25,7 +25,6 @@ use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
-use Illuminate\Support\Facades\Schema;
 
 class Builder implements BuilderContract
 {
@@ -84,6 +83,13 @@ class Builder implements BuilderContract
      * @var array
      */
     public $columns;
+
+    /**
+     * The columns that should be excepted.
+     *
+     * @var array
+     */
+    public $except;
 
     /**
      * Indicates if the query returns distinct results.
@@ -254,7 +260,6 @@ class Builder implements BuilderContract
         return $this;
     }
 
-
     /**
      * Set the all columns to be selected except columns passed.
      *
@@ -265,10 +270,9 @@ class Builder implements BuilderContract
     {
         $columns = is_array($columns) ? $columns : [$columns];
 
-        $allColumns = Schema::getColumnListing($this->from);
-        $allColumnsExcept = collect($allColumns)->diff($columns)->toArray();
+        $this->except = $columns;
 
-        return $this->select($allColumnsExcept);
+        return $this;
     }
 
     /**
