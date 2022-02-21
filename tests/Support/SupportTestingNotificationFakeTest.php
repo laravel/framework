@@ -138,9 +138,9 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->assertNotSame($id, $this->notification->id);
     }
 
-    public function testAssertTimesSent()
+    public function testAssertSentTimes()
     {
-        $this->fake->assertTimesSent(0, NotificationStub::class);
+        $this->fake->assertSentTimes(0, NotificationStub::class);
 
         $this->fake->send($this->user, new NotificationStub);
 
@@ -148,7 +148,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->send(new UserStub, new NotificationStub);
 
-        $this->fake->assertTimesSent(3, NotificationStub::class);
+        $this->fake->assertSentTimes(3, NotificationStub::class);
     }
 
     public function testAssertSentToTimes()
