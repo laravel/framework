@@ -143,7 +143,7 @@ class MailChannel
         $this->addAttachments($mailMessage, $message);
 
         if (! is_null($message->priority)) {
-            $mailMessage->setPriority($message->priority);
+            $mailMessage->priority($message->priority);
         }
 
         if ($message->tags) {
