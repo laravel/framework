@@ -256,7 +256,7 @@ class HandleCorsTest extends TestCase
         $router->post('web/ping', [
             'uses' => function () {
                 return 'PONG';
-            }
+            },
         ]);
     }
 
@@ -265,19 +265,19 @@ class HandleCorsTest extends TestCase
         $router->post('api/ping', [
             'uses' => function () {
                 return 'PONG';
-            }
+            },
         ]);
 
         $router->put('api/ping', [
             'uses' => function () {
                 return 'PONG';
-            }
+            },
         ]);
 
         $router->post('api/error', [
             'uses' => function () {
                 abort(500);
-            }
+            },
         ]);
 
         $router->post('api/validation', [
@@ -287,7 +287,7 @@ class HandleCorsTest extends TestCase
                 ]);
 
                 return 'ok';
-            }
+            },
         ]);
     }
 }
