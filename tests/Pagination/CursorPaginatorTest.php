@@ -22,7 +22,9 @@ class CursorPaginatorTest extends TestCase
             'data' => [['id' => 1], ['id' => 2]],
             'path' => '/',
             'per_page' => 2,
+            'next_cursor' => $this->getCursor(['id' => 2]),
             'next_page_url' => '/?cursor='.$this->getCursor(['id' => 2]),
+            'prev_cursor' => null,
             'prev_page_url' => null,
         ];
 

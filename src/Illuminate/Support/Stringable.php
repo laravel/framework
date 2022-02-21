@@ -196,6 +196,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Extracts an excerpt from text that matches the first instance of a phrase.
+     *
+     * @param  string  $phrase
+     * @param  array  $options
+     * @return string|null
+     */
+    public function excerpt($phrase = '', $options = [])
+    {
+        return Str::excerpt($this->value, $phrase, $options);
+    }
+
+    /**
      * Explode the string into an array.
      *
      * @param  string  $delimiter

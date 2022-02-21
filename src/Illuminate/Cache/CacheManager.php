@@ -328,7 +328,7 @@ class CacheManager implements FactoryContract
      * Get the cache connection configuration.
      *
      * @param  string  $name
-     * @return array
+     * @return array|null
      */
     protected function getConfig($name)
     {

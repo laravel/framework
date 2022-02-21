@@ -1021,4 +1021,19 @@ class SupportArrTest extends TestCase
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
         ], $sortedWithCallable);
     }
+
+    public function testKeyBy()
+    {
+        $array = [
+            ['id' => '123', 'data' => 'abc'],
+            ['id' => '345', 'data' => 'def'],
+            ['id' => '498', 'data' => 'hgi'],
+        ];
+
+        $this->assertEquals([
+            '123' => ['id' => '123', 'data' => 'abc'],
+            '345' => ['id' => '345', 'data' => 'def'],
+            '498' => ['id' => '498', 'data' => 'hgi'],
+        ], Arr::keyBy($array, 'id'));
+    }
 }

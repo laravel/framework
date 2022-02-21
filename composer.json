@@ -92,7 +92,6 @@
         "phpstan/phpstan": "^1.0",
         "predis/predis": "^1.1.9",
         "phpunit/phpunit": "^9.5.8",
-        "symfony/amazon-mailer": "^6.1",
         "symfony/cache": "^6.1"
     },
     "provide": {

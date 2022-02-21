@@ -103,22 +103,22 @@ class RedisQueueIntegrationTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider redisDriverProvider
-     *
-     * @param  string  $driver
-     */
-    public function testMigrateMoreThan100Jobs($driver)
-    {
-        $this->setQueue($driver);
-        for ($i = -1; $i >= -201; $i--) {
-            $this->queue->later($i, new RedisQueueIntegrationTestJob($i));
-        }
-        for ($i = -201; $i <= -1; $i++) {
-            $this->assertEquals($i, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command)->i);
-            $this->assertEquals(-$i - 1, $this->redis[$driver]->llen('queues:default:notify'));
-        }
-    }
+    // /**
+    //  * @dataProvider redisDriverProvider
+    //  *
+    //  * @param  string  $driver
+    //  */
+    // public function testMigrateMoreThan100Jobs($driver)
+    // {
+    //     $this->setQueue($driver);
+    //     for ($i = -1; $i >= -201; $i--) {
+    //         $this->queue->later($i, new RedisQueueIntegrationTestJob($i));
+    //     }
+    //     for ($i = -201; $i <= -1; $i++) {
+    //         $this->assertEquals($i, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command)->i);
+    //         $this->assertEquals(-$i - 1, $this->redis[$driver]->llen('queues:default:notify'));
+    //     }
+    // }
 
     /**
      * @dataProvider redisDriverProvider
