@@ -24,6 +24,7 @@
         "laravel/serializable-closure": "^1.0",
         "league/commonmark": "^2.2",
         "league/flysystem": "^3.0",
+        "fruitcake/php-cors": "^1.2",
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.53.1",
         "psr/container": "^1.1.1|^2.0.1",

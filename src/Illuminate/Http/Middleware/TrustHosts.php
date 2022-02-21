@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Middleware;
 
+use Closure;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 
@@ -36,10 +37,10 @@ abstract class TrustHosts
      * Handle the incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  callable  $next
+     * @param  \Closure  $next
      * @return \Illuminate\Http\Response
      */
-    public function handle(Request $request, $next)
+    public function handle(Request $request, Closure $next)
     {
         if ($this->shouldSpecifyTrustedHosts()) {
             Request::setTrustedHosts(array_filter($this->hosts()));
