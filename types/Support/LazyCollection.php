@@ -113,6 +113,12 @@ assertType('bool', $collection->contains(function ($user) {
 
     return true;
 }));
+assertType('bool', $collection->contains(function ($user, $int) {
+    assertType('int', $int);
+    assertType('User', $user);
+
+    return true;
+}));
 assertType('bool', $collection::make(['string'])->contains('string', '=', 'string'));
 
 assertType('Illuminate\Support\LazyCollection<int, array<int, string|User>>', $collection->crossJoin($collection::make(['string'])));
