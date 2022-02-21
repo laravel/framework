@@ -6,7 +6,6 @@ use Closure;
 use Fruitcake\Cors\CorsService;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class HandleCors
 {
@@ -46,7 +45,7 @@ class HandleCors
      */
     public function handle($request, Closure $next)
     {
-        if (! $this->shouldRun($request)) {
+        if (! $this->hasMatchingPath($request)) {
             return $next($request);
         }
 
@@ -66,30 +65,7 @@ class HandleCors
             $this->cors->varyHeader($response, 'Access-Control-Request-Method');
         }
 
-        return $this->addHeaders($request, $response);
-    }
-
-    /**
-     * Add the headers to the response, if they don't exist yet.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return \Illuminate\Http\Response
-     */
-    protected function addHeaders(Request $request, Response $response)
-    {
         return $this->cors->addActualRequestHeaders($response, $request);
-    }
-
-    /**
-     * Determine if the request has a URI that should pass through the CORS flow.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    protected function shouldRun(Request $request): bool
-    {
-        return $this->isMatchingPath($request);
     }
 
     /**
@@ -98,7 +74,7 @@ class HandleCors
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
-    protected function isMatchingPath(Request $request): bool
+    protected function hasMatchingPath(Request $request): bool
     {
         $paths = $this->getPathsByHost($request->getHost());
 
