@@ -78,11 +78,7 @@ class HandleCors
      */
     protected function addHeaders(Request $request, Response $response)
     {
-        if (! $response->headers->has('Access-Control-Allow-Origin')) {
-            $response = $this->cors->addActualRequestHeaders($response, $request);
-        }
-
-        return $response;
+        return $this->cors->addActualRequestHeaders($response, $request);
     }
 
     /**
