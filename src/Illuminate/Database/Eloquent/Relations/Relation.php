@@ -297,18 +297,6 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Get the base query builder driving the Eloquent builder.
-     *
-     * @deprecated Use toBase() instead
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function getBaseQuery()
-    {
-        return $this->toBase();
-    }
-
-    /**
      * Get a base query builder instance.
      *
      * @return \Illuminate\Database\Query\Builder
