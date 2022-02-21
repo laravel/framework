@@ -235,23 +235,6 @@ abstract class ServiceProvider
     }
 
     /**
-     * Register Eloquent model factory paths.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  array|string  $paths
-     * @return void
-     */
-    protected function loadFactoriesFrom($paths)
-    {
-        $this->callAfterResolving(ModelFactory::class, function ($factory) use ($paths) {
-            foreach ((array) $paths as $path) {
-                $factory->load($path);
-            }
-        });
-    }
-
-    /**
      * Setup an after resolving listener, or fire immediately if already resolved.
      *
      * @param  string  $name
