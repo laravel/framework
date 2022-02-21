@@ -38,8 +38,8 @@ class CommandReflection
     public function getArguments(): Collection
     {
         return collect($this->reflection->getProperties())
-            ->filter(fn(\ReflectionProperty $property) => ArgumentReflection::isArgument($property))
-            ->map(fn(\ReflectionProperty $property) => new ArgumentReflection(
+            ->filter(fn (\ReflectionProperty $property) => ArgumentReflection::isArgument($property))
+            ->map(fn (\ReflectionProperty $property) => new ArgumentReflection(
                     $property,
                     $property->getAttributes(Argument::class)[0]->newInstance()
                 )
@@ -49,8 +49,8 @@ class CommandReflection
     public function getOptions(): Collection
     {
         return collect($this->reflection->getProperties())
-            ->filter(fn(\ReflectionProperty $property) => OptionReflection::isOption($property))
-            ->map(fn(\ReflectionProperty $property) => new OptionReflection(
+            ->filter(fn (\ReflectionProperty $property) => OptionReflection::isOption($property))
+            ->map(fn (\ReflectionProperty $property) => new OptionReflection(
                     $property,
                     $property->getAttributes(Option::class)[0]->newInstance()
                 )
@@ -59,7 +59,7 @@ class CommandReflection
 
     public function getName(): ?string
     {
-        if (!$this->usesCommandAttribute()) {
+        if (! $this->usesCommandAttribute()) {
             return $this->command->getName();
         }
 
@@ -68,7 +68,7 @@ class CommandReflection
 
     public function getDescription(): string
     {
-        if (!$this->usesCommandAttribute()) {
+        if (! $this->usesCommandAttribute()) {
             return $this->command->getDescription();
         }
 
@@ -77,7 +77,7 @@ class CommandReflection
 
     public function getHelp(): string
     {
-        if (!$this->usesCommandAttribute()) {
+        if (! $this->usesCommandAttribute()) {
             return $this->command->getHelp();
         }
 
@@ -86,7 +86,7 @@ class CommandReflection
 
     public function isHidden(): bool
     {
-        if (!$this->usesCommandAttribute()) {
+        if (! $this->usesCommandAttribute()) {
             return $this->command->isHidden();
         }
 
@@ -95,7 +95,7 @@ class CommandReflection
 
     public function getAliases(): array
     {
-        if (!$this->usesCommandAttribute()) {
+        if (! $this->usesCommandAttribute()) {
             return [];
         }
 

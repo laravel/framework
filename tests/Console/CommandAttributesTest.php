@@ -5,10 +5,8 @@ namespace Illuminate\Tests\Console;
 use Illuminate\Console\Attributes\Argument;
 use Illuminate\Console\Attributes\Option;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Tests\Console\fixtures\AttributeCommand;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -20,8 +18,8 @@ class CommandAttributesTest extends TestCase
 {
     public function testAttributeWillBeUsed()
     {
-        $command  = new AttributeCommand();
-        $command= $this->callCommand($command);
+        $command = new AttributeCommand();
+        $command = $this->callCommand($command);
 
         $this->assertSame('test:basic', $command->getName());
         $this->assertSame('Basic Command description!', $command->getDescription());
@@ -32,7 +30,8 @@ class CommandAttributesTest extends TestCase
 
     public function testArgumentsWillBeRegisteredWithAttributeSyntax()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Argument]
@@ -46,7 +45,6 @@ class CommandAttributesTest extends TestCase
 
             public function handle()
             {
-
             }
         };
 
@@ -57,7 +55,6 @@ class CommandAttributesTest extends TestCase
             'optionalArgument' => 'Argument_Optional',
             'defaultArgument' => 'Argument_Default',
         ]);
-
 
         $this->assertTrue($definition->getArgument('requiredArgument')->isRequired());
         $this->assertSame('Argument_Required', $command->requiredArgument);
@@ -71,7 +68,8 @@ class CommandAttributesTest extends TestCase
 
     public function testArrayArgumentsWillBeRegisteredWithAttributeSyntax()
     {
-        $commandRequired = new class extends Command {
+        $commandRequired = new class extends Command
+        {
             protected $name = 'test';
 
             #[Argument]
@@ -79,7 +77,6 @@ class CommandAttributesTest extends TestCase
 
             public function handle()
             {
-
             }
         };
 
@@ -91,11 +88,11 @@ class CommandAttributesTest extends TestCase
 
             public function handle()
             {
-
             }
         };
 
-        $commandDefault = new class extends Command {
+        $commandDefault = new class extends Command
+        {
             protected $name = 'test';
 
             #[Argument]
@@ -103,10 +100,8 @@ class CommandAttributesTest extends TestCase
 
             public function handle()
             {
-
             }
         };
-
 
         $commandRequired = $this->callCommand($commandRequired, [
             'arrayArgument' => ['Array_Required'],
@@ -118,7 +113,6 @@ class CommandAttributesTest extends TestCase
         $this->assertTrue($definition->getArgument('arrayArgument')->isRequired());
         $this->assertSame(['Array_Required'], $commandRequired->arrayArgument);
 
-
         $commandOptional = $this->callCommand($commandOptional, [
             'optionalArrayArgument' => ['Array_Optional'],
         ]);
@@ -128,7 +122,6 @@ class CommandAttributesTest extends TestCase
         $this->assertTrue($definition->getArgument('optionalArrayArgument')->isArray());
         $this->assertFalse($definition->getArgument('optionalArrayArgument')->isRequired());
         $this->assertSame(['Array_Optional'], $commandOptional->optionalArrayArgument);
-
 
         $commandDefault = $this->callCommand($commandDefault, [
             'defaultArrayArgument' => ['Array_Default'],
@@ -143,13 +136,12 @@ class CommandAttributesTest extends TestCase
 
         $commandDefault = $this->callCommand($commandDefault, []);
         $this->assertSame(['Value A', 'Value B'], $commandDefault->defaultArrayArgument);
-
-
     }
 
     public function testOptionsWillBeRegisteredWithAttributeSyntax()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Option]
@@ -164,7 +156,9 @@ class CommandAttributesTest extends TestCase
             #[Option]
             public string $optionWithDefaultValue = 'default';
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $definition = $command->getDefinition();
@@ -198,7 +192,8 @@ class CommandAttributesTest extends TestCase
 
     public function testArrayOptionsWillBeRegisteredWithAttributeSyntax()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Option]
@@ -207,7 +202,9 @@ class CommandAttributesTest extends TestCase
             #[Option]
             public array $optionDefaultArray = ['default1', 'default2'];
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $definition = $command->getDefinition();
@@ -220,23 +217,23 @@ class CommandAttributesTest extends TestCase
         ]);
 
         $this->assertTrue($definition->getOption('optionArray')->isArray());
-        $this->assertSame(['Value A', 'Value B'],$command->optionArray);
+        $this->assertSame(['Value A', 'Value B'], $command->optionArray);
 
         $this->assertTrue($definition->getOption('optionArray')->isArray());
         $this->assertTrue($definition->getOption('optionArray')->isValueOptional());
-        $this->assertSame(['Value A', 'Value B'],$command->optionArray);
+        $this->assertSame(['Value A', 'Value B'], $command->optionArray);
 
         $command = $this->callCommand($command, [
             '--optionDefaultArray' => ['Value C', 'Value D'],
         ]);
 
         $this->assertSame(['Value C', 'Value D'], $command->optionDefaultArray);
-
     }
 
     public function testInputMetaDataWillBeRegisteredWithAttributeSyntax()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Argument(
@@ -251,7 +248,9 @@ class CommandAttributesTest extends TestCase
             )]
             public bool $option;
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $definition = $command->getDefinition();
@@ -270,7 +269,8 @@ class CommandAttributesTest extends TestCase
 
     public function testOptionShortcutWillBeRegisteredWithAttributeSyntax()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Option(
@@ -294,7 +294,8 @@ class CommandAttributesTest extends TestCase
 
     public function testOptionNegatableWillBeRegisteredWithAttributeSyntax()
     {
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Option(
@@ -302,7 +303,9 @@ class CommandAttributesTest extends TestCase
             )]
             public bool $option;
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $definition = $command->getDefinition();
@@ -332,7 +335,8 @@ class CommandAttributesTest extends TestCase
             return;
         }
 
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Argument]
@@ -347,7 +351,9 @@ class CommandAttributesTest extends TestCase
             #[Argument]
             public StringEnum $enumDefaultArgument = StringEnum::B;
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $command = $this->callCommand($command, [
@@ -375,7 +381,8 @@ class CommandAttributesTest extends TestCase
             return;
         }
 
-        $command = new class extends Command {
+        $command = new class extends Command
+        {
             protected $name = 'test';
 
             #[Option]
@@ -390,7 +397,9 @@ class CommandAttributesTest extends TestCase
             #[Option]
             public StringEnum $enumDefaultOption = StringEnum::B;
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $command = $this->callCommand($command, [

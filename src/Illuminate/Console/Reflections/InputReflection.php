@@ -54,10 +54,9 @@ abstract class InputReflection
     {
         return match (gettype($value)) {
             'integer', 'NULL', 'boolean', 'double', 'string', 'array' => $value,
-            'object' => function_exists('enum_exists') && enum_exists($value::class) ?  $this->castEnum($value) : $value,
+            'object' => function_exists('enum_exists') && enum_exists($value::class) ? $this->castEnum($value) : $value,
             default => $value,
         };
-
     }
 
     public function castEnum(object $value): int|float|array|string|bool|null
@@ -69,7 +68,7 @@ abstract class InputReflection
 
     public function castTo(int|array|float|string|bool|null $value): mixed
     {
-        if (!($type = $this->property->getType())) {
+        if (! ($type = $this->property->getType())) {
             return $value;
         }
 
@@ -77,11 +76,11 @@ abstract class InputReflection
             return $value;
         }
 
-        if (!function_exists('enum_exists')){
+        if (! function_exists('enum_exists')){
             return $value;
         }
 
-        if (!enum_exists($type->getName())){
+        if (! enum_exists($type->getName())){
             return $value;
         }
 

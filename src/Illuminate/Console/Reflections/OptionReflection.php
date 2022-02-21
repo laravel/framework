@@ -13,7 +13,7 @@ class OptionReflection extends InputReflection
 
     public static function isOption(\ReflectionProperty $property): bool
     {
-        return !empty($property->getAttributes(Option::class));
+        return ! empty($property->getAttributes(Option::class));
     }
 
     public function isNegatable(): bool
@@ -23,7 +23,7 @@ class OptionReflection extends InputReflection
 
     public function hasRequiredValue(): bool
     {
-        return $this->hasValue() && !$this->isOptional();
+        return $this->hasValue() && ! $this->isOptional();
     }
 
     public function getShortcut(): ?string

@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 trait HasAttributeSyntax
 {
-
     /**
      * Configure the console command using an Attribute definition.
      *
@@ -68,7 +67,7 @@ trait HasAttributeSyntax
             ->each(function (OptionReflection $optionReflection) {
                 $consoleName = $optionReflection->getAlias() ?? $optionReflection->getName();
 
-                if (!$optionReflection->hasRequiredValue()) {
+                if (! $optionReflection->hasRequiredValue()) {
                     $this->{$optionReflection->getName()} = $optionReflection->castTo($this->option($consoleName));
                     return;
                 }
@@ -78,15 +77,13 @@ trait HasAttributeSyntax
                 }
 
                 $this->{$optionReflection->getName()} = $optionReflection->castTo($this->option($consoleName));
-
             });
     }
-
 
     protected function propertyToArgument(ArgumentReflection $argument): InputArgument
     {
         return match (true) {
-            $argument->isArray() && !$argument->isOptional() => $this->makeInputArgument($argument,
+            $argument->isArray() && ! $argument->isOptional() => $this->makeInputArgument($argument,
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED),
 
             $argument->isArray() => $this->makeInputArgument($argument, InputArgument::IS_ARRAY,
@@ -108,7 +105,7 @@ trait HasAttributeSyntax
                 $option->getDefaultValue()
             ),
 
-            $option->hasValue() && !$option->isOptional() => $this->makeInputOption($option,
+            $option->hasValue() && ! $option->isOptional() => $this->makeInputOption($option,
                 InputOption::VALUE_REQUIRED),
 
             $option->hasValue() => $this->makeInputOption($option, InputOption::VALUE_OPTIONAL,

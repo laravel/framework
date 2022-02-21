@@ -6,5 +6,5 @@ interface ConsoleInput
 {
     public function getDescription(): string;
 
-    public function getAlias(): ? string;
+    public function getAlias(): ?string;
 }

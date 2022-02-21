@@ -90,11 +90,13 @@ class Command extends SymfonyCommand
     {
         if (isset($this->signature)) {
             $this->configureUsingFluentDefinition();
+
             return;
         }
 
         if ($this->reflection->usesInputAttributes()) {
             $this->configureUsingAttributeDefinition();
+
             return;
         }
 
@@ -191,10 +193,11 @@ class Command extends SymfonyCommand
     {
         if ($this->reflection->usesCommandAttribute()) {
             $this->initCommandDataFromAttribute();
+
             return;
         }
 
-        if(!isset($this->signature)) {
+        if ( !isset($this->signature)) {
             parent::__construct($this->name);
         }
 
