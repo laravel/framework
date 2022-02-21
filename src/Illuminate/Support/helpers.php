@@ -418,3 +418,16 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (!function_exists('ddt')) {
+    /**
+     * Dumps and dies after the given time.
+     *
+     * @param  int  $times
+     * @param  mixed[] $vars
+     */
+    function ddt(int $times, ...$vars)
+    {
+        return VarDumper::ddt($times, ...$vars);
+    }
+}
