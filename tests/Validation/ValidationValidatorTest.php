@@ -732,6 +732,47 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('all must be required!', $v->messages()->first('name.1'));
     }
 
+    public function testInlineValidationMessagesForRuleObjectsAreRespected()
+    {
+        $rule = new class implements Rule
+        {
+            public function passes($attribute, $value)
+            {
+                return false;
+            }
+
+            public function message()
+            {
+                return 'this is my message';
+            }
+        };
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'Taylor'], ['name' => $rule], [$rule::class => 'my custom message']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my custom message', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'Ryan'], ['name' => $rule], ['name.' . $rule::class => 'my custom message']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my custom message', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name.*' => $rule], ['name.*.' . $rule::class => 'my custom message']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my custom message', $v->messages()->first('name.0'));
+        $this->assertSame('my custom message', $v->messages()->first('name.1'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'Ryan'], ['name' => $rule], [$rule::class => 'my attribute is :attribute']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my attribute is name', $v->messages()->first('name'));
+    }
+
     public function testIfRulesAreSuccessfullyAdded()
     {
         $trans = $this->getIlluminateArrayTranslator();
