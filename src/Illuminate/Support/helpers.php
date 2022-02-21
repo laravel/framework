@@ -428,6 +428,6 @@ if (!function_exists('ddt')) {
      */
     function ddt(int $times, ...$vars)
     {
-        return DumpService::ddt($times, ...$vars);
+        return VarDumper::ddt($times, ...$vars);
     }
 }
