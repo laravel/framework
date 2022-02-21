@@ -69,7 +69,7 @@ class HandleCors
     }
 
     /**
-     * The the path from the config, to see if the CORS Service should run.
+     * Get the path from the config, to see if the CORS Service should run.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return bool
