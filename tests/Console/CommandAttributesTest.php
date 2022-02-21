@@ -80,7 +80,8 @@ class CommandAttributesTest extends TestCase
             }
         };
 
-        $commandOptional = new class extends Command {
+        $commandOptional = new class extends Command
+        {
             protected $name = 'test';
 
             #[Argument]
@@ -278,7 +279,9 @@ class CommandAttributesTest extends TestCase
             )]
             public string $option;
 
-            public function handle(){}
+            public function handle()
+            {
+            }
         };
 
         $definition = $command->getDefinition();
@@ -332,6 +335,7 @@ class CommandAttributesTest extends TestCase
     {
         if (PHP_VERSION_ID <= 80100) {
             $this->markTestSkipped('Enum Casting test skipped caused by PHP version.');
+
             return;
         }
 
@@ -378,6 +382,7 @@ class CommandAttributesTest extends TestCase
     {
         if (PHP_VERSION_ID <= 80100) {
             $this->markTestSkipped('Enum Casting test skipped caused by PHP version.');
+
             return;
         }
 
@@ -426,6 +431,7 @@ class CommandAttributesTest extends TestCase
         $output = new NullOutput();
 
         $command->run($input, $output);
+
         return $command;
     }
 }

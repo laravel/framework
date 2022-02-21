@@ -3,8 +3,6 @@
 namespace Illuminate\Console\Reflections;
 
 use Illuminate\Contracts\Console\ConsoleInput;
-use Illuminate\Tests\Console\StringEnum;
-use Illuminate\Validation\Rules\Enum;
 
 abstract class InputReflection
 {
@@ -76,11 +74,11 @@ abstract class InputReflection
             return $value;
         }
 
-        if (! function_exists('enum_exists')){
+        if (! function_exists('enum_exists')) {
             return $value;
         }
 
-        if (! enum_exists($type->getName())){
+        if (! enum_exists($type->getName())) {
             return $value;
         }
 

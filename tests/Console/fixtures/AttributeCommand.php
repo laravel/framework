@@ -6,15 +6,15 @@ use Illuminate\Console\Attributes\ArtisanCommand;
 use Illuminate\Console\Command;
 
 #[ArtisanCommand(
-    name: "test:basic",
-    description: "Basic Command description!",
-    help: "Some Help.",
+    name: 'test:basic',
+    description: 'Basic Command description!',
+    help: 'Some Help.',
     aliases: ['alias:basic'],
     hidden: true
 )]
 class AttributeCommand extends Command
 {
-    public function handle(){
-
+    public function handle()
+    {
     }
 }

@@ -69,6 +69,7 @@ trait HasAttributeSyntax
 
                 if (! $optionReflection->hasRequiredValue()) {
                     $this->{$optionReflection->getName()} = $optionReflection->castTo($this->option($consoleName));
+
                     return;
                 }
 

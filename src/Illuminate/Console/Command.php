@@ -197,7 +197,7 @@ class Command extends SymfonyCommand
             return;
         }
 
-        if ( !isset($this->signature)) {
+        if (! isset($this->signature)) {
             parent::__construct($this->name);
         }
 
