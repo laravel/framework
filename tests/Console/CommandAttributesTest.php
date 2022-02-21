@@ -27,6 +27,7 @@ class CommandAttributesTest extends TestCase
         $this->assertSame('Basic Command description!', $command->getDescription());
         $this->assertSame('Some Help.', $command->getHelp());
         $this->assertTrue($command->isHidden());
+        $this->assertSame(['alias:basic'], $command->getAliases());
     }
 
     public function testArgumentsWillBeRegisteredWithAttributeSyntax()

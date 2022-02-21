@@ -15,10 +15,19 @@ trait HasAttributeSyntax
      *
      * @return void
      */
-    protected function configureUsingAttributeDefinition()
+    protected function configureUsingAttributeDefinition(): void
     {
         $this->configureArgumentsUsingAttributeDefinition();
         $this->configureOptionsUsingAttributeDefinition();
+    }
+
+    protected function initCommandDataFromAttribute(): void
+    {
+        parent::__construct($this->name = $this->reflection->getName());
+        $this->setDescription($this->reflection->getDescription());
+        $this->setHelp($this->reflection->getHelp());
+        $this->setHidden($this->reflection->isHidden());
+        $this->setAliases($this->reflection->getAliases());
     }
 
     protected function configureArgumentsUsingAttributeDefinition(): void

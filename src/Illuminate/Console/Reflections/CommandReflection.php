@@ -3,7 +3,7 @@
 namespace Illuminate\Console\Reflections;
 
 use Illuminate\Console\Attributes\Argument;
-use Illuminate\Console\Attributes\CommandAttribute;
+use Illuminate\Console\Attributes\ArtisanCommand;
 use Illuminate\Console\Attributes\Option;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 class CommandReflection
 {
     public \ReflectionClass $reflection;
-    public ?CommandAttribute $attribute;
+    public ?ArtisanCommand $attribute;
 
     public function __construct(
         public Command $command
@@ -93,9 +93,18 @@ class CommandReflection
         return $this->attribute->hidden;
     }
 
-    protected function initCommandAttribute(): ?CommandAttribute
+    public function getAliases(): array
     {
-        $attributes = $this->reflection->getAttributes(CommandAttribute::class);
+        if (!$this->usesCommandAttribute()) {
+            return [];
+        }
+
+        return $this->attribute->aliases;
+    }
+
+    protected function initCommandAttribute(): ?ArtisanCommand
+    {
+        $attributes = $this->reflection->getAttributes(ArtisanCommand::class);
 
         if (empty($attributes)) {
             return null;

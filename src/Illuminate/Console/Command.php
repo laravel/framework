@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Console\Reflections\ArgumentReflection;
 use Illuminate\Console\Reflections\CommandReflection;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -191,11 +190,7 @@ class Command extends SymfonyCommand
     protected function intiCommandData(): void
     {
         if ($this->reflection->usesCommandAttribute()) {
-            parent::__construct($this->name = $this->reflection->getName());
-            $this->setDescription($this->reflection->getDescription());
-            $this->setHelp($this->reflection->getHelp());
-            $this->setHidden($this->reflection->isHidden());
-
+            $this->initCommandDataFromAttribute();
             return;
         }
 

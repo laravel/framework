@@ -2,13 +2,14 @@
 
 namespace Illuminate\Tests\Console\fixtures;
 
-use Illuminate\Console\Attributes\CommandAttribute;
+use Illuminate\Console\Attributes\ArtisanCommand;
 use Illuminate\Console\Command;
 
-#[CommandAttribute(
+#[ArtisanCommand(
     name: "test:basic",
     description: "Basic Command description!",
     help: "Some Help.",
+    aliases: ['alias:basic'],
     hidden: true
 )]
 class AttributeCommand extends Command
