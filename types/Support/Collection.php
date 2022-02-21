@@ -117,6 +117,8 @@ assertType('bool', $collection->contains(function ($user) {
 assertType('bool', $collection->contains(function ($user, $int) {
     assertType('int', $int);
     assertType('User', $user);
+
+    return true;
 }));
 assertType('bool', $collection::make(['string'])->contains('string', '=', 'string'));
 
