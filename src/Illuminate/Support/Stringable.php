@@ -131,6 +131,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return static
+     */
+    public function betweenFirst($from, $to)
+    {
+        return new static(Str::betweenFirst($this->value, $from, $to));
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
@@ -143,7 +155,7 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public function contains($needles)
@@ -176,7 +188,7 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public function endsWith($needles)
@@ -689,7 +701,7 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public function startsWith($needles)
@@ -812,7 +824,7 @@ class Stringable implements JsonSerializable
     /**
      * Execute the given callback if the string contains a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
@@ -862,7 +874,7 @@ class Stringable implements JsonSerializable
     /**
      * Execute the given callback if the string ends with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
@@ -925,7 +937,7 @@ class Stringable implements JsonSerializable
     /**
      * Execute the given callback if the string starts with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
