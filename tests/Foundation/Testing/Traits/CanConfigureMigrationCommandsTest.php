@@ -10,7 +10,7 @@ class CanConfigureMigrationCommandsTest extends TestCase
 {
     protected $traitObject;
 
-    protected function setup(): void
+    protected function setUp(): void
     {
         $this->traitObject = $this->getObjectForTrait(CanConfigureMigrationCommands::class);
     }

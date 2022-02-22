@@ -82,7 +82,7 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
