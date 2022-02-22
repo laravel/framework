@@ -22,13 +22,27 @@ class SupportVarDumperTest extends TestCase
         $this->assertEquals(['a', 'b', 'c'],  VarDumper::getDumpedItems());
 
         VarDumper::reset();
+
+        VarDumper::fake();
+
+        $array = ['a', 'b', 'c', 'd', 'e'];
+
+        foreach ($array as $item) {
+            ddt(4, $item, 'test');
+        }
+
+        $this->assertEquals(VarDumper::getDumpedCount(), 4);
+        $this->assertTrue(VarDumper::died());
+        $this->assertEquals(['a', 'test', 'b', 'test', 'c', 'test', 'd', 'test'],  VarDumper::getDumpedItems());
+
+        VarDumper::reset();
     }
 
     public function test_works_with_count_of_array()
     {
         VarDumper::fake();
         $array = ['a', 'b', 'c', 'd', 'e'];
-        
+
         foreach ($array as $item) {
             ddt(count($array), $item);
         }
@@ -53,7 +67,7 @@ class SupportVarDumperTest extends TestCase
         $this->assertEquals(VarDumper::getDumpedCount(), 0);
         $this->assertTrue(VarDumper::died());
         $this->assertEquals([],  VarDumper::getDumpedItems());
-        
+
         VarDumper::reset();
     }
 }

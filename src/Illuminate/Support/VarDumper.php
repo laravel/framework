@@ -83,15 +83,12 @@ class VarDumper
                 SymfonyVarDumper::dump($v);
                 continue;
             }
-
-            self::$dumpedCount ++;
         }
 
+        self::$dumpedCount ++;
         self::$times --;
 
         if (! self::moreTimes()) {
-            self::$times = 0;
-
             return self::exit(1);
         }
     }
@@ -158,6 +155,7 @@ class VarDumper
             exit($status);
         }
 
+        self::$times = 0;
         self::$died = true;
 
         return;
