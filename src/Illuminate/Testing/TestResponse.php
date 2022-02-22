@@ -847,6 +847,10 @@ EOF;
      */
     public function assertJsonValidationErrors($errors, $responseKey = 'errors')
     {
+        if (is_null($errors)) {
+            return $this->assertStatus(422);
+        }
+
         $errors = Arr::wrap($errors);
 
         PHPUnit::assertNotEmpty($errors, 'No validation errors were provided.');
@@ -1160,6 +1164,10 @@ EOF;
                                   $errorBag = 'default',
                                   $responseKey = 'errors')
     {
+        if (is_null($errors)) {
+            return $this->assertStatus(422);
+        }
+
         if ($this->baseResponse->headers->get('Content-Type') === 'application/json') {
             return $this->assertJsonValidationErrors($errors, $responseKey);
         }
