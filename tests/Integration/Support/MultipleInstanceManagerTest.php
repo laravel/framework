@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Tests\Integration\Support\Fixtures\MultipleInstanceManager;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class MultipleInstanceManagerTest extends TestCase
 {
@@ -25,7 +26,7 @@ class MultipleInstanceManagerTest extends TestCase
 
     public function test_unresolvable_isntances_throw_errors()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $manager = new MultipleInstanceManager($this->app);
 

@@ -420,7 +420,7 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 
         $attributes = new ComponentAttributeBag(['userId' => 'bar', 'other' => 'ok']);
 
-        $component = Mockery::mock(\Illuminate\View\Component::class);
+        $component = Mockery::mock(Component::class);
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(true);
         $component->shouldReceive('resolveView')->andReturn('');

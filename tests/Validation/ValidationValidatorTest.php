@@ -28,6 +28,7 @@ use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -678,7 +679,7 @@ class ValidationValidatorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
 
-        $v->setException(\RuntimeException::class);
+        $v->setException(RuntimeException::class);
     }
 
     public function testValidationDotCustomDotAnythingCanBeTranslated()
