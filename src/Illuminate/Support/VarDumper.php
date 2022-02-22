@@ -54,13 +54,14 @@ class VarDumper
     /**
      * Dumps and dies after the given time.
      *
-     * @var int $times
-     * @var array $vars
+     * @var int
+     * @var array
+     *
      * @return void|Symfony\Component\VarDumper\VarDumper
      */
     public static function ddt(int $times, ...$vars)
     {
-        if (!in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !headers_sent()) {
+        if (! in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && ! headers_sent()) {
             header('HTTP/1.1 500 Internal Server Error');
         }
 
@@ -85,8 +86,8 @@ class VarDumper
             }
         }
 
-        self::$dumpedCount ++;
-        self::$times --;
+        self::$dumpedCount++;
+        self::$times--;
 
         if (! self::moreTimes()) {
             return self::exit(1);
@@ -147,6 +148,7 @@ class VarDumper
      * Exists from dumping.
      *
      * @var string|int
+     *
      * @return void
      */
     private static function exit($status)
@@ -157,8 +159,6 @@ class VarDumper
 
         self::$times = 0;
         self::$died = true;
-
-        return;
     }
 
     /**
