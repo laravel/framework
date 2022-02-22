@@ -115,7 +115,7 @@ class EloquentWhereTest extends DatabaseTestCase
             'address' => 'other-address',
         ]);
 
-        $this->expectException(MultipleRecordsFoundException::class);
+        $this->expectExceptionObject(new MultipleRecordsFoundException(2));
 
         UserWhereTest::where('name', 'test-name')->sole();
     }

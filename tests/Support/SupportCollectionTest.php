@@ -104,7 +104,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testSoleThrowsExceptionIfMoreThanOneItemExists($collection)
     {
-        $this->expectException(MultipleItemsFoundException::class);
+        $this->expectExceptionObject(new MultipleItemsFoundException(2));
 
         $collection = new $collection([
             ['name' => 'foo'],
@@ -146,7 +146,7 @@ class SupportCollectionTest extends TestCase
      */
     public function testSoleThrowsExceptionIfMoreThanOneItemExistsWithCallback($collection)
     {
-        $this->expectException(MultipleItemsFoundException::class);
+        $this->expectExceptionObject(new MultipleItemsFoundException(2));
 
         $data = new $collection(['foo', 'bar', 'bar']);
 

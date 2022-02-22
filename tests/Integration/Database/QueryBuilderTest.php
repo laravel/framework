@@ -40,7 +40,7 @@ class QueryBuilderTest extends DatabaseTestCase
             ['title' => 'Foo Post', 'content' => 'Lorem Ipsum.', 'created_at' => new Carbon('2017-11-12 13:14:15')],
         ]);
 
-        $this->expectException(MultipleRecordsFoundException::class);
+        $this->expectExceptionObject(new MultipleRecordsFoundException(2));
 
         DB::table('posts')->where('title', 'Foo Post')->sole();
     }
