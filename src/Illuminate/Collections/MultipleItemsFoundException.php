@@ -11,10 +11,10 @@ class MultipleItemsFoundException extends RuntimeException
      *
      * @var int
      */
-    protected $count;
+    public $count;
 
     /**
-     * MultipleItemsFoundException constructor.
+     * Create a new exception instance.
      *
      * @param  int  $count
      * @param  int  $code
@@ -24,7 +24,8 @@ class MultipleItemsFoundException extends RuntimeException
     public function __construct($count, $code = 0, $previous = null)
     {
         $this->count = $count;
-        parent::__construct("$count items have been found.", $code, $previous);
+
+        parent::__construct("$count items were found.", $code, $previous);
     }
 
     /**

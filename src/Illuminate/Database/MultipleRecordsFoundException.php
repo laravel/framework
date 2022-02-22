@@ -11,10 +11,10 @@ class MultipleRecordsFoundException extends RuntimeException
      *
      * @var int
      */
-    protected $count;
+    public $count;
 
     /**
-     * MultipleRecordsFoundException constructor.
+     * Create a new exception instance.
      *
      * @param  int  $count
      * @param  int  $code
@@ -24,11 +24,12 @@ class MultipleRecordsFoundException extends RuntimeException
     public function __construct($count, $code = 0, $previous = null)
     {
         $this->count = $count;
-        parent::__construct("$count records have been found.", $code, $previous);
+
+        parent::__construct("$count records were found.", $code, $previous);
     }
 
     /**
-     * Get the number of records found..
+     * Get the number of records found.
      *
      * @return int
      */
