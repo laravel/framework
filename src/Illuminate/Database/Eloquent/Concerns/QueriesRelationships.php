@@ -581,7 +581,7 @@ trait QueriesRelationships
             // Finally, we will make the proper column alias to the query and run this sub-select on
             // the query builder. Then, we will return the builder instance back to the developer
             // for further constraint chaining that needs to take place on the query as needed.
-            $alias = $alias ?? Str::snake(
+            $alias ??= Str::snake(
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
             );
 

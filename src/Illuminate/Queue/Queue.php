@@ -104,7 +104,7 @@ abstract class Queue
 
         $payload = json_encode($this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new InvalidPayloadException(
                 'Unable to JSON encode payload. Error code: '.json_last_error()
             );

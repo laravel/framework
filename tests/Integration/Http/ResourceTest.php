@@ -38,7 +38,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use LogicException;
-use Mockery;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
@@ -1156,7 +1156,7 @@ class ResourceTest extends TestCase
     {
         $this->expectException(PostTooLargeException::class);
 
-        $request = Mockery::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
+        $request = m::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
         $post = new ValidatePostSize;
         $post->handle($request, function () {
         });

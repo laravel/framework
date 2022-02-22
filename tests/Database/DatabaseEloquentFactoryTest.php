@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentFactoryTest extends TestCase
@@ -24,7 +24,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('App\\');
 
         $db = new DB;
@@ -89,7 +89,7 @@ class DatabaseEloquentFactoryTest extends TestCase
      */
     protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
 
         $this->schema()->drop('users');
 
@@ -472,7 +472,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_name_from_factory()
     {
-        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
 
         Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
@@ -484,7 +484,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_non_app_nested_model_factories()
     {
-        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('Foo\\');
 
         Factory::useNamespace('Factories\\');

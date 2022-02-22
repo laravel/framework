@@ -866,7 +866,7 @@ trait ValidatesAttributes
      */
     protected function getUniqueIds($idColumn, $parameters)
     {
-        $idColumn = $idColumn ?? $parameters[3] ?? 'id';
+        $idColumn ??= $parameters[3] ?? 'id';
 
         return [$idColumn, $this->prepareUniqueId($parameters[2])];
     }
@@ -923,7 +923,7 @@ trait ValidatesAttributes
             $model = new $table;
 
             $table = $model->getTable();
-            $connection = $connection ?? $model->getConnectionName();
+            $connection ??= $model->getConnectionName();
 
             if (str_contains($table, '.') && Str::startsWith($table, $connection)) {
                 $connection = null;

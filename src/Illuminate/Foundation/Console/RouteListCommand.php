@@ -303,7 +303,7 @@ class RouteListCommand extends Command
             fn ($route) => array_merge($route, [
                 'action' => $this->formatActionForCli($route),
                 'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
-                'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
+                'uri' => $route['domain'] ? ($route['domain'].'/'.ltrim($route['uri'], '/')) : $route['uri'],
             ]),
         );
 

@@ -241,7 +241,7 @@ class PostgresBuilder extends Builder
             $searchPath = $matches[0];
         }
 
-        $searchPath = $searchPath ?? [];
+        $searchPath ??= [];
 
         array_walk($searchPath, function (&$schema) {
             $schema = trim($schema, '\'"');

@@ -132,7 +132,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
             $searchPath = $matches[0];
         }
 
-        $searchPath = $searchPath ?? [];
+        $searchPath ??= [];
 
         array_walk($searchPath, function (&$schema) {
             $schema = trim($schema, '\'"');
