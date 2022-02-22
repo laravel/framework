@@ -75,11 +75,35 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
+    public function testSeeInDatabaseFindsNotMatchingResultsComparison()
+    {
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->expectExceptionMessage(
+            '- title'."\n".
+            'Given Data:            '.json_encode("Spark")."\n".
+            'Found Similar Value:   '.json_encode("Forge")."\n".
+            '- name'."\n".
+            'Given Data:            '.json_encode("Laravel")."\n".
+            'Found Similar Value:   '.json_encode(null)."\n"
+        );
+
+        $builder = $this->mockCountBuilder(0);
+
+        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
+
+        $this->assertDatabaseHas($this->table, $this->data);
+    }
+
     public function testSeeInDatabaseFindsManyNotMatchingResults()
     {
         $this->expectException(ExpectationFailedException::class);
 
-        $this->expectExceptionMessage('Found similar results: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
+        $this->expectExceptionMessage(
+            'Found similar results: '.json_encode(['data', 'data', 'data'],
+            JSON_PRETTY_PRINT).' and 2 others.'
+        );
 
         $builder = $this->mockCountBuilder(0);
         $builder->shouldReceive('count')->andReturn(0, 5);
@@ -137,7 +161,9 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     public function testAssertTableEntriesCountWrong()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed asserting that table [products] matches expected entries count of 3. Entries found: 1.');
+        $this->expectExceptionMessage(
+            'Failed asserting that table [products] matches expected entries count of 3. Entries found: 1.'
+        );
         $this->mockCountBuilder(1);
 
         $this->assertDatabaseCount($this->table, 3);

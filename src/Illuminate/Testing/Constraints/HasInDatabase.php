@@ -84,19 +84,7 @@ class HasInDatabase extends Constraint
         )->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
-            $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT)."\n";
-
-            foreach ($similarResults as $similarResult) {
-                foreach ($this->data as $fieldName => $value) {
-                    $similarValue = is_array($similarResult) ? $similarResult[$fieldName] : $similarResult->$fieldName;
-
-                    if ($similarValue != $value) {
-                        $description .= '- '.$fieldName."\n".
-                            'Given Data:          '.json_encode($value)."\n".
-                            'Found Similar Value: '.json_encode($similarValue)."\n";
-                    }
-                }
-            }
+            $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT);
         } else {
             $query = $this->database->table($table);
 
@@ -111,6 +99,24 @@ class HasInDatabase extends Constraint
 
         if ($query->count() > $this->show) {
             $description .= sprintf(' and %s others', $query->count() - $this->show);
+        } else {
+            $description .= "\n";
+
+            foreach ($similarResults as $similarResult) {
+                foreach ($this->data as $fieldName => $value) {
+                    if(is_array($similarResult)){
+                        $similarValue = $similarResult[$fieldName] ?? null;
+                    } else {
+                        $similarValue = is_object($similarResult) ? $similarResult->$fieldName : $similarResult;
+                    }
+
+                    if ($similarValue != $value) {
+                        $description .= '- '.$fieldName."\n".
+                            'Given Data:            '.json_encode($value)."\n".
+                            'Found Similar Value:   '.json_encode($similarValue)."\n";
+                    }
+                }
+            }
         }
 
         return $description;
