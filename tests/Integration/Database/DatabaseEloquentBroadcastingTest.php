@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Closure;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
@@ -191,7 +192,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
         });
     }
 
-    private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, \Closure $closure)
+    private function assertHandldedBroadcastableEvent(BroadcastableModelEventOccurred $event, Closure $closure)
     {
         $broadcaster = m::mock(Broadcaster::class);
         $broadcaster->shouldReceive('broadcast')->once()
