@@ -473,7 +473,7 @@ class Str
     {
         $converter = new GithubFlavoredMarkdownConverter($options);
 
-        return (string) $converter->convertToHtml($string);
+        return (string) $converter->convert($string);
     }
 
     /**
