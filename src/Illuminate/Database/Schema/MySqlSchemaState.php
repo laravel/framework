@@ -118,7 +118,7 @@ class MySqlSchemaState extends SchemaState
      */
     protected function baseVariables(array $config)
     {
-        $config['host'] = $config['host'] ?? '';
+        $config['host'] ??= '';
 
         return [
             'LARAVEL_LOAD_SOCKET' => $config['unix_socket'] ?? '',
