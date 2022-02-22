@@ -47,7 +47,7 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
     {
         $model = new TestEloquentBroadcastUser;
 
-        $this->assertEquals('Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
+        $this->assertSame('Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{testEloquentBroadcastUser}', $model->broadcastChannelRoute());
     }
 
     public function testBroadcastingOnModelTrashing()

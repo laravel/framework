@@ -183,7 +183,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals(1, $models[0]->foo->foreign_key);
         $this->assertEquals(2, $models[1]->foo->foreign_key);
         $this->assertNull($models[2]->foo);
-        $this->assertEquals('4', $models[3]->foo->foreign_key);
+        $this->assertSame('4', (string) $models[3]->foo->foreign_key);
     }
 
     public function testRelationCountQueryCanBeBuilt()

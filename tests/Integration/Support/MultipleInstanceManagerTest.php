@@ -12,10 +12,10 @@ class MultipleInstanceManagerTest extends TestCase
         $manager = new MultipleInstanceManager($this->app);
 
         $fooInstance = $manager->instance('foo');
-        $this->assertEquals('option-value', $fooInstance->config['foo-option']);
+        $this->assertSame('option-value', $fooInstance->config['foo-option']);
 
         $barInstance = $manager->instance('bar');
-        $this->assertEquals('option-value', $barInstance->config['bar-option']);
+        $this->assertSame('option-value', $barInstance->config['bar-option']);
 
         $duplicateFooInstance = $manager->instance('foo');
         $duplicateBarInstance = $manager->instance('bar');
