@@ -780,7 +780,7 @@ class Route
      */
     public function prefix($prefix)
     {
-        $prefix = $prefix ?? '';
+        $prefix ??= '';
 
         $this->updatePrefixOnAction($prefix);
 

@@ -524,7 +524,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function callCustomDirective($name, $value)
     {
-        $value = $value ?? '';
+        $value ??= '';
 
         if (str_starts_with($value, '(') && str_ends_with($value, ')')) {
             $value = Str::substr($value, 1, -1);

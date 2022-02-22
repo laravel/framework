@@ -1078,7 +1078,7 @@ class Mailable implements MailableContract, Renderable
                 $text = $view[1];
             }
 
-            $text = $text ?? $view['text'] ?? '';
+            $text ??= $view['text'] ?? '';
 
             if (! empty($text) && ! $text instanceof Htmlable) {
                 $text = Container::getInstance()->make('mailer')->render(
