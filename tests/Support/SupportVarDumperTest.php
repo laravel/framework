@@ -53,5 +53,7 @@ class SupportVarDumperTest extends TestCase
         $this->assertEquals(VarDumper::getDumpedCount(), 0);
         $this->assertTrue(VarDumper::died());
         $this->assertEquals([],  VarDumper::getDumpedItems());
+        
+        VarDumper::reset();
     }
 }
