@@ -1627,8 +1627,8 @@ class TestResponseTest extends TestCase
         $cookie = $response->getCookie('cookie-name', false);
 
         $this->assertInstanceOf(Cookie::class, $cookie);
-        $this->assertEquals('cookie-name', $cookie->getName());
-        $this->assertEquals('cookie-value', $cookie->getValue());
+        $this->assertSame('cookie-name', $cookie->getName());
+        $this->assertSame('cookie-value', $cookie->getValue());
     }
 
     public function testGetEncryptedCookie()

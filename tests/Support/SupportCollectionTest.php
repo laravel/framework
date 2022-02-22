@@ -2152,31 +2152,31 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
 
-        $this->assertEquals('taylor', $data->getOrPut('name', null));
-        $this->assertEquals('foo', $data->getOrPut('email', null));
-        $this->assertEquals('male', $data->getOrPut('gender', 'male'));
+        $this->assertSame('taylor', $data->getOrPut('name', null));
+        $this->assertSame('foo', $data->getOrPut('email', null));
+        $this->assertSame('male', $data->getOrPut('gender', 'male'));
 
-        $this->assertEquals('taylor', $data->get('name'));
-        $this->assertEquals('foo', $data->get('email'));
-        $this->assertEquals('male', $data->get('gender'));
+        $this->assertSame('taylor', $data->get('name'));
+        $this->assertSame('foo', $data->get('email'));
+        $this->assertSame('male', $data->get('gender'));
 
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
 
-        $this->assertEquals('taylor', $data->getOrPut('name', function () {
+        $this->assertSame('taylor', $data->getOrPut('name', function () {
             return null;
         }));
 
-        $this->assertEquals('foo', $data->getOrPut('email', function () {
+        $this->assertSame('foo', $data->getOrPut('email', function () {
             return null;
         }));
 
-        $this->assertEquals('male', $data->getOrPut('gender', function () {
+        $this->assertSame('male', $data->getOrPut('gender', function () {
             return 'male';
         }));
 
-        $this->assertEquals('taylor', $data->get('name'));
-        $this->assertEquals('foo', $data->get('email'));
-        $this->assertEquals('male', $data->get('gender'));
+        $this->assertSame('taylor', $data->get('name'));
+        $this->assertSame('foo', $data->get('email'));
+        $this->assertSame('male', $data->get('gender'));
     }
 
     public function testPut()

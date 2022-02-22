@@ -549,7 +549,7 @@ class RoutingRouteTest extends TestCase
         $route->bind($request1);
         $this->assertTrue($route->hasParameter('id'));
         $this->assertFalse($route->hasParameter('foo'));
-        $this->assertSame('1', $route->parameter('id'));
+        $this->assertSame('1', (string) $route->parameter('id'));
         $this->assertSame('png', $route->parameter('ext'));
 
         $request2 = Request::create('images/12.png', 'GET');
@@ -857,7 +857,7 @@ class RoutingRouteTest extends TestCase
         $request1 = Request::create('images/1.png', 'GET');
         $this->assertTrue($route->matches($request1));
         $route->bind($request1);
-        $this->assertSame('1', $route->parameter('id'));
+        $this->assertSame('1', (string) $route->parameter('id'));
         $this->assertSame('png', $route->parameter('ext'));
 
         $request2 = Request::create('images/12.png', 'GET');

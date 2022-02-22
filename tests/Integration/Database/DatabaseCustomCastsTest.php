@@ -37,7 +37,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
 
         $this->assertEquals(['name' => 'Taylor'], $model->array_object->toArray());
         $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
-        $this->assertEquals('Taylor', (string) $model->stringable);
+        $this->assertSame('Taylor', (string) $model->stringable);
 
         $model->array_object['age'] = 34;
         $model->array_object['meta']['title'] = 'Developer';

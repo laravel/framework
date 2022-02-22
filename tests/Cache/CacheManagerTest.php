@@ -56,7 +56,7 @@ class CacheManagerTest extends TestCase
 
         $driver = $cacheManager->store('my_store');
 
-        $this->assertEquals('mm(u_u)mm', $driver->flag);
+        $this->assertSame('mm(u_u)mm', $driver->flag);
     }
 
     public function testItMakesRepositoryWhenContainerHasNoDispatcher()
