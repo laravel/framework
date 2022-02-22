@@ -954,21 +954,21 @@ if (! function_exists('unzipper')) {
     /**
      * This function will unzip the given file to the path specified.
      *
-     * @param string $path
-     * @param string $filename
-     * @param boolean $remove
-     * 
+     * @param  string  $path
+     * @param  string  $filename
+     * @param  bool  $remove
      * @return bool
      */
     function unzipper($path, $filename, $remove = false)
     {
         $unzipper = resolve(\ZipArchive::class);
-        if ($unzipper->open($path . $filename)) {
+        if ($unzipper->open($path.$filename)) {
             $unzipper->extractTo($path);
             $unzipper->close();
             if ($remove) {
-                unlink($path . $filename);
+                unlink($path.$filename);
             }
+
             return true;
         }
 
