@@ -35,9 +35,9 @@ class MigratorTest extends TestCase
 
         $this->subject->run([__DIR__.'/fixtures']);
 
-        self::assertTrue(DB::getSchemaBuilder()->hasTable('people'));
-        self::assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
-        self::assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
 
     public function testRollback()
@@ -56,7 +56,7 @@ class MigratorTest extends TestCase
 
         $this->subject->rollback([__DIR__.'/fixtures']);
 
-        self::assertFalse(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }
 
     public function testPretendMigrate()
@@ -68,7 +68,7 @@ class MigratorTest extends TestCase
 
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
-        self::assertFalse(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
     }
 
     private function expectOutput($argument): void
