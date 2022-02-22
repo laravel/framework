@@ -88,10 +88,12 @@ class HasInDatabase extends Constraint
 
             foreach ($similarResults as $similarResult) {
                 foreach ($this->data as $fieldName => $value) {
-                    if ($similarResult->$fieldName != $value) {
+                    $similarValue = is_array($similarResult) ? $similarResult[$fieldName] : $similarResult->$fieldName;
+
+                    if ($similarValue != $value) {
                         $description .= '- '.$fieldName."\n".
                             'Given Data:          '.json_encode($value)."\n".
-                            'Found Similar Value: '.json_encode($similarResult->$fieldName)."\n";
+                            'Found Similar Value: '.json_encode($similarValue)."\n";
                     }
                 }
             }
