@@ -56,7 +56,6 @@ class VarDumper
      *
      * @param int
      * @param array
-     *
      * @return void|Symfony\Component\VarDumper\VarDumper
      */
     public static function ddt(int $times, ...$vars)
@@ -148,7 +147,6 @@ class VarDumper
      * Exists from dumping.
      *
      * @param string|int
-     *
      * @return void
      */
     private static function exit($status)
