@@ -10,7 +10,7 @@ use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
-class ForgotPasswordTest extends TestCase
+class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 {
     protected function tearDown(): void
     {
@@ -32,18 +32,17 @@ class ForgotPasswordTest extends TestCase
 
     protected function defineRoutes($router)
     {
-        $router->get('password/reset/{token}', function ($token) {
-            return 'Reset password!';
-        })->name('password.reset');
-
         $router->get('custom/password/reset/{token}', function ($token) {
             return 'Custom reset password!';
         })->name('custom.password.reset');
     }
 
     /** @test */
-    public function it_can_send_forgot_password_email()
+    public function it_cannot_send_forgot_password_email()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
+        $this->expectExceptionMessage('Route [password.reset] not defined.');
+
         Notification::fake();
 
         UserFactory::new()->create();
@@ -60,7 +59,7 @@ class ForgotPasswordTest extends TestCase
                 $message = $notification->toMail($user);
 
                 return ! is_null($notification->token)
-                    && $message->actionUrl === route('password.reset', ['token' => $notification->token, 'email' => $user->email]);
+                    && $message->actionUrl === route('custom.password.reset', ['token' => $notification->token, 'email' => $user->email]);
             }
         );
     }

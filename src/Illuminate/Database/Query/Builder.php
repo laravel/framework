@@ -206,6 +206,15 @@ class Builder implements BuilderContract
     ];
 
     /**
+     * All of the available bitwise operators.
+     *
+     * @var string[]
+     */
+    public $bitwiseOperators = [
+        '&', '|', '^', '<<', '>>', '&~',
+    ];
+
+    /**
      * Whether to use write pdo for the select.
      *
      * @var bool
@@ -758,6 +767,10 @@ class Builder implements BuilderContract
             }
         }
 
+        if ($this->isBitwiseOperator($operator)) {
+            $type = 'Bitwise';
+        }
+
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
@@ -839,6 +852,18 @@ class Builder implements BuilderContract
     {
         return ! is_string($operator) || (! in_array(strtolower($operator), $this->operators, true) &&
                ! in_array(strtolower($operator), $this->grammar->getOperators(), true));
+    }
+
+    /**
+     * Determine if the operator is a bitwise operator.
+     *
+     * @param  string  $operator
+     * @return bool
+     */
+    protected function isBitwiseOperator($operator)
+    {
+        return in_array(strtolower($operator), $this->bitwiseOperators, true) ||
+               in_array(strtolower($operator), $this->grammar->getBitwiseOperators(), true);
     }
 
     /**
@@ -1925,6 +1950,10 @@ class Builder implements BuilderContract
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
             [$value, $operator] = [$operator, '='];
+        }
+
+        if ($this->isBitwiseOperator($operator)) {
+            $type = 'Bitwise';
         }
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');

@@ -1691,6 +1691,20 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateWithQualifiedTimestampValue()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "table"."foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
+
+        $result = $builder->update(['table.foo' => 'bar', 'table.updated_at' => null]);
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateWithoutTimestamp()
     {
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
@@ -1719,6 +1733,24 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->from('table as alias')->update(['foo' => 'bar']);
         $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateWithAliasWithQualifiedTimestampValue()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', null])->andReturn(1);
+
+        $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
     }
 
     public function testUpsert()
