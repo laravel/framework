@@ -1208,12 +1208,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $items = $this->unless($filter == null)->filter($filter);
 
-        if ($items->isEmpty()) {
+        $count = $items->count();
+
+        if ($count === 0) {
             throw new ItemNotFoundException;
         }
 
-        if ($items->count() > 1) {
-            throw new MultipleItemsFoundException;
+        if ($count > 1) {
+            throw new MultipleItemsFoundException($count);
         }
 
         return $items->first();
