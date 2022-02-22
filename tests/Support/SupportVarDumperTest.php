@@ -19,7 +19,7 @@ class SupportVarDumperTest extends TestCase
 
         $this->assertEquals(VarDumper::getDumpedCount(), 3);
         $this->assertTrue(VarDumper::died());
-        $this->assertEquals(['a', 'b', 'c'],  VarDumper::getDumpedItems());
+        $this->assertEquals(['a', 'b', 'c'], VarDumper::getDumpedItems());
 
         VarDumper::reset();
 
@@ -33,7 +33,7 @@ class SupportVarDumperTest extends TestCase
 
         $this->assertEquals(VarDumper::getDumpedCount(), 4);
         $this->assertTrue(VarDumper::died());
-        $this->assertEquals(['a', 'test', 'b', 'test', 'c', 'test', 'd', 'test'],  VarDumper::getDumpedItems());
+        $this->assertEquals(['a', 'test', 'b', 'test', 'c', 'test', 'd', 'test'], VarDumper::getDumpedItems());
 
         VarDumper::reset();
     }
@@ -49,7 +49,7 @@ class SupportVarDumperTest extends TestCase
 
         $this->assertEquals(VarDumper::getDumpedCount(), count($array));
         $this->assertTrue(VarDumper::died());
-        $this->assertEquals($array,  VarDumper::getDumpedItems());
+        $this->assertEquals($array, VarDumper::getDumpedItems());
 
         VarDumper::reset();
     }
@@ -66,7 +66,7 @@ class SupportVarDumperTest extends TestCase
 
         $this->assertEquals(VarDumper::getDumpedCount(), 0);
         $this->assertTrue(VarDumper::died());
-        $this->assertEquals([],  VarDumper::getDumpedItems());
+        $this->assertEquals([], VarDumper::getDumpedItems());
 
         VarDumper::reset();
     }
