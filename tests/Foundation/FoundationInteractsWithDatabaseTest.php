@@ -81,10 +81,10 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $this->expectExceptionMessage(
             '- title'."\n".
-            'Given Data:            '.json_encode("Spark")."\n".
-            'Found Similar Value:   '.json_encode("Forge")."\n".
+            'Given Data:            '.json_encode('Spark')."\n".
+            'Found Similar Value:   '.json_encode('Forge')."\n".
             '- name'."\n".
-            'Given Data:            '.json_encode("Laravel")."\n".
+            'Given Data:            '.json_encode('Laravel')."\n".
             'Found Similar Value:   '.json_encode(null)."\n"
         );
 

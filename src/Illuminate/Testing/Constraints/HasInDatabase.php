@@ -104,7 +104,7 @@ class HasInDatabase extends Constraint
 
             foreach ($similarResults as $similarResult) {
                 foreach ($this->data as $fieldName => $value) {
-                    if(is_array($similarResult)){
+                    if (is_array($similarResult)) {
                         $similarValue = $similarResult[$fieldName] ?? null;
                     } else {
                         $similarValue = is_object($similarResult) ? $similarResult->$fieldName : $similarResult;
