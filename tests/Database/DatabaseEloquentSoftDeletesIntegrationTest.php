@@ -12,7 +12,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
-use Mockery;
+use Mockery as m;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
@@ -212,7 +213,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
             public function newModelQuery()
             {
-                return Mockery::spy(parent::newModelQuery(), function (Mockery\MockInterface $mock) {
+                return m::spy(parent::newModelQuery(), function (MockInterface $mock) {
                     $mock->shouldReceive('forceDelete')->andThrow(new Exception());
                 });
             }
