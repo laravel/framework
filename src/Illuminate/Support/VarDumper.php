@@ -54,8 +54,8 @@ class VarDumper
     /**
      * Dumps and dies after the given time.
      *
-     * @var int
-     * @var array
+     * @param int
+     * @param array
      *
      * @return void|Symfony\Component\VarDumper\VarDumper
      */
@@ -147,7 +147,7 @@ class VarDumper
     /**
      * Exists from dumping.
      *
-     * @var string|int
+     * @param string|int
      *
      * @return void
      */
