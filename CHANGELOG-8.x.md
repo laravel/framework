@@ -1,6 +1,18 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.1...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.2...8.x)
+
+
+## [v8.83.2 (2022-02-22)](https://github.com/laravel/framework/compare/v8.83.1...v8.83.2)
+
+### Added
+- Added support of Bitwise opperators in query ([#41112](https://github.com/laravel/framework/pull/41112))
+
+### Fixed
+- Fixes attempt to log deprecations on mocks ([#41057](https://github.com/laravel/framework/pull/41057))
+- Fixed loadAggregate not correctly applying casts ([#41108](https://github.com/laravel/framework/pull/41108))
+- Fixed updated with provided qualified updated_at ([#41133](https://github.com/laravel/framework/pull/41133))
+- Fixed database migrations $connection property ([#41161](https://github.com/laravel/framework/pull/41161))
 
 
 ## [v8.83.1 (2022-02-15)](https://github.com/laravel/framework/compare/v8.83.0...v8.83.1)
