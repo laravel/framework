@@ -420,7 +420,7 @@ if (! function_exists('with')) {
     }
 }
 
-if (!function_exists('ddt')) {
+if (! function_exists('ddt')) {
     /**
      * Dumps and dies after given time.
      *
