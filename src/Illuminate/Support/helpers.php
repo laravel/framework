@@ -425,7 +425,7 @@ if (! function_exists('ddt')) {
      * Dumps and dies after given time.
      *
      * @param  int  $times
-     * @param  array $vars
+     * @param  array  $vars
      */
     function ddt(int $times, ...$vars)
     {
