@@ -1,6 +1,47 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.1.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.2.0...9.x)
+
+
+## [v9.2.0 (2022-02-22)](https://github.com/laravel/framework/compare/v9.1.0...v9.2.0)
+
+### Added
+- Added `Illuminate/Database/Eloquent/Casts/Attribute::make()` ([#41014](https://github.com/laravel/framework/pull/41014))
+- Added `Illuminate/Collections/Arr::keyBy()` ([#41029](https://github.com/laravel/framework/pull/41029))
+- Added expectsOutputToContain to the PendingCommand. ([#40984](https://github.com/laravel/framework/pull/40984))
+- Added ability to supply HTTP client methods with JsonSerializable instances ([#41055](https://github.com/laravel/framework/pull/41055))
+- Added `Illuminate/Filesystem/AwsS3V3Adapter::getClinet()` ([#41079](https://github.com/laravel/framework/pull/41079))
+- Added Support for enum in Builder::whereRelation ([#41091](https://github.com/laravel/framework/pull/41091))
+- Added X headers when using Mail::alwaysTo ([#41101](https://github.com/laravel/framework/pull/41101))
+- Added of support Bitwise operators in query ([#41112](https://github.com/laravel/framework/pull/41112))
+- Integrate Laravel CORS into framework ([#41137](https://github.com/laravel/framework/pull/41137))
+- Added `Illuminate/Support/Str::betweenFirst()` ([#41144](https://github.com/laravel/framework/pull/41144))
+- Allow specifiying custom messages for Rule objects ([#41145](https://github.com/laravel/framework/pull/41145))
+
+### Fixed
+- Fixed Queue Failed_jobs insert issue with Exception contain UNICODE ([#41020](https://github.com/laravel/framework/pull/41020))
+- Fixes attempt to log deprecations on mocks ([#41057](https://github.com/laravel/framework/pull/41057))
+- Fixed loadAggregate not correctly applying casts ([#41050](https://github.com/laravel/framework/pull/41050))
+- Do not transform JsonSerializable instances to array in HTTP client methods ([#41077](https://github.com/laravel/framework/pull/41077))
+- Fix parsing config('database.connections.pgsql.search_path') ([#41088](https://github.com/laravel/framework/pull/41088))
+- Eloquent: firstWhere returns Object instead of NULL ([#41099](https://github.com/laravel/framework/pull/41099))
+- Fixed updated with provided qualified updated_at ([#41133](https://github.com/laravel/framework/pull/41133))
+- Fix setPriority Call for MailChannel ([#41120](https://github.com/laravel/framework/pull/41120))
+- Fixed route:list command output ([#41177](https://github.com/laravel/framework/pull/41177))
+- Fix database migrations $connection property ([#41161](https://github.com/laravel/framework/pull/41161))
+
+### Changed
+- Cursor pagination: convert original column to expression ([#41003](https://github.com/laravel/framework/pull/41003))
+- Cast $perPage to integer on Paginator ([#41073](https://github.com/laravel/framework/pull/41073))
+- Restore S3 client extra options ([#41097](https://github.com/laravel/framework/pull/41097))
+- Use `latest()` within `notifications()` in `Illuminate/Notifications/HasDatabaseNotifications.php` ([#41095](https://github.com/laravel/framework/pull/41095))
+- Remove duplicate queries to find batch ([#41121](https://github.com/laravel/framework/pull/41121))
+- Remove redundant check in FormRequest::validated() ([#41115](https://github.com/laravel/framework/pull/41115))
+- Illuminate/Support/Facades/Storage::fake() changed ([#41113](https://github.com/laravel/framework/pull/41113))
+- Use coalesce equal as provided by PHP >= 7.4 ([#41174](https://github.com/laravel/framework/pull/41174))
+- Simplify some conditions with is_countable() ([#41168](https://github.com/laravel/framework/pull/41168))
+- Pass AWS temporary URL options to createPresignedRequest method ([#41156](https://github.com/laravel/framework/pull/41156))
+- Let Multiple* exceptions hold the number of records and items found ([#41164](https://github.com/laravel/framework/pull/41164))
 
 
 ## [v9.1.0 (2022-02-15)](https://github.com/laravel/framework/compare/v9.0.2...v9.1.0)
