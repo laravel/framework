@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -22,7 +22,7 @@ class RefreshDatabaseTest extends TestCase
             'beginDatabaseTransaction',
         ]);
 
-        $kernelObj = Mockery::mock();
+        $kernelObj = m::mock();
         $kernelObj->shouldReceive('setArtisan')
             ->with(null);
 

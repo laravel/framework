@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Foundation\Testing;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -22,7 +22,7 @@ class DatabaseMigrationsTest extends TestCase
             'beforeApplicationDestroyed',
         ]);
 
-        $kernelObj = Mockery::mock();
+        $kernelObj = m::mock();
         $kernelObj->shouldReceive('setArtisan')
             ->with(null);
 
