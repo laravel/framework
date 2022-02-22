@@ -1064,6 +1064,6 @@ class Stringable implements JsonSerializable
      */
     public function __toString()
     {
-        return (string) $this->value;
+        return $this->value;
     }
 }

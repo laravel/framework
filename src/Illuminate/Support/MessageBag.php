@@ -87,7 +87,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     protected function isUnique($key, $message)
     {
-        $messages = (array) $this->messages;
+        $messages = $this->messages;
 
         return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
     }

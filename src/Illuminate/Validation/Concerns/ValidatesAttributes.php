@@ -1521,7 +1521,7 @@ trait ValidatesAttributes
         } elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
             return false;
         } elseif ($value instanceof File) {
-            return (string) $value->getPath() !== '';
+            return $value->getPath() !== '';
         }
 
         return true;
