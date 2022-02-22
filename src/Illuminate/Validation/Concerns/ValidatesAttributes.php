@@ -2,7 +2,6 @@
 
 namespace Illuminate\Validation\Concerns;
 
-use Countable;
 use DateTime;
 use DateTimeInterface;
 use Egulias\EmailValidator\EmailValidator;
