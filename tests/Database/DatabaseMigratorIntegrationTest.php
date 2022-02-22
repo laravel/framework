@@ -37,6 +37,11 @@ class DatabaseMigratorIntegrationTest extends TestCase
             'database' => ':memory:',
         ], 'sqlite2');
 
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ], 'sqlite3');
+
         $db->setAsGlobal();
 
         $container = new Container;
@@ -82,6 +87,55 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $this->assertTrue(Str::contains($ran[0], 'users'));
         $this->assertTrue(Str::contains($ran[1], 'password_resets'));
+    }
+
+    public function testMigrationsDefaultConnectionCanBeChanged()
+    {
+        $ran = $this->migrator->usingConnection('sqlite2', function () {
+            return $this->migrator->run([__DIR__.'/migrations/one'], ['database' => 'sqllite3']);
+        });
+
+        $this->assertFalse($this->db->schema()->hasTable('users'));
+        $this->assertFalse($this->db->schema()->hasTable('password_resets'));
+        $this->assertTrue($this->db->schema('sqlite2')->hasTable('users'));
+        $this->assertTrue($this->db->schema('sqlite2')->hasTable('password_resets'));
+        $this->assertFalse($this->db->schema('sqlite3')->hasTable('users'));
+        $this->assertFalse($this->db->schema('sqlite3')->hasTable('password_resets'));
+
+        $this->assertTrue(Str::contains($ran[0], 'users'));
+        $this->assertTrue(Str::contains($ran[1], 'password_resets'));
+    }
+
+    public function testMigrationsCanEachDefineConnection()
+    {
+        $ran = $this->migrator->run([__DIR__.'/migrations/connection_configured']);
+
+        $this->assertFalse($this->db->schema()->hasTable('failed_jobs'));
+        $this->assertFalse($this->db->schema()->hasTable('jobs'));
+        $this->assertFalse($this->db->schema('sqlite2')->hasTable('failed_jobs'));
+        $this->assertFalse($this->db->schema('sqlite2')->hasTable('jobs'));
+        $this->assertTrue($this->db->schema('sqlite3')->hasTable('failed_jobs'));
+        $this->assertTrue($this->db->schema('sqlite3')->hasTable('jobs'));
+
+        $this->assertTrue(Str::contains($ran[0], 'failed_jobs'));
+        $this->assertTrue(Str::contains($ran[1], 'jobs'));
+    }
+
+    public function testMigratorCannotChangeDefinedMigrationConnection()
+    {
+        $ran = $this->migrator->usingConnection('sqlite2', function () {
+            return $this->migrator->run([__DIR__.'/migrations/connection_configured']);
+        });
+
+        $this->assertFalse($this->db->schema()->hasTable('failed_jobs'));
+        $this->assertFalse($this->db->schema()->hasTable('jobs'));
+        $this->assertFalse($this->db->schema('sqlite2')->hasTable('failed_jobs'));
+        $this->assertFalse($this->db->schema('sqlite2')->hasTable('jobs'));
+        $this->assertTrue($this->db->schema('sqlite3')->hasTable('failed_jobs'));
+        $this->assertTrue($this->db->schema('sqlite3')->hasTable('jobs'));
+
+        $this->assertTrue(Str::contains($ran[0], 'failed_jobs'));
+        $this->assertTrue(Str::contains($ran[1], 'jobs'));
     }
 
     public function testMigrationsCanBeRolledBack()
