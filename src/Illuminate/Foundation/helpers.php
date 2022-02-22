@@ -948,3 +948,30 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('unzipper')) {
+
+    /**
+     * This function will unzip the given file to the path specified.
+     *
+     * @param string $path
+     * @param string $filename
+     * @param boolean $remove
+     * 
+     * @return bool
+     */
+    function unzipper($path, $filename, $remove = false)
+    {
+        $unzipper = resolve(\ZipArchive::class);
+        if ($unzipper->open($path . $filename)) {
+            $unzipper->extractTo($path);
+            $unzipper->close();
+            if ($remove) {
+                unlink($path . $filename);
+            }
+            return true;
+        }
+
+        return false;
+    }
+}
