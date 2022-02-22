@@ -84,7 +84,17 @@ class HasInDatabase extends Constraint
         )->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
-            $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT);
+            $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT) . "\n";
+
+            foreach ($similarResults as $similarResult) {
+                foreach ($this->data as $fieldName => $value) {
+                    if ($similarResult->$fieldName != $value) {
+                        $description .= "- " . $fieldName . "\n" .
+                            "Given Data:           " . json_encode($value) . "\n" .
+                            "Found Similar Result: " . json_encode($similarResult->$fieldName) . "\n";
+                    }
+                }
+            }
         } else {
             $query = $this->database->table($table);
 
