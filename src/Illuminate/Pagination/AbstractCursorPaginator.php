@@ -489,4 +489,36 @@ abstract class AbstractCursorPaginator extends AbstractBasePaginator
     {
         return Paginator::viewFactory();
     }
+
+    /**
+     * Render the paginator using the given view.
+     *
+     * @param  string|null  $view
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Support\Htmlable
+     */
+    public function render($view = null, $data = [])
+    {
+        return static::viewFactory()->make($view ?: Paginator::$defaultSimpleView, array_merge($data, [
+            'paginator' => $this,
+        ]));
+    }
+
+        /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'data' => $this->items->toArray(),
+            'path' => $this->path(),
+            'per_page' => $this->perPage(),
+            'next_cursor' => $this->nextCursor()?->encode(),
+            'next_page_url' => $this->nextPageUrl(),
+            'prev_cursor' => $this->previousCursor()?->encode(),
+            'prev_page_url' => $this->previousPageUrl(),
+        ];
+    }
 }

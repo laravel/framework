@@ -70,20 +70,6 @@ class CursorPaginator extends AbstractCursorPaginator implements PaginatorContra
     }
 
     /**
-     * Render the paginator using the given view.
-     *
-     * @param  string|null  $view
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Support\Htmlable
-     */
-    public function render($view = null, $data = [])
-    {
-        return static::viewFactory()->make($view ?: Paginator::$defaultSimpleView, array_merge($data, [
-            'paginator' => $this,
-        ]));
-    }
-
-    /**
      * Determine if there are more items in the data source.
      *
      * @return bool
@@ -113,23 +99,5 @@ class CursorPaginator extends AbstractCursorPaginator implements PaginatorContra
     public function onFirstPage()
     {
         return is_null($this->cursor) || ($this->cursor->pointsToPreviousItems() && ! $this->hasMore);
-    }
-
-    /**
-     * Get the instance as an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'data' => $this->items->toArray(),
-            'path' => $this->path(),
-            'per_page' => $this->perPage(),
-            'next_cursor' => $this->nextCursor()?->encode(),
-            'next_page_url' => $this->nextPageUrl(),
-            'prev_cursor' => $this->previousCursor()?->encode(),
-            'prev_page_url' => $this->previousPageUrl(),
-        ];
     }
 }
