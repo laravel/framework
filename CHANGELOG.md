@@ -6,16 +6,16 @@
 ## [v9.2.0 (2022-02-22)](https://github.com/laravel/framework/compare/v9.1.0...v9.2.0)
 
 ### Added
-- Added `Illuminate/Database/Eloquent/Casts/Attribute::make()` ([#41014](https://github.com/laravel/framework/pull/41014))
-- Added `Illuminate/Collections/Arr::keyBy()` ([#41029](https://github.com/laravel/framework/pull/41029))
+- Added `Illuminate\Database\Eloquent\Casts\Attribute::make()` ([#41014](https://github.com/laravel/framework/pull/41014))
+- Added `Illuminate\Collections\Arr::keyBy()` ([#41029](https://github.com/laravel/framework/pull/41029))
 - Added expectsOutputToContain to the PendingCommand. ([#40984](https://github.com/laravel/framework/pull/40984))
 - Added ability to supply HTTP client methods with JsonSerializable instances ([#41055](https://github.com/laravel/framework/pull/41055))
-- Added `Illuminate/Filesystem/AwsS3V3Adapter::getClient()` ([#41079](https://github.com/laravel/framework/pull/41079))
+- Added `Illuminate\Filesystem\AwsS3V3Adapter::getClient()` ([#41079](https://github.com/laravel/framework/pull/41079))
 - Added Support for enum in Builder::whereRelation ([#41091](https://github.com/laravel/framework/pull/41091))
 - Added X headers when using Mail::alwaysTo ([#41101](https://github.com/laravel/framework/pull/41101))
 - Added of support Bitwise operators in query ([#41112](https://github.com/laravel/framework/pull/41112))
 - Integrate Laravel CORS into framework ([#41137](https://github.com/laravel/framework/pull/41137))
-- Added `Illuminate/Support/Str::betweenFirst()` ([#41144](https://github.com/laravel/framework/pull/41144))
+- Added `Illuminate\Support\Str::betweenFirst()` ([#41144](https://github.com/laravel/framework/pull/41144))
 - Allow specifiying custom messages for Rule objects ([#41145](https://github.com/laravel/framework/pull/41145))
 
 ### Fixed
@@ -34,7 +34,7 @@
 - Cursor pagination: convert original column to expression ([#41003](https://github.com/laravel/framework/pull/41003))
 - Cast $perPage to integer on Paginator ([#41073](https://github.com/laravel/framework/pull/41073))
 - Restore S3 client extra options ([#41097](https://github.com/laravel/framework/pull/41097))
-- Use `latest()` within `notifications()` in `Illuminate/Notifications/HasDatabaseNotifications.php` ([#41095](https://github.com/laravel/framework/pull/41095))
+- Use `latest()` within `notifications()` in `Illuminate\Notifications\HasDatabaseNotifications.php` ([#41095](https://github.com/laravel/framework/pull/41095))
 - Remove duplicate queries to find batch ([#41121](https://github.com/laravel/framework/pull/41121))
 - Remove redundant check in FormRequest::validated() ([#41115](https://github.com/laravel/framework/pull/41115))
 - Illuminate/Support/Facades/Storage::fake() changed ([#41113](https://github.com/laravel/framework/pull/41113))
