@@ -504,7 +504,7 @@ abstract class AbstractCursorPaginator extends AbstractBasePaginator
         ]));
     }
 
-        /**
+    /**
      * Get the instance as an array.
      *
      * @return array
