@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Foundation\Testing\Concerns;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Orchestra\Testbench\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
@@ -158,6 +160,56 @@ class MakesHttpRequestsTest extends TestCase
         $this->followingRedirects()->get('from');
 
         $this->assertEquals(['from', 'to'], $callOrder);
+    }
+
+    public function testJsonRequest()
+    {
+        $method = 'GET';
+        $uri = 'to';
+        $data = ['key' => 'value'];
+        $parameters = ['param' => 'val'];
+        $headers = ['X-CUSTOM' => 'myheader'];
+
+        $router = $this->app->make(Registrar::class);
+        $router->any($uri, fn(Request $request) => [
+            'method' => $request->method(),
+            'uri' => $request->path(),
+            'query' => $request->getQueryString(),
+            'content' => $request->getContent(),
+            'headers' => $request->headers->all(),
+        ]);
+
+        $this->json($method, $uri, $data, $headers, $parameters)
+            ->assertJson(fn (AssertableJson $json) =>
+                $json->where('method', $method)
+                    ->where('uri', $uri)
+                    ->where('query', http_build_query($parameters))
+                    ->where('content', json_encode($data))
+                    ->has('headers', fn (AssertableJson $h) =>
+                        $h->where('x-custom', array_values($headers))
+                            ->where('content-type', ['application/json'])
+                            ->where('accept', ['application/json'])
+                            ->etc()
+                    )
+            );
+    }
+
+    public function testGetWithParameters()
+    {
+        $uri = 'to';
+        $parameters = ['param' => 'val'];
+        $queryString = http_build_query($parameters);
+
+        $router = $this->app->make(Registrar::class);
+        $router->any($uri, fn(Request $request) =>
+            $request->getQueryString()
+        );
+
+        $this->get($uri, [], $parameters)
+            ->assertSee($queryString);
+
+        $this->getJson($uri, [], $parameters)
+            ->assertSee($queryString);
     }
 }
 
