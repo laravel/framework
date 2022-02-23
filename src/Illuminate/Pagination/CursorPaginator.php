@@ -2,16 +2,10 @@
 
 namespace Illuminate\Pagination;
 
-use ArrayAccess;
-use Countable;
 use Illuminate\Contracts\Pagination\CursorPaginator as PaginatorContract;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
-use IteratorAggregate;
-use JsonSerializable;
 
-class CursorPaginator extends AbstractCursorPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
+class CursorPaginator extends AbstractCursorPaginator implements PaginatorContract
 {
     /**
      * Indicates whether there are more items in the data source.
@@ -137,26 +131,5 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
             'prev_cursor' => $this->previousCursor()?->encode(),
             'prev_page_url' => $this->previousPageUrl(),
         ];
-    }
-
-    /**
-     * Convert the object into something JSON serializable.
-     *
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
-    }
-
-    /**
-     * Convert the object to its JSON representation.
-     *
-     * @param  int  $options
-     * @return string
-     */
-    public function toJson($options = 0)
-    {
-        return json_encode($this->jsonSerialize(), $options);
     }
 }

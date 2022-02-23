@@ -3,27 +3,13 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Traits\ForwardsCalls;
-use Illuminate\Support\Traits\Tappable;
-use Traversable;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
-abstract class AbstractPaginator implements Htmlable
+abstract class AbstractPaginator extends AbstractBasePaginator
 {
-    use ForwardsCalls, Tappable;
-
-    /**
-     * All of the items being paginated.
-     *
-     * @var \Illuminate\Support\Collection
-     */
-    protected $items;
-
     /**
      * The number of items to be shown per page.
      *
@@ -72,13 +58,6 @@ abstract class AbstractPaginator implements Htmlable
      * @var int
      */
     public $onEachSide = 3;
-
-    /**
-     * The paginator options.
-     *
-     * @var array
-     */
-    protected $options;
 
     /**
      * The current path resolver callback.
@@ -643,155 +622,5 @@ abstract class AbstractPaginator implements Htmlable
     {
         static::defaultView('pagination::bootstrap-5');
         static::defaultSimpleView('pagination::simple-bootstrap-5');
-    }
-
-    /**
-     * Get an iterator for the items.
-     *
-     * @return \ArrayIterator
-     */
-    public function getIterator(): Traversable
-    {
-        return $this->items->getIterator();
-    }
-
-    /**
-     * Determine if the list of items is empty.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return $this->items->isEmpty();
-    }
-
-    /**
-     * Determine if the list of items is not empty.
-     *
-     * @return bool
-     */
-    public function isNotEmpty()
-    {
-        return $this->items->isNotEmpty();
-    }
-
-    /**
-     * Get the number of items for the current page.
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return $this->items->count();
-    }
-
-    /**
-     * Get the paginator's underlying collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function getCollection()
-    {
-        return $this->items;
-    }
-
-    /**
-     * Set the paginator's underlying collection.
-     *
-     * @param  \Illuminate\Support\Collection  $collection
-     * @return $this
-     */
-    public function setCollection(Collection $collection)
-    {
-        $this->items = $collection;
-
-        return $this;
-    }
-
-    /**
-     * Get the paginator options.
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Determine if the given item exists.
-     *
-     * @param  mixed  $key
-     * @return bool
-     */
-    public function offsetExists($key): bool
-    {
-        return $this->items->has($key);
-    }
-
-    /**
-     * Get the item at the given offset.
-     *
-     * @param  mixed  $key
-     * @return mixed
-     */
-    public function offsetGet($key): mixed
-    {
-        return $this->items->get($key);
-    }
-
-    /**
-     * Set the item at the given offset.
-     *
-     * @param  mixed  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($key, $value): void
-    {
-        $this->items->put($key, $value);
-    }
-
-    /**
-     * Unset the item at the given key.
-     *
-     * @param  mixed  $key
-     * @return void
-     */
-    public function offsetUnset($key): void
-    {
-        $this->items->forget($key);
-    }
-
-    /**
-     * Render the contents of the paginator to HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return (string) $this->render();
-    }
-
-    /**
-     * Make dynamic calls into the collection.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->forwardCallTo($this->getCollection(), $method, $parameters);
-    }
-
-    /**
-     * Render the contents of the paginator when casting to a string.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->render();
     }
 }
