@@ -5,6 +5,9 @@
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
+        "forum": "https://laravel.com/forum",
+        "chat": "https://laravel.com/chat",
+        "docs": "https://laravel.com/docs",
         "issues": "https://github.com/laravel/framework/issues",
         "source": "https://github.com/laravel/framework"
     },
