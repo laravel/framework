@@ -1724,6 +1724,18 @@ class Builder implements BuilderContract
             }
         }
     }
+    
+    /**
+     * Add a basic find_in_set query to the query.
+     *
+     * @param mixed $column
+     * @param mixed $value
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function findInSet($column, $value)
+    {
+        return $this->query->whereRaw("FIND_IN_SET(?, $column)", $value);
+    }
 
     /**
      * Clone the Eloquent query builder.
