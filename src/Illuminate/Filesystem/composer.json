@@ -2,17 +2,17 @@
     "name": "illuminate/filesystem",
     "description": "The Illuminate Filesystem package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.0.2",
         "illuminate/collections": "^9.0",
@@ -20,16 +20,6 @@
         "illuminate/macroable": "^9.0",
         "illuminate/support": "^9.0",
         "symfony/finder": "^6.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Illuminate\\Filesystem\\": ""
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "9.x-dev"
-        }
     },
     "suggest": {
         "ext-ftp": "Required to use the Flysystem FTP driver.",
@@ -42,8 +32,18 @@
         "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
         "symfony/mime": "Required to enable support for guessing extensions (^6.0)."
     },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Filesystem\\": ""
+        }
+    },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "9.x-dev"
+        }
+    }
 }

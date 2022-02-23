@@ -2,17 +2,17 @@
     "name": "illuminate/validation",
     "description": "The Illuminate Validation package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
@@ -26,22 +26,22 @@
         "symfony/http-foundation": "^6.0",
         "symfony/mime": "^6.0"
     },
+    "suggest": {
+        "ext-bcmath": "Required to use the multiple_of validation rule.",
+        "illuminate/database": "Required to use the database presence verifier (^9.0)."
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Validation\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "9.x-dev"
         }
-    },
-    "suggest": {
-        "ext-bcmath": "Required to use the multiple_of validation rule.",
-        "illuminate/database": "Required to use the database presence verifier (^9.0)."
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

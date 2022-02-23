@@ -2,18 +2,23 @@
     "name": "illuminate/database",
     "description": "The Illuminate Database package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
-    "keywords": ["laravel", "database", "sql", "orm"],
+    "keywords": [
+        "database",
+        "laravel",
+        "orm",
+        "sql"
+    ],
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
@@ -24,18 +29,8 @@
         "illuminate/support": "^9.0",
         "symfony/console": "^6.0"
     },
-    "autoload": {
-        "psr-4": {
-            "Illuminate\\Database\\": ""
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "9.x-dev"
-        }
-    },
     "suggest": {
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3|^3.1.4).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.13.3 || ^3.1.4).",
         "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",
         "illuminate/console": "Required to use the database commands (^9.0).",
         "illuminate/events": "Required to use the observers with Eloquent (^9.0).",
@@ -43,8 +38,18 @@
         "illuminate/pagination": "Required to paginate the result set (^9.0).",
         "symfony/finder": "Required to use Eloquent model factories (^6.0)."
     },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Database\\": ""
+        }
+    },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "9.x-dev"
+        }
+    }
 }

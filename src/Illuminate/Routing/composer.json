@@ -2,17 +2,17 @@
     "name": "illuminate/routing",
     "description": "The Illuminate Routing package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
@@ -28,23 +28,23 @@
         "symfony/http-kernel": "^6.0",
         "symfony/routing": "^6.0"
     },
-    "autoload": {
-        "psr-4": {
-            "Illuminate\\Routing\\": ""
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "9.x-dev"
-        }
-    },
     "suggest": {
         "illuminate/console": "Required to use the make commands (^9.0).",
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "symfony/psr-http-message-bridge": "Required to use PSR-7 bridging features (^2.0)."
     },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Routing\\": ""
+        }
+    },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "9.x-dev"
+        }
+    }
 }

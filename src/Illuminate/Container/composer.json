@@ -2,37 +2,37 @@
     "name": "illuminate/container",
     "description": "The Illuminate Container package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.0.2",
         "illuminate/contracts": "^9.0",
-        "psr/container": "^1.1.1|^2.0.1"
+        "psr/container": "^1.1.1 || ^2.0.1"
     },
     "provide": {
-        "psr/container-implementation": "1.1|2.0"
+        "psr/container-implementation": "1.1 || 2.0"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Illuminate\\Container\\": ""
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "9.x-dev"
         }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev"
+    }
 }

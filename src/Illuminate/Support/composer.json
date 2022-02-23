@@ -2,17 +2,17 @@
     "name": "illuminate/support",
     "description": "The Illuminate Support package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
         }
     ],
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
@@ -28,19 +28,6 @@
     "conflict": {
         "tightenco/collect": "<5.5.33"
     },
-    "autoload": {
-        "psr-4": {
-            "Illuminate\\Support\\": ""
-        },
-        "files": [
-            "helpers.php"
-        ]
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "9.x-dev"
-        }
-    },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (^9.0).",
         "league/commonmark": "Required to use Str::markdown() and Stringable::markdown() (^2.0.2).",
@@ -49,8 +36,21 @@
         "symfony/var-dumper": "Required to use the dd function (^6.0).",
         "vlucas/phpdotenv": "Required to use the Env class and env helper (^5.4.1)."
     },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Support\\": ""
+        },
+        "files": [
+            "helpers.php"
+        ]
+    },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "9.x-dev"
+        }
+    }
 }
