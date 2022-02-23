@@ -751,7 +751,7 @@ class Arr
     public static function whereNotEmpty($array)
     {
         return static::where($array, function ($value) {
-            return ! $value === "";
+            return ! $value === '';
         });
     }
 

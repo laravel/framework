@@ -98,7 +98,7 @@ trait DatabaseRule
             return $this->whereNull($column);
         }
 
-        if ($value === "") {
+        if ($value === '') {
             return $this->whereEmpty($column);
         }
 

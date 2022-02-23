@@ -759,7 +759,7 @@ class Builder implements BuilderContract
         // If the value is "empty", we will just assume the developer wants to add a
         // where empty clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
-        if ($value === "") {
+        if ($value === '') {
             return $this->whereEmpty($column, $boolean, $operator !== '=');
         }
 

@@ -588,7 +588,7 @@ trait EnumeratesValues
      */
     public function whereEmpty($key = null)
     {
-        return $this->whereStrict($key, "");
+        return $this->whereStrict($key, '');
     }
 
     /**
@@ -599,7 +599,7 @@ trait EnumeratesValues
      */
     public function whereNotEmpty($key = null)
     {
-        return $this->where($key, '!==', "");
+        return $this->where($key, '!==', '');
     }
 
     /**
