@@ -10,7 +10,7 @@
 - Added `Illuminate/Collections/Arr::keyBy()` ([#41029](https://github.com/laravel/framework/pull/41029))
 - Added expectsOutputToContain to the PendingCommand. ([#40984](https://github.com/laravel/framework/pull/40984))
 - Added ability to supply HTTP client methods with JsonSerializable instances ([#41055](https://github.com/laravel/framework/pull/41055))
-- Added `Illuminate/Filesystem/AwsS3V3Adapter::getClinet()` ([#41079](https://github.com/laravel/framework/pull/41079))
+- Added `Illuminate/Filesystem/AwsS3V3Adapter::getClient()` ([#41079](https://github.com/laravel/framework/pull/41079))
 - Added Support for enum in Builder::whereRelation ([#41091](https://github.com/laravel/framework/pull/41091))
 - Added X headers when using Mail::alwaysTo ([#41101](https://github.com/laravel/framework/pull/41101))
 - Added of support Bitwise operators in query ([#41112](https://github.com/laravel/framework/pull/41112))
