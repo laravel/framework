@@ -367,6 +367,30 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where empty" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereEmpty(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' = \'""\'';
+    }
+
+    /**
+     * Compile a "where not empty" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotEmpty(Builder $query, $where)
+    {
+        return $this->wrap($where['column']).' != \'""\'';
+    }
+
+    /**
      * Compile a "between" where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

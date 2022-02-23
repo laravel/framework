@@ -393,6 +393,22 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function whereNotNull($key = null);
 
     /**
+     * Filter items where the value for the given key is empty.
+     *
+     * @param  string|null  $key
+     * @return static
+     */
+    public function whereEmpty($key = null);
+
+    /**
+     * Filter items where the value for the given key is not empty.
+     *
+     * @param  string|null  $key
+     * @return static
+     */
+    public function whereNotEmpty($key = null);
+
+    /**
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key

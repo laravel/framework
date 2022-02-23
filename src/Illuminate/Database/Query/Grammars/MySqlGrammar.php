@@ -51,6 +51,42 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Add a "where empty" clause to the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereEmpty(Builder $query, $where)
+    {
+        if ($this->isJsonSelector($where['column'])) {
+            [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
+
+            return '(json_extract('.$field.$path.') is empty OR json_type(json_extract('.$field.$path.')) = \'""\')';
+        }
+
+        return parent::whereEmpty($query, $where);
+    }
+
+    /**
+     * Add a "where not empty" clause to the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotEmpty(Builder $query, $where)
+    {
+        if ($this->isJsonSelector($where['column'])) {
+            [$field, $path] = $this->wrapJsonFieldAndPath($where['column']);
+
+            return '(json_extract('.$field.$path.') is not empty AND json_type(json_extract('.$field.$path.')) != \'""\')';
+        }
+
+        return parent::whereNotEmpty($query, $where);
+    }
+
+    /**
      * Compile a "where fulltext" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

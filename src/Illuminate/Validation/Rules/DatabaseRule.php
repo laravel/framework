@@ -98,6 +98,10 @@ trait DatabaseRule
             return $this->whereNull($column);
         }
 
+        if ($value === "") {
+            return $this->whereEmpty($column);
+        }
+
         $this->wheres[] = compact('column', 'value');
 
         return $this;
@@ -139,6 +143,28 @@ trait DatabaseRule
     public function whereNotNull($column)
     {
         return $this->where($column, 'NOT_NULL');
+    }
+
+    /**
+     * Set a "where empty" constraint on the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function whereEmpty($column)
+    {
+        return $this->where($column, 'EMPTY');
+    }
+
+    /**
+     * Set a "where not empty" constraint on the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function whereNotEmpty($column)
+    {
+        return $this->where($column, 'NOT_EMPTY');
     }
 
     /**

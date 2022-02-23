@@ -756,6 +756,13 @@ class Builder implements BuilderContract
 
         $type = 'Basic';
 
+        // If the value is "empty", we will just assume the developer wants to add a
+        // where empty clause to the query. So, we will allow a short-cut here to
+        // that method for convenience so the developer doesn't have to check.
+        if ($value === "") {
+            return $this->whereEmpty($column, $boolean, $operator !== '=');
+        }
+
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
@@ -1146,6 +1153,48 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where empty" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereEmpty($columns, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotEmpty' : 'Empty';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->wheres[] = compact('type', 'column', 'boolean');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where empty" clause to the query.
+     *
+     * @param  string|array  $column
+     * @return $this
+     */
+    public function orWhereEmpty($column)
+    {
+        return $this->whereEmpty($column, 'or');
+    }
+
+    /**
+     * Add a "where not empty" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotEmpty($columns, $boolean = 'and')
+    {
+        return $this->whereEmpty($columns, $boolean, true);
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
@@ -1270,6 +1319,17 @@ class Builder implements BuilderContract
     public function orWhereNotNull($column)
     {
         return $this->whereNotNull($column, 'or');
+    }
+
+    /**
+     * Add an "or where not empty" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orWhereNotEmpty($column)
+    {
+        return $this->whereNotEmpty($column, 'or');
     }
 
     /**

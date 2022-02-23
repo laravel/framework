@@ -89,6 +89,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereNulls = [];
 
     /**
+     * Any pivot table restrictions for whereEmpty clauses.
+     *
+     * @var array
+     */
+    protected $pivotWhereEmpties = [];
+
+    /**
      * The default values for the pivot columns.
      *
      * @var array
@@ -561,6 +568,56 @@ class BelongsToMany extends Relation
     public function orWherePivotNotNull($column)
     {
         return $this->orWherePivotNull($column, true);
+    }
+
+    /**
+     * Set a "where empty" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function wherePivotEmpty($column, $boolean = 'and', $not = false)
+    {
+        $this->pivotWhereEmpties[] = func_get_args();
+
+        return $this->whereEmpty($this->qualifyPivotColumn($column), $boolean, $not);
+    }
+
+    /**
+     * Set a "where not empty" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function wherePivotNotEmpty($column, $boolean = 'and')
+    {
+        return $this->wherePivotEmpty($column, $boolean, true);
+    }
+
+    /**
+     * Set a "or where empty" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @param  bool  $not
+     * @return $this
+     */
+    public function orWherePivotEmpty($column, $not = false)
+    {
+        return $this->wherePivotEmpty($column, 'or', $not);
+    }
+
+    /**
+     * Set a "or where not empty" clause for a pivot table column.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orWherePivotNotEmpty($column)
+    {
+        return $this->orWherePivotEmpty($column, true);
     }
 
     /**

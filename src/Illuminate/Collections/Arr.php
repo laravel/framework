@@ -743,6 +743,19 @@ class Arr
     }
 
     /**
+     * Filter items where the value is not empty.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function whereNotEmpty($array)
+    {
+        return static::where($array, function ($value) {
+            return ! $value === "";
+        });
+    }
+
+    /**
      * If the given value is not an array and not null, wrap it in one.
      *
      * @param  mixed  $value
