@@ -407,9 +407,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         $request = $to ?: new static;
 
-        $files = $from->files->all();
-
-        $files = is_array($files) ? array_filter($files) : $files;
+        $files = array_filter($from->files->all());
 
         $request->initialize(
             $from->query->all(),
