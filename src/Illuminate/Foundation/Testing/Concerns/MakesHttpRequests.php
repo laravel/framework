@@ -285,12 +285,12 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
-    public function get($uri, array $headers = [])
+    public function get($uri, array $headers = [], array $parameters = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('GET', $uri, [], $cookies, [], $server);
+        return $this->call('GET', $uri, $parameters, $cookies, [], $server);
     }
 
     /**
@@ -300,9 +300,9 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
-    public function getJson($uri, array $headers = [])
+    public function getJson($uri, array $headers = [], array $parameters = [])
     {
-        return $this->json('GET', $uri, [], $headers);
+        return $this->json('GET', $uri, [], $headers, $parameters);
     }
 
     /**
@@ -459,7 +459,7 @@ trait MakesHttpRequests
      * @param  array  $headers
      * @return \Illuminate\Testing\TestResponse
      */
-    public function json($method, $uri, array $data = [], array $headers = [])
+    public function json($method, $uri, array $data = [], array $headers = [], array $parameters = [])
     {
         $files = $this->extractFilesFromDataArray($data);
 
@@ -474,7 +474,7 @@ trait MakesHttpRequests
         return $this->call(
             $method,
             $uri,
-            [],
+            $parameters,
             $this->prepareCookiesForJsonRequest(),
             $files,
             $this->transformHeadersToServerVars($headers),
