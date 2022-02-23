@@ -623,4 +623,37 @@ abstract class AbstractPaginator extends AbstractBasePaginator
         static::defaultView('pagination::bootstrap-5');
         static::defaultSimpleView('pagination::simple-bootstrap-5');
     }
+
+    /**
+     * Render the paginator using the given view.
+     *
+     * @param  string|null  $view
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Support\Htmlable
+     */
+    public function render($view = null, $data = [])
+    {
+        return static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
+            'paginator' => $this,
+        ]));
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'current_page' => $this->currentPage(),
+            'data' => $this->items->toArray(),
+            'first_page_url' => $this->url(1),
+            'from' => $this->firstItem(),
+            'path' => $this->path(),
+            'per_page' => $this->perPage(),
+            'prev_page_url' => $this->previousPageUrl(),
+            'to' => $this->lastItem(),
+        ];
+    }
 }

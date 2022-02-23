@@ -91,20 +91,6 @@ class Paginator extends AbstractPaginator implements PaginatorContract
     }
 
     /**
-     * Render the paginator using the given view.
-     *
-     * @param  string|null  $view
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Support\Htmlable
-     */
-    public function render($view = null, $data = [])
-    {
-        return static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
-            'paginator' => $this,
-        ]));
-    }
-
-    /**
      * Manually indicate that the paginator does have more pages.
      *
      * @param  bool  $hasMore
@@ -134,16 +120,8 @@ class Paginator extends AbstractPaginator implements PaginatorContract
      */
     public function toArray()
     {
-        return [
-            'current_page' => $this->currentPage(),
-            'data' => $this->items->toArray(),
-            'first_page_url' => $this->url(1),
-            'from' => $this->firstItem(),
+        return array_merge(parent::toArray(), [
             'next_page_url' => $this->nextPageUrl(),
-            'path' => $this->path(),
-            'per_page' => $this->perPage(),
-            'prev_page_url' => $this->previousPageUrl(),
-            'to' => $this->lastItem(),
-        ];
+        ]);
     }
 }
