@@ -159,7 +159,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
     }
 
     /**
-     * Assert that no notifications were sent to the notifiable.
+     * Assert that no notifications were sent to the given notifiable.
      *
      * @param  mixed  $notifiable
      * @return void
