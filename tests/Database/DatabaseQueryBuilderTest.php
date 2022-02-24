@@ -1693,6 +1693,30 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
     }
 
+    public function testWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'bar')->whereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where "name" = ? and not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'bar')->orWhereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where "name" = ? or not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+    }
+
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();

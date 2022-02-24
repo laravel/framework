@@ -884,6 +884,44 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
+    public function testWhereNot()
+    {
+        $nestedQuery = m::mock(Builder::class);
+        $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $model = $this->getMockModel()->makePartial();
+        $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and not');
+        $nestedQuery->shouldReceive('foo')->once();
+
+        $result = $builder->whereNot(function ($query) {
+            $query->foo();
+        });
+        $this->assertEquals($builder, $result);
+    }
+
+    public function testOrWhereNot()
+    {
+        $nestedQuery = m::mock(Builder::class);
+        $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $model = $this->getMockModel()->makePartial();
+        $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'or not');
+        $nestedQuery->shouldReceive('foo')->once();
+
+        $result = $builder->orWhereNot(function ($query) {
+            $query->foo();
+        });
+        $this->assertEquals($builder, $result);
+    }
+
     public function testRealQueryHigherOrderOrWhereScopes()
     {
         $model = new EloquentBuilderTestHigherOrderWhereScopeStub;

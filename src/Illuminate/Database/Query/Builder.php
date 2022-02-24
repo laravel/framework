@@ -884,6 +884,29 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where not" clause to the query.
+     *
+     * @param  \Closure  $callback
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNot(Closure $callback, $boolean = 'and')
+    {
+        return $this->whereNested($callback, $boolean.' not');
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function orWhereNot(Closure $callback)
+    {
+        return $this->whereNot($callback, 'or');
+    }
+
+    /**
      * Add a "where" clause comparing two columns to the query.
      *
      * @param  string|array  $first
