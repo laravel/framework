@@ -229,9 +229,7 @@ trait FormatsMessages
         );
 
         $message = $this->replaceInputPlaceholder($message, $attribute);
-
         $message = $this->replaceIndexPlaceholder($message, $attribute);
-
         $message = $this->replacePositionPlaceholder($message, $attribute);
 
         if (isset($this->replacers[Str::snake($rule)])) {
@@ -320,11 +318,13 @@ trait FormatsMessages
      */
     protected function replaceIndexPlaceholder($message, $attribute)
     {
-        return str_ireplace(':index', explode('.', $attribute)[1] ?? 0, $message);
+        return $this->replaceIndexOrPositionPlaceholder(
+            $message, $attribute, 'index'
+        );
     }
 
     /**
-     * Replace the :pos placeholder in the given message.
+     * Replace the :position placeholder in the given message.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -332,7 +332,65 @@ trait FormatsMessages
      */
     protected function replacePositionPlaceholder($message, $attribute)
     {
-        return str_ireplace(':pos', (int) (explode('.', $attribute)[1] ?? 0) + 1, $message);
+        return $this->replaceIndexOrPositionPlaceholder(
+            $message, $attribute, 'position', fn ($segment) => $segment + 1
+        );
+    }
+
+    /**
+     * Replace the :index or :position placeholder in the given message.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $placeholder
+     * @param  \Closure  $modifier
+     * @return string
+     */
+    protected function replaceIndexOrPositionPlaceholder($message, $attribute, $placeholder, Closure $modifier = null)
+    {
+        $segments = explode('.', $attribute);
+
+        $modifier ??= fn ($value) => $value;
+
+        $numericIndex = 1;
+
+        foreach ($segments as $segment) {
+            if (is_numeric($segment)) {
+                $message = str_ireplace(':'.$placeholder, $modifier((int) $segment), $message);
+
+                $message = str_ireplace(
+                    ':'.$this->numberToIndexOrPositionWord($numericIndex).'-'.$placeholder,
+                    $modifier((int) $segment),
+                    $message
+                );
+
+                $numericIndex++;
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * Get the word for a index or position segment.
+     *
+     * @param  int  $value
+     * @return string
+     */
+    protected function numberToIndexOrPositionWord(int $value)
+    {
+        return [
+            1 => 'first',
+            2 => 'second',
+            3 => 'third',
+            4 => 'fourth',
+            5 => 'fifth',
+            6 => 'sixth',
+            7 => 'seventh',
+            8 => 'eighth',
+            9 => 'ninth',
+            10 => 'tenth',
+        ][(int) $value] ?? 'other';
     }
 
     /**
