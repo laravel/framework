@@ -25,7 +25,7 @@ interface MigrationRepositoryInterface
      * @param  int  $batch
      * @return array
      */
-    public function getMigrationsByBatch($batch): array;
+    public function getMigrationsByBatch($batch);
 
     /**
      * Get the last migration batch.

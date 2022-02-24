@@ -74,7 +74,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      * @param  int  $batchNumber
      * @return array
      */
-    public function getMigrationsByBatch($batch): array
+    public function getMigrationsByBatch($batch)
     {
         return $this->table()
             ->where('batch', $batch)
