@@ -60,6 +60,7 @@ class RollbackCommand extends BaseCommand
                 $this->getMigrationPaths(), [
                     'pretend' => $this->option('pretend'),
                     'step' => (int) $this->option('step'),
+                    'batch' => (int) $this->option('batch'),
                 ]
             );
         });
@@ -86,6 +87,8 @@ class RollbackCommand extends BaseCommand
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run'],
 
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted'],
+
+            ['batch', null, InputOption::VALUE_REQUIRED, 'The batch of migrations (identified by their batch number) to be reverted'],
         ];
     }
 }
