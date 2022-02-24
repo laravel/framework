@@ -1832,7 +1832,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             }
 
             if ($relation instanceof QueueableEntity) {
-                foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
+                foreach ($relation->getQueueableRelations() as $entityValue) {
                     $relations[] = $key.'.'.$entityValue;
                 }
             }

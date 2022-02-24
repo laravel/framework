@@ -1166,8 +1166,6 @@ EOF;
 
         $this->assertSessionHas('errors');
 
-        $keys = (array) $errors;
-
         $sessionErrors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
 
         $errorMessage = $sessionErrors
