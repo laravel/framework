@@ -262,7 +262,7 @@ class RouteListCommand extends Command
     {
         $results = [];
 
-        foreach ($columns as $i => $column) {
+        foreach ($columns as $column) {
             if (str_contains($column, ',')) {
                 $results = array_merge($results, explode(',', $column));
             } else {
