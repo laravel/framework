@@ -404,7 +404,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function forgetExtension($name)
     {
-        unset($this->extensions[$name]); 
+        unset($this->extensions[$name]);
     }
 
     /**
