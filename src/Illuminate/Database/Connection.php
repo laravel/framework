@@ -613,10 +613,18 @@ class Connection implements ConnectionInterface
     public function bindValues($statement, $bindings)
     {
         foreach ($bindings as $key => $value) {
+            if (is_int($value)) {
+                $type = PDO::PARAM_INT;
+            } elseif (is_resource($value)) {
+                $type = PDO::PARAM_LOB;
+            } else {
+                $type = PDO::PARAM_STR;
+            }
+
             $statement->bindValue(
                 is_string($key) ? $key : $key + 1,
                 $value,
-                is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
+                $type
             );
         }
     }
