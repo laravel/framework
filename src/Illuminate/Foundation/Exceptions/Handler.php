@@ -622,8 +622,6 @@ class Handler implements ExceptionHandlerContract
         if (view()->exists($view)) {
             return $view;
         }
-
-        return null;
     }
 
     /**

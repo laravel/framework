@@ -109,8 +109,6 @@ class DbCommand extends Command
         if (method_exists($this, "get{$driver}Environment")) {
             return $this->{"get{$driver}Environment"}($connection);
         }
-
-        return null;
     }
 
     /**

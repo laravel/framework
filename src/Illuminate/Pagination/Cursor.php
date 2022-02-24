@@ -114,13 +114,13 @@ class Cursor implements Arrayable
     public static function fromEncoded($encodedString)
     {
         if (! is_string($encodedString)) {
-            return null;
+            return;
         }
 
         $parameters = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $encodedString)), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return null;
+            return;
         }
 
         $pointsToNextItems = $parameters['_pointsToNextItems'];

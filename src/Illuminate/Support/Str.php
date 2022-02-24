@@ -286,7 +286,7 @@ class Str
         preg_match('/^(.*?)('.preg_quote((string) $phrase).')(.*)$/iu', (string) $text, $matches);
 
         if (empty($matches)) {
-            return null;
+            return;
         }
 
         $start = ltrim($matches[1]);

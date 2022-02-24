@@ -23,8 +23,6 @@ class AsEncryptedArrayObject implements Castable
                 if (isset($attributes[$key])) {
                     return new ArrayObject(json_decode(Crypt::decryptString($attributes[$key]), true));
                 }
-
-                return null;
             }
 
             public function set($model, $key, $value, $attributes)
@@ -32,8 +30,6 @@ class AsEncryptedArrayObject implements Castable
                 if (! is_null($value)) {
                     return [$key => Crypt::encryptString(json_encode($value))];
                 }
-
-                return null;
             }
 
             public function serialize($model, string $key, $value, array $attributes)

@@ -57,7 +57,7 @@ class FilterEmailValidation implements EmailValidation
      */
     public function getError(): ?InvalidEmail
     {
-        return null;
+        //
     }
 
     /**

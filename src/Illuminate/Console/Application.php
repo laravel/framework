@@ -267,13 +267,11 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolve($command)
     {
-        if (is_subclass_of($command, SymfonyCommand::class) && ($commandName = $command::getDefaultName())) {
-            $this->commandMap[$commandName] = $command;
-
-            return null;
+        if (! is_subclass_of($command, SymfonyCommand::class) || ! ($commandName = $command::getDefaultName())) {
+            return $this->add($this->laravel->make($command));
         }
 
-        return $this->add($this->laravel->make($command));
+        $this->commandMap[$commandName] = $command;
     }
 
     /**

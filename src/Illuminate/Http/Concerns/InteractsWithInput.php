@@ -309,7 +309,7 @@ trait InteractsWithInput
     public function date($key, $format = null, $tz = null)
     {
         if ($this->isNotFilled($key)) {
-            return null;
+            return;
         }
 
         if (is_null($format)) {

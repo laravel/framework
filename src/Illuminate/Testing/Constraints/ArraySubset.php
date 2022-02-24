@@ -84,8 +84,6 @@ if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
 
                 $this->fail($other, $description, $f);
             }
-
-            return null;
         }
 
         /**

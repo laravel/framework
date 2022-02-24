@@ -123,11 +123,9 @@ abstract class AbstractCursorPaginator implements Htmlable
      */
     public function previousPageUrl()
     {
-        if (is_null($previousCursor = $this->previousCursor())) {
-            return null;
+        if (! is_null($previousCursor = $this->previousCursor())) {
+            return $this->url($previousCursor);
         }
-
-        return $this->url($previousCursor);
     }
 
     /**
@@ -137,11 +135,9 @@ abstract class AbstractCursorPaginator implements Htmlable
      */
     public function nextPageUrl()
     {
-        if (is_null($nextCursor = $this->nextCursor())) {
-            return null;
+        if (! is_null($nextCursor = $this->nextCursor())) {
+            return $this->url($nextCursor);
         }
-
-        return $this->url($nextCursor);
     }
 
     /**
@@ -151,12 +147,9 @@ abstract class AbstractCursorPaginator implements Htmlable
      */
     public function previousCursor()
     {
-        if (is_null($this->cursor) ||
-            ($this->cursor->pointsToPreviousItems() && ! $this->hasMore)) {
-            return null;
+        if (! is_null($this->cursor) && (! $this->cursor->pointsToPreviousItems() || $this->hasMore)) {
+            return $this->getCursorForItem($this->items->first(), false);
         }
-
-        return $this->getCursorForItem($this->items->first(), false);
     }
 
     /**
@@ -166,12 +159,10 @@ abstract class AbstractCursorPaginator implements Htmlable
      */
     public function nextCursor()
     {
-        if ((is_null($this->cursor) && ! $this->hasMore) ||
-            (! is_null($this->cursor) && $this->cursor->pointsToNextItems() && ! $this->hasMore)) {
-            return null;
+        if ((! is_null($this->cursor) || $this->hasMore) &&
+            (is_null($this->cursor) || ! $this->cursor->pointsToNextItems() || $this->hasMore)) {
+            return $this->getCursorForItem($this->items->last(), true);
         }
-
-        return $this->getCursorForItem($this->items->last(), true);
     }
 
     /**

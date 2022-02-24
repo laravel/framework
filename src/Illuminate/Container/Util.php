@@ -54,7 +54,7 @@ class Util
         $type = $parameter->getType();
 
         if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
-            return null;
+            return;
         }
 
         $name = $type->getName();
