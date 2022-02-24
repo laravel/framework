@@ -35,8 +35,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $table = 'baz';
 
         $creator = $this->getCreator();
-        unset($_SERVER['__migration.creator.table']);
-        unset($_SERVER['__migration.creator.path']);
+        unset($_SERVER['__migration.creator.table'], $_SERVER['__migration.creator.path']);
         $creator->afterCreate(function ($table, $path) {
             $_SERVER['__migration.creator.table'] = $table;
             $_SERVER['__migration.creator.path'] = $path;
@@ -55,8 +54,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $this->assertEquals($_SERVER['__migration.creator.table'], $table);
         $this->assertEquals($_SERVER['__migration.creator.path'], 'foo/foo_create_bar.php');
 
-        unset($_SERVER['__migration.creator.table']);
-        unset($_SERVER['__migration.creator.path']);
+        unset($_SERVER['__migration.creator.table'], $_SERVER['__migration.creator.path']);
     }
 
     public function testTableUpdateMigrationStoresMigrationFile()

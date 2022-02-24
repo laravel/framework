@@ -264,7 +264,7 @@ class CacheManager implements FactoryContract
             'endpoint' => $config['endpoint'] ?? null,
         ];
 
-        if (isset($config['key']) && isset($config['secret'])) {
+        if (isset($config['key'], $config['secret'])) {
             $dynamoConfig['credentials'] = Arr::only(
                 $config, ['key', 'secret', 'token']
             );
