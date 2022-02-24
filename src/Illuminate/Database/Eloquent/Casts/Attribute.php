@@ -56,7 +56,7 @@ class Attribute
      * @param  callable  $get
      * @return static
      */
-    public static function get(callable $get)
+    public static function get(callable $get): static
     {
         return new static(get: $get);
     }
@@ -67,7 +67,7 @@ class Attribute
      * @param  callable  $set
      * @return static
      */
-    public static function set(callable $set)
+    public static function set(callable $set): static
     {
         return new static(set: $set);
     }
@@ -77,7 +77,7 @@ class Attribute
      *
      * @return static
      */
-    public function withoutObjectCaching()
+    public function withoutObjectCaching(): static
     {
         $this->withObjectCaching = false;
 
