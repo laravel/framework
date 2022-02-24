@@ -4,6 +4,7 @@ namespace Illuminate\Testing;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
@@ -919,11 +920,11 @@ EOF;
      * Assert that the response has the given JSON validation errors.
      *
      * @param  string|array  $attribute
-     * @param  string|null  $rule
+     * @param  string|\Illuminate\Contracts\Validation\Rule|null  $rule
      * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrorRule(string|array $attribute, ?string $rule = null, $responseKey = 'errors')
+    public function assertJsonValidationErrorRule(string|array $attribute, string|RuleContract|null $rule = null, $responseKey = 'errors')
     {
         $validationRules = $attribute;
 
