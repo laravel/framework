@@ -612,7 +612,7 @@ class Dispatcher implements DispatcherContract
      * Propagate listener options to the job.
      *
      * @param  mixed  $listener
-     * @param  mixed  $job
+     * @param  \Illuminate\Events\CallQueuedListener  $job
      * @return mixed
      */
     protected function propagateListenerOptions($listener, $job)
@@ -627,7 +627,7 @@ class Dispatcher implements DispatcherContract
             $job->tries = $listener->tries ?? null;
 
             $job->through(array_merge(
-                method_exists($listener, 'middleware') ? $listener->middleware() : [],
+                method_exists($listener, 'middleware') ? $listener->middleware(...$job->data) : [],
                 $listener->middleware ?? []
             ));
         });
