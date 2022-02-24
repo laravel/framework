@@ -865,7 +865,7 @@ class Builder implements BuilderContract
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNot(\Closure $callback, $boolean = 'and')
+    public function whereNot(Closure $callback, $boolean = 'and')
     {
         return $this->whereNested($callback, $boolean.' not');
     }
@@ -876,7 +876,7 @@ class Builder implements BuilderContract
      * @param  \Closure  $callback
      * @return $this
      */
-    public function orWhereNot(\Closure $callback)
+    public function orWhereNot(Closure $callback)
     {
         return $this->whereNot($callback, 'or');
     }
