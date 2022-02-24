@@ -88,9 +88,8 @@ class ComponentTagCompiler
     {
         $value = $this->compileSelfClosingTags($value);
         $value = $this->compileOpeningTags($value);
-        $value = $this->compileClosingTags($value);
 
-        return $value;
+        return $this->compileClosingTags($value);
     }
 
     /**
@@ -563,9 +562,8 @@ class ComponentTagCompiler
         $value = $this->escapeSingleQuotesOutsideOfPhpBlocks($value);
 
         $value = str_replace('<?php echo ', '\'.', $value);
-        $value = str_replace('; ?>', '.\'', $value);
 
-        return $value;
+        return str_replace('; ?>', '.\'', $value);
     }
 
     /**

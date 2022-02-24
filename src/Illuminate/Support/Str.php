@@ -748,11 +748,9 @@ class Str
      */
     public static function remove($search, $subject, $caseSensitive = true)
     {
-        $subject = $caseSensitive
+        return $caseSensitive
                     ? str_replace($search, '', $subject)
                     : str_ireplace($search, '', $subject);
-
-        return $subject;
     }
 
     /**
