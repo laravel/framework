@@ -926,7 +926,7 @@ if (! function_exists('d')) {
      *
      * @param  mixed  $var
      * @param  mixed  ...$moreVars
-     * @return  array|mixed
+     * @return array|mixed
      */
     function d($var, ...$moreVars)
     {
