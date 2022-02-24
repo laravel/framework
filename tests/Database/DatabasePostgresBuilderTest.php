@@ -46,16 +46,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->dropDatabaseIfExists('my_database_a');
     }
 
-    /**
-     * Ensure that when the reference is unqualified (i.e., does not contain a
-     * database name or a schema), and the search_path is empty, the database
-     * specified on the connection is used, and the default schema ('public')
-     * is used.
-     */
-    public function testWhenSearchPathEmptyHasTableWithUnqualifiedReferenceIsCorrect()
+    public function testHasTableWhenSchemaUnqualifiedAndSearchPathMissing()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
+        $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
@@ -67,13 +62,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->hasTable('foo');
     }
 
-    /**
-     * Ensure that when the reference is unqualified (i.e., does not contain a
-     * database name or a schema), and the first schema in the search_path is
-     * NOT the default ('public'), the database specified on the connection is
-     * used, and the first schema in the search_path is used.
-     */
-    public function testWhenSearchPathNotEmptyHasTableWithUnqualifiedSchemaReferenceIsCorrect()
+    public function testHasTableWhenSchemaUnqualifiedAndSearchPathFilled()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
@@ -88,14 +77,23 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->hasTable('foo');
     }
 
-    /**
-     * Ensure that when the reference is unqualified (i.e., does not contain a
-     * database name or a schema), and the first schema in the search_path is
-     * the special variable '$user', the database specified on the connection is
-     * used, the first schema in the search_path is used, and the variable
-     * resolves to the username specified on the connection.
-     */
-    public function testWhenFirstSchemaInSearchPathIsVariableHasTableWithUnqualifiedSchemaReferenceIsCorrect()
+    public function testHasTableWhenSchemaUnqualifiedAndSearchPathFallbackFilled()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
+        $connection->shouldReceive('getConfig')->with('schema')->andReturn(['myapp', 'public']);
+        $grammar = m::mock(PostgresGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileTableExists')->andReturn("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'");
+        $connection->shouldReceive('select')->with("select * from information_schema.tables where table_catalog = ? and table_schema = ? and table_name = ? and table_type = 'BASE TABLE'", ['laravel', 'myapp', 'foo'])->andReturn(['countable_result']);
+        $connection->shouldReceive('getTablePrefix');
+        $connection->shouldReceive('getConfig')->with('database')->andReturn('laravel');
+        $builder = $this->getBuilder($connection);
+
+        $builder->hasTable('foo');
+    }
+
+    public function testHasTableWhenSchemaUnqualifiedAndSearchPathIsUserVariable()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
@@ -111,12 +109,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->hasTable('foo');
     }
 
-    /**
-     * Ensure that when the reference is qualified only with a schema, that
-     * the database specified on the connection is used, and the specified
-     * schema is used, even if it is not within the search_path.
-     */
-    public function testWhenSchemaNotInSearchPathHasTableWithQualifiedSchemaReferenceIsCorrect()
+    public function testHasTableWhenSchemaQualifiedAndSearchPathMismatches()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
@@ -131,12 +124,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->hasTable('myapp.foo');
     }
 
-    /**
-     * Ensure that when the reference is qualified with a database AND a schema,
-     * and the database is NOT the database configured for the connection, the
-     * specified database is used instead.
-     */
-    public function testWhenDatabaseNotDefaultHasTableWithFullyQualifiedReferenceIsCorrect()
+    public function testHasTableWhenDatabaseAndSchemaQualifiedAndSearchPathMismatches()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
@@ -151,16 +139,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->hasTable('mydatabase.myapp.foo');
     }
 
-    /**
-     * Ensure that when the reference is unqualified (i.e., does not contain a
-     * database name or a schema), and the search_path is empty, the database
-     * specified on the connection is used, and the default schema ('public')
-     * is used.
-     */
-    public function testWhenSearchPathEmptyGetColumnListingWithUnqualifiedReferenceIsCorrect()
+    public function testGetColumnListingWhenSchemaUnqualifiedAndSearchPathMissing()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn(null);
+        $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $grammar->shouldReceive('compileColumnListing')->andReturn('select column_name from information_schema.columns where table_catalog = ? and table_schema = ? and table_name = ?');
@@ -175,13 +158,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->getColumnListing('foo');
     }
 
-    /**
-     * Ensure that when the reference is unqualified (i.e., does not contain a
-     * database name or a schema), and the first schema in the search_path is
-     * NOT the default ('public'), the database specified on the connection is
-     * used, and the first schema in the search_path is used.
-     */
-    public function testWhenSearchPathNotEmptyGetColumnListingWithUnqualifiedSchemaReferenceIsCorrect()
+    public function testGetColumnListingWhenSchemaUnqualifiedAndSearchPathFilled()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
@@ -199,14 +176,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->getColumnListing('foo');
     }
 
-    /**
-     * Ensure that when the reference is unqualified (i.e., does not contain a
-     * database name or a schema), and the first schema in the search_path is
-     * the special variable '$user', the database specified on the connection is
-     * used, the first schema in the search_path is used, and the variable
-     * resolves to the username specified on the connection.
-     */
-    public function testWhenFirstSchemaInSearchPathIsVariableGetColumnListingWithUnqualifiedSchemaReferenceIsCorrect()
+    public function testGetColumnListingWhenSchemaUnqualifiedAndSearchPathIsUserVariable()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
@@ -225,12 +195,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->getColumnListing('foo');
     }
 
-    /**
-     * Ensure that when the reference is qualified only with a schema, that
-     * the database specified on the connection is used, and the specified
-     * schema is used, even if it is not within the search_path.
-     */
-    public function testWhenSchemaNotInSearchPathGetColumnListingWithQualifiedSchemaReferenceIsCorrect()
+    public function testGetColumnListingWhenSchemaQualifiedAndSearchPathMismatches()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
@@ -248,12 +213,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->getColumnListing('myapp.foo');
     }
 
-    /**
-     * Ensure that when the reference is qualified with a database AND a schema,
-     * and the database is NOT the database configured for the connection, the
-     * specified database is used instead.
-     */
-    public function testWhenDatabaseNotDefaultGetColumnListingWithFullyQualifiedReferenceIsCorrect()
+    public function testGetColumnWhenDatabaseAndSchemaQualifiedAndSearchPathMismatches()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
@@ -271,12 +231,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->getColumnListing('mydatabase.myapp.foo');
     }
 
-    /**
-     * Ensure that when the search_path contains just one schema, only that
-     * schema is passed into the query that is executed to acquire the list
-     * of tables to be dropped.
-     */
-    public function testDropAllTablesWithOneSchemaInSearchPath()
+    public function testDropAllTablesWhenSearchPathIsString()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
@@ -292,23 +247,38 @@ class DatabasePostgresBuilderTest extends TestCase
         $builder->dropAllTables();
     }
 
-    /**
-     * Ensure that when the search_path contains more than one schema, both
-     * schemas are passed into the query that is executed to acquire the list
-     * of tables to be dropped. Furthermore, ensure that the special '$user'
-     * variable is resolved to the username specified on the database connection
-     * in the process.
-     */
-    public function testDropAllTablesWithMoreThanOneSchemaInSearchPath()
+    public function testDropAllTablesWhenSearchPathIsStringOfMany()
     {
         $connection = $this->getConnection();
         $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
-        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('"$user", public');
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('"$user", public, foo_bar-Baz.Áüõß');
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'public'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public')");
-        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public')")->andReturn(['users', 'users']);
+        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'public', 'foo_bar-Baz.Áüõß'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public','foo_bar-Baz.Áüõß')");
+        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public','foo_bar-Baz.Áüõß')")->andReturn(['users', 'users']);
+        $grammar->shouldReceive('compileDropAllTables')->with(['users', 'users'])->andReturn('drop table "'.implode('","', ['users', 'users']).'" cascade');
+        $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users', 'users']).'" cascade');
+        $builder = $this->getBuilder($connection);
+
+        $builder->dropAllTables();
+    }
+
+    public function testDropAllTablesWhenSearchPathIsArrayOfMany()
+    {
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getConfig')->with('username')->andReturn('foouser');
+        $connection->shouldReceive('getConfig')->with('search_path')->andReturn([
+            '$user',
+            '"dev"',
+            "'test'",
+            'spaced schema',
+        ]);
+        $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
+        $grammar = m::mock(PostgresGrammar::class);
+        $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
+        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'dev', 'test', 'spaced schema'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','dev','test','spaced schema')");
+        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','dev','test','spaced schema')")->andReturn(['users', 'users']);
         $grammar->shouldReceive('compileDropAllTables')->with(['users', 'users'])->andReturn('drop table "'.implode('","', ['users', 'users']).'" cascade');
         $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users', 'users']).'" cascade');
         $builder = $this->getBuilder($connection);
