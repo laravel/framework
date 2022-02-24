@@ -2,7 +2,6 @@
 
 namespace Illuminate\Translation;
 
-use Countable;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
