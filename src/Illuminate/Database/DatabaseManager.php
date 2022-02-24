@@ -397,12 +397,12 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * unset an extension connection resolver.
+     * Remove an extension connection resolver.
      *
      * @param  string  $name
      * @return void
      */
-    public function forgetExtend($name)
+    public function forgetExtension($name)
     {
         unset($this->extensions[$name]); 
     }
