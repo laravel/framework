@@ -94,4 +94,43 @@ class ViewComponentAttributeBagTest extends TestCase
             'test-extract-2' => 'defaultValue',
         ]));
     }
+
+    public function testAttributesCanBeOverridden()
+    {
+        $bag = new ComponentAttributeBag(['class' => 'text-white bg-blue', 'name' => 'test']);
+
+        // Using a wildcard to match "text-*".
+        $this->assertSame(
+            'font-bold text-white  bg-blue',
+            $bag->merge(['class' => 'font-bold text-red'])->override(['class' => ['text-red' => 'text-*']])->get('class')
+        );
+
+        // Using the exact same class name.
+        $this->assertSame(
+            'font-bold text-white  bg-blue',
+            $bag->merge(['class' => 'font-bold text-red'])->override(['class' => ['text-red' => 'text-white']])->get('class')
+        );
+
+        // Overriding multiple classes at once
+        $this->assertSame(
+            'font-bold text-white bg-blue  ',
+            $bag->merge(['class' => 'font-bold text-red bg-green'])
+                ->override(['class' => ['text-red' => 'text-white', 'bg-green' => 'bg-blue']])
+                ->get('class')
+        );
+
+        // Using a different pattern that shouldn't match a class.
+        // This should be ignored and not override any classes.
+        $this->assertSame(
+            'font-bold text-red text-white bg-blue',
+            $bag->merge(['class' => 'font-bold text-red'])->override(['class' => ['text-red' => 'text-blue']])->get('class')
+        );
+
+        // Using a different attribute name that shouldn't match a class.
+        // This should be ignored and not override any classes.
+        $this->assertSame(
+            'font-bold text-red text-white bg-blue',
+            $bag->merge(['class' => 'font-bold text-red'])->override(['name' => ['text-red' => 'text-white']])->get('class')
+        );
+    }
 }

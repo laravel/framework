@@ -243,6 +243,42 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
         return new static(array_merge($attributeDefaults, $attributes));
     }
 
+    public function override(array $overrideAttributes = [])
+    {
+        // Find any attributes which should be overridden.
+        $overrideKeys = array_intersect_assoc(
+            array_keys($overrideAttributes),
+            array_keys($this->attributes)
+        );
+
+        if (! count($overrideKeys)) {
+            return $this;
+        }
+
+        // Loop through any attribute keys (e.g. - "class")
+        foreach ($overrideKeys as $overrideKey) {
+            // Loop through each override set for the attribute.
+            foreach ($overrideAttributes[$overrideKey] as $existingValue => $newValue) {
+                $replace = [];
+
+                // Loop through each word in the attribute and to find any of the
+                // values that match a given pattern and should be replaced.
+                foreach (explode(' ', $this->attributes[$overrideKey]) as $string) {
+                    if (Str::is($newValue, $string)) {
+                        $replace = array_merge(
+                            $replace,
+                            [$string => null, $existingValue => $string]
+                        );
+                    }
+                }
+
+                $this->attributes[$overrideKey] = Str::swap($replace, $this->attributes[$overrideKey]);
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * Determine if the specific attribute value should be escaped.
      *
