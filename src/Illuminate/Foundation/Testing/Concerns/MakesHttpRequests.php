@@ -283,6 +283,7 @@ trait MakesHttpRequests
      *
      * @param  string  $uri
      * @param  array  $headers
+     * @param  array  $parameters
      * @return \Illuminate\Testing\TestResponse
      */
     public function get($uri, array $headers = [], array $parameters = [])
@@ -298,6 +299,7 @@ trait MakesHttpRequests
      *
      * @param  string  $uri
      * @param  array  $headers
+     * @param  array  $parameters
      * @return \Illuminate\Testing\TestResponse
      */
     public function getJson($uri, array $headers = [], array $parameters = [])
@@ -457,6 +459,7 @@ trait MakesHttpRequests
      * @param  string  $uri
      * @param  array  $data
      * @param  array  $headers
+     * @param  array  $parameters
      * @return \Illuminate\Testing\TestResponse
      */
     public function json($method, $uri, array $data = [], array $headers = [], array $parameters = [])
