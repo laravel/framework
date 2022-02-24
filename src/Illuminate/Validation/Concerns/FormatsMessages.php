@@ -356,7 +356,9 @@ trait FormatsMessages
 
         foreach ($segments as $segment) {
             if (is_numeric($segment)) {
-                $message = str_ireplace(':'.$placeholder, $modifier((int) $segment), $message);
+                if ($numericIndex === 1) {
+                    $message = str_ireplace(':'.$placeholder, $modifier((int) $segment), $message);
+                }
 
                 $message = str_ireplace(
                     ':'.$this->numberToIndexOrPositionWord($numericIndex).'-'.$placeholder,
