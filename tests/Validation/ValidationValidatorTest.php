@@ -611,8 +611,8 @@ class ValidationValidatorTest extends TestCase
                         'foo',
                         1,
                     ],
-                ]
-            ]
+                ],
+            ],
         ], ['input.*.attributes.*' => 'string'], ['input.*.attributes.*.string' => 'Attribute (:first-index, :first-position) (:second-index, :second-position) must be a string.']);
         $this->assertFalse($v->passes());
         $this->assertSame('Attribute (0, 1) (1, 2) must be a string.', $v->messages()->first('input.*.attributes.*'));
