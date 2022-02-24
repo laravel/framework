@@ -58,7 +58,7 @@ class Attribute
      */
     public static function get(callable $get)
     {
-        return new static($get);
+        return new static(get: $get);
     }
 
     /**
@@ -69,7 +69,7 @@ class Attribute
      */
     public static function set(callable $set)
     {
-        return new static(null, $set);
+        return new static(set: $set);
     }
 
     /**
