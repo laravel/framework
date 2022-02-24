@@ -915,6 +915,43 @@ EOF;
     }
 
     /**
+     * Assert that the response has the given JSON validation errors.
+     *
+     * @param  string|array  $attribute
+     * @param  string|null  $rule
+     * @param  string  $responseKey
+     * @return $this
+     */
+    public function assertJsonValidationErrorRules(string|array $attribute, ?string $rule = null, $responseKey = 'errors')
+    {
+        $validationRules = $attribute;
+
+        if (is_string($attribute)) {
+            PHPUnit::assertNotNull($rule, 'No validation rule was provided.');
+
+            $validationRules = [$attribute => $rule];
+        }
+
+        $validator = app('validator');
+
+        if (! method_exists($validator, 'getErrorMessage')) {
+            PHPUnit::fail('The current Validator instance does not have a message formatter.');
+        }
+
+        foreach ($validationRules as $attribute => $rules) {
+            $rules = Arr::wrap($rules);
+
+            foreach ($rules as $rule) {
+                $this->assertJsonValidationErrors([
+                    $attribute => $validator->getErrorMessage($attribute, $rule),
+                ], $responseKey);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has no JSON validation errors for the given keys.
      *
      * @param  string|array|null  $keys
@@ -951,43 +988,6 @@ EOF;
                 isset($errors[$key]),
                 "Found unexpected validation error for key: '{$key}'"
             );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Assert that the response has the given JSON validation errors.
-     *
-     * @param  string|array  $attribute
-     * @param  string|null  $rule
-     * @param  string  $responseKey
-     * @return $this
-     */
-    public function assertJsonValidationErrorRules(string|array $attribute, ?string $rule = null, $responseKey = 'errors')
-    {
-        $validationRules = $attribute;
-
-        if (is_string($attribute)) {
-            PHPUnit::assertNotNull($rule, 'No validation rule was provided.');
-
-            $validationRules = [$attribute => $rule];
-        }
-
-        $validator = app('validator');
-
-        if (! method_exists($validator, 'getErrorMessage')) {
-            PHPUnit::fail('The current Validator instance does not have a message formatter.');
-        }
-
-        foreach ($validationRules as $attribute => $rules) {
-            $rules = Arr::wrap($rules);
-
-            foreach ($rules as $rule) {
-                $this->assertJsonValidationErrors([
-                    $attribute => $validator->getErrorMessage($attribute, $rule),
-                ], $responseKey);
-            }
         }
 
         return $this;
