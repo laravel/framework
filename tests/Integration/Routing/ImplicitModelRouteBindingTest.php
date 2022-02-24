@@ -19,10 +19,13 @@ class ImplicitModelRouteBindingTest extends TestCase
     ];
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         $this->tearDownInteractsWithPublishedFiles();
 
-        parent::tearDown();
+
     }
 
     protected function defineDatabaseMigrations(): void

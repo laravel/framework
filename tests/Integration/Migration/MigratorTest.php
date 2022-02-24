@@ -15,8 +15,11 @@ class MigratorTest extends TestCase
     private $output;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->output = m::mock(OutputInterface::class);
         $this->subject = $this->app->make('migrator');

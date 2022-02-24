@@ -25,7 +25,10 @@ use stdClass;
 class BusBatchTest extends TestCase
 {
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $db = new DB;
 
         $db->addConnection([
@@ -70,7 +73,10 @@ class BusBatchTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         unset($_SERVER['__finally.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
         $this->schema()->drop('job_batches');

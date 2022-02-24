@@ -93,7 +93,10 @@ class SeedCommandTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         Model::unsetEventDispatcher();
 
         m::close();

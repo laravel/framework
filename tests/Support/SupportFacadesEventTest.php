@@ -21,8 +21,11 @@ class SupportFacadesEventTest extends TestCase
     private $events;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->events = m::mock(Dispatcher::class);
 
@@ -36,7 +39,10 @@ class SupportFacadesEventTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         Event::clearResolvedInstances();
         Event::setFacadeApplication(null);
 

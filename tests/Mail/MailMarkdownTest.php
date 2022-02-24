@@ -10,7 +10,10 @@ use PHPUnit\Framework\TestCase;
 class MailMarkdownTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

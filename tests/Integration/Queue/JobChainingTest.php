@@ -26,7 +26,10 @@ class JobChainingTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         JobChainingTestFirstJob::$ran = false;
         JobChainingTestSecondJob::$ran = false;
         JobChainingTestThirdJob::$ran = false;

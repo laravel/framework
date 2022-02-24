@@ -36,8 +36,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
-    {
-        parent::tearDown();
+    {parent::tearDown();
+
+
+
+
 
         m::close();
     }

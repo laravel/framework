@@ -10,7 +10,10 @@ use PHPUnit\Framework\TestCase;
 class SupportServiceProviderTest extends TestCase
 {
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
@@ -22,7 +25,10 @@ class SupportServiceProviderTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

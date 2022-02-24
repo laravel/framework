@@ -15,8 +15,11 @@ class InteractsWithDeprecationHandlingTest extends TestCase
     protected $deprecationsFound = false;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->original = set_error_handler(function () {
             $this->deprecationsFound = true;
@@ -43,12 +46,15 @@ class InteractsWithDeprecationHandlingTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         set_error_handler($this->original);
 
         $this->originalDeprecationHandler = null;
         $this->deprecationsFound = false;
 
-        parent::tearDown();
+
     }
 }

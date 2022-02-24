@@ -14,8 +14,11 @@ use stdClass;
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
     protected function tearDown(): void
-    {
-        parent::tearDown();
+    {parent::tearDown();
+
+
+
+
 
         m::close();
     }

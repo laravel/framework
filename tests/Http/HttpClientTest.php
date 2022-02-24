@@ -34,14 +34,20 @@ class HttpClientTest extends TestCase
     protected $factory;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->factory = new Factory;
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

@@ -15,7 +15,10 @@ use ReflectionClass;
 class HandleExceptionsTest extends TestCase
 {
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $this->app = m::mock(Application::setInstance(new Application));
 
         $this->config = new Config();
@@ -40,7 +43,10 @@ class HandleExceptionsTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         Application::setInstance(null);
     }
 

@@ -14,7 +14,10 @@ use PHPUnit\Framework\TestCase;
 class DatabaseSQLiteBuilderTest extends TestCase
 {
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $app = new Container;
 
         Container::setInstance($app)
@@ -24,7 +27,10 @@ class DatabaseSQLiteBuilderTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
 
         Container::setInstance(null);

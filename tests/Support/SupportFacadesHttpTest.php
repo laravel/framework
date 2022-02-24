@@ -13,7 +13,10 @@ class SupportFacadesHttpTest extends TestCase
     protected $app;
 
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $this->app = new Container;
         Facade::setFacadeApplication($this->app);
     }

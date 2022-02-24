@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\Schema;
 class EloquentPivotEventsTest extends DatabaseTestCase
 {
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         // clear event log between requests
         PivotEventsTestCollaborator::$eventsCalled = [];

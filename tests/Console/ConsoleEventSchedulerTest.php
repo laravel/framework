@@ -20,8 +20,11 @@ class ConsoleEventSchedulerTest extends TestCase
     private $schedule;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $container = Container::getInstance();
 
@@ -33,7 +36,10 @@ class ConsoleEventSchedulerTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

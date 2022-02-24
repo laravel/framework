@@ -18,8 +18,11 @@ class RouteCollectionTest extends TestCase
     protected $routeCollection;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->routeCollection = new RouteCollection;
     }

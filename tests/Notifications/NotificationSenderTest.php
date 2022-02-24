@@ -17,8 +17,11 @@ use PHPUnit\Framework\TestCase;
 class NotificationSenderTest extends TestCase
 {
     protected function tearDown(): void
-    {
-        parent::tearDown();
+    {parent::tearDown();
+
+
+
+
 
         m::close();
     }

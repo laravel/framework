@@ -26,8 +26,11 @@ class JobEncryptionTest extends DatabaseTestCase
     }
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         Schema::create('jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -41,11 +44,14 @@ class JobEncryptionTest extends DatabaseTestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         JobEncryptionTestEncryptedJob::$ran = false;
         JobEncryptionTestNonEncryptedJob::$ran = false;
 
-        parent::tearDown();
+
     }
 
     public function testEncryptedJobPayloadIsStoredEncrypted()

@@ -39,8 +39,11 @@ class CommandSchedulingTest extends TestCase
     protected $fs;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->fs = new Filesystem;
 
@@ -51,7 +54,10 @@ class CommandSchedulingTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         $this->fs->delete($this->logfile);
         $this->fs->delete(base_path('artisan'));
 
@@ -59,7 +65,7 @@ class CommandSchedulingTest extends TestCase
             $this->fs->put(base_path('artisan'), $this->originalArtisan);
         }
 
-        parent::tearDown();
+
     }
 
     /**

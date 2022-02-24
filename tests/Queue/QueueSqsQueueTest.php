@@ -14,12 +14,18 @@ use PHPUnit\Framework\TestCase;
 class QueueSqsQueueTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock(SqsClient::class);
 

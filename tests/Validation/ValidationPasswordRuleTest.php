@@ -334,7 +334,10 @@ class ValidationPasswordRuleTest extends TestCase
     }
 
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $container = Container::getInstance();
 
         $container->bind('translator', function () {
@@ -349,7 +352,10 @@ class ValidationPasswordRuleTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         Container::setInstance(null);
 
         Facade::clearResolvedInstances();

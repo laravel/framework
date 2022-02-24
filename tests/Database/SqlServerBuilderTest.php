@@ -11,7 +11,10 @@ use PHPUnit\Framework\TestCase;
 class SqlServerBuilderTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

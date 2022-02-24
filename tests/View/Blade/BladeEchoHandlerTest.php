@@ -9,8 +9,11 @@ use Illuminate\Support\Str;
 class BladeEchoHandlerTest extends AbstractBladeTestCase
 {
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->compiler->stringable(function (Fluent $object) {
             return 'Hello World';

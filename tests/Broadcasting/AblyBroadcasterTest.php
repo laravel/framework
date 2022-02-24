@@ -18,8 +18,11 @@ class AblyBroadcasterTest extends TestCase
     public $ably;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->ably = m::mock('Ably\AblyRest');
         $this->ably->options = (object) ['key' => 'abcd:efgh'];

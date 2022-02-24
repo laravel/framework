@@ -10,7 +10,10 @@ use Orchestra\Testbench\TestCase;
 class JobDispatchingTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         Job::$ran = false;
     }
 

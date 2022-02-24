@@ -14,7 +14,10 @@ class RefreshDatabaseTest extends TestCase
     protected $traitObject;
 
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         RefreshDatabaseState::$migrated = false;
 
         $this->traitObject = $this->getMockForTrait(RefreshDatabase::class, [], '', true, true, true, [

@@ -24,7 +24,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
      * @return void
      */
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $this->db = $db = new DB;
 
         $db->addConnection([
@@ -76,7 +79,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
     }

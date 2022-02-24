@@ -19,8 +19,11 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class PruneCommandTest extends TestCase
 {
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         Container::setInstance($container = new Container);
 
@@ -172,8 +175,11 @@ EOF, str_replace("\r", '', $output->fetch()));
     }
 
     protected function tearDown(): void
-    {
-        parent::tearDown();
+    {parent::tearDown();
+
+
+
+
 
         Container::setInstance(null);
     }

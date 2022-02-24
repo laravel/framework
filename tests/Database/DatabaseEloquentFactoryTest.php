@@ -19,7 +19,10 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentFactoryTest extends TestCase
 {
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $container = Container::getInstance();
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
@@ -88,7 +91,10 @@ class DatabaseEloquentFactoryTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
 
         $this->schema()->drop('users');

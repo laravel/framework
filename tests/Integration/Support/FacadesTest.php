@@ -11,8 +11,11 @@ use ReflectionClass;
 class FacadesTest extends TestCase
 {
     protected function tearDown(): void
-    {
-        parent::tearDown();
+    {parent::tearDown();
+
+
+
+
 
         unset($_SERVER['__laravel.authResolved']);
     }

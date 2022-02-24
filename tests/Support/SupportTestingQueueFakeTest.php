@@ -23,8 +23,11 @@ class SupportTestingQueueFakeTest extends TestCase
     private $job;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
         $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
     }

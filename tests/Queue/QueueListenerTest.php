@@ -11,7 +11,10 @@ use Symfony\Component\Process\Process;
 class QueueListenerTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

@@ -20,7 +20,10 @@ class QueueConnectionTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         QueueConnectionTestJob::$ran = false;
 
         m::close();

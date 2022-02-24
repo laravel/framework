@@ -20,7 +20,10 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 class MailableQueuedTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

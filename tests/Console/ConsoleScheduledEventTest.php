@@ -19,13 +19,19 @@ class ConsoleScheduledEventTest extends TestCase
     protected $defaultTimezone;
 
     protected function setUp(): void
-    {
+    {parent::setUp();
+
+
+
         $this->defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         date_default_timezone_set($this->defaultTimezone);
         Carbon::setTestNow(null);
         m::close();

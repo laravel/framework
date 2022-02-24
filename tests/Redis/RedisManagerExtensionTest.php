@@ -16,8 +16,11 @@ class RedisManagerExtensionTest extends TestCase
     protected $redis;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->redis = new RedisManager(new Application, 'my_custom_driver', [
             'default' => [
@@ -44,7 +47,10 @@ class RedisManagerExtensionTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

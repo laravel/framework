@@ -24,8 +24,11 @@ class CompiledRouteCollectionTest extends TestCase
     protected $router;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->router = $this->app['router'];
 
@@ -33,8 +36,11 @@ class CompiledRouteCollectionTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
-        parent::tearDown();
+    {parent::tearDown();
+
+
+
+
 
         unset($this->routeCollection, $this->router);
     }

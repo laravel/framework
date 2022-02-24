@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
 class DatabaseSchemaBlueprintTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
         Builder::$defaultMorphKeyType = 'int';
     }

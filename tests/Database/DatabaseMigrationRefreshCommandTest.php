@@ -18,7 +18,10 @@ use Symfony\Component\Console\Output\NullOutput;
 class DatabaseMigrationRefreshCommandTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

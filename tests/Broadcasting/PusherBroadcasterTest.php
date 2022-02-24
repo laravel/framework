@@ -18,8 +18,11 @@ class PusherBroadcasterTest extends TestCase
     public $pusher;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->pusher = m::mock('Pusher\Pusher');
         $this->broadcaster = m::mock(PusherBroadcaster::class, [$this->pusher])->makePartial();

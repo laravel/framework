@@ -18,8 +18,11 @@ class RedisBroadcasterTest extends TestCase
     public $broadcaster;
 
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         $this->broadcaster = m::mock(RedisBroadcaster::class)->makePartial();
         $container = Container::setInstance(new Container);
@@ -30,7 +33,10 @@ class RedisBroadcasterTest extends TestCase
     }
 
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
     }
 

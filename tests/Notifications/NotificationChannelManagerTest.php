@@ -19,7 +19,10 @@ use PHPUnit\Framework\TestCase;
 class NotificationChannelManagerTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
 
         Container::setInstance(null);

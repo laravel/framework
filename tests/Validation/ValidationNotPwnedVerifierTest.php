@@ -14,7 +14,10 @@ use PHPUnit\Framework\TestCase;
 class ValidationNotPwnedVerifierTest extends TestCase
 {
     protected function tearDown(): void
-    {
+    {parent::tearDown();
+
+
+
         m::close();
 
         Container::setInstance(null);

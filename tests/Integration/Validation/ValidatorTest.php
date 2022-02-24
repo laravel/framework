@@ -15,8 +15,11 @@ use Illuminate\Validation\Validator;
 class ValidatorTest extends DatabaseTestCase
 {
     protected function setUp(): void
-    {
-        parent::setUp();
+    {parent::setUp();
+
+
+
+
 
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
