@@ -603,6 +603,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertSame('Name 0 is required.', $v->messages()->first('input.*.name'));
 
+        $v = new Validator($trans, [
+            'input' => [
+                [
+                    'name' => '',
+                    'attributes' => [
+                        'foo',
+                        1,
+                    ],
+                ]
+            ]
+        ], ['input.*.attributes.*' => 'string'], ['input.*.attributes.*.string' => 'Attribute (:first-index, :first-position) (:second-index, :second-position) must be a string.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Attribute (0, 1) (1, 2) must be a string.', $v->messages()->first('input.*.attributes.*'));
+
         $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :index is required.']);
         $this->assertFalse($v->passes());
         $this->assertSame('Name 1 is required.', $v->messages()->first('input.*.name'));
