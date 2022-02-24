@@ -7096,6 +7096,54 @@ class ValidationValidatorTest extends TestCase
         );
     }
 
+    public function testGetErrorMessageWithBuiltinRule()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines([
+            'validation.required_array_keys' => 'The :attribute field must contain entries for :values',
+            'validation.required' => 'The :attribute field is required.',
+        ], 'en');
+
+        $validator = new Validator($trans, [], []);
+
+        $this->assertSame(
+            ['The foo field is required.'],
+            $validator->getErrorMessage('foo', 'required')
+        );
+
+        $this->assertSame(
+            ['The foo field must contain entries for bar, baz'],
+            $validator->getErrorMessage('foo', 'required_array_keys:bar,baz')
+        );
+    }
+
+    public function testGetErrorMessageWithCustomRule()
+    {
+        $rule = new class implements Rule
+        {
+            public function passes($attribute, $value)
+            {
+                return true;
+            }
+
+            public function message()
+            {
+                return ':attribute must be baz';
+            }
+        };
+
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [],
+            []
+        );
+
+        $this->assertSame(
+            ['foo must be baz'],
+            $validator->getErrorMessage('foo', $rule)
+        );
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

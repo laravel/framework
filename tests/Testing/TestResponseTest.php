@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Testing;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,7 @@ use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -1654,6 +1655,28 @@ class TestResponseTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $cookie);
         $this->assertEquals($cookieName, $cookie->getName());
         $this->assertEquals($cookieValue, $cookie->getValue());
+    }
+
+    public function testAssertJsonValidationErrorRulesWithNoRule()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('No validation rule was provided.');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertJsonValidationErrorRules('foo');
+    }
+
+    public function testAssertJsonValidationErrorRulesWithoutFormatter()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('The current Validator instance does not have a message formatter.');
+
+        $fakeValidator = new class {};
+
+        $this->app->instance(ValidatorContract::class, $fakeValidator);
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertJsonValidationErrorRules('foo', 'bar');
     }
 
     private function makeMockResponse($content)
