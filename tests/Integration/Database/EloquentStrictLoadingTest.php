@@ -13,11 +13,8 @@ use RuntimeException;
 class EloquentStrictLoadingTest extends DatabaseTestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Model::preventLazyLoading();
     }

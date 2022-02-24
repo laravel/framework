@@ -13,9 +13,8 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 class ConsoleApplicationTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

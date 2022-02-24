@@ -32,11 +32,8 @@ class AuthenticationTest extends TestCase
     }
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');

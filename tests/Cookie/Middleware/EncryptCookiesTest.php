@@ -33,11 +33,8 @@ class EncryptCookiesTest extends TestCase
     protected $queueCookiePath = 'cookie/queue';
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         $this->container = new Container;
         $this->container->singleton(EncrypterContract::class, function () {

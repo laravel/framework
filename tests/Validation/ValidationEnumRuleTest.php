@@ -148,9 +148,8 @@ class ValidationEnumRuleTest extends TestCase
     }
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $container = Container::getInstance();
 
@@ -166,9 +165,8 @@ class ValidationEnumRuleTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         Container::setInstance(null);
 

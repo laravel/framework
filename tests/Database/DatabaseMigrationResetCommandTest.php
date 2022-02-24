@@ -14,9 +14,8 @@ use Symfony\Component\Console\Output\NullOutput;
 class DatabaseMigrationResetCommandTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

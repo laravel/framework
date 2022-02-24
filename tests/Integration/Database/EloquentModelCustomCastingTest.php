@@ -15,9 +15,8 @@ use PHPUnit\Framework\TestCase;
 class EloquentModelCustomCastingTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -54,9 +53,8 @@ class EloquentModelCustomCastingTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->schema()->drop('casting_table');
     }

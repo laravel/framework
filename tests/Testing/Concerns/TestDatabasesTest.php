@@ -13,11 +13,8 @@ use ReflectionMethod;
 class TestDatabasesTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Container::setInstance($container = new Container);
 
@@ -101,11 +98,8 @@ class TestDatabasesTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         Container::setInstance(null);
         DB::clearResolvedInstances();

@@ -25,9 +25,8 @@ use stdClass;
 class BusBatchTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -73,9 +72,8 @@ class BusBatchTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         unset($_SERVER['__finally.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 

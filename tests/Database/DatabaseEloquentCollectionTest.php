@@ -21,9 +21,8 @@ class DatabaseEloquentCollectionTest extends TestCase
      * @return void
      */
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -59,9 +58,8 @@ class DatabaseEloquentCollectionTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->schema()->drop('users');
         $this->schema()->drop('articles');

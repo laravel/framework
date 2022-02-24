@@ -12,11 +12,8 @@ use Orchestra\Testbench\TestCase;
 class EventFakeTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
@@ -27,13 +24,10 @@ class EventFakeTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         Schema::dropIfExists('posts');
-
-
     }
 
     public function testNonFakedEventGetsProperlyDispatched()

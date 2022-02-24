@@ -18,9 +18,8 @@ class RepositoryTest extends TestCase
     protected $config;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->repository = new Repository($this->config = [
             'foo' => 'bar',
@@ -39,8 +38,6 @@ class RepositoryTest extends TestCase
                 'z' => 'zoo',
             ],
         ]);
-
-
     }
 
     public function testConstruct()

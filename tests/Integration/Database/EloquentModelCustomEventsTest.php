@@ -11,11 +11,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 class EloquentModelCustomEventsTest extends DatabaseTestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Event::listen(CustomEvent::class, function () {
             $_SERVER['fired_event'] = true;

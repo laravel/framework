@@ -17,11 +17,8 @@ use Orchestra\Testbench\TestCase;
 class RateLimitedTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

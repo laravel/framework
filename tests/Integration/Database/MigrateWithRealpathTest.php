@@ -8,11 +8,8 @@ use Orchestra\Testbench\TestCase;
 class MigrateWithRealpathTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         if ($this->app['config']->get('database.default') !== 'testing') {
             $this->artisan('db:wipe', ['--drop-views' => true]);

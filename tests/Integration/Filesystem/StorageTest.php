@@ -15,9 +15,8 @@ class StorageTest extends TestCase
     protected $stubFile;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->afterApplicationCreated(function () {
             File::put($file = storage_path('app/public/StardewTaylor.png'), File::get(__DIR__.'/Fixtures/StardewTaylor.png'));
@@ -29,8 +28,6 @@ class StorageTest extends TestCase
                 File::delete($this->stubFile);
             }
         });
-
-
     }
 
     public function testItCanDeleteViaStorage()

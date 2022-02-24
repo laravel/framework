@@ -26,13 +26,10 @@ class WorkCommandTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->app['db']->connection()->getSchemaBuilder()->drop('jobs');
-
-
 
         FirstJob::$ran = false;
         SecondJob::$ran = false;

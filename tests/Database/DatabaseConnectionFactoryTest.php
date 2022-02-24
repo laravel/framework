@@ -16,9 +16,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     protected $db;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->db = new DB;
 
@@ -45,9 +44,8 @@ class DatabaseConnectionFactoryTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

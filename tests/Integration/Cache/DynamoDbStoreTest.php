@@ -12,15 +12,12 @@ use Orchestra\Testbench\TestCase;
 class DynamoDbStoreTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         if (! env('DYNAMODB_CACHE_TABLE')) {
             $this->markTestSkipped('DynamoDB not configured.');
         }
-
-
     }
 
     public function testItemsCanBeStoredAndRetrieved()

@@ -20,9 +20,8 @@ class RoutingRedirectorTest extends TestCase
     protected $redirect;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->headers = m::mock(HeaderBag::class);
 
@@ -50,9 +49,8 @@ class RoutingRedirectorTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

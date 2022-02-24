@@ -16,9 +16,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentRelationTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

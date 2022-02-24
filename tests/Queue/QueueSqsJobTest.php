@@ -13,9 +13,8 @@ use stdClass;
 class QueueSqsJobTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
@@ -54,9 +53,8 @@ class QueueSqsJobTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

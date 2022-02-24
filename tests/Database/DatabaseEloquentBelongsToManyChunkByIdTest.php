@@ -10,9 +10,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -73,9 +72,8 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->schema()->drop('users');
         $this->schema()->drop('articles');

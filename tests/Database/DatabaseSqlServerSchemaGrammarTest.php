@@ -12,9 +12,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

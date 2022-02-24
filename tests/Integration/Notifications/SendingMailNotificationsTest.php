@@ -25,11 +25,8 @@ class SendingMailNotificationsTest extends TestCase
     public $markdown;
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }
@@ -57,11 +54,8 @@ class SendingMailNotificationsTest extends TestCase
     }
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');

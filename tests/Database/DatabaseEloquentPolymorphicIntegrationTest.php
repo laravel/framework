@@ -9,9 +9,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -70,9 +69,8 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->schema()->drop('users');
         $this->schema()->drop('posts');

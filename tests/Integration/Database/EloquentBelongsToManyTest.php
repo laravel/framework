@@ -16,11 +16,8 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         Carbon::setTestNow(null);
     }

@@ -8,11 +8,8 @@ use Orchestra\Testbench\TestCase;
 abstract class MemcachedIntegrationTestCase extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         // Determine whether there is a running Memcached instance
         $testConnection = new Memcached;

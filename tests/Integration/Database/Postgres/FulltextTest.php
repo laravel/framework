@@ -28,11 +28,8 @@ class FulltextTest extends PostgresTestCase
     }
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         DB::table('articles')->insert([
             ['title' => 'PostgreSQL Tutorial', 'body' => 'DBMS stands for DataBase ...'],

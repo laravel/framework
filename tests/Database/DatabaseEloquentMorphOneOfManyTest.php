@@ -9,9 +9,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentMorphOneOfManyTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -51,9 +50,8 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->schema()->drop('products');
         $this->schema()->drop('states');

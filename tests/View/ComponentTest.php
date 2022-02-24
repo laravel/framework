@@ -20,9 +20,8 @@ class ComponentTest extends TestCase
     protected $config;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->config = m::mock(Config::class);
 
@@ -36,14 +35,11 @@ class ComponentTest extends TestCase
 
         Container::setInstance($container);
         Facade::setFacadeApplication($container);
-
-
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
 

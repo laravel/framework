@@ -10,9 +10,8 @@ use PHPUnit\Framework\TestCase;
 class TranslationFileLoaderTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

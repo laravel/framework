@@ -12,10 +12,8 @@ use PHPUnit\Framework\TestCase;
 class SupportTestingEventFakeTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
+    {
+        parent::setUp();
 
         $this->fake = new EventFake(m::mock(Dispatcher::class));
     }

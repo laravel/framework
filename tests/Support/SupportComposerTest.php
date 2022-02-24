@@ -11,9 +11,8 @@ use Symfony\Component\Process\Process;
 class SupportComposerTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

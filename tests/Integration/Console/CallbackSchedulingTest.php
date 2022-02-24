@@ -21,11 +21,8 @@ class CallbackSchedulingTest extends TestCase
     protected $log = [];
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         $cache = new class implements Factory
         {
@@ -49,13 +46,10 @@ class CallbackSchedulingTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         Container::setInstance(null);
-
-
     }
 
     public function testExecutionOrder()

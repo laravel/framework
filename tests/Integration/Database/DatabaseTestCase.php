@@ -17,17 +17,14 @@ abstract class DatabaseTestCase extends TestCase
     protected $driver;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->beforeApplicationDestroyed(function () {
             foreach (array_keys($this->app['db']->getConnections()) as $name) {
                 $this->app['db']->purge($name);
             }
         });
-
-
     }
 
     protected function getEnvironmentSetUp($app)

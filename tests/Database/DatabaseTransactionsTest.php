@@ -17,9 +17,8 @@ class DatabaseTransactionsTest extends TestCase
      * @return void
      */
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -55,9 +54,8 @@ class DatabaseTransactionsTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');

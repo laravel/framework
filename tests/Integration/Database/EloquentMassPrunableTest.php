@@ -17,11 +17,8 @@ use Mockery as m;
 class EloquentMassPrunableTest extends DatabaseTestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Container::setInstance($container = new Container);
 
@@ -98,11 +95,8 @@ class EloquentMassPrunableTest extends DatabaseTestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         Container::setInstance(null);
 

@@ -15,9 +15,8 @@ use stdClass;
 class FoundationApplicationTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

@@ -24,11 +24,8 @@ class AuthorizeMiddlewareTest extends TestCase
     protected $router;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         $this->user = new stdClass;
 
@@ -48,9 +45,8 @@ class AuthorizeMiddlewareTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
 

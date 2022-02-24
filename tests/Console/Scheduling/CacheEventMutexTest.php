@@ -32,11 +32,8 @@ class CacheEventMutexTest extends TestCase
     protected $cacheRepository;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         $this->cacheFactory = m::mock(Factory::class);
         $this->cacheRepository = m::mock(Repository::class);

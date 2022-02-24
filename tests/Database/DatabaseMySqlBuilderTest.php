@@ -11,9 +11,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseMySqlBuilderTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

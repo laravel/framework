@@ -16,9 +16,8 @@ use Mockery as m;
 class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

@@ -28,11 +28,8 @@ class FulltextTest extends MySqlTestCase
     }
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         DB::table('articles')->insert([
             ['title' => 'MySQL Tutorial', 'body' => 'DBMS stands for DataBase ...'],

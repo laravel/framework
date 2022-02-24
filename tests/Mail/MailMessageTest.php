@@ -15,11 +15,8 @@ class MailMessageTest extends TestCase
     protected $message;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         $this->message = new Message(new Email());
     }

@@ -9,11 +9,8 @@ use PHPUnit\Framework\TestCase;
 class ParallelTestingTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Container::setInstance(new Container);
 
@@ -101,11 +98,8 @@ class ParallelTestingTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         Container::setInstance(null);
 

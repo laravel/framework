@@ -18,20 +18,15 @@ class RedisConnectionTest extends TestCase
     use InteractsWithRedis;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
-
+    {
+        parent::setUp();
 
         $this->setUpRedis();
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         $this->tearDownRedis();
 

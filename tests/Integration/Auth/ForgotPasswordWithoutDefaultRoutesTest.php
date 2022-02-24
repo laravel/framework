@@ -13,14 +13,11 @@ use Orchestra\Testbench\TestCase;
 class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         ResetPassword::$createUrlCallback = null;
         ResetPassword::$toMailCallback = null;
-
-
     }
 
     protected function defineEnvironment($app)

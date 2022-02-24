@@ -11,11 +11,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         tap(new DB)->addConnection([
             'driver' => 'sqlite',
@@ -24,11 +21,8 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         Model::unsetConnectionResolver();
     }

@@ -12,18 +12,16 @@ use stdClass;
 class SupportFacadeTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         Facade::clearResolvedInstances();
         FacadeStub::setFacadeApplication(null);
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

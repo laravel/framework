@@ -10,11 +10,8 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentTimestampsTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         $db = new DB;
 
@@ -61,9 +58,8 @@ class DatabaseEloquentTimestampsTest extends TestCase
      * @return void
      */
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         $this->schema()->drop('users');
         $this->schema()->drop('users_created_at');

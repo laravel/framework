@@ -12,11 +12,8 @@ use PHPUnit\Framework\AssertionFailedError;
 class ArtisanCommandTest extends TestCase
 {
     protected function setUp(): void
-    {parent::setUp();
-
-
-
-
+    {
+        parent::setUp();
 
         Artisan::command('survey', function () {
             $name = $this->ask('What is your name?');

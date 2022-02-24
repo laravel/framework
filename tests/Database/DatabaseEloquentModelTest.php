@@ -43,11 +43,8 @@ class DatabaseEloquentModelTest extends TestCase
     use InteractsWithTime;
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         m::close();
         Carbon::setTestNow(null);

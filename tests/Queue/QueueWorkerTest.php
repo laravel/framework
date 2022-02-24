@@ -25,9 +25,8 @@ class QueueWorkerTest extends TestCase
     public $exceptionHandler;
 
     protected function setUp(): void
-    {parent::setUp();
-
-
+    {
+        parent::setUp();
 
         $this->events = m::spy(Dispatcher::class);
         $this->exceptionHandler = m::spy(ExceptionHandler::class);
@@ -39,11 +38,8 @@ class QueueWorkerTest extends TestCase
     }
 
     protected function tearDown(): void
-    {parent::tearDown();
-
-
-
-
+    {
+        parent::tearDown();
 
         Carbon::setTestNow(null);
 

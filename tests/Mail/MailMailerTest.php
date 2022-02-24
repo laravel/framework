@@ -16,9 +16,8 @@ use PHPUnit\Framework\TestCase;
 class MailMailerTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         unset($_SERVER['__mailer.test']);
 

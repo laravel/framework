@@ -15,13 +15,10 @@ use stdClass;
 class CacheMemcachedStoreTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
-
-
     }
 
     public function testGetReturnsNullWhenNotFound()

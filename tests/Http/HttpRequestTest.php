@@ -20,9 +20,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class HttpRequestTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
     }

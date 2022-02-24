@@ -17,9 +17,8 @@ use PHPUnit\Framework\TestCase;
 class QueueSyncQueueTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         m::close();
 

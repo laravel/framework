@@ -10,9 +10,8 @@ use PHPUnit\Framework\TestCase;
 class LoadEnvironmentVariablesTest extends TestCase
 {
     protected function tearDown(): void
-    {parent::tearDown();
-
-
+    {
+        parent::tearDown();
 
         unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
