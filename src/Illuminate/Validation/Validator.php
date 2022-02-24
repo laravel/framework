@@ -1444,7 +1444,7 @@ class Validator implements ValidatorContract
         return [
             $this->makeReplacements(
                 $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
-            )
+            ),
         ];
     }
 

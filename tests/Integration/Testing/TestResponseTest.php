@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Integration\Testing;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Http\Response;
 use Illuminate\Testing\TestResponse;
-use PHPUnit\Framework\ExpectationFailedException;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class TestResponseTest extends TestCase
 {
