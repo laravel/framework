@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class TestResponseTest extends TestCase
 {
-    public function testAssertJsonValidationErrorRulesWithString()
+    public function testassertJsonValidationErrorRuleWithString()
     {
         $data = [
             'status' => 'ok',
@@ -20,10 +20,10 @@ class TestResponseTest extends TestCase
             (new Response)->setContent(json_encode($data))
         );
 
-        $testResponse->assertJsonValidationErrorRules('key', 'required');
+        $testResponse->assertJsonValidationErrorRule('key', 'required');
     }
 
-    public function testAssertJsonValidationErrorRulesWithArray()
+    public function testassertJsonValidationErrorRuleWithArray()
     {
         $data = [
             'status' => 'ok',
@@ -34,15 +34,15 @@ class TestResponseTest extends TestCase
             (new Response)->setContent(json_encode($data))
         );
 
-        $testResponse->assertJsonValidationErrorRules(['key' => 'required']);
+        $testResponse->assertJsonValidationErrorRule(['key' => 'required']);
     }
 
-    public function testAssertJsonValidationErrorRulesWithNoRule()
+    public function testassertJsonValidationErrorRuleWithNoRule()
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('No validation rule was provided.');
 
         $response = TestResponse::fromBaseResponse(new Response());
-        $response->assertJsonValidationErrorRules('foo');
+        $response->assertJsonValidationErrorRule('foo');
     }
 }

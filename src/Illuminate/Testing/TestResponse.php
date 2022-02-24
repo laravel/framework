@@ -923,7 +923,7 @@ EOF;
      * @param  string  $responseKey
      * @return $this
      */
-    public function assertJsonValidationErrorRules(string|array $attribute, ?string $rule = null, $responseKey = 'errors')
+    public function assertJsonValidationErrorRule(string|array $attribute, ?string $rule = null, $responseKey = 'errors')
     {
         $validationRules = $attribute;
 
