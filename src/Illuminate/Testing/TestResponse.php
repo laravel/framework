@@ -18,6 +18,7 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Validation\Validator;
 use LogicException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -932,20 +933,12 @@ EOF;
             $validationRules = [$attribute => $rule];
         }
 
-        $validator = app('validator');
+        $validator = new Validator(app('translator'), [], []);
 
-        if (! method_exists($validator, 'getErrorMessage')) {
-            PHPUnit::fail('The current Validator instance does not have a message formatter.');
-        }
-
-        foreach ($validationRules as $attribute => $rules) {
-            $rules = Arr::wrap($rules);
-
-            foreach ($rules as $rule) {
-                $this->assertJsonValidationErrors([
-                    $attribute => $validator->getErrorMessage($attribute, $rule),
-                ], $responseKey);
-            }
+        foreach ($validationRules as $attribute => $rule) {
+            $this->assertJsonValidationErrors([
+                $attribute => $validator->getErrorMessage($attribute, $rule),
+            ], $responseKey);
         }
 
         return $this;
