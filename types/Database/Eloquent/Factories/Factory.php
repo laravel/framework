@@ -183,8 +183,11 @@ assertType('Illuminate\Database\Eloquent\Model', $factory->newModel(['string' =>
 // assertType('class-string<User>', $factory->modelName());
 assertType('class-string<Illuminate\Database\Eloquent\Model>', $factory->modelName());
 
-$factory->guessModelNamesUsing(function () {
-    return User::class;
+Factory::guessModelNamesUsing(function (Factory $factory) {
+    return match (true) {
+        $factory instanceof UserFactory => User::class,
+        default => throw new LogicException('Unknown factory'),
+    };
 });
 
 $factory->useNamespace('string');
@@ -192,3 +195,10 @@ $factory->useNamespace('string');
 assertType(Factory::class, $factory::factoryForModel(User::class));
 
 assertType('class-string<Illuminate\Database\Eloquent\Factories\Factory>', $factory->resolveFactoryName(User::class));
+
+Factory::guessFactoryNamesUsing(function (string $modelName) {
+    return match ($modelName) {
+        User::class => UserFactory::class,
+        default => throw new LogicException('Unknown factory'),
+    };
+});

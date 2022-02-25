@@ -708,7 +708,7 @@ abstract class Factory
     /**
      * Specify the callback that should be invoked to guess model names based on factory names.
      *
-     * @param  callable(): class-string<\Illuminate\Database\Eloquent\Model|TModel>  $callback
+     * @param  callable(self): class-string<\Illuminate\Database\Eloquent\Model|TModel>  $callback
      * @return void
      */
     public static function guessModelNamesUsing(callable $callback)
@@ -743,7 +743,7 @@ abstract class Factory
     /**
      * Specify the callback that should be invoked to guess factory names based on dynamic relationship names.
      *
-     * @param  callable(): class-string<\Illuminate\Database\Eloquent\Model|TModel>  $callback
+     * @param  callable(class-string<\Illuminate\Database\Eloquent\Model>): class-string<\Illuminate\Database\Eloquent\Factories\Factory>  $callback
      * @return void
      */
     public static function guessFactoryNamesUsing(callable $callback)
