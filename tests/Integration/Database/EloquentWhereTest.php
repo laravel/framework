@@ -63,6 +63,33 @@ class EloquentWhereTest extends DatabaseTestCase
         );
     }
 
+    public function testWhereNot()
+    {
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
+        $firstUser = UserWhereTest::create([
+            'name' => 'test-name',
+            'email' => 'test-email',
+            'address' => 'test-address',
+        ]);
+
+        /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $secondUser */
+        $secondUser = UserWhereTest::create([
+            'name' => 'test-name1',
+            'email' => 'test-email1',
+            'address' => 'test-address1',
+        ]);
+
+        $this->assertTrue($secondUser->is(UserWhereTest::whereNot(function ($query) use ($firstUser) {
+            $query->where('name', '=', $firstUser->name);
+        })->first()));
+        $this->assertTrue($firstUser->is(UserWhereTest::where('name', $firstUser->name)->whereNot(function ($query) use ($secondUser) {
+            $query->where('email', $secondUser->email);
+        })->first()));
+        $this->assertTrue($secondUser->is(UserWhereTest::where('name', 'wrong-name')->orWhereNot(function ($query) use ($firstUser) {
+            $query->where('email', $firstUser->email);
+        })->first()));
+    }
+
     public function testFirstWhere()
     {
         /** @var \Illuminate\Tests\Integration\Database\UserWhereTest $firstUser */
@@ -115,7 +142,7 @@ class EloquentWhereTest extends DatabaseTestCase
             'address' => 'other-address',
         ]);
 
-        $this->expectException(MultipleRecordsFoundException::class);
+        $this->expectExceptionObject(new MultipleRecordsFoundException(2));
 
         UserWhereTest::where('name', 'test-name')->sole();
     }

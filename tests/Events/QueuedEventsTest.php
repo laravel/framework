@@ -116,7 +116,10 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
-            return count($job->middleware) === 1 && $job->middleware[0] instanceof TestMiddleware;
+            return count($job->middleware) === 1
+                && $job->middleware[0] instanceof TestMiddleware
+                && $job->middleware[0]->a === 'foo'
+                && $job->middleware[0]->b === 'bar';
         });
     }
 }
@@ -190,12 +193,12 @@ class TestDispatcherOptions implements ShouldQueue
 
 class TestDispatcherMiddleware implements ShouldQueue
 {
-    public function middleware()
+    public function middleware($a, $b)
     {
-        return [new TestMiddleware()];
+        return [new TestMiddleware($a, $b)];
     }
 
-    public function handle()
+    public function handle($a, $b)
     {
         //
     }
@@ -203,6 +206,15 @@ class TestDispatcherMiddleware implements ShouldQueue
 
 class TestMiddleware
 {
+    public $a;
+    public $b;
+
+    public function __construct($a, $b)
+    {
+        $this->a = $a;
+        $this->b = $b;
+    }
+
     public function handle($job, $next)
     {
         $next($job);

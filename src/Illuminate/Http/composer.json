@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.0.2",
         "ext-json": "*",
+        "fruitcake/php-cors": "^1.2",
         "illuminate/collections": "^10.0",
         "illuminate/macroable": "^10.0",
         "illuminate/session": "^10.0",

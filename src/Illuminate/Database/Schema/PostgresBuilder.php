@@ -2,8 +2,14 @@
 
 namespace Illuminate\Database\Schema;
 
+use Illuminate\Database\Concerns\ParsesSearchPath;
+
 class PostgresBuilder extends Builder
 {
+    use ParsesSearchPath {
+        parseSearchPath as baseParseSearchPath;
+    }
+
     /**
      * Create a database in the schema.
      *
@@ -197,7 +203,7 @@ class PostgresBuilder extends Builder
     protected function parseSchemaAndTable($reference)
     {
         $searchPath = $this->parseSearchPath(
-            $this->connection->getConfig('search_path') ?: 'public'
+            $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema') ?: 'public'
         );
 
         $parts = explode('.', $reference);
@@ -215,9 +221,7 @@ class PostgresBuilder extends Builder
         // We will use the default schema unless the schema has been specified in the
         // query. If the schema has been specified in the query then we can use it
         // instead of a default schema configured in the connection search path.
-        $schema = $searchPath[0] === '$user'
-            ? $this->connection->getConfig('username')
-            : $searchPath[0];
+        $schema = $searchPath[0];
 
         if (count($parts) === 2) {
             $schema = $parts[0];
@@ -228,24 +232,16 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Parse the "search_path" value into an array.
+     * Parse the "search_path" configuration value into an array.
      *
-     * @param  string|array  $searchPath
+     * @param  string|array|null  $searchPath
      * @return array
      */
     protected function parseSearchPath($searchPath)
     {
-        if (is_string($searchPath)) {
-            preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
-
-            $searchPath = $matches[0];
-        }
-
-        $searchPath = $searchPath ?? [];
+        $searchPath = $this->baseParseSearchPath($searchPath);
 
         array_walk($searchPath, function (&$schema) {
-            $schema = trim($schema, '\'"');
-
             $schema = $schema === '$user'
                 ? $this->connection->getConfig('username')
                 : $schema;

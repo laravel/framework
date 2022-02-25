@@ -159,6 +159,34 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
     }
 
     /**
+     * Assert that no notifications were sent to the given notifiable.
+     *
+     * @param  mixed  $notifiable
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function assertNothingSentTo($notifiable)
+    {
+        if (is_array($notifiable) || $notifiable instanceof Collection) {
+            if (count($notifiable) === 0) {
+                throw new Exception('No notifiable given.');
+            }
+
+            foreach ($notifiable as $singleNotifiable) {
+                $this->assertNothingSentTo($singleNotifiable);
+            }
+
+            return;
+        }
+
+        PHPUnit::assertEmpty(
+            $this->notifications[get_class($notifiable)][$notifiable->getKey()] ?? [],
+            'Notifications were sent unexpectedly.',
+        );
+    }
+
+    /**
      * Assert the total amount of times a notification was sent.
      *
      * @param  string  $notification

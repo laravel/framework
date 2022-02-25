@@ -179,12 +179,13 @@ class CallQueuedHandler
         $uses = class_uses_recursive($command);
 
         if (! in_array(Batchable::class, $uses) ||
-            ! in_array(InteractsWithQueue::class, $uses) ||
-            is_null($command->batch())) {
+            ! in_array(InteractsWithQueue::class, $uses)) {
             return;
         }
 
-        $command->batch()->recordSuccessfulJob($command->job->uuid());
+        if ($batch = $command->batch()) {
+            $batch->recordSuccessfulJob($command->job->uuid());
+        }
     }
 
     /**
@@ -273,12 +274,13 @@ class CallQueuedHandler
      */
     protected function ensureFailedBatchJobIsRecorded(string $uuid, $command, $e)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($command)) ||
-            is_null($command->batch())) {
+        if (! in_array(Batchable::class, class_uses_recursive($command))) {
             return;
         }
 
-        $command->batch()->recordFailedJob($uuid, $e);
+        if ($batch = $command->batch()) {
+            $batch->recordFailedJob($uuid, $e);
+        }
     }
 
     /**

@@ -296,7 +296,7 @@ class ComponentTagCompiler
 
         $prefix = $segments[0];
 
-        if (! isset($this->namespaces[$prefix]) || ! isset($segments[1])) {
+        if (! isset($this->namespaces[$prefix], $segments[1])) {
             return;
         }
 

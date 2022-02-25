@@ -21,11 +21,11 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
-     * The grammar specific bit operators.
+     * The grammar specific bitwise operators.
      *
      * @var array
      */
-    protected $bitOperators = [
+    protected $bitwiseOperators = [
         '~', '&', '|', '#', '<<', '>>', '<<=', '>>=',
     ];
 
@@ -48,6 +48,22 @@ class PostgresGrammar extends Grammar
         }
 
         return parent::whereBasic($query, $where);
+    }
+
+    /**
+     * Compile a bitwise operator where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBitwise(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        $operator = str_replace('?', '??', $where['operator']);
+
+        return '('.$this->wrap($where['column']).' '.$operator.' '.$value.')::bool';
     }
 
     /**
@@ -212,6 +228,36 @@ class PostgresGrammar extends Grammar
         $column = str_replace('->>', '->', $this->wrap($column));
 
         return 'jsonb_array_length(('.$column.')::jsonb) '.$operator.' '.$value;
+    }
+
+    /**
+     * Compile a single having clause.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHaving(array $having)
+    {
+        if ($having['type'] === 'Bitwise') {
+            return $this->compileHavingBitwise($having);
+        }
+
+        return parent::compileHaving($having);
+    }
+
+    /**
+     * Compile a having clause involving a bitwise operator.
+     *
+     * @param  array  $having
+     * @return string
+     */
+    protected function compileHavingBitwise($having)
+    {
+        $column = $this->wrap($having['column']);
+
+        $parameter = $this->parameter($having['value']);
+
+        return '('.$column.' '.$having['operator'].' '.$parameter.')::bool';
     }
 
     /**

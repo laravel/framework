@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -277,7 +278,7 @@ class ValidationPasswordRuleTest extends TestCase
             }
         };
 
-        $ruleObject = new class implements \Illuminate\Contracts\Validation\Rule
+        $ruleObject = new class implements RuleContract
         {
             public function passes($attribute, $value)
             {

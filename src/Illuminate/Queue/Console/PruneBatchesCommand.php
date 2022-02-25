@@ -52,7 +52,7 @@ class PruneBatchesCommand extends Command
 
         $this->info("{$count} entries deleted!");
 
-        if ($unfinished = $this->option('unfinished')) {
+        if ($this->option('unfinished')) {
             $count = 0;
 
             if ($repository instanceof DatabaseBatchRepository) {
