@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "ext-json": "*",
         "egulias/email-validator": "^3.1",
         "illuminate/collections": "^10.0",
