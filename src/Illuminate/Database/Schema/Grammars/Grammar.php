@@ -330,9 +330,19 @@ abstract class Grammar extends BaseGrammar
             return $value;
         }
 
-        return is_bool($value)
-                    ? "'".(int) $value."'"
-                    : "'".(string) $value."'";
+        if(is_object($value))
+		{
+			if(isset($value->value))
+			{
+				return "'".(string) $value->value."'";
+			}else{
+				throw new RuntimeException("Obejct most to be an enum");
+			}
+		}
+        
+		return is_bool($value)
+            ? "'".(int) $value."'"
+            : "'".(string) $value."'";
     }
 
     /**
