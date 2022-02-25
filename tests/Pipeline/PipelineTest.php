@@ -102,9 +102,9 @@ class PipelineTest extends TestCase
         $object = new stdClass();
 
         $object->value = 0;
-        
+
         $function = function ($object, $next) {
-            ++$object->value;
+            $object->value++;
 
             return $next($object);
         };
