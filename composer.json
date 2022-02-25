@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.1",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "doctrine/inflector": "^2.0",

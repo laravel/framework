@@ -7,13 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-if (PHP_VERSION_ID >= 80100) {
-    include 'Enums.php';
-}
+include 'Enums.php';
 
-/**
- * @requires PHP >= 8.1
- */
 class EloquentModelEnumCastingTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
