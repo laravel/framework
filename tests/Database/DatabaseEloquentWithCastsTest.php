@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,7 +46,6 @@ class DatabaseEloquentWithCastsTest extends TestCase
 
         $this->assertSame('07:30', $time1->time);
         $this->assertSame($time1->time, $time2->time);
-
     }
 
     public function testWithFirstOrCreate()
@@ -59,7 +57,6 @@ class DatabaseEloquentWithCastsTest extends TestCase
             ->firstOrCreate(['time' => '07:30']);
 
         $this->assertSame($time1->id, $time2->id);
-
     }
 
     /**
@@ -83,14 +80,11 @@ class DatabaseEloquentWithCastsTest extends TestCase
     }
 }
 
-
 class Time extends Eloquent
 {
     protected $guarded = [];
 
     protected $casts = [
-        "time" => "datetime"
+        'time' => 'datetime',
     ];
-
 }
-
