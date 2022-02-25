@@ -196,7 +196,7 @@ assertType(Factory::class, $factory::factoryForModel(User::class));
 
 assertType('class-string<Illuminate\Database\Eloquent\Factories\Factory>', $factory->resolveFactoryName(User::class));
 
-Factory::guessFactoryNamesUsing(function(string $modelName) {
+Factory::guessFactoryNamesUsing(function (string $modelName) {
     return match ($modelName) {
         User::class => UserFactory::class,
         default => throw new LogicException('Unknown factory'),
