@@ -22,13 +22,13 @@ class CacheManagerTest extends TestCase
 
     public function testCustomDriverClosureBoundObjectIsCacheManager()
     {
-        $cacheManager = new CacheManager([
-            'config' => [
-                'cache.stores.'.__CLASS__ => [
-                    'driver' => __CLASS__,
-                ],
+        $userConfig = [
+            'cache.stores.'.__CLASS__ => [
+                'driver' => __CLASS__,
             ],
-        ]);
+        ];
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
         $driver = function () {
             return $this;
         };
@@ -118,13 +118,13 @@ class CacheManagerTest extends TestCase
 
     public function testForgetDriverForgets()
     {
-        $cacheManager = new CacheManager([
-            'config' => [
-                'cache.stores.forget' => [
-                    'driver' => 'forget',
-                ],
+        $userConfig = [
+            'cache.stores.forget' => [
+                'driver' => 'forget',
             ],
-        ]);
+        ];
+        $app = $this->getApp($userConfig);
+        $cacheManager = new CacheManager($app);
         $cacheManager->extend('forget', function () {
             return new ArrayStore;
         });
