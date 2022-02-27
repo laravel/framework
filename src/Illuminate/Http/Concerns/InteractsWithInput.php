@@ -143,8 +143,8 @@ trait InteractsWithInput
     {
         $keys = is_array($key) ? $key : func_get_args();
 
-        foreach ($keys as $value) {
-            if ($this->isEmptyString($value)) {
+        foreach ($keys as $key => $value) {
+            if ($this->isEmptyString($key)) {
                 return false;
             }
         }
