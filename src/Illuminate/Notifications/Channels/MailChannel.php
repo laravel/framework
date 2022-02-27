@@ -52,13 +52,12 @@ class MailChannel
     {
         $message = $notification->toMail($notifiable);
 
-        if (! $notifiable->routeNotificationFor('mail', $notification) &&
-            ! $message instanceof Mailable) {
-            return;
-        }
-
         if ($message instanceof Mailable) {
             return $message->send($this->mailer);
+        }
+
+        if (! $this->routeNotificationFor($notifiable, $notification)) {
+            return;
         }
 
         $this->mailer->mailer($message->mailer ?? null)->send(
@@ -66,6 +65,19 @@ class MailChannel
             array_merge($message->data(), $this->additionalMessageData($notification)),
             $this->messageBuilder($notifiable, $notification, $message)
         );
+    }
+
+    /**
+     * Get the notification routing information for the mail driver.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return mixed
+     */
+    protected function routeNotificationFor($notifiable, $notification)
+    {
+        return $notifiable->routeNotificationFor('mail', $notification) ??
+            $notifiable->routeNotificationFor(static::class, $notification);
     }
 
     /**
@@ -219,7 +231,7 @@ class MailChannel
      */
     protected function getRecipients($notifiable, $notification, $message)
     {
-        if (is_string($recipients = $notifiable->routeNotificationFor('mail', $notification))) {
+        if (is_string($recipients = $this->routeNotificationFor($notifiable, $notification))) {
             $recipients = [$recipients];
         }
 
