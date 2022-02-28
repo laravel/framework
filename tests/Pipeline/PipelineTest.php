@@ -97,7 +97,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
-    public function testPipelineUsageWithChain()
+    public function testPipelineUsageWithPipe()
     {
         $object = new stdClass();
 
@@ -112,7 +112,7 @@ class PipelineTest extends TestCase
         $result = (new Pipeline(new Container))
             ->send($object)
             ->through([$function])
-            ->chain([$function])
+            ->pipe([$function])
             ->then(
                 function ($piped) {
                     return $piped;
