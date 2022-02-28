@@ -1407,7 +1407,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Take items in the collection until a given point in time.
      *
      * @param  \DateTimeInterface  $timeout
-     * @param  callable(TValue, TKey)|null $callback
+     * @param  callable(TValue, TKey)|null  $callback
      * @return static
      */
     public function takeUntilTimeout(DateTimeInterface $timeout, callable $callback = null)
@@ -1417,7 +1417,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         return $this->takeWhile(function ($item, $key) use ($timeout, $callback) {
             if ($this->now() < $timeout) {
                 return true;
-            };
+            }
 
             if ($callback !== null) {
                 $callback($item, $key);
