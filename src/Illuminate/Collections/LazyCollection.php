@@ -1407,14 +1407,23 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Take items in the collection until a given point in time.
      *
      * @param  \DateTimeInterface  $timeout
+     * @param  callable(TValue, TKey)|null $callback
      * @return static
      */
-    public function takeUntilTimeout(DateTimeInterface $timeout)
+    public function takeUntilTimeout(DateTimeInterface $timeout, callable $callback = null)
     {
         $timeout = $timeout->getTimestamp();
 
-        return $this->takeWhile(function () use ($timeout) {
-            return $this->now() < $timeout;
+        return $this->takeWhile(function ($item, $key) use ($timeout, $callback) {
+            if ($this->now() < $timeout) {
+                return true;
+            };
+
+            if ($callback !== null) {
+                $callback($item, $key);
+            }
+
+            return false;
         });
     }
 

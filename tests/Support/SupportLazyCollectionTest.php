@@ -196,6 +196,37 @@ class SupportLazyCollectionTest extends TestCase
         m::close();
     }
 
+    public function testTakeUntilTimeoutWithCallback()
+    {
+        $timeout = Carbon::now();
+
+        $mock = m::mock(LazyCollection::class.'[now]');
+
+        $results = $mock
+            ->times(10)
+            ->tap(function ($collection) use ($mock, $timeout) {
+                tap($collection)
+                    ->mockery_init($mock->mockery_getContainer())
+                    ->shouldAllowMockingProtectedMethods()
+                    ->shouldReceive('now')
+                    ->times(3)
+                    ->andReturn(
+                        (clone $timeout)->sub(2, 'minute')->getTimestamp(),
+                        (clone $timeout)->sub(1, 'minute')->getTimestamp(),
+                        $timeout->getTimestamp()
+                    );
+            })
+            ->takeUntilTimeout($timeout, function ($item, $key) {
+                $this->assertSame(3, $item);
+                $this->assertSame(2, $key);
+            })
+            ->all();
+
+        $this->assertSame([1, 2], $results);
+
+        m::close();
+    }
+
     public function testTapEach()
     {
         $data = LazyCollection::times(10);
