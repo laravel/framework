@@ -209,25 +209,24 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Detect if the route has been defined inside one of the composer packages.
+     * Determine if the route has been defined outside of the application.
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return bool
-     *
-     * @throws \ReflectionException
      */
     protected function isVendorRoute(Route $route)
     {
         if ($route->action['uses'] instanceof Closure) {
-            $fileName = (new ReflectionFunction($route->action['uses']))
-                ->getFileName();
+            $path = (new ReflectionFunction($route->action['uses']))
+                                ->getFileName();
+        } elseif (is_string($route->action['uses'])) {
+            $path = (new ReflectionClass(explode('@', $route->action['uses'])[0]))
+                                ->getFileName();
         } else {
-            [$actionClass] = explode('@', $route->action['uses']);
-            $fileName = (new ReflectionClass($actionClass))
-                ->getFileName();
+            return false;
         }
 
-        return str_starts_with($fileName, base_path('vendor'));
+        return str_starts_with($path, base_path('vendor'));
     }
 
     /**
