@@ -81,7 +81,7 @@ class Pipeline implements PipelineContract
      * @param  array|mixed  $pipes
      * @return $this
      */
-    public function chain($pipes)
+    public function pipe($pipes)
     {
         array_push($this->pipes, ...(is_array($pipes) ? $pipes : func_get_args()));
 
