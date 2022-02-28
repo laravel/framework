@@ -450,7 +450,7 @@ class RouteListCommand extends Command
             ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (precedence, domain, method, uri, name, action, middleware) to sort by', 'uri'],
-            ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined in vendor'],
+            ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
         ];
     }
 }
