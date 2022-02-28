@@ -12,6 +12,15 @@ $iterable = [];
 /** @var Traversable<int, string> $traversable */
 $traversable = [];
 
+class Invokable
+{
+    public function __invoke(): string
+    {
+        return 'Taylor';
+    }
+}
+$invokable = new Invokable();
+
 assertType('Illuminate\Support\Collection<int, User>', $collection);
 
 assertType('Illuminate\Support\Collection<int, string>', collect(['string']));
@@ -294,6 +303,11 @@ assertType(
     )
 );
 
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->when($invokable, function ($collection, $param) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('Invokable', $param);
+}));
+
 assertType('bool|Illuminate\Support\Collection<int, User>', $collection->whenEmpty(function ($collection) {
     assertType('Illuminate\Support\Collection<int, User>', $collection);
 
@@ -375,6 +389,11 @@ assertType(
         }
     )
 );
+
+assertType('Illuminate\Support\Collection<int, User>|void', $collection->unless($invokable, function ($collection, $param) {
+    assertType('Illuminate\Support\Collection<int, User>', $collection);
+    assertType('Invokable', $param);
+}));
 
 assertType('bool|Illuminate\Support\Collection<int, User>', $collection->unlessEmpty(function ($collection) {
     assertType('Illuminate\Support\Collection<int, User>', $collection);
