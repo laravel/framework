@@ -1165,6 +1165,21 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Purge all after resolving callbacks.
+     *
+     * @param  \Closure|string  $abstract
+     * @return void
+     */
+    public function purgeAfterResolvingCallbacks($abstract)
+    {
+        if (is_string($abstract)) {
+            $abstract = $this->getAlias($abstract);
+        }
+
+        unset($this->afterResolvingCallbacks[$abstract]);
+    }
+
+    /**
      * Fire all of the before resolving callbacks.
      *
      * @param  string  $abstract

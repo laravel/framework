@@ -207,4 +207,12 @@ interface Container extends ContainerInterface
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null);
+
+    /**
+     * Purge all after resolving callbacks.
+     *
+     * @param  \Closure|string  $abstract
+     * @return void
+     */
+    public function purgeAfterResolvingCallbacks($abstract);
 }
