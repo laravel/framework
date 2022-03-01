@@ -210,6 +210,8 @@ abstract class Facade
      *
      * @param  string  $name
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected static function resolveFacadeInstance($name)
     {
