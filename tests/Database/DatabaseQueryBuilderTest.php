@@ -302,6 +302,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testBasicWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
+        $this->assertSame('select * from "users" where not "name" = ? and not "name" <> ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
+    }
+
     public function testWheresWithArrayValue()
     {
         $builder = $this->getBuilder();
@@ -714,6 +722,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhere('email', '=', 'foo');
         $this->assertSame('select * from "users" where "id" = ? or "email" = ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
+    }
+
+    public function testBasicOrWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
+        $this->assertSame('select * from "users" where not "name" = ? or not "name" <> ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
     }
 
     public function testRawWheres()
