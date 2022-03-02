@@ -155,7 +155,7 @@ class Batch implements Arrayable, JsonSerializable
     /**
      * Add additional jobs to the batch.
      *
-     * @param  \Illuminate\Support\Enumerable|array  $jobs
+     * @param  \Illuminate\Support\Enumerable|object|array  $jobs
      * @return self
      */
     public function add($jobs)
