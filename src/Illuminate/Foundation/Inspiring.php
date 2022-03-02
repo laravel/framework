@@ -62,6 +62,7 @@ class Inspiring
             'Do what you can, with what you have, where you are. - Theodore Roosevelt',
             'Happiness is not something readymade. It comes from your own actions. - Dalai Lama',
             'He who is contented is rich. - Laozi',
+            'Here I sit broken hearted, came to shit but only farted. Then one day I took a chance, went to fart, but shit my pants. - William Shakespeare',
             'I begin to speak only when I am certain what I will say is not better left unsaid. - Cato the Younger',
             'I have not failed. I\'ve just found 10,000 ways that won\'t work. - Thomas Edison',
             'If you do not have a consistent goal in life, you can not live it in a consistent way. - Marcus Aurelius',
@@ -70,6 +71,8 @@ class Inspiring
             'It is quality rather than quantity that matters. - Lucius Annaeus Seneca',
             'Knowing is not enough; we must apply. Being willing is not enough; we must do. - Leonardo da Vinci',
             'Let all your things have their places; let each part of your business have its time. - Benjamin Franklin',
+            'Life is like a cigarette, smoke it to the butt. - Harvie Krumpet',
+            'Life is now. There was never a time when your life was not now, nor will there ever be. - Eckhart Tolle',
             'Live as if you were to die tomorrow. Learn as if you were to live forever. - Mahatma Gandhi',
             'No surplus words or unnecessary actions. - Marcus Aurelius',
             'Nothing worth having comes easy. - Theodore Roosevelt',
@@ -91,6 +94,7 @@ class Inspiring
             'Breathing in, I calm body and mind. Breathing out, I smile. - Thich Nhat Hanh',
             'Life is available only in the present moment. - Thich Nhat Hanh',
             'The best way to take care of the future is to take care of the present moment. - Thich Nhat Hanh',
+            'The primary cause of unhappiness is never the situation, but your thoughts about it. - Eckhart Tolle',
             'Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less. - Marie Curie',
         ])->random();
     }
