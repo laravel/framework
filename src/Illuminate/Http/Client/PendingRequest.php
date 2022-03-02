@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
@@ -695,7 +696,7 @@ class PendingRequest
      */
     public function send(string $method, string $url, array $options = [])
     {
-        $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+        $url = (string) Psr7\UriResolver::resolve(Psr7\Utils::uriFor($this->baseUrl), Psr7\Utils::uriFor($url));
 
         $options = $this->parseHttpOptions($options);
 

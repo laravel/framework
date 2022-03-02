@@ -597,6 +597,25 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testWithBaseUrl()
+    {
+        $this->factory->fake();
+
+        $this->factory->baseUrl('http://foo.com/')->get('get');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/get';
+        });
+
+        $this->factory->fake();
+
+        $this->factory->baseUrl('http://foo.com/')->get('http://bar.com/get');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://bar.com/get';
+        });
+    }
+
     public function testCanConfirmManyHeaders()
     {
         $this->factory->fake();
