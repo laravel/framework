@@ -236,7 +236,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->read($path);
         } catch (UnableToReadFile $e) {
-            //
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
         }
     }
 
@@ -330,6 +332,10 @@ class FilesystemAdapter implements CloudFilesystemContract
                 ? $this->driver->writeStream($path, $contents, $options)
                 : $this->driver->write($path, $contents, $options);
         } catch (UnableToWriteFile $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -405,6 +411,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->setVisibility($path, $this->parseVisibility($visibility));
         } catch (UnableToSetVisibility $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -461,6 +471,10 @@ class FilesystemAdapter implements CloudFilesystemContract
             try {
                 $this->driver->delete($path);
             } catch (UnableToDeleteFile $e) {
+                if ($this->throwsExceptions()) {
+                    throw $e;
+                }
+
                 $success = false;
             }
         }
@@ -480,6 +494,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->copy($from, $to);
         } catch (UnableToCopyFile $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -498,6 +516,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->move($from, $to);
         } catch (UnableToMoveFile $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -545,7 +567,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             return $this->driver->readStream($path);
         } catch (UnableToReadFile $e) {
-            //
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
         }
     }
 
@@ -557,6 +581,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->writeStream($path, $resource, $options);
         } catch (UnableToWriteFile $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -753,6 +781,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->createDirectory($path);
         } catch (UnableToCreateDirectory $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -770,6 +802,10 @@ class FilesystemAdapter implements CloudFilesystemContract
         try {
             $this->driver->deleteDirectory($directory);
         } catch (UnableToDeleteDirectory $e) {
+            if ($this->throwsExceptions()) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -836,6 +872,17 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function buildTemporaryUrlsUsing(Closure $callback)
     {
         $this->temporaryUrlCallback = $callback;
+    }
+
+
+    /**
+     * Determine if Flysystem exceptions should be thrown.
+     *
+     * @return bool
+     */
+    protected function throwsExceptions(): bool
+    {
+        return (bool) ($this->config['throws_exceptions'] ?? false);
     }
 
     /**
