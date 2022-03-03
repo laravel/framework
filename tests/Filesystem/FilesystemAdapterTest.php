@@ -426,10 +426,9 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    /** @requires OS Linux|Darwin */
     public function testThrowExceptionsForPut()
     {
-        mkdir(__DIR__.'/tmp/bar', 0600);
+        mkdir(__DIR__.'/tmp/bar', 0400);
 
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throws_exceptions' => true]);
 
