@@ -246,4 +246,22 @@ trait InteractsWithDatabase
 
         return $this;
     }
+
+    /**
+     * Dump the database query.
+     *
+     * @return $this
+     */
+    protected function dumpQuery()
+    {
+        $database = $this->app->make('db');
+
+        $database->enableQueryLog();
+
+        $this->beforeApplicationDestroyed(function () use ($database) {
+            dump($database->getQueryLog());
+        });
+
+        return $this;
+    }
 }
