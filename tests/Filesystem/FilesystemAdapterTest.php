@@ -398,7 +398,7 @@ class FilesystemAdapterTest extends TestCase
 
     public function testThrowExceptionForGet()
     {
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throws_exceptions' => true]);
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
         try {
             $adapter->get('/foo.txt');
@@ -413,7 +413,7 @@ class FilesystemAdapterTest extends TestCase
 
     public function testThrowExceptionsForReadStream()
     {
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throws_exceptions' => true]);
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
         try {
             $adapter->readStream('/foo.txt');
@@ -431,7 +431,7 @@ class FilesystemAdapterTest extends TestCase
     {
         mkdir(__DIR__.'/tmp/bar', 0600);
 
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throws_exceptions' => true]);
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
         try {
             $adapter->put('/bar/foo.txt', 'Hello World!');
