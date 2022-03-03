@@ -579,6 +579,20 @@ class FilesystemTest extends TestCase
         $this->assertSame('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash(self::$tempDir.'/foo.txt'));
     }
 
+    public function testTemporaryFilename()
+    {
+        $fs = new Filesystem;
+        $this->assertStringContainsString(sys_get_temp_dir(), $fs->temporaryFilename());
+    }
+
+    public function testPutTemporary()
+    {
+        $files = new Filesystem;
+        $path = $files->putTemporary('Hello World');
+        $this->assertStringContainsString(sys_get_temp_dir(), $path);
+        $this->assertStringEqualsFile($path, 'Hello World');
+    }
+
     /**
      * @param  string  $file
      * @return int

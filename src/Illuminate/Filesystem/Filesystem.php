@@ -738,4 +738,32 @@ class Filesystem
     {
         return $this->deleteDirectory($directory, true);
     }
+
+    /**
+     * Get the path to a temporary file (will be removed when script ends).
+     *
+     * @return string
+     */
+    public function temporaryFilename()
+    {
+        return stream_get_meta_data(tmpfile())['uri'];
+    }
+
+    /**
+     * Write to a temporary file.
+     *
+     * @param  string  $contents
+     * @param  bool  $lock
+     * @return false|string
+     */
+    public function putTemporary($contents, $lock = false)
+    {
+        $path = $this->temporaryFilename();
+
+        if ($this->put($path, $contents, $lock) === false) {
+            return false;
+        }
+
+        return $path;
+    }
 }
