@@ -1024,7 +1024,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 $chunk[$iterator->key()] = $iterator->current();
 
                 if (count($chunk) == $size) {
-                    yield tap(new static($chunk), function () use (&$chunk, $step) {
+                    yield (new static($chunk))->tap(function () use (&$chunk, $step) {
                         $chunk = array_slice($chunk, $step, null, true);
                     });
 
