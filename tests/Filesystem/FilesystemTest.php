@@ -582,7 +582,7 @@ class FilesystemTest extends TestCase
     public function testTemporaryFilename()
     {
         $fs = new Filesystem;
-        $this->assertStringContainsString(realpath(sys_get_temp_dir()), realpath($fs->temporaryFilename()));
+        $this->assertFileExists($fs->temporaryFilename());
     }
 
     public function testPutTemporary()
