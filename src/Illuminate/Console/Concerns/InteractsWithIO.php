@@ -377,7 +377,7 @@ trait InteractsWithIO
     public function newLine($count = 1)
     {
         $this->output->newLine($count);
-        
+
         return $this;
     }
 
