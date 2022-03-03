@@ -45,7 +45,7 @@ class SesTransport extends AbstractTransport
     protected function doSend(SentMessage $message): void
     {
         try {
-            $this->ses->sendRawEmail(
+            $result = $this->ses->sendRawEmail(
                 array_merge(
                     $this->options, [
                         'Source' => $message->getEnvelope()->getSender()->toString(),
@@ -58,6 +58,8 @@ class SesTransport extends AbstractTransport
         } catch (AwsException $e) {
             throw new Exception('Request to AWS SES API failed.', $e->getCode(), $e);
         }
+        
+        $message->setMessageId($result->get('MessageId'));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Aws\Result;
 use Aws\Ses\SesClient;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -56,10 +57,15 @@ class MailSesTransportTest extends TestCase
         $message->to('me@example.com');
         $message->bcc('you@example.com');
 
-        $client = m::mock(SesClient::class);
-        $client->shouldReceive('sendRawEmail')->once();
+        $result = m::mock(Result::class);
+        $result->shouldReceive('get')->once()->with('MessageId')->andReturn('123');
 
-        (new SesTransport($client))->send($message);
+        $client = m::mock(SesClient::class);
+        $client->shouldReceive('sendRawEmail')->once()->andReturn($result);
+
+        $sentMessage = (new SesTransport($client))->send($message);
+
+        $this->assertEquals('123', $sentMessage->getMessageId());
     }
 
     public function testSesLocalConfiguration()
