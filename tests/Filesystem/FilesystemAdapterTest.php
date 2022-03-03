@@ -13,6 +13,8 @@ use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToWriteFile;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -392,5 +394,53 @@ class FilesystemAdapterTest extends TestCase
             $path.$expiration->toString().implode('', $options),
             $filesystemAdapter->temporaryUrl($path, $expiration, $options)
         );
+    }
+
+    public function testThrowExceptionForGet()
+    {
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
+
+        try {
+            $adapter->get('/foo.txt');
+        } catch (UnableToReadFile $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    public function testThrowExceptionsForReadStream()
+    {
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
+
+        try {
+            $adapter->readStream('/foo.txt');
+        } catch (UnableToReadFile $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @requires OS Linux|Darwin */
+    public function testThrowExceptionsForPut()
+    {
+        mkdir(__DIR__.'/tmp/bar', 0600);
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
+
+        try {
+            $adapter->put('/bar/foo.txt', 'Hello World!');
+        } catch (UnableToWriteFile $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 }
