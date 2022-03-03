@@ -408,7 +408,7 @@ class FilesystemAdapterTest extends TestCase
             return;
         }
 
-        $this->fail('Exception was not thrown.');
+        $this->fail('UnableToReadFile exception was not thrown.');
     }
 
     public function testThrowExceptionsForReadStream()
@@ -423,24 +423,25 @@ class FilesystemAdapterTest extends TestCase
             return;
         }
 
-        $this->fail('Exception was not thrown.');
+        $this->fail('UnableToReadFile exception was not thrown.');
     }
 
-    /** @requires OS Linux|Darwin */
     public function testThrowExceptionsForPut()
     {
-        mkdir(__DIR__.'/tmp/bar', 0600);
+        $this->filesystem->write('foo.txt', 'Hello World');
 
-        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
+        chmod(__DIR__.'/tmp/foo.txt', 0400);
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throws_exceptions' => true]);
 
         try {
-            $adapter->put('/bar/foo.txt', 'Hello World!');
+            $adapter->put('foo.txt', 'Hello World!');
+
+            $this->fail('UnableToWriteFile exception was not thrown.');
         } catch (UnableToWriteFile $e) {
             $this->assertTrue(true);
-
-            return;
+        } finally {
+            chmod(__DIR__.'/tmp/foo.txt', 0600);
         }
-
-        $this->fail('Exception was not thrown.');
     }
 }
