@@ -874,7 +874,6 @@ class FilesystemAdapter implements CloudFilesystemContract
         $this->temporaryUrlCallback = $callback;
     }
 
-
     /**
      * Determine if Flysystem exceptions should be thrown.
      *
