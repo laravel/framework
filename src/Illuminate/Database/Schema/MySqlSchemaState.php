@@ -104,6 +104,7 @@ class MySqlSchemaState extends SchemaState
         $value = ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}"';
 
         $config = $this->connection->getConfig();
+
         $value .= $config['unix_socket'] ?? false
                         ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
                         : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
