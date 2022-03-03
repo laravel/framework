@@ -31,7 +31,8 @@ class UserFactory extends Factory
 assertType('UserFactory', $factory = UserFactory::new());
 assertType('UserFactory', UserFactory::new(['string' => 'string']));
 assertType('UserFactory', UserFactory::new(function ($attributes) {
-//    assertType('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
@@ -44,7 +45,8 @@ assertType('UserFactory', $factory->configure());
 assertType('array<int|string, mixed>', $factory->raw());
 assertType('array<int|string, mixed>', $factory->raw(['string' => 'string']));
 assertType('array<int|string, mixed>', $factory->raw(function ($attributes) {
-//    assert('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
@@ -53,7 +55,8 @@ assertType('array<int|string, mixed>', $factory->raw(function ($attributes) {
 assertType('Illuminate\Database\Eloquent\Model', $factory->createOne());
 assertType('Illuminate\Database\Eloquent\Model', $factory->createOne(['string' => 'string']));
 assertType('Illuminate\Database\Eloquent\Model', $factory->createOne(function ($attributes) {
-//    assertType('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
@@ -62,7 +65,8 @@ assertType('Illuminate\Database\Eloquent\Model', $factory->createOne(function ($
 assertType('Illuminate\Database\Eloquent\Model', $factory->createOneQuietly());
 assertType('Illuminate\Database\Eloquent\Model', $factory->createOneQuietly(['string' => 'string']));
 assertType('Illuminate\Database\Eloquent\Model', $factory->createOneQuietly(function ($attributes) {
-//    assertType('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
@@ -85,7 +89,8 @@ assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Elo
     'string' => 'string',
 ]));
 assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->create(function ($attributes) {
-//    assertType('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
@@ -116,7 +121,8 @@ assertType('Illuminate\Database\Eloquent\Model', $factory->makeOne([
     'string' => 'string',
 ]));
 assertType('Illuminate\Database\Eloquent\Model', $factory->makeOne(function ($attributes) {
-//    assert('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
@@ -129,7 +135,8 @@ assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Elo
     'string' => 'string',
 ]));
 assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->make(function ($attributes) {
-//    assert('array<string, mixed>', $attributes);
+    assertType('array<string, mixed>', $attributes);
+
     return ['string' => 'string'];
 }));
 
