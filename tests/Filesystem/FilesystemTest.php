@@ -593,6 +593,22 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($path, 'Hello World');
     }
 
+    public function testCloseOpenTemporaryFiles()
+    {
+        $files = new Filesystem;
+
+        $path1 = $files->temporaryFilename();
+        $path2 = $files->putTemporary('');
+
+        $this->assertFileExists($path1);
+        $this->assertFileExists($path2);
+
+        Filesystem::closeOpenTemporaryFiles();
+
+        $this->assertFileDoesNotExist($path1);
+        $this->assertFileDoesNotExist($path2);
+    }
+
     /**
      * @param  string  $file
      * @return int

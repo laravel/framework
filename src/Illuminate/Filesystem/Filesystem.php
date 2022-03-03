@@ -18,6 +18,25 @@ class Filesystem
     use Macroable;
 
     /**
+     * The currently open temporary files.
+     *
+     * @var array
+     */
+    protected static $openTemporaryFiles = [];
+
+    /**
+     * Close all teh currently open temporary files.
+     *
+     * @return void
+     */
+    public static function closeOpenTemporaryFiles()
+    {
+        while ($pointer = array_pop(self::$openTemporaryFiles)) {
+            fclose($pointer);
+        }
+    }
+
+    /**
      * Determine if a file or directory exists.
      *
      * @param  string  $path
@@ -746,7 +765,11 @@ class Filesystem
      */
     public function temporaryFilename()
     {
-        return stream_get_meta_data(tmpfile())['uri'];
+        $handle = tmpfile();
+
+        self::$openTemporaryFiles[] = $handle;
+
+        return stream_get_meta_data($handle)['uri'];
     }
 
     /**
