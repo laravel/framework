@@ -1064,6 +1064,41 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where in raw" clause to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereInRaw($column, $values, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'NotInRaw' : 'InRaw';
+
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add a "where not in raw" clause to the query.
+     *
+     * @param  string  $column
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotInRaw($column, $values, $boolean = 'and')
+    {
+        return $this->whereInRaw($column, $values, $boolean, true);
+    }
+
+    /**
      * Add a "where in raw" clause for integer values to the query.
      *
      * @param  string  $column
