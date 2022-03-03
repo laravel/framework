@@ -219,6 +219,9 @@ class RouteListCommand extends Command
         if ($route->action['uses'] instanceof Closure) {
             $path = (new ReflectionFunction($route->action['uses']))
                                 ->getFileName();
+        } elseif (is_string($route->action['uses']) &&
+                  str_contains($route->action['uses'], 'SerializableClosure')) {
+            return false;
         } elseif (is_string($route->action['uses'])) {
             $path = (new ReflectionClass(explode('@', $route->action['uses'])[0]))
                                 ->getFileName();
