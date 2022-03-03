@@ -281,7 +281,7 @@ class MailManager implements FactoryContract
         }
 
         return $factory->create(new Dsn(
-            'mailgun+https',
+            'mailgun+'.($config['scheme'] ?? 'https'),
             $config['endpoint'] ?? 'default',
             $config['secret'],
             $config['domain']
