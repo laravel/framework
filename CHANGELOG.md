@@ -26,9 +26,6 @@
 - Unset Connection Resolver extended callback by @emrancu ([#41216](https://github.com/laravel/framework/pull/41216))
 - Update Mailgun transport type by @driesvints ([#41255](https://github.com/laravel/framework/pull/41255))
 
-### Easter egg
-- Return of the dragon by @taylorotwell
-
 
 ## [v9.2.0 (2022-02-22)](https://github.com/laravel/framework/compare/v9.1.0...v9.2.0)
 
