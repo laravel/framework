@@ -23,7 +23,7 @@
 - Fix implicitBinding and withTrashed route with child with no SoftDeletes trait by @stein-j ([#41282](https://github.com/laravel/framework/pull/41282))
 
 ### Changed
-- Unset Connection Resolver extended callback @emrancu by ([#41216](https://github.com/laravel/framework/pull/41216))
+- Unset Connection Resolver extended callback by @emrancu ([#41216](https://github.com/laravel/framework/pull/41216))
 - Update Mailgun transport type by @driesvints ([#41255](https://github.com/laravel/framework/pull/41255))
 
 ### Easter egg
