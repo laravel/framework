@@ -733,12 +733,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Merge the collection with the given items.
+     * 
+     * Supports multiple parameters
      *
      * @param  mixed  $items
+     * @param  mixed  $others
      * @return static
      */
-    public function merge($items)
+    public function merge($items, ...$others)
     {
+        if (func_num_args() > 1){
+            $items = (new static(func_get_args()))
+                ->map(function ($item) {
+                    return $this->getArrayableItems($item);
+                })
+                ->flatten(1);
+        }
+
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
     }
 

@@ -1260,6 +1260,15 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMergeMultiple($collection)
+    {
+        $c = new $collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1, 'roles' => 'admin', 'tage' => ['a', 'b']], $c->merge(['id' => 1], ['roles' => 'admin'], ['tage' => ['a', 'b']])->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testReplaceNull($collection)
     {
         $c = new $collection(['a', 'b', 'c']);
