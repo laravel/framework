@@ -42,7 +42,7 @@ class ScheduleListCommand extends Command
                             ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
                             ->setTimezone(new DateTimeZone($this->option('timezone') ?? config('app.timezone')))
                             ->format('Y-m-d H:i:s P'),
-                ($event->mutex->exists($event)) ? 'Exists' : '',
+                $event->mutex->exists($event) ? 'Yes' : '',
             ];
         }
 
@@ -51,7 +51,7 @@ class ScheduleListCommand extends Command
             'Interval',
             'Description',
             'Next Due',
-            'Mutex',
+            'Has Mutex',
         ], $rows ?? []);
     }
 }
