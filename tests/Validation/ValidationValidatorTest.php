@@ -2799,6 +2799,50 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateInsensitiveIn()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+//        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'Insensitive_in:bar,baz']);
+//        $this->assertFalse($v->passes());
+//
+//        $trans = $this->getIlluminateArrayTranslator();
+//        $v = new Validator($trans, ['name' => 0], ['name' => 'insensitive_in:bar,baz']);
+//        $this->assertFalse($v->passes());
+//
+//        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'insensitive_in:foo,baz']);
+//        $this->assertTrue($v->passes());
+//
+//        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'insensitive_in:FOO,baz']);
+//        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'insensitive_in:fOo,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Array|insensitive_in:foo,baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', 'qux']], ['name' => 'Array|insensitive_in:foo,baz,qux']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo,bar', 'qux']], ['name' => 'Array|insensitive_in:"foo,bar",baz,qux']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo,bAr', 'QUX']], ['name' => 'Array|insensitive_in:"foo,bar",baz,qux']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'f"o"o'], ['name' => 'insensitive_in:"f""O""o",baz,qux']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => "a,b\nc,d"], ['name' => "insensitive_in:\"a,b\nc,d\""]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Alpha|insensitive_in:foo,Bar']);
+        $this->assertFalse($v->passes());
+
+//        $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|insensitive_in:foo,bar']);
+//        $this->assertFalse($v->passes());
+    }
+
     public function testValidateNotIn()
     {
         $trans = $this->getIlluminateArrayTranslator();

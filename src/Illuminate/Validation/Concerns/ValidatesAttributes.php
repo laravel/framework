@@ -1186,6 +1186,31 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate an attribute is contained within a list of values without
+     * regardless of the attribute's case.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateInsensitiveIn($attribute, $value, $parameters)
+    {
+        if (is_array($value) && $this->hasRule($attribute, 'Array')) {
+            foreach ($value as $element) {
+                if (is_array($element)) {
+                    return false;
+                }
+            }
+
+            return count(array_udiff($value, $parameters, 'strcasecmp')) === 0;
+        }
+
+        return ! is_array($value) &&
+            in_array(strtolower($value), array_map('strtolower', $parameters));
+    }
+
+    /**
      * Validate that the values of an attribute are in another attribute.
      *
      * @param  string  $attribute

@@ -7,6 +7,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\InsensitiveIn;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
@@ -64,6 +65,15 @@ class Rule
         }
 
         return new In(is_array($values) ? $values : func_get_args());
+    }
+
+    public static function insensitiveIn($values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new InsensitiveIn(is_array($values) ? $values : func_get_args());
     }
 
     /**
