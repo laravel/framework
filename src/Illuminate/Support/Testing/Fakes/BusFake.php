@@ -223,7 +223,7 @@ class BusFake implements QueueingDispatcher
 
         PHPUnit::assertTrue(
             $this->dispatchedAfterResponse($command, $callback)->count() > 0,
-            "The expected [{$command}] job was not dispatched for after sending the response."
+            "The expected [{$command}] job was not dispatched after sending the response."
         );
     }
 
@@ -259,7 +259,7 @@ class BusFake implements QueueingDispatcher
 
         PHPUnit::assertCount(
             0, $this->dispatchedAfterResponse($command, $callback),
-            "The unexpected [{$command}] job was dispatched for after sending the response."
+            "The unexpected [{$command}] job was dispatched after sending the response."
         );
     }
 

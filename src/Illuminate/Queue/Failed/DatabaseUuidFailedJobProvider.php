@@ -51,7 +51,7 @@ class DatabaseUuidFailedJobProvider implements FailedJobProviderInterface, Pruna
      * @param  string  $queue
      * @param  string  $payload
      * @param  \Throwable  $exception
-     * @return int|null
+     * @return string|null
      */
     public function log($connection, $queue, $payload, $exception)
     {

@@ -67,11 +67,11 @@ class HandleExceptions
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = [])
     {
-        if (error_reporting() & $level) {
-            if ($this->isDeprecation($level)) {
-                return $this->handleDeprecation($message, $file, $line);
-            }
+        if ($this->isDeprecation($level)) {
+            return $this->handleDeprecation($message, $file, $line);
+        }
 
+        if (error_reporting() & $level) {
             throw new ErrorException($message, 0, $level, $file, $line);
         }
     }
@@ -86,7 +86,10 @@ class HandleExceptions
      */
     public function handleDeprecation($message, $file, $line)
     {
-        if (! class_exists(LogManager::class)) {
+        if (! class_exists(LogManager::class)
+            || ! $this->app->hasBeenBootstrapped()
+            || $this->app->runningUnitTests()
+        ) {
             return;
         }
 

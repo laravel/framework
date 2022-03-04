@@ -2,11 +2,25 @@
 
 namespace Illuminate\Tests\Integration\View;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
+use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
 
 class BladeTest extends TestCase
 {
+    public function test_rendering_blade_string()
+    {
+        $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
+    }
+
+    public function test_rendering_blade_component_instance()
+    {
+        $component = new HelloComponent('Taylor');
+
+        $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
     public function test_basic_blade_rendering()
     {
         $view = View::make('hello', ['name' => 'Taylor'])->render();
@@ -102,5 +116,20 @@ class BladeTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
+    }
+}
+
+class HelloComponent extends Component
+{
+    public $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function render()
+    {
+        return 'Hello {{ $name }}';
     }
 }
