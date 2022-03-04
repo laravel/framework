@@ -137,13 +137,15 @@ assertType('Illuminate\Support\Collection<int, array<int, int|User>>', $collecti
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diff([1, 2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diff(['string-2']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffUsing([1, 2], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffUsing([1, 2], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
-assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffUsing(['string-2'], function ($string) {
-    assertType('string', $string);
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffUsing(['string-2'], function ($stringA, $stringB) {
+    assertType('string', $stringA);
+    assertType('string', $stringB);
 
     return -1;
 }));
@@ -151,13 +153,15 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make(['str
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffAssoc([1, 2]));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->diffAssoc(['string' => 'string']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffAssocUsing([1, 2], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffAssocUsing([1, 2], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
-assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffAssocUsing(['string-2'], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffAssocUsing(['string-2'], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
@@ -165,13 +169,15 @@ assertType('Illuminate\Support\Collection<int, string>', $collection::make(['str
 assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffKeys([1, 2]));
 assertType('Illuminate\Support\Collection<string, string>', $collection::make(['string' => 'string'])->diffKeys(['string' => 'string']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffKeysUsing([1, 2], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, int>', $collection::make([3, 4])->diffKeysUsing([1, 2], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
-assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffKeysUsing(['string-2'], function ($int) {
-    assertType('int', $int);
+assertType('Illuminate\Support\Collection<int, string>', $collection::make(['string-1'])->diffKeysUsing(['string-2'], function ($intA, $intB) {
+    assertType('int', $intA);
+    assertType('int', $intB);
 
     return -1;
 }));
