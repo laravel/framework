@@ -188,15 +188,13 @@ class VerifyCsrfToken
             $response = $response->toResponse($request);
         }
 
-        $response->headers->setCookie(
-            $this->newCookie($request, $config)
-        );
+        $response->headers->setCookie($this->newCookie($request, $config));
 
         return $response;
     }
 
     /**
-     * Create the CSRF token that will be sent with the response.
+     * Create a new "XSRF-TOKEN" cookie that contains the CSRF token.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  array  $config
@@ -205,8 +203,15 @@ class VerifyCsrfToken
     protected function newCookie($request, $config)
     {
         return new Cookie(
-            'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
-            $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
+            'XSRF-TOKEN',
+            $request->session()->token(),
+            $this->availableAt(60 * $config['lifetime']),
+            $config['path'],
+            $config['domain'],
+            $config['secure'],
+            false,
+            false,
+            $config['same_site'] ?? null
         );
     }
 
