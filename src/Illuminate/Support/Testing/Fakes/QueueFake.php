@@ -415,7 +415,7 @@ class QueueFake extends QueueManager implements Queue
             return true;
         }
 
-        return $this->jobsToFake->contains(function ($jobToFake) use ($job){
+        return $this->jobsToFake->contains(function ($jobToFake) use ($job) {
             return get_class($job) === $jobToFake;
         });
     }

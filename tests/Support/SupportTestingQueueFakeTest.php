@@ -65,7 +65,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $job = new JobStub;
 
         $manager = m::mock(QueueManager::class);
-        $manager->shouldReceive('push')->once()->withArgs(function($passedJob) use ($job){
+        $manager->shouldReceive('push')->once()->withArgs(function($passedJob) use ($job) {
             return $passedJob === $job;
         });
 
