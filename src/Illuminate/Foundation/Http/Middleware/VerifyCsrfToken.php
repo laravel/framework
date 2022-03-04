@@ -199,7 +199,7 @@ class VerifyCsrfToken
      * Create the CSRF token that will be sent with the response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array $config
+     * @param  array  $config
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     protected function newCookie($request, $config)
