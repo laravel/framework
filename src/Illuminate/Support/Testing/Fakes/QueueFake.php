@@ -35,13 +35,19 @@ class QueueFake extends QueueManager implements Queue
      */
     protected $jobs = [];
 
-    public function __construct($app, QueueManager $queue, $jobsToFake = [])
+    /**
+     * Create a new fake queue instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct($app, $jobsToFake = [], QueueManager $queue = null)
     {
         parent::__construct($app);
 
-        $this->queue = $queue;
-
         $this->jobsToFake = Collection::wrap($jobsToFake);
+
+        $this->queue = $queue;
     }
 
     /**
@@ -412,6 +418,10 @@ class QueueFake extends QueueManager implements Queue
     public function shouldFakeJob($job)
     {
         if ($this->jobsToFake->isEmpty()) {
+            return true;
+        }
+
+        if (is_null($this->queue)) {
             return true;
         }
 

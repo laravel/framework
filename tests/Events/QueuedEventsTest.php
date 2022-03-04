@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +39,7 @@ class QueuedEventsTest extends TestCase
     {
         $d = new Dispatcher;
 
-        $fakeQueue = new QueueFake(new Container, m::mock(QueueManager::class));
+        $fakeQueue = new QueueFake(new Container);
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -56,7 +55,7 @@ class QueuedEventsTest extends TestCase
     {
         $d = new Dispatcher;
 
-        $fakeQueue = new QueueFake(new Container, m::mock(QueueManager::class));
+        $fakeQueue = new QueueFake(new Container);
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -89,7 +88,7 @@ class QueuedEventsTest extends TestCase
     {
         $d = new Dispatcher;
 
-        $fakeQueue = new QueueFake(new Container, m::mock(QueueManager::class));
+        $fakeQueue = new QueueFake(new Container);
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;
@@ -107,7 +106,7 @@ class QueuedEventsTest extends TestCase
     {
         $d = new Dispatcher;
 
-        $fakeQueue = new QueueFake(new Container, m::mock(QueueManager::class));
+        $fakeQueue = new QueueFake(new Container);
 
         $d->setQueueResolver(function () use ($fakeQueue) {
             return $fakeQueue;

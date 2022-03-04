@@ -27,7 +27,7 @@ class SupportTestingQueueFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->fake = new QueueFake(new Application, m::mock(QueueManager::class));
+        $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
     }
 
@@ -69,7 +69,7 @@ class SupportTestingQueueFakeTest extends TestCase
             return $passedJob === $job;
         });
 
-        $fake = new QueueFake(new Application, $manager, JobToFakeStub::class);
+        $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
 
         $fake->push($job);
         $fake->push(new JobToFakeStub());
