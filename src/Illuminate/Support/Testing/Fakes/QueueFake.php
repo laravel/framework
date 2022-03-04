@@ -19,7 +19,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @var \Illuminate\Contracts\Queue\Queue
      */
-    protected $manager;
+    protected $queue;
 
     /**
      * The job types that should be intercepted instead of pushed to the queue.
@@ -35,11 +35,11 @@ class QueueFake extends QueueManager implements Queue
      */
     protected $jobs = [];
 
-    public function __construct($app, QueueManager $manager, $jobsToFake = [])
+    public function __construct($app, QueueManager $queue, $jobsToFake = [])
     {
         parent::__construct($app);
 
-        $this->manager = $manager;
+        $this->queue = $queue;
 
         $this->jobsToFake = Collection::wrap($jobsToFake);
     }
@@ -309,7 +309,7 @@ class QueueFake extends QueueManager implements Queue
                 'queue' => $queue,
             ];
         } else {
-            $this->manager->push($job, $data, $queue);
+            $this->queue->push($job, $data, $queue);
         }
     }
 
