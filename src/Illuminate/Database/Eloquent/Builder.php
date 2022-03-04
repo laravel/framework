@@ -865,9 +865,7 @@ class Builder
      */
     protected function ensureOrderForCursorPagination($shouldReverse = false)
     {
-        $orders = collect($this->query->orders);
-
-        if ($orders->count() === 0) {
+        if (empty($this->query->orders) && empty($this->query->unionOrders)) {
             $this->enforceOrderBy();
         }
 
@@ -877,6 +875,10 @@ class Builder
 
                 return $order;
             })->toArray();
+        }
+
+        if ($this->query->unionOrders) {
+            return collect($this->query->unionOrders);
         }
 
         return collect($this->query->orders);
@@ -1002,7 +1004,7 @@ class Builder
 
         $qualifiedColumn = end($segments).'.'.$column;
 
-        $values[$qualifiedColumn] = $values[$column];
+        $values[$qualifiedColumn] = Arr::get($values, $qualifiedColumn, $values[$column]);
 
         unset($values[$column]);
 

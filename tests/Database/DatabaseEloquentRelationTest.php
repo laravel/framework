@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -281,6 +282,14 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertInstanceOf(EloquentResolverRelationStub::class, $model->customer());
         $this->assertSame(['key' => 'value'], $model->customer);
     }
+
+    public function testIsRelationIgnoresAttribute()
+    {
+        $model = new EloquentRelationAndAtrributeModelStub;
+
+        $this->assertTrue($model->isRelation('parent'));
+        $this->assertFalse($model->isRelation('field'));
+    }
 }
 
 class EloquentRelationResetModelStub extends Model
@@ -349,5 +358,27 @@ class EloquentResolverRelationStub extends EloquentRelationStub
     public function getResults()
     {
         return ['key' => 'value'];
+    }
+}
+
+class EloquentRelationAndAtrributeModelStub extends Model
+{
+    protected $table = 'one_more_table';
+
+    public function field(): Attribute
+    {
+        return new Attribute(
+            function ($value) {
+                return $value;
+            },
+            function ($value) {
+                return $value;
+            },
+        );
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class);
     }
 }

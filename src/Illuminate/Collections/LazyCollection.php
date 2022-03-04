@@ -1289,6 +1289,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Sort the collection keys using a callback.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function sortKeysUsing(callable $callback)
+    {
+        return $this->passthru('sortKeysUsing', func_get_args());
+    }
+
+    /**
      * Take the first or last {$limit} items.
      *
      * @param  int  $limit
