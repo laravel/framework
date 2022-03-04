@@ -2802,18 +2802,17 @@ class ValidationValidatorTest extends TestCase
     public function testValidateInsensitiveIn()
     {
         $trans = $this->getIlluminateArrayTranslator();
-//        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'Insensitive_in:bar,baz']);
-//        $this->assertFalse($v->passes());
-//
-//        $trans = $this->getIlluminateArrayTranslator();
-//        $v = new Validator($trans, ['name' => 0], ['name' => 'insensitive_in:bar,baz']);
-//        $this->assertFalse($v->passes());
-//
-//        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'insensitive_in:foo,baz']);
-//        $this->assertTrue($v->passes());
-//
-//        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'insensitive_in:FOO,baz']);
-//        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'Insensitive_in:bar,baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 0], ['name' => 'insensitive_in:bar,baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'insensitive_in:foo,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'foo'], ['name' => 'insensitive_in:FOO,baz']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['name' => 'Foo'], ['name' => 'insensitive_in:fOo,baz']);
         $this->assertTrue($v->passes());
@@ -2839,8 +2838,8 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Alpha|insensitive_in:foo,Bar']);
         $this->assertFalse($v->passes());
 
-//        $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|insensitive_in:foo,bar']);
-//        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['name' => ['foo', []]], ['name' => 'Array|insensitive_in:foo,bar']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateNotIn()
