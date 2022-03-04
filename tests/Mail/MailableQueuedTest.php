@@ -12,6 +12,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,7 @@ class MailableQueuedTest extends TestCase
 
     public function testQueuedMailableSent()
     {
-        $queueFake = new QueueFake(new Application);
+        $queueFake = new QueueFake(new Application, m::mock(QueueManager::class));
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
             ->onlyMethods(['createMessage', 'to'])
@@ -40,7 +41,7 @@ class MailableQueuedTest extends TestCase
 
     public function testQueuedMailableWithAttachmentSent()
     {
-        $queueFake = new QueueFake(new Application);
+        $queueFake = new QueueFake(new Application, m::mock(QueueManager::class));
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
             ->onlyMethods(['createMessage'])
@@ -69,7 +70,7 @@ class MailableQueuedTest extends TestCase
         $container->singleton('filesystem', function () use ($filesystemFactory) {
             return $filesystemFactory;
         });
-        $queueFake = new QueueFake($app);
+        $queueFake = new QueueFake($app, m::mock(QueueManager::class));
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
             ->onlyMethods(['createMessage'])

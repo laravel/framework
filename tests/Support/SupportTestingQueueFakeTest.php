@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -25,8 +27,14 @@ class SupportTestingQueueFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->fake = new QueueFake(new Application);
+        $this->fake = new QueueFake(new Application, m::mock(QueueManager::class));
         $this->job = new JobStub;
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        m::close();
     }
 
     public function testAssertPushed()
@@ -50,6 +58,24 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(function (JobStub $job) {
             return true;
         });
+    }
+
+    public function testAssertPushedWithIgnore()
+    {
+        $job = new JobStub;
+
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('push')->once()->withArgs(function($passedJob) use ($job){
+            return $passedJob === $job;
+        });
+
+        $fake = new QueueFake(new Application, $manager, JobToFakeStub::class);
+
+        $fake->push($job);
+        $fake->push(new JobToFakeStub());
+
+        $fake->assertNotPushed(JobStub::class);
+        $fake->assertPushed(JobToFakeStub::class);
     }
 
     public function testQueueSize()
@@ -290,6 +316,14 @@ class SupportTestingQueueFakeTest extends TestCase
 }
 
 class JobStub
+{
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobToFakeStub
 {
     public function handle()
     {

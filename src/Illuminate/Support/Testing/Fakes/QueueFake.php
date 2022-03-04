@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -14,11 +15,34 @@ class QueueFake extends QueueManager implements Queue
     use ReflectsClosures;
 
     /**
+     * The original queue manager.
+     *
+     * @var \Illuminate\Contracts\Queue\Queue
+     */
+    protected $manager;
+
+    /**
+     * The job types that should be intercepted instead of pushed to the queue.
+     *
+     * @var array
+     */
+    protected $jobsToFake;
+
+    /**
      * All of the jobs that have been pushed.
      *
      * @var array
      */
     protected $jobs = [];
+
+    public function __construct($app, QueueManager $manager, $jobsToFake = [])
+    {
+        parent::__construct($app);
+
+        $this->manager = $manager;
+
+        $this->jobsToFake = Collection::wrap($jobsToFake);
+    }
 
     /**
      * Assert if a job was pushed based on a truth-test callback.
@@ -275,14 +299,18 @@ class QueueFake extends QueueManager implements Queue
      * @param  string|object  $job
      * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
+     * @return void
      */
     public function push($job, $data = '', $queue = null)
     {
-        $this->jobs[is_object($job) ? get_class($job) : $job][] = [
-            'job' => $job,
-            'queue' => $queue,
-        ];
+        if ($this->shouldFakeJob($job)) {
+            $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+                'job' => $job,
+                'queue' => $queue,
+            ];
+        } else {
+            $this->manager->push($job, $data, $queue);
+        }
     }
 
     /**
@@ -373,6 +401,23 @@ class QueueFake extends QueueManager implements Queue
     public function pushedJobs()
     {
         return $this->jobs;
+    }
+
+    /**
+     * Determine if a job should be faked or actually dispatched.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    public function shouldFakeJob($job)
+    {
+        if ($this->jobsToFake->isEmpty()) {
+            return true;
+        }
+
+        return $this->jobsToFake->contains(function ($jobToFake) use ($job){
+            return get_class($job) === $jobToFake;
+        });
     }
 
     /**
