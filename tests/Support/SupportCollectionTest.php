@@ -767,6 +767,28 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testCount($collection)
+    {
+        $c = new $collection(['foo', 'bar']);
+        $this->assertSame(2, $c->count());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testExists($collection)
+    {
+        $c = new $collection([['id' => 1, 'name' => 'foo'], ['id' => 2, 'name' => 'bar']]);
+
+        $this->assertTrue($c->where('name', 'foo')->exists());
+        $this->assertTrue($c->where('id', 2)->exists());
+        $this->assertFalse($c->where('name', 'baz')->exists());
+        $this->assertFalse($c->where('id', 3)->exists());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCountable($collection)
     {
         $c = new $collection(['foo', 'bar']);

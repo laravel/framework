@@ -1620,6 +1620,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if any item exists in the collection.
+     *
+     * @return bool
+     */
+    public function exists(): bool
+    {
+        return $this->count() > 0;
+    }
+
+    /**
      * Count the number of items in the collection by a field or using a callback.
      *
      * @param  (callable(TValue, TKey): mixed)|string|null  $countBy

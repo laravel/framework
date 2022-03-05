@@ -1582,6 +1582,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if any item exists in the collection.
+     *
+     * @return bool
+     */
+    public function exists(): bool
+    {
+        return $this->count() > 0;
+    }
+
+    /**
      * Make an iterator from the given source.
      *
      * @template TIteratorKey of array-key
