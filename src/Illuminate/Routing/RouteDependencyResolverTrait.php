@@ -19,14 +19,19 @@ trait RouteDependencyResolverTrait
      * @param  string  $method
      * @return array
      */
-    protected function resolveClassMethodDependencies(array $parameters, $instance, $method)
+    protected function resolveClassMethodDependencies(
+        array $parameters,
+              $instance,
+              $method,
+              $onlyMethodParameters = false
+    )
     {
         if (! method_exists($instance, $method)) {
             return $parameters;
         }
 
         return $this->resolveMethodDependencies(
-            $parameters, new ReflectionMethod($instance, $method)
+            $parameters, new ReflectionMethod($instance, $method), $onlyMethodParameters
         );
     }
 
@@ -37,13 +42,20 @@ trait RouteDependencyResolverTrait
      * @param  \ReflectionFunctionAbstract  $reflector
      * @return array
      */
-    public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
+    public function resolveMethodDependencies(
+        array                      $parameters,
+        ReflectionFunctionAbstract $reflector,
+                                   $onlyMethodParameters = false)
     {
         $instanceCount = 0;
 
         $values = array_values($parameters);
 
         $skippableValue = new stdClass;
+
+        if ($onlyMethodParameters){
+            $this->filterToOnlyMethodParameters($parameters, $reflector);
+        }
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency($parameter, $parameters, $skippableValue);
@@ -59,6 +71,23 @@ trait RouteDependencyResolverTrait
         }
 
         return $parameters;
+    }
+
+    /**
+     * Filter parameters to only contain the method parameters.
+     *
+     * @param  array $parameters
+     * @param  ReflectionFunctionAbstract $reflector
+     * @return void
+     */
+    protected function filterToOnlyMethodParameters(array &$parameters, ReflectionFunctionAbstract $reflector)
+    {
+        $reflectorParametersNames = array_map(fn($parameter) => $parameter->name, $reflector->getParameters());
+        foreach ($parameters as $key => $parameter) {
+            if (!in_array($key, $reflectorParametersNames)) {
+                unset($parameters[$key]);
+            }
+        }
     }
 
     /**

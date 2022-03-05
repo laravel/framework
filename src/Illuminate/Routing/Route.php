@@ -1120,6 +1120,28 @@ class Route
     }
 
     /**
+     * Indicate that the route should enforce injecting only the action's defined parameters.
+     *
+     * @return bool
+     */
+    public function injectOnlyActionParameters()
+    {
+        $this->action['inject_only_action_parameters'] = true;
+
+        return $this;
+    }
+
+    /**
+     * Determine if the route should enforce injecting only the action's defined parameters.
+     *
+     * @return bool
+     */
+    public function enforcesInjectOnlyActionParameters()
+    {
+        return (bool) ($this->action['inject_only_action_parameters'] ?? false);
+    }
+
+    /**
      * Specify that the route should not allow concurrent requests from the same session.
      *
      * @param  int|null  $lockSeconds

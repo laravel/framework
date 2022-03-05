@@ -1944,6 +1944,29 @@ class RoutingRouteTest extends TestCase
         ], $route->middleware());
     }
 
+    public function testRouteInjectOnlyActionParameters()
+    {
+        $router = $this->getRouter();
+        $router->get('{lang}/foo/{id}', [RouteTestControllerWithSpecificActionParameters::class, 'show'])
+            ->injectOnlyActionParameters();
+
+        $request = Request::create('en/foo/123', 'GET');
+
+        $response = $router->dispatch($request);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testRouteWithoutInjectOnlyActionParameters()
+    {
+        $router = $this->getRouter();
+        $router->get('{lang}/foo/{id}', [RouteTestControllerWithSpecificActionParameters::class, 'show']);
+
+        $request = Request::create('en/foo/123', 'GET');
+
+        $this->expectException('TypeError');
+        $router->dispatch($request);
+    }
+
     protected function getRouter()
     {
         $container = new Container;
@@ -2060,6 +2083,14 @@ class RouteTestClosureMiddlewareController extends Controller
     public function index()
     {
         return 'index';
+    }
+}
+
+class RouteTestControllerWithSpecificActionParameters extends Controller
+{
+    public function show(int $id)
+    {
+       return $id;
     }
 }
 

@@ -24,6 +24,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
  * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
+ * @method \Illuminate\Routing\RouteRegistrar injectOnlyActionParameters()
  * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
  * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string  $middleware)
  */
@@ -68,6 +69,7 @@ class RouteRegistrar
         'scopeBindings',
         'where',
         'withoutMiddleware',
+        'injectOnlyActionParameters'
     ];
 
     /**
@@ -79,6 +81,7 @@ class RouteRegistrar
         'name' => 'as',
         'scopeBindings' => 'scope_bindings',
         'withoutMiddleware' => 'excluded_middleware',
+        'injectOnlyActionParameters' => 'inject_only_action_parameters'
     ];
 
     /**
