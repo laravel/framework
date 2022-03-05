@@ -69,7 +69,7 @@ class RouteRegistrar
         'scopeBindings',
         'where',
         'withoutMiddleware',
-        'injectOnlyActionParameters'
+        'injectOnlyActionParameters',
     ];
 
     /**
@@ -81,7 +81,7 @@ class RouteRegistrar
         'name' => 'as',
         'scopeBindings' => 'scope_bindings',
         'withoutMiddleware' => 'excluded_middleware',
-        'injectOnlyActionParameters' => 'inject_only_action_parameters'
+        'injectOnlyActionParameters' => 'inject_only_action_parameters',
     ];
 
     /**

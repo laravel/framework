@@ -24,8 +24,7 @@ trait RouteDependencyResolverTrait
               $instance,
               $method,
               $onlyMethodParameters = false
-    )
-    {
+    ) {
         if (! method_exists($instance, $method)) {
             return $parameters;
         }
@@ -43,7 +42,7 @@ trait RouteDependencyResolverTrait
      * @return array
      */
     public function resolveMethodDependencies(
-        array                      $parameters,
+        array $parameters,
         ReflectionFunctionAbstract $reflector,
                                    $onlyMethodParameters = false)
     {
@@ -53,7 +52,7 @@ trait RouteDependencyResolverTrait
 
         $skippableValue = new stdClass;
 
-        if ($onlyMethodParameters){
+        if ($onlyMethodParameters) {
             $this->filterToOnlyMethodParameters($parameters, $reflector);
         }
 
@@ -76,15 +75,15 @@ trait RouteDependencyResolverTrait
     /**
      * Filter parameters to only contain the method parameters.
      *
-     * @param  array $parameters
-     * @param  ReflectionFunctionAbstract $reflector
+     * @param  array  $parameters
+     * @param  ReflectionFunctionAbstract  $reflector
      * @return void
      */
     protected function filterToOnlyMethodParameters(array &$parameters, ReflectionFunctionAbstract $reflector)
     {
-        $reflectorParametersNames = array_map(fn($parameter) => $parameter->name, $reflector->getParameters());
+        $reflectorParametersNames = array_map(fn ($parameter) => $parameter->name, $reflector->getParameters());
         foreach ($parameters as $key => $parameter) {
-            if (!in_array($key, $reflectorParametersNames)) {
+            if (! in_array($key, $reflectorParametersNames)) {
                 unset($parameters[$key]);
             }
         }

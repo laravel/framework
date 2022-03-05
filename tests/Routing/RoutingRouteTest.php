@@ -2090,7 +2090,7 @@ class RouteTestControllerWithSpecificActionParameters extends Controller
 {
     public function show(int $id)
     {
-       return $id;
+        return $id;
     }
 }
 
