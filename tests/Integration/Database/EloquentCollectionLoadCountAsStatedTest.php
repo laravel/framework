@@ -14,44 +14,44 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('new_posts', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('some_default_value');
             $table->softDeletes();
         });
 
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('new_comments', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('post_id');
+            $table->unsignedInteger('new_post_id');
         });
 
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('new_likes', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('post_id');
+            $table->unsignedInteger('new_post_id');
         });
 
-        Schema::create('comment_likes', function (Blueprint $table) {
+        Schema::create('new_comment_likes', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('comment_id');
+            $table->unsignedInteger('new_comment_id');
         });
 
-        $post = Post::create();
-        $post->comments()->saveMany([new Comment, new Comment]);
+        $post = NewPost::create();
+        $post->comments()->saveMany([new NewComment, new NewComment]);
 
         tap($post->comments[0], function ($comment) {
-            $comment->likes()->save(new CommentLike);
-            $comment->likes()->save(new CommentLike);
+            $comment->likes()->save(new NewCommentLike);
+            $comment->likes()->save(new NewCommentLike);
         });
-        tap($post->comments[1], fn($comment) => $comment->likes()->save(new CommentLike));
+        tap($post->comments[1], fn($comment) => $comment->likes()->save(new NewCommentLike));
 
-        $post->likes()->save(new Like);
+        $post->likes()->save(new NewLike);
 
-        Post::create();
+        NewPost::create();
     }
 
     public function testLoadCountAsStated()
     {
-        $posts = Post::all();
+        $posts = NewPost::all();
 
         DB::enableQueryLog();
 
@@ -65,7 +65,7 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
 
     public function testLoadCountAsStatedWithSameModels()
     {
-        $posts = Post::all()->push(Post::first());
+        $posts = NewPost::all()->push(Post::first());
 
         DB::enableQueryLog();
 
@@ -79,7 +79,7 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
 
     public function testLoadCountAsStatedOnDeletedModels()
     {
-        $posts = Post::all()->each->delete();
+        $posts = NewPost::all()->each->delete();
 
         DB::enableQueryLog();
 
@@ -92,7 +92,7 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
 
     public function testLoadCountAsStatedWithArrayOfRelations()
     {
-        $posts = Post::all();
+        $posts = NewPost::all();
 
         DB::enableQueryLog();
 
@@ -109,7 +109,7 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
 
     public function testLoadCountAsStatedDoesNotOverrideAttributesWithDefaultValue()
     {
-        $post = Post::first();
+        $post = NewPost::first();
         $post->some_default_value = 200;
 
         Collection::make([$post])->loadCountAsStated('commentWithLikes');
@@ -119,7 +119,7 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
     }
 }
 
-class Post extends Model
+class NewPost extends Model
 {
     use SoftDeletes;
 
@@ -131,36 +131,36 @@ class Post extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(NewComment::class);
     }
 
     public function commentWithLikes()
     {
-        return $this->comments()->join('comment_likes', 'comment_likes.comment_id', 'comments.id');
+        return $this->comments()->join('new_comment_likes', 'new_comment_likes.comment_id', 'new_comments.id');
     }
 
     public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(NewLike::class);
     }
 }
 
-class Comment extends Model
+class NewComment extends Model
 {
     public $timestamps = false;
 
     public function likes()
     {
-        return $this->hasMany(CommentLike::class);
+        return $this->hasMany(NewCommentLike::class);
     }
 }
 
-class Like extends Model
+class NewLike extends Model
 {
     public $timestamps = false;
 }
 
-class CommentLike extends Model
+class NewCommentLike extends Model
 {
     public $timestamps = false;
 }
