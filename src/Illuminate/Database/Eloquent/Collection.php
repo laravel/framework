@@ -69,9 +69,10 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  array|string  $relations
      * @param  string  $column
      * @param  string  $function
+     * @param  bool  $preserveRelationState
      * @return $this
      */
-    public function loadAggregate($relations, $column, $function = null)
+    public function loadAggregate($relations, $column, $function = null, $preserveRelationState = false)
     {
         if ($this->isEmpty()) {
             return $this;
@@ -80,7 +81,7 @@ class Collection extends BaseCollection implements QueueableCollection
         $models = $this->first()->newModelQuery()
             ->whereKey($this->modelKeys())
             ->select($this->first()->getKeyName())
-            ->withAggregate($relations, $column, $function)
+            ->withAggregate($relations, $column, $function, $preserveRelationState)
             ->get()
             ->keyBy($this->first()->getKeyName());
 
@@ -109,6 +110,17 @@ class Collection extends BaseCollection implements QueueableCollection
     public function loadCount($relations)
     {
         return $this->loadAggregate($relations, '*', 'count');
+    }
+
+    /**
+     * Load a set of relationship counts onto the collection as exactly stated in the relation definition.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadCountAsStated($relations)
+    {
+        return $this->loadAggregate($relations, '*', 'count', true);
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 trait QueriesRelationships
@@ -514,9 +515,10 @@ trait QueriesRelationships
      * @param  mixed  $relations
      * @param  string  $column
      * @param  string  $function
+     * @param  bool  $preserveRelationState
      * @return $this
      */
-    public function withAggregate($relations, $column, $function = null)
+    public function withAggregate($relations, $column, $function = null, $preserveRelationState = false)
     {
         if (empty($relations)) {
             return $this;
@@ -556,16 +558,26 @@ trait QueriesRelationships
                 $expression = $column;
             }
 
-            // Here, we will grab the relationship sub-query and prepare to add it to the main query
-            // as a sub-select. First, we'll get the "has" query and use that to get the relation
-            // sub-query. We'll format this relationship name and append this column if needed.
-            $query = $relation->getRelationExistenceQuery(
-                $relation->getRelated()->newQuery(), $this, new Expression($expression)
-            )->setBindings([], 'select');
+            if ($preserveRelationState) {
+                $query = $relation->getQuery()->whereColumn(
+                    $relation->getQualifiedParentKeyName(), '=', $relation->getExistenceCompareKey()
+                );
+            } else {
+                // Here, we will grab the relationship sub-query and prepare to add it to the main query
+                // as a sub-select. First, we'll get the "has" query and use that to get the relation
+                // sub-query. We'll format this relationship name and append this column if needed.
+                $query = $relation->getRelationExistenceQuery(
+                    $relation->getRelated()->newQuery(), $this, new Expression($expression)
+                )->setBindings([], 'select');
+            }
 
             $query->callScope($constraints);
 
-            $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
+            if ($preserveRelationState) {
+                $query = DB::query()->from($query, $name . '_aggregate')->select(new Expression('count(*)'));
+            } else {
+                $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
+            }
 
             // If the query contains certain elements like orderings / more than one column selected
             // then we will remove those elements from the query so that it will execute properly
@@ -610,6 +622,17 @@ trait QueriesRelationships
     public function withCount($relations)
     {
         return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count');
+    }
+
+    /**
+     * Add subselect queries to count the relations as exactly stated in the relation definition.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function withCountAsStated($relations)
+    {
+        return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count', true);
     }
 
     /**

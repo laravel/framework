@@ -640,11 +640,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array|string  $relations
      * @param  string  $column
      * @param  string  $function
+     * @param  bool  $preserveRelationState
      * @return $this
      */
-    public function loadAggregate($relations, $column, $function = null)
+    public function loadAggregate($relations, $column, $function = null, $preserveRelationState = false)
     {
-        $this->newCollection([$this])->loadAggregate($relations, $column, $function);
+        $this->newCollection([$this])->loadAggregate($relations, $column, $function, $preserveRelationState);
 
         return $this;
     }
@@ -660,6 +661,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $relations = is_string($relations) ? func_get_args() : $relations;
 
         return $this->loadAggregate($relations, '*', 'count');
+    }
+
+    /**
+     * Eager load relation counts on the model as exactly stated in the relation definition.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadCountAsStated($relations)
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        return $this->loadAggregate($relations, '*', 'count', true);
     }
 
     /**
