@@ -1055,6 +1055,93 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
+    public function testWithCountAsStated()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCountAsStated('posts');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "posts_aggregate") as "posts_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAsStatedAndSelect()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->select('id')->withCountAsStated('posts');
+
+        $this->assertSame('select "id", (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "posts_aggregate") as "posts_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAsStatedAndMergedWheres()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->select('id')->withCountAsStated(['posts' => function ($q) {
+            $q->where('bam', '>', 'qux');
+        }]);
+
+        $this->assertSame('select "id", (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "posts_aggregate") as "posts_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $this->assertEquals(['qux', true], $builder->getBindings());
+    }
+
+    public function testWithCountAsStatedAndGlobalScope()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCountAsStated', function ($query) {
+            return $query->addSelect('id');
+        });
+
+        $builder = $model->select('id')->withCount(['posts']);
+
+        // Remove the global scope so it doesn't interfere with any other tests
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCountAsStated', function ($query) {
+            //
+        });
+
+        $this->assertSame('select "id", (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "posts_aggregate") as "posts_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAsStatedAndConstraintsAndHaving()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('bar', 'baz');
+        $builder->withCount(['posts' => function ($q) {
+            $q->where('bam', '>', 'qux');
+        }])->having('posts_count', '>=', 1);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ?) as "posts_aggregate") as "posts_count" from "eloquent_builder_test_model_parent_stubs" where "bar" = ? having "posts_count" >= ?', $builder->toSql());
+        $this->assertEquals(['qux', 'baz', 1], $builder->getBindings());
+    }
+
+    public function testWithCountAsStatedAndRename()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount('posts as posts_bar');
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "posts_aggregate") as "posts_bar" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAsStatedMultipleAndPartialRename()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['posts as posts_bar', 'posts']);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "posts_aggregate") as "posts_bar", (select count(*) from (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "posts_aggregate") as "posts_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAsStatedWithJoinAndSelect()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['postsWithJoin']);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from (select distinct(bar.id) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."post_id" = "eloquent_builder_test_model_close_related_stubs"."id" inner join "bar" on "bar"."post_id" = "posts"."id") as "posts_aggregate") as "posts_with_join_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
     public function testWithExists()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1938,6 +2025,16 @@ class EloquentBuilderTestModelParentStub extends Model
     public function morph()
     {
         return $this->morphTo();
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(EloquentBuilderTestModelCloseRelatedStub::class);
+    }
+
+    public function postsWithJoin()
+    {
+        return $this->hasMany(EloquentBuilderTestModelCloseRelatedStub::class)->join('bar', 'bar.post_id', 'posts.id')->select('distinct(bar.id)');
     }
 }
 
