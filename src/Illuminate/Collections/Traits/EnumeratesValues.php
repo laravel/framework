@@ -393,6 +393,21 @@ trait EnumeratesValues
     }
 
     /**
+     * Map the values into a new class, spreading the arguments.
+     *
+     * @template TMapIntoValue
+     *
+     * @param  class-string<TMapIntoValue>  $class
+     * @return static<TKey, TMapIntoValue>
+     */
+    public function mapIntoSpread($class)
+    {
+        return $this->map(function ($value) use ($class) {
+            return new $class(...$value);
+        });
+    }
+
+    /**
      * Get the min value of a given key.
      *
      * @param  (callable(TValue):mixed)|string|null  $callback

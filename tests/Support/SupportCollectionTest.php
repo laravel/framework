@@ -2941,6 +2941,27 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMapIntoSpread($collection)
+    {
+        $data = new $collection([
+            ['name' => 'Taylor', 'role' => 'author'],
+            ['name' => 'Mohamed', 'role' => 'maintainer'],
+        ]);
+
+        $data = $data->mapIntoSpread(TestCollectionMapIntoSpreadObject::class);
+
+        $this->assertInstanceOf(TestCollectionMapIntoSpreadObject::class, $data->get(0));
+        $this->assertSame('Taylor', $data->get(0)->name);
+        $this->assertSame('author', $data->get(0)->role);
+
+        $this->assertInstanceOf(TestCollectionMapIntoSpreadObject::class, $data->get(1));
+        $this->assertSame('Mohamed', $data->get(1)->name);
+        $this->assertSame('maintainer', $data->get(1)->role);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testNth($collection)
     {
         $data = new $collection([
@@ -5138,6 +5159,16 @@ class TestCollectionMapIntoObject
     public function __construct($value)
     {
         $this->value = $value;
+    }
+}
+
+class TestCollectionMapIntoSpreadObject
+{
+    public function __construct(
+        public string $name,
+        public string $role,
+    ) {
+        //
     }
 }
 

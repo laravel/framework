@@ -694,6 +694,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function mapInto($class);
 
     /**
+     * Map the values into a new class, spreading the arguments.
+     *
+     * @template TMapIntoValue
+     *
+     * @param  class-string<TMapIntoValue>  $class
+     * @return static<TKey, TMapIntoValue>
+     */
+    public function mapIntoSpread($class);
+
+    /**
      * Merge the collection with the given items.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
