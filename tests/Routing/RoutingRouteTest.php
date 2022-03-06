@@ -1947,24 +1947,18 @@ class RoutingRouteTest extends TestCase
     public function testRouteInjectOnlyActionParameters()
     {
         $router = $this->getRouter();
-        $router->get('{lang}/foo/{id}', [RouteTestControllerWithSpecificActionParameters::class, 'show'])
-            ->injectOnlyActionParameters();
-
-        $request = Request::create('en/foo/123', 'GET');
-
-        $response = $router->dispatch($request);
-        $this->assertEquals(200, $response->getStatusCode());
-    }
-
-    public function testRouteWithoutInjectOnlyActionParameters()
-    {
-        $router = $this->getRouter();
         $router->get('{lang}/foo/{id}', [RouteTestControllerWithSpecificActionParameters::class, 'show']);
 
         $request = Request::create('en/foo/123', 'GET');
 
-        $this->expectException('TypeError');
+        $this->expectException(\TypeError::class);
         $router->dispatch($request);
+
+        $router->get('{lang}/foo/{id}', [RouteTestControllerWithSpecificActionParameters::class, 'show'])
+            ->injectOnlyActionParameters();
+
+        $response = $router->dispatch($request);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     protected function getRouter()
