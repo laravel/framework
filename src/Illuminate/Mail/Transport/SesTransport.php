@@ -10,6 +10,12 @@ use Swift_TransportException;
 class SesTransport extends Transport
 {
     /**
+     * Amazon SES has a limit on the total number of recipients per message.
+     * See Also: https://docs.aws.amazon.com/ses/latest/dg/quotas.html.
+     */
+    protected const RECIPIENT_LIMIT = 50;
+
+    /**
      * The Amazon SES instance.
      *
      * @var \Aws\Ses\SesClient
@@ -46,24 +52,31 @@ class SesTransport extends Transport
         $this->beforeSendPerformed($message);
 
         try {
-            $result = $this->ses->sendRawEmail(
-                array_merge(
-                    $this->options, [
-                        'Source' => key($message->getSender() ?: $message->getFrom()),
-                        'RawMessage' => [
-                            'Data' => $message->toString(),
-                        ],
-                    ]
-                )
-            );
+            /**
+             * Batch up API calls to adhere to the recipient limit of the service.
+             * See Also: https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.Ses.SesClient.html#_sendRawEmail.
+             */
+            foreach (collect(array_merge($message->getTo(), $message->getCc(), $message->getBcc()))->chunk(self::RECIPIENT_LIMIT) as $recipients) {
+                $result = $this->ses->sendRawEmail(
+                    array_merge(
+                        $this->options, [
+                            'Source' => key($message->getSender() ?: $message->getFrom()),
+                            'RawMessage' => [
+                                'Data' => $message->toString(),
+                            ],
+                            'Destinations' => $recipients,
+                        ]
+                    )
+                );
+
+                $messageId = $result->get('MessageId');
+
+                $message->getHeaders()->addTextHeader('X-Message-ID', $messageId);
+                $message->getHeaders()->addTextHeader('X-SES-Message-ID', $messageId);
+            }
         } catch (AwsException $e) {
             throw new Swift_TransportException('Request to AWS SES API failed.', $e->getCode(), $e);
         }
-
-        $messageId = $result->get('MessageId');
-
-        $message->getHeaders()->addTextHeader('X-Message-ID', $messageId);
-        $message->getHeaders()->addTextHeader('X-SES-Message-ID', $messageId);
 
         $this->sendPerformed($message);
 
