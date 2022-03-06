@@ -42,7 +42,10 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
             $comment->likes()->save(new NewCommentLike);
             $comment->likes()->save(new NewCommentLike);
         });
-        tap($post->comments[1], fn ($comment) => $comment->likes()->save(new NewCommentLike));
+
+        tap($post->comments[1], function ($comment) {
+            $comment->likes()->save(new NewCommentLike);
+        });
 
         $post->likes()->save(new NewLike);
 
@@ -136,7 +139,7 @@ class NewPost extends Model
 
     public function commentWithLikes()
     {
-        return $this->comments()->join('new_comment_likes', 'new_comment_likes.new_comment_id', 'new_comments.id');
+        return $this->comments()->join('new_comment_likes', 'new_comment_likes.new_comment_id', 'new_comments.id')->select('new_comment_likes.*');
     }
 
     public function likes()
