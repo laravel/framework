@@ -574,7 +574,7 @@ trait QueriesRelationships
             $query->callScope($constraints);
 
             if ($preserveRelationState) {
-                $query = DB::query()->from($query, $name . '_aggregate')->select(new Expression('count(*)'));
+                $query = $query->getConnection()->query()->from($query, $name . '_aggregate')->select(new Expression('count(*)'));
             } else {
                 $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
             }

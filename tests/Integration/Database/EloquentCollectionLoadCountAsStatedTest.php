@@ -65,7 +65,7 @@ class EloquentCollectionLoadCountAsStatedTest extends DatabaseTestCase
 
     public function testLoadCountAsStatedWithSameModels()
     {
-        $posts = NewPost::all()->push(Post::first());
+        $posts = NewPost::all()->push(NewPost::first());
 
         DB::enableQueryLog();
 
@@ -136,7 +136,7 @@ class NewPost extends Model
 
     public function commentWithLikes()
     {
-        return $this->comments()->join('new_comment_likes', 'new_comment_likes.comment_id', 'new_comments.id');
+        return $this->comments()->join('new_comment_likes', 'new_comment_likes.new_comment_id', 'new_comments.id');
     }
 
     public function likes()
