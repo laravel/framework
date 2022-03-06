@@ -2,10 +2,13 @@
 
 namespace Illuminate\Database\Connectors;
 
+use Illuminate\Database\Concerns\ParsesSearchPath;
 use PDO;
 
 class PostgresConnector extends Connector implements ConnectorInterface
 {
+    use ParsesSearchPath;
+
     /**
      * The default PDO connection options.
      *
@@ -119,32 +122,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Parse the "search_path" configuration value into an array.
-     *
-     * @param  string|array  $searchPath
-     * @return array
-     */
-    protected function parseSearchPath($searchPath)
-    {
-        if (is_string($searchPath)) {
-            preg_match_all('/[a-zA-z0-9$]{1,}/i', $searchPath, $matches);
-
-            $searchPath = $matches[0];
-        }
-
-        $searchPath = $searchPath ?? [];
-
-        array_walk($searchPath, function (&$schema) {
-            $schema = trim($schema, '\'"');
-        });
-
-        return $searchPath;
-    }
-
-    /**
      * Format the search path for the DSN.
      *
-     * @param  array|string  $searchPath
+     * @param  array  $searchPath
      * @return string
      */
     protected function quoteSearchPath($searchPath)

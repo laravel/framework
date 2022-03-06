@@ -23,6 +23,7 @@ use UnexpectedValueException;
  * @property-read HigherOrderCollectionProxy $average
  * @property-read HigherOrderCollectionProxy $avg
  * @property-read HigherOrderCollectionProxy $contains
+ * @property-read HigherOrderCollectionProxy $doesntContain
  * @property-read HigherOrderCollectionProxy $each
  * @property-read HigherOrderCollectionProxy $every
  * @property-read HigherOrderCollectionProxy $filter
@@ -68,6 +69,7 @@ trait EnumeratesValues
         'average',
         'avg',
         'contains',
+        'doesntContain',
         'each',
         'every',
         'filter',
@@ -713,7 +715,7 @@ trait EnumeratesValues
     /**
      * Pass the collection into a new class.
      *
-     * @param  string-class  $class
+     * @param  class-string  $class
      * @return mixed
      */
     public function pipeInto($class)

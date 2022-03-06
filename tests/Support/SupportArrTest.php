@@ -452,6 +452,16 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
+
+        $this->assertFalse(Arr::isAssoc([]));
+        $this->assertFalse(Arr::isAssoc([1, 2, 3]));
+        $this->assertFalse(Arr::isAssoc(['foo', 2, 3]));
+        $this->assertFalse(Arr::isAssoc([0 => 'foo', 'bar']));
+
+        $this->assertTrue(Arr::isAssoc([1 => 'foo', 'bar']));
+        $this->assertTrue(Arr::isAssoc([0 => 'foo', 'bar' => 'baz']));
+        $this->assertTrue(Arr::isAssoc([0 => 'foo', 2 => 'bar']));
+        $this->assertTrue(Arr::isAssoc(['foo' => 'bar', 'baz' => 'qux']));
     }
 
     public function testIsList()
@@ -861,7 +871,7 @@ class SupportArrTest extends TestCase
             'mt-4',
         ]);
 
-        $this->assertEquals('font-bold mt-4', $classes);
+        $this->assertSame('font-bold mt-4', $classes);
 
         $classes = Arr::toCssClasses([
             'font-bold',
@@ -870,7 +880,7 @@ class SupportArrTest extends TestCase
             'mr-2' => false,
         ]);
 
-        $this->assertEquals('font-bold mt-4 ml-2', $classes);
+        $this->assertSame('font-bold mt-4 ml-2', $classes);
     }
 
     public function testWhere()
@@ -1020,5 +1030,20 @@ class SupportArrTest extends TestCase
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
         ], $sortedWithCallable);
+    }
+
+    public function testKeyBy()
+    {
+        $array = [
+            ['id' => '123', 'data' => 'abc'],
+            ['id' => '345', 'data' => 'def'],
+            ['id' => '498', 'data' => 'hgi'],
+        ];
+
+        $this->assertEquals([
+            '123' => ['id' => '123', 'data' => 'abc'],
+            '345' => ['id' => '345', 'data' => 'def'],
+            '498' => ['id' => '498', 'data' => 'hgi'],
+        ], Arr::keyBy($array, 'id'));
     }
 }

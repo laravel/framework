@@ -884,6 +884,44 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
+    public function testWhereNot()
+    {
+        $nestedQuery = m::mock(Builder::class);
+        $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $model = $this->getMockModel()->makePartial();
+        $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and not');
+        $nestedQuery->shouldReceive('foo')->once();
+
+        $result = $builder->whereNot(function ($query) {
+            $query->foo();
+        });
+        $this->assertEquals($builder, $result);
+    }
+
+    public function testOrWhereNot()
+    {
+        $nestedQuery = m::mock(Builder::class);
+        $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $model = $this->getMockModel()->makePartial();
+        $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'or not');
+        $nestedQuery->shouldReceive('foo')->once();
+
+        $result = $builder->orWhereNot(function ($query) {
+            $query->foo();
+        });
+        $this->assertEquals($builder, $result);
+    }
+
     public function testRealQueryHigherOrderOrWhereScopes()
     {
         $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
@@ -1691,6 +1729,20 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
+    public function testUpdateWithQualifiedTimestampValue()
+    {
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "table"."foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
+
+        $result = $builder->update(['table.foo' => 'bar', 'table.updated_at' => null]);
+        $this->assertEquals(1, $result);
+    }
+
     public function testUpdateWithoutTimestamp()
     {
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
@@ -1719,6 +1771,24 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->from('table as alias')->update(['foo' => 'bar']);
         $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateWithAliasWithQualifiedTimestampValue()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', null])->andReturn(1);
+
+        $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
     }
 
     public function testUpsert()

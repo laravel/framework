@@ -1693,6 +1693,30 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
     }
 
+    public function testWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'bar')->whereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where "name" = ? and not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('name', '=', 'bar')->orWhereNot(function ($q) {
+            $q->where('email', '=', 'foo');
+        });
+        $this->assertSame('select * from "users" where "name" = ? or not ("email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'bar', 1 => 'foo'], $builder->getBindings());
+    }
+
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();
@@ -3332,6 +3356,41 @@ SQL;
         $this->assertEquals(['John Doe'], $builder->getBindings());
     }
 
+    public function testBitwiseOperators()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from "users" where "bar" & ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('bar', '#', 1);
+        $this->assertSame('select * from "users" where ("bar" # ?)::bool', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('range', '>>', '[2022-01-08 00:00:00,2022-01-09 00:00:00)');
+        $this->assertSame('select * from "users" where ("range" >> ?)::bool', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('bar', '&', 1);
+        $this->assertSame('select * from [users] where ([bar] & ?) != 0', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from "users" having "bar" & ?', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('bar', '#', 1);
+        $this->assertSame('select * from "users" having ("bar" # ?)::bool', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->having('range', '>>', '[2022-01-08 00:00:00,2022-01-09 00:00:00)');
+        $this->assertSame('select * from "users" having ("range" >> ?)::bool', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->having('bar', '&', 1);
+        $this->assertSame('select * from [users] having ([bar] & ?) != 0', $builder->toSql());
+    }
+
     public function testMergeWheresCanMergeWheresAndBindings()
     {
         $builder = $this->getBuilder();
@@ -4108,6 +4167,88 @@ SQL;
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['foo', 'bar', 'baz'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithDynamicColumnInSelectRaw()
+    {
+        $perPage = 15;
+        $cursorName = 'cursor';
+        $cursor = new Cursor(['test' => 'bar']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->select('*')->selectRaw('(CONCAT(firstname, \' \', lastname)) as test')->orderBy('test');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select *, (CONCAT(firstname, \' \', lastname)) as test from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        CursorPaginator::currentCursorResolver(function () use ($cursor) {
+            return $cursor;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate();
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithDynamicColumnInSelectSub()
+    {
+        $perPage = 15;
+        $cursorName = 'cursor';
+        $cursor = new Cursor(['test' => 'bar']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->from('foobar')->select('*')->selectSub('CONCAT(firstname, \' \', lastname)', 'test')->orderBy('test');
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([['test' => 'foo'], ['test' => 'bar']]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
+            $this->assertEquals(
+                'select *, (CONCAT(firstname, \' \', lastname)) as "test" from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
+                $builder->toSql());
+            $this->assertEquals(['bar'], $builder->bindings['where']);
+
+            return $results;
+        });
+
+        CursorPaginator::currentCursorResolver(function () use ($cursor) {
+            return $cursor;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate();
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['test'],
         ]), $result);
     }
 

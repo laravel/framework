@@ -405,9 +405,7 @@ class Arr
      */
     public static function isAssoc(array $array)
     {
-        $keys = array_keys($array);
-
-        return array_keys($keys) !== $keys;
+        return ! array_is_list($array);
     }
 
     /**
@@ -420,7 +418,19 @@ class Arr
      */
     public static function isList($array)
     {
-        return ! self::isAssoc($array);
+        return array_is_list($array);
+    }
+
+    /**
+     * Key an associative array by a field or using a callback.
+     *
+     * @param  array  $array
+     * @param  callable|array|string
+     * @return array
+     */
+    public static function keyBy($array, $keyBy)
+    {
+        return Collection::make($array)->keyBy($keyBy)->all();
     }
 
     /**
@@ -669,7 +679,7 @@ class Arr
             }
         }
 
-        if (static::isAssoc($array)) {
+        if (! array_is_list($array)) {
             $descending
                     ? krsort($array, $options)
                     : ksort($array, $options);

@@ -121,6 +121,26 @@ class NotificationMailMessageTest extends TestCase
         $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
     }
 
+    public function testMetadataIsSetCorrectly()
+    {
+        $message = new MailMessage;
+        $message->metadata('origin', 'test-suite');
+        $message->metadata('user_id', 1);
+
+        $this->assertArrayHasKey('origin', $message->metadata);
+        $this->assertSame('test-suite', $message->metadata['origin']);
+        $this->assertArrayHasKey('user_id', $message->metadata);
+        $this->assertSame(1, $message->metadata['user_id']);
+    }
+
+    public function testTagIsSetCorrectly()
+    {
+        $message = new MailMessage;
+        $message->tag('test');
+
+        $this->assertContains('test', $message->tags);
+    }
+
     public function testCallbackIsSetCorrectly()
     {
         $callback = function () {

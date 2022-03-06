@@ -291,7 +291,7 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -369,7 +369,7 @@ class HasManyThrough extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -508,9 +508,9 @@ class HasManyThrough extends Relation
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
-        $column = $column ?? $this->getRelated()->getQualifiedKeyName();
+        $column ??= $this->getRelated()->getQualifiedKeyName();
 
-        $alias = $alias ?? $this->getRelated()->getKeyName();
+        $alias ??= $this->getRelated()->getKeyName();
 
         return $this->prepareQueryBuilder()->chunkById($count, $callback, $column, $alias);
     }
@@ -564,9 +564,9 @@ class HasManyThrough extends Relation
      */
     public function lazyById($chunkSize = 1000, $column = null, $alias = null)
     {
-        $column = $column ?? $this->getRelated()->getQualifiedKeyName();
+        $column ??= $this->getRelated()->getQualifiedKeyName();
 
-        $alias = $alias ?? $this->getRelated()->getKeyName();
+        $alias ??= $this->getRelated()->getKeyName();
 
         return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias);
     }

@@ -28,6 +28,7 @@ use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -584,6 +585,84 @@ class ValidationValidatorTest extends TestCase
         new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
     }
 
+    public function testIndexValuesAreReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // $v = new Validator($trans, ['name' => ''], ['name' => 'required'], ['name.required' => 'Name :index is required.']);
+        // $this->assertFalse($v->passes());
+        // $this->assertSame('Name 0 is required.', $v->messages()->first('name'));
+
+        $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :index is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 0 is required.', $v->messages()->first('input.*.name'));
+        $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => ':Attribute :index is required.']);
+        $v->setAttributeNames([
+            'input.*.name' => 'name',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 0 is required.', $v->messages()->first('input.*.name'));
+
+        $v = new Validator($trans, [
+            'input' => [
+                [
+                    'name' => '',
+                    'attributes' => [
+                        'foo',
+                        1,
+                    ],
+                ],
+            ],
+        ], ['input.*.attributes.*' => 'string'], ['input.*.attributes.*.string' => 'Attribute (:first-index, :first-position) (:second-index, :second-position) must be a string.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Attribute (0, 1) (1, 2) must be a string.', $v->messages()->first('input.*.attributes.*'));
+
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :index is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 1 is required.', $v->messages()->first('input.*.name'));
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => ':Attribute :index is required.']);
+        $v->setAttributeNames([
+            'input.*.name' => 'name',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 1 is required.', $v->messages()->first('input.*.name'));
+
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :index is required.']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testPositionValuesAreReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // $v = new Validator($trans, ['name' => ''], ['name' => 'required'], ['name.required' => 'Name :position is required.']);
+        // $this->assertFalse($v->passes());
+        // $this->assertSame('Name 1 is required.', $v->messages()->first('name'));
+
+        $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :position is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 1 is required.', $v->messages()->first('input.*.name'));
+        $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => ':Attribute :position is required.']);
+        $v->setAttributeNames([
+            'input.*.name' => 'name',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 1 is required.', $v->messages()->first('input.*.name'));
+
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :position is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 2 is required.', $v->messages()->first('input.*.name'));
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => ':Attribute :position is required.']);
+        $v->setAttributeNames([
+            'input.*.name' => 'name',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame('Name 2 is required.', $v->messages()->first('input.*.name'));
+
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :position is required.']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testCustomValidationLinesAreRespected()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -678,7 +757,7 @@ class ValidationValidatorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Exception [RuntimeException] is invalid. It must extend [Illuminate\Validation\ValidationException].');
 
-        $v->setException(\RuntimeException::class);
+        $v->setException(RuntimeException::class);
     }
 
     public function testValidationDotCustomDotAnythingCanBeTranslated()
@@ -730,6 +809,47 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('all must be required!', $v->messages()->first('name.0'));
         $this->assertSame('all must be required!', $v->messages()->first('name.1'));
+    }
+
+    public function testInlineValidationMessagesForRuleObjectsAreRespected()
+    {
+        $rule = new class implements Rule
+        {
+            public function passes($attribute, $value)
+            {
+                return false;
+            }
+
+            public function message()
+            {
+                return 'this is my message';
+            }
+        };
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'Taylor'], ['name' => $rule], [$rule::class => 'my custom message']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my custom message', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'Ryan'], ['name' => $rule], ['name.'.$rule::class => 'my custom message']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my custom message', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name.*' => $rule], ['name.*.'.$rule::class => 'my custom message']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my custom message', $v->messages()->first('name.0'));
+        $this->assertSame('my custom message', $v->messages()->first('name.1'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'Ryan'], ['name' => $rule], [$rule::class => 'my attribute is :attribute']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('my attribute is name', $v->messages()->first('name'));
     }
 
     public function testIfRulesAreSuccessfullyAdded()

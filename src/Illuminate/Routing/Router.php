@@ -24,6 +24,7 @@ use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use ReflectionClass;
+use stdClass;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -544,7 +545,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $group = end($this->groupStack);
 
-        return isset($group['namespace']) && ! str_starts_with($class, '\\')
+        return isset($group['namespace']) && ! str_starts_with($class, '\\') && ! str_starts_with($class, $group['namespace'])
                 ? $group['namespace'].'\\'.$class : $class;
     }
 
@@ -826,7 +827,7 @@ class Router implements BindingRegistrar, RegistrarContract
                     $response instanceof Jsonable ||
                     $response instanceof ArrayObject ||
                     $response instanceof JsonSerializable ||
-                    $response instanceof \stdClass ||
+                    $response instanceof stdClass ||
                     is_array($response))) {
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
@@ -846,7 +847,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
     public function substituteBindings($route)
@@ -866,7 +867,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
      */
     public function substituteImplicitBindings($route)
@@ -882,7 +883,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Routing\Route  $route
      * @return mixed
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     protected function performBinding($key, $value, $route)
     {

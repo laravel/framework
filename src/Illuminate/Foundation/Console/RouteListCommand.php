@@ -98,7 +98,7 @@ class RouteListCommand extends Command
     {
         $this->router->flushMiddlewareGroups();
 
-        if (empty($this->router->getRoutes())) {
+        if (! $this->router->getRoutes()->count()) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -120,8 +120,10 @@ class RouteListCommand extends Command
             return $this->getRouteInformation($route);
         })->filter()->all();
 
-        if (($sort = $this->option('sort')) !== 'precedence') {
+        if (($sort = $this->option('sort')) !== null) {
             $routes = $this->sortRoutes($sort, $routes);
+        } else {
+            $routes = $this->sortRoutes('uri', $routes);
         }
 
         if ($this->option('reverse')) {
@@ -260,7 +262,7 @@ class RouteListCommand extends Command
     {
         $results = [];
 
-        foreach ($columns as $i => $column) {
+        foreach ($columns as $column) {
             if (str_contains($column, ',')) {
                 $results = array_merge($results, explode(',', $column));
             } else {
@@ -301,7 +303,7 @@ class RouteListCommand extends Command
             fn ($route) => array_merge($route, [
                 'action' => $this->formatActionForCli($route),
                 'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
-                'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
+                'uri' => $route['domain'] ? ($route['domain'].'/'.ltrim($route['uri'], '/')) : $route['uri'],
             ]),
         );
 

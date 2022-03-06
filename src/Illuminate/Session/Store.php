@@ -110,7 +110,7 @@ class Store implements Session
                 $data = @unserialize($this->prepareForUnserialize($data));
             }
 
-            if ($data !== false && ! is_null($data) && is_array($data)) {
+            if ($data !== false && is_array($data)) {
                 return $data;
             }
         }

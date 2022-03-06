@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Mockery;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class CookieTest extends TestCase
@@ -45,7 +45,7 @@ class CookieTest extends TestCase
     {
         $app->instance(
             ExceptionHandler::class,
-            $handler = Mockery::mock(ExceptionHandler::class)->shouldIgnoreMissing()
+            $handler = m::mock(ExceptionHandler::class)->shouldIgnoreMissing()
         );
 
         $handler->shouldReceive('render')->andReturn(new Response);

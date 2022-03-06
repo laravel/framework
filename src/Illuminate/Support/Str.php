@@ -170,6 +170,23 @@ class Str
     }
 
     /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function betweenFirst($subject, $from, $to)
+    {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::before(static::after($subject, $from), $to);
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
@@ -251,6 +268,42 @@ class Str
         }
 
         return false;
+    }
+
+    /**
+     * Extracts an excerpt from text that matches the first instance of a phrase.
+     *
+     * @param  string  $text
+     * @param  string  $phrase
+     * @param  array  $options
+     * @return string|null
+     */
+    public static function excerpt($text, $phrase = '', $options = [])
+    {
+        $radius = $options['radius'] ?? 100;
+        $omission = $options['omission'] ?? '...';
+
+        preg_match('/^(.*?)('.preg_quote((string) $phrase).')(.*)$/iu', (string) $text, $matches);
+
+        if (empty($matches)) {
+            return null;
+        }
+
+        $start = ltrim($matches[1]);
+
+        $start = str(mb_substr($start, max(mb_strlen($start, 'UTF-8') - $radius, 0), $radius, 'UTF-8'))->ltrim()->unless(
+            fn ($startWithRadius) => $startWithRadius->exactly($start),
+            fn ($startWithRadius) => $startWithRadius->prepend($omission),
+        );
+
+        $end = rtrim($matches[3]);
+
+        $end = str(mb_substr($end, 0, $radius, 'UTF-8'))->rtrim()->unless(
+            fn ($endWithRadius) => $endWithRadius->exactly($end),
+            fn ($endWithRadius) => $endWithRadius->append($omission),
+        );
+
+        return $start->append($matches[2], $end)->toString();
     }
 
     /**
@@ -420,7 +473,7 @@ class Str
     {
         $converter = new GithubFlavoredMarkdownConverter($options);
 
-        return (string) $converter->convertToHtml($string);
+        return (string) $converter->convert($string);
     }
 
     /**
@@ -760,8 +813,8 @@ class Str
         $parts = explode(' ', $value);
 
         $parts = count($parts) > 1
-            ? $parts = array_map([static::class, 'title'], $parts)
-            : $parts = array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
+            ? array_map([static::class, 'title'], $parts)
+            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
 
         $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
 

@@ -1497,7 +1497,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $json = json_encode($this->jsonSerialize(), $options);
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw JsonEncodingException::forModel($this, json_last_error_msg());
         }
 
@@ -1832,7 +1832,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             }
 
             if ($relation instanceof QueueableEntity) {
-                foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
+                foreach ($relation->getQueueableRelations() as $entityValue) {
                     $relations[] = $key.'.'.$entityValue;
                 }
             }

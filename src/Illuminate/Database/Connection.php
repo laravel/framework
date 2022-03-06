@@ -616,7 +616,11 @@ class Connection implements ConnectionInterface
             $statement->bindValue(
                 is_string($key) ? $key : $key + 1,
                 $value,
-                is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
+                match (true) {
+                    is_int($value) => PDO::PARAM_INT,
+                    is_resource($value) => PDO::PARAM_LOB,
+                    default => PDO::PARAM_STR
+                },
             );
         }
     }

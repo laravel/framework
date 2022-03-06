@@ -575,7 +575,7 @@ class Gate implements GateContract
 
             $afterResult = $after($user, $ability, $result, $arguments);
 
-            $result = $result ?? $afterResult;
+            $result ??= $afterResult;
         }
 
         return $result;

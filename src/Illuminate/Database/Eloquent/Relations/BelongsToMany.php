@@ -692,7 +692,7 @@ class BelongsToMany extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -744,7 +744,7 @@ class BelongsToMany extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -934,11 +934,11 @@ class BelongsToMany extends Relation
     {
         $this->prepareQueryBuilder();
 
-        $column = $column ?? $this->getRelated()->qualifyColumn(
+        $column ??= $this->getRelated()->qualifyColumn(
             $this->getRelatedKeyName()
         );
 
-        $alias = $alias ?? $this->getRelatedKeyName();
+        $alias ??= $this->getRelatedKeyName();
 
         return $this->query->chunkById($count, function ($results) use ($callback) {
             $this->hydratePivotRelation($results->all());
@@ -990,11 +990,11 @@ class BelongsToMany extends Relation
      */
     public function lazyById($chunkSize = 1000, $column = null, $alias = null)
     {
-        $column = $column ?? $this->getRelated()->qualifyColumn(
+        $column ??= $this->getRelated()->qualifyColumn(
             $this->getRelatedKeyName()
         );
 
-        $alias = $alias ?? $this->getRelatedKeyName();
+        $alias ??= $this->getRelatedKeyName();
 
         return $this->prepareQueryBuilder()->lazyById($chunkSize, $column, $alias)->map(function ($model) {
             $this->hydratePivotRelation([$model]);

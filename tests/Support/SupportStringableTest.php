@@ -474,6 +474,11 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Malmö')->endsWith('mo'));
     }
 
+    public function testExcerpt()
+    {
+        $this->assertSame('...is a beautiful morn...', (string) $this->stringable('This is a beautiful morning')->excerpt('beautiful', ['radius' => 5]));
+    }
+
     public function testBefore()
     {
         $this->assertSame('han', (string) $this->stringable('hannah')->before('nah'));
@@ -512,6 +517,21 @@ class SupportStringableTest extends TestCase
         $this->assertSame('a]ab[b', (string) $this->stringable('[a]ab[b]')->between('[', ']'));
         $this->assertSame('foo', (string) $this->stringable('foofoobar')->between('foo', 'bar'));
         $this->assertSame('bar', (string) $this->stringable('foobarbar')->between('foo', 'bar'));
+    }
+
+    public function testBetweenFirst()
+    {
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('', 'c'));
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('a', ''));
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('', ''));
+        $this->assertSame('b', (string) $this->stringable('abc')->betweenFirst('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('dddabc')->betweenFirst('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('abcddd')->betweenFirst('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('dddabcddd')->betweenFirst('a', 'c'));
+        $this->assertSame('nn', (string) $this->stringable('hannah')->betweenFirst('ha', 'ah'));
+        $this->assertSame('a', (string) $this->stringable('[a]ab[b]')->betweenFirst('[', ']'));
+        $this->assertSame('foo', (string) $this->stringable('foofoobar')->betweenFirst('foo', 'bar'));
+        $this->assertSame('', (string) $this->stringable('foobarbar')->betweenFirst('foo', 'bar'));
     }
 
     public function testAfter()
@@ -890,23 +910,23 @@ class SupportStringableTest extends TestCase
 
     public function testMask()
     {
-        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', 3));
-        $this->assertEquals('******@email.com', $this->stringable('taylor@email.com')->mask('*', 0, 6));
-        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', -13));
-        $this->assertEquals('tay***@email.com', $this->stringable('taylor@email.com')->mask('*', -13, 3));
+        $this->assertSame('tay*************', (string) $this->stringable('taylor@email.com')->mask('*', 3));
+        $this->assertSame('******@email.com', (string) $this->stringable('taylor@email.com')->mask('*', 0, 6));
+        $this->assertSame('tay*************', (string) $this->stringable('taylor@email.com')->mask('*', -13));
+        $this->assertSame('tay***@email.com', (string) $this->stringable('taylor@email.com')->mask('*', -13, 3));
 
-        $this->assertEquals('****************', $this->stringable('taylor@email.com')->mask('*', -17));
-        $this->assertEquals('*****r@email.com', $this->stringable('taylor@email.com')->mask('*', -99, 5));
+        $this->assertSame('****************', (string) $this->stringable('taylor@email.com')->mask('*', -17));
+        $this->assertSame('*****r@email.com', (string) $this->stringable('taylor@email.com')->mask('*', -99, 5));
 
-        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16));
-        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16, 99));
+        $this->assertSame('taylor@email.com', (string) $this->stringable('taylor@email.com')->mask('*', 16));
+        $this->assertSame('taylor@email.com', (string) $this->stringable('taylor@email.com')->mask('*', 16, 99));
 
-        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('', 3));
+        $this->assertSame('taylor@email.com', (string) $this->stringable('taylor@email.com')->mask('', 3));
 
-        $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->mask('something', 3));
+        $this->assertSame('taysssssssssssss', (string) $this->stringable('taylor@email.com')->mask('something', 3));
 
-        $this->assertEquals('这是一***', $this->stringable('这是一段中文')->mask('*', 3));
-        $this->assertEquals('**一段中文', $this->stringable('这是一段中文')->mask('*', 0, 2));
+        $this->assertSame('这是一***', (string) $this->stringable('这是一段中文')->mask('*', 3));
+        $this->assertSame('**一段中文', (string) $this->stringable('这是一段中文')->mask('*', 0, 2));
     }
 
     public function testRepeat()

@@ -5,6 +5,7 @@ namespace Illuminate\Database\Concerns;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
@@ -12,6 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 use RuntimeException;
@@ -111,9 +113,9 @@ trait BuildsQueries
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
     {
-        $column = $column ?? $this->defaultKeyName();
+        $column ??= $this->defaultKeyName();
 
-        $alias = $alias ?? $column;
+        $alias ??= $column;
 
         $lastId = null;
 
@@ -254,9 +256,9 @@ trait BuildsQueries
             throw new InvalidArgumentException('The chunk size should be at least 1');
         }
 
-        $column = $column ?? $this->defaultKeyName();
+        $column ??= $this->defaultKeyName();
 
-        $alias = $alias ?? $column;
+        $alias ??= $column;
 
         return LazyCollection::make(function () use ($chunkSize, $column, $alias, $descending) {
             $lastId = null;
@@ -307,12 +309,14 @@ trait BuildsQueries
     {
         $result = $this->take(2)->get($columns);
 
-        if ($result->isEmpty()) {
+        $count = $result->count();
+
+        if ($count === 0) {
             throw new RecordsNotFoundException;
         }
 
-        if ($result->count() > 1) {
-            throw new MultipleRecordsFoundException;
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
         }
 
         return $result->first();
@@ -340,8 +344,10 @@ trait BuildsQueries
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
                 if (! is_null($previousColumn)) {
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
+
                     $builder->where(
-                        $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                        Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                         '=',
                         $cursor->parameter($previousColumn)
                     );
@@ -350,8 +356,10 @@ trait BuildsQueries
                 $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
+                    $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
+
                     $builder->where(
-                        $this->getOriginalColumnNameForCursorPagination($this, $column),
+                        Str::contains($originalColumn, ['(', ')']) ? new Expression($originalColumn) : $originalColumn,
                         $direction === 'asc' ? '>' : '<',
                         $cursor->parameter($column)
                     );
@@ -394,7 +402,7 @@ trait BuildsQueries
 
                     [$original, $alias] = explode($as, $column);
 
-                    if ($parameter === $alias) {
+                    if ($parameter === $alias || $builder->getGrammar()->wrap($parameter) === $alias) {
                         return $original;
                     }
                 }

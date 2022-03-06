@@ -288,7 +288,7 @@ trait HasAttributes
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
-            if ($attributes[$key] && $attributes[$key] instanceof DateTimeInterface &&
+            if ($attributes[$key] instanceof DateTimeInterface &&
                 $this->isClassCastable($key)) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
@@ -581,7 +581,7 @@ trait HasAttributes
 
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$attributeMutatorCache[get_class($this)][$key] = $returnType &&
+        return static::$attributeMutatorCache[get_class($this)][$key] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class;
     }
@@ -979,7 +979,7 @@ trait HasAttributes
 
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
-        return static::$setAttributeMutatorCache[$class][$key] = $returnType &&
+        return static::$setAttributeMutatorCache[$class][$key] =
                     $returnType instanceof ReflectionNamedType &&
                     $returnType->getName() === Attribute::class &&
                     is_callable($this->{$method}()->set);
@@ -1942,7 +1942,7 @@ trait HasAttributes
             return $this->castAttribute($key, $attribute) ==
                 $this->castAttribute($key, $original);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
-            if (($attribute === null && $original !== null) || ($attribute !== null && $original === null)) {
+            if ($original === null) {
                 return false;
             }
 
@@ -2096,8 +2096,7 @@ trait HasAttributes
         return collect((new ReflectionClass($instance))->getMethods())->filter(function ($method) use ($instance) {
             $returnType = $method->getReturnType();
 
-            if ($returnType &&
-                $returnType instanceof ReflectionNamedType &&
+            if ($returnType instanceof ReflectionNamedType &&
                 $returnType->getName() === Attribute::class) {
                 $method->setAccessible(true);
 

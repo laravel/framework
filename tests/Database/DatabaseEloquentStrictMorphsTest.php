@@ -34,7 +34,7 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
         ]);
 
         $morphName = $model->getMorphClass();
-        $this->assertEquals('test', $morphName);
+        $this->assertSame('test', $morphName);
     }
 
     public function testMapsCanBeEnforcedInOneMethod()
@@ -48,7 +48,7 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
         ]);
 
         $morphName = $model->getMorphClass();
-        $this->assertEquals('test', $morphName);
+        $this->assertSame('test', $morphName);
     }
 
     protected function tearDown(): void

@@ -296,7 +296,7 @@ class Builder implements BuilderContract
      */
     public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where($column, $operator, $value, $boolean)->first();
+        return $this->where(...func_get_args())->first();
     }
 
     /**
@@ -314,6 +314,29 @@ class Builder implements BuilderContract
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add a "where not" clause to the query.
+     *
+     * @param  \Closure  $callback
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNot(Closure $callback, $boolean = 'and')
+    {
+        return $this->where($callback, null, null, $boolean.' not');
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function orWhereNot(Closure $callback)
+    {
+        return $this->whereNot($callback, 'or');
     }
 
     /**
@@ -426,7 +449,7 @@ class Builder implements BuilderContract
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -523,7 +546,7 @@ class Builder implements BuilderContract
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function firstOrFail($columns = ['*'])
     {
@@ -562,7 +585,7 @@ class Builder implements BuilderContract
      * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      * @throws \Illuminate\Database\MultipleRecordsFoundException
      */
     public function sole($columns = ['*'])
@@ -593,7 +616,7 @@ class Builder implements BuilderContract
      * @param  string|\Illuminate\Database\Query\Expression  $column
      * @return mixed
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
      */
     public function valueOrFail($column)
     {
@@ -1011,7 +1034,7 @@ class Builder implements BuilderContract
 
         $qualifiedColumn = end($segments).'.'.$column;
 
-        $values[$qualifiedColumn] = $values[$column];
+        $values[$qualifiedColumn] = Arr::get($values, $qualifiedColumn, $values[$column]);
 
         unset($values[$column]);
 

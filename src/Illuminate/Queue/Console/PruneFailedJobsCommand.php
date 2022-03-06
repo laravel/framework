@@ -41,8 +41,6 @@ class PruneFailedJobsCommand extends Command
     {
         $failer = $this->laravel['queue.failer'];
 
-        $count = 0;
-
         if ($failer instanceof PrunableFailedJobProvider) {
             $count = $failer->prune(Carbon::now()->subHours($this->option('hours')));
         } else {
