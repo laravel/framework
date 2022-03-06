@@ -11,6 +11,12 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 class SesTransport extends AbstractTransport
 {
     /**
+     * Amazon SES has a limit on the total number of recipients per message.
+     * See Also: https://docs.aws.amazon.com/ses/latest/dg/quotas.html.
+     */
+    protected const RECIPIENT_LIMIT = 50;
+
+    /**
      * The Amazon SES instance.
      *
      * @var \Aws\Ses\SesClient
@@ -45,16 +51,24 @@ class SesTransport extends AbstractTransport
     protected function doSend(SentMessage $message): void
     {
         try {
-            $this->ses->sendRawEmail(
-                array_merge(
-                    $this->options, [
-                        'Source' => $message->getEnvelope()->getSender()->toString(),
-                        'RawMessage' => [
-                            'Data' => $message->toString(),
-                        ],
-                    ]
-                )
-            );
+            /**
+             * Batch up API calls to adhere to the recipient limit of the service.
+             * See Also: https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.Ses.SesClient.html#_sendRawEmail.
+             */
+            $recipientList = collect($message->getEnvelope()->getRecipients());
+            foreach ($recipientList->chunk(self::RECIPIENT_LIMIT) as $recipients) {
+                $this->ses->sendRawEmail(
+                    array_merge(
+                        $this->options, [
+                            'Source' => $message->getEnvelope()->getSender()->toString(),
+                            'RawMessage' => [
+                                'Data' => $message->toString(),
+                            ],
+                            'Destinations' => $recipients,
+                        ]
+                    )
+                );
+            }
         } catch (AwsException $e) {
             throw new Exception('Request to AWS SES API failed.', $e->getCode(), $e);
         }
