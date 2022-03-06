@@ -611,6 +611,8 @@ class Builder implements BuilderContract
     {
         if ($result = $this->first([$column])) {
             return $result->{Str::afterLast($column, '.')};
+        } else {
+            return null;
         }
     }
 
