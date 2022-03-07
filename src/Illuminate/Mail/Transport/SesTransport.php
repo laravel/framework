@@ -51,12 +51,9 @@ class SesTransport extends AbstractTransport
     protected function doSend(SentMessage $message): void
     {
         try {
-            /**
-             * Batch up API calls to adhere to the recipient limit of the service.
-             * See Also: https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.Ses.SesClient.html#_sendRawEmail.
-             */
-            $recipientList = collect($message->getEnvelope()->getRecipients());
-            foreach ($recipientList->chunk(self::RECIPIENT_LIMIT) as $recipients) {
+            // Batch up API calls to adhere to the recipient limit of the service.
+            // See also: https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.Ses.SesClient.html#_sendRawEmail.
+            foreach (collect($message->getEnvelope()->getRecipients())->chunk(self::RECIPIENT_LIMIT) as $recipients) {
                 $this->ses->sendRawEmail(
                     array_merge(
                         $this->options, [
