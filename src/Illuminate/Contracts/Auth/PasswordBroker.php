@@ -3,6 +3,7 @@
 namespace Illuminate\Contracts\Auth;
 
 use Closure;
+use Illuminate\Auth\Passwords\ResetResponse;
 
 interface PasswordBroker
 {
@@ -10,6 +11,8 @@ interface PasswordBroker
      * Constant representing a successfully sent reminder.
      *
      * @var string
+     *
+     * @deprecated
      */
     const RESET_LINK_SENT = 'passwords.sent';
 
@@ -17,6 +20,8 @@ interface PasswordBroker
      * Constant representing a successfully reset password.
      *
      * @var string
+     *
+     * @deprecated
      */
     const PASSWORD_RESET = 'passwords.reset';
 
@@ -24,6 +29,8 @@ interface PasswordBroker
      * Constant representing the user not found response.
      *
      * @var string
+     *
+     * @deprecated
      */
     const INVALID_USER = 'passwords.user';
 
@@ -31,6 +38,8 @@ interface PasswordBroker
      * Constant representing an invalid token.
      *
      * @var string
+     *
+     * @deprecated
      */
     const INVALID_TOKEN = 'passwords.token';
 
@@ -38,6 +47,8 @@ interface PasswordBroker
      * Constant representing a throttled reset attempt.
      *
      * @var string
+     *
+     * @deprecated
      */
     const RESET_THROTTLED = 'passwords.throttled';
 
@@ -46,16 +57,16 @@ interface PasswordBroker
      *
      * @param  array  $credentials
      * @param  \Closure|null  $callback
-     * @return string
+     * @return \Illuminate\Auth\Passwords\ResetResponse
      */
-    public function sendResetLink(array $credentials, Closure $callback = null);
+    public function sendResetLink(array $credentials, Closure $callback = null): ResetResponse;
 
     /**
      * Reset the password for the given token.
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
-     * @return mixed
+     * @return \Illuminate\Auth\Passwords\ResetResponse
      */
-    public function reset(array $credentials, Closure $callback);
+    public function reset(array $credentials, Closure $callback): ResetResponse;
 }

@@ -43,9 +43,9 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure|null  $callback
-     * @return string
+     * @return \Illuminate\Auth\Passwords\ResetResponse
      */
-    public function sendResetLink(array $credentials, Closure $callback = null)
+    public function sendResetLink(array $credentials, Closure $callback = null): ResetResponse
     {
         // First we will check to see if we found a user at the given credentials and
         // if we did not we will redirect back to this current URI with a piece of
@@ -53,11 +53,11 @@ class PasswordBroker implements PasswordBrokerContract
         $user = $this->getUser($credentials);
 
         if (is_null($user)) {
-            return static::INVALID_USER;
+            return ResetResponse::InvalidUser;
         }
 
         if ($this->tokens->recentlyCreatedToken($user)) {
-            return static::RESET_THROTTLED;
+            return ResetResponse::ResetThrottled;
         }
 
         $token = $this->tokens->create($user);
@@ -71,7 +71,7 @@ class PasswordBroker implements PasswordBrokerContract
             $user->sendPasswordResetNotification($token);
         }
 
-        return static::RESET_LINK_SENT;
+        return ResetResponse::ResetLinkSent;
     }
 
     /**
@@ -79,9 +79,9 @@ class PasswordBroker implements PasswordBrokerContract
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
-     * @return mixed
+     * @return \Illuminate\Auth\Passwords\ResetResponse
      */
-    public function reset(array $credentials, Closure $callback)
+    public function reset(array $credentials, Closure $callback): ResetResponse
     {
         $user = $this->validateReset($credentials);
 
@@ -101,23 +101,23 @@ class PasswordBroker implements PasswordBrokerContract
 
         $this->tokens->delete($user);
 
-        return static::PASSWORD_RESET;
+        return ResetResponse::PasswordReset;
     }
 
     /**
      * Validate a password reset for the given credentials.
      *
      * @param  array  $credentials
-     * @return \Illuminate\Contracts\Auth\CanResetPassword|string
+     * @return \Illuminate\Contracts\Auth\CanResetPassword|\Illuminate\Auth\Passwords\ResetResponse
      */
     protected function validateReset(array $credentials)
     {
         if (is_null($user = $this->getUser($credentials))) {
-            return static::INVALID_USER;
+            return ResetResponse::InvalidUser;
         }
 
         if (! $this->tokens->exists($user, $credentials['token'])) {
-            return static::INVALID_TOKEN;
+            return ResetResponse::InvalidToken;
         }
 
         return $user;

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\Passwords\PasswordBroker;
+use Illuminate\Auth\Passwords\ResetResponse;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
@@ -29,7 +30,10 @@ class AuthPasswordBrokerTest extends TestCase
             ->getMock();
         $broker->expects($this->once())->method('getUser')->willReturn(null);
 
-        $this->assertSame(PasswordBrokerContract::INVALID_USER, $broker->sendResetLink(['credentials']));
+        $response = $broker->sendResetLink(['credentials']);
+
+        $this->assertSame(PasswordBrokerContract::INVALID_USER, $response->value);
+        $this->assertSame(ResetResponse::InvalidUser, $response);
     }
 
     public function testIfTokenIsRecentlyCreated()
@@ -40,7 +44,10 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertSame(PasswordBrokerContract::RESET_THROTTLED, $broker->sendResetLink(['foo']));
+        $response = $broker->sendResetLink(['foo']);
+
+        $this->assertSame(PasswordBrokerContract::RESET_THROTTLED, $response->value);
+        $this->assertSame(ResetResponse::ResetThrottled, $response);
     }
 
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
@@ -71,7 +78,10 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo']));
+        $response = $broker->sendResetLink(['foo']);
+
+        $this->assertSame(PasswordBrokerContract::RESET_LINK_SENT, $response->value);
+        $this->assertSame(ResetResponse::ResetLinkSent, $response);
     }
 
     public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()
@@ -79,7 +89,7 @@ class AuthPasswordBrokerTest extends TestCase
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['creds'])->andReturn(null);
 
-        $this->assertSame(PasswordBrokerContract::INVALID_USER, $broker->reset(['creds'], function () {
+        $this->assertSame(ResetResponse::InvalidUser, $broker->reset(['creds'], function () {
             //
         }));
     }
@@ -91,9 +101,12 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(Arr::except($creds, ['token']))->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
-        $this->assertSame(PasswordBrokerContract::INVALID_TOKEN, $broker->reset($creds, function () {
+        $response = $broker->reset($creds, function () {
             //
-        }));
+        });
+
+        $this->assertSame(PasswordBrokerContract::INVALID_TOKEN, $response->value);
+        $this->assertSame(ResetResponse::InvalidToken, $response);
     }
 
     public function testResetRemovesRecordOnReminderTableAndCallsCallback()
@@ -112,7 +125,10 @@ class AuthPasswordBrokerTest extends TestCase
             return 'foo';
         };
 
-        $this->assertSame(PasswordBrokerContract::PASSWORD_RESET, $broker->reset(['password' => 'password', 'token' => 'token'], $callback));
+        $response = $broker->reset(['password' => 'password', 'token' => 'token'], $callback);
+
+        $this->assertSame(PasswordBrokerContract::PASSWORD_RESET, $response->value);
+        $this->assertSame(ResetResponse::PasswordReset, $response);
         $this->assertEquals(['user' => $user, 'password' => 'password'], $_SERVER['__password.reset.test']);
     }
 
@@ -131,7 +147,10 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
-        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $closure));
+        $response = $broker->sendResetLink(['foo'], $closure);
+
+        $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $response->value);
+        $this->assertEquals(ResetResponse::ResetLinkSent, $response);
 
         $this->assertTrue($executed);
     }
