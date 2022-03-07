@@ -2517,6 +2517,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a single column's value from the first result of a query if it's the sole matching record.
+     *
+     * @param  string  $column
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\RecordsNotFoundException
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function soleValue($column)
+    {
+        $result = (array) $this->sole([$column]);
+
+        return reset($result);
+    }
+
+    /**
      * Execute the query as a "select" statement.
      *
      * @param  array|string  $columns

@@ -615,6 +615,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get a single column's value from the first result of a query if it's the sole matching record.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function soleValue($column)
+    {
+        return $this->sole([$column])->{Str::afterLast($column, '.')};
+    }
+
+    /**
      * Get a single column's value from the first result of the query or throw an exception.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
