@@ -19,7 +19,7 @@
 {{-- Action Button --}}
 @isset($actionText)
 <?php
-$color = match ((string)$level) {
+$color = match ((string) $level) {
     'success', 'error' => $level,
     default => 'primary',
 };
