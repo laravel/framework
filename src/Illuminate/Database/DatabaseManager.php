@@ -7,6 +7,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
@@ -16,6 +17,8 @@ use RuntimeException;
  */
 class DatabaseManager implements ConnectionResolverInterface
 {
+    use Macroable;
+
     /**
      * The application instance.
      *
