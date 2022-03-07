@@ -78,22 +78,12 @@ class Parser
         [$token, $description] = static::extractDescription($token);
 
         return match (true) {
-            str_ends_with($token, '?*') => new InputArgument(trim($token, '?*'),
-                InputArgument::IS_ARRAY, $description),
-            str_ends_with($token, '*') => new InputArgument(trim($token, '*'),
-                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                $description),
-            str_ends_with($token, '?') => new InputArgument(trim($token, '?'),
-                InputArgument::OPTIONAL, $description),
-            preg_match('/(.+)\=\*(.+)/', $token,
-                $matches) => new InputArgument($matches[1],
-                InputArgument::IS_ARRAY, $description,
-                preg_split('/,\s?/', $matches[2])),
-            preg_match('/(.+)\=(.+)/', $token,
-                $matches) => new InputArgument($matches[1],
-                InputArgument::OPTIONAL, $description, $matches[2]),
-            default => new InputArgument($token, InputArgument::REQUIRED,
-                $description),
+            str_ends_with($token, '?*') => new InputArgument(trim($token, '?*'), InputArgument::IS_ARRAY, $description),
+            str_ends_with($token, '*') => new InputArgument(trim($token, '*'), InputArgument::IS_ARRAY | InputArgument::REQUIRED, $description),
+            str_ends_with($token, '?') => new InputArgument(trim($token, '?'), InputArgument::OPTIONAL, $description),
+            preg_match('/(.+)\=\*(.+)/', $token, $matches) => new InputArgument($matches[1], InputArgument::IS_ARRAY, $description, preg_split('/,\s?/', $matches[2])),
+            preg_match('/(.+)\=(.+)/', $token, $matches) => new InputArgument($matches[1], InputArgument::OPTIONAL, $description, $matches[2]),
+            default => new InputArgument($token, InputArgument::REQUIRED, $description),
         };
     }
 
