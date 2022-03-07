@@ -17,7 +17,7 @@ class QueueFake extends QueueManager implements Queue
     /**
      * The original queue manager.
      *
-     * @var \Illuminate\Contracts\Queue\Queue|null
+     * @var \Illuminate\Queue\QueueManager|null
      */
     protected $queue;
 
@@ -280,12 +280,16 @@ class QueueFake extends QueueManager implements Queue
     /**
      * Resolve a queue connection instance.
      *
-     * @param  mixed  $value
+     * @param  string|null  $name
      * @return \Illuminate\Contracts\Queue\Queue
      */
-    public function connection($value = null)
+    public function connection($name = null, $job = null)
     {
-        return $this;
+        if ($this->shouldFakeJob($job)) {
+            return $this;
+        }
+
+        return $this->queue->connection($name);
     }
 
     /**
@@ -311,14 +315,10 @@ class QueueFake extends QueueManager implements Queue
      */
     public function push($job, $data = '', $queue = null)
     {
-        if ($this->shouldFakeJob($job)) {
-            $this->jobs[is_object($job) ? get_class($job) : $job][] = [
-                'job' => $job,
-                'queue' => $queue,
-            ];
-        } else {
-            $this->queue->push($job, $data, $queue);
-        }
+        $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+            'job' => $job,
+            'queue' => $queue,
+        ];
     }
 
     /**

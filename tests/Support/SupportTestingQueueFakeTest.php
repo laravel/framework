@@ -11,6 +11,8 @@ use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\SyncQueue;
+use Illuminate\Queue\DatabaseQueue;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
@@ -60,22 +62,29 @@ class SupportTestingQueueFakeTest extends TestCase
         });
     }
 
-    public function testAssertPushedWithIgnore()
+    public function testConnectionWithFakedJobs()
     {
-        $job = new JobStub;
-
         $manager = m::mock(QueueManager::class);
-        $manager->shouldReceive('push')->once()->withArgs(function ($passedJob) use ($job) {
-            return $passedJob === $job;
-        });
+        $manager->shouldReceive('connection')->once()->andReturn(new SyncQueue);
 
         $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
 
-        $fake->push($job);
-        $fake->push(new JobToFakeStub());
+        $this->assertInstanceOf(SyncQueue::class, $fake->connection(null, new JobStub));
+        $this->assertInstanceOf(QueueFake::class, $fake->connection(null, new JobToFakeStub));
+    }
 
-        $fake->assertNotPushed(JobStub::class);
-        $fake->assertPushed(JobToFakeStub::class);
+    public function testConnectionWithFakedJobsAndCustomConnection()
+    {
+        $manager = m::mock(QueueManager::class);
+        $manager->shouldReceive('connection')
+            ->once()
+            ->with('database')
+            ->andReturn(m::mock(DatabaseQueue::class));
+
+        $fake = new QueueFake(new Application, JobToFakeStub::class, $manager);
+
+        $this->assertInstanceOf(DatabaseQueue::class, $fake->connection('database', new JobStub));
+        $this->assertInstanceOf(QueueFake::class, $fake->connection(null, new JobToFakeStub));
     }
 
     public function testQueueSize()

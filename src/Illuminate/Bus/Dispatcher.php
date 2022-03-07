@@ -216,7 +216,7 @@ class Dispatcher implements QueueingDispatcher
     {
         $connection = $command->connection ?? null;
 
-        $queue = call_user_func($this->queueResolver, $connection);
+        $queue = call_user_func($this->queueResolver, $connection, $command);
 
         if (! $queue instanceof Queue) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
