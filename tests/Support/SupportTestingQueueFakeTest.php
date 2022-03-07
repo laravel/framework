@@ -5,14 +5,14 @@ namespace Illuminate\Tests\Support;
 use BadMethodCallException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Application;
+use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Queue\SyncQueue;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\SyncQueue;
-use Illuminate\Queue\DatabaseQueue;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
