@@ -1399,6 +1399,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Set the application namespace.
+     *
+     * @param string $namespace
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+    }
+
+    /**
      * Get the application namespace.
      *
      * @return string
