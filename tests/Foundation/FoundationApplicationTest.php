@@ -389,7 +389,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame('Laravel\\One\\', $app->getNamespace());
 
         $app->setNamespace('App\\');
-        $this->assertSame('App\\', $app->getNamespace());        
+        $this->assertSame('App\\', $app->getNamespace());
     }
 
     public function testCachePathsResolveToBootstrapCacheDirectory()
