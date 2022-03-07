@@ -638,6 +638,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
+    public function testLcfirst()
+    {
+        $this->assertSame('laravel', Str::lcfirst('Laravel'));
+        $this->assertSame('laravel framework', Str::lcfirst('Laravel framework'));
+        $this->assertSame('мама', Str::lcfirst('Мама'));
+        $this->assertSame('мама мыла раму', Str::lcfirst('Мама мыла раму'));
+    }
+
     public function testUcfirst()
     {
         $this->assertSame('Laravel', Str::ucfirst('laravel'));
