@@ -1,6 +1,13 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.2...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.3...8.x)
+
+
+## [v8.83.3 (2022-03-03)](https://github.com/laravel/framework/compare/v8.83.2...v8.83.3)
+
+### Fixed
+* $job can be an object in some methods by @villfa in https://github.com/laravel/framework/pull/41244
+* Fixes getting the trusted proxies IPs from the configuration file by @nunomaduro in https://github.com/laravel/framework/pull/41322
 
 
 ## [v8.83.2 (2022-02-22)](https://github.com/laravel/framework/compare/v8.83.1...v8.83.2)
