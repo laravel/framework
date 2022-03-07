@@ -3,7 +3,6 @@
 namespace Illuminate\Contracts\Auth;
 
 use Closure;
-use Illuminate\Auth\Passwords\ResetResponse;
 
 interface PasswordBroker
 {
@@ -57,16 +56,16 @@ interface PasswordBroker
      *
      * @param  array  $credentials
      * @param  \Closure|null  $callback
-     * @return \Illuminate\Auth\Passwords\ResetResponse
+     * @return \Illuminate\Contracts\Auth\PasswordResetResponse
      */
-    public function sendResetLink(array $credentials, Closure $callback = null): ResetResponse;
+    public function sendResetLink(array $credentials, Closure $callback = null): PasswordResetResponse;
 
     /**
      * Reset the password for the given token.
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
-     * @return \Illuminate\Auth\Passwords\ResetResponse
+     * @return \Illuminate\Contracts\Auth\PasswordResetResponse
      */
-    public function reset(array $credentials, Closure $callback): ResetResponse;
+    public function reset(array $credentials, Closure $callback): PasswordResetResponse;
 }
