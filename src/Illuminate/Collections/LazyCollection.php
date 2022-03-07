@@ -1414,18 +1414,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $timeout = $timeout->getTimestamp();
 
         return new static(function () use ($timeout) {
-            $iterator = $this->getIterator();
-
-            if (! $iterator->valid() || $this->now() > $timeout) {
+            if ($this->now() >= $timeout) {
                 return;
             }
 
-            yield $iterator->key() => $iterator->current();
+            foreach ($this as $key => $value) {
+                yield $key => $value;
 
-            while ($iterator->valid() && $this->now() < $timeout) {
-                $iterator->next();
-
-                yield $iterator->key() => $iterator->current();
+                if ($this->now() >= $timeout) {
+                    break;
+                }
             }
         });
     }
