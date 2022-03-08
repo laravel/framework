@@ -209,9 +209,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function is(...$patterns)
     {
-        $path = $this->decodedPath();
-
-        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $path));
+        return Str::is($patterns, $this->decodedPath());
     }
 
     /**
@@ -233,9 +231,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlIs(...$patterns)
     {
-        $url = $this->fullUrl();
-
-        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $url));
+        return Str::is($patterns, $this->fullUrl());
     }
 
     /**
