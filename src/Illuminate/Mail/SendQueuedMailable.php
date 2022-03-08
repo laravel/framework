@@ -103,7 +103,7 @@ class SendQueuedMailable
     }
 
     /**
-     * Get the expiration for the notification.
+     * Get the expiration for the mailable.
      *
      * @return mixed
      */
