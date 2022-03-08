@@ -66,29 +66,6 @@ class SendQueuedMailable
     }
 
     /**
-     * Get the display name for the queued job.
-     *
-     * @return string
-     */
-    public function displayName()
-    {
-        return get_class($this->mailable);
-    }
-
-    /**
-     * Call the failed method on the mailable instance.
-     *
-     * @param  \Throwable  $e
-     * @return void
-     */
-    public function failed($e)
-    {
-        if (method_exists($this->mailable, 'failed')) {
-            $this->mailable->failed($e);
-        }
-    }
-
-    /**
      * Get the number of seconds before a released mailable will be available.
      *
      * @return mixed
@@ -114,6 +91,29 @@ class SendQueuedMailable
         }
 
         return $this->mailable->retryUntil ?? $this->mailable->retryUntil();
+    }
+
+    /**
+     * Call the failed method on the mailable instance.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function failed($e)
+    {
+        if (method_exists($this->mailable, 'failed')) {
+            $this->mailable->failed($e);
+        }
+    }
+
+    /**
+     * Get the display name for the queued job.
+     *
+     * @return string
+     */
+    public function displayName()
+    {
+        return get_class($this->mailable);
     }
 
     /**
