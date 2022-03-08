@@ -80,9 +80,9 @@ class SendQueuedMailable
     }
 
     /**
-     * Get the expiration for the mailable.
+     * Determine the time at which the job should timeout.
      *
-     * @return mixed
+     * @return \DateTime|null
      */
     public function retryUntil()
     {
