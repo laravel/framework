@@ -103,6 +103,20 @@ class SendQueuedMailable
     }
 
     /**
+     * Get the expiration for the notification.
+     *
+     * @return mixed
+     */
+    public function retryUntil()
+    {
+        if (! method_exists($this->mailable, 'retryUntil') && ! isset($this->mailable->retryUntil)) {
+            return;
+        }
+
+        return $this->mailable->retryUntil ?? $this->mailable->retryUntil();
+    }
+
+    /**
      * Prepare the instance for cloning.
      *
      * @return void
