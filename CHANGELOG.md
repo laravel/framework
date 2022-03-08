@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.4.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.4.1...9.x)
+
+## [v9.4.1](https://github.com/laravel/framework/compare/v9.4.0...v9.4.1) - 2022-03-08
+
+### Fixed
+
+- Fixed version of laravel
 
 ## [v9.4.0](https://github.com/laravel/framework/compare/v9.4.0...v9.4.0) - 2022-03-08
 
