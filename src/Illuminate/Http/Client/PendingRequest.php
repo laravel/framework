@@ -670,6 +670,9 @@ class PendingRequest
     public function send(string $method, string $url, array $options = [])
     {
         $url = ltrim(rtrim($this->baseUrl, '/').'/'.ltrim($url, '/'), '/');
+        $options = array_filter($options, function ($value) {
+            return ! is_null($value);
+        });
 
         if (isset($options[$this->bodyFormat])) {
             if ($this->bodyFormat === 'multipart') {

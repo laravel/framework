@@ -954,6 +954,22 @@ class HttpClientTest extends TestCase
         $this->assertSame(['http_errors' => true, 'connect_timeout' => 20], $request->getOptions());
     }
 
+
+    public function testRequestsKeepQueryStringWhenReplacingOptions()
+    {
+        $this->factory->fake();
+
+        $this->factory->withOptions([
+            'query' => [
+                'foo' => 'bar',
+            ],
+        ])->get('https://example.com');
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'https://example.com?foo=bar';
+        });
+    }
+
     public function testMultipleRequestsAreSentInThePool()
     {
         $this->factory->fake([
