@@ -149,6 +149,21 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Determine if a directory is empty.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function assertDirectoryEmpty($path)
+    {
+        PHPUnit::assertEmpty(
+            $this->allFiles($path), "Directory [{$path}] is not empty."
+        );
+
+        return $this;
+    }
+
+    /**
      * Determine if a file or directory exists.
      *
      * @param  string  $path
