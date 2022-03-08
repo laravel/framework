@@ -1160,7 +1160,14 @@ class Container implements ArrayAccess, ContainerContract
         if ($abstract instanceof Closure && is_null($callback)) {
             $this->globalAfterResolvingCallbacks[] = $abstract;
         } else {
-            $this->afterResolvingCallbacks[$abstract][] = $callback;
+            // if the type is resolved, we can already run the callback on the object.
+            if($this->resolved($abstract)) {
+                $object = $this->get($abstract);
+                $this->fireCallbackArray($object, [$callback]);    
+            }else {
+                // if not resolved save the callbacks for later execution.
+                $this->afterResolvingCallbacks[$abstract][] = $callback;
+            }
         }
     }
 
