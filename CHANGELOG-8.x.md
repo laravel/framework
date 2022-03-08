@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.3...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.4...8.x)
+
+
+## [v8.83.4 (2022-03-08)](https://github.com/laravel/framework/compare/v8.83.3...v8.83.4)
+
+### Added
+- Added `Illuminate/Bus/Batch::__get()` ([#41361](https://github.com/laravel/framework/pull/41361))
+
+### Fixed
+- Fixed get and head options in `Illuminate/Http/Client/PendingRequest` ([23ff879](https://github.com/laravel/framework/commit/23ff879c6e5c6c6424b09a8b38c1686a9c89c4a5))
 
 
 ## [v8.83.3 (2022-03-03)](https://github.com/laravel/framework/compare/v8.83.2...v8.83.3)
