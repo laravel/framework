@@ -24,7 +24,8 @@ class MigrateCommand extends BaseCommand
                 {--schema-path= : The path to a schema dump file}
                 {--pretend : Dump the SQL queries that would be run}
                 {--seed : Indicates if the seed task should be re-run}
-                {--step : Force the migrations to be run so they can be rolled back individually}';
+                {--step=false : Force the migrations to be run so they can be rolled back individually, ' .
+                    'by providing a number of migrations to run, or "true" to run all available.}';
 
     /**
      * The console command description.
