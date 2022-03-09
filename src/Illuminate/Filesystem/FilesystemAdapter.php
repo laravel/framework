@@ -149,7 +149,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Determine if a directory is empty.
+     * Assert that the given directory is empty.
      *
      * @param  string  $path
      * @return $this
