@@ -277,7 +277,7 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($data->firstWhere('material', 'nonexistent'));
         $this->assertNull($data->firstWhere('nonexistent', 'key'));
 
-        $this->assertSame('book', $data->firstWhere(fn ($value) => $value['material'] === 'papger')['type']);
+        $this->assertSame('book', $data->firstWhere(fn ($value) => $value['material'] === 'paper')['type']);
         $this->assertSame('gasket', $data->firstWhere(fn ($value) => $value['material'] === 'rubber')['type']);
         $this->assertNull($data->firstWhere(fn ($value) => $value['material'] === 'nonexistent'));
         $this->assertNull($data->firstWhere(fn ($value) => ($value['nonexistent'] ?? null) === 'key'));
