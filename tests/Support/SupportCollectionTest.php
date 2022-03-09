@@ -4976,6 +4976,9 @@ class SupportCollectionTest extends TestCase
                 'bam' => [
                     'boom' => 'bip',
                 ],
+                'quz' => $collection::make([
+                    'bleep' => 'bloop',
+                ]),
             ],
         ])->dot();
         $this->assertSame([
@@ -4983,6 +4986,7 @@ class SupportCollectionTest extends TestCase
             'meta.foo' => 'bar',
             'meta.baz' => 'boom',
             'meta.bam.boom' => 'bip',
+            'meta.quz.bleep' => 'bloop',
         ], $data->all());
 
         $data = $collection::make([
@@ -4990,12 +4994,20 @@ class SupportCollectionTest extends TestCase
                 'bar',
                 'baz',
                 'baz' => 'boom',
+                $collection::make([
+                    'bleep' => 'bloop',
+                ]),
             ],
+            $collection::make([
+                'bleep' => 'bloop',
+            ]),
         ])->dot();
         $this->assertSame([
             'foo.0' => 'bar',
             'foo.1' => 'baz',
             'foo.baz' => 'boom',
+            'foo.2.bleep' => 'bloop',
+            '0.bleep' => 'bloop',
         ], $data->all());
     }
 

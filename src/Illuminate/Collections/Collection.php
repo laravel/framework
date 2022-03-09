@@ -1522,7 +1522,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function dot()
     {
-        return new static(Arr::dot($this->all()));
+        return new static(Arr::dot(json_decode($this->toJson(), true)));
     }
 
     /**
