@@ -2138,8 +2138,12 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('taylor,dayle', $data->implode(','));
 
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
-        $this->assertSame('taylor-foodayle-bar', $data->implode(function ($user) { return $user['name'].'-'.$user['email']; }));
-        $this->assertSame('taylor-foo,dayle-bar', $data->implode(function ($user) { return $user['name'].'-'.$user['email']; }, ','));
+        $this->assertSame('taylor-foodayle-bar', $data->implode(function ($user) {
+            return $user['name'].'-'.$user['email'];
+        }));
+        $this->assertSame('taylor-foo,dayle-bar', $data->implode(function ($user) {
+            return $user['name'].'-'.$user['email'];
+        }, ','));
     }
 
     /**
