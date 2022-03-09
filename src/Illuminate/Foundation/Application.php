@@ -1166,12 +1166,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function terminate()
     {
-        $index = 0;
-
-        while ($index < count($this->terminatingCallbacks)) {
-            $this->call($this->terminatingCallbacks[$index]);
-
-            $index++;
+        foreach ($this->terminatingCallbacks as $terminatingCallback) {
+            $this->call($terminatingCallback);
         }
     }
 
