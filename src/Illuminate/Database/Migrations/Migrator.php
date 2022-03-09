@@ -156,7 +156,14 @@ class Migrator
 
         $pretend = $options['pretend'] ?? false;
 
-        $step = $options['step'] ?? false;
+        // We will also decide whether a limited number of migrations should run,
+        // based on the "step" option passed. Expected allowed values are strings
+        // "false", "true" or integer strings.
+        $step = $options['step'] ?? "false";
+        $increment = $step !== "false";
+        $batch_limit = $increment && is_numeric($step) && ($step = intval($step)) > 0 
+            ? $batch + $step
+            : PHP_INT_MAX;
 
         $this->fireMigrationEvent(new MigrationsStarted('up'));
 
@@ -164,9 +171,13 @@ class Migrator
         // migrations "up" so the changes are made to the databases. We'll then log
         // that the migration was run so we don't repeat it next time we execute.
         foreach ($migrations as $file) {
+            if ($batch >= $batch_limit) {
+                break;
+            }
+
             $this->runUp($file, $batch, $pretend);
 
-            if ($step) {
+            if ($increment) {
                 $batch++;
             }
         }
