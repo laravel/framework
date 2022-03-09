@@ -1462,7 +1462,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Convert an expanded array into a flatten "dot" notation array.
+     * Convert an expanded array into a flattened "dot" notation array.
      *
      * @return static
      */

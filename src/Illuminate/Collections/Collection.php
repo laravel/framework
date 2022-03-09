@@ -1516,7 +1516,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Convert an expanded array into a flatten "dot" notation array.
+     * Convert an expanded array into a flattened "dot" notation array.
      *
      * @return static
      */
