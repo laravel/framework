@@ -281,7 +281,7 @@ class Str
     {
         $quoted = preg_quote($suffix, '/');
 
-        return preg_replace('/(?:'.$quoted.')+$/u', '', $value) . $suffix;
+        return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$suffix;
     }
 
     /**
