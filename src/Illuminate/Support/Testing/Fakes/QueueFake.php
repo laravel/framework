@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -14,11 +15,41 @@ class QueueFake extends QueueManager implements Queue
     use ReflectsClosures;
 
     /**
+     * The original queue manager.
+     *
+     * @var \Illuminate\Contracts\Queue\Queue
+     */
+    protected $queue;
+
+    /**
+     * The job types that should be intercepted instead of pushed to the queue.
+     *
+     * @var array
+     */
+    protected $jobsToFake;
+
+    /**
      * All of the jobs that have been pushed.
      *
      * @var array
      */
     protected $jobs = [];
+
+    /**
+     * Create a new fake queue instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  array  $jobsToFake
+     * @param  \Illuminate\Queue\QueueManager|null  $queue
+     * @return void
+     */
+    public function __construct($app, $jobsToFake = [], $queue = null)
+    {
+        parent::__construct($app);
+
+        $this->jobsToFake = Collection::wrap($jobsToFake);
+        $this->queue = $queue;
+    }
 
     /**
      * Assert if a job was pushed based on a truth-test callback.
@@ -279,10 +310,33 @@ class QueueFake extends QueueManager implements Queue
      */
     public function push($job, $data = '', $queue = null)
     {
-        $this->jobs[is_object($job) ? get_class($job) : $job][] = [
-            'job' => $job,
-            'queue' => $queue,
-        ];
+        if ($this->shouldFakeJob($job)) {
+            $this->jobs[is_object($job) ? get_class($job) : $job][] = [
+                'job' => $job,
+                'queue' => $queue,
+            ];
+        } else {
+            is_object($job) && isset($job->connection)
+                ? $this->queue->connection($job->connection)->push($job, $data, $queue)
+                : $this->queue->push($job, $data, $queue);
+        }
+    }
+
+    /**
+     * Determine if a job should be faked or actually dispatched.
+     *
+     * @param  object  $job
+     * @return bool
+     */
+    public function shouldFakeJob($job)
+    {
+        if ($this->jobsToFake->isEmpty()) {
+            return true;
+        }
+
+        return $this->jobsToFake->contains(function ($jobToFake) use ($job) {
+            return $job instanceof ((string) $jobToFake);
+        });
     }
 
     /**
