@@ -276,6 +276,11 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('gasket', $data->firstWhere('material', 'rubber')['type']);
         $this->assertNull($data->firstWhere('material', 'nonexistent'));
         $this->assertNull($data->firstWhere('nonexistent', 'key'));
+
+        $this->assertSame('book', $data->firstWhere(fn ($value) => $value['material'] === 'paper')['type']);
+        $this->assertSame('gasket', $data->firstWhere(fn ($value) => $value['material'] === 'rubber')['type']);
+        $this->assertNull($data->firstWhere(fn ($value) => $value['material'] === 'nonexistent'));
+        $this->assertNull($data->firstWhere(fn ($value) => ($value['nonexistent'] ?? null) === 'key'));
     }
 
     /**
@@ -998,6 +1003,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(
             [],
             $c->where('v', '>', $object)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 3], ['v' => '3']],
+            $c->where(fn ($value) => $value['v'] == 3)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 3]],
+            $c->where(fn ($value) => $value['v'] === 3)->values()->all()
         );
 
         $c = new $collection([['v' => 1], ['v' => $object]]);
