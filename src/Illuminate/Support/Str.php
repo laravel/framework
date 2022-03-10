@@ -271,6 +271,20 @@ class Str
     }
 
     /**
+     * End a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $suffix
+     * @return string
+     */
+    public static function end($value, $suffix)
+    {
+        $quoted = preg_quote($suffix, '/');
+
+        return preg_replace('/(?:'.$quoted.')+$/u', '', $value) . $suffix;
+    }
+
+    /**
      * Extracts an excerpt from text that matches the first instance of a phrase.
      *
      * @param  string  $text

@@ -197,6 +197,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * End a string with a single instance of a given value.
+     *
+     * @param  string  $suffix
+     * @return static
+     */
+    public function end($suffix)
+    {
+        return new static(Str::end($this->value, $suffix));
+    }
+
+    /**
      * Determine if the string is an exact match with the given value.
      *
      * @param  string  $value

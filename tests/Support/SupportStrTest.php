@@ -149,6 +149,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith('你好', 'a'));
     }
 
+    public function testStrEnd()
+    {
+        $this->assertSame('test/string/', Str::end('test/string', '/'));
+        $this->assertSame('test/string/', Str::end('test/string/', '/'));
+        $this->assertSame('test/string/', Str::end('test/string//', '/'));
+    }
+
     public function testStrExcerpt()
     {
         $this->assertSame('...is a beautiful morn...', Str::excerpt('This is a beautiful morning', 'beautiful', ['radius' => 5]));

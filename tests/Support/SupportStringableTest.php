@@ -175,6 +175,13 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testEnd()
+    {
+        $this->assertSame('test/string/', (string) $this->stringable('test/string')->end('/'));
+        $this->assertSame('test/string/', (string) $this->stringable('test/string/')->end('/'));
+        $this->assertSame('test/string/', (string) $this->stringable('test/string//')->end('/'));
+    }
+
     public function testWhenExactly()
     {
         $this->assertSame('Nailed it...!', (string) $this->stringable('Tony Stark')->whenExactly('Tony Stark', function ($stringable) {
