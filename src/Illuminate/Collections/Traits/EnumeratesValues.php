@@ -1002,7 +1002,7 @@ trait EnumeratesValues
      */
     protected function operatorForWhere($key, $operator = null, $value = null)
     {
-        if (is_callable($key)) {
+        if ($this->useAsCallable($key)) {
             return $key;
         }
 
