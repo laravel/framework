@@ -20,6 +20,16 @@ trait CompilesRawPhp
     }
 
     /**
+     * Compile the return statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileReturn()
+    {
+        return '<?php return; ?>';
+    }
+
+    /**
      * Compile the unset statements into valid PHP.
      *
      * @param  string  $expression
