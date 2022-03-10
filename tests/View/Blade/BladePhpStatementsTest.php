@@ -22,6 +22,13 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testReturnStatements()
+    {
+        $string = '@return';
+        $expected = '<?php return; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testPhpStatementsDontParseBladeCode()
     {
         $string = '@php echo "{{ This is a blade tag }}" @endphp';
