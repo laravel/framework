@@ -827,6 +827,27 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('0.id', '10');
     }
 
+    public function testAssertJsonPathWithClosure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['foo' => 'bar'],
+        ]));
+
+        $response->assertJsonPath('data.foo', fn ($value) => $value === 'bar');
+    }
+
+    public function testAssertJsonPathWithClosureCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['foo' => 'bar'],
+        ]));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that false is true.');
+
+        $response->assertJsonPath('data.foo', fn ($value) => $value === null);
+    }
+
     public function testAssertJsonFragment()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
