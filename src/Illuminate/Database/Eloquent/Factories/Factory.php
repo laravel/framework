@@ -41,35 +41,35 @@ abstract class Factory
     /**
      * The state transformations that will be applied to the model.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $states;
 
     /**
      * The parent relationships that will be applied to the model.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $has;
 
     /**
      * The child relationships that will be applied to the model.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $for;
 
     /**
      * The "after making" callbacks that will be applied to the model.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $afterMaking;
 
     /**
      * The "after creating" callbacks that will be applied to the model.
      *
-     * @var \Illuminate\Support\Collection|null
+     * @var \Illuminate\Support\Collection
      */
     protected $afterCreating;
 
