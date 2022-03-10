@@ -5,8 +5,10 @@ namespace Illuminate\Mail\Transport;
 use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
 use Exception;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Message;
 
 class SesTransport extends AbstractTransport
 {
@@ -44,10 +46,20 @@ class SesTransport extends AbstractTransport
      */
     protected function doSend(SentMessage $message): void
     {
+        $options = $this->options;
+
+        if ($message->getOriginalMessage() instanceof Message) {
+            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+                if ($header instanceof MetadataHeader) {
+                    $options['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                }
+            }
+        }
+
         try {
             $this->ses->sendRawEmail(
                 array_merge(
-                    $this->options, [
+                    $options, [
                         'Source' => $message->getEnvelope()->getSender()->toString(),
                         'Destinations' => collect($message->getEnvelope()->getRecipients())
                                 ->map
