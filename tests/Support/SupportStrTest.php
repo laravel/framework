@@ -768,6 +768,7 @@ class SupportStrTest extends TestCase
             ['Taylor', ['xxx'], false],
             ['Taylor', '', false],
             ['', '', false],
+            [null, 'foo', false],
         ];
     }
 
