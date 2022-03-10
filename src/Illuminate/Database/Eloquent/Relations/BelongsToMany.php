@@ -300,9 +300,9 @@ class BelongsToMany extends Relation
      */
     protected function buildDictionary(Collection $results)
     {
-        // First we will build a dictionary of child models keyed by the foreign key
-        // of the relation so that we will easily and quickly match them to their
-        // parents without having a possibly slow inner loops for every models.
+        // First we'll build a dictionary of child models keyed by the foreign key
+        // of the relation so that we will easily and quickly match them to the
+        // parents without having a possibly slow inner loop for every model.
         $dictionary = [];
 
         foreach ($results as $result) {

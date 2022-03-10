@@ -210,9 +210,9 @@ trait HasRelationships
             $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
         }
 
-        // Once we have the foreign key names, we'll just create a new Eloquent query
-        // for the related models and returns the relationship instance which will
-        // actually be responsible for retrieving and hydrating every relations.
+        // Once we have the foreign key names we'll just create a new Eloquent query
+        // for the related models and return the relationship instance which will
+        // actually be responsible for retrieving and hydrating every relation.
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return $this->newBelongsTo(
@@ -554,9 +554,9 @@ trait HasRelationships
 
         $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
 
-        // Now we're ready to create a new query builder for this related model and
-        // the relationship instances for this relation. This relations will set
-        // appropriate query constraints then entirely manages the hydrations.
+        // Now we're ready to create a new query builder for the related model and
+        // the relationship instances for this relation. This relation will set
+        // appropriate query constraints then entirely manage the hydrations.
         if (! $table) {
             $words = preg_split('/(_)/u', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 

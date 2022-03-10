@@ -345,7 +345,7 @@ trait HasAttributes
         $attributes = [];
 
         foreach ($this->getArrayableRelations() as $key => $value) {
-            // If the values implements the Arrayable interface we can just call this
+            // If the values implement the Arrayable interface we can just call this
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
             if ($value instanceof Arrayable) {
@@ -353,8 +353,8 @@ trait HasAttributes
             }
 
             // If the value is null, we'll still go ahead and set it in this list of
-            // attributes since null is used to represent empty relationships if
-            // if it a has one or belongs to type relationships on the models.
+            // attributes, since null is used to represent empty relationships if
+            // it has a has one or belongs to type relationships on the models.
             elseif (is_null($value)) {
                 $relation = $value;
             }
