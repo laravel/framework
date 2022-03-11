@@ -77,6 +77,7 @@ namespace Illuminate\Support\Facades;
  * @method static string|array|null query(string|null $key = null, string|array|null $default = null)
  * @method static string|array|null server(string|null $key = null, string|array|null $default = null)
  * @method static string|null bearerToken()
+ * @method static object|null basicAuth()
  * @method static string|null ip()
  * @method static string|null segment(int $index, string|null $default = null)
  * @method static void flash()
