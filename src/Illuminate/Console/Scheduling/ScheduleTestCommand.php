@@ -46,11 +46,15 @@ class ScheduleTestCommand extends Command
             $commandNames[] = $command->command ?? $command->getSummaryForDisplay();
         }
 
+        if (empty($commandNames)) {
+            return $this->comment('No scheduled commands have been defined.');
+        }
+
         if (! empty($name = $this->option('name'))) {
             $matches = array_filter($commandNames, fn ($commandName) => Str::endsWith($commandName, $name));
 
             if (count($matches) !== 1) {
-                return $this->error('No scheduled command found');
+                return $this->error('No matching scheduled command found.');
             }
 
             $index = key($matches);
