@@ -47,6 +47,8 @@ class ScheduleListCommandTest extends TestCase
     {
         parent::tearDown();
 
+        putenv('SHELL_VERBOSITY');
+
         ScheduleListCommand::resolveTerminalWidthUsing(null);
     }
 }
