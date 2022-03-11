@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing\Matching;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 
