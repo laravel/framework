@@ -5,9 +5,7 @@ namespace Illuminate\Tests\Integration\Console\Scheduling;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
-use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
 
 class ScheduleListCommandTest extends TestCase
