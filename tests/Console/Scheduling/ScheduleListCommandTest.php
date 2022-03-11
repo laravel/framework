@@ -57,4 +57,3 @@ class FooCommand extends Command
 
     protected $description = 'This is the description of the command.';
 }
-
