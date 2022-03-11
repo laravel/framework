@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
 
 class ScheduleListCommandTest extends TestCase
@@ -48,6 +50,7 @@ class ScheduleListCommandTest extends TestCase
         parent::tearDown();
 
         putenv('SHELL_VERBOSITY');
+        AliasLoader::getInstance()->setAliases([]);
 
         ScheduleListCommand::resolveTerminalWidthUsing(null);
     }
