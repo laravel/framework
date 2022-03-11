@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Console\Scheduling;
+namespace Illuminate\Tests\Integration\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
