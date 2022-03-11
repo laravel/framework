@@ -22,6 +22,8 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
+ * @property-read HigherOrderBuilderProxy $whereNot
+ * @property-read HigherOrderBuilderProxy $orWhereNot
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
@@ -89,6 +91,8 @@ class Builder implements BuilderContract
      */
     protected $higherOrderPassthru = [
         'orWhere',
+        'whereNot',
+        'orWhereNot',
     ];
 
     /**
