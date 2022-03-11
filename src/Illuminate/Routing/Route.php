@@ -7,6 +7,7 @@ use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Matching\CallbackValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
@@ -71,6 +72,13 @@ class Route
      * @var array
      */
     public $wheres = [];
+
+    /**
+     * The closure based requirements.
+     *
+     * @var array
+     */
+    public $callbacks = [];
 
     /**
      * The array of matched parameters.
@@ -630,7 +638,9 @@ class Route
     public function where($name, $expression = null)
     {
         foreach ($this->parseWhere($name, $expression) as $name => $expression) {
-            $this->wheres[$name] = $expression;
+            $expression instanceof Closure
+                ? $this->callbacks[$name] = $expression
+                : $this->wheres[$name] = $expression;
         }
 
         return $this;
@@ -1195,6 +1205,7 @@ class Route
         return static::$validators = [
             new UriValidator, new MethodValidator,
             new SchemeValidator, new HostValidator,
+            new CallbackValidator,
         ];
     }
 
@@ -1279,6 +1290,10 @@ class Route
             $this->action['missing'] = serialize(
                 new SerializableClosure($this->action['missing'])
             );
+        }
+
+        foreach ($this->callbacks as $name => $callback) {
+            $this->callbacks[$name] = new SerializableClosure($callback);
         }
 
         $this->compileRoute();
