@@ -33,7 +33,7 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * *     * *      *  ............................ Next Due: 1 minute from now')
             ->expectsOutput('  0 0     1 1-12/3 *  php artisan foo:command .... Next Due: 3 months from now')
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
-            ->expectsOutput("  * *     * *      *  php artisan foobar a=". ProcessUtils::escapeArgument('b') ." ... Next Due: 1 minute from now");
+            ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now');
     }
 
     public function testDisplayScheduleInVerboseMode()
