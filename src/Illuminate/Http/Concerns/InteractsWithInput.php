@@ -64,6 +64,31 @@ trait InteractsWithInput
             return str_contains($header, ',') ? strstr($header, ',', true) : $header;
         }
     }
+    
+    /**
+     * Get the basic auth from the request headers.
+     *
+     * @return object|null
+     */
+    public function basicAuth()
+    {
+        $header = $this->header('Authorization', '');
+
+        $position = strrpos($header, 'Basic ');
+
+        if ($position !== false) {
+            $basic = substr($header, $position + 6);
+            $basic = base64_decode($basic);
+            if (stripos($basic, ':')) {
+                list($username, $password) = explode(':', $basic);
+
+                return (object) [
+                    'username' => $username,
+                    'password' => $password
+                ];
+            }
+        }
+    }
 
     /**
      * Determine if the request contains a given input item key.
