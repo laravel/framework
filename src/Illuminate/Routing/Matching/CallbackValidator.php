@@ -17,13 +17,13 @@ class CallbackValidator implements ValidatorInterface
      */
     public function matches(Route $route, Request $request)
     {
+        $path = rtrim($request->getPathInfo(), '/') ?: '/';
+
+        if (! preg_match($route->getCompiled()->getRegex(), rawurldecode($path), $matches)) {
+            return false;
+        }
+
         foreach ($route->callbacks as $param => $callback) {
-            $path = rtrim($request->getPathInfo(), '/') ?: '/';
-
-            if (! preg_match($route->getCompiled()->getRegex(), rawurldecode($path), $matches)) {
-                return false;
-            }
-
             if (! $callback($matches[$param] ?? null)) {
                 return false;
             }
