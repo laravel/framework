@@ -48,6 +48,7 @@ class ScheduleListCommand extends Command
 
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
+
             $command = $event->command;
 
             if (! $this->output->isVerbose()) {
@@ -59,7 +60,9 @@ class ScheduleListCommand extends Command
             }
 
             $command = mb_strlen($command) > 1 ? "{$command} " : '';
+
             $nextDueDateLabel = 'Next Due:';
+
             $nextDueDate = Carbon::create((new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
                 ->setTimezone(new DateTimeZone($this->option('timezone') ?? config('app.timezone')))
@@ -75,7 +78,7 @@ class ScheduleListCommand extends Command
                 $terminalWidth - mb_strlen($expression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
             ));
 
-            // Highlights the parameters.
+            // Highlight the parameters...
             $command = preg_replace("#(='?)([^']+)('?)#", '$1<fg=yellow;options=bold>$2</>$3', $command);
 
             return [sprintf(
