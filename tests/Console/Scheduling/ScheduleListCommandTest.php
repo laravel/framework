@@ -39,7 +39,7 @@ class ScheduleListCommandTest extends TestCase
 
         $this->artisan(ScheduleListCommand::class, ['-v' => true])
             ->assertSuccessful()
-            ->expectsOutputToContain('Next Due: ' . now()->setMinutes(1)->format('Y-m-d H:i:s P'))
+            ->expectsOutputToContain('Next Due: '.now()->setMinutes(1)->format('Y-m-d H:i:s P'))
             ->expectsOutput('             ⇁ This is the description of the command.');
     }
 
