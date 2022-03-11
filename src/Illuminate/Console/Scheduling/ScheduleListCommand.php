@@ -97,6 +97,10 @@ class ScheduleListCommand extends Command
             ) : ''];
         });
 
+        if ($events->isEmpty()) {
+            return $this->comment('No tasks have been scheduled.');
+        }
+
         $this->output->writeln(
             $events->flatten()->filter()->prepend('')->push('')->toArray()
         );
