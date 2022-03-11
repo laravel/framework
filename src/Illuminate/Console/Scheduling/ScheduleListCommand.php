@@ -54,7 +54,7 @@ class ScheduleListCommand extends Command
             if (! $this->output->isVerbose()) {
                 $command = str_replace(
                     Application::artisanBinary(),
-                    str_replace("'", '', Application::artisanBinary()),
+                    preg_replace("#['\"]#", '', Application::artisanBinary()),
                     str_replace(Application::phpBinary(), 'php', $event->command)
                 );
             }
@@ -79,7 +79,7 @@ class ScheduleListCommand extends Command
             ));
 
             // Highlight the parameters...
-            $command = preg_replace("#(='?)([^']+)('?)#", '$1<fg=yellow;options=bold>$2</>$3', $command);
+            $command = preg_replace("#(=['\"]?)([^']+)(['\"]?)#", '$1<fg=yellow;options=bold>$2</>$3', $command);
 
             return [sprintf(
                 '  <fg=yellow>%s</>  %s<fg=#6C7280>%s %s%s %s</>',
