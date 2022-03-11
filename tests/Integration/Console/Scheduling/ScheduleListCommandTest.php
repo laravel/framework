@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\ProcessUtils;
 use Orchestra\Testbench\TestCase;
 
 class ScheduleListCommandTest extends TestCase
@@ -25,12 +26,14 @@ class ScheduleListCommandTest extends TestCase
         $this->schedule->call(fn () => '')->everyMinute();
         $this->schedule->command(FooCommand::class)->quarterly();
         $this->schedule->command('inspire')->twiceDaily(14, 18);
+        $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
 
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
             ->expectsOutput('  * *     * *      *  ............................ Next Due: 1 minute from now')
             ->expectsOutput('  0 0     1 1-12/3 *  php artisan foo:command .... Next Due: 3 months from now')
-            ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now');
+            ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
+            ->expectsOutput("  * *     * *      *  php artisan foobar a=". ProcessUtils::escapeArgument('b') ." ... Next Due: 1 minute from now");
     }
 
     public function testDisplayScheduleInVerboseMode()
