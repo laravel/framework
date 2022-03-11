@@ -471,7 +471,11 @@ class Str
      */
     public static function markdown($string, array $options = [])
     {
-        $converter = app(GithubFlavoredMarkdownConverter::class, $options);
+        if (function_exists('app')) {
+            $converter = app(GithubFlavoredMarkdownConverter::class, $options);
+        } else {
+            $converter = new GithubFlavoredMarkdownConverter($options);
+        }
 
         return (string) $converter->convert($string);
     }
