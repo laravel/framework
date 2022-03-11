@@ -122,7 +122,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
         $contents = $this->getContents();
 
         // Once we've finished rendering the view, we'll decrement the render count
-        // so that each sections get flushed out next time a view is created and
+        // so that each section gets flushed out next time a view is created and
         // no old sections are staying around in the memory of an environment.
         $this->factory->decrementRender();
 
