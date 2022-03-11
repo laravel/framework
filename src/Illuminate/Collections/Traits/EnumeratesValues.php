@@ -383,11 +383,16 @@ trait EnumeratesValues
      * @template TMapIntoValue
      *
      * @param  class-string<TMapIntoValue>  $class
+     * @param  string|null  $method
      * @return static<TKey, TMapIntoValue>
      */
-    public function mapInto($class)
+    public function mapInto($class, $method = null)
     {
-        return $this->map(function ($value, $key) use ($class) {
+        return $this->map(function ($value, $key) use ($class, $method) {
+            if (! is_null($method)) {
+                return (new $class)->{$method}($value, $key);
+            }
+
             return new $class($value, $key);
         });
     }

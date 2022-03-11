@@ -2960,6 +2960,21 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMapIntoMethod($collection)
+    {
+        $data = new $collection([
+            'first', 'second',
+        ]);
+
+        $data = $data->mapInto(TestCollectionMapIntoMethodObject::class, 'transform');
+
+        $this->assertSame('first', $data->get(0)['value']);
+        $this->assertSame('second', $data->get(1)['value']);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testNth($collection)
     {
         $data = new $collection([
@@ -5157,6 +5172,16 @@ class TestCollectionMapIntoObject
     public function __construct($value)
     {
         $this->value = $value;
+    }
+}
+
+class TestCollectionMapIntoMethodObject
+{
+    public function transform($value)
+    {
+        return [
+            'value' => $value,
+        ];
     }
 }
 

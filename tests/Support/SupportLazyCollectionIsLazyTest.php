@@ -606,6 +606,27 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testMapIntoMethodIsLazy()
+    {
+        $class = new class
+        {
+            public function transform($value)
+            {
+                return [
+                    'value' => $value,
+                ];
+            }
+        };
+
+        $this->assertDoesNotEnumerate(function ($collection) use ($class) {
+            $collection->mapInto($class, 'transform');
+        });
+
+        $this->assertEnumerates(2, function ($collection) use ($class) {
+            $collection->mapInto($class, 'transform')->take(2)->all();
+        });
+    }
+
     public function testMapSpreadIsLazy()
     {
         $data = $this->make([[1, 2], [3, 4], [5, 6], [7, 8]]);
