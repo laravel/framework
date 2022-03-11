@@ -24,7 +24,7 @@ class CallbackValidator implements ValidatorInterface
                 return false;
             }
 
-            if (! $callback($matches[$param])) {
+            if (! $callback($matches[$param] ?? null)) {
                 return false;
             }
         }
