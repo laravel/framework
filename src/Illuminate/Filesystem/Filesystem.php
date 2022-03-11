@@ -702,6 +702,7 @@ class Filesystem
             }
         }
 
+        // need unset $items before remove am empty dir.
         if (! $preserve) {
             @rmdir($directory);
         }
