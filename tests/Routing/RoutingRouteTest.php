@@ -875,6 +875,15 @@ class RoutingRouteTest extends TestCase
             return $bar === 'baz';
         });
         $this->assertTrue($route->matches($request));
+
+        $request = Request::create('foo/bar/baz', 'GET');
+        $route->where('bar', function ($bar) {
+            return $bar === 'bar';
+        });
+        $route->where('baz', function ($bar) {
+            return $bar === '123';
+        });
+        $this->assertFalse($route->matches($request));
     }
 
     public function testRoutePrefixParameterParsing()
