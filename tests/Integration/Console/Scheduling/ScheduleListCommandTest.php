@@ -50,7 +50,7 @@ class ScheduleListCommandTest extends TestCase
         parent::tearDown();
 
         putenv('SHELL_VERBOSITY');
-        AliasLoader::getInstance()->setAliases([]);
+        // AliasLoader::getInstance()->setAliases([]);
 
         ScheduleListCommand::resolveTerminalWidthUsing(null);
     }
