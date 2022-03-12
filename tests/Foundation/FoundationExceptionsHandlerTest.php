@@ -95,6 +95,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new UnReportableException('Exception message'));
     }
 
+    public function testHandlerDoesNotReportExceptionWhenDeclaredNotTo()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('error');
+
+        $this->handler->report(new NonReportingException('Exception message'));
+    }
+
     public function testHandlerCallsReportMethodWithDependencies()
     {
         $reporter = m::mock(ReportingService::class);
@@ -376,6 +385,11 @@ class UnReportableException extends Exception
     {
         return false;
     }
+}
+
+class NonReportingException extends Exception
+{
+    public $dontReport = true;
 }
 
 class ContextProvidingException extends Exception

@@ -270,6 +270,10 @@ class Handler implements ExceptionHandlerContract
      */
     protected function shouldntReport(Throwable $e)
     {
+        if (property_exists($e, 'dontReport') && $e->dontReport === true) {
+            return true;
+        }
+
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
         return ! is_null(Arr::first($dontReport, function ($type) use ($e) {
