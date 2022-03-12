@@ -112,7 +112,7 @@ class View implements ArrayAccess, Htmlable, ViewContract
      */
     protected function renderContents()
     {
-        // We will keep track of the amount of views being rendered so we can flush
+        // We will keep track of the number of views being rendered so we can flush
         // the section after the complete rendering operation is done. This will
         // clear out the sections for any separate views that may be rendered.
         $this->factory->incrementRender();
