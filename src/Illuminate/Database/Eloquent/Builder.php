@@ -85,17 +85,6 @@ class Builder implements BuilderContract
     ];
 
     /**
-     * The properties that should be proxied to query builder.
-     *
-     * @var string[]
-     */
-    protected $higherOrderPassthru = [
-        'orWhere',
-        'whereNot',
-        'orWhereNot',
-    ];
-
-    /**
      * The methods that should be returned from query builder.
      *
      * @var string[]
@@ -1668,7 +1657,7 @@ class Builder implements BuilderContract
      */
     public function __get($key)
     {
-        if (in_array($key, $this->higherOrderPassthru)) {
+        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
             return new HigherOrderBuilderProxy($this, $key);
         }
 
