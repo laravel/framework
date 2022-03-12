@@ -1100,7 +1100,7 @@ class Route
     /**
      * Indicate that the route should enforce scoping of multiple implicit Eloquent bindings.
      *
-     * @return bool
+     * @return $this
      */
     public function scopeBindings()
     {
