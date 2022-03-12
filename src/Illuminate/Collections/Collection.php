@@ -705,9 +705,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Returns the last key of the collection.
+     * Get the last key of the collection.
      *
-     * @return int|string|null
+     * @return mixed
      */
     public function lastKey()
     {
