@@ -69,13 +69,13 @@ class EncrypterTest extends TestCase
         $this->assertSame('bar', $mixed->decrypt($encrypted));
     }
 
-    public function testThatAnAeadCipherIncludesTag()
+    public function testThatAnAeadCipherIncludesTagButNoMac()
     {
         $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
-        $this->assertEmpty($data->mac);
+        $this->assertFalse(isset($data->mac));
         $this->assertNotEmpty($data->tag);
     }
 
@@ -107,13 +107,13 @@ class EncrypterTest extends TestCase
         $e->decrypt($encrypted);
     }
 
-    public function testThatANonAeadCipherIncludesMac()
+    public function testThatANonAeadCipherIncludesMacButNoTag()
     {
         $e = new Encrypter(str_repeat('b', 32), 'AES-256-CBC');
         $encrypted = $e->encrypt('foo');
         $data = json_decode(base64_decode($encrypted));
 
-        $this->assertEmpty($data->tag);
+        $this->assertFalse(isset($data->tag));
         $this->assertNotEmpty($data->mac);
     }
 

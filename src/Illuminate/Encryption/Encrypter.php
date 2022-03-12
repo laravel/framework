@@ -111,11 +111,11 @@ class Encrypter implements EncrypterContract, StringEncrypter
         $iv = base64_encode($iv);
         $tag = base64_encode($tag ?? '');
 
-        $mac = self::$supportedCiphers[strtolower($this->cipher)]['aead']
+        $mac = $this->isUsingAEAD()
             ? '' // For AEAD-algoritms, the tag / MAC is returned by openssl_encrypt...
             : $this->hash($iv, $value);
 
-        $json = json_encode(compact('iv', 'value', 'mac', 'tag'), JSON_UNESCAPED_SLASHES);
+        $json = json_encode(compact('iv', 'value', $mac ? 'mac' : 'tag'), JSON_UNESCAPED_SLASHES);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptException('Could not encrypt the data.');
@@ -154,7 +154,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
 
         $tag = empty($payload['tag']) ? null : base64_decode($payload['tag']);
 
-        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && strlen($tag) !== 16) {
+        if ($this->isUsingAEAD() && strlen($tag) !== 16) {
             throw new DecryptException('Could not decrypt the data.');
         }
 
@@ -216,7 +216,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             throw new DecryptException('The payload is invalid.');
         }
 
-        if (! self::$supportedCiphers[strtolower($this->cipher)]['aead'] && ! $this->validMac($payload)) {
+        if (! $this->isUsingAEAD() && ! $this->validMac($payload)) {
             throw new DecryptException('The MAC is invalid.');
         }
 
@@ -231,7 +231,9 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function validPayload($payload)
     {
-        return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
+        $hasMacOrTag = isset($payload[$this->isUsingAEAD() ? 'tag' : 'mac']);
+
+        return is_array($payload) && isset($payload['iv'], $payload['value']) && $hasMacOrTag &&
             strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length(strtolower($this->cipher));
     }
 
@@ -256,5 +258,15 @@ class Encrypter implements EncrypterContract, StringEncrypter
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * Determines if the chosen cipher supports AEAD.
+     *
+     * @return bool
+     */
+    private function isUsingAEAD()
+    {
+        return self::$supportedCiphers[strtolower($this->cipher)]['aead'];
     }
 }
