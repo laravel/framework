@@ -153,6 +153,12 @@ trait CompilesComponents
     \$\$__key = \$\$__key ?? \$__value;
 } ?>
 <?php \$attributes = \$attributes->exceptProps{$expression}; ?>
+<?php if (\$attributes->has('__positional')) {
+    \$__positionalProperty = array_key_first{$expression};
+    if (is_numeric(\$__positionalProperty)) \$__positionalProperty = {$expression}[\$__positionalProperty];
+    \$\$__positionalProperty ??= \$attributes->get('__positional');
+    unset(\$__positionalProperty, \$attributes['__positional']);
+} ?>
 <?php foreach (array_filter({$expression}, 'is_string', ARRAY_FILTER_USE_KEY) as \$__key => \$__value) {
     \$\$__key = \$\$__key ?? \$__value;
 } ?>

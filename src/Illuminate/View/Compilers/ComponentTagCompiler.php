@@ -208,6 +208,10 @@ class ComponentTagCompiler
      */
     protected function componentString(string $component, array $attributes)
     {
+        if (! is_null($positionalAttribute = $this->positionalAttribute($component))) {
+            $attributes['__positional'] = $positionalAttribute;
+        }
+
         $class = $this->componentClass($component);
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
@@ -235,6 +239,35 @@ class ComponentTagCompiler
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['.$this->attributesToString($attributes->all(), $escapeAttributes = $class !== DynamicComponent::class).']); ?>';
+    }
+
+    /**
+     * Compile and separate out any positional attribute for the given component alias.
+     *
+     * @param  string  $component
+     * @return string|null
+     */
+    public function positionalAttribute(string &$component)
+    {
+        // Make sure the original component name has not been defined
+        // as a component alias, as colons are permitted for those.
+        if (isset($this->aliases[$component])) {
+            return;
+        }
+
+        // Split the component alias by any single ":". If there are
+        // multiple such instances, we assume the positional attribute
+        // to be what follows the last colon.
+        $parts = Str::of($component)->split('/(?<!:):(?!:)/');
+        if ($parts->count() > 1) {
+            $attribute = $parts->pop();
+
+            $component = $parts->join(',');
+
+            // Return the attribute wrapped in single quotes so
+            // that it can be treated like the other attributes.
+            return "'$attribute'";
+        }
     }
 
     /**
@@ -377,6 +410,16 @@ class ComponentTagCompiler
         $parameterNames = $constructor
                     ? collect($constructor->getParameters())->map->getName()->all()
                     : [];
+
+        // Set positional parameter if not already explicitly set
+        if (
+            isset($attributes['__positional']) &&
+            ($firstParameterName = head($parameterNames)) &&
+            collect($attributes)->doesntContain(fn ($value, $key) => Str::camel($key) == $firstParameterName)
+        ) {
+            $attributes[$firstParameterName] = $attributes['__positional'];
+            unset($attributes['__positional']);
+        }
 
         return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
             return in_array(Str::camel($key), $parameterNames);

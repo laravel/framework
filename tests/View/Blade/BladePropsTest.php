@@ -12,6 +12,12 @@ class BladePropsTest extends AbstractBladeTestCase
     $$__key = $$__key ?? $__value;
 } ?>
 <?php $attributes = $attributes->exceptProps([\'one\' => true, \'two\' => \'string\']); ?>
+<?php if ($attributes->has(\'__positional\')) {
+    $__positionalProperty = array_key_first([\'one\' => true, \'two\' => \'string\']);
+    if (is_numeric($__positionalProperty)) $__positionalProperty = ([\'one\' => true, \'two\' => \'string\'])[$__positionalProperty];
+    $$__positionalProperty ??= $attributes->get(\'__positional\');
+    unset($__positionalProperty, $attributes[\'__positional\']);
+} ?>
 <?php foreach (array_filter(([\'one\' => true, \'two\' => \'string\']), \'is_string\', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 } ?>
