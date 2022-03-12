@@ -993,9 +993,9 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Wraps a string with the given wrappers
+     * Wraps a string with the given wrappers.
      *
-     * @param  string $before
+     * @param  string  $before
      * @param  string|null  $after
      * @return static
      */
