@@ -956,6 +956,38 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "table" where "one" = ? or ("two" = ?) or ("three" = ?)', $query->toSql());
     }
 
+    public function testRealQueryHigherOrderWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->whereNot->two();
+        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryChainedHigherOrderWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->whereNot->two()->whereNot->three();
+        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?) and not ("three" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryHigherOrderOrWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->orWhereNot->two();
+        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryChainedHigherOrderOrWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->orWhereNot->two()->orWhereNot->three();
+        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?) or not ("three" = ?)', $query->toSql());
+    }
+
     public function testSimpleWhere()
     {
         $builder = $this->getBuilder();
