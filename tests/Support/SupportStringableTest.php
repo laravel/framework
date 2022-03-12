@@ -941,6 +941,12 @@ class SupportStringableTest extends TestCase
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
     }
 
+    public function testWrap()
+    {
+        $this->assertEquals('This is me!', $this->stringable('is')->wrap('This ', ' me!'));
+        $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
+    }
+
     public function testToHtmlString()
     {
         $this->assertEquals(

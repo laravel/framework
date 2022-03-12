@@ -993,6 +993,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Wraps a string with the given wrappers
+     *
+     * @param  string $before
+     * @param  string|null  $after
+     * @return static
+     */
+    public function wrap($before, $after = null)
+    {
+        return new static(Str::wrap($this->value, $before, $after));
+    }
+
+    /**
      * Convert the string into a `HtmlString` instance.
      *
      * @return \Illuminate\Support\HtmlString
