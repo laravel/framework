@@ -190,7 +190,7 @@ class Grammar extends BaseGrammar
      */
     public function compileWheres(Builder $query)
     {
-        // Each type of where clauses has its own compiler function which is responsible
+        // Each type of where clause has its own compiler function, which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
         // and maintainable since each clause has a very small method that it uses.
         if (is_null($query->wheres)) {
