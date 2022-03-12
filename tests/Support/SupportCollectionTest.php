@@ -69,17 +69,6 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('default', $result);
     }
 
-    public function testFirstKey()
-    {
-        $data = new Collection(['foo' => 'bar', 'baz' => 'quz', 'qux' => 'quux']);
-
-        $this->assertSame('foo', $data->firstKey());
-
-        $data = new Collection(['foo', 'bar', 'baz', 'quz']);
-
-        $this->assertSame(0, $data->firstKey());
-    }
-
     /**
      * @dataProvider collectionClassProvider
      */
@@ -339,17 +328,6 @@ class SupportCollectionTest extends TestCase
         $data = new $collection;
         $result = $data->last(null, 'default');
         $this->assertSame('default', $result);
-    }
-
-    public function testLastKey()
-    {
-        $data = new Collection(['foo' => 'bar', 'baz' => 'quz', 'qux' => 'quux']);
-
-        $this->assertSame('qux', $data->lastKey());
-
-        $data = new Collection(['foo', 'bar', 'baz', 'quz']);
-
-        $this->assertSame(3, $data->lastKey());
     }
 
     public function testPopReturnsAndRemovesLastItemInCollection()

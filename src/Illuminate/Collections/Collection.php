@@ -390,16 +390,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Get the first key of the collection.
-     *
-     * @return mixed
-     */
-    public function firstKey()
-    {
-        return array_key_first($this->items);
-    }
-
-    /**
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
@@ -702,16 +692,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function last(callable $callback = null, $default = null)
     {
         return Arr::last($this->items, $callback, $default);
-    }
-
-    /**
-     * Get the last key of the collection.
-     *
-     * @return mixed
-     */
-    public function lastKey()
-    {
-        return array_key_last($this->items);
     }
 
     /**
