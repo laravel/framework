@@ -390,9 +390,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Returns the first key of the collection.
+     * Get the first key of the collection.
      *
-     * @return int|string|void|null
+     * @return mixed
      */
     public function firstKey()
     {
