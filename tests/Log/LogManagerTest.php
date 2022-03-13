@@ -459,7 +459,7 @@ class LogManagerTest extends TestCase
         $this->assertCount(1, $handlers);
 
         $expectedFingersCrossedHandler = $handlers[0];
-        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler, );
+        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler);
 
         $activationStrategyProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'activationStrategy');
         $activationStrategyProp->setAccessible(true);
