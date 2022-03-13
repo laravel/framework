@@ -59,6 +59,6 @@ class ConfigClearCommand extends Command
     {
         $this->files->delete($this->laravel->getCachedConfigPath());
 
-        $this->info('Configuration cache cleared!');
+        $this->info('Configuration cache cleared successfully.');
     }
 }
