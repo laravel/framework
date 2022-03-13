@@ -55,7 +55,7 @@ class PackageManifest
         $this->files = $files;
         $this->basePath = $basePath;
         $this->manifestPath = $manifestPath;
-        $this->vendorPath = getenv('COMPOSER_VENDOR_DIR') ?: $basePath.'/vendor';
+        $this->vendorPath = env('COMPOSER_VENDOR_DIR') ?: $basePath.'/vendor';
     }
 
     /**
