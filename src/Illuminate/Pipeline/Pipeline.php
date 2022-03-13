@@ -76,6 +76,19 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Push additional pipes onto the pipeline.
+     *
+     * @param  array|mixed  $pipes
+     * @return $this
+     */
+    public function pipe($pipes)
+    {
+        array_push($this->pipes, ...(is_array($pipes) ? $pipes : func_get_args()));
+
+        return $this;
+    }
+
+    /**
      * Set the method to call on the pipes.
      *
      * @param  string  $method

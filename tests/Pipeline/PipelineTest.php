@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use stdClass;
 
 class PipelineTest extends TestCase
 {
@@ -94,6 +95,32 @@ class PipelineTest extends TestCase
         $this->assertSame('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineUsageWithPipe()
+    {
+        $object = new stdClass();
+
+        $object->value = 0;
+
+        $function = function ($object, $next) {
+            $object->value++;
+
+            return $next($object);
+        };
+
+        $result = (new Pipeline(new Container))
+            ->send($object)
+            ->through([$function])
+            ->pipe([$function])
+            ->then(
+                function ($piped) {
+                    return $piped;
+                }
+            );
+
+        $this->assertSame($object, $result);
+        $this->assertEquals(2, $object->value);
     }
 
     public function testPipelineUsageWithInvokableClass()

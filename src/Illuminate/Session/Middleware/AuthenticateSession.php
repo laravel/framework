@@ -5,8 +5,9 @@ namespace Illuminate\Session\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Session\Middleware\AuthenticatesSessions;
 
-class AuthenticateSession
+class AuthenticateSession implements AuthenticatesSessions
 {
     /**
      * The authentication factory implementation.
@@ -40,18 +41,18 @@ class AuthenticateSession
         }
 
         if ($this->guard()->viaRemember()) {
-            $passwordHash = explode('|', $request->cookies->get($this->auth->getRecallerName()))[2] ?? null;
+            $passwordHash = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
 
             if (! $passwordHash || $passwordHash != $request->user()->getAuthPassword()) {
                 $this->logout($request);
             }
         }
 
-        if (! $request->session()->has('password_hash_'.$this->auth->getDefaultDriver())) {
+        if (! $request->session()->has('password_hash_'.$this->guard()->getDefaultDriver())) {
             $this->storePasswordHashInSession($request);
         }
 
-        if ($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()) !== $request->user()->getAuthPassword()) {
+        if ($request->session()->get('password_hash_'.$this->guard()->getDefaultDriver()) !== $request->user()->getAuthPassword()) {
             $this->logout($request);
         }
 
@@ -75,7 +76,7 @@ class AuthenticateSession
         }
 
         $request->session()->put([
-            'password_hash_'.$this->auth->getDefaultDriver() => $request->user()->getAuthPassword(),
+            'password_hash_'.$this->guard()->getDefaultDriver() => $request->user()->getAuthPassword(),
         ]);
     }
 
@@ -93,7 +94,7 @@ class AuthenticateSession
 
         $request->session()->flush();
 
-        throw new AuthenticationException('Unauthenticated.', [$this->auth->getDefaultDriver()]);
+        throw new AuthenticationException('Unauthenticated.', [$this->guard()->getDefaultDriver()]);
     }
 
     /**

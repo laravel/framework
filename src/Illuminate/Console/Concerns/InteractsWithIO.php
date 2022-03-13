@@ -372,11 +372,13 @@ trait InteractsWithIO
      * Write a blank line.
      *
      * @param  int  $count
-     * @return void
+     * @return $this
      */
     public function newLine($count = 1)
     {
         $this->output->newLine($count);
+
+        return $this;
     }
 
     /**

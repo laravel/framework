@@ -44,6 +44,6 @@ class ClearCompiledCommand extends Command
             @unlink($packagesPath);
         }
 
-        $this->info('Compiled services and packages files removed!');
+        $this->info('Compiled services and packages files removed successfully.');
     }
 }

@@ -69,7 +69,7 @@ class NotificationTableCommand extends Command
 
         $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/notifications.stub'));
 
-        $this->info('Migration created successfully!');
+        $this->info('Migration created successfully.');
 
         $this->composer->dumpAutoloads();
     }

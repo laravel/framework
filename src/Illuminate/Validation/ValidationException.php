@@ -78,7 +78,7 @@ class ValidationException extends Exception
     }
 
     /**
-     * Create a error message summary from the validation errors.
+     * Create an error message summary from the validation errors.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return string

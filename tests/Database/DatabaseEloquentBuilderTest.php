@@ -884,6 +884,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
+    public function testSimpleWhereNot()
+    {
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
+        $this->assertEquals('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
+        $this->assertEquals(['foo', 'bar'], $query->getBindings());
+    }
+
     public function testWhereNot()
     {
         $nestedQuery = m::mock(Builder::class);
@@ -901,6 +910,15 @@ class DatabaseEloquentBuilderTest extends TestCase
             $query->foo();
         });
         $this->assertEquals($builder, $result);
+    }
+
+    public function testSimpleOrWhereNot()
+    {
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
+        $this->assertEquals('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
+        $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
     public function testOrWhereNot()
@@ -936,6 +954,38 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->one()->orWhere->two()->orWhere->three();
         $this->assertSame('select * from "table" where "one" = ? or ("two" = ?) or ("three" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryHigherOrderWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->whereNot->two();
+        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryChainedHigherOrderWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->whereNot->two()->whereNot->three();
+        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?) and not ("three" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryHigherOrderOrWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->orWhereNot->two();
+        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?)', $query->toSql());
+    }
+
+    public function testRealQueryChainedHigherOrderOrWhereNotScopes()
+    {
+        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()->one()->orWhereNot->two()->orWhereNot->three();
+        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?) or not ("three" = ?)', $query->toSql());
     }
 
     public function testSimpleWhere()

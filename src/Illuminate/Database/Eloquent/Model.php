@@ -493,7 +493,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static((array) $attributes);
+        $model = new static;
 
         $model->exists = $exists;
 
@@ -504,6 +504,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $model->setTable($this->getTable());
 
         $model->mergeCasts($this->casts);
+
+        $model->fill((array) $attributes);
 
         return $model;
     }

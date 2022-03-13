@@ -22,6 +22,8 @@ use ReflectionMethod;
 
 /**
  * @property-read HigherOrderBuilderProxy $orWhere
+ * @property-read HigherOrderBuilderProxy $whereNot
+ * @property-read HigherOrderBuilderProxy $orWhereNot
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
@@ -317,26 +319,30 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where not" clause to the query.
+     * Add a basic "where not" clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
-    public function whereNot(Closure $callback, $boolean = 'and')
+    public function whereNot($column, $operator = null, $value = null, $boolean = 'and')
     {
-        return $this->where($callback, null, null, $boolean.' not');
+        return $this->where($column, $operator, $value, $boolean.' not');
     }
 
     /**
      * Add an "or where not" clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return $this
      */
-    public function orWhereNot(Closure $callback)
+    public function orWhereNot($column, $operator = null, $value = null)
     {
-        return $this->whereNot($callback, 'or');
+        return $this->whereNot($column, $operator, $value, 'or');
     }
 
     /**
@@ -608,6 +614,20 @@ class Builder implements BuilderContract
         if ($result = $this->first([$column])) {
             return $result->{Str::afterLast($column, '.')};
         }
+    }
+
+    /**
+     * Get a single column's value from the first result of a query if it's the sole matching record.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+     * @throws \Illuminate\Database\MultipleRecordsFoundException
+     */
+    public function soleValue($column)
+    {
+        return $this->sole([$column])->{Str::afterLast($column, '.')};
     }
 
     /**
@@ -1637,7 +1657,7 @@ class Builder implements BuilderContract
      */
     public function __get($key)
     {
-        if ($key === 'orWhere') {
+        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
             return new HigherOrderBuilderProxy($this, $key);
         }
 

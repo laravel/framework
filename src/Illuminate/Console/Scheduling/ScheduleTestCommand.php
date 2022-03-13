@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class ScheduleTestCommand extends Command
 {
@@ -11,7 +12,7 @@ class ScheduleTestCommand extends Command
      *
      * @var string
      */
-    protected $name = 'schedule:test';
+    protected $signature = 'schedule:test {--name= : The name of the scheduled command to run}';
 
     /**
      * The name of the console command.
@@ -45,7 +46,21 @@ class ScheduleTestCommand extends Command
             $commandNames[] = $command->command ?? $command->getSummaryForDisplay();
         }
 
-        $index = array_search($this->choice('Which command would you like to run?', $commandNames), $commandNames);
+        if (empty($commandNames)) {
+            return $this->comment('No scheduled commands have been defined.');
+        }
+
+        if (! empty($name = $this->option('name'))) {
+            $matches = array_filter($commandNames, fn ($commandName) => Str::endsWith($commandName, $name));
+
+            if (count($matches) !== 1) {
+                return $this->error('No matching scheduled command found.');
+            }
+
+            $index = key($matches);
+        } else {
+            $index = array_search($this->choice('Which command would you like to run?', $commandNames), $commandNames);
+        }
 
         $event = $commands[$index];
 

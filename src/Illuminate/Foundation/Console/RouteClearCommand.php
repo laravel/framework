@@ -59,6 +59,6 @@ class RouteClearCommand extends Command
     {
         $this->files->delete($this->laravel->getCachedRoutesPath());
 
-        $this->info('Route cache cleared!');
+        $this->info('Route cache cleared successfully.');
     }
 }
