@@ -45,7 +45,7 @@ class ViewCacheCommand extends Command
             $this->compileViews($this->bladeFilesIn([$path]));
         });
 
-        $this->info('Blade templates cached successfully!');
+        $this->info('Blade templates cached successfully.');
     }
 
     /**

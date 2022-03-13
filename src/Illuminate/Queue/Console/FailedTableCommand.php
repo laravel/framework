@@ -71,7 +71,7 @@ class FailedTableCommand extends Command
             $this->createBaseMigration($table), $table
         );
 
-        $this->info('Migration created successfully!');
+        $this->info('Migration created successfully.');
 
         $this->composer->dumpAutoloads();
     }
