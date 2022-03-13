@@ -23,6 +23,18 @@ class RouteCachingTest extends TestCase
         $this->get('/foo/1')->assertRedirect('/foo/1/bar');
     }
 
+    public function testCallbackRoutes()
+    {
+        $this->routes(__DIR__.'/Fixtures/callback_routes.php');
+
+        $this->get('/foo')->assertNotFound();
+        $this->get('/bar')->assertSee('Wildcard matched route');
+        $this->get('/baz')->assertSee('Wildcard matched route');
+
+        $this->get('/foo/bar')->assertNotFound();
+        $this->get('/foo/baz')->assertSee('Regular matched route');
+    }
+
     protected function routes(string $file)
     {
         $this->defineCacheRoutes(file_get_contents($file));

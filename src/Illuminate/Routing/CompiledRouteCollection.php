@@ -128,7 +128,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
                 //
             }
         }
-
+        
         if ($route && $route->isFallback) {
             try {
                 $dynamicRoute = $this->routes->match($request);
@@ -301,6 +301,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setFallback($attributes['fallback'])
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
+            ->setCallbacks($attributes['callbacks'])
             ->setBindingFields($attributes['bindingFields'])
             ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null)
             ->withTrashed($attributes['withTrashed'] ?? false);

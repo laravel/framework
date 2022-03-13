@@ -674,6 +674,23 @@ class Route
     }
 
     /**
+     * Set a list of callback requirements on the route.
+     *
+     * @param  array  $callbacks
+     * @return $this
+     */
+    public function setCallbacks(array $callbacks)
+    {
+        foreach ($callbacks as $name => $callback) {
+            $this->callbacks[$name] = is_string($callback)
+                ? unserialize($callback)->getClosure()
+                : $callback;
+        }
+
+        return $this;
+    }
+
+    /**
      * Mark this route as a fallback route.
      *
      * @return $this
@@ -1293,7 +1310,9 @@ class Route
         }
 
         foreach ($this->callbacks as $name => $callback) {
-            $this->callbacks[$name] = new SerializableClosure($callback);
+            $this->callbacks[$name] = serialize(
+                new SerializableClosure($callback)
+            );
         }
 
         $this->compileRoute();

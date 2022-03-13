@@ -28,7 +28,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      */
     protected function handleMatchedRoute(Request $request, $route)
     {
-        if (! is_null($route)) {
+        if (! is_null($route) && $route->matches($request)) {
             return $route->bind($request);
         }
 
@@ -144,6 +144,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
                 'fallback' => $route->isFallback,
                 'defaults' => $route->defaults,
                 'wheres' => $route->wheres,
+                'callbacks' => $route->callbacks,
                 'bindingFields' => $route->bindingFields(),
                 'lockSeconds' => $route->locksFor(),
                 'waitSeconds' => $route->waitsFor(),
