@@ -78,7 +78,7 @@ class Builder
     /**
      * The columns that should be returned.
      *
-     * @var array
+     * @var string[]
      */
     public $columns;
 
@@ -87,7 +87,7 @@ class Builder
      *
      * Occasionally contains the columns that should be distinct.
      *
-     * @var bool|array
+     * @var bool|string[]
      */
     public $distinct = false;
 
@@ -239,7 +239,7 @@ class Builder
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  array|...string  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -393,7 +393,7 @@ class Builder
     /**
      * Add a new select column to the query.
      *
-     * @param  array|mixed  $column
+     * @param  array|...string  $column
      * @return $this
      */
     public function addSelect($column)
@@ -418,7 +418,7 @@ class Builder
     /**
      * Force the query to only return distinct results.
      *
-     * @param  mixed  ...$distinct
+     * @param  ...string[]|bool $distinct An array of columns should be distinct of a boolean or nothing
      * @return $this
      */
     public function distinct()
@@ -1102,7 +1102,7 @@ class Builder
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string|array  $columns
+     * @param  string|string[]  $columns
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1132,7 +1132,7 @@ class Builder
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string|array  $columns
+     * @param  string|string[]  $columns
      * @param  string  $boolean
      * @return $this
      */
@@ -1646,7 +1646,7 @@ class Builder
     /**
      * Adds a where condition using row values.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  string  $operator
      * @param  array  $values
      * @param  string  $boolean
@@ -1672,7 +1672,7 @@ class Builder
     /**
      * Adds an or where condition using row values.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  string  $operator
      * @param  array  $values
      * @return $this
@@ -2369,7 +2369,7 @@ class Builder
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return mixed|static
      */
     public function find($id, $columns = ['*'])
@@ -2393,7 +2393,7 @@ class Builder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array|string  $columns
+     * @param  string[]|string  $columns
      * @return \Illuminate\Support\Collection
      */
     public function get($columns = ['*'])
@@ -2419,7 +2419,7 @@ class Builder
      * Paginate the given query into a simple paginator.
      *
      * @param  int  $perPage
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -2444,7 +2444,7 @@ class Builder
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int  $perPage
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -2467,7 +2467,7 @@ class Builder
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
@@ -2501,7 +2501,7 @@ class Builder
     /**
      * Get the count of the total records for the paginator.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return int
      */
     public function getCountForPagination($columns = ['*'])
@@ -2523,7 +2523,7 @@ class Builder
     /**
      * Run a pagination count query.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return array
      */
     protected function runPaginationCountQuery($columns = ['*'])
@@ -2564,7 +2564,7 @@ class Builder
     /**
      * Remove the column aliases since they will break count queries.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return array
      */
     protected function withoutSelectAliases(array $columns)
@@ -2783,7 +2783,7 @@ class Builder
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param  string  $columns
+     * @param  string[]|string  $columns
      * @return int
      */
     public function count($columns = '*')
@@ -2852,7 +2852,7 @@ class Builder
      * Execute an aggregate function on the database.
      *
      * @param  string  $function
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return mixed
      */
     public function aggregate($function, $columns = ['*'])
@@ -2871,7 +2871,7 @@ class Builder
      * Execute a numeric aggregate function on the database.
      *
      * @param  string  $function
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return float|int
      */
     public function numericAggregate($function, $columns = ['*'])
@@ -2900,7 +2900,7 @@ class Builder
      * Set the aggregate property without running the query.
      *
      * @param  string  $function
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @return $this
      */
     protected function setAggregate($function, $columns)
@@ -2921,7 +2921,7 @@ class Builder
      *
      * After running the callback, the columns are reset to the original value.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  callable  $callback
      * @return mixed
      */
@@ -3031,7 +3031,7 @@ class Builder
     /**
      * Insert new records into the table using a subquery.
      *
-     * @param  array  $columns
+     * @param  string[]  $columns
      * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
      * @return int
      */
