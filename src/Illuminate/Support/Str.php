@@ -463,23 +463,6 @@ class Str
     }
 
     /**
-     * Wraps a string with the given wrappers.
-     *
-     * @param  string  $value
-     * @param  string  $before
-     * @param  string|null  $after
-     * @return string
-     */
-    public static function wrap($value, $before, $after = null)
-    {
-        if ($after === null) {
-            $after = $before;
-        }
-
-        return $before.$value.$after;
-    }
-
-    /**
      * Converts GitHub flavored Markdown into HTML.
      *
      * @param  string  $string

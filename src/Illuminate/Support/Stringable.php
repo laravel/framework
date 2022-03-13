@@ -993,7 +993,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Wraps a string with the given wrappers.
+     * Wrap the string with the given strings.
      *
      * @param  string  $before
      * @param  string|null  $after
@@ -1001,7 +1001,7 @@ class Stringable implements JsonSerializable
      */
     public function wrap($before, $after = null)
     {
-        return new static(Str::wrap($this->value, $before, $after));
+        return new static($before.$this->value.($after ??= $before));
     }
 
     /**
