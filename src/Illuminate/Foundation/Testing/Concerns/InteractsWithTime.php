@@ -11,11 +11,11 @@ trait InteractsWithTime
      * Freezes the current time.
      *
      * @param  callable|null  $callback
-     * @return void
+     * @return mixed
      */
     public function freezeTime($callback = null)
     {
-        $this->travelTo(Carbon::now()->startOfSecond(), $callback);
+        return $this->travelTo(Carbon::now(), $callback);
     }
 
     /**
