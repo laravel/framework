@@ -19,6 +19,17 @@ trait InteractsWithTime
     }
 
     /**
+     * Freezes the current second.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function freezeSecond($callback = null)
+    {
+        return $this->travelTo(Carbon::now()->startOfSecond(), $callback);
+    }
+
+    /**
      * Begin travelling to another time.
      *
      * @param  int  $value
