@@ -8,6 +8,17 @@ use Illuminate\Support\Carbon;
 trait InteractsWithTime
 {
     /**
+     * Freezes the current time.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function freezeTime($callback = null)
+    {
+        $this->travelTo(Carbon::now()->startOfSecond(), $callback);
+    }
+
+    /**
      * Begin travelling to another time.
      *
      * @param  int  $value
