@@ -166,7 +166,7 @@ class EloquentWhereTest extends DatabaseTestCase
             'address' => 'test-address',
         ]);
 
-        $this->assertEquals('test-name', UserWhereTest::where('name', 'test-name')->soleValue('name'));
+        $this->assertSame('test-name', UserWhereTest::where('name', 'test-name')->soleValue('name'));
     }
 
     public function testChunkMap()

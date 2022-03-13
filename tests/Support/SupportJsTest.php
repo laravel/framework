@@ -16,7 +16,7 @@ class SupportJsTest extends TestCase
         $this->assertSame('true', (string) Js::from(true));
         $this->assertSame('1', (string) Js::from(1));
         $this->assertSame('1.1', (string) Js::from(1.1));
-        $this->assertEquals(
+        $this->assertSame(
             "'\\u003Cdiv class=\\u0022foo\\u0022\\u003E\\u0027quoted html\\u0027\\u003C\\/div\\u003E'",
             (string) Js::from('<div class="foo">\'quoted html\'</div>')
         );
@@ -24,12 +24,12 @@ class SupportJsTest extends TestCase
 
     public function testArrays()
     {
-        $this->assertEquals(
+        $this->assertSame(
             "JSON.parse('[\\u0022hello\\u0022,\\u0022world\\u0022]')",
             (string) Js::from(['hello', 'world'])
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from(['foo' => 'hello', 'bar' => 'world'])
         );
@@ -37,7 +37,7 @@ class SupportJsTest extends TestCase
 
     public function testObjects()
     {
-        $this->assertEquals(
+        $this->assertSame(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from((object) ['foo' => 'hello', 'bar' => 'world'])
         );
@@ -64,7 +64,7 @@ class SupportJsTest extends TestCase
             }
         };
 
-        $this->assertEquals(
+        $this->assertSame(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from($data)
         );
@@ -96,7 +96,7 @@ class SupportJsTest extends TestCase
             }
         };
 
-        $this->assertEquals(
+        $this->assertSame(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from($data)
         );
@@ -116,7 +116,7 @@ class SupportJsTest extends TestCase
             }
         };
 
-        $this->assertEquals(
+        $this->assertSame(
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from($data)
         );

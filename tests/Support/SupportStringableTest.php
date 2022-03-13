@@ -904,8 +904,8 @@ class SupportStringableTest extends TestCase
 
     public function testMarkdown()
     {
-        $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
-        $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+        $this->assertSame("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
+        $this->assertSame("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
     }
 
     public function testMask()
@@ -943,8 +943,8 @@ class SupportStringableTest extends TestCase
 
     public function testWrap()
     {
-        $this->assertEquals('This is me!', $this->stringable('is')->wrap('This ', ' me!'));
-        $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
+        $this->assertSame('This is me!', $this->stringable('is')->wrap('This ', ' me!'));
+        $this->assertSame('"value"', $this->stringable('value')->wrap('"'));
     }
 
     public function testToHtmlString()
