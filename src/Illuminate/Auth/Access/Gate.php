@@ -609,9 +609,16 @@ class Gate implements GateContract
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
-        if (isset($arguments[0]) &&
-            ! is_null($policy = $this->getPolicyFor($arguments[0])) &&
-            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)) {
+        if (isset($arguments[0])) {
+            $policy = $this->getPolicyFor($arguments[0]);
+        } else {
+            $policy = $this->getPolicyFor($user);
+        }
+
+        if (
+            ! is_null($policy) &&
+            $callback = $this->resolvePolicyCallback($user, $ability, $arguments, $policy)
+        ) {
             return $callback;
         }
 
