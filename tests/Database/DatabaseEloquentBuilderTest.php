@@ -832,6 +832,28 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testQueryDynamicScopes()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->getQuery()->shouldReceive('where')->once()->with('bar', 'foo');
+        $builder->setModel($model = new EloquentBuilderTestDynamicScopeStub);
+        $result = $builder->dynamic('bar', 'foo');
+
+        $this->assertEquals($builder, $result);
+    }
+
+    public function testQueryDynamicScopesNamed()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'foo');
+        $builder->setModel($model = new EloquentBuilderTestDynamicScopeStub);
+        $result = $builder->dynamic(bar: 'foo');
+
+        $this->assertEquals($builder, $result);
+    }
+
     public function testNestedWhere()
     {
         $nestedQuery = m::mock(Builder::class);
@@ -1936,6 +1958,14 @@ class EloquentBuilderTestScopeStub extends Model
     public function scopeApproved($query)
     {
         $query->where('foo', 'bar');
+    }
+}
+
+class EloquentBuilderTestDynamicScopeStub extends Model
+{
+    public function scopeDynamic($query, $foo = 'foo', $bar = 'bar')
+    {
+        $query->where($foo, $bar);
     }
 }
 
