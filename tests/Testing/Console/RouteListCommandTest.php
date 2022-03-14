@@ -113,6 +113,21 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
+    public function testDisplayRoutesExceptVendor()
+    {
+        $this->router->get('foo/{user}', [FooController::class, 'show']);
+        $this->router->view('view', 'blade.path');
+        $this->router->redirect('redirect', 'destination');
+
+        $this->artisan(RouteListCommand::class, ['-v' => true, '--except-vendor' => true])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
+            ->expectsOutput('  ANY            redirect .... Illuminate\Routing\RedirectController')
+            ->expectsOutput('  GET|HEAD       view .............................................. ')
+            ->expectsOutput('');
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
