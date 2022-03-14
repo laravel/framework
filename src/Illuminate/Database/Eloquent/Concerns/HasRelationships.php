@@ -760,12 +760,12 @@ trait HasRelationships
     }
 
     /**
-     * Create a new model instance for a through model.
+     * Create a new model instance for a related "through" model.
      *
      * @param  string  $class
      * @return mixed
      */
-    protected function newThroughInstance($class)
+    protected function newRelatedThroughInstance($class)
     {
         return new $class;
     }
