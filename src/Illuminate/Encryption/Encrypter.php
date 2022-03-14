@@ -159,11 +159,9 @@ class Encrypter implements EncrypterContract, StringEncrypter
 
         $iv = base64_decode($payload['iv']);
 
-        $tag = empty($payload['tag']) ? null : base64_decode($payload['tag']);
-
-        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && strlen($tag) !== 16) {
-            throw new DecryptException('Could not decrypt the data.');
-        }
+        $this->ensureTagIsValid(
+            $tag = empty($payload['tag']) ? null : base64_decode($payload['tag'])
+        );
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
@@ -253,6 +251,23 @@ class Encrypter implements EncrypterContract, StringEncrypter
         return hash_equals(
             $this->hash($payload['iv'], $payload['value']), $payload['mac']
         );
+    }
+
+    /**
+     * Ensure the given tag is a valid tag given the selected cipher.
+     *
+     * @param  string  $tag
+     * @return void
+     */
+    protected function ensureTagIsValid($tag)
+    {
+        if (self::$supportedCiphers[strtolower($this->cipher)]['aead'] && strlen($tag) !== 16) {
+            throw new DecryptException('Could not decrypt the data.');
+        }
+
+        if (! self::$supportedCiphers[strtolower($this->cipher)]['aead'] && is_string($tag)) {
+            throw new DecryptException('Unable to use tag because the cipher algorithm does not support AEAD.');
+        }
     }
 
     /**
