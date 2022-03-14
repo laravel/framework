@@ -115,7 +115,7 @@ trait HasRelationships
      */
     public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
-        $through = $this->newThroughInstance($through);
+        $through = $this->newRelatedThroughInstance($through);
 
         $firstKey = $firstKey ?: $this->getForeignKey();
 
@@ -387,7 +387,7 @@ trait HasRelationships
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
-        $through = $this->newThroughInstance($through);
+        $through = $this->newRelatedThroughInstance($through);
 
         $firstKey = $firstKey ?: $this->getForeignKey();
 
