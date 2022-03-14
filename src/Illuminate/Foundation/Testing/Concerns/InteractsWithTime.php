@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 trait InteractsWithTime
 {
     /**
-     * Freezes the current time.
+     * Freeze time.
      *
      * @param  callable|null  $callback
      * @return mixed
@@ -19,7 +19,7 @@ trait InteractsWithTime
     }
 
     /**
-     * Freezes the current second.
+     * Freeze time at the beginning of the current second.
      *
      * @param  callable|null  $callback
      * @return mixed
@@ -52,7 +52,7 @@ trait InteractsWithTime
         Carbon::setTestNow($date);
 
         if ($callback) {
-            return tap($callback(), function () {
+            return tap($callback(Carbon::now()), function () {
                 Carbon::setTestNow();
             });
         }
