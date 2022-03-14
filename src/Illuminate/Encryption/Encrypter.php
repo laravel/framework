@@ -158,7 +158,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             throw new DecryptException('Could not decrypt the data.');
         }
         
-        if(!self::$supportedCiphers[strtolower($this->cipher)]['aead'] && is_string($tag)) {
+        if(! self::$supportedCiphers[strtolower($this->cipher)]['aead'] && is_string($tag)) {
             throw new DecryptException('The tag cannot be used because the cipher algorithm does not support AEAD');
         }
 
