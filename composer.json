@@ -18,6 +18,7 @@
         "php": "^8.0.2",
         "ext-mbstring": "*",
         "ext-openssl": "*",
+        "doctrine/dbal": "^2.13.3|^3.1.4",
         "doctrine/inflector": "^2.0",
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^3.1",
@@ -81,7 +82,6 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "^3.198.1",
-        "doctrine/dbal": "^2.13.3|^3.1.4",
         "fakerphp/faker": "^1.9.2",
         "guzzlehttp/guzzle": "^7.2",
         "league/flysystem-aws-s3-v3": "^3.0",
