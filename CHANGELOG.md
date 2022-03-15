@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.5.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.5.1...9.x)
+
+
+## [v9.5.1](https://github.com/laravel/framework/compare/v9.5.0...v9.5.1) - 2022-03-15
+
+### Reverted
+- Revert "Fix the guard instance used." ([#41491](https://github.com/laravel/framework/pull/41491))
 
 
 ## [v9.5.0](https://github.com/laravel/framework/compare/v9.4.1...v9.5.0) - 2022-03-15
