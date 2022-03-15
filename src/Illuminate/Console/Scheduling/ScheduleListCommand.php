@@ -142,7 +142,7 @@ class ScheduleListCommand extends Command
     }
 
     /**
-     * Get the location and line number for the event closure.
+     * Get the file and line number for the event closure.
      *
      * @param  \Illuminate\Console\Scheduling\CallbackEvent  $event
      * @return string
