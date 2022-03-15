@@ -19,7 +19,7 @@
 - Added callable support to operatorForWhere on Collection ([#41414](https://github.com/laravel/framework/pull/41414), [#41424](https://github.com/laravel/framework/pull/41424))
 - Added partial queue faking ([#41425](https://github.com/laravel/framework/pull/41425))
 - Added --name option to schedule:test command ([#41439](https://github.com/laravel/framework/pull/41439))
-- Define `Illuminate/Database/Eloquent/Concerns/HasRelationships::newThroughInstance()` ([#41444](https://github.com/laravel/framework/pull/41444))
+- Define `Illuminate/Database/Eloquent/Concerns/HasRelationships::newRelatedThroughInstance()` ([#41444](https://github.com/laravel/framework/pull/41444))
 - Added `Illuminate/Support/Stringable::wrap()` ([#41455](https://github.com/laravel/framework/pull/41455))
 - Adds "freezeTime" helper for tests ([#41460](https://github.com/laravel/framework/pull/41460))
 - Allow for callables with beforeSending in`Illuminate/Http/Client/PendingRequest.php::runBeforeSendingCallbacks()` ([#41489](https://github.com/laravel/framework/pull/41489))
