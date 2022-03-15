@@ -142,22 +142,22 @@ class ScheduleListCommand extends Command
     }
 
     /**
-     * Gets the location and line number to the event closure.
+     * Get the location and line number for the event closure.
      *
-     * @param  CallbackEvent  $event
+     * @param  \Illuminate\Console\Scheduling\CallbackEvent  $event
      * @return string
      */
     private function getClosureLocation(CallbackEvent $event)
     {
-        $property = (new ReflectionClass($event))->getProperty('callback');
-        $property->setAccessible(true);
+        $function = new ReflectionFunction(tap((new ReflectionClass($event))->getProperty('callback'))
+                        ->setAccessible(true)
+                        ->getValue($event));
 
-        $callback = $property->getValue($event);
-        $reflection = new ReflectionFunction($callback);
-
-        $path = str_replace(base_path().DIRECTORY_SEPARATOR, '', $reflection->getFileName() ?: '');
-
-        return $path.':'.$reflection->getStartLine();
+        return sprintf(
+            '%s:%s',
+            str_replace(base_path().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
+            $function->getStartLine()
+        );
     }
 
     /**
