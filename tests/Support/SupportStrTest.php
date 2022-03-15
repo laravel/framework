@@ -460,6 +460,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
     }
 
+    public function testSingular()
+    {
+        $this->assertEquals('child', Str::singular('children'));
+        $this->assertEquals('child', Str::singular('child'));
+        $this->assertEquals('car', Str::singular('cars'));
+        $this->assertEquals('car', Str::singular('car'));
+    }
+
     public function testReplaceArray()
     {
         $this->assertSame('foo/bar/baz', Str::replaceArray('?', ['foo', 'bar', 'baz'], '?/?/?'));

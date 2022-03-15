@@ -32,6 +32,14 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('ù')->isAscii());
     }
 
+    public function testSingular()
+    {
+        $this->assertEquals('child', $this->stringable('children')->singular());
+        $this->assertEquals('child', $this->stringable('child')->singular());
+        $this->assertEquals('car', $this->stringable('cars')->singular());
+        $this->assertEquals('car', $this->stringable('car')->singular());
+    }
+
     public function testIsUuid()
     {
         $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
