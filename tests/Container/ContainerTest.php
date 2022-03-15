@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Container;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\IsSingleton;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -603,6 +604,16 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 
+    public function testContainerSharedViaIsSingletonInterface()
+    {
+        $container = new Container;
+
+        $r1 = $container->make(SharedStub::class);
+        $r2 = $container->make(SharedStub::class);
+
+        $this->assertSame($r1, $r2);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -720,4 +731,8 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
     {
         $this->something = $something;
     }
+}
+
+class SharedStub implements IsSingleton {
+    //
 }

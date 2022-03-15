@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
+use Illuminate\Contracts\Container\IsSingleton;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
@@ -220,9 +221,27 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function isShared($abstract)
     {
-        return isset($this->instances[$abstract]) ||
-               (isset($this->bindings[$abstract]['shared']) &&
-               $this->bindings[$abstract]['shared'] === true);
+        if (isset($this->instances[$abstract])) {
+            return true;
+        }
+
+        if (isset($this->bindings[$abstract]['shared']) &&
+            $this->bindings[$abstract]['shared'] === true) {
+            return true;
+        }
+
+        // Determine if $abstract is alias or real class that we can check
+        if (class_exists($abstract) === false) {
+            return false;
+        }
+
+        $classImplements = class_implements($abstract, true);
+
+        if ($classImplements === false) {
+            return false;
+        }
+
+        return isset($classImplements[IsSingleton::class]);
     }
 
     /**
