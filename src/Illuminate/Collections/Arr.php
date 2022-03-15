@@ -25,7 +25,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  string|int|float  $key
      * @param  mixed  $value
      * @return array
      */
@@ -599,7 +599,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string|null  $key
+     * @param  string|int|null  $key
      * @param  mixed  $value
      * @return array
      */

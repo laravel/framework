@@ -32,6 +32,8 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
+        $this->assertEquals([1 => 'hAz'], Arr::add([], 1, 'hAz'));
+        $this->assertEquals([1 => [1 => 'hAz']], Arr::add([], 1.1, 'hAz'));
     }
 
     public function testCollapse()
@@ -760,6 +762,9 @@ class SupportArrTest extends TestCase
         $array = ['products' => 'table'];
         Arr::set($array, 'products.desk.price', 300);
         $this->assertSame(['products' => ['desk' => ['price' => 300]]], $array);
+
+        $array = [1 => 'test'];
+        $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
     public function testShuffleWithSeed()
