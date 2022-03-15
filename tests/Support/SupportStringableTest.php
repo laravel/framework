@@ -660,6 +660,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo bar baz', (string) $this->stringable('fOo Bar bAz')->lower());
     }
 
+    public function testLcfirst()
+    {
+        $this->assertEquals('hello World', (string) $this->stringable('Hello World')->lcfirst());
+        $this->assertEquals('world', (string) $this->stringable('World')->lcfirst());
+        $this->assertEquals('helloFromNewWorld', (string) $this->stringable('HelloFromNewWorld')->lcfirst());
+    }
+
     public function testUpper()
     {
         $this->assertSame('FOO BAR BAZ', (string) $this->stringable('foo bar baz')->upper());
