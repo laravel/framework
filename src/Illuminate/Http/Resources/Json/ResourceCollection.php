@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Countable;
+use Illuminate\Container\Container;
 use Illuminate\Http\Resources\CollectsResources;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
@@ -130,6 +131,6 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
             $this->resource->appends($this->queryParameters);
         }
 
-        return (new PaginatedResourceResponse($this))->toResponse($request);
+        return Container::getInstance()->makeWith(PaginatedResourceResponse::class, ['resource' => $this])->toResponse($request);
     }
 }
