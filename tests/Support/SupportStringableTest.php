@@ -150,6 +150,13 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testUcsplitOnStringable()
+    {
+        $this->assertSame(['Taylor', 'Otwell'], $this->stringable('TaylorOtwell')->ucsplit()->toArray());
+        $this->assertSame(['Hello', 'From', 'Laravel'], $this->stringable('HelloFromLaravel')->ucsplit()->toArray());
+        $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
+    }
+
     public function testWhenEndsWith()
     {
         $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {
