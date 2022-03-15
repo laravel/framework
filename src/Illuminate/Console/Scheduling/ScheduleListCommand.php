@@ -6,7 +6,10 @@ use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
+use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Support\Carbon;
+use ReflectionClass;
+use ReflectionFunction;
 use Symfony\Component\Console\Terminal;
 
 class ScheduleListCommand extends Command
@@ -57,6 +60,10 @@ class ScheduleListCommand extends Command
                     preg_replace("#['\"]#", '', Application::artisanBinary()),
                     str_replace(Application::phpBinary(), 'php', $event->command)
                 );
+            }
+
+            if ($event instanceof CallbackEvent) {
+                $command = 'Closure at: '.$this->getClosureLocation($event);
             }
 
             $command = mb_strlen($command) > 1 ? "{$command} " : '';
@@ -133,6 +140,25 @@ class ScheduleListCommand extends Command
         return collect($spacing)
             ->map(fn ($length, $index) => $expression[$index] = str_pad($expression[$index], $length))
             ->implode(' ');
+    }
+
+    /**
+     * Gets the location and line number to the event closure.
+     *
+     * @param  CallbackEvent  $event
+     * @return string
+     */
+    private function getClosureLocation(CallbackEvent $event)
+    {
+        $property = (new ReflectionClass($event))->getProperty('callback');
+        $property->setAccessible(true);
+
+        $callback = $property->getValue($event);
+        $reflection = new ReflectionFunction($callback);
+
+        $path = str_replace(base_path().DIRECTORY_SEPARATOR, '', $reflection->getFileName() ?: '');
+
+        return $path.':'.$reflection->getStartLine();
     }
 
     /**

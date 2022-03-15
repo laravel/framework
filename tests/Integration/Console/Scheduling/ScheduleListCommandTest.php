@@ -23,17 +23,20 @@ class ScheduleListCommandTest extends TestCase
 
     public function testDisplaySchedule()
     {
-        $this->schedule->call(fn () => '')->everyMinute();
         $this->schedule->command(FooCommand::class)->quarterly();
         $this->schedule->command('inspire')->twiceDaily(14, 18);
         $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
 
+        $this->schedule->call(fn () => '')->everyMinute();
+        $closureLineNumber = __LINE__ - 1;
+        $closureFilePath = __FILE__;
+
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('  * *     * *      *  ............................ Next Due: 1 minute from now')
             ->expectsOutput('  0 0     1 1-12/3 *  php artisan foo:command .... Next Due: 3 months from now')
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
-            ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now');
+            ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
     }
 
     public function testDisplayScheduleInVerboseMode()
