@@ -6,7 +6,6 @@ use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-use Illuminate\Console\Scheduling\CallbackEvent;
 use Illuminate\Support\Carbon;
 use ReflectionClass;
 use ReflectionFunction;
