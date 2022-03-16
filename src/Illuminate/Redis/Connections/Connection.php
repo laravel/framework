@@ -36,8 +36,8 @@ abstract class Connection
      */
     protected $events;
 
-     /**
-     * Indicates if the connection is invalid and needs to reconnect
+    /**
+     * Indicates if the connection is invalid and needs to reconnect.
      *
      * @var bool
      */
@@ -115,6 +115,7 @@ abstract class Connection
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     *
      * @throws \Exception Throws an exception if this connection should not be used
      */
     public function command($method, array $parameters = [])
@@ -126,7 +127,7 @@ abstract class Connection
 
             // Basically - if you see this, this is a bug in whatever is NOT using RedisManager
             // to get Redis objects.
-            throw new \Exception("The Redis connection " . $this->name . " has been marked as failed and needs to be recreated.");
+            throw new \Exception('The Redis connection '.$this->name.' has been marked as failed and needs to be recreated.');
         }
         $start = microtime(true);
 
@@ -136,6 +137,7 @@ abstract class Connection
             // If there is a RedisException, this connection is no longer usable.
             // Mark the connection as shouldReconnect, and return an empty array.
             $this->shouldReconnect = true;
+
             return [];
         }
 

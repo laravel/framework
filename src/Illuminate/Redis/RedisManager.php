@@ -87,7 +87,7 @@ class RedisManager implements Factory
             // If the connection has had a fatal socket error, the \Redis object
             // in this connection is no longer valid, and needs to be destroyed
             // and recreated.
-            if (!$this->connections[$name]->shouldReconnect) {
+            if (! $this->connections[$name]->shouldReconnect) {
                 return $this->connections[$name];
             }
             // Unset and destroy the Connection object to ensure it's cleaned up.
@@ -117,7 +117,7 @@ class RedisManager implements Factory
         if (isset($this->config[$name])) {
             return $this->connector()->connect(
                 $this->parseConnectionConfiguration($this->config[$name]),
-                array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.' . $name, Arr::get($options, 'parameters', []))])
+                array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.'.$name, Arr::get($options, 'parameters', []))])
             );
         }
 
