@@ -9,9 +9,9 @@ trait Dispatchable
      *
      * @return void
      */
-    public static function dispatch()
+    public static function dispatch(...$arguments)
     {
-        return event(new static(...func_get_args()));
+        return event(new static(...$arguments));
     }
 
     /**
