@@ -171,14 +171,14 @@ class Builder
     }
 
     /**
-     * Execute a callback inside table builder if has a column
+     * Execute a table builder callback if the given table has a given column.
      *
      * @param  string  $table
      * @param  string  $column
      * @param  \Closure  $callback
      * @return void
      */
-    public function whenTableHasColumn(string $table, string $column, Closure $callback): void
+    public function whenTableHasColumn(string $table, string $column, Closure $callback)
     {
         if ($this->hasColumn($table, $column)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
@@ -186,14 +186,14 @@ class Builder
     }
 
     /**
-     * Execute a callback inside table builder if does't have a column
+     * Execute a table builder callback if the given table doesn't have a given column.
      *
      * @param  string  $table
      * @param  string  $column
      * @param  \Closure  $callback
      * @return void
      */
-    public function whenTableHasNotColumn(string $table, string $column, Closure $callback): void
+    public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
     {
         if (! $this->hasColumn($table, $column)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
