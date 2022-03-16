@@ -45,11 +45,11 @@ class DurationLimiterBuilder
     public $timeout = 3;
 
     /**
-     * The time in milliseconds to wait between attempts to acquire the lock
+     * The number of milliseconds to wait between attempts to acquire the lock.
      *
      * @var int
      */
-    public $retryWaitMs = 750;
+    public $sleep = 750;
 
     /**
      * Create a new builder instance.
@@ -104,14 +104,14 @@ class DurationLimiterBuilder
     }
 
     /**
-     * Set the wait time in milliseconds between lock acquisition retries
+     * The number of milliseconds to wait between lock acquisition attempts.
      *
-     * @param float $retryWaitMs
+     * @param  int  $sleep
      * @return $this
      */
-    public function retryWait(float $retryWaitMs)
+    public function sleep($sleep)
     {
-        $this->retryWaitMs = $retryWaitMs;
+        $this->sleep = $sleep;
 
         return $this;
     }
@@ -130,7 +130,7 @@ class DurationLimiterBuilder
         try {
             return (new DurationLimiter(
                 $this->connection, $this->name, $this->maxLocks, $this->decay
-            ))->block($this->timeout, $callback, $this->retryWaitMs);
+            ))->block($this->timeout, $callback, $this->sleep);
         } catch (LimiterTimeoutException $e) {
             if ($failure) {
                 return $failure($e);
