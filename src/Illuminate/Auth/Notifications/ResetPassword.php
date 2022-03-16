@@ -59,11 +59,13 @@ class ResetPassword extends Notification
      */
     public function toMail($notifiable)
     {
+        $passwordResetUrl = $this->resetUrl($notifiable);
+
         if (static::$toMailCallback) {
-            return call_user_func(static::$toMailCallback, $notifiable, $this->token);
+            return call_user_func(static::$toMailCallback, $notifiable, $passwordResetUrl);
         }
 
-        return $this->buildMailMessage($this->resetUrl($notifiable));
+        return $this->buildMailMessage($passwordResetUrl);
     }
 
     /**

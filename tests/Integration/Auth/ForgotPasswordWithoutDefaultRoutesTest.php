@@ -93,15 +93,18 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_send_forgot_password_email_via_to_mail_using()
+    public function it_cannot_send_forgot_password_email_via_to_mail_using_without_default_route()
     {
+        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
+        $this->expectExceptionMessage('Route [password.reset] not defined.');
+
         Notification::fake();
 
-        ResetPassword::toMailUsing(function ($notifiable, $token) {
+        ResetPassword::toMailUsing(function ($notifiable, $url) {
             return (new MailMessage)
                 ->subject(__('Reset Password Notification'))
                 ->line(__('You are receiving this email because we received a password reset request for your account.'))
-                ->action(__('Reset Password'), route('custom.password.reset', $token))
+                ->action(__('Reset Password'), $url)
                 ->line(__('If you did not request a password reset, no further action is required.'));
         });
 
@@ -119,7 +122,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
                 $message = $notification->toMail($user);
 
                 return ! is_null($notification->token)
-                    && $message->actionUrl === route('custom.password.reset', ['token' => $notification->token]);
+                    && $message->actionUrl === route('password.reset', ['token' => $notification->token, 'email' => $user->email]);
             }
         );
     }
