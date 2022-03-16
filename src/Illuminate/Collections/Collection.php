@@ -793,6 +793,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Merge arrays when the values are not null.
+     *
+     * @param  iterable  ...$arrays
+     * @return array
+     */
+    public function mergeNotNull(...$arrays)
+    {
+        return new static(Arr::mergeNotNull(
+            $this->items, ...array_map([$this, 'getArrayableItems'], $arrays)
+        ));
+    }
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @template TMergeRecursiveValue

@@ -452,6 +452,27 @@ class Arr
     }
 
     /**
+     * Merge arrays when the values are not null.
+     *
+     * @param  iterable  ...$arrays
+     * @return array
+     */
+    public static function mergeNotNull(array ...$arrays)
+    {
+        $result = [];
+
+        foreach ($arrays as $array) {
+            foreach ($array as $key => $value) {
+                if (! isset($result[$key]) || ! is_null($value)) {
+                    $result[$key] = $value;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array

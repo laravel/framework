@@ -1275,6 +1275,28 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMergeNotNull($collection)
+    {
+        $first = ['a' => null, 'b' => 'b-filled'];
+        $second = ['a' => 'a-filled', 'b' => null];
+        $aOnly = ['a' => 'a-only'];
+        $bNull = ['b' => null];
+
+        $this->assertEquals(['a' => 'a-filled', 'b' => 'b-filled'], (new $collection($first))->mergeNotNull($second)->all());
+        $this->assertEquals(['a' => 'a-filled', 'b' => 'b-filled'], (new $collection($second))->mergeNotNull($first)->all());
+        $this->assertEquals(['a' => 'a-only', 'b' => 'b-filled'], (new $collection($first))->mergeNotNull($aOnly)->all());
+        $this->assertEquals(['a' => 'a-only', 'b' => null], (new $collection($second))->mergeNotNull($aOnly)->all());
+        $this->assertEquals(['a' => null, 'b' => 'b-filled'], (new $collection($first))->mergeNotNull($bNull)->all());
+        $this->assertEquals(['a' => 'a-filled', 'b' => null], (new $collection($second))->mergeNotNull($bNull)->all());
+        $this->assertEquals(['a' => 'a-only', 'b' => 'b-filled'], (new $collection($aOnly))->mergeNotNull($first)->all());
+        $this->assertEquals(['a' => 'a-filled', 'b' => null], (new $collection($aOnly))->mergeNotNull($second)->all());
+        $this->assertEquals(['a' => null, 'b' => 'b-filled'], (new $collection($bNull))->mergeNotNull($first)->all());
+        $this->assertEquals(['a' => 'a-filled', 'b' => null], (new $collection($bNull))->mergeNotNull($second)->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testReplaceNull($collection)
     {
         $c = new $collection(['a', 'b', 'c']);

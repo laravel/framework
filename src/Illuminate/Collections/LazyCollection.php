@@ -780,6 +780,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Merge arrays when the values are not null.
+     *
+     * @param  iterable  ...$arrays
+     * @return array
+     */
+    public function mergeNotNull(...$arrays)
+    {
+        return $this->passthru('mergeNotNull', func_get_args());
+    }
+
+    /**
      * Recursively merge the collection with the given items.
      *
      * @template TMergeRecursiveValue

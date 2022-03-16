@@ -480,6 +480,25 @@ class SupportArrTest extends TestCase
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
     }
 
+    public function testMergeNotNull()
+    {
+        $first = ['a' => null, 'b' => 'b-filled'];
+        $second = ['a' => 'a-filled', 'b' => null];
+        $aOnly = ['a' => 'a-only'];
+        $bNull = ['b' => null];
+
+        $this->assertEquals(['a' => 'a-filled', 'b' => 'b-filled'], Arr::mergeNotNull($first, $second));
+        $this->assertEquals(['a' => 'a-filled', 'b' => 'b-filled'], Arr::mergeNotNull($second, $first));
+        $this->assertEquals(['a' => 'a-only', 'b' => 'b-filled'], Arr::mergeNotNull($first, $aOnly));
+        $this->assertEquals(['a' => 'a-only', 'b' => null], Arr::mergeNotNull($second, $aOnly));
+        $this->assertEquals(['a' => null, 'b' => 'b-filled'], Arr::mergeNotNull($first, $bNull));
+        $this->assertEquals(['a' => 'a-filled', 'b' => null], Arr::mergeNotNull($second, $bNull));
+        $this->assertEquals(['a' => 'a-only', 'b' => 'b-filled'], Arr::mergeNotNull($aOnly, $first));
+        $this->assertEquals(['a' => 'a-filled', 'b' => null], Arr::mergeNotNull($aOnly, $second));
+        $this->assertEquals(['a' => null, 'b' => 'b-filled'], Arr::mergeNotNull($bNull, $first));
+        $this->assertEquals(['a' => 'a-filled', 'b' => null], Arr::mergeNotNull($bNull, $second));
+    }
+
     public function testPluck()
     {
         $data = [
