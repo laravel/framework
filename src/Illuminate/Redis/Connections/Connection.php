@@ -135,10 +135,10 @@ abstract class Connection
             $result = $this->client->{$method}(...$parameters);
         } catch (\RedisException $e) {
             // If there is a RedisException, this connection is no longer usable.
-            // Mark the connection as shouldReconnect, and return an empty array.
+            // Mark the connection as shouldReconnect, and re-throw the Exception
             $this->shouldReconnect = true;
 
-            return [];
+            throw $e;
         }
 
         $time = round((microtime(true) - $start) * 1000, 2);
