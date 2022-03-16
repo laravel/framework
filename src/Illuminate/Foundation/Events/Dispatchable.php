@@ -7,6 +7,7 @@ trait Dispatchable
     /**
      * Dispatch the event with the given arguments.
      *
+     * @param  mixed  ...$arguments
      * @return void
      */
     public static function dispatch(...$arguments)
