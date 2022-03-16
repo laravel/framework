@@ -1275,6 +1275,21 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMergeUnshift($collection)
+    {
+        $c = new $collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello'], $c->mergeUnshift(null)->all());
+
+        $c = new $collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->mergeUnshift(['id' => 1])->all());
+
+        $c = new $collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->mergeUnshift(new $collection(['name' => 'World', 'id' => 1]))->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testReplaceNull($collection)
     {
         $c = new $collection(['a', 'b', 'c']);

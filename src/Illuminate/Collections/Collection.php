@@ -806,6 +806,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Merge the given items with the collection.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeUnshift($items)
+    {
+        return new static(array_merge($this->getArrayableItems($items), $this->items));
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @template TCombineValue

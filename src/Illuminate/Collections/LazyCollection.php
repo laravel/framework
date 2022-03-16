@@ -793,6 +793,17 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Merge the given items with the collection.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
+     * @return static
+     */
+    public function mergeUnshift($items)
+    {
+        return $this->passthru('mergeUnshift', func_get_args());
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @template TCombineValue
