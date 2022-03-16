@@ -155,9 +155,10 @@ interface Container extends ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @template T
+     * @param  class-string<T>  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return T
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
