@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
 {
@@ -40,7 +41,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
     /** @test */
     public function it_cannot_send_forgot_password_email()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
+        $this->expectException(RouteNotFoundException::class);
         $this->expectExceptionMessage('Route [password.reset] not defined.');
 
         Notification::fake();
@@ -95,7 +96,7 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
     /** @test */
     public function it_cannot_send_forgot_password_email_via_to_mail_using_without_default_route()
     {
-        $this->expectException('Symfony\Component\Routing\Exception\RouteNotFoundException');
+        $this->expectException(RouteNotFoundException::class);
         $this->expectExceptionMessage('Route [password.reset] not defined.');
 
         Notification::fake();
