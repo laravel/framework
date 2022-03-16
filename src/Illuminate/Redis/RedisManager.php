@@ -84,11 +84,19 @@ class RedisManager implements Factory
         $name = $name ?: 'default';
 
         if (isset($this->connections[$name])) {
-            return $this->connections[$name];
+            // If the connection has had a fatal socket error, the \Redis object
+            // in this connection is no longer valid, and needs to be destroyed
+            // and recreated.
+            if (!$this->connections[$name]->shouldReconnect) {
+                return $this->connections[$name];
+            }
+            // Unset and destroy the Connection object to ensure it's cleaned up.
+            unset($this->connections[$name]);
         }
 
         return $this->connections[$name] = $this->configure(
-            $this->resolve($name), $name
+            $this->resolve($name),
+            $name
         );
     }
 
@@ -109,7 +117,7 @@ class RedisManager implements Factory
         if (isset($this->config[$name])) {
             return $this->connector()->connect(
                 $this->parseConnectionConfiguration($this->config[$name]),
-                array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.'.$name, Arr::get($options, 'parameters', []))])
+                array_merge(Arr::except($options, 'parameters'), ['parameters' => Arr::get($options, 'parameters.' . $name, Arr::get($options, 'parameters', []))])
             );
         }
 
@@ -169,8 +177,8 @@ class RedisManager implements Factory
         }
 
         return match ($this->driver) {
-            'predis' => new PredisConnector,
-            'phpredis' => new PhpRedisConnector,
+            'predis' => new PredisConnector(),
+            'phpredis' => new PhpRedisConnector(),
             default => null,
         };
     }
@@ -183,7 +191,7 @@ class RedisManager implements Factory
      */
     protected function parseConnectionConfiguration($config)
     {
-        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
+        $parsed = (new ConfigurationUrlParser())->parseConfiguration($config);
 
         $driver = strtolower($parsed['driver'] ?? '');
 

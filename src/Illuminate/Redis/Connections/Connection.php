@@ -36,6 +36,13 @@ abstract class Connection
      */
     protected $events;
 
+     /**
+     * Indicates if the connection is invalid and needs to reconnect
+     *
+     * @var bool
+     */
+    public $shouldReconnect = false;
+
     /**
      * Subscribe to a set of given channels for messages.
      *
@@ -108,12 +115,29 @@ abstract class Connection
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     * @throws \Exception Throws an exception if this connection should not be used
      */
     public function command($method, array $parameters = [])
     {
+        if ($this->shouldReconnect) {
+            // shouldReconnect is checked by RedisManager before returning this connection.
+            // If this exception is triggered, it means some other codepath is using this
+            // which should also be made aware of the public bool shouldReconnect.
+
+            // Basically - if you see this, this is a bug in whatever is NOT using RedisManager
+            // to get Redis objects.
+            throw new \Exception("The Redis connection " . $this->name . " has been marked as failed and needs to be recreated.");
+        }
         $start = microtime(true);
 
-        $result = $this->client->{$method}(...$parameters);
+        try {
+            $result = $this->client->{$method}(...$parameters);
+        } catch (\RedisException $e) {
+            // If there is a RedisException, this connection is no longer usable.
+            // Mark the connection as shouldReconnect, and return an empty array.
+            $this->shouldReconnect = true;
+            return [];
+        }
 
         $time = round((microtime(true) - $start) * 1000, 2);
 
