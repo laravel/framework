@@ -606,6 +606,12 @@ class Arr
      */
     public static function select(&$array, $columns)
     {
+        if (is_string($columns)) {
+            $columns = array($columns);
+        }
+        if (is_null($columns)) {
+            $columns = [];
+        }
         return array_map(fn ($item) => array_intersect_key($item, array_flip($columns)), $array);
     }
 

@@ -5081,7 +5081,26 @@ class SupportCollectionTest extends TestCase
         $c = Collection::make([
         ])->select(['field'])->all();
         $this->assertCount(0, $c);
-        
+
+        $c = Collection::make([
+            ['product' => 'Desk', 'price' => 200, 'active' => true],
+            ['product' => 'Chair', 'price' => 100, 'active' => true],
+            ['product' => 'Door', 'price' => 300, 'active' => false],
+            ['product' => 'Bookcase', 'price' => 150, 'active' => true],
+            ['product' => 'Door', 'price' => 100, 'active' => true],
+        ])->select('product')->all();
+        $this->assertCount(5, $c);
+        $this->assertCount(1, $c[1]);
+   
+        $c = Collection::make([
+            ['product' => 'Desk', 'price' => 200, 'active' => true],
+            ['product' => 'Chair', 'price' => 100, 'active' => true],
+            ['product' => 'Door', 'price' => 300, 'active' => false],
+            ['product' => 'Bookcase', 'price' => 150, 'active' => true],
+            ['product' => 'Door', 'price' => 100, 'active' => true],
+        ])->select(null)->all();
+        $this->assertCount(5, $c);
+        $this->assertCount(0, $c[1]);
 
     }
 
