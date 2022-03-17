@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Cache;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Exception\AwsException;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -64,6 +65,14 @@ class DynamoDbStoreTest extends TestCase
         Cache::driver('dynamodb')->lock('lock', 10)->get(function () {
             $this->assertFalse(Cache::driver('dynamodb')->lock('lock', 10)->get());
         });
+    }
+
+    public function testItCanRememberAnItemForever()
+    {
+        $cache = Cache::driver('dynamodb');
+        $cache->forever('name', 'Taylor');
+        Carbon::setTestNow(now()->addYears(1000));
+        $this->assertSame('Taylor', $cache->get('name'));
     }
 
     /**

@@ -192,21 +192,34 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function put($key, $value, $seconds)
     {
+        return $this->putItem($key, $value, $this->toTimestamp($seconds));
+    }
+
+    /**
+     * Put an item in dynamo with an optional expires at value
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int|null  $expiresAt
+     * @return bool
+     */
+    private function putItem(string $key, mixed $value, ?int $expiresAt = null)
+    {
         $this->dynamo->putItem([
             'TableName' => $this->table,
-            'Item' => [
+            'Item' => array_merge([
                 $this->keyAttribute => [
                     'S' => $this->prefix.$key,
                 ],
                 $this->valueAttribute => [
                     $this->type($value) => $this->serialize($value),
-                ],
+                ]
+            ], $expiresAt !== null ? [
                 $this->expirationAttribute => [
-                    'N' => (string) $this->toTimestamp($seconds),
-                ],
-            ],
+                    'N' => (string) $expiresAt,
+                ]
+            ] : [])
         ]);
-
         return true;
     }
 
@@ -391,7 +404,7 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, Carbon::now()->addYears(5)->getTimestamp());
+        return $this->putItem($key, $value);
     }
 
     /**
