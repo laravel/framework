@@ -5091,7 +5091,7 @@ class SupportCollectionTest extends TestCase
         ])->select('product')->all();
         $this->assertCount(5, $c);
         $this->assertCount(1, $c[1]);
-   
+
         $c = Collection::make([
             ['product' => 'Desk', 'price' => 200, 'active' => true],
             ['product' => 'Chair', 'price' => 100, 'active' => true],
@@ -5101,11 +5101,7 @@ class SupportCollectionTest extends TestCase
         ])->select(null)->all();
         $this->assertCount(5, $c);
         $this->assertCount(0, $c[1]);
-
     }
-
-
-
 }
 
 class TestSupportCollectionHigherOrderItem
