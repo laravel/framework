@@ -52,6 +52,7 @@ class ScheduleListCommand extends Command
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
             $command = $event->command;
+            $description = $event->description;
 
             if (! $this->output->isVerbose()) {
                 $command = str_replace(
@@ -62,7 +63,12 @@ class ScheduleListCommand extends Command
             }
 
             if ($event instanceof CallbackEvent) {
-                $command = 'Closure at: '.$this->getClosureLocation($event);
+                if (class_exists($event->description)) {
+                    $command = $event->description;
+                    $description = '';
+                } else {
+                    $command = 'Closure at: '.$this->getClosureLocation($event);
+                }
             }
 
             $command = mb_strlen($command) > 1 ? "{$command} " : '';
@@ -95,11 +101,11 @@ class ScheduleListCommand extends Command
                 $hasMutex,
                 $nextDueDateLabel,
                 $nextDueDate
-            ), $this->output->isVerbose() && mb_strlen($event->description) > 1 ? sprintf(
+            ), $this->output->isVerbose() && mb_strlen($description) > 1 ? sprintf(
                 '  <fg=#6C7280>%s%s %s</>',
                 str_repeat(' ', mb_strlen($expression) + 2),
                 '⇁',
-                $event->description
+                $description
             ) : ''];
         });
 

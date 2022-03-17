@@ -26,6 +26,7 @@ class ScheduleListCommandTest extends TestCase
         $this->schedule->command(FooCommand::class)->quarterly();
         $this->schedule->command('inspire')->twiceDaily(14, 18);
         $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
+        $this->schedule->job(FooJob::class)->everyMinute();
 
         $this->schedule->call(fn () => '')->everyMinute();
         $closureLineNumber = __LINE__ - 1;
@@ -36,6 +37,7 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  0 0     1 1-12/3 *  php artisan foo:command .... Next Due: 3 months from now')
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
     }
 
@@ -64,4 +66,8 @@ class FooCommand extends Command
     protected $signature = 'foo:command';
 
     protected $description = 'This is the description of the command.';
+}
+
+class FooJob
+{
 }
