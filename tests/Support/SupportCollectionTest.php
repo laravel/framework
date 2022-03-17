@@ -1715,6 +1715,10 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('a', (new $collection(['a']))->join(', ', ' and '));
 
         $this->assertSame('', (new $collection([]))->join(', ', ' and '));
+
+        $this->assertSame('a1b1c2d', (new $collection(['a', 'b', 'c', 'd']))->join(1, 2));
+
+        $this->assertSame('a3.4b3.4c2.9d', (new $collection(['a', 'b', 'c', 'd']))->join(3.4, 2.9));
     }
 
     /**
@@ -2156,6 +2160,10 @@ class SupportCollectionTest extends TestCase
         $data = new $collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('taylor-foodayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email']));
         $this->assertSame('taylor-foo,dayle-bar', $data->implode(fn ($user) => $user['name'].'-'.$user['email'], ','));
+
+        $data = new $collection(['taylor', 'dayle']);
+        $this->assertSame('taylor8dayle', $data->implode(8));
+        $this->assertSame('taylor2.3dayle', $data->implode(2.3));
     }
 
     /**
