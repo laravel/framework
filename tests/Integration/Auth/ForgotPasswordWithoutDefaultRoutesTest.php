@@ -123,4 +123,40 @@ class ForgotPasswordWithoutDefaultRoutesTest extends TestCase
             }
         );
     }
+
+    /** @test */
+    public function it_can_send_forgot_password_email_via_to_mail_using_and_custom_reset_url()
+    {
+        Notification::fake();
+
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+            return route('custom.password.reset', $token);
+        });
+
+        ResetPassword::toMailUsing(function ($notifiable, $token) {
+            return (new MailMessage)
+                ->subject(__('Reset Password Notification'))
+                ->line(__('You are receiving this email because we received a password reset request for your account.'))
+                ->action(__('Reset Password'), ResetPassword::resetUrl($notifiable, $token))
+                ->line(__('If you did not request a password reset, no further action is required.'));
+        });
+
+        UserFactory::new()->create();
+
+        $user = AuthenticationTestUser::first();
+
+        Password::broker()->sendResetLink([
+            'email' => $user->email,
+        ]);
+
+        Notification::assertSentTo(
+            $user,
+            function (ResetPassword $notification, $channels) use ($user) {
+                $message = $notification->toMail($user);
+
+                return ! is_null($notification->token)
+                    && $message->actionUrl === route('custom.password.reset', ['token' => $notification->token]);
+            }
+        );
+    }
 }

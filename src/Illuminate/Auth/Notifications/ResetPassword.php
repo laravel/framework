@@ -63,7 +63,7 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        return $this->buildMailMessage($this->resetUrl($notifiable));
+        return $this->buildMailMessage(static::resetUrl($notifiable, $this->token));
     }
 
     /**
@@ -86,16 +86,17 @@ class ResetPassword extends Notification
      * Get the reset URL for the given notifiable.
      *
      * @param  mixed  $notifiable
+     * @param  string  $token
      * @return string
      */
-    protected function resetUrl($notifiable)
+    public static function resetUrl($notifiable, $token)
     {
         if (static::$createUrlCallback) {
-            return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
+            return call_user_func(static::$createUrlCallback, $notifiable, $token);
         }
 
         return url(route('password.reset', [
-            'token' => $this->token,
+            'token' => $token,
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
     }
