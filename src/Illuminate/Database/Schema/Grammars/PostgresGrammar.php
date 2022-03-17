@@ -272,7 +272,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table "'.implode('","', $tables).'" cascade';
+        return 'drop table '.implode(',', $this->escapeObjectReferences($tables)).' cascade';
     }
 
     /**
@@ -283,7 +283,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view "'.implode('","', $views).'" cascade';
+        return 'drop view '.implode(',', $this->escapeObjectReferences($views)).' cascade';
     }
 
     /**
@@ -294,7 +294,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTypes($types)
     {
-        return 'drop type "'.implode('","', $types).'" cascade';
+        return 'drop type '.implode(',', $this->escapeObjectReferences($types)).' cascade';
     }
 
     /**
@@ -305,7 +305,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileGetAllTables($searchPath)
     {
-        return "select tablename from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
+        return "select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**
@@ -316,7 +316,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileGetAllViews($searchPath)
     {
-        return "select viewname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
+        return "select viewname, schemaname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**
@@ -1069,5 +1069,32 @@ class PostgresGrammar extends Grammar
         if ($column->storedAs !== null) {
             return " generated always as ({$column->storedAs}) stored";
         }
+    }
+
+    /**
+     * Escape database object references consitently, schema-qualified or not.
+     *
+     * @param  array  $objects
+     * @return array
+     */
+    public function escapeObjectReferences(array $objects): array
+    {
+        $escapedObjects = [];
+
+        foreach ($objects as $object) {
+            $parts = explode('.', $object);
+
+            $newParts = [];
+
+            array_walk($parts, function (&$part) use (&$newParts) {
+                $part = str_replace(['"', "'"], '', $part);
+
+                $newParts[] = $part;
+            });
+
+            $escapedObjects[] = '"'.implode('"."', $parts).'"';
+        }
+
+        return $escapedObjects;
     }
 }

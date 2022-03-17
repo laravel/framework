@@ -64,12 +64,14 @@ class PostgresBuilder extends Builder
 
         $excludedTables = $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys'];
 
+        $excludedTables = $this->grammar->escapeObjectReferences($excludedTables);
+
         foreach ($this->getAllTables() as $row) {
             $row = (array) $row;
 
-            $table = reset($row);
+            $table = '"'.$row['schemaname'].'"."'.$row['tablename'].'"';
 
-            if (! in_array($table, $excludedTables)) {
+            if (! in_array('"'.$row['tablename'].'"', $excludedTables) && ! in_array($table, $excludedTables)) {
                 $tables[] = $table;
             }
         }
@@ -95,7 +97,7 @@ class PostgresBuilder extends Builder
         foreach ($this->getAllViews() as $row) {
             $row = (array) $row;
 
-            $views[] = reset($row);
+            $views[] = '"'.$row['schemaname'].'"."'.$row['viewname'].'"';
         }
 
         if (empty($views)) {

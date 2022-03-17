@@ -238,10 +238,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileGetAllTables')->with(['public'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('public')");
-        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('public')")->andReturn(['users']);
-        $grammar->shouldReceive('compileDropAllTables')->with(['users'])->andReturn('drop table "'.implode('","', ['users']).'" cascade');
-        $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users']).'" cascade');
+        $grammar->shouldReceive('compileGetAllTables')->with(['public'])->andReturn("select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('public')");
+        $connection->shouldReceive('select')->with("select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('public')")->andReturn([['schemaname' => 'public', 'tablename' => 'users']]);
+        $grammar->shouldReceive('escapeObjectReferences')->with(['foo'])->andReturn(['"foo"']);
+        $grammar->shouldReceive('compileDropAllTables')->with(['"public"."users"'])->andReturn('drop table "public"."users" cascade');
+        $connection->shouldReceive('statement')->with('drop table "public"."users" cascade');
         $builder = $this->getBuilder($connection);
 
         $builder->dropAllTables();
@@ -255,10 +256,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'public', 'foo_bar-Baz.Áüõß'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public','foo_bar-Baz.Áüõß')");
-        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','public','foo_bar-Baz.Áüõß')")->andReturn(['users', 'users']);
-        $grammar->shouldReceive('compileDropAllTables')->with(['users', 'users'])->andReturn('drop table "'.implode('","', ['users', 'users']).'" cascade');
-        $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users', 'users']).'" cascade');
+        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'public', 'foo_bar-Baz.Áüõß'])->andReturn("select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('foouser','public','foo_bar-Baz.Áüõß')");
+        $connection->shouldReceive('select')->with("select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('foouser','public','foo_bar-Baz.Áüõß')")->andReturn([['schemaname' => 'users', 'tablename' => 'users']]);
+        $grammar->shouldReceive('escapeObjectReferences')->with(['foo'])->andReturn(['"foo"']);
+        $grammar->shouldReceive('compileDropAllTables')->with(['"users"."users"'])->andReturn('drop table "users"."users" cascade');
+        $connection->shouldReceive('statement')->with('drop table "users"."users" cascade');
         $builder = $this->getBuilder($connection);
 
         $builder->dropAllTables();
@@ -277,10 +279,11 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('dont_drop')->andReturn(['foo']);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'dev', 'test', 'spaced schema'])->andReturn("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','dev','test','spaced schema')");
-        $connection->shouldReceive('select')->with("select tablename from pg_catalog.pg_tables where schemaname in ('foouser','dev','test','spaced schema')")->andReturn(['users', 'users']);
-        $grammar->shouldReceive('compileDropAllTables')->with(['users', 'users'])->andReturn('drop table "'.implode('","', ['users', 'users']).'" cascade');
-        $connection->shouldReceive('statement')->with('drop table "'.implode('","', ['users', 'users']).'" cascade');
+        $grammar->shouldReceive('compileGetAllTables')->with(['foouser', 'dev', 'test', 'spaced schema'])->andReturn("select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('foouser','dev','test','spaced schema')");
+        $connection->shouldReceive('select')->with("select tablename, schemaname from pg_catalog.pg_tables where schemaname in ('foouser','dev','test','spaced schema')")->andReturn([['schemaname' => 'users', 'tablename' => 'users']]);
+        $grammar->shouldReceive('escapeObjectReferences')->with(['foo'])->andReturn(['"foo"']);
+        $grammar->shouldReceive('compileDropAllTables')->with(['"users"."users"'])->andReturn('drop table "users"."users" cascade');
+        $connection->shouldReceive('statement')->with('drop table "users"."users" cascade');
         $builder = $this->getBuilder($connection);
 
         $builder->dropAllTables();
