@@ -492,7 +492,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([0, 0, 0], Arr::pad([], 3, 0));
         $this->assertEquals([0, 0, 0], Arr::pad([], 3, 0));
         $this->assertEquals([1, 0, 0], Arr::pad([1], 3, 0));
-        $this->assertEquals([0, 0, 1,], Arr::pad([1], -3, 0));
+        $this->assertEquals([0, 0, 1], Arr::pad([1], -3, 0));
     }
 
     public function testPluck()
