@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -51,7 +52,11 @@ class ScheduleTestCommand extends Command
         }
 
         if (! empty($name = $this->option('name'))) {
-            $matches = array_filter($commandNames, fn ($commandName) => Str::endsWith($commandName, $name));
+            $commandBinary = Application::phpBinary().' '.Application::artisanBinary();
+
+            $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
+                 return trim(Str::replace($commandBinary, '', $commandName)) === $name;
+            });
 
             if (count($matches) !== 1) {
                 return $this->error('No matching scheduled command found.');
