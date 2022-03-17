@@ -114,7 +114,7 @@ class ResetPassword extends Notification
     /**
      * Set a callback that should be used when building the notification mail message.
      *
-     * @param  \Closure(mixed, string): (\Illuminate\Notifications\Messages\MailMessage|\Illuminate\Mail\Mailable)  $callback
+     * @param  \Closure(mixed, string): \Illuminate\Notifications\Messages\MailMessage  $callback
      * @return void
      */
     public static function toMailUsing($callback)
