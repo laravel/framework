@@ -220,6 +220,7 @@ class DynamoDbStore implements LockProvider, Store
                 ],
             ] : []),
         ]);
+        
         return true;
     }
 
