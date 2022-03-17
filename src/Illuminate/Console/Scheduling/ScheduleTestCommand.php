@@ -55,7 +55,7 @@ class ScheduleTestCommand extends Command
             $commandBinary = Application::phpBinary().' '.Application::artisanBinary();
 
             $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
-                 return trim(Str::replace($commandBinary, '', $commandName)) === $name;
+                return trim(Str::replace($commandBinary, '', $commandName)) === $name;
             });
 
             if (count($matches) !== 1) {
