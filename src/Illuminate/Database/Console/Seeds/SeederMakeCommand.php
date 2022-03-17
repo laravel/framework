@@ -97,5 +97,4 @@ class SeederMakeCommand extends GeneratorCommand
     {
         return 'Database\Seeders\\';
     }
-
 }
