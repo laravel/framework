@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class ScheduleTestCommand extends Command
 {
@@ -55,7 +54,7 @@ class ScheduleTestCommand extends Command
             $commandBinary = Application::phpBinary().' '.Application::artisanBinary();
 
             $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
-                return trim(Str::replace($commandBinary, '', $commandName)) === $name;
+                return trim(str_replace($commandBinary, '', $commandName)) === $name;
             });
 
             if (count($matches) !== 1) {
