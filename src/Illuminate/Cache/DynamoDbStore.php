@@ -5,13 +5,12 @@ namespace Illuminate\Cache;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
 use Illuminate\Contracts\Cache\LockProvider;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class DynamoDbStore implements LockProvider, Store
+class DynamoDbStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime;
 
