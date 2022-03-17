@@ -1047,6 +1047,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Select and "pick" columns from a bi-dimensional array
+     *
+     * @param  array  $columns
+     * @return static
+     */
+    public function select($columns)
+    {
+        return new static(Arr::select($this->items, $columns));
+    }
+
+    /**
      * Get and remove the first N items from the collection.
      *
      * @param  int  $count

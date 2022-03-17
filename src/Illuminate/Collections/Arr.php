@@ -598,6 +598,18 @@ class Arr
     }
 
     /**
+     * Select and "pick" columns from a bi-dimensional array
+     *
+     * @param  array  $array
+     * @param  array  $columns
+     * @return array
+     */
+    public static function select(&$array, $columns)
+    {
+        return array_map(fn ($item) => array_intersect_key($item, array_flip($columns)), $array);
+    }
+
+    /**
      * Set an array item to a given value using "dot" notation.
      *
      * If no key is given to the method, the entire array will be replaced.
