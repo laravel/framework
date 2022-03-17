@@ -123,6 +123,15 @@ class SupportMessageBagTest extends TestCase
         $this->assertTrue($container->has(null));
     }
 
+    public function testAny(){
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $this->assertFalse($container->any());
+
+        $container->add('foo', 'bar');
+        $this->assertTrue($container->any());
+    }
+
     public function testHasAnyIndicatesExistence()
     {
         $container = new MessageBag;
