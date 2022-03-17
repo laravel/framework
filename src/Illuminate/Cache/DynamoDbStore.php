@@ -196,7 +196,7 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
-     * Put an item in dynamo with an optional expires at value
+     * Put an item in dynamo with an optional expires at value.
      *
      * @param  string  $key
      * @param  mixed  $value
@@ -213,12 +213,12 @@ class DynamoDbStore implements LockProvider, Store
                 ],
                 $this->valueAttribute => [
                     $this->type($value) => $this->serialize($value),
-                ]
+                ],
             ], $expiresAt !== null ? [
                 $this->expirationAttribute => [
                     'N' => (string) $expiresAt,
-                ]
-            ] : [])
+                ],
+            ] : []),
         ]);
         return true;
     }
