@@ -167,6 +167,8 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists([null], 1));
         $this->assertFalse(Arr::exists(['a' => 1], 0));
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
+
+        $this->assertTrue(Arr::exists(['3.4' => 'pi'], 3.4));
     }
 
     public function testWhereNotNull()
@@ -364,6 +366,9 @@ class SupportArrTest extends TestCase
         $this->assertSame('dayle', Arr::get($array, 'names.otherDeveloper', function () {
             return 'dayle';
         }));
+
+        $array = [2 => [5 => 178]];
+        $this->assertEquals(178, Arr::get($array, 2.5));
     }
 
     public function testHas()
@@ -427,6 +432,10 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::has([''], ''));
         $this->assertFalse(Arr::has([], ''));
         $this->assertFalse(Arr::has([], ['']));
+
+        $array = [2 => [5 => 178]];
+        $this->assertTrue(Arr::has($array, 2.5));
+        $this->assertTrue(Arr::has($array, 2));
     }
 
     public function testHasAnyMethod()
@@ -449,6 +458,10 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::hasAny($array, 'foo.baz'));
         $this->assertFalse(Arr::hasAny($array, 'foo.bax'));
         $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
+
+        $array = [1 => 'hAz', 3 => 'baz', 4 => [5 => 'foo']];
+        $this->assertTrue(Arr::hasAny($array, 4.5));
+        $this->assertTrue(Arr::hasAny($array, 1));
     }
 
     public function testIsAssoc()
@@ -482,6 +495,11 @@ class SupportArrTest extends TestCase
         $array = Arr::only($array, ['name', 'price']);
         $this->assertEquals(['name' => 'Desk', 'price' => 100], $array);
         $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
+
+        $array = [1 => 'math', 2 => 'even', 3 => [5 => 'k', 4 => 'pi']];
+        $this->assertEquals([3 => [5 => 'k', 4 => 'pi']], Arr::only($array, 3));
+        $this->assertEquals([1 => 'math'], Arr::only($array, 1));
+        $this->assertEmpty(Arr::only($array, 5));
     }
 
     public function testPluck()
@@ -639,6 +657,16 @@ class SupportArrTest extends TestCase
         $name = Arr::pull($array, 'emails.joe@example.com');
         $this->assertNull($name);
         $this->assertEquals(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
+
+        $array = ['name' => 'Desk', 'price' => 100, 3.4 => 'pi', 3 => [4 => 'foo']];
+        $this->assertEquals('foo', Arr::pull($array, 3.4));
+
+        $array = ['name' => 'Desk', 'price' => 100, 3.4 => 'pi', 3 => [4 => 'foo']];
+        $this->assertEquals([4 => 'foo'], Arr::pull($array, 3));
+
+        //test default value
+        $shippingCost = Arr::pull($array, 'shippingCost', 5.24);
+        $this->assertEquals(5.24, $shippingCost);
     }
 
     public function testQuery()

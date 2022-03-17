@@ -156,7 +156,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
+     * @param  string|int|float  $key
      * @return bool
      */
     public static function exists($array, $key)
@@ -300,7 +300,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
+     * @param  string|int|null|float  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -337,7 +337,7 @@ class Arr
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|array|int|float  $keys
      * @return bool
      */
     public static function has($array, $keys)
@@ -371,7 +371,7 @@ class Arr
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|array|int|float  $keys
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -443,7 +443,7 @@ class Arr
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|string|int  $keys
      * @return array
      */
     public static function only($array, $keys)
@@ -526,7 +526,7 @@ class Arr
      * Get a value from the array, and remove it.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  string|int|float  $key
      * @param  mixed  $default
      * @return mixed
      */
