@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Doctrine\Inflector\Inflector;
+use Illuminate\Support\Pluralizer;
 
 class SupportPluralizerTest extends TestCase
 {
@@ -111,6 +113,16 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
         $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
+    }
+
+    public function testInflectorObjectIsCreatedProperly()
+    {
+        $firstObject = Pluralizer::inflector();
+        $this->assertInstanceOf(Inflector::class, $firstObject);
+
+        $secondObject = Pluralizer::inflector();
+
+        $this->assertTrue($firstObject === $secondObject);
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)
