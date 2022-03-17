@@ -157,7 +157,7 @@ interface Container extends ContainerInterface
      *
      * @template T
      *
-     * @param  class-string<T> $abstract
+     * @param  class-string<T>  $abstract
      * @param  array  $parameters
      * @return T
      *
