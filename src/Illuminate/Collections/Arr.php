@@ -504,6 +504,19 @@ class Arr
     }
 
     /**
+     * Pad an array to the specified length with a value.
+     *
+     * @param  array  $array
+     * @param  int  $length
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function pad($array, $length, $value)
+    {
+        return array_pad($array, $length, $value);
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
