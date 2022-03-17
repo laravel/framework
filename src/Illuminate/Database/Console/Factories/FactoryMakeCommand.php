@@ -74,7 +74,9 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $namespaceModel = $this->option('model')
             ? $this->qualifyModel($this->option('model'))
-            : $this->qualifyModel($this->guessModelName($name));
+            : $this->guessModelName($name);
+
+
 
         $model = class_basename($namespaceModel);
         $namespace = $this->getNamespace($name);
@@ -118,7 +120,7 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function guessModelName($name)
     {
-        if (str_ends_with($name, 'Factory')) {
+        if (Str::endsWith($name, 'Factory')) {
             $name = substr($name, 0, -7);
         }
 
@@ -129,10 +131,10 @@ class FactoryMakeCommand extends GeneratorCommand
         }
 
         if (is_dir(app_path('Models/'))) {
-            return $this->rootNamespace() . 'Models\Model';
+            return $this->laravel->getNamespace() . 'Models\Model';
         }
 
-        return $this->rootNamespace() . 'Model';
+        return $this->laravel->getNamespace() . 'Model';
     }
 
     /**
@@ -148,7 +150,7 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (Str::startsWith($model, $rootNamespace)) {
+        if (Str::startsWith($model, $rootNamespace . '\Models\\')) {
             return $model;
         }
 
