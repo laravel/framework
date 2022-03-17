@@ -536,14 +536,18 @@ trait HasRelationships
      * @param  string|null  $relatedPivotKey
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
+     * @param  string|null  $relation
      * @param  bool  $inverse
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function morphToMany($related, $name, $table = null, $foreignPivotKey = null,
                                 $relatedPivotKey = null, $parentKey = null,
-                                $relatedKey = null, $inverse = false)
+                                $relatedKey = null, $relation = null, $inverse = false)
     {
-        $caller = $this->guessBelongsToManyRelation();
+        // If no relationship name was passed, we will pull backtraces to get the
+        // name of the calling function. We will use that function name as the
+        // title of this relation since that is a great convention to apply.
+        $relation = $relation ?: $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we will make the query
@@ -568,7 +572,7 @@ trait HasRelationships
         return $this->newMorphToMany(
             $instance->newQuery(), $this, $name, $table,
             $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $caller, $inverse
+            $relatedKey ?: $instance->getKeyName(), $relation, $inverse
         );
     }
 
@@ -605,10 +609,11 @@ trait HasRelationships
      * @param  string|null  $relatedPivotKey
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
+     * @param  string|null  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
-                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null)
+                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null)
     {
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
@@ -619,7 +624,7 @@ trait HasRelationships
 
         return $this->morphToMany(
             $related, $name, $table, $foreignPivotKey,
-            $relatedPivotKey, $parentKey, $relatedKey, true
+            $relatedPivotKey, $parentKey, $relatedKey, $relation, true
         );
     }
 
