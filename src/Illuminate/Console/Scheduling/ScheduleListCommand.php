@@ -7,6 +7,8 @@ use DateTimeZone;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use ReflectionClass;
+use ReflectionFunction;
 use Symfony\Component\Console\Terminal;
 
 class ScheduleListCommand extends Command
@@ -50,6 +52,7 @@ class ScheduleListCommand extends Command
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
             $command = $event->command;
+            $description = $event->description;
 
             if (! $this->output->isVerbose()) {
                 $command = str_replace(
@@ -57,6 +60,15 @@ class ScheduleListCommand extends Command
                     preg_replace("#['\"]#", '', Application::artisanBinary()),
                     str_replace(Application::phpBinary(), 'php', $event->command)
                 );
+            }
+
+            if ($event instanceof CallbackEvent) {
+                if (class_exists($event->description)) {
+                    $command = $event->description;
+                    $description = '';
+                } else {
+                    $command = 'Closure at: '.$this->getClosureLocation($event);
+                }
             }
 
             $command = mb_strlen($command) > 1 ? "{$command} " : '';
@@ -89,11 +101,11 @@ class ScheduleListCommand extends Command
                 $hasMutex,
                 $nextDueDateLabel,
                 $nextDueDate
-            ), $this->output->isVerbose() && mb_strlen($event->description) > 1 ? sprintf(
+            ), $this->output->isVerbose() && mb_strlen($description) > 1 ? sprintf(
                 '  <fg=#6C7280>%s%s %s</>',
                 str_repeat(' ', mb_strlen($expression) + 2),
                 '⇁',
-                $event->description
+                $description
             ) : ''];
         });
 
@@ -133,6 +145,25 @@ class ScheduleListCommand extends Command
         return collect($spacing)
             ->map(fn ($length, $index) => $expression[$index] = str_pad($expression[$index], $length))
             ->implode(' ');
+    }
+
+    /**
+     * Get the file and line number for the event closure.
+     *
+     * @param  \Illuminate\Console\Scheduling\CallbackEvent  $event
+     * @return string
+     */
+    private function getClosureLocation(CallbackEvent $event)
+    {
+        $function = new ReflectionFunction(tap((new ReflectionClass($event))->getProperty('callback'))
+                        ->setAccessible(true)
+                        ->getValue($event));
+
+        return sprintf(
+            '%s:%s',
+            str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
+            $function->getStartLine()
+        );
     }
 
     /**

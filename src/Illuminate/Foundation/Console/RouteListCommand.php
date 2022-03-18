@@ -223,13 +223,31 @@ class RouteListCommand extends Command
                   str_contains($route->action['uses'], 'SerializableClosure')) {
             return false;
         } elseif (is_string($route->action['uses'])) {
-            $path = (new ReflectionClass(explode('@', $route->action['uses'])[0]))
+            if ($this->isFrameworkController($route)) {
+                return false;
+            }
+
+            $path = (new ReflectionClass($route->getControllerClass()))
                                 ->getFileName();
         } else {
             return false;
         }
 
         return str_starts_with($path, base_path('vendor'));
+    }
+
+    /**
+     * Determine if the route uses a framework controller.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return bool
+     */
+    protected function isFrameworkController(Route $route)
+    {
+        return in_array($route->getControllerClass(), [
+            '\Illuminate\Routing\RedirectController',
+            '\Illuminate\Routing\ViewController',
+        ], true);
     }
 
     /**

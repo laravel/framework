@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 
 class SeederMakeCommand extends GeneratorCommand
 {
@@ -77,21 +78,22 @@ class SeederMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
+        $name = str_replace('\\', '/', Str::replaceFirst($this->rootNamespace(), '', $name));
+
         if (is_dir($this->laravel->databasePath().'/seeds')) {
             return $this->laravel->databasePath().'/seeds/'.$name.'.php';
-        } else {
-            return $this->laravel->databasePath().'/seeders/'.$name.'.php';
         }
+
+        return $this->laravel->databasePath().'/seeders/'.$name.'.php';
     }
 
     /**
-     * Parse the class name and format according to the root namespace.
+     * Get the root namespace for the class.
      *
-     * @param  string  $name
      * @return string
      */
-    protected function qualifyClass($name)
+    protected function rootNamespace()
     {
-        return $name;
+        return 'Database\Seeders\\';
     }
 }
