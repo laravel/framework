@@ -150,7 +150,7 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (Str::startsWith($model, $rootNamespace . '\Models\\')) {
+        if (Str::startsWith($model, $rootNamespace . 'Models\\')) {
             return $model;
         }
 
