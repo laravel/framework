@@ -143,10 +143,10 @@ class ScheduleListCommand extends Command
      */
     private function formatCronExpression($expression, $spacing)
     {
-        $expression = explode(' ', $expression);
+        $expressions = explode(' ', $expression);
 
         return collect($spacing)
-            ->map(fn ($length, $index) => $expression[$index] = str_pad($expression[$index], $length))
+            ->map(fn ($length, $index) => str_pad($expressions[$index], $length))
             ->implode(' ');
     }
 
