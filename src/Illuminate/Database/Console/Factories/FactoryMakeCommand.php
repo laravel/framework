@@ -59,7 +59,7 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.$stub;
+            : __DIR__ . $stub;
     }
 
     /**
@@ -75,6 +75,8 @@ class FactoryMakeCommand extends GeneratorCommand
         $namespaceModel = $this->option('model')
             ? $this->qualifyModel($this->option('model'))
             : $this->guessModelName($name);
+
+
 
         $model = class_basename($namespaceModel);
         $namespace = $this->getNamespace($name);
@@ -106,7 +108,7 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         $name = (string)Str::of($name)->replaceFirst($this->rootNamespace(), '')->finish('Factory');
 
-        return $this->laravel->databasePath().'/factories/'.str_replace('\\', '/', $name).'.php';
+        return $this->laravel->databasePath() . '/factories/' . str_replace('\\', '/', $name) . '.php';
     }
 
 
@@ -129,10 +131,10 @@ class FactoryMakeCommand extends GeneratorCommand
         }
 
         if (is_dir(app_path('Models/'))) {
-            return $this->laravel->getNamespace().'Models\Model';
+            return $this->laravel->getNamespace() . 'Models\Model';
         }
 
-        return $this->laravel->getNamespace().'Model';
+        return $this->laravel->getNamespace() . 'Model';
     }
 
     /**
@@ -148,13 +150,13 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (Str::startsWith($model, $rootNamespace.'\Models\\')) {
+        if (Str::startsWith($model, $rootNamespace . '\Models\\')) {
             return $model;
         }
 
         return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
+            ? $rootNamespace . 'Models\\' . $model
+            : $rootNamespace . $model;
     }
 
     /**
