@@ -5,6 +5,7 @@ namespace Illuminate\Cache;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Support\Str;
 
 class RedisStore extends TaggableStore implements LockProvider
 {
@@ -320,7 +321,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
+        $this->prefix = ! empty($prefix) ? Str::finish($prefix, ':') : '';
     }
 
     /**
