@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'route:list')]
+#[AsCommand(name: 'route:clear')]
 class RouteClearCommand extends Command
 {
     /**
