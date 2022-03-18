@@ -127,6 +127,8 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models = EloquentStrictLoadingTestModel1::get();
 
         $models[0]->modelTwos;
+
+        Model::handleLazyLoadingViolationUsing(null);
     }
 
     public function testStrictModeWithOverriddenHandlerOnLazyLoading()
@@ -140,6 +142,21 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models = EloquentStrictLoadingTestModel1WithCustomHandler::get();
 
         $models[0]->modelTwos;
+    }
+
+    public function testStrictModeDoesntThrowAnExceptionOnManuallyMadeModel()
+    {
+        $model1 = EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading::make();
+        $model2 = EloquentStrictLoadingTestModel2::make();
+        $model1->modelTwos->push($model2);
+
+        $this->assertInstanceOf(Collection::class, $model1->modelTwos);
+    }
+
+    public function testStrictModeDoesntThrowAnExceptionOnRecentlyCreatedModel()
+    {
+        $model1 = EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading::create();
+        $this->assertInstanceOf(Collection::class, $model1->modelTwos);
     }
 }
 
@@ -169,6 +186,19 @@ class EloquentStrictLoadingTestModel1WithCustomHandler extends Model
     protected function handleLazyLoadingViolation($key)
     {
         throw new \RuntimeException("Violated {$key}");
+    }
+}
+
+class EloquentStrictLoadingTestModel1WithLocalPreventsLazyLoading extends Model
+{
+    public $table = 'test_model1';
+    public $timestamps = false;
+    public $preventsLazyLoading = true;
+    protected $guarded = [];
+
+    public function modelTwos()
+    {
+        return $this->hasMany(EloquentStrictLoadingTestModel2::class, 'model_1_id');
     }
 }
 
