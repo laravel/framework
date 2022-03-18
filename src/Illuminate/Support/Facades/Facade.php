@@ -336,4 +336,18 @@ abstract class Facade
 
         return $instance->$method(...$args);
     }
+
+    /**
+     * Handle dynamic, calls to the object.
+     *
+     * @param  string  $method
+     * @param  array  $args
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function __call($method, $args)
+    {
+        return static::__callStatic($method, $args);
+    }
 }
