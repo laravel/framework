@@ -52,7 +52,7 @@ class ScheduleListCommand extends Command
             return;
         }
 
-        $terminalWidth = $this->getTerminalWidth();
+        $terminalWidth = self::getTerminalWidth();
         $expressionSpacing = $this->getCronExpressionSpacing($events);
 
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing) {
