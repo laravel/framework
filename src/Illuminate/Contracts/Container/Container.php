@@ -113,9 +113,10 @@ interface Container extends ContainerInterface
     /**
      * Register an existing instance as shared in the container.
      *
+     * @template T
      * @param  string  $abstract
-     * @param  mixed  $instance
-     * @return mixed
+     * @param  T  $instance
+     * @return T
      */
     public function instance($abstract, $instance);
 
@@ -155,9 +156,10 @@ interface Container extends ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @template T
+     * @param  class-string<T>  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return T|mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
