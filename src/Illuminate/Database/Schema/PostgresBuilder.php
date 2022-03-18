@@ -239,14 +239,10 @@ class PostgresBuilder extends Builder
      */
     protected function parseSearchPath($searchPath)
     {
-        $searchPath = $this->baseParseSearchPath($searchPath);
-
-        array_walk($searchPath, function (&$schema) {
-            $schema = $schema === '$user'
+        return array_map(function ($schema) {
+            return $schema === '$user'
                 ? $this->connection->getConfig('username')
                 : $schema;
-        });
-
-        return $searchPath;
+        }, $this->baseParseSearchPath($searchPath));
     }
 }
