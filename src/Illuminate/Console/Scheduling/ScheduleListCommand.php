@@ -54,8 +54,9 @@ class ScheduleListCommand extends Command
 
         $terminalWidth = self::getTerminalWidth();
         $expressionSpacing = $this->getCronExpressionSpacing($events);
+        $timezone = new DateTimeZone($this->option('timezone') ?? config('app.timezone'));
 
-        $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing) {
+        $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
             $expression = $this->formatCronExpression($event->expression, $expressionSpacing);
 
             $command = $event->command;
@@ -83,7 +84,7 @@ class ScheduleListCommand extends Command
 
             $nextDueDate = Carbon::create((new CronExpression($event->expression))
                 ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
-                ->setTimezone(new DateTimeZone($this->option('timezone') ?? config('app.timezone')))
+                ->setTimezone($timezone)
             );
 
             $nextDueDate = $this->output->isVerbose()
