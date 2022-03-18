@@ -6,7 +6,9 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'make:mail')]
 class MailMakeCommand extends GeneratorCommand
 {
     use CreatesMatchingTest;
@@ -24,6 +26,7 @@ class MailMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     * @deprecated
      */
     protected static $defaultName = 'make:mail';
 
