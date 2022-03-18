@@ -12,9 +12,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
 
+#[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
 {
     /**
@@ -30,6 +32,8 @@ class RouteListCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'route:list';
 

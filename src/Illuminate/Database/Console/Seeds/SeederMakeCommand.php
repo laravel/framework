@@ -4,7 +4,9 @@ namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'make:seeder')]
 class SeederMakeCommand extends GeneratorCommand
 {
     /**
@@ -20,6 +22,8 @@ class SeederMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'make:seeder';
 

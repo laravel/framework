@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeDisabled;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'up')]
 class UpCommand extends Command
 {
     /**
@@ -21,6 +23,8 @@ class UpCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'up';
 

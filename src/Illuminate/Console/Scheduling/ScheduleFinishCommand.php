@@ -5,7 +5,9 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledBackgroundTaskFinished;
 use Illuminate\Contracts\Events\Dispatcher;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'schedule:finish')]
 class ScheduleFinishCommand extends Command
 {
     /**
@@ -21,6 +23,8 @@ class ScheduleFinishCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'schedule:finish';
 
