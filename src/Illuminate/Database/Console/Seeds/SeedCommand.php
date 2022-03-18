@@ -6,9 +6,9 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:seed')]
 class SeedCommand extends Command
@@ -28,6 +28,7 @@ class SeedCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
      * @deprecated
      */
     protected static $defaultName = 'db:seed';

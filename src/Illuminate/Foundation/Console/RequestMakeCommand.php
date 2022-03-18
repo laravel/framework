@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'make:request')]
@@ -22,6 +21,7 @@ class RequestMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
      * @deprecated
      */
     protected static $defaultName = 'make:request';

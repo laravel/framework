@@ -5,8 +5,8 @@ namespace Illuminate\Routing\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use InvalidArgumentException;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:controller')]
 class ControllerMakeCommand extends GeneratorCommand
@@ -26,6 +26,7 @@ class ControllerMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
      * @deprecated
      */
     protected static $defaultName = 'make:controller';

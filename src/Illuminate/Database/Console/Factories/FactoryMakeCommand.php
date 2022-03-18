@@ -4,8 +4,8 @@ namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:factory')]
 class FactoryMakeCommand extends GeneratorCommand
@@ -23,6 +23,7 @@ class FactoryMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
      * @deprecated
      */
     protected static $defaultName = 'make:factory';

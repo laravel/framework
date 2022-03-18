@@ -4,9 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'make:command')]
 class ConsoleMakeCommand extends GeneratorCommand
@@ -26,6 +26,7 @@ class ConsoleMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
      * @deprecated
      */
     protected static $defaultName = 'make:command';

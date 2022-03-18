@@ -4,10 +4,10 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'serve')]
 class ServeCommand extends Command
@@ -25,6 +25,7 @@ class ServeCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
      * @deprecated
      */
     protected static $defaultName = 'serve';
