@@ -107,6 +107,7 @@ if (! function_exists('app')) {
      * Get the available container instance.
      *
      * @template T
+     *
      * @param  class-string<T>|mixed  $abstract
      * @param  array  $parameters
      * @return mixed|T|\Illuminate\Contracts\Foundation\Application

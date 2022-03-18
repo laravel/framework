@@ -830,6 +830,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Resolve the given type from the container.
      *
      * @template T
+     *
      * @param  class-string<T>  $abstract
      * @param  array  $parameters
      * @return T|mixed

@@ -114,6 +114,7 @@ interface Container extends ContainerInterface
      * Register an existing instance as shared in the container.
      *
      * @template T
+     *
      * @param  string  $abstract
      * @param  T  $instance
      * @return T
@@ -157,6 +158,7 @@ interface Container extends ContainerInterface
      * Resolve the given type from the container.
      *
      * @template T
+     *
      * @param  class-string<T>  $abstract
      * @param  array  $parameters
      * @return T|mixed

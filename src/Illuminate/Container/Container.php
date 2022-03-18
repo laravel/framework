@@ -462,6 +462,7 @@ class Container implements ArrayAccess, ContainerContract
      * Register an existing instance as shared in the container.
      *
      * @template T
+     *
      * @param  string  $abstract
      * @param  T  $instance
      * @return T
@@ -685,6 +686,7 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve the given type from the container.
      *
      * @template T
+     *
      * @param  class-string<T>  $abstract
      * @param  array  $parameters
      * @return T|mixed
