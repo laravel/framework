@@ -2247,9 +2247,10 @@ class Builder implements BuilderContract
      *
      * @param array $columns
      * @param string $direction
+     * @param string|null $as
      * @return $this
      */
-    public function orderByConcat(array $columns, $direction = 'asc')
+    public function orderByConcat(array $columns, $direction = 'asc', $as = null)
     {
         if (empty($columns)) {
             return $this;
@@ -2259,7 +2260,7 @@ class Builder implements BuilderContract
             $this->select([$this->from.'.*']);
         }
 
-        $alias ??= Str::snake(implode(' ', $columns));
+        $alias = $as ?: Str::snake(implode(' ', $columns));
 
         $this->addSelect(new Expression('CONCAT('.implode(',', $columns).') as '.$alias));
 
