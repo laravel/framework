@@ -74,7 +74,7 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        if (is_null($this->child->{$this->foreignKey})) {
+        if (is_null($this->child->getRawOriginal($this->foreignKey))) {
             return $this->getDefaultFor($this->parent);
         }
 
@@ -94,7 +94,7 @@ class BelongsTo extends Relation
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
 
-            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->{$this->foreignKey});
+            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->getRawOriginal($this->foreignKey));
         }
     }
 
@@ -337,7 +337,7 @@ class BelongsTo extends Relation
      */
     public function getParentKey()
     {
-        return $this->child->{$this->foreignKey};
+        return $this->child->getRawOriginal($this->foreignKey);
     }
 
     /**
