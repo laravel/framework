@@ -2243,6 +2243,30 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add "order by" with field concatenation clause to the query.
+     *
+     * @param array $columns
+     * @param string $direction
+     * @return $this
+     */
+    public function orderByConcat(array $columns, $direction = 'asc')
+    {
+        if (empty($columns)) {
+            return $this;
+        }
+
+        if (is_null($this->columns)) {
+            $this->select([$this->from.'.*']);
+        }
+
+        $alias ??= Str::snake(implode(' ', $columns));
+
+        $this->addSelect(new Expression('CONCAT('.implode(',', $columns).') as '.$alias));
+
+        return $this->orderBy($alias, $direction);
+    }
+
+    /**
      * Alias to set the "offset" value of the query.
      *
      * @param  int  $value
