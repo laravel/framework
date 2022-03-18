@@ -65,7 +65,7 @@ class ScheduleListCommand extends Command
             if (! $this->output->isVerbose()) {
                 $command = str_replace([Application::phpBinary(), Application::artisanBinary()], [
                     'php',
-                    preg_replace("#['\"]#", '', Application::artisanBinary())
+                    preg_replace("#['\"]#", '', Application::artisanBinary()),
                 ], $event->command);
             }
 
