@@ -461,11 +461,9 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register an existing instance as shared in the container.
      *
-     * @template T
-     *
      * @param  string  $abstract
-     * @param  T  $instance
-     * @return T
+     * @param  mixed  $instance
+     * @return mixed
      */
     public function instance($abstract, $instance)
     {
@@ -685,11 +683,9 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve the given type from the container.
      *
-     * @template T
-     *
-     * @param  class-string<T>  $abstract
+     * @param  string|callable  $abstract
      * @param  array  $parameters
-     * @return T|mixed
+     * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
