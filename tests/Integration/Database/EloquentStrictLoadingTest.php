@@ -127,6 +127,8 @@ class EloquentStrictLoadingTest extends DatabaseTestCase
         $models = EloquentStrictLoadingTestModel1::get();
 
         $models[0]->modelTwos;
+
+        Model::handleLazyLoadingViolationUsing(null);
     }
 
     public function testStrictModeWithOverriddenHandlerOnLazyLoading()
