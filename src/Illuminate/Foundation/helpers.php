@@ -106,11 +106,9 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @template T
-     *
-     * @param  class-string<T>|mixed  $abstract
+     * @param  string|null  $abstract
      * @param  array  $parameters
-     * @return mixed|T|\Illuminate\Contracts\Foundation\Application
+     * @return mixed|\Illuminate\Contracts\Foundation\Application
      */
     function app($abstract = null, array $parameters = [])
     {
