@@ -53,7 +53,9 @@ class ScheduleListCommand extends Command
         }
 
         $terminalWidth = self::getTerminalWidth();
+
         $expressionSpacing = $this->getCronExpressionSpacing($events);
+
         $timezone = new DateTimeZone($this->option('timezone') ?? config('app.timezone'));
 
         $events = $events->map(function ($event) use ($terminalWidth, $expressionSpacing, $timezone) {
