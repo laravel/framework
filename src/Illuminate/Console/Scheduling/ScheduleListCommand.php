@@ -45,6 +45,13 @@ class ScheduleListCommand extends Command
     public function handle(Schedule $schedule)
     {
         $events = collect($schedule->events());
+
+        if ($events->isEmpty()) {
+            $this->comment('No scheduled tasks have been defined.');
+
+            return;
+        }
+
         $terminalWidth = $this->getTerminalWidth();
         $expressionSpacing = $this->getCronExpressionSpacing($events);
 
@@ -108,10 +115,6 @@ class ScheduleListCommand extends Command
                 $description
             ) : ''];
         });
-
-        if ($events->isEmpty()) {
-            return $this->comment('No scheduled tasks have been defined.');
-        }
 
         $this->output->writeln(
             $events->flatten()->filter()->prepend('')->push('')->toArray()
