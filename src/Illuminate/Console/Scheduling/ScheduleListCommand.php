@@ -116,7 +116,7 @@ class ScheduleListCommand extends Command
             ) : ''];
         });
 
-        $this->output->writeln(
+        $this->line(
             $events->flatten()->filter()->prepend('')->push('')->toArray()
         );
     }
