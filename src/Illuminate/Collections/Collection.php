@@ -1049,7 +1049,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Select and "pick" columns from a bi-dimensional array.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return static
      */
     public function select($columns)

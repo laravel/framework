@@ -601,14 +601,14 @@ class Arr
      * Select and "pick" columns from a bi-dimensional array.
      *
      * @param  array  $array
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return array
      */
     public static function select(&$array, $columns)
     {
-        $columns = (array) $columns;
+        $columns = static::wrap($columns);
 
-        return array_map(fn ($item) => array_intersect_key($item, array_flip($columns)), $array);
+        return array_map(fn ($item) => static::only($item, $columns), $array);
     }
 
     /**
