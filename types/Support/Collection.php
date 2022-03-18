@@ -687,6 +687,8 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->reverse());
 //    return true;
 // }));
 
+assertType('Illuminate\Support\Collection<int, array>', $collection::make([["code"=>1, "number"=>101], ["code"=>2, "number"=>102]])->select(["code"]));
+
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->shuffle());
 assertType('Illuminate\Support\Collection<int, User>', $collection->shuffle());
 
