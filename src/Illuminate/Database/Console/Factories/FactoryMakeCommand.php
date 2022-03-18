@@ -76,8 +76,6 @@ class FactoryMakeCommand extends GeneratorCommand
             ? $this->qualifyModel($this->option('model'))
             : $this->guessModelName($name);
 
-
-
         $model = class_basename($namespaceModel);
         $namespace = $this->getNamespace($name);
 
