@@ -71,6 +71,36 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $post->children->first()->refresh();
     }
+
+    public function testItUnsetsRelations()
+    {
+        Schema::create('post_children', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->bigInteger('parent_id')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        $parent = Post::create(['title' => 'parent']);
+        $child = ChildPost::create(['title' => 'child']);
+
+        $child->parent()->associate($parent)->save();
+
+        $this->assertInstanceOf(
+            Post::class,
+            $child->parent
+        );
+
+        $child->parent()->disassociate($parent)->save();
+        $child->refresh();
+
+        $this->assertArrayNotHasKey(
+            'parent',
+            $child->getRelations(),
+            'The parent relation was not unset by calling refresh()'
+        );
+    }
 }
 
 class Post extends Model
@@ -91,6 +121,16 @@ class Post extends Model
     }
 }
 
+class ChildPost extends Post
+{
+    public $table = 'post_children';
+
+    public function parent()
+    {
+        return $this->belongsTo(static::class, 'parent_id', 'id');
+    }
+}
+
 class AsPivotPost extends Post
 {
     public function children()
@@ -107,3 +147,5 @@ class AsPivotPostPivot extends Model
 
     protected $table = 'post_posts';
 }
+
+
