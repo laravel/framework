@@ -882,6 +882,20 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testHigherOrderCollectionPluck($collection)
+    {
+        $data = new $collection([
+            ['id' => 23, 'title' => 'Foo'],
+            ['id' => 42, 'title' => 'Bar'],
+            ['id' => 1, 'title' => 'One'],
+        ]);
+
+        $this->assertSame([23, 42, 1], $data->pluck->id);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testHigherOrderUnique($collection)
     {
         $c = new $collection([
