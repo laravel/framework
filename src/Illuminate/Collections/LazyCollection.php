@@ -688,12 +688,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the values of a given key.
      *
-     * @param  string|array<array-key, string>  $value
+     * @param  string|array<array-key, string>|callable  $value
      * @param  string|null  $key
      * @return static<int, mixed>
      */
     public function pluck($value, $key = null)
     {
+        if (is_callable($value)) {
+            return $this->map($value);
+        }
+        
         return new static(function () use ($value, $key) {
             [$value, $key] = $this->explodePluckParameters($value, $key);
 
