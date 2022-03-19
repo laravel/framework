@@ -281,9 +281,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function disconnect($name = null)
     {
-        if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()])) {
-            $this->connections[$name]->disconnect();
-        }
+        $this->connections[$name ?? $this->getDefaultConnection()]?->disconnect();
     }
 
     /**
