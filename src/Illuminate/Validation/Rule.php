@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
@@ -37,6 +38,17 @@ class Rule
     public static function dimensions(array $constraints = [])
     {
         return new Dimensions($constraints);
+    }
+
+    /**
+     * Get an enum builder instance.
+     *
+     * @param  string  $type
+     * @return \Illuminate\Validation\Rules\Enum
+     */
+    public static function enum($type)
+    {
+        return new Enum($type);
     }
 
     /**
