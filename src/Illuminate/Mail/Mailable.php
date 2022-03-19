@@ -778,6 +778,17 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the mailable has the given subject.
+     *
+     * @param  string  $subject
+     * @return bool
+     */
+    public function hasSubject($subject)
+    {
+        return $this->subject === $subject;
+    }
+
+    /**
      * Set the Markdown template for the message.
      *
      * @param  string  $view
