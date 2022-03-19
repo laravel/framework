@@ -890,7 +890,7 @@ class SupportCollectionTest extends TestCase
             ['id' => 1, 'title' => 'One'],
         ]);
 
-        $this->assertSame([23, 42, 1], $data->pluck->id);
+        $this->assertSame([23, 42, 1], $data->pluck->id->toArray());
     }
 
     /**
