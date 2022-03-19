@@ -29,9 +29,7 @@ class DiscoverEvents
 
         foreach ($listeners as $listener => $events) {
             foreach ($events as $event) {
-                if (! isset($discoveredEvents[$event])) {
-                    $discoveredEvents[$event] = [];
-                }
+                $discoveredEvents[$event] ??= [];
 
                 $discoveredEvents[$event][] = $listener;
             }

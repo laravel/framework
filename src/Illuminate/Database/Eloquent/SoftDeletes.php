@@ -33,9 +33,7 @@ trait SoftDeletes
      */
     public function initializeSoftDeletes()
     {
-        if (! isset($this->casts[$this->getDeletedAtColumn()])) {
-            $this->casts[$this->getDeletedAtColumn()] = 'datetime';
-        }
+        $this->casts[$this->getDeletedAtColumn()] ??= 'datetime';
     }
 
     /**

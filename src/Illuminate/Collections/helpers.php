@@ -127,9 +127,7 @@ if (! function_exists('data_set')) {
             }
         } elseif (is_object($target)) {
             if ($segments) {
-                if (! isset($target->{$segment})) {
-                    $target->{$segment} = [];
-                }
+                $target->{$segment} ??= [];
 
                 data_set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {

@@ -745,9 +745,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
             $value = reset($pair);
 
-            if (! isset($dictionary[$key])) {
-                $dictionary[$key] = [];
-            }
+            $dictionary[$key] ??= [];
 
             $dictionary[$key][] = $value;
         }

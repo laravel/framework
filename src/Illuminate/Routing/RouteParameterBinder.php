@@ -107,9 +107,7 @@ class RouteParameterBinder
         }
 
         foreach ($this->route->defaults as $key => $value) {
-            if (! isset($parameters[$key])) {
-                $parameters[$key] = $value;
-            }
+            $parameters[$key] ??= $value;
         }
 
         return $parameters;

@@ -371,9 +371,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function json($key = null, $default = null)
     {
-        if (! isset($this->json)) {
-            $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
-        }
+        $this->json ??= new ParameterBag((array) json_decode($this->getContent(), true));
 
         if (is_null($key)) {
             return $this->json;
