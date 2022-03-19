@@ -697,7 +697,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         if (is_callable($value)) {
             return $this->map($value);
         }
-        
+
         return new static(function () use ($value, $key) {
             [$value, $key] = $this->explodePluckParameters($value, $key);
 

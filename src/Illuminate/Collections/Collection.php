@@ -706,7 +706,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         if (is_callable($value)) {
             return $this->map($value);
         }
-        
+
         return new static(Arr::pluck($this->items, $value, $key));
     }
 
