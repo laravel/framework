@@ -492,10 +492,6 @@ class Str
             return $string;
         }
 
-        if (is_null($length) && PHP_MAJOR_VERSION < 8) {
-            $length = mb_strlen($string, $encoding);
-        }
-
         $segment = mb_substr($string, $index, $length, $encoding);
 
         if ($segment === '') {
