@@ -72,7 +72,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  \Closure|string|array  $events
      * @param  \Closure|string|array|null  $listener
-     * @return void
+     * @return void|\Illuminate\Support\Collection
      */
     public function listen($events, $listener = null)
     {
