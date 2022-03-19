@@ -600,6 +600,9 @@ assertType('Illuminate\Support\Collection<int, string>', $collection->make(['str
 assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->mergeRecursive([2 => 'string']));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->mergeRecursive(['string']));
 
+assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->mergeUnshift([2]));
+assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->mergeUnshift(['string']));
+
 assertType('Illuminate\Support\Collection<string, int>', $collection->make(['string' => 'string'])->combine([2]));
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->combine([1]));
 
