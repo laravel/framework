@@ -1047,9 +1047,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function getBindingCallback($key)
     {
-        if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
-            return $this->binders[$key];
-        }
+        return $this->binders[str_replace('-', '_', $key)] ?? null;
     }
 
     /**
