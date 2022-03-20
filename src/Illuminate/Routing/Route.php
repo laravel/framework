@@ -265,11 +265,11 @@ class Route
     /**
      * Get the controller instance for the route.
      *
-     * @return mixed
+     * @return object|null
      */
     public function getController()
     {
-        if (! $this->controller) {
+        if (! $this->controller && $this->isControllerAction()) {
             $class = $this->getControllerClass();
 
             $this->controller = $this->container->make(ltrim($class, '\\'));
