@@ -20,6 +20,32 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to start running at a specific datetime.
+     *
+     * @param DateTime|string $end
+     * @return $this
+     */
+    public function startingAt(DateTime $start)
+    {
+        $start = Carbon::parse($start)->timezone($this->timezone);
+
+        return $this->when(fn () => Carbon::now($this->timezone) >= $start);
+    }
+
+    /**
+     * Schedule the event to stop running at a specific datetime.
+     *
+     * @param DateTime|string $end
+     * @return $this
+     */
+    public function endingAt($end)
+    {
+        $end = Carbon::parse($end)->timezone($this->timezone);
+
+        return $this->when(fn () => Carbon::now($this->timezone) < $end);
+    }
+
+    /**
      * Schedule the event to run between start and end time.
      *
      * @param  string  $startTime

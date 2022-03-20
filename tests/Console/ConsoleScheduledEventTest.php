@@ -91,6 +91,33 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertTrue($event->isDue($app));
     }
 
+    public function testStartingEndingChecks()
+    {
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+
+        Carbon::setTestNow(Carbon::now());
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->startingAt(Carbon::now()->subDay())->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->startingAt(Carbon::now()->subDay()->toDateString())->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->startingAt(Carbon::now()->addDay())->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->endingAt(Carbon::now()->addDay())->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertTrue($event->endingAt(Carbon::now()->addDay()->toDateString())->filtersPass($app));
+
+        $event = new Event(m::mock(EventMutex::class), 'php foo', 'UTC');
+        $this->assertFalse($event->endingAt(Carbon::now()->subDay())->filtersPass($app));
+    }
+
     public function testTimeBetweenChecks()
     {
         $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
