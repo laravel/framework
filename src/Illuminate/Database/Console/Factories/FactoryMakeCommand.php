@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
@@ -128,32 +129,38 @@ class FactoryMakeCommand extends GeneratorCommand
         }
 
         if (is_dir(app_path('Models/'))) {
-            return $this->laravel->getNamespace().'Models\Model';
+            return $this->laravel->getNamespace().'Models\\Model';
         }
 
         return $this->laravel->getNamespace().'Model';
     }
 
     /**
-     * Qualify the given model class base name.
+     * Parse the model name and format according to the root namespace or given namespace.
      *
      * @param  string  $model
      * @return string
      */
     protected function qualifyModel(string $model)
     {
-        $model = ltrim($model, '\\/');
-        $model = str_replace('/', '\\', $model);
-
+        $model = str_replace('/', '\\', ltrim($model, '\\/'));
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (Str::startsWith($model, $rootNamespace.'Models\\')) {
+        // check when full namespace is not given
+        // checking model name is just for app/ and app/Models folders
+        if (class_exists($class = $rootNamespace.'Models\\'.$model) || class_exists($class = $rootNamespace.$model)) {
+            return $class;
+        }
+
+        if (Str::startsWith($rootNamespace.'Models\\', $model)) {
+            return $rootNamespace.'Models\\'.class_basename($model);
+        }
+
+        if (count(explode('\\', $model)) > 1) {
             return $model;
         }
 
-        return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
+        return $rootNamespace.'Models\\'.$model;
     }
 
     /**
