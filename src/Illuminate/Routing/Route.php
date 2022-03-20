@@ -270,9 +270,13 @@ class Route
     public function getController()
     {
         if (! $this->controller) {
-            $class = $this->getControllerClass();
+            if (is_string($this->action['uses'])) {
+                $class = $this->parseControllerCallback()[0];
 
-            $this->controller = $this->container->make(ltrim($class, '\\'));
+                $this->controller = $this->container->make(ltrim($class, '\\'));
+            } elseif (is_a($this->action['uses'], Closure::class)) {
+                $this->controller = $this->action['uses'];
+            }
         }
 
         return $this->controller;
