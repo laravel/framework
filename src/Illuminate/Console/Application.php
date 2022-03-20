@@ -9,9 +9,13 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Console\ClosureCommand;
 use Illuminate\Support\ProcessUtils;
+use ReflectionClass;
+use ReflectionFunction;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+use Symfony\Component\Console\Command\ListCommand as SymfonyListCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -59,6 +63,13 @@ class Application extends SymfonyApplication implements ApplicationContract
      * @var array
      */
     protected $commandMap = [];
+
+    /**
+     * Whether vendor commands should be excluded from the command listing.
+     *
+     * @var bool
+     */
+    protected $shouldExcludeVendor = false;
 
     /**
      * Create a new Artisan console application.
@@ -193,6 +204,22 @@ class Application extends SymfonyApplication implements ApplicationContract
         return $this->run(
             $input, $this->lastOutput = $outputBuffer ?: new BufferedOutput
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getDefaultCommands(): array
+    {
+        $commands = parent::getDefaultCommands();
+
+        $listCommandKey = collect($commands)->search(
+            fn (SymfonyCommand $command) => $command instanceof SymfonyListCommand
+        );
+
+        $commands[$listCommandKey] = new ListCommand();
+
+        return $commands;
     }
 
     /**
@@ -339,5 +366,57 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function getLaravel()
     {
         return $this->laravel;
+    }
+
+    /**
+     * Set whether vendor commands should be excluded from the command listing.
+     * 
+     * @param bool $shouldExcludeVendor
+     * @return $this
+     */
+    public function setShouldExcludeVendor(bool $shouldExcludeVendor)
+    {
+        $this->shouldExcludeVendor = $shouldExcludeVendor;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all(string $namespace = null)
+    {
+        $commands = parent::all($namespace);
+
+        if (! $this->shouldExcludeVendor) {
+            return $commands;
+        }
+
+        return array_filter($commands, function (SymfonyCommand $command) {
+            if (str_starts_with(get_class($command), $this->getLaravel()->getNamespace())) {
+                return true;
+            }
+
+            if ($command instanceof ClosureCommand && ! $this->isVendorClosure($command)) {
+                return true;
+            }   
+
+            return false;
+        });
+    }
+
+    /**
+     * Determine if a ClosureCommand exists within the vendor directory.
+     *
+     * @param ClosureCommand $command
+     * @return bool
+     */
+    protected function isVendorClosure(ClosureCommand $command)
+    {
+        $function = new ReflectionFunction(tap((new ReflectionClass($command))->getProperty('callback'))
+            ->setAccessible(true)
+            ->getvalue($command));
+
+        return str_starts_with($function->getFileName(), $this->getLaravel()->basePath('vendor'));
     }
 }
