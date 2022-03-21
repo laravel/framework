@@ -814,7 +814,7 @@ class Connection implements ConnectionInterface
      *
      * @return void
      */
-    protected function reconnectIfMissingConnection()
+    public function reconnectIfMissingConnection()
     {
         if (is_null($this->pdo)) {
             $this->reconnect();
