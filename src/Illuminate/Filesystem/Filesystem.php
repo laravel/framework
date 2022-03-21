@@ -500,6 +500,20 @@ class Filesystem
     }
 
     /**
+     * Check if both files are the same by comparing their hash.
+     *
+     * @param  string  $file
+     * @param  string  $comparable
+     * @return bool
+     */
+    public function isEqual($file, $comparable)
+    {
+        $hash = @md5_file($file);
+
+        return $hash && $hash === @md5_file($comparable);
+    }
+
+    /**
      * Determine if the given path is a file.
      *
      * @param  string  $file
