@@ -544,7 +544,7 @@ class FilesystemTest extends TestCase
         $this->assertEquals($data, file_get_contents(self::$tempDir.'/text/foo2.txt'));
     }
 
-    public function testIsEqualChecksFileHashes()
+    public function testHasSameHashChecksFileHashes()
     {
         $filesystem = new Filesystem;
 
@@ -553,10 +553,10 @@ class FilesystemTest extends TestCase
         file_put_contents(self::$tempDir.'/text/foo2.txt', 'contents');
         file_put_contents(self::$tempDir.'/text/foo3.txt', 'invalid');
 
-        $this->assertTrue($filesystem->isEqual(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt'));
-        $this->assertFalse($filesystem->isEqual(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo3.txt'));
-        $this->assertFalse($filesystem->isEqual(self::$tempDir.'/text/foo4.txt', self::$tempDir.'/text/foo.txt'));
-        $this->assertFalse($filesystem->isEqual(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo4.txt'));
+        $this->assertTrue($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo2.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo3.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo4.txt', self::$tempDir.'/text/foo.txt'));
+        $this->assertFalse($filesystem->hasSameHash(self::$tempDir.'/text/foo.txt', self::$tempDir.'/text/foo4.txt'));
     }
 
     public function testIsFileChecksFilesProperly()
