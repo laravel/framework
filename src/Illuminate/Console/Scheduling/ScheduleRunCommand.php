@@ -10,10 +10,8 @@ use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Date;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
-#[AsCommand(name: 'schedule:run')]
 class ScheduleRunCommand extends Command
 {
     /**

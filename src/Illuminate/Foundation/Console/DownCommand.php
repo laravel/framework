@@ -7,10 +7,8 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
-#[AsCommand(name: 'down')]
 class DownCommand extends Command
 {
     /**
