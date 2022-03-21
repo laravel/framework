@@ -19,17 +19,6 @@ class PruneFailedJobsCommand extends Command
                 {--hours=24 : The number of hours to retain failed jobs data}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'queue:prune-failed';
-
-    /**
      * The console command description.
      *
      * @var string

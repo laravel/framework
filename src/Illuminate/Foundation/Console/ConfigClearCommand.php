@@ -17,17 +17,6 @@ class ConfigClearCommand extends Command
     protected $name = 'config:clear';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'config:clear';
-
-    /**
      * The console command description.
      *
      * @var string
