@@ -384,10 +384,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling lazy loading violations.
      *
-     * @param  callable  $callback
+     * @param  callable|null  $callback
      * @return void
      */
-    public static function handleLazyLoadingViolationUsing(callable $callback)
+    public static function handleLazyLoadingViolationUsing(?callable $callback)
     {
         static::$lazyLoadingViolationCallback = $callback;
     }
