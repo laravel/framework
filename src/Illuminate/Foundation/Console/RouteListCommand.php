@@ -12,11 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
 
-#[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
 {
     /**
