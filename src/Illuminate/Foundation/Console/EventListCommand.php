@@ -18,17 +18,6 @@ class EventListCommand extends Command
     protected $signature = 'event:list {--event= : Filter the events by name}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'event:list';
-
-    /**
      * The console command description.
      *
      * @var string

@@ -17,17 +17,6 @@ class RouteClearCommand extends Command
     protected $name = 'route:clear';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'route:clear';
-
-    /**
      * The console command description.
      *
      * @var string
