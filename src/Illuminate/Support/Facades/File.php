@@ -15,6 +15,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool deleteDirectory(string $directory, bool $preserve = false)
  * @method static bool exists(string $path)
  * @method static bool isDirectory(string $directory)
+ * @method static bool isEqual(string $file, string $compared)
  * @method static bool isFile(string $file)
  * @method static bool isReadable(string $path)
  * @method static bool isWritable(string $path)
