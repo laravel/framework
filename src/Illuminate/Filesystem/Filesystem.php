@@ -503,14 +503,14 @@ class Filesystem
      * Check if both files are the same by comparing their hash.
      *
      * @param  string  $file
-     * @param  string  $comparable
+     * @param  string  $compared
      * @return bool
      */
-    public function isEqual($file, $comparable)
+    public function isEqual($file, $compared)
     {
         $hash = @md5_file($file);
 
-        return $hash && $hash === @md5_file($comparable);
+        return $hash && $hash === @md5_file($compared);
     }
 
     /**
