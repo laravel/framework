@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
 use JsonSerializable;
+use SplFixedArray;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
@@ -858,6 +859,16 @@ trait EnumeratesValues
     public function collect()
     {
         return new Collection($this->all());
+    }
+
+    /**
+     * Get the collection of items as a fixed array object, using integer keys.
+     *
+     * @return \SplFixedArray<int, mixed>
+     */
+    public function toFixedArray()
+    {
+        return SplFixedArray::fromArray($this->values()->toArray());
     }
 
     /**

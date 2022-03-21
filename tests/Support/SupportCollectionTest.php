@@ -20,6 +20,7 @@ use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use SplFixedArray;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
@@ -633,6 +634,17 @@ class SupportCollectionTest extends TestCase
 
         $this->assertInstanceOf(LazyCollection::class, $lazy);
         $this->assertSame([1, 2, 3, 4, 5], $lazy->all());
+    }
+
+    public function testFixedArrayReturnsSplFixedArray()
+    {
+        $data = new Collection(['foo' => 'bar', 'baz' => 'quz', 'qux' => ['cougar']]);
+
+        $this->assertInstanceOf(SplFixedArray::class, $data->toFixedArray());
+        $this->assertCount(3, $data->toFixedArray());
+        $this->assertSame('bar', $data->toFixedArray()[0]);
+        $this->assertSame('quz', $data->toFixedArray()[1]);
+        $this->assertSame(['cougar'], $data->toFixedArray()[2]);
     }
 
     /**
