@@ -263,6 +263,10 @@ trait HasAttributes
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
+        if ($this->disableAttributeCasting) {
+            return $attributes;
+        }
+
         foreach ($this->getCasts() as $key => $value) {
             if (! array_key_exists($key, $attributes) ||
                 in_array($key, $mutatedAttributes)) {
@@ -692,6 +696,10 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
+        if ($this->disableAttributeCasting) {
+            return $value;
+        }
+
         $castType = $this->getCastType($key);
 
         if (is_null($value) && in_array($castType, static::$primitiveCastTypes)) {

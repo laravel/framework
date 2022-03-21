@@ -119,6 +119,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $escapeWhenCastingToString = false;
 
     /**
+     * Indicates that the object does not make any casting.
+     *
+     * @var bool
+     */
+    public $disableAttributeCasting = false;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -505,6 +512,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $model->mergeCasts($this->casts);
 
+        $model->disableAttributeCasting = $this->disableAttributeCasting;
+
         $model->fill((array) $attributes);
 
         return $model;
@@ -567,6 +576,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public static function all($columns = ['*'])
     {
         return static::query()->get(
+            is_array($columns) ? $columns : func_get_args()
+        );
+    }
+
+    /**
+     * Get all of the models from the database. No checking is done.
+     *
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Collection<int, static>
+     */
+    public static function allWithoutCasting($columns = ['*'])
+    {
+        return static::query()->getWithoutCasting(
             is_array($columns) ? $columns : func_get_args()
         );
     }

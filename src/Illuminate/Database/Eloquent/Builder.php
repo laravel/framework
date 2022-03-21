@@ -48,6 +48,13 @@ class Builder implements BuilderContract
     protected $model;
 
     /**
+     * Indicates that the model does not make any casting.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    protected static $disableModelAttributeCasting = false;
+
+    /**
      * The relationships that should be eager loaded.
      *
      * @var array
@@ -653,6 +660,8 @@ class Builder implements BuilderContract
     {
         $builder = $this->applyScopes();
 
+        $builder->model->disableAttributeCasting = self::$disableModelAttributeCasting;
+
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
         // n+1 query issue for the developers to avoid running a lot of queries.
@@ -661,6 +670,24 @@ class Builder implements BuilderContract
         }
 
         return $builder->getModel()->newCollection($models);
+    }
+
+    /**
+     * Execute the query as a "select" statement.
+     * And disables attribute casting for the models.
+     *
+     * @param  array|string  $columns
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getWithoutCasting($columns = ['*'])
+    {
+        self::$disableModelAttributeCasting = true;
+
+        $get = $this->get($columns);
+
+        self::$disableModelAttributeCasting = false;
+
+        return $get;
     }
 
     /**
