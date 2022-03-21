@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Encryption\Encrypter;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'key:generate')]
 class KeyGenerateCommand extends Command
 {
     use ConfirmableTrait;
@@ -25,6 +27,8 @@ class KeyGenerateCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'key:generate';
 

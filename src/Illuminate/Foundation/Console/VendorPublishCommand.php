@@ -13,7 +13,9 @@ use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\MountManager;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'vendor:publish')]
 class VendorPublishCommand extends Command
 {
     /**
@@ -53,6 +55,8 @@ class VendorPublishCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'vendor:publish';
 

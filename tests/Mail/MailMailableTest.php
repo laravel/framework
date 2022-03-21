@@ -304,6 +304,13 @@ class MailMailableTest extends TestCase
         }
     }
 
+    public function testMailableSetsSubjectCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->subject('foo');
+        $this->assertTrue($mailable->hasSubject('foo'));
+    }
+
     public function testItIgnoresDuplicatedRawAttachments()
     {
         $mailable = new WelcomeMailableStub;

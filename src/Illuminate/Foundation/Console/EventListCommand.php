@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Illuminate\Console\Command;
 use ReflectionFunction;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'event:list')]
 class EventListCommand extends Command
 {
     /**
@@ -21,6 +23,8 @@ class EventListCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'event:list';
 

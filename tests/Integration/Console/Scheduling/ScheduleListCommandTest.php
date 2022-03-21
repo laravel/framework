@@ -21,6 +21,13 @@ class ScheduleListCommandTest extends TestCase
         $this->schedule = $this->app->make(Schedule::class);
     }
 
+    public function testDisplayEmptySchedule()
+    {
+        $this->artisan(ScheduleListCommand::class)
+            ->assertSuccessful()
+            ->expectsOutput('No scheduled tasks have been defined.');
+    }
+
     public function testDisplaySchedule()
     {
         $this->schedule->command(FooCommand::class)->quarterly();
