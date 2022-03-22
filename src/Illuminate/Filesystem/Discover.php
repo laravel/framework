@@ -169,11 +169,10 @@ class Discover
     /**
      * Create a new instance of the discoverer.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application|null  $app
      * @return static
      */
-    public static function make($app = null)
+    public static function inside(string $dir)
     {
-        return new static($app ?? app());
+        return (new static(app()))->in($dir);
     }
 }
