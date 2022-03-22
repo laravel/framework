@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Rules\AllExists;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
@@ -113,5 +114,17 @@ class Rule
     public static function unique($table, $column = 'NULL')
     {
         return new Unique($table, $column);
+    }
+
+    /**
+     * Get a all_exists constraint builder instance.
+     *
+     * @param  string  $table
+     * @param  string  $column
+     * @return \Illuminate\Validation\Rules\AllExists
+     */
+    public static function allExists($table, $column = 'NULL')
+    {
+        return new AllExists($table, $column);
     }
 }
