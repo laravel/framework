@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Macroable;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -56,6 +57,16 @@ class Command extends SymfonyCommand
      * @var bool
      */
     protected $hidden = false;
+
+    /**
+     * Indicates whether the timer should be shown after the command output message.
+     * 
+     * @uses Carbon\Carbon::now     Start time of the command, which is used to output
+     *                              how long it took to complete the command.
+     *
+     * @var bool
+     */
+    protected $timer = false;
 
     /**
      * Create a new console command instance.
@@ -166,9 +177,15 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $start_time = Carbon::now();
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
+        $result = (int) $this->laravel->call([$this, $method]);
 
-        return (int) $this->laravel->call([$this, $method]);
+        // display how long it took to complete 
+        if ( $this->timer ) {
+            echo PHP_EOL, "Took ", $start_time->longAbsoluteDiffForHumans(), " to complete", PHP_EOL;
+        }
+        return $result;
     }
 
     /**
