@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Notifications\Channel;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Markdown;
 use Illuminate\Notifications\Notification;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 
-class MailChannel
+class MailChannel implements Channel
 {
     /**
      * The mailer implementation.

@@ -58,7 +58,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * Get a channel instance.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return \Illuminate\Contracts\Notifications\Channel
      */
     public function channel($name = null)
     {
@@ -68,7 +68,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Create an instance of the database driver.
      *
-     * @return \Illuminate\Notifications\Channels\DatabaseChannel
+     * @return \Illuminate\Contracts\Notifications\Channel
      */
     protected function createDatabaseDriver()
     {
@@ -78,7 +78,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Create an instance of the broadcast driver.
      *
-     * @return \Illuminate\Notifications\Channels\BroadcastChannel
+     * @return \Illuminate\Contracts\Notifications\Channel
      */
     protected function createBroadcastDriver()
     {
@@ -88,7 +88,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Create an instance of the mail driver.
      *
-     * @return \Illuminate\Notifications\Channels\MailChannel
+     * @return \Illuminate\Contracts\Notifications\Channel
      */
     protected function createMailDriver()
     {

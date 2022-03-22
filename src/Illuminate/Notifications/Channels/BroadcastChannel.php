@@ -3,12 +3,13 @@
 namespace Illuminate\Notifications\Channels;
 
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Notifications\Channel;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use RuntimeException;
 
-class BroadcastChannel
+class BroadcastChannel implements Channel
 {
     /**
      * The event dispatcher.
