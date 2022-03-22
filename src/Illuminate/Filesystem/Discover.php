@@ -6,13 +6,9 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Finder\SplFileInfo;
-use function lcfirst;
-use function ucfirst;
-use const DIRECTORY_SEPARATOR;
 
 class Discover
 {
