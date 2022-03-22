@@ -9,6 +9,7 @@ use Illuminate\Mail\MailManager;
 use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\View\Factory;
 use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Email;
 
@@ -57,7 +58,13 @@ class MailSesTransportTest extends TestCase
         $message->bcc('you@example.com');
 
         $client = m::mock(SesClient::class);
-        $client->shouldReceive('sendRawEmail')->once();
+        $sesResult = Mockery::mock();
+        $sesResult->shouldReceive('get')
+            ->with('MessageId')
+            ->once()
+            ->andReturn('ses-message-id');
+        $client->shouldReceive('sendRawEmail')->once()
+            ->andReturn($sesResult);
 
         (new SesTransport($client))->send($message);
     }
