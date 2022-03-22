@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Contracts\Foundation\Application;
+
 /**
  * @method static \Illuminate\Contracts\Foundation\Application loadEnvironmentFrom(string $file)
  * @method static \Illuminate\Support\ServiceProvider register(\Illuminate\Support\ServiceProvider|string $provider, bool $force = false)
@@ -59,6 +61,6 @@ class App extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'app';
+        return Application::class;
     }
 }
