@@ -8,6 +8,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Testing\Assert;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SplFileInfo;
 
 class FilesystemTest extends TestCase
@@ -604,5 +605,21 @@ class FilesystemTest extends TestCase
         $filePerms = substr(sprintf('%o', $filePerms), -3);
 
         return (int) base_convert($filePerms, 8, 10);
+    }
+
+    public function testRelativeLinkWhenNotInstalledSymfonyFilesystem()
+    {
+        mkdir(self::$tempDir.'/tmp', 0777, true);
+        $path = self::$tempDir.'/tmp/foo.txt';
+        file_put_contents($path, '');
+        $target = self::$tempDir.'/tmp/bar.txt';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('To enable support for relative links, please install the symfony/filesystem package.');
+        $files = new Filesystem;
+        $files->relativeLink($target, $path);
+
+        $this->assertFileDoesNotExist($target);
+        $this->assertFileExists($path);
     }
 }
