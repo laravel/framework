@@ -1669,6 +1669,20 @@ class TestResponseTest extends TestCase
         $response->assertSessionHasErrors(['foo']);
     }
 
+    public function testAssertSessionHas()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'value');
+        $store->put('bar', 'value');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHas('foo');
+        $response->assertSessionHas('bar');
+        $response->assertSessionHas(['foo', 'bar']);
+    }
+
     public function testGetEncryptedCookie()
     {
         $container = Container::getInstance();
