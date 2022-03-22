@@ -2,14 +2,13 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use const DIRECTORY_SEPARATOR as DS;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Discover;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
-use function realpath;
-use const DIRECTORY_SEPARATOR as DS;
 
 class DiscoverTest extends TestCase
 {

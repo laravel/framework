@@ -6,7 +6,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
-use const DIRECTORY_SEPARATOR;
 
 class Discover
 {
@@ -117,7 +116,7 @@ class Discover
                 continue;
             }
 
-            if (!$reflection->isInstantiable()) {
+            if (! $reflection->isInstantiable()) {
                 continue;
             }
 
