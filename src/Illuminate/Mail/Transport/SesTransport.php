@@ -72,13 +72,13 @@ class SesTransport extends AbstractTransport
                     ]
                 )
             );
-            $messageId = $result->get('MessageId');
-
-            $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
-            $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
         } catch (AwsException $e) {
             throw new Exception('Request to AWS SES API failed.', $e->getCode(), $e);
         }
+        
+        $messageId = $result->get('MessageId');
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
     }
 
     /**
