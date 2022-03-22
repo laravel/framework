@@ -469,7 +469,7 @@ abstract class Factory
     /**
      * Add a new state transformation to the model definition.
      *
-     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $state
+     * @param  (callable(array<string, mixed>, \Illuminate\Database\Eloquent\Model|null=): array<string, mixed>)|array<string, mixed>  $state
      * @return static
      */
     public function state($state)
