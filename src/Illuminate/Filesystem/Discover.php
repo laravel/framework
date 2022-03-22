@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
+use const DIRECTORY_SEPARATOR;
 
 class Discover
 {
@@ -157,13 +158,15 @@ class Discover
      */
     protected function classFromFile($file)
     {
-        $class = trim(Str::replaceFirst($this->root, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
-
-        return str_replace(
-            [DIRECTORY_SEPARATOR, ucfirst($this->baseDir.'\\')],
-            ['\\', $this->baseNamespace],
-            ucfirst(Str::replaceLast('.php', '', $class))
-        );
+        return Str::of($file->getRealPath())
+            ->after($this->root)
+            ->trim(DIRECTORY_SEPARATOR)
+            ->beforeLast('.php')
+            ->ucfirst()
+            ->replace(
+                [DIRECTORY_SEPARATOR, ucfirst($this->baseDir.'\\')],
+                ['\\', $this->baseNamespace]
+            )->toString();
     }
 
     /**
