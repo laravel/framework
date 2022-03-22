@@ -57,7 +57,6 @@ class MailSesTransportTest extends TestCase
         $message->bcc('you@example.com');
 
         $client = m::mock(SesClient::class);
-        $client->shouldReceive('sendRawEmail')->once();
         $sesResult = m::mock();
         $sesResult->shouldReceive('get')
             ->with('MessageId')
