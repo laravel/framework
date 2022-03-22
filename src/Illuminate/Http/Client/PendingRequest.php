@@ -723,7 +723,7 @@ class PendingRequest
 
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100, $this->retryWhenCallback);
+        }, $this->retryDelay, $this->retryWhenCallback);
     }
 
     /**
