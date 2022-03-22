@@ -96,7 +96,7 @@ class Discover
                 continue;
             }
 
-            if (!$reflection->isInstantiable()) {
+            if (! $reflection->isInstantiable()) {
                 continue;
             }
 
