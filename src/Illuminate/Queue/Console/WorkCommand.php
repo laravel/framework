@@ -182,14 +182,11 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status)
     {
-        switch ($status) {
-            case 'starting':
-                return $this->writeStatus($job, 'Processing', 'comment');
-            case 'success':
-                return $this->writeStatus($job, 'Processed', 'info');
-            case 'failed':
-                return $this->writeStatus($job, 'Failed', 'error');
-        }
+        match ($status) {
+            'starting' => $this->writeStatus($job, 'Processing', 'comment'),
+            'success' => $this->writeStatus($job, 'Processed', 'info'),
+            'failed' => $this->writeStatus($job, 'Failed', 'error')
+        };
     }
 
     /**
