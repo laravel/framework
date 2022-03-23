@@ -276,12 +276,13 @@ class ComponentTagCompiler
         // by the developer. We can use these folders to guess the correct view name.
         $guess = collect($this->blade->getAnonymousComponentNamespaces())
             // Next, we'll filter out the component paths that cannot be used here, based on their prefix.
-            // For example, for the anonymous component "<x-admin:dashboard>", we should look for the 'dashboard'
+            // For example, for the anonymous component "<x-admin::dashboard>", we should look for the 'dashboard'
             // view in the folder associated with the 'admin' prefix.
             ->filter(function ($directory, $prefix) use ($component): bool {
                 return Str::startsWith($component, $prefix.'::');
             })
             // Next, we'll prepend the default components directory and our full component name. This is convention.
+            // Prepending it ensures that the /components always has precedence over the cutom directories.
             ->prepend('components', $component)
             // Finally, we'll go over the components and prefixes and check whether we can find a matching view name.
             ->reduce(function($carry, $directory, $prefix) use ($component, $viewFactory) {
