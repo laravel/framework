@@ -310,6 +310,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the HTTP referer.
+     *
+     * @return string|null
+     */
+    public function referer()
+    {
+        return $this->headers->get('referer');
+    }
+
+    /**
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
