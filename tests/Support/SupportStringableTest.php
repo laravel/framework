@@ -419,6 +419,11 @@ class SupportStringableTest extends TestCase
         $this->assertSame('u', (string) $this->stringable('ü')->ascii());
     }
 
+    public function testNewLine()
+    {
+        $this->assertSame('Laravel'.PHP_EOL, (string) $this->stringable('Laravel')->newLine());
+    }
+
     public function testAsciiWithSpecificLocale()
     {
         $this->assertSame('h H sht Sht a A ia yo', (string) $this->stringable('х Х щ Щ ъ Ъ иа йо')->ascii('bg'));

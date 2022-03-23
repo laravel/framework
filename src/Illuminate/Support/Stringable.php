@@ -65,6 +65,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Append a new line to the string.
+     *
+     * @return $this
+     */
+    public function newLine()
+    {
+        return $this->append(PHP_EOL);
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $language
