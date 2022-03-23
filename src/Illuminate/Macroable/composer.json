@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.0.2"
+        "php": "^8.1"
     },
     "autoload": {
         "psr-4": {
@@ -23,7 +23,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "9.x-dev"
+            "dev-master": "10.x-dev"
         }
     },
     "config": {

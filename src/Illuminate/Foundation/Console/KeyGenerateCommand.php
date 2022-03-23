@@ -20,17 +20,6 @@ class KeyGenerateCommand extends Command
                     {--force : Force the operation to run when in production}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'key:generate';
-
-    /**
      * The console command description.
      *
      * @var string

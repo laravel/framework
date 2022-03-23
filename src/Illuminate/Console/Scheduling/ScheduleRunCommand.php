@@ -22,17 +22,6 @@ class ScheduleRunCommand extends Command
     protected $name = 'schedule:run';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'schedule:run';
-
-    /**
      * The console command description.
      *
      * @var string

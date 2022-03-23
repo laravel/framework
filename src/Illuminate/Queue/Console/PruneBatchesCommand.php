@@ -20,17 +20,6 @@ class PruneBatchesCommand extends Command
                 {--unfinished= : The number of hours to retain unfinished batch data }';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'queue:prune-batches';
-
-    /**
      * The console command description.
      *
      * @var string

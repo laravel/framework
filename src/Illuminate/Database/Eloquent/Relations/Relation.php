@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 
@@ -299,18 +298,6 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Get the base query builder driving the Eloquent builder.
-     *
-     * @deprecated Use toBase() instead
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function getBaseQuery()
-    {
-        return $this->toBase();
-    }
-
-    /**
      * Get a base query builder instance.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -457,7 +444,7 @@ abstract class Relation implements BuilderContract
      */
     protected static function buildMorphMapFromModels(array $models = null)
     {
-        if (is_null($models) || Arr::isAssoc($models)) {
+        if (is_null($models) || ! array_is_list($models)) {
             return $models;
         }
 
