@@ -271,12 +271,39 @@ class ComponentTagCompiler
             return $class;
         }
 
-        if ($viewFactory->exists($view = $this->guessViewName($component))) {
-            return $view;
-        }
+        // The following code serves to guess the view name for this component.
+        // First, we'll create a collection with the custom component paths provided
+        // by the developer. We can use these folders to guess the correct view name.
+        $guess = collect($this->blade->getAnonymousComponentNamespaces())
+            // Next, we'll filter out the component paths that cannot be used here, based on their prefix.
+            // For example, for the anonymous component "<x-admin:dashboard>", we should look for the 'dashboard'
+            // view in the folder associated with the 'admin' prefix.
+            ->filter(function ($directory, $prefix) use ($component): bool {
+                return Str::startsWith($component, $prefix.'::');
+            })
+            // Next, we'll prepend the default components directory and our full component name. This is convention.
+            ->prepend('components', $component)
+            // Finally, we'll go over the components and prefixes and check whether we can find a matching view name.
+            ->reduce(function($carry, $directory, $prefix) use ($component, $viewFactory) {
+                $componentName = Str::after($component, $prefix.'::');
 
-        if ($viewFactory->exists($view = $this->guessViewName($component).'.index')) {
-            return $view;
+                if ($carry !== null) {
+                    return $carry;
+                }
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory))) {
+                    return $view;
+                }
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName).'.index')) {
+                    return $view;
+                }
+
+                return null;
+            });
+
+        if ($guess !== null) {
+            return $guess;
         }
 
         throw new InvalidArgumentException(
@@ -341,11 +368,14 @@ class ComponentTagCompiler
      * Guess the view name for the given component.
      *
      * @param  string  $name
+     * @param  string  $prefix
      * @return string
      */
-    public function guessViewName($name)
+    public function guessViewName($name, $prefix = 'components.')
     {
-        $prefix = 'components.';
+        if (! Str::endsWith($prefix, '.')) {
+            $prefix .= '.';
+        }
 
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
