@@ -440,6 +440,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return $this->items[$key];
         }
 
+        if (str_contains((string) $key, ".")) {
+            $keys = explode('.', (string) $key);
+
+            do {
+                $nested_key = array_shift($keys);
+                $nested_value = ($nested_value ?? $this->items)[$nested_key] ?? $default;
+                $nested_value = $nested_value instanceof Collection ? $nested_value->toArray() : $nested_value;
+            } while (!empty($keys) && is_array($nested_value) && $nested_value != $default);
+
+            return empty($keys) ? $nested_value : value($default);
+        }
+
+
         return value($default);
     }
 
