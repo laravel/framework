@@ -461,6 +461,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Filter the items, removing any items that don't match the given type(s).
      *
      * @template TWhereInstanceOf
+     *
      * @param  class-string<TWhereInstanceOf>|array<array-key, class-string<TWhereInstanceOf>>  $type
      * @return static<TKey, TWhereInstanceOf>
      */
