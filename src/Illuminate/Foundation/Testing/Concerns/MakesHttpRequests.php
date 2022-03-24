@@ -451,6 +451,21 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given URI with a HEAD request.
+     *
+     * @param  string  $uri
+     * @param  array  $headers
+     * @return \Illuminate\Testing\TestResponse
+     */
+    public function head($uri, array $headers = [])
+    {
+        $server = $this->transformHeadersToServerVars($headers);
+        $cookies = $this->prepareCookiesForRequest();
+
+        return $this->call('HEAD', $uri, [], $cookies, [], $server);
+    }
+
+    /**
      * Call the given URI with a JSON request.
      *
      * @param  string  $method
