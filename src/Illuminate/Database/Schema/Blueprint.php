@@ -1197,6 +1197,19 @@ class Blueprint
     }
 
     /**
+     * Add creation and update timestamps with CURRENT_TIMESTAMP as default value to the table.
+     *
+     * @param  int  $precision
+     * @return void
+     */
+    public function useCurrentTimestamps($precision = 0)
+    {
+        $this->timestamp('created_at', $precision)->useCurrent();
+
+        $this->timestamp('updated_at', $precision)->useCurrent();
+    }
+
+    /**
      * Add a "deleted at" timestamp for the table.
      *
      * @param  string  $column
