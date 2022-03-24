@@ -28,6 +28,14 @@ interface UrlGenerator
     public function previousWithoutQuery($fallback = false);
 
     /**
+     * Get the previous path info for the request.
+     *
+     * @param  mixed  $fallback
+     * @return string
+     */
+    public function previousPath($fallback = false);
+
+    /**
      * Generate an absolute URL to the given path.
      *
      * @param  string  $path
