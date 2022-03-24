@@ -167,6 +167,17 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Get the URL for the previous request without the query string.
+     *
+     * @param  mixed  $fallback
+     * @return string
+     */
+    public function previousWithoutQuery($fallback = false)
+    {
+        return rtrim(preg_replace('/\?.*/', '', $this->previous($fallback)), '/');
+    }
+
+    /**
      * Get the previous URL from the session if possible.
      *
      * @return string|null
