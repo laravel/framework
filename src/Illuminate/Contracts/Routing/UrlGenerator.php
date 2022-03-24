@@ -21,7 +21,7 @@ interface UrlGenerator
 
     /**
      * Get the URL for the previous request without the query string.
-     * 
+     *
      * @param  mixed  $fallback
      * @return string
      */
@@ -29,7 +29,7 @@ interface UrlGenerator
 
     /**
      * Get the previous path info for the request.
-     * 
+     *
      * @param  mixed  $fallback
      * @return string
      */
