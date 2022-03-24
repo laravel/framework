@@ -1023,9 +1023,9 @@ class Str
      * @param  string|null  $characters
      * @return int
      */
-    public static function wordCount($string, ?string $characters = null)
+    public static function wordCount($string, $characters = null)
     {
-        return str_word_count($string, characters: $characters);
+        return str_word_count($string, 0, $characters);
     }
 
     /**
