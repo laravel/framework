@@ -67,11 +67,12 @@ class Stringable implements JsonSerializable
     /**
      * Append a new line to the string.
      *
+     * @param  int  $count
      * @return $this
      */
-    public function newLine()
+    public function newLine($count = 1)
     {
-        return $this->append(PHP_EOL);
+        return $this->append(str_repeat(PHP_EOL, $count));
     }
 
     /**
