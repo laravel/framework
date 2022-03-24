@@ -463,11 +463,11 @@ assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection
 assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotInStrict('string', [2]));
 
-assertType('Illuminate\Support\Collection<int, int|User>', $collection::make([new User, 1])
+assertType('Illuminate\Support\Collection<int, User>', $collection::make([new User, 1])
     ->whereInstanceOf(User::class));
 
-assertType('Illuminate\Support\Collection<int, int|User>', $collection::make([new User, 1])
-    ->whereInstanceOf([User::class, User::class]));
+assertType('Illuminate\Support\Collection<int, Exception|User>', $collection::make([new User, 1])
+    ->whereInstanceOf([User::class, Exception::class]));
 
 assertType('User|null', $collection->first());
 assertType('User|null', $collection->first(function ($user) {

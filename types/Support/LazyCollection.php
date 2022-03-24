@@ -359,10 +359,10 @@ assertType("Illuminate\Support\LazyCollection<int, array{string: int}>", $collec
 assertType("Illuminate\Support\LazyCollection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotInStrict('string', [2]));
 
-assertType('Illuminate\Support\LazyCollection<int, int|User>', $collection::make([new User, 1])
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection::make([new User, 1])
     ->whereInstanceOf(User::class));
 
-assertType('Illuminate\Support\LazyCollection<int, int|User>', $collection::make([new User, 1])
+assertType('Illuminate\Support\LazyCollection<int, User>', $collection::make([new User, 1])
     ->whereInstanceOf([User::class, User::class]));
 
 assertType('User|null', $collection->first());
