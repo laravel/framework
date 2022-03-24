@@ -14,7 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
+use Mockery;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class EncryptCookiesTest extends TestCase
@@ -127,6 +129,19 @@ class EncryptCookiesTest extends TestCase
                 return new Response;
             }
         );
+    }
+
+    public function testItCanDisableEncryptingSpecificCookieName()
+    {
+        $mock = Mockery::mock(EncryptCookies::class)->makePartial();
+
+        $mock->disableFor(['unencrypted_cookie1', 'unencrypted_cookie2']);
+
+        $property = (new ReflectionObject($mock))->getProperty('except');
+
+        $property->setAccessible(true);
+
+        $this->assertSame(['unencrypted_cookie1', 'unencrypted_cookie2'], $property->getValue($mock));
     }
 }
 
