@@ -488,7 +488,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             }
 
             foreach ($groupKeys as $groupKey) {
-                $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
+                $groupKey = match (true) {
+                    is_bool($groupKey) => (int) $groupKey,
+                    is_object($groupKey) => (string) $groupKey,
+                    default => $groupKey,
+                };
 
                 if (! array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
