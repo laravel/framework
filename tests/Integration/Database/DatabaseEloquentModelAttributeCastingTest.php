@@ -430,14 +430,14 @@ class TestEloquentModelWithAttributeCast extends Model
     {
         return Attribute::get(function () {
             return Str::random(10);
-        })->withCaching();
+        })->shouldCache();
     }
 
     public function virtualBooleanCached(): Attribute
     {
         return Attribute::get(function () {
             return (bool) mt_rand(0, 1);
-        })->withCaching();
+        })->shouldCache();
     }
 
     public function virtualBoolean(): Attribute
@@ -455,7 +455,7 @@ class TestEloquentModelWithAttributeCast extends Model
             $this->virtualNullCalls++;
 
             return null;
-        })->withCaching();
+        })->shouldCache();
     }
 
     public function virtualObject(): Attribute

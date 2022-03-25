@@ -96,7 +96,7 @@ class Attribute
      *
      * @return static
      */
-    public function withCaching()
+    public function shouldCache()
     {
         $this->withCaching = true;
 
