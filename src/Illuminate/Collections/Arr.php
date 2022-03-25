@@ -640,7 +640,6 @@ class Arr
      * @param array $array
      * @param mixed $array
      * @param bool $strict
-     *
      * @return int|string|false
      */
     public static function search($array, mixed $needle, bool $strict = false)
