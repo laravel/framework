@@ -538,6 +538,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
                     break;
                 }
             }
+
             throw $e;
         }
     }
