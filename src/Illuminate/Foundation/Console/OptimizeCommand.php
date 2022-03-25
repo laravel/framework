@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 
 class OptimizeCommand extends Command
 {
@@ -38,6 +39,11 @@ class OptimizeCommand extends Command
      */
     public function handle()
     {
+        $confirmationMessage = 'Further configuration and routes changes will not take effect unless you run the command again or clear the cache, are you sure you want to run this command?';
+        if (App::environment('local') && ! $this->confirm($confirmationMessage)) {
+            return 1;
+        }
+
         $this->call('config:cache');
         $this->call('route:cache');
 
