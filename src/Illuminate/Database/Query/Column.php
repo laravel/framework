@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Query;
 
+use RuntimeException;
+
 /**
  * @method static \Illuminate\Database\Query\Column max(string|Column $name)
  * @method static \Illuminate\Database\Query\Column min(string|Column $name)
@@ -59,13 +61,13 @@ class Column
      * @param  string  $name
      * @param  array  $arguments
      * @return \Illuminate\Database\Query\Column
-     * @throws \Exception
+     * 
+     * @throws \RuntimeException
      */
     public static function __callStatic($name, $arguments)
     {
         if (!in_array($name, static::$basicFunctions)) {
-            // TODO: change exception type
-            throw new \Exception('Cannot find a basic function with the name ' . $name);
+            throw new RuntimeException('Cannot find a basic database function with the name ' . $name);
         }
 
         return new self($arguments[0], $name);
