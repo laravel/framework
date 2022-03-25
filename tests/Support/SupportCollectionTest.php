@@ -3031,7 +3031,13 @@ class SupportCollectionTest extends TestCase
         $data = new $collection($payload = [
             ['name' => Str::of('Laravel'), 'url' => '1'],
             ['name' => new HtmlString('Laravel'), 'url' => '1'],
-            ['name' => new class() { public function __toString() { return 'Framework'; } }, 'url' => '2'],
+            ['name' => new class()
+            {
+                public function __toString()
+                {
+                    return 'Framework';
+                }
+            }, 'url' => '2', ],
         ]);
 
         $result = $data->groupBy('name');
