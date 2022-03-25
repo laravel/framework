@@ -42,8 +42,8 @@ class Arr
      * Searches an ordered array via binary searching, returns the first corresponding key index if successful.
 
      *
-     * @param mixed $array
-     * @param mixed $needle
+     * @param  mixed  $array
+     * @param  mixed  $needle
      *
      * @return false|int
      */
@@ -639,11 +639,12 @@ class Arr
     /**
      * Searches the array for a given value and returns the first corresponding key if successful.
      *
-     * @param mixed $array
-     *
+     * @param  array  $array
+     * @param  mixed  $needle
+     * @param  bool  $strict
      * @return int|string|false
      */
-    public static function search($array, mixed $needle, bool $strict = false)
+    public static function search($array, $needle, bool $strict = false)
     {
         return array_search($needle, $array, $strict);
     }
