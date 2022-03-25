@@ -41,7 +41,7 @@ class Column
         'max',
         'sum',
         'avg',
-        'date'
+        'date',
     ];
 
     /**
@@ -66,8 +66,8 @@ class Column
      */
     public static function __callStatic($name, $arguments)
     {
-        if (!in_array($name, static::$basicFunctions)) {
-            throw new RuntimeException('Cannot find a basic database function with the name ' . $name);
+        if (! in_array($name, static::$basicFunctions)) {
+            throw new RuntimeException('Cannot find a basic database function with the name '.$name);
         }
 
         return new self($arguments[0], $name);

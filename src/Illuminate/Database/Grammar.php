@@ -81,7 +81,7 @@ abstract class Grammar
     /**
      * Wrap a column object.
      *
-     * @param  \Illuminate\Database\Query\Column $column
+     * @param  \Illuminate\Database\Query\Column  $column
      * @param  bool  $prefixAlias
      * @return string
      */
@@ -93,7 +93,7 @@ abstract class Grammar
             $value = $this->wrapColumnFunction($column, $prefixAlias);
         }
 
-        if (!$alias = $column->getAlias()) {
+        if (! $alias = $column->getAlias()) {
             return $this->wrap($value, $prefixAlias);
         }
 
@@ -107,7 +107,7 @@ abstract class Grammar
     /**
      * Wrap database function call from a column.
      *
-     * @param  \Illuminate\Database\Query\Column $column
+     * @param  \Illuminate\Database\Query\Column  $column
      * @param  bool  $prefixAlias
      * @return \Illuminate\Database\Query\Expression
      */

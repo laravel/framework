@@ -331,7 +331,7 @@ class SQLiteGrammar extends Grammar
     /**
      * Wrap database function call from a column.
      *
-     * @param  \Illuminate\Database\Query\Column $column
+     * @param  \Illuminate\Database\Query\Column  $column
      * @param  bool  $prefixAlias
      * @return \Illuminate\Database\Query\Expression
      *
