@@ -8,6 +8,8 @@ use DateTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Column;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
@@ -4601,6 +4603,90 @@ SQL;
 
         $this->assertSame('select * from "users" order by "email" asc', $clone->toSql());
         $this->assertEquals([], $clone->getBindings());
+    }
+
+    public function testColumnSelect()
+    {
+        $builder = $this->getBuilder();
+        $builder->select(Column::name('id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select "id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::name('users.id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select "users"."id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+    }
+
+    public function testColumnSelectAlias()
+    {
+        $builder = $this->getBuilder();
+        $builder->select(Column::name('id')->as('alias_id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select "id" as "alias_id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+    }
+
+    public function testColumnSelectFunctions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select(Column::max('id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select MAX("id") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::min('id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select MIN("id") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::sum('id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select SUM("id") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::avg('id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select AVG("id") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::date('created_at'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select DATE("created_at") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::coalesce('id', 1, Column::name('foo')))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select COALESCE(\'id\', 1, "foo") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::concat(Column::name('first_name'), ' ', Column::name('last_name')))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select CONCAT("first_name", \' \', "last_name") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::max(new Expression('id + 5')))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select MAX(id + 5) from "users" where "email" = ? order by "email" asc', $builder->toSql());
+    }
+
+    public function testColumnSelectFunctionsWithAlias()
+    {
+        $builder = $this->getBuilder();
+        $builder->select(Column::max('id')->as('max_id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select MAX("id") as "max_id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::min('id')->as('min_id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select MIN("id") as "min_id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::sum('id')->as('sum_id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select SUM("id") as "sum_id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::avg('id')->as('avg_id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select AVG("id") as "avg_id" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::date('created_at')->as('created_at_date'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select DATE("created_at") as "created_at_date" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::coalesce('id', 1, Column::name('foo'))->as('coalesced'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select COALESCE(\'id\', 1, "foo") as "coalesced" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::concat(Column::name('first_name'), ' ', Column::name('last_name'))->as('full_name'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select CONCAT("first_name", \' \', "last_name") as "full_name" from "users" where "email" = ? order by "email" asc', $builder->toSql());
     }
 
     protected function getConnection()

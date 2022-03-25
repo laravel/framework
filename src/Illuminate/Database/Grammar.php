@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Database\Query\Column;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
@@ -46,12 +47,16 @@ abstract class Grammar
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  \Illuminate\Database\Query\Expression|\Illuminate\Database\Query\Column|string  $value
      * @param  bool  $prefixAlias
      * @return string
      */
     public function wrap($value, $prefixAlias = false)
     {
+        if ($value instanceof Column) {
+            return $this->wrapColumn($value, $prefixAlias);
+        }
+
         if ($this->isExpression($value)) {
             return $this->getValue($value);
         }
@@ -71,6 +76,76 @@ abstract class Grammar
         }
 
         return $this->wrapSegments(explode('.', $value));
+    }
+
+    /**
+     * Wrap a column object.
+     *
+     * @param  \Illuminate\Database\Query\Column $column
+     * @param  bool  $prefixAlias
+     * @return string
+     */
+    protected function wrapColumn($column, $prefixAlias = false)
+    {
+        $value = $column->getName();
+
+        if (! is_null($column->getFunction())) {
+            $value = $this->wrapColumnFunction($column, $prefixAlias);
+        }
+
+        if (!$alias = $column->getAlias()) {
+            return $this->isExpression($value)
+                ? $value->getValue()
+                : $this->wrapSegments(explode('.', $value));
+        }
+
+        if ($this->isExpression($value)) {
+            return sprintf('%s as %s', $value->getValue(), $this->wrapValue($alias));
+        }
+
+        return $this->wrapAliasedValue(sprintf('%s as %s', $value, $alias), $prefixAlias);
+    }
+
+    /**
+     * Wrap database function call from a column.
+     *
+     * @param  \Illuminate\Database\Query\Column $column
+     * @param  bool  $prefixAlias
+     * @return \Illuminate\Database\Query\Expression
+     */
+    protected function wrapColumnFunction($column, $prefixAlias = false)
+    {
+        $values = [$this->wrap($column->getName(), $prefixAlias)];
+
+        if (count($column->getParameters()) > 0) {
+            $values = array_map(function ($value) use ($prefixAlias) {
+                return $this->wrapFunctionParameter($value, $prefixAlias);
+            }, [$column->getName(), ...$column->getParameters()]);
+        }
+
+        return new Expression(sprintf(
+            '%s(%s)',
+            strtoupper($column->getFunction()),
+            implode(', ', $values)
+        ));
+    }
+
+    /**
+     * @param  mixed  $parameter
+     * @param  bool  $prefixAlias
+     * @return mixed|string
+     */
+    protected function wrapFunctionParameter($parameter, $prefixAlias = false)
+    {
+        if ($this->isExpression($parameter)) {
+            return $parameter->getValue();
+        }
+
+        if ($parameter instanceof Column) {
+            return $this->wrap($parameter, $prefixAlias);
+        }
+
+        return is_string($parameter) ? $this->quoteString($parameter) : $parameter;
     }
 
     /**

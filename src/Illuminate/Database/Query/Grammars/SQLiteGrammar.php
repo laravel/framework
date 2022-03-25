@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class SQLiteGrammar extends Grammar
 {
@@ -325,6 +326,24 @@ class SQLiteGrammar extends Grammar
             'delete from sqlite_sequence where name = ?' => [$query->from],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
+    }
+
+    /**
+     * Wrap database function call from a column.
+     *
+     * @param  \Illuminate\Database\Query\Column $column
+     * @param  bool  $prefixAlias
+     * @return \Illuminate\Database\Query\Expression
+     *
+     * @throws \RuntimeException
+     */
+    protected function wrapColumnFunction($column, $prefixAlias = false)
+    {
+        if ($column->getFunction() === 'concat') {
+            throw new RuntimeException('This database driver does not support the concat function.');
+        }
+
+        return parent::wrapColumnFunction($column, $prefixAlias);
     }
 
     /**
