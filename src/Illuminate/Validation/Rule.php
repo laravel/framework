@@ -95,6 +95,17 @@ class Rule
     }
 
     /**
+     * Get a required_if constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($callback)
+    {
+        return new RequiredIf($callback);
+    }
+
+    /**
      * Get a exclude_if constraint builder instance.
      *
      * @param  callable|bool  $callback
@@ -114,17 +125,6 @@ class Rule
     public static function prohibitedIf($callback)
     {
         return new ProhibitedIf($callback);
-    }
-
-    /**
-     * Get a required_if constraint builder instance.
-     *
-     * @param  callable|bool  $callback
-     * @return \Illuminate\Validation\Rules\RequiredIf
-     */
-    public static function requiredIf($callback)
-    {
-        return new RequiredIf($callback);
     }
 
     /**
