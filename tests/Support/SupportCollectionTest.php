@@ -3026,6 +3026,30 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testGroupByAttributeWithStringableKey($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => Str::of('Laravel'), 'url' => '1'],
+            ['name' => new HtmlString('Laravel'), 'url' => '1'],
+            ['name' => new class()
+            {
+                public function __toString()
+                {
+                    return 'Framework';
+                }
+            }, 'url' => '2', ],
+        ]);
+
+        $result = $data->groupBy('name');
+        $this->assertEquals(['Laravel' => [$payload[0], $payload[1]], 'Framework' => [$payload[2]]], $result->toArray());
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGroupByCallable($collection)
     {
         $data = new $collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
