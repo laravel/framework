@@ -637,6 +637,18 @@ class Arr
     }
 
     /**
+     * Searches the array for a given value and returns the first corresponding key if successful.
+     *
+     * @param mixed $array
+     *
+     * @return int|string|false
+     */
+    public static function search($array, mixed $needle, bool $strict = false)
+    {
+        return array_search($needle, $array, $strict);
+    }
+
+    /**
      * Set an array item to a given value using "dot" notation.
      *
      * If no key is given to the method, the entire array will be replaced.

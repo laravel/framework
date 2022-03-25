@@ -742,6 +742,19 @@ class SupportArrTest extends TestCase
         $this->assertSame(3, $exceptions);
     }
 
+    public function testSearch()
+    {
+        $array = range(0, 100);
+
+        $this->assertEquals(0, Arr::search($array, 0));
+        $this->assertEquals(25, Arr::search($array, 25));
+        $this->assertEquals(50, Arr::search($array, 50));
+        $this->assertEquals(75, Arr::search($array, 75));
+        $this->assertEquals(100, Arr::search($array, 100));
+
+        $this->assertFalse(Arr::search($array, 101));
+    }
+
     public function testSet()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
