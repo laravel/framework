@@ -637,8 +637,9 @@ class Arr
     /**
      * Searches the array for a given value and returns the first corresponding key if successful.
      *
-     * @param mixed $array
-     *
+     * @param  array  $array
+     * @param  mixed  $needle
+     * @param  bool  $strict
      * @return int|string|false
      */
     public static function search($array, $needle, bool $strict = false)
