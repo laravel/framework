@@ -57,7 +57,7 @@ class Arr
         while ($high >= $low) {
             $middle = (int) ($low + (($high - $low) / 2));
 
-            if (!isset($array[$middle])) {
+            if (! isset($array[$middle])) {
                 return false;
             }
 
