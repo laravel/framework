@@ -1917,7 +1917,7 @@ class Builder implements BuilderContract
     /**
      * Add a "group by" clause to the query.
      *
-     * @param  array|string  ...$groups
+     * @param  array|string|\Illuminate\Database\Query\Column  ...$groups
      * @return $this
      */
     public function groupBy(...$groups)
@@ -2150,7 +2150,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|\Illuminate\Database\Query\Column|string  $column
      * @param  string  $direction
      * @return $this
      *
@@ -2183,7 +2183,7 @@ class Builder implements BuilderContract
     /**
      * Add a descending "order by" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|\Illuminate\Database\Query\Column|string  $column
      * @return $this
      */
     public function orderByDesc($column)
@@ -2194,7 +2194,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|\Illuminate\Database\Query\Column|string  $column
      * @return $this
      */
     public function latest($column = 'created_at')
@@ -2205,7 +2205,7 @@ class Builder implements BuilderContract
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|\Illuminate\Database\Query\Column|string  $column
      * @return $this
      */
     public function oldest($column = 'created_at')

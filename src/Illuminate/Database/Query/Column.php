@@ -61,7 +61,7 @@ class Column
      * @param  string  $name
      * @param  array  $arguments
      * @return \Illuminate\Database\Query\Column
-     * 
+     *
      * @throws \RuntimeException
      */
     public static function __callStatic($name, $arguments)
