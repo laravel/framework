@@ -94,9 +94,7 @@ abstract class Grammar
         }
 
         if (!$alias = $column->getAlias()) {
-            return $this->isExpression($value)
-                ? $value->getValue()
-                : $this->wrapSegments(explode('.', $value));
+            return $this->wrap($value, $prefixAlias);
         }
 
         if ($this->isExpression($value)) {
