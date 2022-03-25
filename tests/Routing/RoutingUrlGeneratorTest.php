@@ -654,6 +654,50 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
     }
 
+    public function testPreviousWithoutQuery()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com?baz=bah');
+        $this->assertSame('http://www.foo.com', $url->previousWithoutQuery());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/?baz=bah');
+        $this->assertSame('http://www.foo.com', $url->previousWithoutQuery());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar?baz=bah');
+        $this->assertSame('http://www.foo.com/bar', $url->previousWithoutQuery());
+
+        $url->getRequest()->headers->remove('referer');
+        $this->assertSame($url->to('/'), $url->previousWithoutQuery());
+
+        $this->assertSame($url->to('/bar'), $url->previousWithoutQuery('/bar'));
+    }
+
+    public function testPreviousPath()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com?baz=bah');
+        $this->assertSame('', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/?baz=bah');
+        $this->assertSame('', $url->previousPath());
+
+        $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar?baz=bah');
+        $this->assertSame('/bar', $url->previousPath());
+
+        $url->getRequest()->headers->remove('referer');
+        $this->assertSame('', $url->previousPath());
+
+        $this->assertSame('/bar', $url->previousPath('/bar'));
+    }
+
     public function testRouteNotDefinedException()
     {
         $this->expectException(RouteNotFoundException::class);
