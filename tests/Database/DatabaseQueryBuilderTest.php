@@ -4626,6 +4626,14 @@ SQL;
     public function testColumnSelectFunctions()
     {
         $builder = $this->getBuilder();
+        $builder->select(Column::count())->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select COUNT(*) from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::count('id'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select COUNT("id") from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $builder->select(Column::max('id'))->from('users')->where('email', 'foo')->orderBy('email');
         $this->assertSame('select MAX("id") from "users" where "email" = ? order by "email" asc', $builder->toSql());
 
@@ -4660,6 +4668,14 @@ SQL;
 
     public function testColumnSelectFunctionsWithAlias()
     {
+        $builder = $this->getBuilder();
+        $builder->select(Column::count()->as('user_count'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select COUNT(*) as "user_count" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select(Column::count('id')->as('user_count'))->from('users')->where('email', 'foo')->orderBy('email');
+        $this->assertSame('select COUNT("id") as "user_count" from "users" where "email" = ? order by "email" asc', $builder->toSql());
+
         $builder = $this->getBuilder();
         $builder->select(Column::max('id')->as('max_id'))->from('users')->where('email', 'foo')->orderBy('email');
         $this->assertSame('select MAX("id") as "max_id" from "users" where "email" = ? order by "email" asc', $builder->toSql());

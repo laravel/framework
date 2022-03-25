@@ -74,7 +74,7 @@ class Column
     }
 
     /**
-     * @param  \Illuminate\Database\Query\Column|\Illuminate\Database\Query\Expression|string  $name
+     * @param  \Illuminate\Database\Query\Expression|string  $name
      * @return static
      */
     public static function name($name): self
@@ -83,8 +83,16 @@ class Column
     }
 
     /**
-     * @param \Illuminate\Database\Query\Column|\Illuminate\Database\Query\Expression|string  ...$columns
-     *
+     * @param  \Illuminate\Database\Query\Expression|string  $name
+     * @return static
+     */
+    public static function count($name = '*'): self
+    {
+        return new self($name, 'count');
+    }
+
+    /**
+     * @param  \Illuminate\Database\Query\Column|\Illuminate\Database\Query\Expression|string  ...$columns
      * @return static
      */
     public static function coalesce(...$columns): self
@@ -93,8 +101,7 @@ class Column
     }
 
     /**
-     * @param \Illuminate\Database\Query\Column|\Illuminate\Database\Query\Expression|string  ...$columns
-     *
+     * @param  \Illuminate\Database\Query\Column|\Illuminate\Database\Query\Expression|string  ...$columns
      * @return static
      */
     public static function concat(...$columns): self
