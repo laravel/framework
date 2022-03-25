@@ -84,10 +84,9 @@ class PhpRedisConnector implements Connector
             $this->establishConnection($client, $config);
             
             if (! empty($config['password'])) {
-                if (! empty($config['username']) && is_string($config['password'])) {
-                    $client->auth([$config['username'],$config['password']]);
-                }
-                else
+                if (isset($config['username']) && is_string($config['password'])) {
+                    $client->auth([$config['username'], $config['password']]);
+                } else {
                     $client->auth($config['password']);
                 }
             }
