@@ -51,15 +51,16 @@ class Arr
             return false;
         }
 
-        $low = 0;
-        $high = count($array);
-        
-        if ($high <= 2) {
+        $start = 0;
+        $total = count($array);
+        $end = $total - 1;
+
+        if ($total <= 2) {
             return array_search($needle, $array);
         }
 
-        while ($high >= $low) {
-            $middle = (int) ($low + (($high - $low) / 2));
+        while ($start <= $end) {
+            $middle = (int) ($start + (($end - $start) / 2));
 
             if (! isset($array[$middle])) {
                 return false;
@@ -70,9 +71,9 @@ class Arr
             }
 
             if ($array[$middle] > $needle) {
-                $high = $middle - 1;
+                $end = $middle - 1;
             } elseif ($array[$middle] < $needle) {
-                $low = $middle + 1;
+                $start = $middle + 1;
             }
         }
 
