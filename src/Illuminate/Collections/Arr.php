@@ -39,6 +39,45 @@ class Arr
     }
 
     /**
+     * Searches an ordered array via binary searching, returns the first corresponding key index if successful.
+
+     *
+     * @param mixed $array
+     * @param mixed $needle
+     *
+     * @return false|int
+     */
+    public static function binarySearch($array, $needle)
+    {
+        if (empty($array)) {
+            return false;
+        }
+
+        $low = 0;
+        $high = count($array);
+
+        while ($high >= $low) {
+            $middle = (int) ($low + (($high - $low) / 2));
+
+            if (!isset($array[$middle])) {
+                return false;
+            }
+
+            if ($array[$middle] === $needle) {
+                return $middle;
+            }
+
+            if ($array[$middle] > $needle) {
+                $high = $middle - 1;
+            } elseif ($array[$middle] < $needle) {
+                $low = $middle + 1;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  iterable  $array

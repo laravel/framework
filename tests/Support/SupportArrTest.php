@@ -36,6 +36,19 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => [1 => 'hAz']], Arr::add([], 1.1, 'hAz'));
     }
 
+    public function testBinarySearch()
+    {
+        $array = range(0, 100);
+
+        $this->assertEquals(0, Arr::binarySearch($array, 0));
+        $this->assertEquals(25, Arr::binarySearch($array, 25));
+        $this->assertEquals(50, Arr::binarySearch($array, 50));
+        $this->assertEquals(75, Arr::binarySearch($array, 75));
+        $this->assertEquals(100, Arr::binarySearch($array, 100));
+
+        $this->assertFalse(Arr::binarySearch($array, 101));
+    }
+
     public function testCollapse()
     {
         $data = [['foo', 'bar'], ['baz']];
