@@ -226,6 +226,25 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         }
     }
 
+    public function testAttributesCanCacheNull()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $this->assertSame(0, $model->virtualNullCalls);
+
+        $first = $model->virtual_null_cached;
+
+        $this->assertNull($first);
+
+        $this->assertSame(1, $model->virtualNullCalls);
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertSame($first, $model->virtual_null_cached);
+        }
+
+        $this->assertSame(1, $model->virtualNullCalls);
+    }
+
     public function testAttributesByDefaultDontCacheBooleans()
     {
         $model = new TestEloquentModelWithAttributeCast;
@@ -426,6 +445,17 @@ class TestEloquentModelWithAttributeCast extends Model
         return Attribute::get(function () {
             return (bool) mt_rand(0, 1);
         });
+    }
+
+    public $virtualNullCalls = 0;
+
+    public function virtualNullCached(): Attribute
+    {
+        return Attribute::get(function () {
+            $this->virtualNullCalls++;
+
+            return null;
+        })->withCaching();
     }
 
     public function virtualObject(): Attribute
