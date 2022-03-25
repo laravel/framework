@@ -432,6 +432,7 @@ trait MakesHttpRequests
     public function options($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
+
         $cookies = $this->prepareCookiesForRequest();
 
         return $this->call('OPTIONS', $uri, $data, $cookies, [], $server);
@@ -460,6 +461,7 @@ trait MakesHttpRequests
     public function head($uri, array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
+
         $cookies = $this->prepareCookiesForRequest();
 
         return $this->call('HEAD', $uri, [], $cookies, [], $server);
