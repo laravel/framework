@@ -202,6 +202,51 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         }
     }
 
+    public function testAttributesCanCacheStrings()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = $model->virtual_string_cached;
+
+        $this->assertIsString($previous);
+
+        $this->assertSame($previous, $model->virtual_string_cached);
+    }
+
+    public function testAttributesCanCacheBooleans()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $first = $model->virtual_boolean_cached;
+
+        $this->assertIsBool($first);
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertSame($first, $model->virtual_boolean_cached);
+        }
+    }
+
+    public function testAttributesByDefaultDontCacheBooleans()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $first = $model->virtual_boolean;
+
+        $this->assertIsBool($first);
+
+        foreach (range(0, 50) as $ignored) {
+            $current = $model->virtual_boolean;
+
+            $this->assertIsBool($current);
+
+            if ($first !== $current) {
+                return;
+            }
+        }
+
+        $this->fail('"virtual_boolean" seems to be cached.');
+    }
+
     public function testCastsThatOnlyHaveGetterThatReturnsObjectAreCached()
     {
         $model = new TestEloquentModelWithAttributeCast;
@@ -360,6 +405,27 @@ class TestEloquentModelWithAttributeCast extends Model
                 return Str::random(10);
             }
         );
+    }
+
+    public function virtualStringCached(): Attribute
+    {
+        return Attribute::get(function () {
+            return Str::random(10);
+        })->withCaching();
+    }
+
+    public function virtualBooleanCached(): Attribute
+    {
+        return Attribute::get(function () {
+            return (bool) mt_rand(0, 1);
+        })->withCaching();
+    }
+
+    public function virtualBoolean(): Attribute
+    {
+        return Attribute::get(function () {
+            return (bool) mt_rand(0, 1);
+        });
     }
 
     public function virtualObject(): Attribute
