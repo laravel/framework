@@ -53,6 +53,10 @@ class Arr
 
         $low = 0;
         $high = count($array);
+        
+        if ($high <= 2) {
+            return array_search($needle, $array);
+        }
 
         while ($high >= $low) {
             $middle = (int) ($low + (($high - $low) / 2));
