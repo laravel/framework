@@ -141,7 +141,15 @@ assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Elo
 }));
 
 assertType('UserFactory', $factory->state(['string' => 'string']));
-assertType('UserFactory', $factory->state(function () {
+assertType('UserFactory', $factory->state(function ($attributes) {
+    assertType('array<string, mixed>', $attributes);
+
+    return ['string' => 'string'];
+}));
+assertType('UserFactory', $factory->state(function ($attributes, $model) {
+    assertType('array<string, mixed>', $attributes);
+    assertType('Illuminate\Database\Eloquent\Model|null', $model);
+
     return ['string' => 'string'];
 }));
 

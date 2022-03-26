@@ -5,9 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledBackgroundTaskFinished;
 use Illuminate\Contracts\Events\Dispatcher;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'schedule:finish')]
 class ScheduleFinishCommand extends Command
 {
     /**

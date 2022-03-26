@@ -4,9 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'event:clear')]
 class EventClearCommand extends Command
 {
     /**

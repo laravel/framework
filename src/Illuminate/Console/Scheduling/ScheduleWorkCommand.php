@@ -4,10 +4,8 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Process;
 
-#[AsCommand(name: 'schedule:work')]
 class ScheduleWorkCommand extends Command
 {
     /**

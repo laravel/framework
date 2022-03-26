@@ -3,10 +3,8 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'make:exception')]
 class ExceptionMakeCommand extends GeneratorCommand
 {
     /**

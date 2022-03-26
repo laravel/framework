@@ -4,9 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'event:generate')]
 class EventGenerateCommand extends Command
 {
     /**

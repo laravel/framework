@@ -482,6 +482,17 @@ class SessionStoreTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRememberMethodReturnsPreviousValueIfItAlreadySets()
+    {
+        $session = $this->getSession();
+        $session->put('key', 'foo');
+        $result = $session->remember('key', function () {
+            return 'bar';
+        });
+        $this->assertSame('foo', $session->get('key'));
+        $this->assertSame('foo', $result);
+    }
+
     public function getSession()
     {
         $reflection = new ReflectionClass(Store::class);
