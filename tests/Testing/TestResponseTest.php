@@ -1702,6 +1702,18 @@ class TestResponseTest extends TestCase
         $response->assertSessionHas(['foo', 'bar']);
     }
 
+    public function testAssertSessionMissing()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'value');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing('foo');
+    }
+
     public function testAssertSessionHasInput()
     {
         app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
