@@ -29,7 +29,7 @@ class OptimizeCommand extends Command
     public function handle()
     {
         $confirmationMessage = 'Further configuration and routes changes will not take effect unless you run the command again or clear the cache, are you sure you want to run this command?';
-        if (App::environment('local') && ! $this->confirm($confirmationMessage)) {
+        if (App::isLocal() && ! $this->confirm($confirmationMessage)) {
             return 1;
         }
 
