@@ -7039,7 +7039,7 @@ class ValidationValidatorTest extends TestCase
             ],
             [
                 'cat' => 'string',
-                'mouse' => 'string|exclude_with:cat'
+                'mouse' => 'string|exclude_with:cat',
             ]
         );
 
