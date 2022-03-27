@@ -425,6 +425,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $clazz = new \ReflectionClass($factory);
         $prop = $clazz->getProperty('count');
+        $prop->setAccessible(true);
         $value = $prop->getValue($factory);
 
         $this->assertSame(3, $value);
