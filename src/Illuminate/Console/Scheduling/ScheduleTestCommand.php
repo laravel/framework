@@ -75,11 +75,4 @@ class ScheduleTestCommand extends Command
 
         $event->run($this->laravel);
     }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
 }

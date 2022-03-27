@@ -72,6 +72,13 @@ class ScheduleTestCommandTest extends TestCase
             )
             ->expectsOutput(sprintf('[%s] Running scheduled command: callback', $this->timestamp));
     }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
 }
 
 class BarCommandStub extends Command
