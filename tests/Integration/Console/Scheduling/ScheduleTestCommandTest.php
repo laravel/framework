@@ -21,7 +21,7 @@ class ScheduleTestCommandTest extends TestCase
         $this->schedule = $this->app->make(Schedule::class);
     }
 
-    public function testNoDefinedCommands()
+    public function testRunNoDefinedCommands()
     {
         $this->artisan(ScheduleTestCommand::class)
             ->assertSuccessful()
