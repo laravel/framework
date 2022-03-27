@@ -71,6 +71,23 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(new BusDispatcherBasicCommand);
     }
 
+    public function testCommandsThatShouldDispatchSyncIsDispatched()
+    {
+        $container = new Container;
+
+        $queue = m::mock(Queue::class)->shouldNotReceive('push')->getMock();
+
+        $dispatcher = new Dispatcher($container, function () use ($queue) {
+            return $queue;
+        });
+
+        $job = m::mock(BusDispatcherNormalCommand::class);
+
+        $job->shouldReceive('handle')->once()->andReturnNull();
+
+        $dispatcher->dispatchSync($job);
+    }
+
     public function testDispatcherCanDispatchStandAloneHandler()
     {
         $container = new Container;
@@ -119,6 +136,21 @@ class BusInjectionStub
 }
 
 class BusDispatcherBasicCommand
+{
+    public $name;
+
+    public function __construct($name = null)
+    {
+        $this->name = $name;
+    }
+
+    public function handle(BusInjectionStub $stub)
+    {
+        //
+    }
+}
+
+class BusDispatcherNormalCommand implements ShouldQueue
 {
     public $name;
 
