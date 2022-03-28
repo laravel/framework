@@ -417,14 +417,14 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_counted_sequence()
     {
-        $factory = FactoryTestUserFactory::new()->countedSequence(
+        $factory = FactoryTestUserFactory::new()->forEachSequence(
             ['name' => 'Taylor Otwell'],
             ['name' => 'Abigail Otwell'],
             ['name' => 'Dayle Rees']
         );
 
-        $clazz = new \ReflectionClass($factory);
-        $prop = $clazz->getProperty('count');
+        $class = new \ReflectionClass($factory);
+        $prop = $class->getProperty('count');
         $prop->setAccessible(true);
         $value = $prop->getValue($factory);
 

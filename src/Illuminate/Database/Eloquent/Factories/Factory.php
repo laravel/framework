@@ -495,12 +495,12 @@ abstract class Factory
     }
 
     /**
-     * Add a new sequenced state transformation to the model definition and update count to the size of the sequence.
+     * Add a new sequenced state transformation to the model definition and update the pending creation count to the size of the sequence.
      *
      * @param  array  $sequence
      * @return static
      */
-    public function countedSequence(...$sequence)
+    public function forEachSequence(...$sequence)
     {
         return $this->state(new Sequence(...$sequence))->count(count($sequence));
     }
