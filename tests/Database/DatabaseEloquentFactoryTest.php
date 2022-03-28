@@ -415,6 +415,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('index: 1', $users[1]->name);
     }
 
+    public function test_counted_sequence()
+    {
+        $factory = FactoryTestUserFactory::new()->forEachSequence(
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Abigail Otwell'],
+            ['name' => 'Dayle Rees']
+        );
+
+        $class = new \ReflectionClass($factory);
+        $prop = $class->getProperty('count');
+        $prop->setAccessible(true);
+        $value = $prop->getValue($factory);
+
+        $this->assertSame(3, $value);
+    }
+
     public function test_cross_join_sequences()
     {
         $assert = function ($users) {
