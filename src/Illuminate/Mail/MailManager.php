@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Transport\SendmailTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 /**
  * @mixin \Illuminate\Mail\Mailer
@@ -185,11 +186,11 @@ class MailManager implements FactoryContract
     /**
      * Configure the additional SMTP driver options.
      *
-     * @param  \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport  $transport
+     * @param  \Symfony\Component\Mailer\Transport\TransportInterface $transport
      * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport
      */
-    protected function configureSmtpTransport(EsmtpTransport $transport, array $config)
+    protected function configureSmtpTransport(TransportInterface $transport, array $config)
     {
         $stream = $transport->getStream();
 
