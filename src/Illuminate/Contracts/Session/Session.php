@@ -72,6 +72,14 @@ interface Session
     public function has($key);
 
     /**
+     * Checks if a key is missing or is null.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function doesntHave($key);
+
+    /**
      * Get an item from the session.
      *
      * @param  string  $key
