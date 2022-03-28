@@ -8,13 +8,6 @@ use Illuminate\Support\Facades\App;
 class OptimizeCommand extends Command
 {
     /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'optimize';
-
-    /**
      * The name and signature of the console command.
      *
      * @var string
