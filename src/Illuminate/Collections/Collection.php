@@ -68,6 +68,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get a lazy collection for the items in this collection.
      *
      * @return \Illuminate\Support\LazyCollection<TKey, TValue>
+     *
+     * @internal This method is only meant to be used internally and not in userland.
      */
     public function lazy()
     {
