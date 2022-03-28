@@ -343,7 +343,6 @@ class SupportTestingQueueFakeTest extends TestCase
 
         $this->fake->assertClosureNotPushed();
     }
-
 }
 
 class JobStub
