@@ -1688,6 +1688,25 @@ class TestResponseTest extends TestCase
         $response->assertSessionDoesntHaveErrors(['foo']);
     }
 
+    public function testAssertSessionHasNoErrors()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasNoErrors();
+    }
+
     public function testAssertSessionHas()
     {
         app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
