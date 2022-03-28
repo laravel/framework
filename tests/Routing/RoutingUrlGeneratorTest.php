@@ -662,16 +662,16 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $url->getRequest()->headers->set('referer', 'http://www.foo.com?baz=bah');
-        $this->assertSame('', $url->previousPath());
+        $this->assertSame('/', $url->previousPath());
 
         $url->getRequest()->headers->set('referer', 'http://www.foo.com/?baz=bah');
-        $this->assertSame('', $url->previousPath());
+        $this->assertSame('/', $url->previousPath());
 
         $url->getRequest()->headers->set('referer', 'http://www.foo.com/bar?baz=bah');
         $this->assertSame('/bar', $url->previousPath());
 
         $url->getRequest()->headers->remove('referer');
-        $this->assertSame('', $url->previousPath());
+        $this->assertSame('/', $url->previousPath());
 
         $this->assertSame('/bar', $url->previousPath('/bar'));
     }
