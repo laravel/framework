@@ -64,7 +64,7 @@ trait InteractsWithIO
      * Get the value of a command argument.
      *
      * @param  string|null  $key
-     * @return string|array|null
+     * @return string|array|null|bool
      */
     public function argument($key = null)
     {
