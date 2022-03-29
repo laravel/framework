@@ -1346,6 +1346,29 @@ EOF;
     }
 
     /**
+     * Assert that the session matches the given errors.
+     *
+     * @param  string|array  $keys
+     * @param  mixed  $format
+     * @param  string  $errorBag
+     * @return $this
+     */
+    public function assertSessionMatchesErrors($keys = [], $errorBag = 'default')
+    {
+        $this->assertSessionHasErrors($keys, null, $errorBag);
+
+        $keys = (array) $keys;
+
+        $errors = $this->session()->get('errors')->getBag($errorBag);
+
+        $diffKeys = array_diff($errors->keys(), $keys);
+
+        PHPUnit::assertEmpty($diffKeys, "Session errors doesn't match.");
+
+        return $this;
+    }
+
+    /**
      * Assert that the session has no errors.
      *
      * @return $this
