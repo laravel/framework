@@ -519,6 +519,10 @@ trait HasAttributes
             return call_user_func(static::$lazyLoadingViolationCallback, $this, $key);
         }
 
+        if (! $this->exists || $this->wasRecentlyCreated) {
+            return;
+        }
+
         throw new LazyLoadingViolationException($this, $key);
     }
 
