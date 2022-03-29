@@ -28,7 +28,7 @@ class RedisStoreTest extends TestCase
         $redisStore = $repository->getStore();
         $redisConnection = $redisStore->connection();
 
-        if ($redisConnection instanceof PhpRedisConnection && $redisConnection->usesJsonSerialization()) {
+        if ($redisConnection instanceof PhpRedisConnection && $redisConnection->jsonSerialized()) {
             $this->markTestSkipped(
                 'JSON does not support INF or -INF. It will be serialized to null '.
                 'and as a result phpredis will store it as 0.'
@@ -54,7 +54,7 @@ class RedisStoreTest extends TestCase
         $redisStore = $repository->getStore();
         $redisConnection = $redisStore->connection();
 
-        if ($redisConnection instanceof PhpRedisConnection && $redisConnection->usesJsonSerialization()) {
+        if ($redisConnection instanceof PhpRedisConnection && $redisConnection->jsonSerialized()) {
             $this->markTestSkipped(
                 'JSON does not support NAN. It will be serialized to null '.
                 'and as a result phpredis will store it as 0.'
