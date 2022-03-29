@@ -218,7 +218,7 @@ class Store implements Session
     }
 
     /**
-     * Checks if a key is present and not null.
+     * Determine if a key is present and not null.
      *
      * @param  string|array  $key
      * @return bool
@@ -231,7 +231,7 @@ class Store implements Session
     }
 
     /**
-     * Checks if a key is missing or is null.
+     * Determine if a key is missing or null.
      *
      * @param  string|array  $key
      * @return bool
