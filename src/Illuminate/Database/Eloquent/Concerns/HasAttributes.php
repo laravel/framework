@@ -73,6 +73,13 @@ trait HasAttributes
     protected $attributeCastCache = [];
 
     /**
+     * The attributes that may have been altered using custom classes or "Attribute" return type mutators.
+     *
+     * @var array
+     */
+    protected $potentiallyAlteredCasts = [];
+
+    /**
      * The built-in, primitive cast types supported by Eloquent.
      *
      * @var string[]
@@ -630,6 +637,8 @@ trait HasAttributes
      */
     protected function mutateAttributeMarkedAttribute($key, $value)
     {
+        $this->potentiallyAlteredCasts[$key] = true;
+
         if (array_key_exists($key, $this->attributeCastCache)) {
             return $this->attributeCastCache[$key];
         }
@@ -767,6 +776,8 @@ trait HasAttributes
      */
     protected function getClassCastableAttributeValue($key, $value)
     {
+        $this->potentiallyAlteredCasts[$key] = true;
+
         if (isset($this->classCastCache[$key])) {
             return $this->classCastCache[$key];
         } else {
@@ -1617,6 +1628,10 @@ trait HasAttributes
     protected function mergeAttributesFromClassCasts()
     {
         foreach ($this->classCastCache as $key => $value) {
+            if (!isset($this->potentiallyAlteredCasts[$key]) || $this->potentiallyAlteredCasts[$key] === false) {
+                continue;
+            }
+
             $caster = $this->resolveCasterClass($key);
 
             $this->attributes = array_merge(
@@ -1625,6 +1640,8 @@ trait HasAttributes
                     ? [$key => $value]
                     : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
             );
+
+            $this->potentiallyAlteredCasts[$key] = false;
         }
     }
 
@@ -1636,6 +1653,10 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
+            if (!isset($this->potentiallyAlteredCasts[$key]) || $this->potentiallyAlteredCasts[$key] === false) {
+                continue;
+            }
+
             $attribute = $this->{Str::camel($key)}();
 
             if ($attribute->get && ! $attribute->set) {
@@ -1652,6 +1673,8 @@ trait HasAttributes
                     $key, $callback($value, $this->attributes)
                 )
             );
+
+            $this->potentiallyAlteredCasts[$key] = false;
         }
     }
 

@@ -53,8 +53,8 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
 
         $model = new TestEloquentModelWithCustomCast;
 
-        $model->address = $address = new Address('110 Kingsbrook St.', 'My Childhood House');
-        $address->lineOne = '117 Spencer St.';
+        $model->address = new Address('110 Kingsbrook St.', 'My Childhood House');
+        $model->address->lineOne = '117 Spencer St.';
         $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
 
         $model = new TestEloquentModelWithCustomCast;

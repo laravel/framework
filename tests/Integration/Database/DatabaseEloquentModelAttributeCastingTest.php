@@ -49,8 +49,8 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 
         $model = new TestEloquentModelWithAttributeCast;
 
-        $model->address = $address = new AttributeCastAddress('110 Kingsbrook St.', 'My Childhood House');
-        $address->lineOne = '117 Spencer St.';
+        $model->address = new AttributeCastAddress('110 Kingsbrook St.', 'My Childhood House');
+        $model->address->lineOne = '117 Spencer St.';
         $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
 
         $model = new TestEloquentModelWithAttributeCast;
