@@ -184,11 +184,11 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
     public function testAsEncryptedCollection()
     {
         $this->encrypter->expects('encryptString')
-            ->twice()
+            ->once()
             ->with('{"key1":"value1"}')
             ->andReturn('encrypted-secret-collection-string-1');
         $this->encrypter->expects('encryptString')
-            ->times(10)
+            ->times(6)
             ->with('{"key1":"value1","key2":"value2"}')
             ->andReturn('encrypted-secret-collection-string-2');
         $this->encrypter->expects('decryptString')
@@ -242,7 +242,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             ->with('encrypted-secret-array-string-1')
             ->andReturn('{"key1":"value1"}');
         $this->encrypter->expects('encryptString')
-            ->times(10)
+            ->times(6)
             ->with('{"key1":"value1","key2":"value2"}')
             ->andReturn('encrypted-secret-array-string-2');
         $this->encrypter->expects('decryptString')

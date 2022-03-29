@@ -331,6 +331,17 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCachingFluent);
         }
     }
+
+    public function testMutatorsAreCalledOnlyWhenNeeded()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $model->address = new AttributeCastAddress('110 Kingsbrook St.', 'My Childhood House');
+        $model->address->lineOne = '117 Spencer St.';
+        $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
+
+        $this->assertEquals(2, $model->countAddressMutatorCalls);        
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -341,6 +352,8 @@ class TestEloquentModelWithAttributeCast extends Model
      * @var string[]
      */
     protected $guarded = [];
+
+    public $countAddressMutatorCalls = 0;
 
     public function uppercase(): Attribute
     {
@@ -365,6 +378,8 @@ class TestEloquentModelWithAttributeCast extends Model
                 return new AttributeCastAddress($attributes['address_line_one'], $attributes['address_line_two']);
             },
             function ($value) {
+                $this->countAddressMutatorCalls++;
+
                 if (is_null($value)) {
                     return [
                         'address_line_one' => null,
