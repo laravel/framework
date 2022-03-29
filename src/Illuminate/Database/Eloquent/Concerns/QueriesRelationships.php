@@ -509,6 +509,59 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a "belongs to one of" relationship where clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $values
+     * @param  string|null  $relationshipName
+     * @param  string  $boolean
+     * @return $this
+     *
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    public function whereBelongsToOneOf($values, $relationshipName = null, $boolean = 'and')
+    {
+        if (! $related = $values->first()) {
+            return $this->whereNull($this->getModel()->getKeyName(), $boolean);
+        }
+
+        if ($relationshipName === null) {
+            $relationshipName = Str::camel(class_basename($related));
+        }
+
+        try {
+            $relationship = $this->model->{$relationshipName}();
+        } catch (BadMethodCallException $exception) {
+            throw RelationNotFoundException::make($this->model, $relationshipName);
+        }
+
+        if (! $relationship instanceof BelongsTo) {
+            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
+        }
+
+        $this->whereIn(
+            $relationship->getQualifiedForeignKeyName(),
+            $values->pluck($relationship->getOwnerKeyName())->toArray(),
+            $boolean,
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add a "belongs to one of" relationship with an or where clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $values
+     * @param  string|null  $relationshipName
+     * @return $this
+     *
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    public function orWhereBelongsToOneOf($values, string $relationshipName = null)
+    {
+        return $this->whereBelongsToOneOf($values, $relationshipName, 'or');
+    }
+
+    /**
      * Add subselect queries to include an aggregate value for a relationship.
      *
      * @param  mixed  $relations

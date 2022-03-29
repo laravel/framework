@@ -1055,6 +1055,38 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testWhereBelongsToOneOf()
+    {
+        $related = new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 1,
+            'parent_id' => 2,
+        ]);
+
+        $parents = new Collection([new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 2,
+            'parent_id' => 1,
+        ]), new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 3,
+            'parent_id' => 1,
+        ])]);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
+
+        $result = $builder->whereBelongsToOneOf($parents);
+        $this->assertEquals($result, $builder);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
+
+        $result = $builder->whereBelongsToOneOf($parents, 'parent');
+        $this->assertEquals($result, $builder);
+    }
+
     public function testDeleteOverride()
     {
         $builder = $this->getBuilder();
