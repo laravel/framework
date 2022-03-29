@@ -1021,6 +1021,8 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
+        $this->potentiallyAlteredCasts[$key] = false;
+
         $attribute = $this->{Str::camel($key)}();
 
         $callback = $attribute->set ?: function ($value) use ($key) {
@@ -1084,6 +1086,8 @@ trait HasAttributes
      */
     protected function setClassCastableAttribute($key, $value)
     {
+        $this->potentiallyAlteredCasts[$key] = false;
+
         $caster = $this->resolveCasterClass($key);
 
         $this->attributes = array_merge(
