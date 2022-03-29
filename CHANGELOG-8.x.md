@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.5...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.6...8.x)
+
+
+## [v8.83.6 (2022-03-29)](https://github.com/laravel/framework/compare/v8.83.5...v8.83.6)
+
+### Fixed
+- Stop throwing LazyLoadingViolationException for recently created model instances ([#41549](https://github.com/laravel/framework/pull/41549))
+- Close doctrineConnection on disconnect ([#41584](https://github.com/laravel/framework/pull/41584))
+- Fix require fails if is_file cached by opcache ([#41614](https://github.com/laravel/framework/pull/41614))
+- Fix collection nth where step <= offset ([#41645](https://github.com/laravel/framework/pull/41645))
 
 
 ## [v8.83.5 (2022-03-15)](https://github.com/laravel/framework/compare/v8.83.4...v8.83.5)
