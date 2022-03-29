@@ -340,7 +340,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $model->address->lineOne = '117 Spencer St.';
         $this->assertSame('117 Spencer St.', $model->getAttributes()['address_line_one']);
 
-        $this->assertEquals(2, $model->countAddressMutatorCalls);        
+        $this->assertEquals(2, $model->countAddressMutatorCalls);
     }
 }
 

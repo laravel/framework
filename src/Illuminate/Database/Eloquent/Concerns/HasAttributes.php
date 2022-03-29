@@ -1628,7 +1628,7 @@ trait HasAttributes
     protected function mergeAttributesFromClassCasts()
     {
         foreach ($this->classCastCache as $key => $value) {
-            if (!isset($this->potentiallyAlteredCasts[$key]) || $this->potentiallyAlteredCasts[$key] === false) {
+            if (! isset($this->potentiallyAlteredCasts[$key]) || $this->potentiallyAlteredCasts[$key] === false) {
                 continue;
             }
 
@@ -1653,7 +1653,7 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
-            if (!isset($this->potentiallyAlteredCasts[$key]) || $this->potentiallyAlteredCasts[$key] === false) {
+            if (! isset($this->potentiallyAlteredCasts[$key]) || $this->potentiallyAlteredCasts[$key] === false) {
                 continue;
             }
 
