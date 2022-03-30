@@ -564,7 +564,7 @@ class Worker
      */
     protected function markJobAsFailedIfItShouldFailOnTimeout($connectionName, $job, Throwable $e)
     {
-        if (method_exists($job, 'shouldFailOnTimeout') ? $job->shouldFailOnTimeout() : false) {
+        if (method_exists($job, 'shouldFailOnTimeout') && $job->shouldFailOnTimeout()) {
             $this->failJob($job, $e);
         }
     }

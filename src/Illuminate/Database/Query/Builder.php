@@ -2379,8 +2379,7 @@ class Builder implements BuilderContract
     {
         return Collection::make($this->orders)
                     ->reject(function ($order) use ($column) {
-                        return isset($order['column'])
-                               ? $order['column'] === $column : false;
+                        return isset($order['column']) && $order['column'] === $column;
                     })->values()->all();
     }
 

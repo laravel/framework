@@ -1699,11 +1699,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'exclude_with');
 
-        if (! Arr::has($this->data, $parameters[0])) {
-            return true;
-        }
-
-        return false;
+        return ! Arr::has($this->data, $parameters[0]);
     }
 
     /**

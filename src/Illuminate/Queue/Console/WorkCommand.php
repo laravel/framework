@@ -246,6 +246,6 @@ class WorkCommand extends Command
      */
     protected function downForMaintenance()
     {
-        return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
+        return ! $this->option('force') && $this->laravel->isDownForMaintenance();
     }
 }
