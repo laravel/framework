@@ -346,6 +346,30 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "superior to" clause to the query.
+     *
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereSuperiorTo($column, $value = null)
+    {
+        return $this->where($column, '>', $value);
+    }
+
+    /**
+     * Add an "inferior to" clause to the query.
+     *
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereInferiorTo($column, $value = null)
+    {
+        return $this->where($column, '<', $value);
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
