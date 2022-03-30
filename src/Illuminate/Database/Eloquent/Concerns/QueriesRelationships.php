@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 trait QueriesRelationships
 {
@@ -472,14 +473,15 @@ trait QueriesRelationships
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
         if (! $related instanceof Collection) {
-            $values = $related->newCollection([$related]);
+            $relatedCollection = $related->newCollection([$related]);
         } else {
-            $values = $related;
-            $related = $values->first();
+            $relatedCollection = $related;
+
+            $related = $relatedCollection->first();
         }
 
-        if (! $related) {
-            return $this->whereNull($this->getModel()->getKeyName(), $boolean);
+        if ($relatedCollection->isEmpty()) {
+            throw new InvalidArgumentException("Collection given to whereBelongsTo method may not be empty.");
         }
 
         if ($relationshipName === null) {
@@ -498,7 +500,7 @@ trait QueriesRelationships
 
         $this->whereIn(
             $relationship->getQualifiedForeignKeyName(),
-            $values->pluck($relationship->getOwnerKeyName())->toArray(),
+            $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray(),
             $boolean,
         );
 
