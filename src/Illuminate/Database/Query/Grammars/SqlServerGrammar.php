@@ -166,6 +166,22 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileJsonContainsKey($column)
+    {
+        $parts = explode('->', $column);
+        $key = "'".str_replace("'", "''", array_pop($parts))."'";
+
+        [$field, $path] = $this->wrapJsonFieldAndPath(implode('->', $parts));
+
+        return $key.' in (select [key] from openjson('.$field.$path.'))';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column
