@@ -1041,7 +1041,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
         $result = $builder->whereBelongsTo($parent);
         $this->assertEquals($result, $builder);
@@ -1049,9 +1049,33 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
         $result = $builder->whereBelongsTo($parent, 'parent');
+        $this->assertEquals($result, $builder);
+
+        $parents = new Collection([new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 2,
+            'parent_id' => 1,
+        ]), new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 3,
+            'parent_id' => 1,
+        ])]);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
+
+        $result = $builder->whereBelongsTo($parents);
+        $this->assertEquals($result, $builder);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
+
+        $result = $builder->whereBelongsTo($parents, 'parent');
         $this->assertEquals($result, $builder);
     }
 
