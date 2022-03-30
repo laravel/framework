@@ -216,6 +216,22 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileJsonContainsKey($column)
+    {
+        $parts = explode('->', $column);
+        $key = "'" . str_replace("'", "''", array_pop($parts)) . "'";
+
+        $column = str_replace('->>', '->', $this->wrap(implode('->', $parts)));
+
+        return 'coalesce(('.$column.')::jsonb ?? '.$key.', false)';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column
