@@ -1956,6 +1956,8 @@ trait HasAttributes
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
+        } elseif ($this->isClassSerializable($key)) {
+            return $this->serializeClassCastableAttribute($key, $attribute) === $this->serializeClassCastableAttribute($key, $original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
