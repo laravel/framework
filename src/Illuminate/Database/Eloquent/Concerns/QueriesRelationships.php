@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -461,7 +462,7 @@ trait QueriesRelationships
     /**
      * Add a "belongs to" relationship where clause to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $related
      * @param  string|null  $relationshipName
      * @param  string  $boolean
      * @return $this
@@ -470,57 +471,14 @@ trait QueriesRelationships
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
-        if ($relationshipName === null) {
-            $relationshipName = Str::camel(class_basename($related));
+        if (! $related instanceof Collection) {
+            $values = $related->newCollection([$related]);
+        } else {
+            $values = $related;
+            $related = $values->first();
         }
 
-        try {
-            $relationship = $this->model->{$relationshipName}();
-        } catch (BadMethodCallException $exception) {
-            throw RelationNotFoundException::make($this->model, $relationshipName);
-        }
-
-        if (! $relationship instanceof BelongsTo) {
-            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
-        }
-
-        $this->where(
-            $relationship->getQualifiedForeignKeyName(),
-            '=',
-            $related->getAttributeValue($relationship->getOwnerKeyName()),
-            $boolean,
-        );
-
-        return $this;
-    }
-
-    /**
-     * Add an "BelongsTo" relationship with an "or where" clause to the query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $related
-     * @param  string|null  $relationshipName
-     * @return $this
-     *
-     * @throws \RuntimeException
-     */
-    public function orWhereBelongsTo($related, $relationshipName = null)
-    {
-        return $this->whereBelongsTo($related, $relationshipName, 'or');
-    }
-
-    /**
-     * Add a "belongs to one of" relationship where clause to the query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $values
-     * @param  string|null  $relationshipName
-     * @param  string  $boolean
-     * @return $this
-     *
-     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
-     */
-    public function whereBelongsToOneOf($values, $relationshipName = null, $boolean = 'and')
-    {
-        if (! $related = $values->first()) {
+        if (! $related) {
             return $this->whereNull($this->getModel()->getKeyName(), $boolean);
         }
 
@@ -548,17 +506,17 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "belongs to one of" relationship with an or where clause to the query.
+     * Add an "BelongsTo" relationship with an "or where" clause to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $values
+     * @param  \Illuminate\Database\Eloquent\Model  $related
      * @param  string|null  $relationshipName
      * @return $this
      *
-     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     * @throws \RuntimeException
      */
-    public function orWhereBelongsToOneOf($values, string $relationshipName = null)
+    public function orWhereBelongsTo($related, $relationshipName = null)
     {
-        return $this->whereBelongsToOneOf($values, $relationshipName, 'or');
+        return $this->whereBelongsTo($related, $relationshipName, 'or');
     }
 
     /**

@@ -1041,7 +1041,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
         $result = $builder->whereBelongsTo($parent);
         $this->assertEquals($result, $builder);
@@ -1049,18 +1049,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
         $result = $builder->whereBelongsTo($parent, 'parent');
         $this->assertEquals($result, $builder);
-    }
-
-    public function testWhereBelongsToOneOf()
-    {
-        $related = new EloquentBuilderTestWhereBelongsToStub([
-            'id' => 1,
-            'parent_id' => 2,
-        ]);
 
         $parents = new Collection([new EloquentBuilderTestWhereBelongsToStub([
             'id' => 2,
@@ -1075,7 +1067,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($related);
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
 
-        $result = $builder->whereBelongsToOneOf($parents);
+        $result = $builder->whereBelongsTo($parents);
         $this->assertEquals($result, $builder);
 
         $builder = $this->getBuilder();
@@ -1083,7 +1075,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($related);
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
 
-        $result = $builder->whereBelongsToOneOf($parents, 'parent');
+        $result = $builder->whereBelongsTo($parents, 'parent');
         $this->assertEquals($result, $builder);
     }
 
