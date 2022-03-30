@@ -481,7 +481,7 @@ trait QueriesRelationships
         }
 
         if ($relatedCollection->isEmpty()) {
-            throw new InvalidArgumentException("Collection given to whereBelongsTo method may not be empty.");
+            throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
         }
 
         if ($relationshipName === null) {
