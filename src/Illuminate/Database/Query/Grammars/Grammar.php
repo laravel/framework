@@ -623,6 +623,35 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where JSON contains key" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonContainsKey(Builder $query, $where)
+    {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonContainsKey(
+            $where['column']
+        );
+    }
+
+    /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param  string  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileJsonContainsKey($column)
+    {
+        throw new RuntimeException('This database engine does not support JSON contains key operations.');
+    }
+
+    /**
      * Compile a "where JSON length" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
