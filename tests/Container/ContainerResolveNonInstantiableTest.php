@@ -23,6 +23,14 @@ class ContainerResolveNonInstantiableTest extends TestCase
         $this->assertCount(0, $parent->child->objects);
         $this->assertSame(42, $parent->i);
     }
+
+    public function testResolvingOverrideVariadic()
+    {
+        $container = new Container;
+        $childClass = $container->make(ChildClass::class, ['objects' => [new TestClass(), new TestClass()]]);
+
+        $this->assertCount(2, $childClass->objects);
+    }
 }
 
 interface TestInterface
@@ -72,4 +80,8 @@ class ChildClass
     {
         $this->objects = $objects;
     }
+}
+
+class TestClass implements TestInterface
+{
 }

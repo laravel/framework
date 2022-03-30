@@ -933,6 +933,12 @@ class Container implements ArrayAccess, ContainerContract
             // If the dependency has an override for this particular build we will use
             // that instead as the value. Otherwise, we will continue with this run
             // of resolutions and let reflection attempt to determine the result.
+            if ($dependency->isVariadic() && $this->hasParameterOverride($dependency)) {
+                $results = array_merge($results, $this->getParameterOverride($dependency));
+
+                continue;
+            }
+
             if ($this->hasParameterOverride($dependency)) {
                 $results[] = $this->getParameterOverride($dependency);
 
