@@ -1184,15 +1184,53 @@ class HttpClientTest extends TestCase
 
     public function testRequestExceptionIsThrownWhenRetriesExhausted()
     {
-        $this->expectException(RequestException::class);
-
         $this->factory->fake([
             '*' => $this->factory->response(['error'], 403),
         ]);
 
-        $this->factory
-            ->retry(2, 1000, null, true)
-            ->get('http://foo.com/get');
+        $exception = null;
+
+        try {
+            $this->factory
+                ->retry(2, 1000, null, true)
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $this->factory->assertSentCount(2);
+    }
+
+    public function testRequestExceptionIsThrownWithoutRetriesIfRetryNotNecessary()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 500),
+        ]);
+
+        $exception = null;
+        $whenAttempts = 0;
+
+        try {
+            $this->factory
+                ->retry(2, 1000, function ($exception) use (&$whenAttempts) {
+                    $whenAttempts++;
+
+                    return $exception->response->status() === 403;
+                }, true)
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $this->assertSame(1, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
     }
 
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
@@ -1206,6 +1244,31 @@ class HttpClientTest extends TestCase
             ->get('http://foo.com/get');
 
         $this->assertTrue($response->failed());
+
+        $this->factory->assertSentCount(2);
+    }
+
+    public function testRequestExceptionIsNotThrownWithoutRetriesIfRetryNotNecessary()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 500),
+        ]);
+
+        $whenAttempts = 0;
+
+        $response = $this->factory
+            ->retry(2, 1000, function ($exception) use (&$whenAttempts) {
+                $whenAttempts++;
+
+                return $exception->response->status() === 403;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->failed());
+
+        $this->assertSame(1, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
     }
 
     public function testMiddlewareRunsWhenFaked()
