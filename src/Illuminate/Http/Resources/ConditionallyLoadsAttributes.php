@@ -147,8 +147,8 @@ trait ConditionallyLoadsAttributes
     /**
      * Retrieve a model attribute if it has been selected.
      *
-     * @param mixed $value
-     * @param mixed $default
+     * @param  mixed  $value
+     * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenSelected($value, $default = null)
@@ -157,7 +157,7 @@ trait ConditionallyLoadsAttributes
             $args = [$value] :
             $args = [$value, $default];
 
-        return $this->when(!is_null($value), ...$args);
+        return $this->when(! is_null($value), ...$args);
     }
 
     /**
