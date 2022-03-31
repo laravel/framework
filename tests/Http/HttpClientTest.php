@@ -1184,15 +1184,24 @@ class HttpClientTest extends TestCase
 
     public function testRequestExceptionIsThrownWhenRetriesExhausted()
     {
-        $this->expectException(RequestException::class);
-
         $this->factory->fake([
             '*' => $this->factory->response(['error'], 403),
         ]);
 
-        $this->factory
+        $exception = null;
+
+        try {
+            $this->factory
             ->retry(2, 1000, null, true)
             ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testRequestExceptionIsNotThrownWhenDisabledAndRetriesExhausted()
@@ -1206,6 +1215,8 @@ class HttpClientTest extends TestCase
             ->get('http://foo.com/get');
 
         $this->assertTrue($response->failed());
+
+        $this->factory->assertSentCount(2);
     }
 
     public function testMiddlewareRunsWhenFaked()
