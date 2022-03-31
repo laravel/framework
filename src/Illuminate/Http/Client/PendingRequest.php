@@ -707,21 +707,23 @@ class PendingRequest
             return $this->makePromise($method, $url, $options);
         }
 
-        $attempt = 0;
+        $shouldRetry = true;
 
-        return retry($this->tries ?? 1, function () use ($method, $url, $options, &$attempt) {
-            $attempt++;
-
+        return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
-                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt) {
+                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
-                    if ($attempt < $this->tries && ! $response->successful()) {
-                        $response->throw();
-                    }
+                    if (! $response->successful()) {
+                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException()) : true;
 
-                    if ($this->tries > 1 && $this->retryThrow && ! $response->successful()) {
-                        $response->throw();
+                        if ($attempt < $this->tries && $shouldRetry) {
+                            $response->throw();
+                        }
+
+                        if ($this->tries > 1 && $this->retryThrow) {
+                            $response->throw();
+                        }
                     }
 
                     $this->dispatchResponseReceivedEvent($response);
@@ -731,7 +733,9 @@ class PendingRequest
 
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100, $this->retryWhenCallback);
+        }, $this->retryDelay ?? 100, function () use (&$shouldRetry) {
+            return $shouldRetry;
+        });
     }
 
     /**
