@@ -707,10 +707,18 @@ class PendingRequest
             return $this->makePromise($method, $url, $options);
         }
 
-        return retry($this->tries ?? 1, function () use ($method, $url, $options) {
+        $attempt = 0;
+
+        return retry($this->tries ?? 1, function () use ($method, $url, $options, &$attempt) {
+            $attempt++;
+
             try {
-                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) {
+                return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt) {
                     $this->populateResponse($response);
+
+                    if ($attempt < $this->tries && ! $response->successful()) {
+                        $response->throw();
+                    }
 
                     if ($this->tries > 1 && $this->retryThrow && ! $response->successful()) {
                         $response->throw();
