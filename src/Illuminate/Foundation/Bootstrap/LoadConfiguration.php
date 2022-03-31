@@ -46,7 +46,7 @@ class LoadConfiguration
             return $config->get('app.env', 'production');
         });
 
-        date_default_timezone_set($config->get('app.timezone', 'UTC'));
+        date_default_timezone_set($config->get('app.timezone', date_default_timezone_get()));
 
         mb_internal_encoding('UTF-8');
     }
