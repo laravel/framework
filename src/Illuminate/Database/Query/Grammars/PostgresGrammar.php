@@ -224,6 +224,7 @@ class PostgresGrammar extends Grammar
     protected function compileJsonContainsKey($column)
     {
         $parts = explode('->', $column);
+
         $key = "'".str_replace("'", "''", array_pop($parts))."'";
 
         $column = str_replace('->>', '->', $this->wrap(implode('->', $parts)));

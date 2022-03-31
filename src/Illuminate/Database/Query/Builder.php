@@ -1777,7 +1777,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where JSON contains key" clause to the query.
+     * Add a clause that determines if a JSON path exists to the query.
      *
      * @param  string  $column
      * @param  string  $boolean
@@ -1794,7 +1794,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "or where JSON contains key" clause to the query.
+     * Add an "or" clause that determines if a JSON path exists to the query.
      *
      * @param  string  $column
      * @return $this
@@ -1805,7 +1805,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a "where JSON not contains key" clause to the query.
+     * Add a clause that determines if a JSON path does not exist to the query.
      *
      * @param  string  $column
      * @param  string  $boolean
@@ -1817,7 +1817,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "or where JSON not contains key" clause to the query.
+     * Add an "or" clause that determines if a JSON path does not exist to the query.
      *
      * @param  string  $column
      * @return $this
