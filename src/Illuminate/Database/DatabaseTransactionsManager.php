@@ -89,9 +89,7 @@ class DatabaseTransactionsManager
      */
     public function addCallback($callback)
     {
-        if ($current = $this->transactions->reject(function ($transaction) {
-            return $transaction === $this->callbacksShouldIgnore;
-        })->last()) {
+        if ($current = $this->callbackApplicableTransactions()->last()) {
             return $current->addCallback($callback);
         }
 
@@ -109,6 +107,18 @@ class DatabaseTransactionsManager
         $this->callbacksShouldIgnore = $transaction;
 
         return $this;
+    }
+
+    /**
+     * Get the transactions that are applicable to callbacks.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function callbackApplicableTransactions()
+    {
+        return $this->transactions->reject(function ($transaction) {
+            return $transaction === $this->callbacksShouldIgnore;
+        })->values();
     }
 
     /**
