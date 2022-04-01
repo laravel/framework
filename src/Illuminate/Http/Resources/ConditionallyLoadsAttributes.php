@@ -153,9 +153,9 @@ trait ConditionallyLoadsAttributes
      */
     protected function whenSelected($value, $default = null)
     {
-        func_num_args() == 1 ?
-            $args = [$value] :
-            $args = [$value, $default];
+        $args = func_num_args() == 1 ?
+            [$value] :
+            [$value, $default];
 
         return $this->when(! is_null($value), ...$args);
     }
