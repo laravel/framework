@@ -145,6 +145,20 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a model attribute if it is not null.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenNotNull($value, $default = null)
+    {
+        $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
+
+        return $this->when(! is_null($value), ...$arguments);
+    }
+
+    /**
      * Retrieve an accessor when it has been appended.
      *
      * @param  string  $attribute
