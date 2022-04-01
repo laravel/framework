@@ -314,6 +314,35 @@ class SupportTestingQueueFakeTest extends TestCase
             )));
         }
     }
+
+    public function testAssertClosurePushed()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->assertClosurePushed();
+    }
+
+    public function testAssertClosurePushedWithTimes()
+    {
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->push(function () {
+            // Do nothing
+        });
+
+        $this->fake->assertClosurePushed(2);
+    }
+
+    public function testAssertClosureNotPushed()
+    {
+        $this->fake->push($this->job);
+
+        $this->fake->assertClosureNotPushed();
+    }
 }
 
 class JobStub
