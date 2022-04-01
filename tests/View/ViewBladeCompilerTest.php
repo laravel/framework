@@ -218,6 +218,36 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
     }
 
+    public function testAnonymousComponentNamespacesCanBeStored()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('frontend', ' public/frontend ');
+        $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('frontend', 'public/frontend/');
+        $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('admin', '/admin/components');
+        $this->assertEquals(['admin' => 'admin.components'], $compiler->getAnonymousComponentNamespaces());
+
+        // Test directory is automatically inferred from the namespace
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('frontend');
+        $this->assertEquals(['frontend' => 'frontend'], $compiler->getAnonymousComponentNamespaces());
+
+        // Test that the prefix can also contain dots.
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('frontend.auth', 'frontend/auth');
+        $this->assertEquals(['frontend.auth' => 'frontend.auth'], $compiler->getAnonymousComponentNamespaces());
+    }
+
     protected function getFiles()
     {
         return m::mock(Filesystem::class);

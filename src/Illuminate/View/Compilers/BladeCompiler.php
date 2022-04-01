@@ -682,14 +682,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register an anonymous component namespace.
      *
-     * @param  string  $directory
      * @param  string  $prefix
+     * @param  string  $directory
      * @return void
      */
-    public function anonymousComponentNamespace($directory, $prefix)
+    public function anonymousComponentNamespace(string $prefix, string $directory = null)
     {
-        // Store the directory as dot notation.
-        $this->anonymousComponentNamespaces[$prefix] = Str::replace('/', '.', $directory);
+        if ($directory === null) {
+            $directory = $prefix;
+        }
+
+        // Store the directory in dot notation.
+        $this->anonymousComponentNamespaces[$prefix] = (string) Str::of($directory)->replace('/', '.')->trim('. ');
     }
 
     /**

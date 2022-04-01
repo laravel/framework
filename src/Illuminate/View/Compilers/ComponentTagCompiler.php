@@ -296,7 +296,7 @@ class ComponentTagCompiler
                     return $view;
                 }
 
-                if ($viewFactory->exists($view = $this->guessViewName($componentName).'.index')) {
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.index')) {
                     return $view;
                 }
 
