@@ -9,8 +9,8 @@ class PostResourceWithOptionalAttributes extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->whenSelected($this->id),
-            'title' => $this->whenSelected($this->title, 'no title'),
+            'id' => $this->whenNotNull($this->id),
+            'title' => $this->whenNotNull($this->title, 'no title'),
         ];
     }
 }
