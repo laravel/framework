@@ -21,7 +21,7 @@ enum CategoryBackedEnumWithKey: int
 
     public function slug(): string
     {
-        return match($this) {
+        return match ($this) {
             self::People => 'people',
             self::Fruits => 'fruits',
         };

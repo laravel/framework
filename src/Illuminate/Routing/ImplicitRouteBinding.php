@@ -125,7 +125,7 @@ class ImplicitRouteBinding
 
     protected static function getBackedEnumForBoundKey($enumClass, $field, $parameterValue)
     {
-        foreach($enumClass::cases() as $case) {
+        foreach ($enumClass::cases() as $case) {
             if ((string) $case->{$field}() === (string) $parameterValue) {
                 return $case;
             }
