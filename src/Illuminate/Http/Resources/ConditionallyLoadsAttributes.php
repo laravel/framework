@@ -151,7 +151,7 @@ trait ConditionallyLoadsAttributes
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function whenSelected($value, $default = null)
+    protected function whenNotNull($value, $default = null)
     {
         $args = func_num_args() == 1 ?
             [$value] :
