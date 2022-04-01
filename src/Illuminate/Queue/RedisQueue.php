@@ -99,7 +99,11 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         $this->getConnection()->pipeline(function () use ($jobs, $data, $queue) {
             $this->getConnection()->transaction(function () use ($jobs, $data, $queue) {
                 foreach ((array) $jobs as $job) {
-                    $this->push($job, $data, $queue);
+                    if (isset($job->delay)) {
+                        $this->later($job->delay, $job, $data, $queue);
+                    } else {
+                        $this->push($job, $data, $queue);
+                    }
                 }
             });
         });
