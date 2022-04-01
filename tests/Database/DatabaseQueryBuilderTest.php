@@ -3138,6 +3138,21 @@ class DatabaseQueryBuilderTest extends TestCase
         ]);
     }
 
+    public function testPostgresUpdateWrappingJsonPathArrayIndex()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{1,"2fa"}\', ?), "meta" = jsonb_set("meta"::jsonb, \'{"tags",0,2}\', ?) where ("options"->1->\'2fa\')::jsonb = \'true\'::jsonb', [
+                'false',
+                '"large"',
+            ]);
+
+        $builder->from('users')->where('options->[1]->2fa', true)->update([
+            'options->[1]->2fa' => false,
+            'meta->tags[0][2]' => 'large',
+        ]);
+    }
+
     public function testSQLiteUpdateWrappingJsonArray()
     {
         $builder = $this->getSQLiteBuilder();
@@ -3170,6 +3185,21 @@ class DatabaseQueryBuilderTest extends TestCase
             'options->security' => ['2fa' => false, 'presets' => ['laravel', 'vue']],
             'options->sharing->twitter' => 'username',
             'created_at' => new DateTime('2019-08-06'),
+        ]);
+    }
+
+    public function testSQLiteUpdateWrappingJsonPathArrayIndex()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = json_patch(ifnull("options", json(\'{}\')), json(?)), "meta" = json_patch(ifnull("meta", json(\'{}\')), json(?)) where json_extract("options", \'$[1]."2fa"\') = true', [
+                '{"[1]":{"2fa":false}}',
+                '{"tags[0][2]":"large"}',
+            ]);
+
+        $builder->from('users')->where('options->[1]->2fa', true)->update([
+            'options->[1]->2fa' => false,
+            'meta->tags[0][2]' => 'large',
         ]);
     }
 
