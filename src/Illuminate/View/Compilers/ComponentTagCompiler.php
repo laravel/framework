@@ -285,7 +285,7 @@ class ComponentTagCompiler
             // Prepending it ensures that the /components always has precedence over the cutom directories.
             ->prepend('components', $component)
             // Finally, we'll go over the components and prefixes and check whether we can find a matching view name.
-            ->reduce(function($carry, $directory, $prefix) use ($component, $viewFactory) {
+            ->reduce(function ($carry, $directory, $prefix) use ($component, $viewFactory) {
                 $componentName = Str::after($component, $prefix.'::');
 
                 if ($carry !== null) {
