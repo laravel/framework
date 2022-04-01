@@ -832,6 +832,24 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the given string is present in the HTML email body.
+     *
+     * @param  string  $string
+     * @return bool
+     */
+    public function htmlContains(string $string)
+    {
+        Container::getInstance()->call([$this, 'build']);
+
+        $view = $this->buildView();
+
+        return str_contains(
+            is_array($view) ? $view['html'] ?? $view[0] ?? '' : $view,
+            $string
+        );
+    }
+
+    /**
      * Set the plain text view for the message.
      *
      * @param  string  $textView
@@ -844,6 +862,24 @@ class Mailable implements MailableContract, Renderable
         $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
+    }
+
+    /**
+     * Determine if the given string is present in the plain-text email body.
+     *
+     * @param  string  $string
+     * @return bool
+     */
+    public function textContains(string $string)
+    {
+        Container::getInstance()->call([$this, 'build']);
+
+        $view = $this->buildView();
+
+        return str_contains(
+            is_array($view) ? $view['text'] ?? $view[1] ?? '' : $view,
+            $string
+        );
     }
 
     /**

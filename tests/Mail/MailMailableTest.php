@@ -311,6 +311,57 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasSubject('foo'));
     }
 
+    public function testHtmlContains()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->html('My name is Taylor Otwell');
+
+        $this->assertTrue($mailable->htmlContains('Taylor Otwell'));
+        $this->assertFalse($mailable->htmlContains('Otwell Taylor'));
+    }
+
+    public function testHtmlContainsWithView()
+    {
+        $mailable = new WelcomeMailableStub;
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('__toString')->once()->andReturn('My name is Taylor Otwell');
+
+        $mailable->view($view);
+
+        $this->assertTrue($mailable->htmlContains('Taylor Otwell'));
+    }
+
+    public function testHtmlContainsWithViewAndText()
+    {
+        $mailable = new WelcomeMailableStub;
+        $view = m::mock(Factory::class);
+        $view->shouldReceive('__toString')->once()->andReturn('My name is Taylor Otwell');
+
+        $mailable->view($view);
+        $mailable->text('text');
+
+        $this->assertTrue($mailable->htmlContains('Taylor Otwell'));
+    }
+
+    public function testTextContains()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->text('My name is Taylor Otwell');
+
+        $this->assertTrue($mailable->textContains('Taylor Otwell'));
+        $this->assertFalse($mailable->textContains('Otwell Taylor'));
+    }
+
+    public function testTextContainsWithView()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->view(m::mock(Factory::class));
+        $mailable->text('My name is Taylor Otwell');
+
+        $this->assertTrue($mailable->textContains('Taylor Otwell'));
+    }
+
     public function testItIgnoresDuplicatedRawAttachments()
     {
         $mailable = new WelcomeMailableStub;
