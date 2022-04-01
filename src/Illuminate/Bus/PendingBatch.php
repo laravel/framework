@@ -269,4 +269,49 @@ class PendingBatch
 
         return $batch;
     }
+
+    /**
+     * Dispatch the batch after the current process.
+     *
+     * @return \Illuminate\Bus\Batch
+     */
+    public function dispatchAfterResponse()
+    {
+        $repository = $this->container->make(BatchRepository::class);
+
+        $batch = $repository->store($this);
+
+        if ($batch) {
+            $this->container->terminating(function () use ($batch) {
+                $this->dispatchAlreadyCreated($batch);
+            });
+        }
+
+        return $batch;
+    }
+
+    /**
+     * Dispatch already created batch.
+     *
+     * @param \Illuminate\Bus\Batch $batch
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    private function dispatchAlreadyCreated($batch)
+    {
+        try {
+            $batch = $batch->add($this->jobs);
+        } catch (Throwable $e) {
+            if (isset($batch)) {
+                $batch->delete();
+            }
+
+            throw $e;
+        }
+
+        $this->container->make(EventDispatcher::class)->dispatch(
+            new BatchDispatched($batch)
+        );
+    }
 }
