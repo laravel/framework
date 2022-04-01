@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing\Events;
 
-class RouteMatching
+class Routing
 {
     /**
      * The request instance.

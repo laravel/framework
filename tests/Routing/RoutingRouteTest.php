@@ -19,7 +19,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Illuminate\Routing\Events\RouteMatching;
+use Illuminate\Routing\Events\Routing;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\ResourceRegistrar;
@@ -1539,7 +1539,7 @@ class RoutingRouteTest extends TestCase
 
         $_SERVER['__router.request'] = null;
 
-        $events->listen(RouteMatching::class, function ($event) {
+        $events->listen(Routing::class, function ($event) {
             $_SERVER['__router.request'] = $event->request;
         });
 
