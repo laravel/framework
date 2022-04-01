@@ -39,6 +39,28 @@ class ImplicitRouteBindingTest extends TestCase
     /**
      * @requires PHP >= 8.1
      */
+    public function test_it_can_resolve_the_implicit_backed_enum_route_with_key_bindings_for_the_given_route()
+    {
+        $action = ['uses' => function (CategoryBackedEnumWithKey $category) {
+            return $category->value;
+        }];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['category' => 'fruits'];
+        $route->setBindingFields(['category' => 'slug']);
+
+        $route->prepareForSerialization();
+
+        $container = Container::getInstance();
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+
+        $this->assertSame(2, $route->parameter('category')->value);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
     public function test_it_does_not_resolve_implicit_non_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryEnum $category) {

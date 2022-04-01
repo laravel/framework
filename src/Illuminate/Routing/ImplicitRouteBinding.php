@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
+use Illuminate\Routing\Exceptions\BackedEnumImplicitKeyMethodNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
 
@@ -84,7 +85,15 @@ class ImplicitRouteBinding
 
             $backedEnumClass = (string) $parameter->getType();
 
-            $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
+            if ($field = $route->bindingFieldFor($parameterName)) {
+                if (! method_exists($backedEnumClass, $field)) {
+                    throw new BackedEnumImplicitKeyMethodNotFoundException($backedEnumClass, $field);
+                }
+
+                $backedEnum = static::getBackedEnumForBoundKey($backedEnumClass, $field, $parameterValue);
+            } else {
+                $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
+            }
 
             if (is_null($backedEnum)) {
                 throw new BackedEnumCaseNotFoundException($backedEnumClass, $parameterValue);
@@ -112,5 +121,16 @@ class ImplicitRouteBinding
         if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
             return $snakedName;
         }
+    }
+
+    protected static function getBackedEnumForBoundKey($enumClass, $field, $parameterValue)
+    {
+        foreach($enumClass::cases() as $case) {
+            if ((string) $case->{$field}() === (string) $parameterValue) {
+                return $case;
+            }
+        }
+
+        return null;
     }
 }
