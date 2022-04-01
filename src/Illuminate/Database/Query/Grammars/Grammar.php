@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Database\Concerns\CompilesJsonPath;
+use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -11,7 +11,7 @@ use RuntimeException;
 
 class Grammar extends BaseGrammar
 {
-    use CompilesJsonPath;
+    use CompilesJsonPaths;
 
     /**
      * The grammar specific operators.

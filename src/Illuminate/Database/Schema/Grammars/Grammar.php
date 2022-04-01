@@ -4,7 +4,7 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
-use Illuminate\Database\Concerns\CompilesJsonPath;
+use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Expression;
@@ -15,7 +15,7 @@ use RuntimeException;
 
 abstract class Grammar extends BaseGrammar
 {
-    use CompilesJsonPath;
+    use CompilesJsonPaths;
 
     /**
      * If this Grammar supports schema changes wrapped in a transaction.

@@ -4,7 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Illuminate\Support\Str;
 
-trait CompilesJsonPath
+trait CompilesJsonPaths
 {
     /**
      * Split the given JSON selector into the field and the optional path and wrap them separately.
