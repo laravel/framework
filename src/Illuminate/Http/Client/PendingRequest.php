@@ -715,7 +715,7 @@ class PendingRequest
                     $this->populateResponse($response);
 
                     if (! $response->successful()) {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException()) : true;
+                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
 
                         if ($attempt < $this->tries && $shouldRetry) {
                             $response->throw();
