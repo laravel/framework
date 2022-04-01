@@ -415,6 +415,29 @@ class Arr
     }
 
     /**
+     * Determines if an array is a multi-dimensional array.
+     *
+     * An array is "multi-dimensional" if it contains one or more arrays.
+     *
+     * @param array $array
+     * @return bool
+     */
+    public static function isMutidimensional(array $array)
+    {
+        // "rsort" sorts all the sub-arrays towards the beginning of the parent array,
+        // and re-indexes the array. This ensures that if there are one or more sub-arrays
+        // inside the parent array, the first value of parent array (at index 0) will always
+        // be an array.
+        rsort($array);
+
+        // Checking if the value at index 0 is an array, we can tell if the array is a
+        // multidimensional array or not.
+        $firstValue = reset($array);
+
+        return isset($firstValue) && is_array($firstValue);
+    }
+
+    /**
      * Determines if an array is a list.
      *
      * An array is a "list" if all array keys are sequential integers starting from 0 with no gaps in between.
