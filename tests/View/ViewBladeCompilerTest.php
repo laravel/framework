@@ -235,7 +235,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler->anonymousComponentNamespace('admin', '/admin/components');
         $this->assertEquals(['admin' => 'admin.components'], $compiler->getAnonymousComponentNamespaces());
 
-        // Test directory is automatically inferred from the namespace
+        // Test directory is automatically inferred from the prefix if not given.
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
         $compiler->anonymousComponentNamespace('frontend');
