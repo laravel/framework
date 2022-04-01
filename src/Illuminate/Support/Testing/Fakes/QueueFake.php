@@ -214,7 +214,7 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
-     * Determine if a closure was pushed based on a truth-test callback.
+     * Assert that a closure was not pushed based on a truth-test callback.
      *
      * @param  callable|null  $callback
      * @return void
