@@ -509,7 +509,11 @@ class PostgresGrammar extends Grammar
      */
     protected function typeChar(Fluent $column)
     {
-        return "char({$column->length})";
+        if ($column->length) {
+            return "char({$column->length})";
+        }
+
+        return 'char';
     }
 
     /**
@@ -520,7 +524,11 @@ class PostgresGrammar extends Grammar
      */
     protected function typeString(Fluent $column)
     {
-        return "varchar({$column->length})";
+        if ($column->length) {
+            return "varchar({$column->length})";
+        }
+
+        return 'varchar';
     }
 
     /**
