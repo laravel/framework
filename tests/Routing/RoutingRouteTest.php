@@ -801,6 +801,20 @@ class RoutingRouteTest extends TestCase
         $route->where('bar', '[0-9]+');
         $this->assertFalse($route->matches($request));
 
+        $request = Request::create('foo/123', 'GET');
+        $route = new Route('GET', 'foo/{bar}', ['where' => ['bar' => '123|456'], function () {
+            //
+        }]);
+        $route->where('bar', '123|456');
+        $this->assertTrue($route->matches($request));
+
+        $request = Request::create('foo/123abc', 'GET');
+        $route = new Route('GET', 'foo/{bar}', ['where' => ['bar' => '123|456'], function () {
+            //
+        }]);
+        $route->where('bar', '123|456');
+        $this->assertFalse($route->matches($request));
+
         /*
          * Optional
          */
