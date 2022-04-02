@@ -72,7 +72,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
 
         return (int) $this->pheanstalk->statsTube($queue)->current_jobs_ready;
     }
-    
+
     /**
      * Push a new job onto the queue.
      *
