@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use Exception;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
@@ -1285,6 +1286,31 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->failed());
 
         $this->assertSame(1, $whenAttempts);
+
+        $this->factory->assertSentCount(1);
+    }
+
+    public function testExceptionThrownInRetryCallbackWithoutRetrying()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 500),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->retry(2, 1000, function ($exception) use (&$whenAttempts) {
+                    throw new Exception('Foo bar');
+                }, false)
+                ->get('http://foo.com/get');
+        } catch (Exception $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(Exception::class, $exception);
+        $this->assertEquals('Foo bar', $exception->getMessage());
 
         $this->factory->assertSentCount(1);
     }

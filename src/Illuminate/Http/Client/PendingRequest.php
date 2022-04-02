@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
@@ -717,7 +718,13 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
 
                     if (! $response->successful()) {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException()) : true;
+                        try {
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException()) : true;
+                        } catch (Exception $exception) {
+                            $shouldRetry = false;
+
+                            throw $exception;
+                        }
 
                         if ($attempt < $this->tries && $shouldRetry) {
                             $response->throw();
