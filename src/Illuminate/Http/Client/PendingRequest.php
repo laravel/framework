@@ -714,6 +714,8 @@ class PendingRequest
                 return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
+                    $this->dispatchResponseReceivedEvent($response);
+
                     if (! $response->successful()) {
                         $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException()) : true;
 
@@ -725,8 +727,6 @@ class PendingRequest
                             $response->throw();
                         }
                     }
-
-                    $this->dispatchResponseReceivedEvent($response);
                 });
             } catch (ConnectException $e) {
                 $this->dispatchConnectionFailedEvent();

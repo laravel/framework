@@ -1132,6 +1132,24 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testTheRequestSendingAndResponseReceivedEventsAreFiredForEveryRetry()
+    {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->times(2)->with(m::type(RequestSending::class));
+        $events->shouldReceive('dispatch')->times(2)->with(m::type(ResponseReceived::class));
+
+        $factory = new Factory($events);
+        $factory->fake([
+            '*' => $factory->response(['error'], 403),
+        ]);
+
+        $response = $factory->retry(2, 1000, null, false)->get('http://foo.com/get');
+
+        $this->assertTrue($response->failed());
+
+        $factory->assertSentCount(2);
+    }
+
     public function testTheTransferStatsAreCalledSafelyWhenFakingTheRequest()
     {
         $this->factory->fake(['https://example.com' => ['world' => 'Hello world']]);
