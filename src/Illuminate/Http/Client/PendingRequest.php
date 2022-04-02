@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ConnectException;
@@ -714,8 +715,16 @@ class PendingRequest
                 return tap(new Response($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
+                    $this->dispatchResponseReceivedEvent($response);
+
                     if (! $response->successful()) {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
+                        try {
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
+                        } catch (Exception $exception) {
+                            $shouldRetry = false;
+
+                            throw $exception;
+                        }
 
                         if ($attempt < $this->tries && $shouldRetry) {
                             $response->throw();
@@ -725,8 +734,6 @@ class PendingRequest
                             $response->throw();
                         }
                     }
-
-                    $this->dispatchResponseReceivedEvent($response);
                 });
             } catch (ConnectException $e) {
                 $this->dispatchConnectionFailedEvent();
