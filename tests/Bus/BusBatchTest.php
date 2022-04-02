@@ -147,7 +147,8 @@ class BusBatchTest extends TestCase
         $count = 3;
         $generator = function (int $jobsCount) {
             for ($i = 0; $i < $jobsCount; $i++) {
-                yield new class {
+                yield new class
+                {
                     use Batchable;
                 };
             }
