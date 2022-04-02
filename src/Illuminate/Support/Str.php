@@ -882,6 +882,17 @@ class Str
     }
 
     /**
+     * Squish all blank space in a string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function squish($value)
+    {
+        return preg_replace('/\s+/', ' ', trim($value));
+    }
+
+    /**
      * Determine if a given string starts with a given substring.
      *
      * @param  string  $haystack
