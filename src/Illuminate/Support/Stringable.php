@@ -634,7 +634,6 @@ class Stringable implements JsonSerializable
         return new static(Str::squish($this->value));
     }
 
-
     /**
      * Begin a string with a single instance of a given value.
      *
