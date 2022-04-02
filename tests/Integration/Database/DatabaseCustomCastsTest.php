@@ -49,7 +49,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEquals(['name' => 'Taylor'], $model->array_object->toArray());
         $this->assertEquals(['name' => 'Taylor'], $model->array_object_json->toArray());
         $this->assertEquals(['name' => 'Taylor'], $model->collection->toArray());
-        $this->assertSame('Taylor', (string)$model->stringable);
+        $this->assertSame('Taylor', (string) $model->stringable);
 
         $model->array_object['age'] = 34;
         $model->array_object['meta']['title'] = 'Developer';
@@ -85,7 +85,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $model = new TestEloquentModelWithCustomCastsNullable();
 
         $model->array_object = null;
-        $model->array_object_json =  null;
+        $model->array_object_json = null;
         $model->collection = collect();
         $model->stringable = null;
 
@@ -96,7 +96,7 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEmpty($model->array_object);
         $this->assertEmpty($model->array_object_json);
         $this->assertEmpty($model->collection);
-        $this->assertSame('', (string)$model->stringable);
+        $this->assertSame('', (string) $model->stringable);
 
         $model->array_object['name'] = 'Taylor';
         $model->array_object['meta']['title'] = 'Developer';
