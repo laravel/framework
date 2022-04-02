@@ -1290,6 +1290,31 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testRequestCanBeModifiedInRetryCallback()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->sequence()
+                ->push(['error'], 500)
+                ->push(['ok'], 200),
+        ]);
+
+        $response = $this->factory
+            ->retry(2, 1000, function ($exception, $request) {
+                $this->assertInstanceOf(PendingRequest::class, $request);
+
+                $request->withHeaders(['Foo' => 'Bar']);
+
+                return true;
+            }, false)
+            ->get('http://foo.com/get');
+
+        $this->assertTrue($response->successful());
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->hasHeader('Foo') && $request->header('Foo') === ['Bar'];
+        });
+    }
+
     public function testExceptionThrownInRetryCallbackWithoutRetrying()
     {
         $this->factory->fake([
