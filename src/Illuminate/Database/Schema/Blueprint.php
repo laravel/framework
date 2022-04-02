@@ -1089,7 +1089,7 @@ class Blueprint
      * Create a new date-time column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function dateTime($column, $precision = 0)
@@ -1101,7 +1101,7 @@ class Blueprint
      * Create a new date-time column (with time zone) on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function dateTimeTz($column, $precision = 0)
@@ -1113,7 +1113,7 @@ class Blueprint
      * Create a new time column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function time($column, $precision = 0)
@@ -1125,7 +1125,7 @@ class Blueprint
      * Create a new time column (with time zone) on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timeTz($column, $precision = 0)
@@ -1137,7 +1137,7 @@ class Blueprint
      * Create a new timestamp column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timestamp($column, $precision = 0)
@@ -1149,7 +1149,7 @@ class Blueprint
      * Create a new timestamp (with time zone) column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timestampTz($column, $precision = 0)
@@ -1160,7 +1160,7 @@ class Blueprint
     /**
      * Add nullable creation and update timestamps to the table.
      *
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return void
      */
     public function timestamps($precision = 0)
@@ -1175,7 +1175,7 @@ class Blueprint
      *
      * Alias for self::timestamps().
      *
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return void
      */
     public function nullableTimestamps($precision = 0)
@@ -1186,7 +1186,7 @@ class Blueprint
     /**
      * Add creation and update timestampTz columns to the table.
      *
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return void
      */
     public function timestampsTz($precision = 0)
@@ -1200,7 +1200,7 @@ class Blueprint
      * Add a "deleted at" timestamp for the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletes($column = 'deleted_at', $precision = 0)
@@ -1212,7 +1212,7 @@ class Blueprint
      * Add a "deleted at" timestampTz for the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletesTz($column = 'deleted_at', $precision = 0)
