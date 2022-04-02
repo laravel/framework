@@ -62,9 +62,9 @@ class PendingBatch
      */
     public function add($jobs)
     {
-        $wrappedJobs = is_iterable($jobs) ? $jobs : Arr::wrap($jobs);
+        $jobs = is_iterable($jobs) ? $jobs : Arr::wrap($jobs);
 
-        foreach ($wrappedJobs as $job) {
+        foreach ($jobs as $job) {
             $this->jobs->push($job);
         }
 
