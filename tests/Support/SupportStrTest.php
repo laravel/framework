@@ -541,6 +541,7 @@ class SupportStrTest extends TestCase
     public function testSquish()
     {
         $this->assertSame('laravel php framework', Str::squish(' laravel   php  framework '));
+        $this->assertSame('laravel php framework', Str::squish("laravel\t\tphp\n\nframework"));
         $this->assertSame('laravel php framework', Str::squish('
             laravel
             php
