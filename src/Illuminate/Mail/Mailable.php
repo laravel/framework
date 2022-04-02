@@ -877,7 +877,7 @@ class Mailable implements MailableContract, Renderable
         $view = $this->buildView();
 
         return str_contains(
-            is_array($view) ? $view['text'] ?? $view[1] ?? '' : $view,
+            is_array($view) ? $view['text'] ?? $view[1] ?? '' : '',
             $string
         );
     }

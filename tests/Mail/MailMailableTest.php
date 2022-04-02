@@ -362,6 +362,17 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->textContains('Taylor Otwell'));
     }
 
+    public function testTextContainsWithViewAndNoText()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $view = m::mock(Factory::class);
+        $view->shouldNotReceive('__toString');
+
+        $mailable->view($view);
+        $this->assertFalse($mailable->textContains('Taylor Otwell'));
+    }
+
     public function testItIgnoresDuplicatedRawAttachments()
     {
         $mailable = new WelcomeMailableStub;
