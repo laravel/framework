@@ -613,7 +613,7 @@ class SupportStringableTest extends TestCase
 
     public function testSquish()
     {
-        $this->assertSame('words with spaces', (string) $this->stringable(' words  with  spaces   ')->squish());
+        $this->assertSame('words with spaces', (string) $this->stringable(' words  with   spaces ')->squish());
         $this->assertSame('words with spaces', (string) $this->stringable("words\t\twith\n\nspaces")->squish());
         $this->assertSame('words with spaces', (string) $this->stringable('
             words

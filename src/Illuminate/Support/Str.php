@@ -882,7 +882,7 @@ class Str
     }
 
     /**
-     * Squish all blank space in a string.
+     * Squish all blank space from the given string.
      *
      * @param  string  $value
      * @return string
