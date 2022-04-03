@@ -625,7 +625,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Squish all blank space from the given string.
+     * Remove all "extra" blank space from the given string.
      *
      * @return static
      */
