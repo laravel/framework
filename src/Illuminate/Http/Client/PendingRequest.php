@@ -708,7 +708,7 @@ class PendingRequest
             return $this->makePromise($method, $url, $options);
         }
 
-        $shouldRetry = true;
+        $shouldRetry = null;
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
@@ -740,8 +740,12 @@ class PendingRequest
 
                 throw new ConnectionException($e->getMessage(), 0, $e);
             }
-        }, $this->retryDelay ?? 100, function () use (&$shouldRetry) {
-            return $shouldRetry;
+        }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
+            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this) : true);
+
+            $shouldRetry = null;
+
+            return $result;
         });
     }
 
