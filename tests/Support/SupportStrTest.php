@@ -538,6 +538,17 @@ class SupportStrTest extends TestCase
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
+    public function testSquish()
+    {
+        $this->assertSame('laravel php framework', Str::squish(' laravel   php  framework '));
+        $this->assertSame('laravel php framework', Str::squish("laravel\t\tphp\n\nframework"));
+        $this->assertSame('laravel php framework', Str::squish('
+            laravel
+            php
+            framework
+        '));
+    }
+
     public function testStudly()
     {
         $this->assertSame('LaravelPHPFramework', Str::studly('laravel_p_h_p_framework'));
