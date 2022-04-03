@@ -389,6 +389,28 @@ class Str
     }
 
     /**
+     * Determine if a given string is a hex (a-f, A-F, 0-9)
+     *
+     * @param string $value
+     * @param string $prefix
+     * @return bool
+     */
+    public static function isHex($value, $prefix = '')
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        // If prefix was passed, validate that value contains prefix
+        if($prefix !== '' && !static::startsWith($value, $prefix)) {
+            return false;
+        }
+        
+        $afterPrefix = static::substr($value, static::length($prefix));
+        return preg_match('/^[0-9a-f]+$/i', $afterPrefix) > 0;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
