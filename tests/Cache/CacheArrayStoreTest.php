@@ -44,6 +44,8 @@ class CacheArrayStoreTest extends TestCase
 
     public function testItemsCanExpire()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
 
         $store->put('foo', 'bar', 10);
@@ -113,6 +115,8 @@ class CacheArrayStoreTest extends TestCase
 
     public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
 
         $store->put('foo', 999, 10);
@@ -172,6 +176,8 @@ class CacheArrayStoreTest extends TestCase
 
     public function testCanAcquireLockAgainAfterExpiry()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
         $lock = $store->lock('foo', 10);
         $lock->acquire();
