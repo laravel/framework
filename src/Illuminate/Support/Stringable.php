@@ -304,9 +304,9 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Determine if a given string is a hex (a-f, A-F, 0-9)
+     * Determine if a given string is a hex (a-f, A-F, 0-9).
      *
-     * @param string $prefix
+     * @param  string  $prefix
      * @return bool
      */
     public function isHex($prefix = '')

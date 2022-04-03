@@ -389,10 +389,10 @@ class Str
     }
 
     /**
-     * Determine if a given string is a hex (a-f, A-F, 0-9)
+     * Determine if a given string is a hex (a-f, A-F, 0-9).
      *
-     * @param string $value
-     * @param string $prefix
+     * @param  string  $value
+     * @param  string  $prefix
      * @return bool
      */
     public static function isHex($value, $prefix = '')
@@ -402,11 +402,12 @@ class Str
         }
 
         // If prefix was passed, validate that value contains prefix
-        if($prefix !== '' && !static::startsWith($value, $prefix)) {
+        if ($prefix !== '' && ! static::startsWith($value, $prefix)) {
             return false;
         }
-        
+
         $afterPrefix = static::substr($value, static::length($prefix));
+
         return preg_match('/^[0-9a-f]+$/i', $afterPrefix) > 0;
     }
 

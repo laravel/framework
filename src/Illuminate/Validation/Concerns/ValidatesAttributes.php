@@ -2039,7 +2039,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is a hex string (a-f, A-F, 0-9)
+     * Validate that an attribute is a hex string (a-f, A-F, 0-9).
      *
      * @param  string  $attribute
      * @param  mixed  $value
