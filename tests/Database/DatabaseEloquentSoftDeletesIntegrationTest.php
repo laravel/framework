@@ -311,7 +311,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function testUpdateModelAfterSoftDeleting()
     {
-        $now = Carbon::now();
+        Carbon::setTestNow($now = Carbon::now());
         $this->createUsers();
 
         /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
