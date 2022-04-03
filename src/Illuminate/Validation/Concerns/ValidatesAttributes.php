@@ -2039,6 +2039,22 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a hex string (a-f, A-F, 0-9)
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateHex($attribute, $value, $parameters)
+    {
+        $prefix = empty($parameters)
+            ? ''
+            : $parameters[0];
+
+        return Str::isHex($value, $prefix);
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute
