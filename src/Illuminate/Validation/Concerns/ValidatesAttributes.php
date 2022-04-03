@@ -2039,6 +2039,31 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is a hex string.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateHex($attribute, $value, $parameters)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        if (! empty($parameters)) {
+            if (! Str::startsWith($value, $parameters[0])) {
+                return false;
+            }
+
+            $value = Str::substr($value, Str::length($parameters[0]));
+        }
+
+        return preg_match('/^[0-9a-f]+$/i', $value) > 0;
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute
