@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Support\MessageBag;
@@ -1624,6 +1627,20 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response);
 
         $response->assertCookieMissing('cookie-name');
+    }
+
+    public function testAssertLocation()
+    {
+        app()->instance('url', $url = new UrlGenerator(new RouteCollection, new Request));
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com')))
+        );
+
+        $response->assertLocation('https://foo.com');
+
+        $this->expectException(ExpectationFailedException::class);
+        $response->assertLocation('https://foo.net');
     }
 
     public function testAssertRedirectContains()
