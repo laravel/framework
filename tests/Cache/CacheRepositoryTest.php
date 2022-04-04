@@ -264,7 +264,7 @@ class CacheRepositoryTest extends TestCase
     public function dataProviderTestGetSeconds()
     {
         return [
-            [Carbon::now()->addMinutes(5)],
+            [Carbon::parse($this->getTestDate())->addMinutes(5)],
             [(new DateTime($this->getTestDate()))->modify('+5 minutes')],
             [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')],
             [new DateInterval('PT5M')],
