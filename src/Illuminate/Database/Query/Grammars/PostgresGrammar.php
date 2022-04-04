@@ -217,6 +217,40 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileJsonContainsKey($column)
+    {
+        $segments = explode('->', $column);
+
+        $lastSegment = array_pop($segments);
+
+        if (filter_var($lastSegment, FILTER_VALIDATE_INT) !== false) {
+            $i = $lastSegment;
+        } elseif (preg_match('/\[(-?[0-9]+)\]$/', $lastSegment, $matches)) {
+            $segments[] = Str::beforeLast($lastSegment, $matches[0]);
+
+            $i = $matches[1];
+        }
+
+        $column = str_replace('->>', '->', $this->wrap(implode('->', $segments)));
+
+        if (isset($i)) {
+            return vsprintf('case when %s then %s else false end', [
+                'jsonb_typeof(('.$column.")::jsonb) = 'array'",
+                'jsonb_array_length(('.$column.')::jsonb) >= '.($i < 0 ? abs($i) : $i + 1),
+            ]);
+        }
+
+        $key = "'".str_replace("'", "''", $lastSegment)."'";
+
+        return 'coalesce(('.$column.')::jsonb ?? '.$key.', false)';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column

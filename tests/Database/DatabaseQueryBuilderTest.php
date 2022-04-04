@@ -4432,6 +4432,150 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testWhereJsonContainsKeyMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from `users` where ifnull(json_contains_path(`users`.`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from `users` where ifnull(json_contains_path(`options`, \'one\', \'$."language"."primary"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from `users` where `id` = ? or ifnull(json_contains_path(`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from `users` where ifnull(json_contains_path(`options`, \'one\', \'$."languages"[0][1]\'), 0)', $builder->toSql());
+    }
+
+    public function testWhereJsonContainsKeyPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from "users" where coalesce(("users"."options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from "users" where coalesce(("options"->\'language\')::jsonb ?? \'primary\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or coalesce(("options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where case when jsonb_typeof(("options"->\'languages\'->0)::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\'->0)::jsonb) >= 2 else false end', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[-1]');
+        $this->assertSame('select * from "users" where case when jsonb_typeof(("options"->\'languages\')::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\')::jsonb) >= 1 else false end', $builder->toSql());
+    }
+
+    public function testWhereJsonContainsKeySqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from "users" where json_type("users"."options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from "users" where json_type("options", \'$."language"."primary"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or json_type("options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where json_type("options", \'$."languages"[0][1]\') is not null', $builder->toSql());
+    }
+
+    public function testWhereJsonContainsKeySqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('users.options->languages');
+        $this->assertSame('select * from [users] where \'languages\' in (select [key] from openjson([users].[options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->language->primary');
+        $this->assertSame('select * from [users] where \'primary\' in (select [key] from openjson([options], \'$."language"\'))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContainsKey('options->languages');
+        $this->assertSame('select * from [users] where [id] = ? or \'languages\' in (select [key] from openjson([options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContainsKey('options->languages[0][1]');
+        $this->assertSame('select * from [users] where 1 in (select [key] from openjson([options], \'$."languages"[0]\'))', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeyMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from `users` where not ifnull(json_contains_path(`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from `users` where `id` = ? or not ifnull(json_contains_path(`options`, \'one\', \'$."languages"\'), 0)', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from `users` where not ifnull(json_contains_path(`options`, \'one\', \'$."languages"[0][1]\'), 0)', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeyPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where not coalesce(("options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or not coalesce(("options")::jsonb ?? \'languages\', false)', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where not case when jsonb_typeof(("options"->\'languages\'->0)::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\'->0)::jsonb) >= 2 else false end', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages[-1]');
+        $this->assertSame('select * from "users" where not case when jsonb_typeof(("options"->\'languages\')::jsonb) = \'array\' then jsonb_array_length(("options"->\'languages\')::jsonb) >= 1 else false end', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeySqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where not json_type("options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from "users" where "id" = ? or not json_type("options", \'$."languages"\') is not null', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from "users" where "id" = ? or not json_type("options", \'$."languages"[0][1]\') is not null', $builder->toSql());
+    }
+
+    public function testWhereJsonDoesntContainKeySqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from [users] where not \'languages\' in (select [key] from openjson([options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages');
+        $this->assertSame('select * from [users] where [id] = ? or not \'languages\' in (select [key] from openjson([options]))', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContainKey('options->languages[0][1]');
+        $this->assertSame('select * from [users] where [id] = ? or not 1 in (select [key] from openjson([options], \'$."languages"[0]\'))', $builder->toSql());
+    }
+
     public function testWhereJsonLengthMySql()
     {
         $builder = $this->getMySqlBuilder();
