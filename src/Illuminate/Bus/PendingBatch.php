@@ -295,7 +295,7 @@ class PendingBatch
     /**
      * Dispatch an existing batch.
      *
-     * @param \Illuminate\Bus\Batch $batch
+     * @param  \Illuminate\Bus\Batch  $batch
      * @return void
      *
      * @throws \Throwable
