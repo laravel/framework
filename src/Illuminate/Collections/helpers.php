@@ -123,7 +123,11 @@ if (! function_exists('data_set')) {
 
                 data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite || ! Arr::exists($target, $segment)) {
-                $target[$segment] = $value;
+                if ($value instanceof \Closure) {
+                    $target[$segment] = $value($target[$segment]);
+                } else {
+                    $target[$segment] = $value;
+                }
             }
         } elseif (is_object($target)) {
             if ($segments) {
@@ -133,7 +137,11 @@ if (! function_exists('data_set')) {
 
                 data_set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || ! isset($target->{$segment})) {
-                $target->{$segment} = $value;
+                if ($value instanceof \Closure) {
+                    $target->{$segment} = $value($target->{$segment});
+                } else {
+                    $target->{$segment} = $value;
+                }
             }
         } else {
             $target = [];
@@ -141,7 +149,11 @@ if (! function_exists('data_set')) {
             if ($segments) {
                 data_set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
-                $target[$segment] = $value;
+                if ($value instanceof \Closure) {
+                    $target[$segment] = $value($target[$segment]);
+                } else {
+                    $target[$segment] = $value;
+                }
             }
         }
 
