@@ -1656,6 +1656,15 @@ class TestResponseTest extends TestCase
         $response->assertRedirectContains('url.net');
     }
 
+    public function testAssertRedirect()
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+        );
+
+        $response->assertRedirect();
+    }
+
     public function testGetDecryptedCookie()
     {
         $response = TestResponse::fromBaseResponse(
