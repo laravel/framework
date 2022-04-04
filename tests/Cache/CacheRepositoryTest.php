@@ -279,8 +279,6 @@ class CacheRepositoryTest extends TestCase
      */
     public function testGetSeconds($duration)
     {
-        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
-
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 300);
         $repo->put($key, $value, $duration);
