@@ -34,7 +34,7 @@ class Builder
     /**
      * The default string length for migrations.
      *
-     * @var int
+     * @var int|null
      */
     public static $defaultStringLength = 255;
 

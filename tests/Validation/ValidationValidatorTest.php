@@ -39,6 +39,7 @@ class ValidationValidatorTest extends TestCase
     {
         parent::tearDown();
 
+        Carbon::setTestNow(null);
         m::close();
     }
 
@@ -4143,8 +4144,6 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => new Carbon('2018-01-01')], ['x' => 'date_equals:tomorrow']);
         $this->assertTrue($v->fails());
-
-        Carbon::setTestNow(null);
     }
 
     public function testBeforeAndAfter()
