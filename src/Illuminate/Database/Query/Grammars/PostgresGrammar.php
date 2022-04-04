@@ -225,12 +225,14 @@ class PostgresGrammar extends Grammar
     protected function compileJsonContainsKey($column)
     {
         $segments = explode('->', $column);
+
         $lastSegment = array_pop($segments);
 
         if (filter_var($lastSegment, FILTER_VALIDATE_INT) !== false) {
             $i = $lastSegment;
         } elseif (preg_match('/\[(-?[0-9]+)\]$/', $lastSegment, $matches)) {
             $segments[] = Str::beforeLast($lastSegment, $matches[0]);
+
             $i = $matches[1];
         }
 

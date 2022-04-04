@@ -174,10 +174,12 @@ class SqlServerGrammar extends Grammar
     protected function compileJsonContainsKey($column)
     {
         $segments = explode('->', $column);
+
         $lastSegment = array_pop($segments);
 
         if (preg_match('/\[([0-9]+)\]$/', $lastSegment, $matches)) {
             $segments[] = Str::beforeLast($lastSegment, $matches[0]);
+
             $key = $matches[1];
         } else {
             $key = "'".str_replace("'", "''", $lastSegment)."'";
