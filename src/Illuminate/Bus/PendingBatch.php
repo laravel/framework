@@ -271,7 +271,7 @@ class PendingBatch
     }
 
     /**
-     * Dispatch the batch after the current process.
+     * Dispatch the batch after the response is sent to the browser.
      *
      * @return \Illuminate\Bus\Batch
      */
@@ -283,7 +283,7 @@ class PendingBatch
 
         if ($batch) {
             $this->container->terminating(function () use ($batch) {
-                $this->dispatchAlreadyCreated($batch);
+                $this->dispatchExistingBatch($batch);
             });
         }
 
@@ -291,14 +291,14 @@ class PendingBatch
     }
 
     /**
-     * Dispatch already created batch.
+     * Dispatch an existing batch.
      *
      * @param \Illuminate\Bus\Batch $batch
      * @return void
      *
      * @throws \Throwable
      */
-    private function dispatchAlreadyCreated($batch)
+    protected function dispatchExistingBatch($batch)
     {
         try {
             $batch = $batch->add($this->jobs);
