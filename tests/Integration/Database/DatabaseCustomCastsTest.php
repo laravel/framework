@@ -98,9 +98,11 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertEmpty($model->collection);
         $this->assertSame('', (string) $model->stringable);
 
+        $model->array_object = ['name' => 'John'];
         $model->array_object['name'] = 'Taylor';
         $model->array_object['meta']['title'] = 'Developer';
 
+        $model->array_object_json = ['name' => 'John'];
         $model->array_object_json['name'] = 'Taylor';
         $model->array_object_json['meta']['title'] = 'Developer';
 

@@ -22,7 +22,7 @@ class AsCollection implements Castable
             {
                 $data = json_decode($attributes[$key], true);
 
-                return is_array($data) ? new Collection($data) : new Collection();
+                return is_array($data) ? new Collection($data) : null;
             }
 
             public function set($model, $key, $value, $attributes)
