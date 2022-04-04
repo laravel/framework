@@ -165,11 +165,6 @@ class PostEventSubscriber
             [PostEventSubscriber::class, 'handlePostCreated']
         );
     }
-
-    public function handle($event)
-    {
-        //
-    }
 }
 
 class PostAutoEventSubscriber
