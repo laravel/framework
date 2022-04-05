@@ -1,6 +1,13 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.6...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.7...8.x)
+
+
+## [v8.83.7 (2022-04-05)](https://github.com/laravel/framework/compare/v8.83.6...v8.83.7)
+
+### Fixed
+- Backport - Fix trashed implicitBinding with child with no softdelete ([#41814](https://github.com/laravel/framework/pull/41814))
+- Fix assertListening check with auto discovery ([#41820](https://github.com/laravel/framework/pull/41820))
 
 
 ## [v8.83.6 (2022-03-29)](https://github.com/laravel/framework/compare/v8.83.5...v8.83.6)
