@@ -83,7 +83,7 @@ class CastMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['inbound', 'i', InputOption::VALUE_OPTIONAL, 'Generate an inbound cast class'],
+            ['inbound', null, InputOption::VALUE_OPTIONAL, 'Generate an inbound cast class'],
         ];
     }
 }
