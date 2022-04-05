@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class CastMakeCommand extends GeneratorCommand
 {
@@ -45,7 +46,9 @@ class CastMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->resolveStubPath('/stubs/cast.stub');
+        return $this->option('inbound')
+                    ? $this->resolveStubPath('/stubs/cast.inbound.stub')
+                    : $this->resolveStubPath('/stubs/cast.stub');
     }
 
     /**
@@ -70,5 +73,17 @@ class CastMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Casts';
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['inbound', null, InputOption::VALUE_OPTIONAL, 'Generate an inbound cast class'],
+        ];
     }
 }
