@@ -13,9 +13,11 @@ permissions:
 jobs:
   uneditable:
     if: github.repository == 'laravel/framework'
+
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/github-script@2b34a689ec86a68d8ab9478298f91d5401337b7d
+      - uses: actions/github-script@v6
         with:
           script: |
             const query = `
@@ -49,14 +51,21 @@ jobs:
                 return;
               }
 
-              if (!pullRequest.maintainerCanModify) {
+              if (! pullRequest.maintainerCanModify) {
                 console.log('PR not owned by Laravel and does not have maintainer edits enabled');
 
-                await github.issues.createComment({
+                await github.rest.issues.createComment({
                   issue_number: pullNumber,
                   owner: 'laravel',
                   repo: 'framework',
-                  body: "Thanks for submitting a PR!\n\nIn order to review and merge PRs most efficiently, we require that all PRs grant maintainer edit access before we review them. For information on how to do this, [see the relevant GitHub documentation](https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork)."
+                  body: "Thanks for submitting a PR!\n\nIn order to review and merge PRs most efficiently, we require that all PRs grant maintainer edit access before we review them. For information on how to do this, [see the relevant GitHub documentation](https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork). Additionally, GitHub doesn't allow maintainer permissions from organization accounts. Please resubmit this PR with maintainer permissions enabled."
+                });
+
+                await github.rest.pulls.update({
+                  pull_number: pullNumber,
+                  owner: 'laravel',
+                  repo: 'framework',
+                  state: 'closed'
                 });
               }
             } catch(e) {
