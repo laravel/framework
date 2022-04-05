@@ -1,6 +1,38 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.6.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.7.0...9.x)
+
+
+## [v9.7.0](https://github.com/laravel/framework/compare/v9.6.0...v9.7.0) - 2022-04-05
+
+### Added
+- Make whereBelongsTo accept Collection ([#41733](https://github.com/laravel/framework/pull/41733))
+- Database queries containing JSON paths support array index braces ([#41767](https://github.com/laravel/framework/pull/41767))
+- Fire event before route matched ([#41765](https://github.com/laravel/framework/pull/41765))
+- Added to `Illuminate/Http/Resources/ConditionallyLoadsAttributes::whenNotNull` method ([#41769](https://github.com/laravel/framework/pull/41769))
+- Added "whereIn" route parameter constraint method ([#41794](https://github.com/laravel/framework/pull/41794))
+- Added `Illuminate/Queue/BeanstalkdQueue::bulk()` ([#41789](https://github.com/laravel/framework/pull/41789))
+- Added `Illuminate/Queue/SqsQueue::bulk()` ([#41788](https://github.com/laravel/framework/pull/41788))
+- Added String::squish() helper ([#41791](https://github.com/laravel/framework/pull/41791))
+- Added query builder method whereJsonContainsKey() ([#41802](https://github.com/laravel/framework/pull/41802))
+- Enable dispatchAfterResponse for batch ([#41787](https://github.com/laravel/framework/pull/41787))
+
+### Fixed
+- Factory generation fixes ([#41688](https://github.com/laravel/framework/pull/41688))
+- Fixed Http Client throw boolean parameter of retry method ([#41762](https://github.com/laravel/framework/pull/41762), [#41792](https://github.com/laravel/framework/pull/41792))
+- Ignore empty redis username string in PhpRedisConnector ([#41773](https://github.com/laravel/framework/pull/41773))
+- Fixed support of nullable type for AsArrayObject/AsCollection ([#41797](https://github.com/laravel/framework/pull/41797), [05846e7](https://github.com/laravel/framework/commit/05846e7ba5cecc12a3ab8a3238272e9c1dd4e07f))
+- Fixed adding jobs from iterable to the pending batch ([#41786](https://github.com/laravel/framework/pull/41786))
+- Http client: fix retry handling of connection exception ([#41811](https://github.com/laravel/framework/pull/41811))
+
+### Changed
+- Enable batch jobs delay for database queue ([#41758](https://github.com/laravel/framework/pull/41758))
+- Enable batch jobs delay for redis queue ([#41783](https://github.com/laravel/framework/pull/41783))
+- Http client: dispatch "response received" event for every retry attempt ([#41793](https://github.com/laravel/framework/pull/41793))
+- Http Client: provide pending request to retry callback ([#41779](https://github.com/laravel/framework/pull/41779))
+- Allow non length limited strings and char for postgresql ([#41800](https://github.com/laravel/framework/pull/41800))
+- Revert some Carbon::setTestNow() removals ([#41810](https://github.com/laravel/framework/pull/41810))
+- Allow cleanup of databases when using parallel tests ([#41806](https://github.com/laravel/framework/pull/41806))
 
 
 ## [v9.6.0](https://github.com/laravel/framework/compare/v9.5.1...v9.6.0) - 2022-03-29
