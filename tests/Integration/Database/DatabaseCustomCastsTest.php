@@ -136,6 +136,19 @@ class TestEloquentModelWithCustomCasts extends Model
      * @var string[]
      */
     protected $guarded = [];
+    
+    
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'array_object_json' => [
+            'name' => 'Bob',
+            'age' => 0
+        ],
+    ];
 
     /**
      * The attributes that should be cast to native types.
