@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -948,6 +949,18 @@ class HttpRequestTest extends TestCase
         $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
         $request->setLaravelSession($session);
         $this->assertSame('boom', $request->old('foo', 'bar'));
+    }
+
+	public function testOldMethodCanGetDefaultValueFromModel()
+    {
+        $request = Request::create('/');
+		$model = m::mock(Price::class);
+		$model->shouldReceive('getAttributes')->once()->withNoArgs()->andReturn(['name' => 'foobar']);
+		$model->shouldReceive('getAttribute')->once()->with('name')->andReturn('foobar');
+        $session = m::mock(Store::class);
+        $session->shouldReceive('getOldInput')->once()->with('name', 'foobar')->andReturn('foobar');
+        $request->setLaravelSession($session);
+        $this->assertSame('foobar', $request->old('name', $model));
     }
 
     public function testFlushMethodCallsSession()

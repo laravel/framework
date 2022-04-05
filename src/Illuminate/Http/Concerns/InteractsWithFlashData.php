@@ -2,17 +2,24 @@
 
 namespace Illuminate\Http\Concerns;
 
+use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
+
 trait InteractsWithFlashData
 {
     /**
      * Retrieve an old input item.
      *
      * @param  string|null  $key
-     * @param  string|array|null  $default
+     * @param  \Illuminate\Database\Eloquent\Model|string|array|null  $default
      * @return string|array|null
      */
     public function old($key = null, $default = null)
     {
+		if ($default instanceof Model && Arr::has($default->getAttributes(), $key)) {
+			$default = $default->getAttribute($key);
+		}
+
         return $this->hasSession() ? $this->session()->getOldInput($key, $default) : $default;
     }
 
