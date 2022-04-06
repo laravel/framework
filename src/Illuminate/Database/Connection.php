@@ -342,7 +342,7 @@ class Connection implements ConnectionInterface
      * @param  bool  $useReadPdo
      * @return mixed
      *
-     * @throws MultipleColumnsSelectedException
+     * @throws \Illuminate\Database\MultipleColumnsSelectedException
      */
     public function scalar($query, $bindings = [], $useReadPdo = true)
     {
