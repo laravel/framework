@@ -954,9 +954,8 @@ class HttpRequestTest extends TestCase
 	public function testOldMethodCanGetDefaultValueFromModel()
     {
         $request = Request::create('/');
-		$model = m::mock(Price::class);
-		$model->shouldReceive('getAttributes')->once()->withNoArgs()->andReturn(['name' => 'foobar']);
-		$model->shouldReceive('getAttribute')->once()->with('name')->andReturn('foobar');
+        $model = m::mock(Price::class);
+        $model->shouldReceive('getAttribute')->once()->with('name')->andReturn('foobar');
         $session = m::mock(Store::class);
         $session->shouldReceive('getOldInput')->once()->with('name', 'foobar')->andReturn('foobar');
         $request->setLaravelSession($session);
