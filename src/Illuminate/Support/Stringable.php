@@ -215,7 +215,7 @@ class Stringable implements JsonSerializable
     public function exactly($value)
     {
         if ($value instanceof Stringable) {
-          $value = $value->toString();
+            $value = $value->toString();
         }
 
         return $this->value === $value;
