@@ -839,14 +839,16 @@ class Mailable implements MailableContract, Renderable
      */
     public function htmlContains(string $string)
     {
-        Container::getInstance()->call([$this, 'build']);
+        return $this->withLocale($this->locale, function () use ($string) {
+            Container::getInstance()->call([$this, 'build']);
 
-        $view = $this->buildView();
+            $view = $this->buildView();
 
-        return str_contains(
-            is_array($view) ? $view['html'] ?? $view[0] ?? '' : $view,
-            $string
-        );
+            return str_contains(
+                is_array($view) ? $view['html'] ?? $view[0] ?? '' : $view,
+                $string
+            );
+        });
     }
 
     /**
@@ -872,14 +874,16 @@ class Mailable implements MailableContract, Renderable
      */
     public function textContains(string $string)
     {
-        Container::getInstance()->call([$this, 'build']);
+        return $this->withLocale($this->locale, function () use ($string) {
+            Container::getInstance()->call([$this, 'build']);
 
-        $view = $this->buildView();
+            $view = $this->buildView();
 
-        return str_contains(
-            is_array($view) ? $view['text'] ?? $view[1] ?? '' : '',
-            $string
-        );
+            return str_contains(
+                is_array($view) ? $view['text'] ?? $view[1] ?? '' : '',
+                $string
+            );
+        });
     }
 
     /**
