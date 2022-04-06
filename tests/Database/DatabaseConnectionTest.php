@@ -60,14 +60,14 @@ class DatabaseConnectionTest extends TestCase
     public function testScalarCallsSelectOneAndReturnsSingleResult()
     {
         $connection = $this->getMockConnection(['selectOne']);
-        $connection->expects($this->once())->method('selectOne')->with('select count(*) from tbl')->willReturn((object)['count(*)' => 5]);
+        $connection->expects($this->once())->method('selectOne')->with('select count(*) from tbl')->willReturn((object) ['count(*)' => 5]);
         $this->assertSame(5, $connection->scalar('select count(*) from tbl'));
     }
 
     public function testScalarThrowsExceptionIfMultipleColumnsAreSelected()
     {
         $connection = $this->getMockConnection(['selectOne']);
-        $connection->expects($this->once())->method('selectOne')->with('select a, b from tbl')->willReturn((object)['a' => 'a', 'b' => 'b']);
+        $connection->expects($this->once())->method('selectOne')->with('select a, b from tbl')->willReturn((object) ['a' => 'a', 'b' => 'b']);
         $this->expectException(MultipleColumnsSelectedException::class);
         $connection->scalar('select a, b from tbl');
     }

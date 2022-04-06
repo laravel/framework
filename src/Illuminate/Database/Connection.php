@@ -352,8 +352,7 @@ class Connection implements ConnectionInterface
             return null;
         }
 
-
-        $record = (array)$record;
+        $record = (array) $record;
 
         if (count($record) > 1) {
             throw new MultipleColumnsSelectedException;
