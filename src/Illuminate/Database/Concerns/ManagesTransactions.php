@@ -47,7 +47,7 @@ trait ManagesTransactions
 
                 $this->transactions = max(0, $this->transactions - 1);
 
-                if ($this->transactions == 0) {
+                if ($this->afterCommitCallbacksShouldBeExecuted()) {
                     $this->transactionsManager?->commit($this->getName());
                 }
             } catch (Throwable $e) {
@@ -193,11 +193,23 @@ trait ManagesTransactions
 
         $this->transactions = max(0, $this->transactions - 1);
 
-        if ($this->transactions == 0) {
+        if ($this->afterCommitCallbacksShouldBeExecuted()) {
             $this->transactionsManager?->commit($this->getName());
         }
 
         $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Determine if after commit callbacks should be executed.
+     *
+     * @return bool
+     */
+    protected function afterCommitCallbacksShouldBeExecuted()
+    {
+        return $this->transactions == 0 ||
+            ($this->transactionsManager &&
+             $this->transactionsManager->callbackApplicableTransactions()->count() === 1);
     }
 
     /**
