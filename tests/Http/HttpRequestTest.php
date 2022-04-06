@@ -8,11 +8,11 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -960,7 +960,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame(['bar'], $request->old('foo', ['bar']));
     }
 
-	public function testOldMethodCanGetDefaultValueFromModel()
+    public function testOldMethodCanGetDefaultValueFromObjectIfHasGetAttributeMethod()
     {
         $request = Request::create('/');
         $model = m::mock(Price::class);
