@@ -13,9 +13,9 @@ trait InteractsWithFlashData
      */
     public function old($key = null, $default = null)
     {
-        if (method_exists($default, 'getAttribute')) {
-            $default = $default->getAttribute($key);
-        }
+        $default = is_object($default) && method_exists($default, 'getAttribute')
+            ? $default->getAttribute($key)
+            : $default;
 
         return $this->hasSession() ? $this->session()->getOldInput($key, $default) : $default;
     }

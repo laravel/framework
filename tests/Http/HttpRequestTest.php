@@ -951,6 +951,15 @@ class HttpRequestTest extends TestCase
         $this->assertSame('boom', $request->old('foo', 'bar'));
     }
 
+    public function testOldMethodCallsSessionWhenDefaultIsArray()
+    {
+        $request = Request::create('/');
+        $session = m::mock(Store::class);
+        $session->shouldReceive('getOldInput')->once()->with('foo', ['bar'])->andReturn(['bar']);
+        $request->setLaravelSession($session);
+        $this->assertSame(['bar'], $request->old('foo', ['bar']));
+    }
+
 	public function testOldMethodCanGetDefaultValueFromModel()
     {
         $request = Request::create('/');
