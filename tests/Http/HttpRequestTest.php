@@ -960,7 +960,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame(['bar'], $request->old('foo', ['bar']));
     }
 
-    public function testOldMethodCanGetDefaultValueFromObjectIfHasGetAttributeMethod()
+    public function testOldMethodCanGetDefaultValueFromModelByKey()
     {
         $request = Request::create('/');
         $model = m::mock(Price::class);
