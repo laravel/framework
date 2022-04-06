@@ -22,7 +22,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to start running at a specific datetime.
      *
-     * @param \DateTime|string $end
+     * @param \DateTime|string $start
      * @return $this
      */
     public function startingAt($start)
