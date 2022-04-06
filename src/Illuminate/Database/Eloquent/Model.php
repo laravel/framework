@@ -935,11 +935,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // To sync all of the relationships to the database, we will simply spin through
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
-        foreach ($this->relations as $models) {
+        foreach ($this->relations as $relation => $models) {
             $models = $models instanceof Collection
                         ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
+                $model->setAttribute($this->$relation()->getForeignKeyName(), $this->$relation()->getParentKey());
+
                 if (! $model->push()) {
                     return false;
                 }
