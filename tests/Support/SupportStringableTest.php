@@ -990,12 +990,12 @@ class SupportStringableTest extends TestCase
 
     public function testExactly()
     {
-      $this->assertTrue($this->stringable('foo')->exactly($this->stringable('foo')));
-      $this->assertTrue($this->stringable('foo')->exactly('foo'));
+        $this->assertTrue($this->stringable('foo')->exactly($this->stringable('foo')));
+        $this->assertTrue($this->stringable('foo')->exactly('foo'));
 
-      $this->assertFalse($this->stringable('Foo')->exactly($this->stringable('foo')));
-      $this->assertFalse($this->stringable('Foo')->exactly('foo'));
-      $this->assertFalse($this->stringable('[]')->exactly([]));
-      $this->assertFalse($this->stringable('0')->exactly(0));
+        $this->assertFalse($this->stringable('Foo')->exactly($this->stringable('foo')));
+        $this->assertFalse($this->stringable('Foo')->exactly('foo'));
+        $this->assertFalse($this->stringable('[]')->exactly([]));
+        $this->assertFalse($this->stringable('0')->exactly(0));
     }
 }
