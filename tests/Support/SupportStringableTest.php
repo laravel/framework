@@ -999,4 +999,15 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo', $this->stringable('foo')->value());
         $this->assertSame('foo', $this->stringable('foo')->toString());
     }
+
+    public function testExactly()
+    {
+        $this->assertTrue($this->stringable('foo')->exactly($this->stringable('foo')));
+        $this->assertTrue($this->stringable('foo')->exactly('foo'));
+
+        $this->assertFalse($this->stringable('Foo')->exactly($this->stringable('foo')));
+        $this->assertFalse($this->stringable('Foo')->exactly('foo'));
+        $this->assertFalse($this->stringable('[]')->exactly([]));
+        $this->assertFalse($this->stringable('0')->exactly(0));
+    }
 }
