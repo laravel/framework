@@ -35,6 +35,22 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->has('baz'));
     }
 
+    public function testSessionDataCanBeSerializedAsJson()
+    {
+        $session = $this->getSession('json');
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(json_encode(['foo' => 'bar', 'bagged' => ['name' => 'taylor']]));
+        $session->start();
+
+        $this->assertSame('bar', $session->get('foo'));
+        $this->assertSame('baz', $session->get('bar', 'baz'));
+        $this->assertTrue($session->has('foo'));
+        $this->assertFalse($session->has('bar'));
+        $this->assertTrue($session->isStarted());
+
+        $session->put('baz', 'boom');
+        $this->assertTrue($session->has('baz'));
+    }
+
     public function testSessionMigration()
     {
         $session = $this->getSession();
@@ -136,6 +152,37 @@ class SessionStoreTest extends TestCase
         $session->getHandler()->shouldReceive('write')->once()->with(
             $this->getSessionId(),
             serialize([
+                '_token' => $session->token(),
+                'foo' => 'bar',
+                '_flash' => [
+                    'new' => [],
+                    'old' => [],
+                ],
+            ])
+        );
+
+        $session->save();
+
+        $this->assertFalse($session->isStarted());
+    }
+
+    public function testSessionIsProperlyUpdatedWithJsonSerialization()
+    {
+        $session = $this->getSession('json');
+        $session->getHandler()->shouldReceive('read')->once()->andReturn(json_encode([
+            '_token' => Str::random(40),
+            'foo' => 'bar',
+            'baz' => 'boom',
+            '_flash' => [
+                'new' => [],
+                'old' => ['baz'],
+            ],
+        ]));
+        $session->start();
+
+        $session->getHandler()->shouldReceive('write')->once()->with(
+            $this->getSessionId(),
+            json_encode([
                 '_token' => $session->token(),
                 'foo' => 'bar',
                 '_flash' => [
@@ -493,19 +540,20 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function getSession()
+    public function getSession($serialization = 'php')
     {
         $reflection = new ReflectionClass(Store::class);
 
-        return $reflection->newInstanceArgs($this->getMocks());
+        return $reflection->newInstanceArgs($this->getMocks($serialization));
     }
 
-    public function getMocks()
+    public function getMocks($serialization = 'php')
     {
         return [
             $this->getSessionName(),
             m::mock(SessionHandlerInterface::class),
             $this->getSessionId(),
+            $serialization,
         ];
     }
 
