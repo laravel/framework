@@ -15,7 +15,7 @@ trait InteractsWithFlashData
      */
     public function old($key = null, $default = null)
     {
-        $default = $default instanceof Model ? $default->getAttribute($key) : $default;
+        $default = $default instanceof Model ? $default->{$key} : $default;
 
         return $this->hasSession() ? $this->session()->getOldInput($key, $default) : $default;
     }
