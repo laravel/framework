@@ -779,7 +779,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->createDirectory($path);
-        } catch (UnableToCreateDirectory $e) {
+        } catch (UnableToCreateDirectory | UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
 
             return false;
