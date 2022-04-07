@@ -547,6 +547,12 @@ class SupportStrTest extends TestCase
             php
             framework
         '));
+        $this->assertSame('laravel php framework', Str::squish('   laravel   php   framework   '));
+        $this->assertSame('123', Str::squish('   123    '));
+        $this->assertSame('だ', Str::squish('だ'));
+        $this->assertSame('ム', Str::squish('ム'));
+        $this->assertSame('だ', Str::squish('   だ    '));
+        $this->assertSame('ム', Str::squish('   ム    '));
     }
 
     public function testStudly()

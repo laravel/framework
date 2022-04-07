@@ -620,6 +620,12 @@ class SupportStringableTest extends TestCase
             with
             spaces
         ')->squish());
+        $this->assertSame('laravel php framework', (string) $this->stringable('   laravel   php   framework   ')->squish());
+        $this->assertSame('123', (string) $this->stringable('   123    ')->squish());
+        $this->assertSame('だ', (string) $this->stringable('だ')->squish());
+        $this->assertSame('ム', (string) $this->stringable('ム')->squish());
+        $this->assertSame('だ', (string) $this->stringable('   だ    ')->squish());
+        $this->assertSame('ム', (string) $this->stringable('   ム    ')->squish());
     }
 
     public function testStart()
