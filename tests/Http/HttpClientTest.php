@@ -93,6 +93,30 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $response->json('result.foo'));
         $this->assertSame('default', $response->json('missing_key', 'default'));
         $this->assertSame(['foo' => 'bar'], $response['result']);
+    }
+
+    public function testResponseObjectAsArray()
+    {
+        $this->factory->fake([
+            '*' => [['foo' => 'bar'], ['bar' => 'foo']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertSame('[{"foo":"bar"},{"bar":"foo"}]', $response->body());
+        $this->assertSame('[{"foo":"bar"},{"bar":"foo"}]', (string) $response);
+        $this->assertIsArray($response->object());
+        $this->assertSame('bar', $response->object()[0]->foo);
+    }
+
+    public function testResponseObjectAsObject()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
     }
