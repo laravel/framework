@@ -75,7 +75,7 @@ class ScheduleListCommand extends Command
                 if (class_exists($event->description)) {
                     $command = $event->description;
                     $description = '';
-                } else if ($event->description) {
+                } elseif ($event->description) {
                     $command = $event->description;
                     $description = 'Closure at: '.$this->getClosureLocation($event);
                 } else {
