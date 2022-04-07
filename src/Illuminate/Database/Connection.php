@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 use Doctrine\DBAL\Types\Type;
 use Exception;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\StatementPrepared;
@@ -28,7 +29,8 @@ class Connection implements ConnectionInterface
 {
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
-        Concerns\ManagesTransactions;
+        Concerns\ManagesTransactions,
+        Macroable;
 
     /**
      * The active PDO connection.
