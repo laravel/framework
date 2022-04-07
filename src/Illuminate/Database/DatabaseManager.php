@@ -7,6 +7,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
@@ -16,6 +17,10 @@ use RuntimeException;
  */
 class DatabaseManager implements ConnectionResolverInterface
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The application instance.
      *
@@ -450,6 +455,10 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->connection()->$method(...$parameters);
     }
 }
