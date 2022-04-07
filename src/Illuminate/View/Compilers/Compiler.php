@@ -30,16 +30,24 @@ abstract class Compiler
     protected $basePath;
 
     /**
+     * Determines if cached view should be used.
+     *
+     * @var bool
+     */
+    protected $useCache;
+
+    /**
      * Create a new compiler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
      * @param  string  $basePath
+     * @param  bool  $useCache
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files, $cachePath, $basePath = '')
+    public function __construct(Filesystem $files, $cachePath, $basePath = '', $useCache = true)
     {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
@@ -48,6 +56,7 @@ abstract class Compiler
         $this->files = $files;
         $this->cachePath = $cachePath;
         $this->basePath = $basePath;
+        $this->useCache = $useCache;
     }
 
     /**
@@ -69,6 +78,10 @@ abstract class Compiler
      */
     public function isExpired($path)
     {
+        if (! $this->useCache) {
+            return true;
+        }
+
         $compiled = $this->getCompiledPath($path);
 
         // If the compiled file doesn't exist we will indicate that the view is expired
