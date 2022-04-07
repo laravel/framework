@@ -39,23 +39,32 @@ class ScheduleListCommandTest extends TestCase
         $closureLineNumber = __LINE__ - 1;
         $closureFilePath = __FILE__;
 
+        $this->schedule->call(fn () => '')->everyMinute()->name('Foo closure description');
+
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
             ->expectsOutput('  0 0     1 1-12/3 *  php artisan foo:command .... Next Due: 3 months from now')
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
-            ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
+            ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      *  Foo closure description .... Next Due: 1 minute from now');
     }
 
     public function testDisplayScheduleInVerboseMode()
     {
         $this->schedule->command(FooCommand::class)->everyMinute();
 
+        $this->schedule->call(fn () => '')->everyMinute()->description('Foo closure description');
+        $closureLineNumber = __LINE__ - 1;
+        $closureFilePath = __FILE__;
+
         $this->artisan(ScheduleListCommand::class, ['-v' => true])
             ->assertSuccessful()
-            ->expectsOutputToContain('Next Due: '.now()->setMinutes(1)->format('Y-m-d H:i:s P'))
-            ->expectsOutput('             ⇁ This is the description of the command.');
+            ->expectsOutputToContain('Next Due: ')
+            ->expectsOutput('             ⇁ This is the description of the command.')
+            ->expectsOutput('  * * * * *  Foo closure description .... Next Due: '.now()->setMinutes(1)->format('Y-m-d H:i:s P'))
+            ->expectsOutput('             ⇁ Closure at: '.$closureFilePath.':'.$closureLineNumber);
     }
 
     protected function tearDown(): void
