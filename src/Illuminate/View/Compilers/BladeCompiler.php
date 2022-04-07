@@ -48,13 +48,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $customDirectives = [];
 
     /**
-     * The array of anonymous component namespaces to autoload from.
-     *
-     * @var array
-     */
-    protected $anonymousComponentNamespaces = [];
-
-    /**
      * All custom "condition" handlers.
      *
      * @var array
@@ -128,6 +121,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $rawBlocks = [];
+
+    /**
+     * The array of anonymous component namespaces to autoload from.
+     *
+     * @var array
+     */
+    protected $anonymousComponentNamespaces = [];
 
     /**
      * The array of class component aliases and their class names.
@@ -682,18 +682,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register an anonymous component namespace.
      *
-     * @param  string  $prefix
      * @param  string  $directory
+     * @param  string|null  $prefix
      * @return void
      */
-    public function anonymousComponentNamespace(string $prefix, string $directory = null)
+    public function anonymousComponentNamespace(string $directory, string $prefix = null)
     {
-        if ($directory === null) {
-            $directory = $prefix;
-        }
+        $prefix ??= $directory;
 
-        // Store the directory in dot notation.
-        $this->anonymousComponentNamespaces[$prefix] = (string) Str::of($directory)->replace('/', '.')->trim('. ');
+        $this->anonymousComponentNamespaces[$prefix] = Str::of($directory)
+                ->replace('/', '.')
+                ->trim('. ')
+                ->toString();
     }
 
     /**

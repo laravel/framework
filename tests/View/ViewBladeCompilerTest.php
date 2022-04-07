@@ -222,17 +222,17 @@ class ViewBladeCompilerTest extends TestCase
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
-        $compiler->anonymousComponentNamespace('frontend', ' public/frontend ');
+        $compiler->anonymousComponentNamespace(' public/frontend ', 'frontend');
         $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
-        $compiler->anonymousComponentNamespace('frontend', 'public/frontend/');
+        $compiler->anonymousComponentNamespace('public/frontend/', 'frontend');
         $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
 
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
-        $compiler->anonymousComponentNamespace('admin', '/admin/components');
+        $compiler->anonymousComponentNamespace('/admin/components', 'admin');
         $this->assertEquals(['admin' => 'admin.components'], $compiler->getAnonymousComponentNamespaces());
 
         // Test directory is automatically inferred from the prefix if not given.
@@ -244,7 +244,7 @@ class ViewBladeCompilerTest extends TestCase
         // Test that the prefix can also contain dots.
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
 
-        $compiler->anonymousComponentNamespace('frontend.auth', 'frontend/auth');
+        $compiler->anonymousComponentNamespace('frontend/auth', 'frontend.auth');
         $this->assertEquals(['frontend.auth' => 'frontend.auth'], $compiler->getAnonymousComponentNamespaces());
     }
 

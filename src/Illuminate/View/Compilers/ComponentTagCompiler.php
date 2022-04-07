@@ -271,26 +271,17 @@ class ComponentTagCompiler
             return $class;
         }
 
-        // The following code serves to guess the view name for this component.
-        // First, we'll create a collection with the custom component paths provided
-        // by the developer. We can use these folders to guess the correct view name.
         $guess = collect($this->blade->getAnonymousComponentNamespaces())
-            // Next, we'll filter out the component paths that cannot be used here, based on their prefix.
-            // For example, for the anonymous component "<x-admin::dashboard>", we should look for the 'dashboard'
-            // view in the folder associated with the 'admin' prefix.
-            ->filter(function ($directory, $prefix) use ($component): bool {
+            ->filter(function ($directory, $prefix) use ($component) {
                 return Str::startsWith($component, $prefix.'::');
             })
-            // Next, we'll prepend the default components directory and our full component name. This is convention.
-            // Prepending it ensures that the /components always has precedence over the cutom directories.
             ->prepend('components', $component)
-            // Finally, we'll go over the components and prefixes and check whether we can find a matching view name.
             ->reduce(function ($carry, $directory, $prefix) use ($component, $viewFactory) {
-                $componentName = Str::after($component, $prefix.'::');
-
-                if ($carry !== null) {
+                if (! is_null($carry)) {
                     return $carry;
                 }
+
+                $componentName = Str::after($component, $prefix.'::');
 
                 if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory))) {
                     return $view;
@@ -299,11 +290,9 @@ class ComponentTagCompiler
                 if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.index')) {
                     return $view;
                 }
-
-                return null;
             });
 
-        if ($guess !== null) {
+        if (! is_null($guess)) {
             return $guess;
         }
 
