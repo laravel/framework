@@ -39,6 +39,21 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
+    public function testIsExpiredReturnsFalseWhenUseCacheIsTrueAndNoFileModification()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(true);
+        $files->shouldReceive('lastModified')->once()->with('foo')->andReturn(0);
+        $files->shouldReceive('lastModified')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(100);
+        $this->assertFalse($compiler->isExpired('foo'));
+    }
+
+    public function testIsExpiredReturnsTrueWhenUseCacheIsFalse()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, $basePath = '', $useCache = false);
+        $this->assertTrue($compiler->isExpired('foo'));
+    }
+
     public function testCompilePathIsProperlyCreated()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
