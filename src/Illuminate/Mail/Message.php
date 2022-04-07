@@ -220,13 +220,17 @@ class Message
         if (is_array($address)) {
             $type = lcfirst($type);
 
-            $addresses = collect($address)->map(function (string|array $address, $key) {
+            $addresses = collect($address)->map(function ($address, $key) {
                 if (is_string($key) && is_string($address)) {
                     return new Address($key, $address);
                 }
 
                 if (is_array($address)) {
                     return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
+                }
+
+                if (is_null($address)) {
+                    return new Address($key);
                 }
 
                 return $address;
