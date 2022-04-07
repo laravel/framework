@@ -271,12 +271,29 @@ class ComponentTagCompiler
             return $class;
         }
 
-        if ($viewFactory->exists($view = $this->guessViewName($component))) {
-            return $view;
-        }
+        $guess = collect($this->blade->getAnonymousComponentNamespaces())
+            ->filter(function ($directory, $prefix) use ($component) {
+                return Str::startsWith($component, $prefix.'::');
+            })
+            ->prepend('components', $component)
+            ->reduce(function ($carry, $directory, $prefix) use ($component, $viewFactory) {
+                if (! is_null($carry)) {
+                    return $carry;
+                }
 
-        if ($viewFactory->exists($view = $this->guessViewName($component).'.index')) {
-            return $view;
+                $componentName = Str::after($component, $prefix.'::');
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory))) {
+                    return $view;
+                }
+
+                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.index')) {
+                    return $view;
+                }
+            });
+
+        if (! is_null($guess)) {
+            return $guess;
         }
 
         throw new InvalidArgumentException(
@@ -341,11 +358,14 @@ class ComponentTagCompiler
      * Guess the view name for the given component.
      *
      * @param  string  $name
+     * @param  string  $prefix
      * @return string
      */
-    public function guessViewName($name)
+    public function guessViewName($name, $prefix = 'components.')
     {
-        $prefix = 'components.';
+        if (! Str::endsWith($prefix, '.')) {
+            $prefix .= '.';
+        }
 
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
