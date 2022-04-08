@@ -9,53 +9,8 @@ class Pluralizer
     /**
      * Uncountable word forms.
      *
-     * @var string[]
+     * New uncuntable words should be added to: https://github.com/doctrine/inflector/blob/2.0.x/lib/Doctrine/Inflector/Rules/English/Uninflected.php
      */
-    public static $uncountable = [
-        'audio',
-        'bison',
-        'cattle',
-        'chassis',
-        'compensation',
-        'coreopsis',
-        'data',
-        'deer',
-        'education',
-        'emoji',
-        'equipment',
-        'evidence',
-        'feedback',
-        'firmware',
-        'fish',
-        'furniture',
-        'gold',
-        'hardware',
-        'information',
-        'jedi',
-        'kin',
-        'knowledge',
-        'love',
-        'metadata',
-        'money',
-        'moose',
-        'news',
-        'nutrition',
-        'offspring',
-        'plankton',
-        'pokemon',
-        'police',
-        'rain',
-        'recommended',
-        'related',
-        'rice',
-        'series',
-        'sheep',
-        'software',
-        'species',
-        'swine',
-        'traffic',
-        'wheat',
-    ];
 
     /**
      * Get the plural form of an English word.
@@ -70,7 +25,7 @@ class Pluralizer
             $count = count($count);
         }
 
-        if ((int) abs($count) === 1 || static::uncountable($value) || preg_match('/^(.*)[A-Za-z0-9\x{0080}-\x{FFFF}]$/u', $value) == 0) {
+        if ((int) abs($count) === 1 || preg_match('/^(.*)[A-Za-z0-9\x{0080}-\x{FFFF}]$/u', $value) == 0) {
             return $value;
         }
 
@@ -90,17 +45,6 @@ class Pluralizer
         $singular = static::inflector()->singularize($value);
 
         return static::matchCase($singular, $value);
-    }
-
-    /**
-     * Determine if the given value is uncountable.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected static function uncountable($value)
-    {
-        return in_array(strtolower($value), static::$uncountable);
     }
 
     /**
