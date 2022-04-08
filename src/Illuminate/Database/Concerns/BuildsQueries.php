@@ -304,7 +304,7 @@ trait BuildsQueries
      */
     public function last($columns = ['*'])
     {
-        return $this->latest(primaryKey: true)->take(1)->get($columns)->first();
+        return $this->latest(defaultKey: true)->take(1)->get($columns)->first();
     }
 
     /**

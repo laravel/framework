@@ -2248,9 +2248,9 @@ class Builder implements BuilderContract
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @return $this
      */
-    public function latest($column = 'created_at', $primaryKey = false)
+    public function latest($column = 'created_at', $defaultKey = false)
     {
-        return $this->orderBy($primaryKey ? $this->defaultKeyName() : $column, 'desc');
+        return $this->orderBy($defaultKey ? $this->defaultKeyName() : $column, 'desc');
     }
 
     /**
