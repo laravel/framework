@@ -482,7 +482,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Create a new instance of the given model.
+     * Create a new instance of the model.
      *
      * @param  array  $attributes
      * @param  bool  $exists
@@ -504,6 +504,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $model->setTable($this->getTable());
 
         $model->mergeCasts($this->casts);
+
+        $model->setVisible($this->visible);
+
+        $model->setHidden($this->hidden);
+
+        $model->setAppends($this->appends);
+
+        $model->mergeFillable($this->fillable);
+
+        $model->mergeGuarded($this->guarded);
 
         $model->fill((array) $attributes);
 

@@ -307,6 +307,51 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('date', $newInstance->getCasts()['foo']);
     }
 
+    public function testNewInstanceReturnsNewInstanceWithAppendsSet()
+    {
+        $model = new EloquentModelStub;
+        $model->append(['appendable']);
+        $newInstance = $model->newInstance();
+
+        $this->assertTrue($newInstance->hasAppended('appendable'));
+    }
+
+    public function testNewInstanceReturnsNewInstanceWithHiddenSet()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age', 'id']);
+        $newInstance = $model->newInstance();
+
+        $this->assertSame($model->getHidden(), $newInstance->getHidden());
+    }
+
+    public function testNewInstanceReturnsNewInstanceWithVisibleSet()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setVisible(['name', 'age']);
+        $newInstance = $model->newInstance();
+
+        $this->assertSame($model->getVisible(), $newInstance->getVisible());
+    }
+
+    public function testNewInstanceReturnsNewInstanceWithMergedFillable()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->mergeFillable(['name', 'age']);
+        $newInstance = $model->newInstance();
+
+        $this->assertSame($model->getFillable(), $newInstance->getFillable());
+    }
+
+    public function testNewInstanceReturnsNewInstanceWithMergedGuarded()
+    {
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->mergeGuarded(['id']);
+        $newInstance = $model->newInstance();
+
+        $this->assertSame($model->getGuarded(), $newInstance->getGuarded());
+    }
+
     public function testCreateMethodSavesNewModel()
     {
         $_SERVER['__eloquent.saved'] = false;
