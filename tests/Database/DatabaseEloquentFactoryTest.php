@@ -108,6 +108,10 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertSame('Taylor Otwell', $user->name);
 
+        $user = FactoryTestUserFactory::new()->set('name', 'Taylor Otwell')->create();
+        $this->assertInstanceOf(Eloquent::class, $user);
+        $this->assertSame('Taylor Otwell', $user->name);
+
         $users = FactoryTestUserFactory::new()->createMany([
             ['name' => 'Taylor Otwell'],
             ['name' => 'Jeffrey Way'],

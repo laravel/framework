@@ -484,6 +484,18 @@ abstract class Factory
     }
 
     /**
+     * Set a single model attribute.
+     *
+     * @param  string|int  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function set($key, $value)
+    {
+        return $this->state([$key => $value]);
+    }
+
+    /**
      * Add a new sequenced state transformation to the model definition.
      *
      * @param  array  $sequence
