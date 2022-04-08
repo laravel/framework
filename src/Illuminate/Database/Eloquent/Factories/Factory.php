@@ -486,8 +486,8 @@ abstract class Factory
     /**
      * Put a specific key in the model definition.
      *
-     * @param string|int $key
-     * @param mixed $value
+     * @param  string|int  $key
+     * @param  mixed  $value
      * @return static
      */
     public function set($key, $value)
