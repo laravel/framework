@@ -2243,14 +2243,14 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "order by" clause for a timestamp or primary key to the query.
+     * Add an "order by" clause for a timestamp or default key to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @return $this
      */
     public function latest($column = 'created_at', $primaryKey = false)
     {
-        return $this->orderBy($primaryKey ? 'id' : $column, 'desc');
+        return $this->orderBy($primaryKey ? $this->defaultKeyName() : $column, 'desc');
     }
 
     /**
