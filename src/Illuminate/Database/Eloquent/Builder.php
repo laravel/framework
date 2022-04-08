@@ -351,10 +351,10 @@ class Builder implements BuilderContract
      * @param  string|\Illuminate\Database\Query\Expression  $column
      * @return $this
      */
-    public function latest($column = null)
+    public function latest($column = null, $primaryKey = false)
     {
         if (is_null($column)) {
-            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+            $column = $primaryKey ? $this->model->getKeyName() : $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
         $this->query->latest($column);
