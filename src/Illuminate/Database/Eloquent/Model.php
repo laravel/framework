@@ -511,9 +511,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $model->setAppends($this->appends);
 
-        $model->mergeFillable($this->fillable);
+        $model->fillable($this->fillable);
 
-        $model->mergeGuarded($this->guarded);
+        $model->guard($this->guarded);
 
         $model->fill((array) $attributes);
 
