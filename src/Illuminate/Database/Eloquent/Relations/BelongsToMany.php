@@ -600,7 +600,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
+        if (is_null($instance = $this->clone()->where($attributes)->first())) {
             $instance = $this->related->newInstance(array_merge($attributes, $values));
         }
 
@@ -618,7 +618,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrCreate(array $attributes = [], array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
+        if (is_null($instance = $this->clone()->where($attributes)->first())) {
             $instance = $this->create(array_merge($attributes, $values), $joining, $touch);
         }
 
@@ -636,7 +636,7 @@ class BelongsToMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true)
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
+        if (is_null($instance = $this->clone()->where($attributes)->first())) {
             return $this->create(array_merge($attributes, $values), $joining, $touch);
         }
 

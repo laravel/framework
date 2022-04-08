@@ -427,6 +427,18 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 666]));
     }
 
+    public function testFirstOrNewWithoutExistingRelated()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $name = Str::random();
+        $tag = Tag::create(['name' => $name]);
+
+        $new = $post->tags()->firstOrNew(['name' => $name]);
+        $this->assertSame($name, $new->name);
+        $this->assertFalse($tag->is($new));
+    }
+
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -440,6 +452,20 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $new = $post->tags()->firstOrCreate(['name' => 'wavez']);
         $this->assertSame('wavez', $new->name);
         $this->assertNotNull($new->id);
+    }
+
+    public function testFirstOrCreateWithoutExistingRelated()
+    {
+        /** @var Post $post */
+        $post = Post::create(['title' => Str::random()]);
+
+        $name = Str::random();
+        $tag = Tag::create(['name' => $name]);
+
+        $new = $post->tags()->firstOrCreate(['name' => $name]);
+        $this->assertSame($name, $new->name);
+        $this->assertNotNull($new->id);
+        $this->assertFalse($tag->is($new));
     }
 
     public function testFirstOrNewMethodWithValues()
@@ -517,6 +543,18 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->updateOrCreate(['id' => 666], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
+    }
+
+    public function testUpdateOrCreateWithoutExistingRelated()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => 'foo']);
+
+        $new = $post->tags()->updateOrCreate(['name' => 'foo'], ['name' => 'wavez']);
+        $this->assertSame('foo', $tag->fresh()->name);
+        $this->assertSame('wavez', $new->name);
+        $this->assertFalse($tag->is($new));
     }
 
     public function testUpdateOrCreateMethodCreate()
