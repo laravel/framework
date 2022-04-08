@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Container\Container;
 use Doctrine\Inflector\InflectorFactory;
 
 class Pluralizer
@@ -77,7 +78,8 @@ class Pluralizer
         static $inflector;
 
         if (is_null($inflector)) {
-            $inflector = InflectorFactory::createForLanguage('english')->build();
+            $app = Container::getInstance();
+            $inflector = InflectorFactory::createForLanguage( $app['config']->get('app.pluralizer_ruleset', 'english') )->build();
         }
 
         return $inflector;
