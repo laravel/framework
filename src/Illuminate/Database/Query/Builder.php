@@ -2243,7 +2243,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "order by" clause for a timestamp to the query.
+     * Add an "order by" clause for a timestamp or primary key to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
      * @return $this

@@ -346,7 +346,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add an "order by" clause for a timestamp to the query.
+     * Add an "order by" clause for a timestamp or primary key to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
      * @return $this
