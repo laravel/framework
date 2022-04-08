@@ -484,7 +484,7 @@ abstract class Factory
     }
 
     /**
-     * Put a specific key in the model definition.
+     * Set a single model attribute.
      *
      * @param  string|int  $key
      * @param  mixed  $value
