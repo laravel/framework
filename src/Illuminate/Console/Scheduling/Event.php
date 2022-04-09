@@ -38,6 +38,20 @@ class Event
     public $expression = '* * * * *';
 
     /**
+     * When to start the scheduled event.
+     *
+     * @var \Illuminate\Support\Carbon
+     */
+    public $startingAt;
+
+    /**
+     * When to end the scheduled event.
+     *
+     * @var \Illuminate\Support\Carbon
+     */
+    public $endingAt;
+
+    /**
      * The timezone the date should be evaluated on.
      *
      * @var \DateTimeZone|string

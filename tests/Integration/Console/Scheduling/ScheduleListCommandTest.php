@@ -15,7 +15,7 @@ class ScheduleListCommandTest extends TestCase
     {
         parent::setUp();
 
-        Carbon::setTestNow(now()->startOfYear());
+        Carbon::setTestNow(Carbon::parse('2022-01-01'));
         ScheduleListCommand::resolveTerminalWidthUsing(fn () => 80);
 
         $this->schedule = $this->app->make(Schedule::class);
@@ -34,6 +34,10 @@ class ScheduleListCommandTest extends TestCase
         $this->schedule->command('inspire')->twiceDaily(14, 18);
         $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
         $this->schedule->job(FooJob::class)->everyMinute();
+        $this->schedule->command('startAtPast')->mondays()->startingAt(Carbon::now()->subMonth());
+        $this->schedule->command('startAtFuture')->mondays()->startingAt(Carbon::now()->addMonth());
+        $this->schedule->command('endAtPast')->mondays()->endingAt(Carbon::now()->subMonth());
+        $this->schedule->command('endAtFuture')->mondays()->endingAt(Carbon::now()->addMonth());
 
         $this->schedule->call(fn () => '')->everyMinute();
         $closureLineNumber = __LINE__ - 1;
@@ -45,6 +49,10 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  0 14,18 * *      *  php artisan inspire ........ Next Due: 14 hours from now')
             ->expectsOutput('  * *     * *      *  php artisan foobar a='.ProcessUtils::escapeArgument('b').' ... Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
+            ->expectsOutput('  * *     * *      1  php artisan startAtPast ...... Next Due: 2 days from now')
+            ->expectsOutput('  * *     * *      1  php artisan startAtFuture ... Next Due: 1 month from now')
+            ->expectsOutput('  * *     * *      1  php artisan endAtPast ............ Ended At: 1 month ago')
+            ->expectsOutput('  * *     * *      1  php artisan endAtFuture ...... Next Due: 2 days from now')
             ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
     }
 

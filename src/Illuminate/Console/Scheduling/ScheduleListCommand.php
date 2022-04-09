@@ -6,6 +6,7 @@ use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
+use Illuminate\Console\Scheduling\Event;
 use Illuminate\Support\Carbon;
 use ReflectionClass;
 use ReflectionFunction;
@@ -85,9 +86,14 @@ class ScheduleListCommand extends Command
             $nextDueDateLabel = 'Next Due:';
 
             $nextDueDate = Carbon::create((new CronExpression($event->expression))
-                ->getNextRunDate(Carbon::now()->setTimezone($event->timezone))
+                ->getNextRunDate($this->getStartDate($event))
                 ->setTimezone($timezone)
             );
+
+            if ($event->endingAt && Carbon::now()->setTimezone($event->timezone) > $event->endingAt) {
+                $nextDueDate = $event->endingAt;
+                $nextDueDateLabel = 'Ended At:';
+            }
 
             $nextDueDate = $this->output->isVerbose()
                 ? $nextDueDate->format('Y-m-d H:i:s P')
@@ -121,6 +127,21 @@ class ScheduleListCommand extends Command
         $this->line(
             $events->flatten()->filter()->prepend('')->push('')->toArray()
         );
+    }
+
+    /**
+     * Get the start date to calculate next run date from.
+     *
+     * @param Event $even
+     * @return Carbon
+     */
+    private function getStartDate(Event $event)
+    {
+        if ($event->startingAt && $event->startingAt > Carbon::now()) {
+            return $event->startingAt;
+        }
+
+        return Carbon::now()->setTimezone($event->timezone);
     }
 
     /**

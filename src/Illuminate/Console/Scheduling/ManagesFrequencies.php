@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 
 trait ManagesFrequencies
 {
+
     /**
      * The Cron expression representing the event's frequency.
      *
@@ -27,9 +28,9 @@ trait ManagesFrequencies
      */
     public function startingAt($start)
     {
-        $start = Carbon::parse($start, $this->timezone);
+        $this->startingAt = Carbon::parse($start, $this->timezone);
 
-        return $this->when(fn () => Carbon::now($this->timezone) >= $start);
+        return $this->when(fn () => Carbon::now($this->timezone) >= $this->startingAt);
     }
 
     /**
@@ -40,9 +41,9 @@ trait ManagesFrequencies
      */
     public function endingAt($end)
     {
-        $end = Carbon::parse($end, $this->timezone);
+        $this->endingAt = Carbon::parse($end, $this->timezone);
 
-        return $this->when(fn () => Carbon::now($this->timezone) < $end);
+        return $this->when(fn () => Carbon::now($this->timezone) < $this->endingAt);
     }
 
     /**
