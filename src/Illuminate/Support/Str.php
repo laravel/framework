@@ -1025,7 +1025,7 @@ class Str
 
     /**
      * Multibyte alternative to native `str_pad` function.
-     * Adapted from https://www.php.net/manual/en/ref.mbstring.php#90611
+     * Adapted from https://www.php.net/manual/en/ref.mbstring.php#90611.
      *
      * @param  string  $value
      * @param  int  $length
