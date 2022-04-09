@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
-use Mockery as m;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\EloquentTokenRepository;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class AuthEloquentTokenRepositoryTest extends TestCase
 {
@@ -192,25 +192,11 @@ class AuthEloquentTokenRepositoryTest extends TestCase
     {
         $hasher = m::mock(Hasher::class);
 
-        // $repo = $this->getMockBuilder(EloquentTokenRepository::class)->setConstructorArgs([$hasher, 'model', 'key'])->getMock();
-
-        // $repo = $this->createMock(EloquentTokenRepository::class);
-        // $repo = $this->getMockBuilder(EloquentTokenRepository::class)->onlyMethods(['create', 'createModel', 'getHasher'])->setConstructorArgs([$hasher, 'model', 'key'])->getMock();
         $repo = $this->getMockBuilder(EloquentTokenRepository::class)
-            ->onlyMethods(['createModel',])
+            ->onlyMethods(['createModel'])
             ->setConstructorArgs([$hasher, 'model', 'key'])
             ->getMock();
 
-        // $repo->method('getHasher')->willReturn($hasher);
-
-        // $repo->shouldReceive('getHasher')->andReturn($hasher);
-
         return $repo;
-
-        return new EloquentTokenRepository(
-            m::mock(Hasher::class),
-            'model',
-            'key'
-        );
     }
 }

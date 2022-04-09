@@ -2,11 +2,10 @@
 
 namespace Illuminate\Auth\Passwords;
 
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Illuminate\Auth\Passwords\TokenRepositoryInterface;
-use Illuminate\Contracts\Hashing\Hasher as HasherContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 class EloquentTokenRepository implements TokenRepositoryInterface
 {
@@ -129,7 +128,7 @@ class EloquentTokenRepository implements TokenRepositoryInterface
         )->first();
 
         return $record &&
-            !$this->tokenExpired($record['created_at']) &&
+            ! $this->tokenExpired($record['created_at']) &&
             $this->hasher->check($token, $record['token']);
     }
 
@@ -230,7 +229,7 @@ class EloquentTokenRepository implements TokenRepositoryInterface
      */
     public function createModel()
     {
-        $class = '\\' . ltrim($this->model, '\\');
+        $class = '\\'.ltrim($this->model, '\\');
 
         return new $class;
     }
