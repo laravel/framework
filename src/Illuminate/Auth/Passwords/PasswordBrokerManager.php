@@ -81,22 +81,64 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function createTokenRepository(array $config)
     {
-        $key = $this->app['config']['app.key'];
-
-        if (str_starts_with($key, 'base64:')) {
-            $key = base64_decode(substr($key, 7));
+        if (isset($config['model'])) {
+            return $this->createEloquentTokenRepository($config);
         }
 
+        return $this->createDababaseTokenRepository($config);
+    }
+
+    /**
+     * Create an instance of the Database token repository.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     */
+    public function createDababaseTokenRepository(array $config)
+    {
         $connection = $config['connection'] ?? null;
 
         return new DatabaseTokenRepository(
             $this->app['db']->connection($connection),
             $this->app['hash'],
             $config['table'],
-            $key,
+            $this->makeHashKey(),
             $config['expire'],
             $config['throttle'] ?? 0
         );
+    }
+
+    /**
+     * Create an instance of the Eloquent token repository.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
+     */
+    protected function createEloquentTokenRepository(array $config)
+    {
+        return new EloquentTokenRepository(
+            $this->app['hash'],
+            $config['model'],
+            $this->makeHashKey(),
+            $config['expire'],
+            $config['throttle'] ?? 0
+        );
+    }
+
+    /**
+     * Get the hashing key.
+     *
+     * @return string
+     */
+    protected function makeHashKey()
+    {
+        $key = $this->app['config']['app.key'];
+
+        if (str_starts_with($key, 'base64:')) {
+            $key = base64_decode(substr($key, 7));
+        }
+
+        return $key;
     }
 
     /**
