@@ -489,7 +489,7 @@ class Str
      */
     public static function padBoth($value, $length, $pad = ' ')
     {
-        return static::mbStrPad($value, $length, $pad, STR_PAD_BOTH);
+        return str_pad($value, strlen($value) - mb_strlen($value) + $length, $pad, STR_PAD_BOTH);
     }
 
     /**
@@ -502,7 +502,7 @@ class Str
      */
     public static function padLeft($value, $length, $pad = ' ')
     {
-        return static::mbStrPad($value, $length, $pad, STR_PAD_LEFT);
+        return str_pad($value, strlen($value) - mb_strlen($value) + $length, $pad, STR_PAD_LEFT);
     }
 
     /**
@@ -515,7 +515,7 @@ class Str
      */
     public static function padRight($value, $length, $pad = ' ')
     {
-        return static::mbStrPad($value, $length, $pad, STR_PAD_RIGHT);
+        return str_pad($value, strlen($value) - mb_strlen($value) + $length, $pad, STR_PAD_RIGHT);
     }
 
     /**
@@ -1021,26 +1021,5 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
-    }
-
-    /**
-     * Multibyte alternative to native `str_pad` function.
-     * Adapted from https://www.php.net/manual/en/ref.mbstring.php#90611.
-     *
-     * @param  string  $value
-     * @param  int  $length
-     * @param  string  $pad
-     * @param  int  $pad_type
-     * @param  string|null  $encoding
-     * @return string
-     */
-    protected static function mbStrPad($value, $length, $pad = ' ', $pad_type = STR_PAD_RIGHT, $encoding = null)
-    {
-        return str_pad(
-            $value,
-            strlen($value) - mb_strlen($value, $encoding) + $length,
-            $pad,
-            $pad_type,
-        );
     }
 }
