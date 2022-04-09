@@ -28,7 +28,7 @@ trait ConditionallyLoadsAttributes
             if (is_numeric($key) && $value instanceof MergeValue) {
                 return $this->mergeData(
                     $data, $index, $this->filter($value->data),
-                    array_values($value->data) === $value->data
+                    array_is_list($value->data)
                 );
             }
 

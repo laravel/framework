@@ -716,7 +716,7 @@ class Mailable implements MailableContract, Renderable
     protected function normalizeRecipient($recipient)
     {
         if (is_array($recipient)) {
-            if (array_values($recipient) === $recipient) {
+            if (array_is_list($recipient)) {
                 return (object) array_map(function ($email) {
                     return compact('email');
                 }, $recipient);
