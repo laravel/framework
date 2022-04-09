@@ -51,7 +51,7 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooJob  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      1  php artisan startAtPast ...... Next Due: 2 days from now')
             ->expectsOutput('  * *     * *      1  php artisan startAtFuture ... Next Due: 1 month from now')
-            ->expectsOutput('  * *     * *      1  php artisan endAtPast ............ Ended At: 1 month ago')
+            ->expectsOutput('  * *     * *      1  php artisan endAtPast ............... Ended: 1 month ago')
             ->expectsOutput('  * *     * *      1  php artisan endAtFuture ...... Next Due: 2 days from now')
             ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
     }

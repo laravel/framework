@@ -92,7 +92,7 @@ class ScheduleListCommand extends Command
 
             if ($event->endingAt && Carbon::now()->setTimezone($event->timezone) > $event->endingAt) {
                 $nextDueDate = $event->endingAt;
-                $nextDueDateLabel = 'Ended At:';
+                $nextDueDateLabel = 'Ended:';
             }
 
             $nextDueDate = $this->output->isVerbose()
