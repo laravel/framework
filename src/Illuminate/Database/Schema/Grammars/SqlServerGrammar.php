@@ -393,6 +393,27 @@ class SqlServerGrammar extends Grammar
             EXEC sp_executesql @sql;";
     }
 
+	/**
+	 * Compile the SQL needed to retrieve all table names.
+	 *
+	 * @return string
+	 */
+	public function compileGetAllTables()
+	{
+		return "Select name,type from sys.tables where type = 'U'";
+	}
+
+	/**
+	 * Compile the SQL needed to retrieve all view names.
+	 *
+	 * @return string
+	 */
+	public function compileGetAllViews()
+	{
+		return "Select name,type from sys.objects where type = 'V'";
+	}
+
+
     /**
      * Create the column definition for a char type.
      *
