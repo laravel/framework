@@ -1034,7 +1034,7 @@ class Str
      * @param  string|null  $encoding
      * @return string
      */
-    public static function mbStrPad($value, $length, $pad = ' ', $pad_type = STR_PAD_RIGHT, $encoding = null)
+    protected static function mbStrPad($value, $length, $pad = ' ', $pad_type = STR_PAD_RIGHT, $encoding = null)
     {
         return str_pad(
             $value,
