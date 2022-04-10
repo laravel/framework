@@ -91,7 +91,8 @@ class FilesystemAdapter implements CloudFilesystemContract
         $this->config = $config;
 
         $this->prefixer = new PathPrefixer(
-            $config['root'] ?? '', $config['directory_separator'] ?? DIRECTORY_SEPARATOR
+            $config['root'] ?? '',
+            $config['directory_separator'] ?? DIRECTORY_SEPARATOR
         );
     }
 
@@ -110,7 +111,8 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         foreach ($paths as $path) {
             PHPUnit::assertTrue(
-                $this->exists($path), "Unable to find a file or directory at path [{$path}]."
+                $this->exists($path),
+                "Unable to find a file or directory at path [{$path}]."
             );
 
             if (! is_null($content)) {
@@ -141,7 +143,8 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         foreach ($paths as $path) {
             PHPUnit::assertFalse(
-                $this->exists($path), "Found unexpected file or directory at path [{$path}]."
+                $this->exists($path),
+                "Found unexpected file or directory at path [{$path}]."
             );
         }
 
@@ -157,7 +160,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function assertDirectoryEmpty($path)
     {
         PHPUnit::assertEmpty(
-            $this->allFiles($path), "Directory [{$path}] is not empty."
+            $this->allFiles($path),
+            "Directory [{$path}] is not empty."
         );
 
         return $this;
@@ -271,7 +275,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         $filename = $name ?? basename($path);
 
         $disposition = $response->headers->makeDisposition(
-            $disposition, $filename, $this->fallbackName($filename)
+            $disposition,
+            $filename,
+            $this->fallbackName($filename)
         );
 
         $response->headers->replace($headers + [
@@ -385,7 +391,9 @@ class FilesystemAdapter implements CloudFilesystemContract
         // they provide better performance than alternatives. Once we write the file this
         // stream will get closed automatically by us so the developer doesn't have to.
         $result = $this->put(
-            $path = trim($path.'/'.$name, '/'), $stream, $options
+            $path = trim($path.'/'.$name, '/'),
+            $stream,
+            $options
         );
 
         if (is_resource($stream)) {
@@ -487,6 +495,21 @@ class FilesystemAdapter implements CloudFilesystemContract
         }
 
         return $success;
+    }
+
+    /**
+     * Delete multiple files at a given paths.
+     *
+     * @param  array  $paths
+     * @return bool
+     */
+    public function deleteMultiple(array $paths)
+    {
+        if (method_exists($this->adapter, 'deleteMultiple')) {
+            return $this->adapter->deleteMultiple($paths);
+        }
+
+        throw new RuntimeException('This driver does not support deleting multiple files.');
     }
 
     /**
@@ -673,7 +696,9 @@ class FilesystemAdapter implements CloudFilesystemContract
 
         if ($this->temporaryUrlCallback) {
             return $this->temporaryUrlCallback->bindTo($this, static::class)(
-                $path, $expiration, $options
+                $path,
+                $expiration,
+                $options
             );
         }
 

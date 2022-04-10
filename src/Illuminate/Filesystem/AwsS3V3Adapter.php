@@ -49,7 +49,8 @@ class AwsS3V3Adapter extends FilesystemAdapter
         }
 
         return $this->client->getObjectUrl(
-            $this->config['bucket'], $this->prefixer->prefixPath($path)
+            $this->config['bucket'],
+            $this->prefixer->prefixPath($path)
         );
     }
 
@@ -69,7 +70,9 @@ class AwsS3V3Adapter extends FilesystemAdapter
         ], $options));
 
         $uri = $this->client->createPresignedRequest(
-            $command, $expiration, $options
+            $command,
+            $expiration,
+            $options
         )->getUri();
 
         // If an explicit base URL has been set on the disk configuration then we will use
@@ -80,6 +83,34 @@ class AwsS3V3Adapter extends FilesystemAdapter
         }
 
         return (string) $uri;
+    }
+
+    /**
+     * Delete multiple files at a given paths.
+     *
+     * @param  array  $paths
+     * @return bool
+     */
+    public function deleteMultiple(array $paths)
+    {
+        $success = true;
+
+        $delete = $this->client->deleteObjects([
+            'Bucket' => $this->config['bucket'],
+            'Delete' => [
+                'Objects' => collect($paths)->map(function ($path) {
+                    return [
+                        'Key' => $path,
+                    ];
+                })->toArray(),
+            ],
+        ]);
+
+        if (! $delete) {
+            $success = false;
+        }
+
+        return $success;
     }
 
     /**
