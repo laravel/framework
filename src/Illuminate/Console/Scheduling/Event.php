@@ -40,14 +40,14 @@ class Event
     /**
      * When to start the scheduled event.
      *
-     * @var \Illuminate\Support\Carbon
+     * @var \Illuminate\Support\Carbon|null
      */
     public $startingAt;
 
     /**
      * When to end the scheduled event.
      *
-     * @var \Illuminate\Support\Carbon
+     * @var \Illuminate\Support\Carbon|null
      */
     public $endingAt;
 
