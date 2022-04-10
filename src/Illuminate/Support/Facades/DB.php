@@ -39,5 +39,5 @@ namespace Illuminate\Support\Facades;
  */
 class DB extends Facade
 {
-
+    //
 }
