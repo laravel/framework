@@ -28,6 +28,13 @@ abstract class Facade
     protected static $resolvedInstance;
 
     /**
+     * The resolved names.
+     *
+     * @var array
+     */
+    protected static $resolvedNames;
+
+    /**
      * Indicates if the resolved instance should be cached.
      *
      * @var bool
@@ -200,7 +207,11 @@ abstract class Facade
      */
     protected static function getFacadeAccessor()
     {
-        return strtolower(class_basename(get_called_class()));
+        if(isset(static::$resolvedNames[static::class])) {
+            return static::$resolvedNames[static::class];
+        }
+
+        return static::$resolvedNames[static::class] = strtolower(class_basename(static::class));
     }
 
     /**
