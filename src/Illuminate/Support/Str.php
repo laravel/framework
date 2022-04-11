@@ -889,7 +889,7 @@ class Str
      */
     public static function squish($value)
     {
-        return preg_replace('~\s+~u', ' ', preg_replace('~^\s+|\s+$~u', '', $value));
+        return preg_replace('~(\s|\x{3164})+~u', ' ', preg_replace('~^\s+|\s+$~u', '', $value));
     }
 
     /**
