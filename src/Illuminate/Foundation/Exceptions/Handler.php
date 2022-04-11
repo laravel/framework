@@ -28,6 +28,7 @@ use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -63,6 +64,13 @@ class Handler implements ExceptionHandlerContract
      * @var \Illuminate\Foundation\Exceptions\ReportableHandler[]
      */
     protected $reportCallbacks = [];
+
+    /**
+     * A map of exceptions with their corresponding custom log levels.
+     *
+     * @var array<string, string>
+     */
+    protected $levels = [];
 
     /**
      * The callbacks that should be used during rendering.
@@ -209,6 +217,20 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Set the log level for the given exception type.
+     *
+     * @param  class-string<\Throwable>  $type
+     * @param  string  $level
+     * @return $this
+     */
+    public function level($type, $level)
+    {
+        $this->levels[$type] = $level;
+
+        return $this;
+    }
+
+    /**
      * Report or log an exception.
      *
      * @param  \Throwable  $e
@@ -241,7 +263,12 @@ class Handler implements ExceptionHandlerContract
             throw $e;
         }
 
-        $logger->error(
+        $level = Arr::first($this->levels, function ($level, $type) use ($e) {
+            return $e instanceof $type;
+        }, LogLevel::ERROR);
+
+        $logger->log(
+            $level,
             $e->getMessage(),
             array_merge(
                 $this->exceptionContext($e),
