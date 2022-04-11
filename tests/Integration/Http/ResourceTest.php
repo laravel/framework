@@ -293,6 +293,18 @@ class ResourceTest extends TestCase
 
             $post->setRelation('author', new Author(['name' => 'jrrmartin']));
 
+            $target = $post;
+
+            foreach (['deeply', 'nested', 'relation'] as $relation) {
+                $model = new class extends \Illuminate\Database\Eloquent\Model
+                {
+                    //
+                };
+
+                $target->setRelation($relation, $model->setAttribute('value', $relation));
+                $target = $model;
+            }
+
             return new PostResourceWithOptionalRelationship($post);
         });
 
@@ -307,6 +319,7 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'author' => ['name' => 'jrrmartin'],
                 'author_name' => 'jrrmartin',
+                'nested' => 'relation',
             ],
         ]);
     }
@@ -320,6 +333,10 @@ class ResourceTest extends TestCase
             ]);
 
             $post->setRelation('author', null);
+            $post->setRelation('deeply', new class extends \Illuminate\Database\Eloquent\Model
+            {
+                //
+            });
 
             return new PostResourceWithOptionalRelationship($post);
         });

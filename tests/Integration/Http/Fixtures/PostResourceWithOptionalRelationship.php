@@ -13,6 +13,9 @@ class PostResourceWithOptionalRelationship extends PostResource
             'author_name' => $this->whenLoaded('author', function () {
                 return $this->author->name;
             }),
+            'nested' => $this->whenLoaded('deeply.nested.relation', function () {
+                return $this->deeply->nested->relation->value;
+            }),
         ];
     }
 }

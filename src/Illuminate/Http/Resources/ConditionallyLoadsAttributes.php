@@ -189,16 +189,23 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        if (! $this->resource->relationLoaded($relationship)) {
-            return value($default);
+        /** @var \Illuminate\Database\Eloquent\Model $child */
+        $target = $this->resource;
+
+        foreach (explode('.', $relationship) as $relation) {
+            if ($target === null || ! $target->relationLoaded($relation)) {
+                return value($default);
+            }
+
+            $target = $target->getRelation($relation);
         }
 
         if (func_num_args() === 1) {
-            return $this->resource->{$relationship};
+            return $target;
         }
 
-        if ($this->resource->{$relationship} === null) {
-            return;
+        if ($target === null) {
+            return null;
         }
 
         return value($value);
