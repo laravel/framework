@@ -49,8 +49,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
         }
 
         return $this->client->getObjectUrl(
-            $this->config['bucket'],
-            $this->prefixer->prefixPath($path)
+            $this->config['bucket'], $this->prefixer->prefixPath($path)
         );
     }
 
@@ -70,9 +69,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
         ], $options));
 
         $uri = $this->client->createPresignedRequest(
-            $command,
-            $expiration,
-            $options
+            $command, $expiration, $options
         )->getUri();
 
         // If an explicit base URL has been set on the disk configuration then we will use
