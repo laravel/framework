@@ -67,6 +67,24 @@ class QueuedEventsTest extends TestCase
         $fakeQueue->assertPushedOn('some_other_queue', CallQueuedListener::class);
     }
 
+    public function testQueueIsSetByWithDelay()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithDelay::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->delay === 100;
+        });
+    }
+
     public function testQueueIsSetByGetConnection()
     {
         $d = new Dispatcher;
@@ -158,6 +176,21 @@ class TestDispatcherGetQueue implements ShouldQueue
     public function viaQueue()
     {
         return 'some_other_queue';
+    }
+}
+
+class TestDispatcherWithDelay implements ShouldQueue
+{
+    public $queue = 'my_queue_with_delay';
+
+    public function handle()
+    {
+        //
+    }
+
+    public function withDelay()
+    {
+        return 100;
     }
 }
 

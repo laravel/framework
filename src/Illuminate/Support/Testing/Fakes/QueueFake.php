@@ -390,6 +390,8 @@ class QueueFake extends QueueManager implements Queue
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
+        $job->delay($delay);
+
         return $this->push($job, $data, $queue);
     }
 
