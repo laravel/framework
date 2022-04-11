@@ -247,6 +247,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $this->compileComments($this->storeUncompiledBlocks($value))
         );
 
+        // Next we will compile forms with implicit CSRF token by default, which
+        // may be disabled by adding a special @nocsrf helper to the form.
+        $value = $this->compileImplicitCsrfTokens($value);
+
         foreach ($this->precompilers as $precompiler) {
             $value = $precompiler($value);
         }
@@ -412,6 +416,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return (new ComponentTagCompiler(
             $this->classComponentAliases, $this->classComponentNamespaces, $this
         ))->compile($value);
+    }
+
+    protected function compileImplicitCsrfTokens($value)
+    {
+        $pattern = "/(?<opening><\s*form[^>]*>)(?<body>.*)(?<closing><\/\s*form>)/s";
+
+        return preg_replace_callback($pattern, function ($matches) {
+            $body = str_contains($matches['body'], '@nocsrf')
+                ? str_replace("@nocsrf", '', $matches['body'])
+                : "\n@csrf{$matches['body']}";
+
+            return $matches['opening'].$body.$matches['closing'];
+        }, $value);
     }
 
     /**
