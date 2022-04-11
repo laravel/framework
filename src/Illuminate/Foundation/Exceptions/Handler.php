@@ -219,9 +219,8 @@ class Handler implements ExceptionHandlerContract
     /**
      * Set the log level for the given exception type.
      *
-     * @param class-string<\Throwable> $type
-     * @param string $level
-     *
+     * @param  class-string<\Throwable>  $type
+     * @param  string  $level
      * @return $this
      */
     public function useLogLevel($type, $level)

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use InvalidArgumentException;
-use OutOfRangeException;
 use Exception;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -20,8 +18,10 @@ use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
+use OutOfRangeException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
