@@ -424,7 +424,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         return preg_replace_callback($pattern, function ($matches) {
             $body = str_contains($matches['body'], '@nocsrf')
-                ? str_replace("@nocsrf", '', $matches['body'])
+                ? str_replace('@nocsrf', '', $matches['body'])
                 : "\n@csrf{$matches['body']}";
 
             return $matches['opening'].$body.$matches['closing'];
