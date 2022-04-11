@@ -6,7 +6,6 @@ use Illuminate\Support\Carbon;
 
 trait ManagesFrequencies
 {
-
     /**
      * The Cron expression representing the event's frequency.
      *
