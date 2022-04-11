@@ -307,7 +307,7 @@ abstract class Relation implements BuilderContract
      */
     public function getBaseQuery()
     {
-        return $this->toBase();
+        return $this->query->getQuery();
     }
 
     /**
@@ -317,7 +317,7 @@ abstract class Relation implements BuilderContract
      */
     public function toBase()
     {
-        return $this->query->applyScopes()->getQuery();
+        return $this->query->toBase();
     }
 
     /**
