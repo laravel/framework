@@ -106,8 +106,8 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Error message', m::hasKey('exception')])->once();
         $logger->shouldReceive('log')->withArgs([LogLevel::WARNING, 'Warning message', m::hasKey('exception')])->once();
 
-        $this->handler->useLogLevel(InvalidArgumentException::class, LogLevel::CRITICAL);
-        $this->handler->useLogLevel(OutOfRangeException::class, LogLevel::WARNING);
+        $this->handler->level(InvalidArgumentException::class, LogLevel::CRITICAL);
+        $this->handler->level(OutOfRangeException::class, LogLevel::WARNING);
 
         $this->handler->report(new InvalidArgumentException('Critical message'));
         $this->handler->report(new RuntimeException('Error message'));

@@ -66,11 +66,11 @@ class Handler implements ExceptionHandlerContract
     protected $reportCallbacks = [];
 
     /**
-     * A map of exceptions with the corresponding custom log level.
+     * A map of exceptions with their corresponding custom log levels.
      *
      * @var array<string, string>
      */
-    protected $reportLogLevels = [];
+    protected $levels = [];
 
     /**
      * The callbacks that should be used during rendering.
@@ -223,9 +223,9 @@ class Handler implements ExceptionHandlerContract
      * @param  string  $level
      * @return $this
      */
-    public function useLogLevel($type, $level)
+    public function level($type, $level)
     {
-        $this->reportLogLevels[$type] = $level;
+        $this->levels[$type] = $level;
 
         return $this;
     }
@@ -263,7 +263,7 @@ class Handler implements ExceptionHandlerContract
             throw $e;
         }
 
-        $level = Arr::first($this->reportLogLevels, function ($level, $type) use ($e) {
+        $level = Arr::first($this->levels, function ($level, $type) use ($e) {
             return $e instanceof $type;
         }, LogLevel::ERROR);
 
