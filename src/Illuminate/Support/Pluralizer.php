@@ -3,58 +3,22 @@
 namespace Illuminate\Support;
 
 use Doctrine\Inflector\InflectorFactory;
+use Illuminate\Container\Container;
 
 class Pluralizer
 {
     /**
-     * Uncountable word forms.
+     * Uncountable non-nouns word forms.
+     * Only words not listed on Doctrine/Inflector/Rules/English/Uninflected.php
+     * Unlisted nouns should be primarily requested there.
      *
      * @var string[]
      */
     public static $uncountable = [
-        'audio',
-        'bison',
         'cattle',
-        'chassis',
-        'compensation',
-        'coreopsis',
-        'data',
-        'deer',
-        'education',
-        'emoji',
-        'equipment',
-        'evidence',
-        'feedback',
-        'firmware',
-        'fish',
-        'furniture',
-        'gold',
-        'hardware',
-        'information',
-        'jedi',
         'kin',
-        'knowledge',
-        'love',
-        'metadata',
-        'money',
-        'moose',
-        'news',
-        'nutrition',
-        'offspring',
-        'plankton',
-        'pokemon',
-        'police',
-        'rain',
         'recommended',
         'related',
-        'rice',
-        'series',
-        'sheep',
-        'software',
-        'species',
-        'swine',
-        'traffic',
-        'wheat',
     ];
 
     /**
@@ -133,7 +97,9 @@ class Pluralizer
         static $inflector;
 
         if (is_null($inflector)) {
-            $inflector = InflectorFactory::createForLanguage('english')->build();
+            $app = Container::getInstance();
+            $language = $app->has('config') ? $app['config']->get('app.pluralizer.language', 'english') : 'english';
+            $inflector = InflectorFactory::createForLanguage($language)->build();
         }
 
         return $inflector;
