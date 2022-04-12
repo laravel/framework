@@ -8,7 +8,7 @@ use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
@@ -900,11 +900,8 @@ class ValidationValidatorTest extends TestCase
         $auth->shouldReceive('guard')->andReturn($auth);
         $auth->shouldReceive('guest')->andReturn(true);
 
-        $hasher = m::mock(Hasher::class);
-
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -918,17 +915,17 @@ class ValidationValidatorTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword');
 
+        $userProvider = m::mock(UserProvider::class);
+        $userProvider->shouldReceive('validateCredentials')->andReturn(false);
+
         $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('getProvider')->andReturn($userProvider);
         $auth->shouldReceive('guest')->andReturn(false);
         $auth->shouldReceive('user')->andReturn($user);
 
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(false);
-
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -942,17 +939,17 @@ class ValidationValidatorTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword');
 
+        $userProvider = m::mock(UserProvider::class);
+        $userProvider->shouldReceive('validateCredentials')->andReturn(true);
+
         $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->andReturn($auth);
+        $auth->shouldReceive('getProvider')->andReturn($userProvider);
         $auth->shouldReceive('guest')->andReturn(false);
         $auth->shouldReceive('user')->andReturn($user);
 
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(true);
-
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);
@@ -966,17 +963,17 @@ class ValidationValidatorTest extends TestCase
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthPassword');
 
+        $userProvider = m::mock(UserProvider::class);
+        $userProvider->shouldReceive('validateCredentials')->andReturn(true);
+
         $auth = m::mock(Guard::class);
         $auth->shouldReceive('guard')->with('custom')->andReturn($auth);
+        $auth->shouldReceive('getProvider')->andReturn($userProvider);
         $auth->shouldReceive('guest')->andReturn(false);
         $auth->shouldReceive('user')->andReturn($user);
 
-        $hasher = m::mock(Hasher::class);
-        $hasher->shouldReceive('check')->andReturn(true);
-
         $container = m::mock(Container::class);
         $container->shouldReceive('make')->with('auth')->andReturn($auth);
-        $container->shouldReceive('make')->with('hash')->andReturn($hasher);
 
         $trans = $this->getTranslator();
         $trans->shouldReceive('get')->andReturnArg(0);

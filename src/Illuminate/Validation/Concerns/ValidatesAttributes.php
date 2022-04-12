@@ -447,7 +447,6 @@ trait ValidatesAttributes
     protected function validateCurrentPassword($attribute, $value, $parameters)
     {
         $auth = $this->container->make('auth');
-        $hasher = $this->container->make('hash');
 
         $guard = $auth->guard(Arr::first($parameters));
 
@@ -455,7 +454,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return $hasher->check($value, $guard->user()->getAuthPassword());
+        return $guard->getProvider()->validateCredentials($guard->user(), ['password' => $value]);
     }
 
     /**
