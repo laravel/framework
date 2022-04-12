@@ -165,6 +165,15 @@ class SendingMailWithLocaleTest extends TestCase
             app('mailer')->getSymfonyTransport()->messages()[1]->toString()
         );
     }
+
+    public function testLocaleWithHtmlContains()
+    {
+        $mailable = new TestMail;
+        $mailable->locale('es');
+        $mailable->markdown('view');
+
+        $this->assertTrue($mailable->htmlContains('nombre'));
+    }
 }
 
 class TestMail extends Mailable
