@@ -180,7 +180,6 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
     {
         DB::enableQueryLog();
         User::with('posts:id')->with('posts:content')->get();
-        dd(DB::getQueryLog());
         //
     }
 }
