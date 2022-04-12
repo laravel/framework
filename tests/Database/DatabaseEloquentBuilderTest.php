@@ -1110,7 +1110,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $model = new EloquentBuilderTestModelParentStub;
 
-        $builder = $model->withCount(['address', 'foo' => function($query) {
+        $builder = $model->withCount(['address', 'foo' => function ($query) {
             $query->where('active', false);
         }]);
 
