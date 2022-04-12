@@ -1277,6 +1277,16 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Get the container's method bindings.
+     *
+     * @return array
+     */
+    public function getMethodBindings()
+    {
+        return $this->methodBindings;
+    }
+
+    /**
      * Get the alias for an abstract if available.
      *
      * @param  string  $abstract
