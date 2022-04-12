@@ -622,13 +622,7 @@ trait QueriesRelationships
      */
     public function withCount($relations)
     {
-        $relations = is_array($relations) ? $relations : func_get_args();
-
-        if (count($relations) === 2 && $relations[1] instanceof Closure) {
-            $relations = [$relations[0] => $relations[1]];
-        }
-
-        return $this->withAggregate($relations, '*', 'count');
+        return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count');
     }
 
     /**
@@ -682,18 +676,12 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the existence of related models.
      *
-     * @param  mixed  $relations
+     * @param  string|array  $relation
      * @return $this
      */
-    public function withExists($relations)
+    public function withExists($relation)
     {
-        $relations = is_array($relations) ? $relations : func_get_args();
-
-        if (count($relations) === 2 && $relations[1] instanceof Closure) {
-            $relations = [$relations[0] => $relations[1]];
-        }
-
-        return $this->withAggregate($relations, '*', 'exists');
+        return $this->withAggregate($relation, '*', 'exists');
     }
 
     /**
