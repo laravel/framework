@@ -18,10 +18,12 @@ class ExcludeIf
      *
      * @param  callable|bool  $condition
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($condition)
     {
-        if (! is_string($condition)) {
+        if (is_callable($condition) || is_bool($condition)) {
             $this->condition = $condition;
         } else {
             throw new InvalidArgumentException('The provided condition must be a callable or boolean.');
