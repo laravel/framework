@@ -404,16 +404,21 @@ class ContainerTest extends TestCase
         $container->bind('ConcreteStub', function () {
             return new ContainerConcreteStub;
         }, true);
+        $container->bindMethod('testMethod', function () {
+            return new ContainerConcreteStub;
+        });
         $container->alias('ConcreteStub', 'ContainerConcreteStub');
         $container->make('ConcreteStub');
         $this->assertTrue($container->resolved('ConcreteStub'));
         $this->assertTrue($container->isAlias('ContainerConcreteStub'));
         $this->assertArrayHasKey('ConcreteStub', $container->getBindings());
+        $this->assertArrayHasKey('testMethod', $container->getMethodBindings());
         $this->assertTrue($container->isShared('ConcreteStub'));
         $container->flush();
         $this->assertFalse($container->resolved('ConcreteStub'));
         $this->assertFalse($container->isAlias('ContainerConcreteStub'));
         $this->assertEmpty($container->getBindings());
+        $this->assertEmpty($container->getMethodBindings());
         $this->assertFalse($container->isShared('ConcreteStub'));
     }
 
