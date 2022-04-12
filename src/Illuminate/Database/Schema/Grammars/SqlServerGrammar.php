@@ -413,7 +413,6 @@ class SqlServerGrammar extends Grammar
         return "select name, type from sys.objects where type = 'V'";
     }
 
-
     /**
      * Create the column definition for a char type.
      *

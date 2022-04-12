@@ -63,7 +63,7 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 
     public function testGetAllViews()
     {
-        DB::connection('sqlsrv')->statement(<<<SQL
+        DB::connection('sqlsrv')->statement(<<<'SQL'
 CREATE VIEW users_view
 AS
 SELECT name,age from users;
@@ -76,7 +76,7 @@ SQL);
         $this->assertEquals('users_view', $obj->name);
         $this->assertEquals('V ', $obj->type);
 
-        DB::connection('sqlsrv')->statement(<<<SQL
+        DB::connection('sqlsrv')->statement(<<<'SQL'
 DROP VIEW IF EXISTS users_view;
 SQL);
 

@@ -30,7 +30,7 @@ class SqlServerBuilder extends Builder
         );
     }
 
-	/**
+    /**
      * Drop all tables from the database.
      *
      * @return void
