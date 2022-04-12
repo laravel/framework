@@ -246,25 +246,25 @@ class SQLiteGrammar extends Grammar
         return "delete from sqlite_master where type in ('view')";
     }
 
-	/**
-	 * Compile the SQL needed to retrieve all table names.
-	 *
-	 * @return string
-	 */
-	public function compileGetAllTables()
-	{
-		return 'Select type,name from sqlite_master where type = \'table\' and name not like \'sqlite_%\'';
-	}
+    /**
+     * Compile the SQL needed to retrieve all table names.
+     *
+     * @return string
+     */
+    public function compileGetAllTables()
+    {
+        return 'select type, name from sqlite_master where type = \'table\' and name not like \'sqlite_%\'';
+    }
 
-	/**
-	 * Compile the SQL needed to retrieve all view names.
-	 *
-	 * @return string
-	 */
-	public function compileGetAllViews()
-	{
-		return 'select type,name from sqlite_master where type = \'view\'';
-	}
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'select type, name from sqlite_master where type = \'view\'';
+    }
 
     /**
      * Compile the SQL needed to rebuild the database.
