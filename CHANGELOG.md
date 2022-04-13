@@ -1,6 +1,36 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.7.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.8.0...9.x)
+
+
+## [v9.8.0](https://github.com/laravel/framework/compare/v9.7.0...v9.8.0) - 2022-04-12
+
+### Added
+- Added inbound option to CastMakeCommand ([#41838](https://github.com/laravel/framework/pull/41838))
+- Added a way to retrieve the first column of the first row from a query ([#41858](https://github.com/laravel/framework/pull/41858))
+- Make DatabaseManager Macroable ([#41868](https://github.com/laravel/framework/pull/41868))
+- Improve Str::squish() ([#41877](https://github.com/laravel/framework/pull/41877), [#41924](https://github.com/laravel/framework/pull/41924))
+- Added option to disable cached view ([#41859](https://github.com/laravel/framework/pull/41859))
+- Make Connection Class Macroable ([#41865](https://github.com/laravel/framework/pull/41865))
+- Added possibility to discover anonymous Blade components in other folders ([#41637](https://github.com/laravel/framework/pull/41637))
+- Added `Illuminate/Database/Eloquent/Factories/Factory::set()` ([#41890](https://github.com/laravel/framework/pull/41890))
+- Added multibyte support to string padding helper functions ([#41899](https://github.com/laravel/framework/pull/41899))
+- Allow to use custom log level in exception handler reporting ([#41925](https://github.com/laravel/framework/pull/41925))
+
+### Fixed
+- Illuminate/Support/Stringable::exactly() with Stringable value ([#41846](https://github.com/laravel/framework/pull/41846))
+- Fixed afterCommit and RefreshDatabase ([#41782](https://github.com/laravel/framework/pull/41782))
+- Fix null name for email address in `Illuminate/Mail/Message` ([#41870](https://github.com/laravel/framework/pull/41870))
+- Fix seeder property for in-memory tests ([#41869](https://github.com/laravel/framework/pull/41869))
+- Fix empty paths for server.php ([#41933](https://github.com/laravel/framework/pull/41933))
+- Fix ExcludeIf constructor ([#41931](https://github.com/laravel/framework/pull/41931))
+
+### Changed
+- Set custom host to the serve command with environment variable ([#41831](https://github.com/laravel/framework/pull/41831))
+- Add handling of object being passed into old method in Model ([#41842](https://github.com/laravel/framework/pull/41842))
+- Catch permission exception when creating directory ([#41871](https://github.com/laravel/framework/pull/41871))
+- Restore v8 behaviour of base query for relations ([#41918](https://github.com/laravel/framework/pull/41918), [#41923](https://github.com/laravel/framework/pull/41923))
+- Standardize withCount() & withExists() eager loading aggregates ([#41914](https://github.com/laravel/framework/pull/41914))
 
 
 ## [v9.7.0](https://github.com/laravel/framework/compare/v9.6.0...v9.7.0) - 2022-04-05
