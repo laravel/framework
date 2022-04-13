@@ -90,6 +90,13 @@ class PendingRequest
     protected $options = [];
 
     /**
+     * A callback to run when throwing if a server or client error occurs.
+     *
+     * @var \Closure
+     */
+    protected $throwCallback;
+
+    /**
      * The number of times to try the request.
      *
      * @var int
@@ -116,20 +123,6 @@ class PendingRequest
      * @var callable|null
      */
     protected $retryWhenCallback = null;
-
-    /**
-     * Whether to throw an exception if a server or client error occurs.
-     *
-     * @var bool
-     */
-    private $shouldThrow = false;
-
-    /**
-     * A callback to run when throwing if a server or client error occurs.
-     *
-     * @var \Closure
-     */
-    private $shouldThrowCallback;
 
     /**
      * The callbacks that should execute before the request is sent.
@@ -562,6 +555,19 @@ class PendingRequest
     }
 
     /**
+     * Throw an exception if a server or client error occurs.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function throw(callable $callback = null)
+    {
+        $this->throwCallback = $callback ?: fn () => null;
+
+        return $this;
+    }
+
+    /**
      * Dump the request before sending.
      *
      * @return $this
@@ -699,20 +705,6 @@ class PendingRequest
     }
 
     /**
-     * Throw an exception if a server or client error occurs.
-     *
-     * @param  \Closure|null  $callback
-     * @return $this
-     */
-    public function throw()
-    {
-        $this->shouldThrow = true;
-        $this->shouldThrowCallback = func_get_args()[0] ?? null;
-
-        return $this;
-    }
-
-    /**
      * Send the request to the given URL.
      *
      * @param  string  $method
@@ -754,8 +746,8 @@ class PendingRequest
                             throw $exception;
                         }
 
-                        if ($this->shouldThrow) {
-                            $response->throw($this->shouldThrowCallback);
+                        if ($this->throwCallback) {
+                            $response->throw($this->throwCallback);
                         }
 
                         if ($attempt < $this->tries && $shouldRetry) {
