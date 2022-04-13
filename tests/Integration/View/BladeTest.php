@@ -14,12 +14,13 @@ class BladeTest extends TestCase
         $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
     }
 
-    public function test_rendering_blade_long_maxpathlen_string() {
+    public function test_rendering_blade_long_maxpathlen_string()
+    {
         $longString = str_repeat('a', PHP_MAXPATHLEN);
 
-        $result = Blade::render($longString .'{{ $name }}', ['name' => 'a']);
+        $result = Blade::render($longString.'{{ $name }}', ['name' => 'a']);
 
-        $this->assertSame($longString . 'a', $result);
+        $this->assertSame($longString.'a', $result);
     }
 
     public function test_rendering_blade_component_instance()
