@@ -1386,4 +1386,63 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
     }
+
+    public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['success'], 200),
+        ]);
+
+        $response = $this->factory
+            ->throw()
+            ->get('http://foo.com/get');
+
+        $this->assertSame(200, $response->status());
+    }
+
+    public function testRequestExceptionIsThrownIfThePendingRequestIsSetToThrowOnFailure()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->throw()
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsThrownWithCallbackIfThePendingRequestIsSetToThrowOnFailure()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        $flag = false;
+
+        try {
+            $this->factory
+                ->throw(function ($exception) use (&$flag) {
+                    $flag = true;
+                })
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertTrue($flag);
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
 }
