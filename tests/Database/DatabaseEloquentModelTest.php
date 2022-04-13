@@ -69,6 +69,19 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(json_encode(['name' => 'taylor']), $attributes['list_items']);
     }
 
+    public function testToggleBooleanAttributes()
+    {
+        $model = new EloquentModelStub;
+        $model->boolean_attribute = true;
+
+        $this->assertTrue($model->boolean_attribute);
+
+        $returnedModel = $model->toggle('boolean_attribute');
+
+        $this->assertFalse($model->boolean_attribute);
+        $this->assertSame($model, $returnedModel);
+    }
+
     public function testSetAttributeWithNumericKey()
     {
         $model = new EloquentDateModelStub;

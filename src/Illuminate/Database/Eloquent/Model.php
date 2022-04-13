@@ -1488,6 +1488,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Toggle a boolean attribute.
+     *
+     * @param  string $attribute
+     * @return static
+     */
+    public function toggle($attribute)
+    {
+        $this->{$attribute} = ! $this->{$attribute};
+
+        return $this;
+    }
+
+    /**
      * Convert the model instance to JSON.
      *
      * @param  int  $options
