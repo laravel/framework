@@ -1,6 +1,44 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.7.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.8.1...9.x)
+
+
+## [v9.8.1](https://github.com/laravel/framework/compare/v9.8.0...v9.8.1) - 2022-04-13
+
+### Reverted
+- Revert "Standardize `withCount()` & `withExists()` eager loading aggregates ([#41943](https://github.com/laravel/framework/pull/41943))
+
+
+## [v9.8.0](https://github.com/laravel/framework/compare/v9.7.0...v9.8.0) - 2022-04-13
+
+### Added
+- Add inbound option to CastMakeCommand by @smokills ([#41838](https://github.com/laravel/framework/pull/41838))
+- Added `SERVER_HOST` environment variable to the serve command host option by @medabkari ([#41831](https://github.com/laravel/framework/pull/41831))
+- Added a way to retrieve the first column of the first row from a query by @peterlupu ([#41858](https://github.com/laravel/framework/pull/41858))
+- Add handling of object being passed into old method by @Drewdan ([#41842](https://github.com/laravel/framework/pull/41842))
+- Add test for assertChained in BusFake by @rezaamini-ir ([#41867](https://github.com/laravel/framework/pull/41867))
+- Add option to disable cached view by @bernardwiesner ([#41859](https://github.com/laravel/framework/pull/41859))
+- Add test for assertListening in EventFake by @rezaamini-ir ([#41875](https://github.com/laravel/framework/pull/41875))
+- Discover anonymous Blade components in other folders by @ralphjsmit ([#41637](https://github.com/laravel/framework/pull/41637))
+- Add `->set()` method to factory by @ralphjsmit ([#41890](https://github.com/laravel/framework/pull/41890))
+- Added definition of hex whitespace symbol on `Str::squish()` by @andrey-helldar ([#41924](https://github.com/laravel/framework/pull/41924))
+- Allow to use custom log level in exception handler reporting by @Gummibeer ([#41925](https://github.com/laravel/framework/pull/41925))
+
+### Fixed
+- Stringable exactly not match with other Stringable variable by @medeiroz ([#41846](https://github.com/laravel/framework/pull/41846))
+- Fix `afterCommit` and `RefreshDatabase` by @taylorotwell ([#41782](https://github.com/laravel/framework/pull/41782))
+- Fix null name for email address by @driesvints ([#41870](https://github.com/laravel/framework/pull/41870))
+- Fix the php doc on object method by @squiaios ([#41866](https://github.com/laravel/framework/pull/41866))
+- Catch permission exception when creating directory by @sebdesign ([#41871](https://github.com/laravel/framework/pull/41871))
+- Improve Unicode support on `Str::squish()` by @rodrigopedra ([#41877](https://github.com/laravel/framework/pull/41877))
+- Fix base query for relationships by @driesvints ([#41918](https://github.com/laravel/framework/pull/41918))
+- Restore v8 behaviour of base query for relations by @tpetry ([#41923](https://github.com/laravel/framework/pull/41923))
+- Fix `ExcludeIf` constructor by @seriquynh ([#41931](https://github.com/laravel/framework/pull/41931))
+
+### Changed
+- Make DatabaseManager Macroable by @haider00125 ([#41868](https://github.com/laravel/framework/pull/41868))
+- Make Connection Class Macroable by @haider00125 ([#41865](https://github.com/laravel/framework/pull/41865))
+- Standardize `withCount()` & `withExists()` eager loading aggregates by @r-kujawa ([#41914](https://github.com/laravel/framework/pull/41914))
 
 
 ## [v9.7.0](https://github.com/laravel/framework/compare/v9.6.0...v9.7.0) - 2022-04-05
