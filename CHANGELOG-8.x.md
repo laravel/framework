@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.7...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.8...8.x)
+
+
+## [v8.83.8 (2022-04-12)](https://github.com/laravel/framework/compare/v8.83.7...v8.83.8)
+
+### Added
+- Added multibyte support to string padding helper functions ([#41899](https://github.com/laravel/framework/pull/41899))
+
+### Fixed
+- Fixed seeder property for in-memory tests ([#41869](https://github.com/laravel/framework/pull/41869))
 
 
 ## [v8.83.7 (2022-04-05)](https://github.com/laravel/framework/compare/v8.83.6...v8.83.7)
