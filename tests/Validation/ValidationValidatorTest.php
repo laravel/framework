@@ -7193,6 +7193,29 @@ class ValidationValidatorTest extends TestCase
         );
     }
 
+    public function testTopLevelValdationRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.unknown_property' => ':attribute is an unrecognized field.'], 'en');
+
+        $data = [
+            'foo' => 'known field',
+            'bar' => 'another known field',
+            'baz' => 'not a known field',
+        ];
+
+        $rules = [
+            '' => new OnlyKnownProperties(['foo', 'bar']),
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertFalse($validator->passes());
+        $this->assertSame(
+            'baz is an unrecognized field.',
+            $validator->messages()->first('baz'),
+        );
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
@@ -7236,4 +7259,50 @@ class ExplicitTableAndConnectionModel extends Model
 
 class NonEloquentModel
 {
+}
+
+class OnlyKnownProperties implements Rule, ValidatorAwareRule
+{
+    /**
+     * @var string[]
+     */
+    private $knownProperties;
+
+    /**
+     * @var Validator
+     */
+    private $validator;
+
+    public function __construct(array $knownProperties)
+    {
+        $this->knownProperties = $knownProperties;
+    }
+
+    public function passes($attribute, $value)
+    {
+        if (!is_array($value)) {
+            // Abstain from validating.
+            return true;
+        }
+
+        $path = array_filter(explode('.', $attribute));
+
+        $unknownProperties = array_diff(array_keys($value), $this->knownProperties);
+        foreach ($unknownProperties as $property) {
+            $attrPath = array_merge($path, [$property]);
+            $this->validator->addFailure(implode('.', $attrPath), 'unknown_property');
+        }
+        return true;
+    }
+
+    public function message()
+    {
+        return '';
+    }
+
+    public function setValidator($validator)
+    {
+        $this->validator = $validator;
+        return $this;
+    }
 }

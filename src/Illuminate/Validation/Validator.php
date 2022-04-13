@@ -705,6 +705,10 @@ class Validator implements ValidatorContract
             return true;
         }
 
+        if ($attribute === '') {
+            return true;
+        }
+
         return $this->presentOrRuleIsImplicit($rule, $attribute, $value) &&
                $this->passesOptionalCheck($attribute) &&
                $this->isNotNullIfMarkedAsNullable($rule, $attribute) &&
@@ -1074,6 +1078,10 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
+        if ($attribute === '') {
+            return $this->data;
+        }
+
         return Arr::get($this->data, $attribute);
     }
 
