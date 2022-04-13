@@ -1495,7 +1495,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function toggle($attribute)
     {
-        $this->{$attribute} = ! $this->{$attribute};
+        $this->setAttribute($attribute, ! $this->getAttribute($attribute));
 
         return $this;
     }
