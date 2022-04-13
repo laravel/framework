@@ -34,6 +34,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method static \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
  * @method static array pool(callable $callback)
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
