@@ -1,6 +1,12 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.8.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.8.1...9.x)
+
+
+## [v9.8.1](https://github.com/laravel/framework/compare/v9.8.0...v9.8.1) - 2022-04-12
+
+### Reverted
+- Revert "Standardize withCount() & withExists() eager loading aggregates ([#41943](https://github.com/laravel/framework/pull/41943))
 
 
 ## [v9.8.0](https://github.com/laravel/framework/compare/v9.7.0...v9.8.0) - 2022-04-12
