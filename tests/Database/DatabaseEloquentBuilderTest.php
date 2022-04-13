@@ -666,6 +666,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo'], $results);
     }
 
+    public function testEagerLoadRelationsCanBeFlushed()
+    {
+        $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+
+        $builder->setEagerLoads(['foo']);
+
+        $this->assertSame(['foo'], $builder->getEagerLoads());
+
+        $builder->withoutEagerLoads();
+
+        $this->assertEmpty($builder->getEagerLoads());
+    }
+
     public function testRelationshipEagerLoadProcess()
     {
         $builder = m::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
