@@ -1445,4 +1445,86 @@ class HttpClientTest extends TestCase
         $this->assertNotNull($exception);
         $this->assertInstanceOf(RequestException::class, $exception);
     }
+
+    public function testRequestExceptionIsThrownIfTheRequestFails()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throw();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsThrownWithCallbackIfTheRequestFails()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        $flag = false;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throw(function () use (&$flag) {
+                $flag = true;
+            });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertTrue($flag);
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfTheRequestDoesNotFail()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throw();
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testRequestExceptionIsThrowIfConditionIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIf(true);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfConditionIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['result' => ['foo' => 'bar']], 400),
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throwIf(false);
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
 }
