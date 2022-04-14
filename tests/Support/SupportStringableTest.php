@@ -626,6 +626,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('ム', (string) $this->stringable('ム')->squish());
         $this->assertSame('だ', (string) $this->stringable('   だ    ')->squish());
         $this->assertSame('ム', (string) $this->stringable('   ム    ')->squish());
+        $this->assertSame('ム', (string) $this->stringable('﻿   ム ﻿﻿   ﻿')->squish());
     }
 
     public function testStart()
