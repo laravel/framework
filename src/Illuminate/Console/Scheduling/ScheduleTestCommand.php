@@ -4,11 +4,8 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-<<<<<<< HEAD
 use Illuminate\Support\Carbon;
-=======
 use Symfony\Component\Console\Attribute\AsCommand;
->>>>>>> parent of 628d39f02 ([9.x] Improve command name handling (#41595))
 
 #[AsCommand(name: 'schedule:test')]
 class ScheduleTestCommand extends Command
