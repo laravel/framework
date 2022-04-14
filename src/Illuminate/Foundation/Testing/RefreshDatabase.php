@@ -56,6 +56,7 @@ trait RefreshDatabase
     {
         return [
             '--seed' => $this->shouldSeed(),
+            '--seeder' => $this->seeder(),
         ];
     }
 
