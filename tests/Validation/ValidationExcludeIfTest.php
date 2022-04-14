@@ -39,7 +39,7 @@ class ValidationExcludeIfTest extends TestCase
         new ExcludeIf(true);
         new ExcludeIf(fn () => true);
 
-        foreach ([1, 1.1, 'foobar', new stdClass] as $condition) {
+        foreach ([1, 1.1, 'phpinfo', new stdClass] as $condition) {
             try {
                 new ExcludeIf($condition);
                 $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
