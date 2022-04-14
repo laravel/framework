@@ -182,7 +182,7 @@ class ResourceRegistrar
      */
     protected function addResourceIndex($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name);
+        $uri = $this->getResourceUri($name, $options);
 
         unset($options['missing']);
 
@@ -202,7 +202,7 @@ class ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/'.static::$verbs['create'];
+        $uri = $this->getResourceUri($name, $options).'/'.static::$verbs['create'];
 
         unset($options['missing']);
 
@@ -222,7 +222,7 @@ class ResourceRegistrar
      */
     protected function addResourceStore($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name);
+        $uri = $this->getResourceUri($name, $options);
 
         unset($options['missing']);
 
@@ -244,7 +244,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+        $uri = $this->getResourceUri($name, $options).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'show', $options);
 
@@ -264,7 +264,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
+        $uri = $this->getResourceUri($name, $options).'/{'.$base.'}/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -284,7 +284,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+        $uri = $this->getResourceUri($name, $options).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
 
@@ -304,7 +304,7 @@ class ResourceRegistrar
     {
         $name = $this->getShallowName($name, $options);
 
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+        $uri = $this->getResourceUri($name, $options).'/{'.$base.'}';
 
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
@@ -347,9 +347,10 @@ class ResourceRegistrar
      * Get the base resource URI for a given resource.
      *
      * @param  string  $resource
+     * @param  array  $options
      * @return string
      */
-    public function getResourceUri($resource)
+    public function getResourceUri($resource, $options)
     {
         if (! str_contains($resource, '.')) {
             return $resource;
@@ -360,7 +361,7 @@ class ResourceRegistrar
         // paths however they need to, as some do not have any parameters at all.
         $segments = explode('.', $resource);
 
-        $uri = $this->getNestedResourceUri($segments);
+        $uri = $this->getNestedResourceUri($segments, $options);
 
         return str_replace('/{'.$this->getResourceWildcard(end($segments)).'}', '', $uri);
     }
@@ -369,16 +370,23 @@ class ResourceRegistrar
      * Get the URI for a nested resource segment array.
      *
      * @param  array  $segments
+     * @param  array  $options
      * @return string
      */
-    protected function getNestedResourceUri(array $segments)
+    protected function getNestedResourceUri(array $segments, $options)
     {
         // We will spin through the segments and create a place-holder for each of the
         // resource segments, as well as the resource itself. Then we should get an
         // entire string for the resource URI that contains all nested resources.
-        return implode('/', array_map(function ($s) {
-            return $s.'/{'.$this->getResourceWildcard($s).'}';
-        }, $segments));
+        if(isset($options['attronly']) && $options['attronly']){
+            return implode('/', array_map(function ($s) {
+                return '{'.$this->getResourceWildcard($s).'}';
+            }, $segments));
+        } else {
+            return implode('/', array_map(function ($s) {
+                return $s.'/{'.$this->getResourceWildcard($s).'}';
+            }, $segments));
+        }
     }
 
     /**

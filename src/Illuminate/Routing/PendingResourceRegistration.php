@@ -202,6 +202,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Indicate that a nested resource routes should have the attributes only.
+     *
+     * @param  bool  $attronly
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function attributeOnly($attronly = true)
+    {
+        $this->options['attronly'] = $attronly;
+
+        return $this;
+    }
+
+    /**
      * Define the callable that should be invoked on a missing model exception.
      *
      * @param  callable  $callback
