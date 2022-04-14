@@ -203,13 +203,17 @@ class PendingResourceRegistration
 
     /**
      * Indicate that a nested resource routes should have the attributes only.
+     * And sets the scoped fields.
      *
+     * @param  array  $fields
      * @param  bool  $attronly
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function attributeOnly($attronly = true)
+    public function attributeOnly(array $fields = [], $attronly = true)
     {
         $this->options['attronly'] = $attronly;
+
+        $this->scoped($fields);
 
         return $this;
     }
