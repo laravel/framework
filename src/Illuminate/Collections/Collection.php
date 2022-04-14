@@ -361,6 +361,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if at least one item exists
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return $this->count() > 0;
+    }
+
+    /**
      * Run a filter over each of the items.
      *
      * @param (callable(TValue, TKey): bool)|null  $callback

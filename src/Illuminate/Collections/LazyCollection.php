@@ -396,6 +396,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if at least one item exists
+     *
+     * @return bool
+     */
+    public function exists()
+    {
+        return $this->take(1)->count() > 0;
+    }
+
+    /**
      * Run a filter over each of the items.
      *
      * @param  (callable(TValue): bool)|null  $callback

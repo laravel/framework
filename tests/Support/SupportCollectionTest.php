@@ -2081,6 +2081,21 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testExists($collection)
+    {
+        $c = new $collection([1, 2, 3]);
+        $this->assertTrue($c->exists());
+
+        $c = new $collection([1]);
+        $this->assertTrue($c->exists());
+
+        $c = new $collection([]);
+        $this->assertFalse($c->exists());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testPluckWithArrayAndObjectValues($collection)
     {
         $data = new $collection([(object) ['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
