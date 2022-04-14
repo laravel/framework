@@ -127,7 +127,7 @@ abstract class AbstractPaginator implements Htmlable
      *
      * @var bool
      */
-    protected static bool $appendsQueryString = false;
+    protected static $appendsQueryString = false;
 
     /**
      * Determine if the given value is a valid page number.
@@ -655,7 +655,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Indicate if all query string values should be appended to the paginator.
      *
-     * @param  bool|\Closure  $value
+     * @param  \Closure|bool  $value
      * @return void
      */
     public static function appendQueryString($value = true)
