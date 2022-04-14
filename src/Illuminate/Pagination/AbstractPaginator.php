@@ -123,6 +123,13 @@ abstract class AbstractPaginator implements Htmlable
     public static $defaultSimpleView = 'pagination::simple-tailwind';
 
     /**
+     * Indicates if all query string values should be appended to the paginator.
+     *
+     * @var bool
+     */
+    protected static bool $appendsQueryString = false;
+
+    /**
      * Determine if the given value is a valid page number.
      *
      * @param  int  $page
@@ -643,6 +650,17 @@ abstract class AbstractPaginator implements Htmlable
     {
         static::defaultView('pagination::bootstrap-5');
         static::defaultSimpleView('pagination::simple-bootstrap-5');
+    }
+
+    /**
+     * Indicate if all query string values should be appended to the paginator.
+     *
+     * @param  bool|\Closure  $value
+     * @return void
+     */
+    public static function appendQueryString($value = true)
+    {
+        static::$appendsQueryString = value($value);
     }
 
     /**

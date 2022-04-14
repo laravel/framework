@@ -51,6 +51,10 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
+
+        if (static::$appendsQueryString) {
+            $this->withQueryString();
+        }
     }
 
     /**

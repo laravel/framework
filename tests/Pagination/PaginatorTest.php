@@ -75,4 +75,22 @@ class PaginatorTest extends TestCase
         $this->assertInstanceOf(Paginator::class, $p);
         $this->assertSame(['1', '2', '3'], $p->items());
     }
+
+    public function testPaginatorAppendsQueryString()
+    {
+        Paginator::appendQueryString();
+        Paginator::queryStringResolver(fn () => ['key1' => 'foo', 'key2' => 'bar']);
+
+        $p = new Paginator(
+            items: ['item1', 'item2', 'item3'],
+            perPage: 2,
+            currentPage: 1,
+            options: ['path' => 'http://website.com/test']
+        );
+
+        $this->assertSame($p->nextPageUrl(), 'http://website.com/test?key1=foo&key2=bar&page=2');
+
+        Paginator::appendQueryString(false);
+        Paginator::queryStringResolver(fn () => []);
+    }
 }

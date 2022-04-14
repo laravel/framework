@@ -42,6 +42,10 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 
         $this->setItems($items);
+
+        if (static::$appendsQueryString) {
+            $this->withQueryString();
+        }
     }
 
     /**
