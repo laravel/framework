@@ -140,6 +140,56 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
+    public function testThenMethodIsNotCalledIfThePipeReturns()
+    {
+        $_SERVER['__test.pipe.then'] = '(*_*)';
+        $_SERVER['__test.pipe.second'] = '(*_*)';
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([
+                fn ($value, $next) => 'm(-_-)m',
+                fn ($value, $next) => $_SERVER['__test.pipe.second'] = 'm(-_-)m',
+            ])
+            ->then(function ($piped) {
+                $_SERVER['__test.pipe.then'] = '(0_0)';
+
+                return $piped;
+            });
+
+        $this->assertSame('m(-_-)m', $result);
+        // The then callback is not called.
+        $this->assertSame('(*_*)', $_SERVER['__test.pipe.then']);
+        // The second pipe is not called.
+        $this->assertSame('(*_*)', $_SERVER['__test.pipe.second']);
+
+        unset($_SERVER['__test.pipe.then']);
+    }
+
+    public function testThenMethodInputValue()
+    {
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([function ($value, $next) {
+                $value = $next('::not_foo::');
+
+                $_SERVER['__test.pipe.return'] = $value;
+
+                return 'pipe::'.$value;
+            }])
+            ->then(function ($piped) {
+                $_SERVER['__test.then.arg'] = $piped;
+
+                return 'then'.$piped;
+            });
+
+        $this->assertSame('pipe::then::not_foo::', $result);
+        $this->assertSame('::not_foo::', $_SERVER['__test.then.arg']);
+
+        unset($_SERVER['__test.then.arg']);
+        unset($_SERVER['__test.pipe.return']);
+    }
+
     public function testPipelineUsageWithParameters()
     {
         $parameters = ['one', 'two'];
