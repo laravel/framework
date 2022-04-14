@@ -3,8 +3,13 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+<<<<<<< HEAD
 use Symfony\Component\Console\Input\InputOption;
+=======
+use Symfony\Component\Console\Attribute\AsCommand;
+>>>>>>> parent of 628d39f02 ([9.x] Improve command name handling (#41595))
 
+#[AsCommand(name: 'make:cast')]
 class CastMakeCommand extends GeneratorCommand
 {
     /**
