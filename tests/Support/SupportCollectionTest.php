@@ -5046,6 +5046,24 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testDeepCopy($collection)
+    {
+        $quantity = 1;
+        $changedQuantity = 20;
+        $data = $collection::make([
+            'foo' => new TestDeepCopyObject($quantity),
+        ]);
+
+        $deepCopyData = $data->deepCopy();
+        $deepCopyData->get("foo")->changeQuantity($changedQuantity);
+
+        $this->assertSame($data->get("foo")->quantity(), $quantity);
+        $this->assertSame($deepCopyData->get("foo")->quantity(), $changedQuantity);
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
@@ -5190,4 +5208,24 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class TestDeepCopyObject
+{
+    private int $quantity;
+
+    public function __construct(int $quantity)
+    {
+        $this->quantity = $quantity;
+    }
+
+    public function quantity(): int
+    {
+        return $this->quantity;
+    }
+
+    public function changeQuantity(int $quantity)
+    {
+        $this->quantity = $quantity;
+    }
 }
