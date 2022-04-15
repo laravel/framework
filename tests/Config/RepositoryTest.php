@@ -38,7 +38,7 @@ class RepositoryTest extends TestCase
             ],
             'a.b' => 'c',
             'a' => [
-                'b.c' => 'd'
+                'b.c' => 'd',
             ]
         ]);
 
@@ -48,17 +48,17 @@ class RepositoryTest extends TestCase
     public function testGetValueWhenKeyContainDot()
     {
         $this->assertSame(
-            $this->repository->get("a.b") ,"c"
+            $this->repository->get('a.b'), 'c'
         );
         $this->assertNull(
-            $this->repository->get("a.b.c")
+            $this->repository->get('a.b.c')
         );
     }
 
     public function testGetBooleanValue()
     {
         $this->assertTrue(
-            $this->repository->get("boolean")
+            $this->repository->get('boolean')
         );
     }
 
