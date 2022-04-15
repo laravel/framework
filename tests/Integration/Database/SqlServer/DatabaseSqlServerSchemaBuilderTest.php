@@ -3,24 +3,24 @@
 namespace Illuminate\Tests\Integration\Database\SqlServer;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use stdClass;
 
 class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 {
-    protected function getEnvironmentSetUp($app)
+	protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
-        if (getenv('DB_CONNECTION') !== 'sqlsrv') {
-            $this->markTestSkipped('Test requires a SQLServer connection.');
-        }
+		parent::defineDatabaseMigrations();
 
-        $this->driver = 'sqlsrv';
-    }
+		foreach ($this->getSchema()->getAllTables() as $table) {
+			if (filled($name = $table->name) && $name !== 'migrations') {
+				$this->getSchema()->drop($name);
+			}
+		}
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
-    {
-        Schema::create('users', function (Blueprint $table) {
+		$this->getSchema()->create('users', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name');
             $table->string('age');
@@ -30,12 +30,12 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 
     protected function destroyDatabaseMigrations()
     {
-        Schema::drop('users');
+		$this->getSchema()->drop('users');
     }
 
     public function testGetAllTablesAndColumnListing()
     {
-        $tables = Schema::getAllTables();
+        $tables = $this->getSchema()->getAllTables();
 
         $this->assertCount(2, $tables);
         $tableProperties = array_values((array) $tables[0]);
@@ -52,11 +52,11 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
             $this->assertContains($column, $columns);
         }
 
-        Schema::create('posts', function (Blueprint $table) {
+		$this->getSchema()->create('posts', function (Blueprint $table) {
             $table->integer('id');
             $table->string('title');
         });
-        $tables = Schema::getAllTables();
+        $tables = $this->getSchema()->getAllTables();
         $this->assertCount(3, $tables);
         Schema::drop('posts');
     }
@@ -69,7 +69,7 @@ AS
 SELECT name,age from users;
 SQL);
 
-        $tableView = Schema::getAllViews();
+        $tableView = $this->getSchema()->getAllViews();
 
         $this->assertCount(1, $tableView);
         $this->assertInstanceOf(stdClass::class, $obj = array_values($tableView)[0]);
@@ -80,6 +80,14 @@ SQL);
 DROP VIEW IF EXISTS users_view;
 SQL);
 
-        $this->assertEmpty(Schema::getAllViews());
+        $this->assertEmpty($this->getSchema()->getAllViews());
     }
+
+	/**
+	 * @return Builder
+	 */
+	protected function getSchema()
+	{
+		return Schema::connection('sqlsrv');
+	}
 }
