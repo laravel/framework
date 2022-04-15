@@ -3,12 +3,34 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Auth\AuthServiceProvider;
+use Illuminate\Auth\Passwords\PasswordResetServiceProvider;
+use Illuminate\Broadcasting\BroadcastServiceProvider;
+use Illuminate\Bus\BusServiceProvider;
+use Illuminate\Cache\CacheServiceProvider;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Cookie\CookieServiceProvider;
+use Illuminate\Database\DatabaseServiceProvider;
 use Illuminate\Database\Eloquent\Factory as ModelFactory;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Filesystem\FilesystemServiceProvider;
+use Illuminate\Foundation\Providers\ConsoleSupportServiceProvider;
+use Illuminate\Foundation\Providers\FoundationServiceProvider;
+use Illuminate\Hashing\HashServiceProvider;
+use Illuminate\Mail\MailServiceProvider;
+use Illuminate\Notifications\NotificationServiceProvider;
+use Illuminate\Pagination\PaginationServiceProvider;
+use Illuminate\Pipeline\PipelineServiceProvider;
+use Illuminate\Queue\QueueServiceProvider;
+use Illuminate\Redis\RedisServiceProvider;
+use Illuminate\Session\SessionServiceProvider;
+use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\ViewServiceProvider;
 
 abstract class ServiceProvider
 {
@@ -403,6 +425,39 @@ abstract class ServiceProvider
         Artisan::starting(function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);
         });
+    }
+
+    /**
+     * Get the application default providers.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function defaultProviders()
+    {
+        return collect([
+            AuthServiceProvider::class,
+            BroadcastServiceProvider::class,
+            BusServiceProvider::class,
+            CacheServiceProvider::class,
+            ConsoleSupportServiceProvider::class,
+            CookieServiceProvider::class,
+            DatabaseServiceProvider::class,
+            EncryptionServiceProvider::class,
+            FilesystemServiceProvider::class,
+            FoundationServiceProvider::class,
+            HashServiceProvider::class,
+            MailServiceProvider::class,
+            NotificationServiceProvider::class,
+            PaginationServiceProvider::class,
+            PipelineServiceProvider::class,
+            QueueServiceProvider::class,
+            RedisServiceProvider::class,
+            PasswordResetServiceProvider::class,
+            SessionServiceProvider::class,
+            TranslationServiceProvider::class,
+            ValidationServiceProvider::class,
+            ViewServiceProvider::class,
+        ]);
     }
 
     /**
