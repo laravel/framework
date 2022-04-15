@@ -426,9 +426,7 @@ class Container implements ArrayAccess, ContainerContract
     public function scopedIf($abstract, $concrete = null)
     {
         if (! $this->bound($abstract)) {
-            $this->scopedInstances[] = $abstract;
-
-            $this->singleton($abstract, $concrete);
+            $this->scoped($abstract, $concrete);
         }
     }
 
