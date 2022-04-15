@@ -338,7 +338,9 @@ class Gate implements GateContract
      */
     public function check($abilities, $arguments = [])
     {
-        return collect($abilities)->every(fn ($ability) => $this->inspect($ability, $arguments)->allowed());
+        return collect($abilities)->every(
+            fn ($ability) => $this->inspect($ability, $arguments)->allowed()
+        );
     }
 
     /**
