@@ -5,9 +5,11 @@ namespace Illuminate\Support;
 use ArrayIterator;
 use Closure;
 use DateTimeInterface;
+use DeepCopy\DeepCopy;
 use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\HasDeepCopy;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use IteratorAggregate;
@@ -25,7 +27,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>
      */
-    use EnumeratesValues, Macroable;
+    use EnumeratesValues, Macroable, HasDeepCopy;
 
     /**
      * The source from which to generate items.

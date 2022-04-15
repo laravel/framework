@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Traits\EnumeratesValues;
+use Illuminate\Support\Traits\HasDeepCopy;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
 use Traversable;
@@ -22,7 +23,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * @use \Illuminate\Support\Traits\EnumeratesValues<TKey, TValue>
      */
-    use EnumeratesValues, Macroable;
+    use EnumeratesValues, Macroable, HasDeepCopy;
 
     /**
      * The items contained in the collection.
@@ -1709,4 +1710,5 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
 }
