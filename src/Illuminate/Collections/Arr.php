@@ -306,31 +306,21 @@ class Arr
      */
     public static function get($array, $key, $default = null)
     {
-        if (! static::accessible($array)) {
-            return value($default);
-        }
-
-        if (is_null($key)) {
-            return $array;
-        }
-
-        if (static::exists($array, $key)) {
-            return $array[$key];
-        }
-
-        if (! str_contains($key, '.')) {
-            return $array[$key] ?? value($default);
-        }
-
-        foreach (explode('.', $key) as $segment) {
-            if (static::accessible($array) && static::exists($array, $segment)) {
-                $array = $array[$segment];
-            } else {
-                return value($default);
-            }
-        }
-
-        return $array;
+        return match (true) {
+            ! static::accessible($array) => value($default) ,
+            is_null($key) => $array ,
+            static::exists($array, $key) => $array[$key] ,
+            default => array_reduce(
+                explode("." , $key),
+                function($carry, $item) use ($array, $default){
+                    $carry ??= $array;
+                    return
+                        static::accessible($carry) && static::exists($carry, $item) ?
+                            $carry[$item] :
+                            value($default);
+                }
+            )
+        };
     }
 
     /**
