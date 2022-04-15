@@ -9,15 +9,6 @@ use stdClass;
 
 class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        if (getenv('DB_CONNECTION') !== 'sqlsrv') {
-            $this->markTestSkipped('Test requires a SQLServer connection.');
-        }
-
-        $this->driver = 'sqlsrv';
-    }
-
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('users', function (Blueprint $table) {
@@ -31,55 +22,50 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
     protected function destroyDatabaseMigrations()
     {
         Schema::drop('users');
+        DB::statement('drop view if exists users_view');
     }
 
-    public function testGetAllTablesAndColumnListing()
+    public function testGetAllTables()
     {
-        $tables = Schema::getAllTables();
+        DB::statement('create view users_view AS select name, age from users');
 
-        $this->assertCount(2, $tables);
-        $tableProperties = array_values((array) $tables[0]);
-        $this->assertEquals(['migrations', 'U '], $tableProperties);
+        $rows = Schema::getAllTables();
 
-        $this->assertInstanceOf(stdClass::class, $tables[1]);
+        $this->assertContainsOnlyInstancesOf(stdClass::class, $rows);
+        $this->assertGreaterThanOrEqual(2, count($rows));
+        $this->assertTrue(
+            collect($rows)->contains(fn ($row) => $row->name === 'migrations' && $row->type === 'U '),
+            'Failed asserting that table "migrations" was returned.'
+        );
+        $this->assertTrue(
+            collect($rows)->contains(fn ($row) => $row->name === 'users' && $row->type === 'U '),
+            'Failed asserting that table "users" was returned.'
+        );
+        $this->assertFalse(
+            collect($rows)->contains('name', 'users_view'),
+            'Failed asserting that view "users_view" was not returned.'
+        );
+    }
 
-        $tableProperties = array_values((array) $tables[1]);
-        $this->assertEquals(['users', 'U '], $tableProperties);
-
-        $columns = Schema::getColumnListing('users');
-
-        foreach (['id', 'name', 'age', 'color'] as $column) {
-            $this->assertContains($column, $columns);
-        }
-
-        Schema::create('posts', function (Blueprint $table) {
-            $table->integer('id');
-            $table->string('title');
-        });
-        $tables = Schema::getAllTables();
-        $this->assertCount(3, $tables);
-        Schema::drop('posts');
+    public function testColumnListing()
+    {
+        $this->assertSame(['id', 'name', 'age', 'color'], Schema::getColumnListing('users'));
     }
 
     public function testGetAllViews()
     {
-        DB::connection('sqlsrv')->statement(<<<'SQL'
-CREATE VIEW users_view
-AS
-SELECT name,age from users;
-SQL);
+        DB::statement('create view users_view AS select name, age from users');
 
-        $tableView = Schema::getAllViews();
+        $rows = Schema::getAllViews();
 
-        $this->assertCount(1, $tableView);
-        $this->assertInstanceOf(stdClass::class, $obj = array_values($tableView)[0]);
-        $this->assertEquals('users_view', $obj->name);
-        $this->assertEquals('V ', $obj->type);
+        $this->assertContainsOnlyInstancesOf(stdClass::class, $rows);
+        $this->assertCount(1, $rows);
+        $this->assertSame('users_view', $rows[0]->name);
+        $this->assertSame('V ', $rows[0]->type);
+    }
 
-        DB::connection('sqlsrv')->statement(<<<'SQL'
-DROP VIEW IF EXISTS users_view;
-SQL);
-
-        $this->assertEmpty(Schema::getAllViews());
+    public function testGetAllViewsWhenNoneExist()
+    {
+        $this->assertSame([], Schema::getAllViews());
     }
 }
