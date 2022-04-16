@@ -127,7 +127,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * If the attributes' names are to be preserved, merge any attributes
      * that have explicitly been defined on the request.
      *
-     * @return array|int[]|string[]
+     * @return array<string,string>
      */
     protected function gatherAttributes()
     {
