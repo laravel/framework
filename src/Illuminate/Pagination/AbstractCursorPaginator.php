@@ -19,7 +19,7 @@ use Traversable;
 /**
  * @mixin \Illuminate\Support\Collection
  */
-abstract class AbstractCursorPaginator implements Htmlable
+abstract class AbstractCursorPaginator extends AbstractBasePaginator implements Htmlable
 {
     use ForwardsCalls, Tappable;
 

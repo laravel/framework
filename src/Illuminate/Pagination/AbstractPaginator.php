@@ -13,7 +13,7 @@ use Traversable;
 /**
  * @mixin \Illuminate\Support\Collection
  */
-abstract class AbstractPaginator implements Htmlable
+abstract class AbstractPaginator extends AbstractBasePaginator implements Htmlable
 {
     use ForwardsCalls, Tappable;
 
