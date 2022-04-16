@@ -68,6 +68,20 @@ interface Application extends Container
      * @return string|bool
      */
     public function environment(...$environments);
+    
+    /**
+     * Determine if the application is in the production environment.
+     *
+     * @return bool
+     */
+    public function isProduction();
+    
+    /**
+     * Determine if the application is in the local environment.
+     *
+     * @return bool
+     */
+    public function isLocal();
 
     /**
      * Determine if the application is running in the console.
