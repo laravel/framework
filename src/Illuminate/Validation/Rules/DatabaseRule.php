@@ -185,7 +185,7 @@ trait DatabaseRule
     /**
      * Only soft deleted models during the existence check.
      *
-     * @param string $deletedAtColumn
+     * @param  string  $deletedAtColumn
      * @return $this
      */
     public function onlyTrashed($deletedAtColumn = 'deleted_at')

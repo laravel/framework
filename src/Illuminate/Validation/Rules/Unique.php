@@ -57,7 +57,6 @@ class Unique
         return $this;
     }
 
-
     /**
      * Convert the rule to a validation string.
      *
