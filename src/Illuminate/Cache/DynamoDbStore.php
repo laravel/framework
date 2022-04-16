@@ -346,40 +346,7 @@ class DynamoDbStore implements LockProvider, Store
      */
     public function decrement($key, $value = 1)
     {
-        try {
-            $response = $this->dynamo->updateItem([
-                'TableName' => $this->table,
-                'Key' => [
-                    $this->keyAttribute => [
-                        'S' => $this->prefix.$key,
-                    ],
-                ],
-                'ConditionExpression' => 'attribute_exists(#key) AND #expires_at > :now',
-                'UpdateExpression' => 'SET #value = #value - :amount',
-                'ExpressionAttributeNames' => [
-                    '#key' => $this->keyAttribute,
-                    '#value' => $this->valueAttribute,
-                    '#expires_at' => $this->expirationAttribute,
-                ],
-                'ExpressionAttributeValues' => [
-                    ':now' => [
-                        'N' => (string) Carbon::now()->getTimestamp(),
-                    ],
-                    ':amount' => [
-                        'N' => (string) $value,
-                    ],
-                ],
-                'ReturnValues' => 'UPDATED_NEW',
-            ]);
-
-            return (int) $response['Attributes'][$this->valueAttribute]['N'];
-        } catch (DynamoDbException $e) {
-            if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
-                return false;
-            }
-
-            throw $e;
-        }
+        return $this->increment($key, $value * -1);
     }
 
     /**
