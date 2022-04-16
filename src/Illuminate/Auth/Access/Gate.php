@@ -198,7 +198,7 @@ class Gate implements GateContract
 
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
         } else {
-            throw new InvalidArgumentException("Callback must be a callable or a [Class,method] array or a 'Class@method' string.");
+            throw new InvalidArgumentException("Callback must be a callable, callback array, or a 'Class@method' string.");
         }
 
         return $this;
