@@ -39,7 +39,7 @@ class RepositoryTest extends TestCase
             'a.b' => 'c',
             'a' => [
                 'b.c' => 'd',
-            ]
+            ],
         ]);
 
         parent::setUp();
