@@ -57,18 +57,6 @@ class Unique
         return $this;
     }
 
-    /**
-     * Ignore soft deleted models during the unique check.
-     *
-     * @param  string  $deletedAtColumn
-     * @return $this
-     */
-    public function withoutTrashed($deletedAtColumn = 'deleted_at')
-    {
-        $this->whereNull($deletedAtColumn);
-
-        return $this;
-    }
 
     /**
      * Convert the rule to a validation string.

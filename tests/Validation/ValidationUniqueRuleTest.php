@@ -84,13 +84,40 @@ class ValidationUniqueRuleTest extends TestCase
 
     public function testItIgnoresSoftDeletes()
     {
+        $rule = new Unique('table', 'column');
+        $rule->withoutTrashed();
+        $this->assertSame('unique:table,column,NULL,id,deleted_at,"NULL"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->withoutTrashed('soft_deleted_at');
+        $this->assertSame('unique:table,column,NULL,id,soft_deleted_at,"NULL"', (string) $rule);
+
         $rule = new Unique('table');
         $rule->withoutTrashed();
         $this->assertSame('unique:table,NULL,NULL,id,deleted_at,"NULL"', (string) $rule);
 
         $rule = new Unique('table');
-        $rule->withoutTrashed('softdeleted_at');
-        $this->assertSame('unique:table,NULL,NULL,id,softdeleted_at,"NULL"', (string) $rule);
+        $rule->withoutTrashed('soft_deleted_at');
+        $this->assertSame('unique:table,NULL,NULL,id,soft_deleted_at,"NULL"', (string) $rule);
+    }
+
+    public function testItOnlySoftDeletes()
+    {
+        $rule = new Unique('table', 'column');
+        $rule->onlyTrashed();
+        $this->assertSame('unique:table,column,NULL,id,deleted_at,"NOT_NULL"', (string) $rule);
+
+        $rule = new Unique('table', 'column');
+        $rule->onlyTrashed('soft_deleted_at');
+        $this->assertSame('unique:table,column,NULL,id,soft_deleted_at,"NOT_NULL"', (string) $rule);
+
+        $rule = new Unique('table');
+        $rule->onlyTrashed();
+        $this->assertSame('unique:table,NULL,NULL,id,deleted_at,"NOT_NULL"', (string) $rule);
+
+        $rule = new Unique('table');
+        $rule->onlyTrashed('soft_deleted_at');
+        $this->assertSame('unique:table,NULL,NULL,id,soft_deleted_at,"NOT_NULL"', (string) $rule);
     }
 }
 
