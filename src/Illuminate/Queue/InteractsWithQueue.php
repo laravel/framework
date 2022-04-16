@@ -56,7 +56,7 @@ trait InteractsWithQueue
      */
     public function release($delay = 0)
     {
-        if ($this->job) {
+        if ($this->job && $this->attempts() < $this->job->maxTries()) {
             return $this->job->release($delay);
         }
     }
