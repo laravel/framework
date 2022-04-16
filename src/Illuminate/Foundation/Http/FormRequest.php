@@ -67,6 +67,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $stopOnFirstFailure = false;
 
     /**
+     * Indicates whether the attribute names should be preserved in validation error messages.
+     *
+     * @var bool
+     */
+    protected $preserveAttributeNames = false;
+
+    /**
      * The validator instance.
      *
      * @var \Illuminate\Contracts\Validation\Validator
@@ -111,8 +118,25 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         return $factory->make(
             $this->validationData(), $this->container->call([$this, 'rules']),
-            $this->messages(), $this->attributes()
+            $this->messages(), $this->gatherAttributes()
         )->stopOnFirstFailure($this->stopOnFirstFailure);
+    }
+
+    /**
+     * Gather the attributes that will be used for validation error messages.
+     * If the attributes' names are to be preserved, merge any attributes
+     * that have explicitly been defined on the request.
+     *
+     * @return array|int[]|string[]
+     */
+    protected function gatherAttributes()
+    {
+        $defaultAttributes = $this->preserveAttributeNames ? array_combine(
+            array_keys($this->rules()),
+            array_keys($this->rules()),
+        ) : [];
+
+        return array_merge($defaultAttributes, $this->attributes());
     }
 
     /**
