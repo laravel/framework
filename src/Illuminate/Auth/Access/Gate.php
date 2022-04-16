@@ -180,7 +180,7 @@ class Gate implements GateContract
      * Define a new ability.
      *
      * @param  string  $ability
-     * @param  callable|string  $callback
+     * @param  callable|array|string  $callback
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -198,7 +198,7 @@ class Gate implements GateContract
 
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
         } else {
-            throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
+            throw new InvalidArgumentException("Callback must be a callable, callback array, or a 'Class@method' string.");
         }
 
         return $this;
