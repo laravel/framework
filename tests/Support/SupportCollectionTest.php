@@ -23,6 +23,9 @@ use ReflectionClass;
 use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
+use Illuminate\Support\Carbon as IlluminateCarbon;
+use Carbon\Carbon;
+use DateTime;
 
 class SupportCollectionTest extends TestCase
 {
@@ -2956,6 +2959,31 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame('first', $data->get(0)->value);
         $this->assertSame('second', $data->get(1)->value);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapIntoCanHandleDateClasses($collection)
+    {
+        $baseCollection = new $collection([
+            '2021-01-01', '2022-01-01',
+        ]);
+
+        $data1 = $baseCollection->mapInto(IlluminateCarbon::class);
+
+        $this->assertSame((new IlluminateCarbon('2021-01-01'))->toIso8601String(), $data1->get(0)->toIso8601String());
+        $this->assertSame((new IlluminateCarbon('2022-01-01'))->toIso8601String(), $data1->get(1)->toIso8601String());
+
+        $data2 = $baseCollection->mapInto(Carbon::class);
+
+        $this->assertSame((new Carbon('2021-01-01'))->toIso8601String(), $data2->get(0)->toIso8601String());
+        $this->assertSame((new Carbon('2022-01-01'))->toIso8601String(), $data2->get(1)->toIso8601String());
+
+        $data3 = $baseCollection->mapInto(DateTime::class);
+
+        $this->assertSame((new DateTime('2021-01-01'))->format(DateTime::ISO8601), $data3->get(0)->format(DateTime::ISO8601));
+        $this->assertSame((new DateTime('2022-01-01'))->format(DateTime::ISO8601), $data3->get(1)->format(DateTime::ISO8601));
     }
 
     /**

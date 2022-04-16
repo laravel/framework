@@ -388,6 +388,10 @@ trait EnumeratesValues
     public function mapInto($class)
     {
         return $this->map(function ($value, $key) use ($class) {
+            if ($class == 'DateTime' || in_array('DateTime', class_parents($class))) {
+                return new $class($value);
+            }
+
             return new $class($value, $key);
         });
     }
