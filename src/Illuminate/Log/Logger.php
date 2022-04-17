@@ -178,9 +178,13 @@ class Logger implements LoggerInterface
      */
     protected function writeLog($level, $message, $context): void
     {
+        $backtrace = debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 4)[3];
+
         $this->logger->{$level}(
             $message = $this->formatMessage($message),
-            $context = array_merge($this->context, $context)
+            $context = array_merge([
+                '_where' => "{$backtrace['file']}:{$backtrace['line']}",
+            ], $this->context, $context)
         );
 
         $this->fireLogEvent($level, $message, $context);

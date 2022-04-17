@@ -36,6 +36,13 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testContextHasWhereThatCallPlace()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+
+        require __DIR__ . '/testContextHasWhereThatCallPlace.php';
+    }
+
     public function testContextIsFlushed()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));
