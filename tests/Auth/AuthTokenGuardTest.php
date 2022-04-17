@@ -30,6 +30,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertSame(1, $user->id);
         $this->assertTrue($guard->check());
         $this->assertFalse($guard->guest());
+        $this->assertTrue($guard->hasUser());
         $this->assertSame(1, $guard->id());
     }
 
@@ -48,6 +49,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertSame(1, $user->id);
         $this->assertTrue($guard->check());
         $this->assertFalse($guard->guest());
+        $this->assertTrue($guard->hasUser());
         $this->assertSame(1, $guard->id());
     }
 
