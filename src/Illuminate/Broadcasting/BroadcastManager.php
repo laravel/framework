@@ -69,8 +69,7 @@ class BroadcastManager implements FactoryContract
 
         $attributes = $attributes ?: ['middleware' => ['web']];
 
-        $this->app['router']->group($attributes, fn ($router) =>
-            $router->match(
+        $this->app['router']->group($attributes, fn ($router) => $router->match(
                 ['get', 'post'], '/broadcasting/auth',
                 '\\'.BroadcastController::class.'@authenticate'
             )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])

@@ -16,7 +16,7 @@ class BroadcastController extends Controller
      */
     public function authenticate(Request $request)
     {
-        !$request->hasSession() ?: $request->session()->reflash();
+        ! $request->hasSession() ?: $request->session()->reflash();
 
         return Broadcast::auth($request);
     }
