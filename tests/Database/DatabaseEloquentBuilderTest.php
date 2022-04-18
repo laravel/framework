@@ -666,6 +666,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo'], $results);
     }
 
+    public function testEagerLoadRelationsCanBeFlushed()
+    {
+        $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+
+        $builder->setEagerLoads(['foo']);
+
+        $this->assertSame(['foo'], $builder->getEagerLoads());
+
+        $builder->withoutEagerLoads();
+
+        $this->assertEmpty($builder->getEagerLoads());
+    }
+
     public function testRelationshipEagerLoadProcess()
     {
         $builder = m::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
@@ -1041,7 +1054,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
         $result = $builder->whereBelongsTo($parent);
         $this->assertEquals($result, $builder);
@@ -1049,9 +1062,33 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
 
         $result = $builder->whereBelongsTo($parent, 'parent');
+        $this->assertEquals($result, $builder);
+
+        $parents = new Collection([new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 2,
+            'parent_id' => 1,
+        ]), new EloquentBuilderTestWhereBelongsToStub([
+            'id' => 3,
+            'parent_id' => 1,
+        ])]);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
+
+        $result = $builder->whereBelongsTo($parents);
+        $this->assertEquals($result, $builder);
+
+        $builder = $this->getBuilder();
+        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
+        $builder->setModel($related);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
+
+        $result = $builder->whereBelongsTo($parents, 'parent');
         $this->assertEquals($result, $builder);
     }
 
@@ -1080,6 +1117,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $model->select('id')->withCount('foo');
 
         $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountSecondRelationWithClosure()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->withCount(['address', 'foo' => function ($query) {
+            $query->where('active', false);
+        }]);
+
+        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "address_count", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "active" = ?) as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountAndMergedWheres()

@@ -5,6 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionFunction;
@@ -60,6 +61,10 @@ class EventFake implements Dispatcher
         foreach ($this->dispatcher->getListeners($expectedEvent) as $listenerClosure) {
             $actualListener = (new ReflectionFunction($listenerClosure))
                         ->getStaticVariables()['listener'];
+
+            if (is_string($actualListener) && Str::endsWith($actualListener, '@handle')) {
+                $actualListener = Str::parseCallback($actualListener)[0];
+            }
 
             if ($actualListener === $expectedListener ||
                 ($actualListener instanceof Closure &&

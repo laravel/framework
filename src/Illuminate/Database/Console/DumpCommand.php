@@ -9,7 +9,9 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'schema:dump')]
 class DumpCommand extends Command
 {
     /**

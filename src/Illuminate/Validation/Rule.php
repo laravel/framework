@@ -109,7 +109,7 @@ class Rule
      * Get a exclude_if constraint builder instance.
      *
      * @param  callable|bool  $callback
-     * @return \Illuminate\Validation\Rules\ProhibitedIf
+     * @return \Illuminate\Validation\Rules\ExcludeIf
      */
     public static function excludeIf($callback)
     {

@@ -123,6 +123,19 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $query->get());
     }
 
+    public function testSoftDeletesAreNotRetrievedFromRelationshipBaseQuery()
+    {
+        [, $abigail] = $this->createUsers();
+
+        $abigail->posts()->create(['title' => 'Foo']);
+        $abigail->posts()->create(['title' => 'Bar'])->delete();
+
+        $query = $abigail->posts()->toBase();
+
+        $this->assertInstanceOf(Builder::class, $query);
+        $this->assertCount(1, $query->get());
+    }
+
     public function testSoftDeletesAreNotRetrievedFromBuilderHelpers()
     {
         $this->createUsers();
@@ -311,7 +324,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function testUpdateModelAfterSoftDeleting()
     {
-        $now = Carbon::now();
+        Carbon::setTestNow($now = Carbon::now());
         $this->createUsers();
 
         /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
@@ -867,13 +880,17 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     /**
      * Helpers...
+     *
+     * @return \Illuminate\Tests\Database\SoftDeletesTestUser[]
      */
     protected function createUsers()
     {
         $taylor = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        $abigail = SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $taylor->delete();
+
+        return [$taylor, $abigail];
     }
 
     /**

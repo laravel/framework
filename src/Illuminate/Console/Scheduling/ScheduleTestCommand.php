@@ -4,7 +4,10 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'schedule:test')]
 class ScheduleTestCommand extends Command
 {
     /**
@@ -59,7 +62,7 @@ class ScheduleTestCommand extends Command
 
         $event = $commands[$index];
 
-        $this->line('<info>['.date('c').'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $this->line('<info>['.Carbon::now()->format('c').'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
         $event->run($this->laravel);
     }

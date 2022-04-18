@@ -61,6 +61,16 @@ trait TestDatabases
                 });
             }
         });
+
+        ParallelTesting::tearDownProcess(function () {
+            $this->whenNotUsingInMemoryDatabase(function ($database) {
+                if (ParallelTesting::option('drop_databases')) {
+                    Schema::dropDatabaseIfExists(
+                        $this->testDatabase($database)
+                    );
+                }
+            });
+        });
     }
 
     /**

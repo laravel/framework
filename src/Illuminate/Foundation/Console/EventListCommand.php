@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Illuminate\Console\Command;
 use ReflectionFunction;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'event:list')]
 class EventListCommand extends Command
 {
     /**

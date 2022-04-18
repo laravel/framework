@@ -1688,6 +1688,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Indicate that an attribute should be excluded when another attribute presents.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateExcludeWith($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'exclude_with');
+
+        if (! Arr::has($this->data, $parameters[0])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Indicate that an attribute should be excluded when another attribute is missing.
      *
      * @param  string  $attribute

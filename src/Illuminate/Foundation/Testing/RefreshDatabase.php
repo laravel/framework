@@ -56,6 +56,7 @@ trait RefreshDatabase
     {
         return [
             '--seed' => $this->shouldSeed(),
+            '--seeder' => $this->seeder(),
         ];
     }
 
@@ -93,6 +94,12 @@ trait RefreshDatabase
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
+
+            if ($this->app->resolved('db.transactions')) {
+                $this->app->make('db.transactions')->callbacksShouldIgnore(
+                    $this->app->make('db.transactions')->getTransactions()->first()
+                );
+            }
         }
 
         $this->beforeApplicationDestroyed(function () use ($database) {

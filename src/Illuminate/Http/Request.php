@@ -726,8 +726,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        return Arr::get($this->all(), $key, function () use ($key) {
-            return $this->route($key);
-        });
+        return Arr::get($this->all(), $key, fn () => $this->route($key));
     }
 }

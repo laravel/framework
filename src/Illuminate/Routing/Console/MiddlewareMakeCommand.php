@@ -4,7 +4,9 @@ namespace Illuminate\Routing\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'make:middleware')]
 class MiddlewareMakeCommand extends GeneratorCommand
 {
     use CreatesMatchingTest;

@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\TableDiff;
+use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Expression;
@@ -14,6 +15,8 @@ use RuntimeException;
 
 abstract class Grammar extends BaseGrammar
 {
+    use CompilesJsonPaths;
+
     /**
      * If this Grammar supports schema changes wrapped in a transaction.
      *
@@ -271,37 +274,6 @@ abstract class Grammar extends BaseGrammar
         return parent::wrapTable(
             $table instanceof Blueprint ? $table->getTable() : $table
         );
-    }
-
-    /**
-     * Split the given JSON selector into the field and the optional path and wrap them separately.
-     *
-     * @param  string  $column
-     * @return array
-     */
-    protected function wrapJsonFieldAndPath($column)
-    {
-        $parts = explode('->', $column, 2);
-
-        $field = $this->wrap($parts[0]);
-
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
-
-        return [$field, $path];
-    }
-
-    /**
-     * Wrap the given JSON path.
-     *
-     * @param  string  $value
-     * @param  string  $delimiter
-     * @return string
-     */
-    protected function wrapJsonPath($value, $delimiter = '->')
-    {
-        $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
-
-        return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }
 
     /**

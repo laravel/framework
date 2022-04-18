@@ -39,6 +39,7 @@ class ValidationValidatorTest extends TestCase
     {
         parent::tearDown();
 
+        Carbon::setTestNow(null);
         m::close();
     }
 
@@ -4143,8 +4144,6 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => new Carbon('2018-01-01')], ['x' => 'date_equals:tomorrow']);
         $this->assertTrue($v->fails());
-
-        Carbon::setTestNow(null);
     }
 
     public function testBeforeAndAfter()
@@ -7027,6 +7026,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($validator->fails());
         $this->assertSame(['cat' => 'Tom'], $validator->valid());
         $this->assertSame(['mouse' => null], $validator->invalid());
+    }
+
+    public function testExcludeWithValuesAreReallyRemoved()
+    {
+        $validator = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            [
+                'cat' => 'Tom',
+                'mouse' => 'Jerry',
+            ],
+            [
+                'cat' => 'string',
+                'mouse' => 'string|exclude_with:cat',
+            ]
+        );
+
+        $this->assertTrue($validator->passes());
+        $this->assertSame(['cat' => 'Tom'], $validator->validated());
+        $this->assertSame(['cat' => 'Tom'], $validator->valid());
+        $this->assertSame([], $validator->invalid());
     }
 
     public function testValidateFailsWithAsterisksAsDataKeys()

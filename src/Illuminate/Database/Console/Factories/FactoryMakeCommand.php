@@ -4,8 +4,10 @@ namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'make:factory')]
 class FactoryMakeCommand extends GeneratorCommand
 {
     /**
@@ -68,11 +70,9 @@ class FactoryMakeCommand extends GeneratorCommand
 
         $model = class_basename($namespaceModel);
 
-        if (Str::startsWith($namespaceModel, $this->rootNamespace().'Models')) {
-            $namespace = Str::beforeLast('Database\\Factories\\'.Str::after($namespaceModel, $this->rootNamespace().'Models\\'), '\\');
-        } else {
-            $namespace = 'Database\\Factories';
-        }
+        $namespace = $this->getNamespace(
+            Str::replaceFirst($this->rootNamespace(), 'Database\\Factories\\', $this->qualifyClass($this->getNameInput()))
+        );
 
         $replace = [
             '{{ factoryNamespace }}' => $namespace,

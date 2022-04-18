@@ -4,7 +4,9 @@ namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'cache:forget')]
 class ForgetCommand extends Command
 {
     /**

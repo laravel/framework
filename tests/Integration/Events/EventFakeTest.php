@@ -126,6 +126,7 @@ class EventFakeTest extends TestCase
         Event::fake();
         Event::listen('event', 'listener');
         Event::listen('event', PostEventSubscriber::class);
+        Event::listen('event', 'Illuminate\\Tests\\Integration\\Events\\PostAutoEventSubscriber@handle');
         Event::listen('event', [PostEventSubscriber::class, 'foo']);
         Event::subscribe(PostEventSubscriber::class);
         Event::listen(function (NonImportantEvent $event) {
@@ -134,6 +135,7 @@ class EventFakeTest extends TestCase
 
         Event::assertListening('event', 'listener');
         Event::assertListening('event', PostEventSubscriber::class);
+        Event::assertListening('event', PostAutoEventSubscriber::class);
         Event::assertListening('event', [PostEventSubscriber::class, 'foo']);
         Event::assertListening('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
         Event::assertListening(NonImportantEvent::class, Closure::class);
@@ -162,6 +164,14 @@ class PostEventSubscriber
             'post-created',
             [PostEventSubscriber::class, 'handlePostCreated']
         );
+    }
+}
+
+class PostAutoEventSubscriber
+{
+    public function handle($event)
+    {
+        //
     }
 }
 
