@@ -171,7 +171,7 @@ class BroadcastManager implements FactoryContract
      * Resolve the given broadcaster.
      *
      * @param  string  $name
-     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
