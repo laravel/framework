@@ -9,6 +9,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Arr;
@@ -578,17 +579,21 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
-        $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
-                    ? $listener->viaConnection()
-                    : $listener->connection ?? null);
+        $connection = method_exists($listener, 'viaConnection')
+            ? $listener->viaConnection()
+            : $listener->connection ?? null;
 
         $queue = method_exists($listener, 'viaQueue')
-                    ? $listener->viaQueue()
-                    : $listener->queue ?? null;
+            ? $listener->viaQueue()
+            : $listener->queue ?? null;
 
-        isset($listener->delay)
-                    ? $connection->laterOn($queue, $listener->delay, $job)
-                    : $connection->pushOn($queue, $job);
+        $job->onConnection($connection)->onQueue($queue);
+
+        if (isset($listener->delay)) {
+            $job->delay($listener->delay);
+        }
+
+        $this->container[BusDispatcherContract::class]->dispatch($job);
     }
 
     /**
@@ -668,29 +673,6 @@ class Dispatcher implements DispatcherContract
                 $this->forget($key);
             }
         }
-    }
-
-    /**
-     * Get the queue implementation from the resolver.
-     *
-     * @return \Illuminate\Contracts\Queue\Queue
-     */
-    protected function resolveQueue()
-    {
-        return call_user_func($this->queueResolver);
-    }
-
-    /**
-     * Set the queue resolver implementation.
-     *
-     * @param  callable  $resolver
-     * @return $this
-     */
-    public function setQueueResolver(callable $resolver)
-    {
-        $this->queueResolver = $resolver;
-
-        return $this;
     }
 
     /**

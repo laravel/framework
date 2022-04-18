@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Events;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Bus\Dispatcher as Bus;
 
 class QueuedEventsTest extends TestCase
 {
@@ -20,16 +21,13 @@ class QueuedEventsTest extends TestCase
 
     public function testQueuedEventHandlersAreQueued()
     {
-        $d = new Dispatcher;
-        $queue = m::mock(Queue::class);
+        $bus = m::mock(BusDispatcherContract::class);
+        $bus->shouldReceive('dispatch')->once()->with(m::type(CallQueuedListener::class));
 
-        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
+        $container = new Container();
+        $container->bind(BusDispatcherContract::class, fn () => $bus);
 
-        $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
-
-        $d->setQueueResolver(function () use ($queue) {
-            return $queue;
-        });
+        $d = new Dispatcher($container);
 
         $d->listen('some.event', TestDispatcherQueuedHandler::class.'@someMethod');
         $d->dispatch('some.event', ['foo', 'bar']);
@@ -37,13 +35,13 @@ class QueuedEventsTest extends TestCase
 
     public function testCustomizedQueuedEventHandlersAreQueued()
     {
-        $d = new Dispatcher;
+        $container = new Container();
 
-        $fakeQueue = new QueueFake(new Container);
+        $fakeQueue = new QueueFake($container);
+        $bus = new Bus($container, fn () => $fakeQueue);
+        $container->bind(BusDispatcherContract::class, fn () => $bus);
 
-        $d->setQueueResolver(function () use ($fakeQueue) {
-            return $fakeQueue;
-        });
+        $d = new Dispatcher($container);
 
         $d->listen('some.event', TestDispatcherConnectionQueuedHandler::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
@@ -53,13 +51,13 @@ class QueuedEventsTest extends TestCase
 
     public function testQueueIsSetByGetQueue()
     {
-        $d = new Dispatcher;
+        $container = new Container();
 
-        $fakeQueue = new QueueFake(new Container);
+        $fakeQueue = new QueueFake($container);
+        $bus = new Bus($container, fn () => $fakeQueue);
+        $container->bind(BusDispatcherContract::class, fn () => $bus);
 
-        $d->setQueueResolver(function () use ($fakeQueue) {
-            return $fakeQueue;
-        });
+        $d = new Dispatcher($container);
 
         $d->listen('some.event', TestDispatcherGetQueue::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
@@ -69,16 +67,13 @@ class QueuedEventsTest extends TestCase
 
     public function testQueueIsSetByGetConnection()
     {
-        $d = new Dispatcher;
-        $queue = m::mock(Queue::class);
+        $container = new Container();
 
-        $queue->shouldReceive('connection')->once()->with('some_other_connection')->andReturnSelf();
+        $fakeQueue = new QueueFake($container);
+        $bus = new Bus($container, fn () => $fakeQueue);
+        $container->bind(BusDispatcherContract::class, fn () => $bus);
 
-        $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
-
-        $d->setQueueResolver(function () use ($queue) {
-            return $queue;
-        });
+        $d = new Dispatcher($container);
 
         $d->listen('some.event', TestDispatcherGetConnection::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
@@ -86,13 +81,13 @@ class QueuedEventsTest extends TestCase
 
     public function testQueuePropagateRetryUntilAndMaxExceptions()
     {
-        $d = new Dispatcher;
+        $container = new Container();
 
-        $fakeQueue = new QueueFake(new Container);
+        $fakeQueue = new QueueFake($container);
+        $bus = new Bus($container, fn () => $fakeQueue);
+        $container->bind(BusDispatcherContract::class, fn () => $bus);
 
-        $d->setQueueResolver(function () use ($fakeQueue) {
-            return $fakeQueue;
-        });
+        $d = new Dispatcher($container);
 
         $d->listen('some.event', TestDispatcherOptions::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
@@ -104,13 +99,13 @@ class QueuedEventsTest extends TestCase
 
     public function testQueuePropagateMiddleware()
     {
-        $d = new Dispatcher;
+        $container = new Container();
 
-        $fakeQueue = new QueueFake(new Container);
+        $fakeQueue = new QueueFake($container);
+        $bus = new Bus($container, fn () => $fakeQueue);
+        $container->bind(BusDispatcherContract::class, fn () => $bus);
 
-        $d->setQueueResolver(function () use ($fakeQueue) {
-            return $fakeQueue;
-        });
+        $d = new Dispatcher($container);
 
         $d->listen('some.event', TestDispatcherMiddleware::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
