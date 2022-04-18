@@ -101,11 +101,11 @@ abstract class Broadcaster implements BroadcasterContract
     {
         $callbackParameters = $this->extractParameters($callback);
 
-        return collect($this->extractChannelKeys($pattern, $channel))->reject(function ($value, $key) {
-            return is_numeric($key);
-        })->map(function ($value, $key) use ($callbackParameters) {
-            return $this->resolveBinding($key, $value, $callbackParameters);
-        })->values()->all();
+        return collect($this->extractChannelKeys($pattern, $channel))
+            ->reject(fn ($value, $key) => is_numeric($key) )
+            ->map(fn ($value, $key) => $this->resolveBinding($key, $value, $callbackParameters) )
+            ->values()
+            ->all();
     }
 
     /**
@@ -245,9 +245,7 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function formatChannels(array $channels)
     {
-        return array_map(function ($channel) {
-            return (string) $channel;
-        }, $channels);
+        return array_map(fn ($channel) => (string) $channel , $channels);
     }
 
     /**
@@ -273,11 +271,9 @@ abstract class Broadcaster implements BroadcasterContract
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {
-        return is_callable($callback) ? $callback : function (...$args) use ($callback) {
-            return Container::getInstance()
-                ->make($callback)
-                ->join(...$args);
-        };
+        return is_callable($callback) ? $callback : fn (...$args) => Container::getInstance()
+            ->make($callback)
+            ->join(...$args);
     }
 
     /**
