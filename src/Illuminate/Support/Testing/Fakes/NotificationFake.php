@@ -302,7 +302,8 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
             if (method_exists($notification, 'shouldSend')) {
                 $notifiableChannels = array_filter(
                     $notifiableChannels,
-                    fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false);
+                    fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
+                );
 
                 if (empty($notifiableChannels)) {
                     continue;
