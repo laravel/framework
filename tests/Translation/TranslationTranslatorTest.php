@@ -55,6 +55,16 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testGetMethodProperlyLoadsAndRetrievesArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo', 'beep' => ['rock' => 'tree :foo']]]);
+        $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
+        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
     public function testGetMethodForNonExistingReturnsSameKey()
     {
         $t = new Translator($this->getLoader(), 'en');
