@@ -579,15 +579,13 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
-        $connection = method_exists($listener, 'viaConnection')
+        $job->onConnection(method_exists($listener, 'viaConnection')
             ? $listener->viaConnection()
-            : $listener->connection ?? null;
+            : $listener->connection ?? null);
 
-        $queue = method_exists($listener, 'viaQueue')
+        $job->onQueue(method_exists($listener, 'viaQueue')
             ? $listener->viaQueue()
-            : $listener->queue ?? null;
-
-        $job->onConnection($connection)->onQueue($queue);
+            : $listener->queue ?? null);
 
         if (isset($listener->delay)) {
             $job->delay($listener->delay);

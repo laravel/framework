@@ -2,7 +2,6 @@
 
 namespace Illuminate\Events;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,6 +13,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('events', fn (Application $app): Dispatcher => new Dispatcher($app));
+        $this->app->singleton('events', fn ($app): Dispatcher => new Dispatcher($app));
     }
 }
