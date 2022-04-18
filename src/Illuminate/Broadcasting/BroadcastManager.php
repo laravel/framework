@@ -120,15 +120,12 @@ class BroadcastManager implements FactoryContract
             return $this->app->make(BusDispatcherContract::class)->dispatchNow(new BroadcastEvent(clone $event));
         }
 
-        $queue = null;
-
-        if (method_exists($event, 'broadcastQueue')) {
-            $queue = $event->broadcastQueue();
-        } elseif (isset($event->broadcastQueue)) {
-            $queue = $event->broadcastQueue;
-        } elseif (isset($event->queue)) {
-            $queue = $event->queue;
-        }
+        $queue = match (true){
+            method_exists($event, 'broadcastQueue') => $event->broadcastQueue() ,
+            isset($event->broadcastQueue) => $event->broadcastQueue ,
+            isset($event->queue) => $event->queue ,
+            default => null
+        };
 
         $this->app->make('queue')->connection($event->connection ?? null)->pushOn(
             $queue, new BroadcastEvent(clone $event)
