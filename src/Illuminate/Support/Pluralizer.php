@@ -7,6 +7,20 @@ use Doctrine\Inflector\InflectorFactory;
 class Pluralizer
 {
     /**
+     * The cached inflector instance.
+     *
+     * @var static
+     */
+    protected static $inflector;
+
+    /**
+     * The language that should be used by the inflector.
+     *
+     * @var string
+     */
+    protected static $language = 'english';
+
+    /**
      * Uncountable non-nouns word forms.
      *
      * Contains words supported by Doctrine/Inflector/Rules/English/Uninflected.php
@@ -19,20 +33,6 @@ class Pluralizer
         'recommended',
         'related',
     ];
-
-    /**
-     * The language that should be used by the inflector.
-     *
-     * @var string
-     */
-    protected static $language = 'english';
-
-    /**
-     * The cached inflector instance.
-     *
-     * @var static
-     */
-    protected static $inflector;
 
     /**
      * Get the plural form of an English word.
