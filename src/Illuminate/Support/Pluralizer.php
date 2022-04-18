@@ -3,14 +3,13 @@
 namespace Illuminate\Support;
 
 use Doctrine\Inflector\InflectorFactory;
-use Illuminate\Container\Container;
 
 class Pluralizer
 {
     /**
      * Uncountable non-nouns word forms.
-     * Only words not listed on Doctrine/Inflector/Rules/English/Uninflected.php
-     * Unlisted nouns should be primarily requested there.
+     *
+     * Contains words supported by Doctrine/Inflector/Rules/English/Uninflected.php
      *
      * @var string[]
      */
@@ -20,6 +19,20 @@ class Pluralizer
         'recommended',
         'related',
     ];
+
+    /**
+     * The language that should be used by the inflector.
+     *
+     * @var string
+     */
+    protected static $language = 'english';
+
+    /**
+     * The cached inflector instance.
+     *
+     * @var static
+     */
+    protected static $inflector;
 
     /**
      * Get the plural form of an English word.
@@ -94,14 +107,23 @@ class Pluralizer
      */
     public static function inflector()
     {
-        static $inflector;
-
-        if (is_null($inflector)) {
-            $app = Container::getInstance();
-            $language = $app->has('config') ? $app['config']->get('app.pluralizer.language', 'english') : 'english';
-            $inflector = InflectorFactory::createForLanguage($language)->build();
+        if (is_null(static::$inflector)) {
+            static::$inflector = InflectorFactory::createForLanguage(static::$language)->build();
         }
 
-        return $inflector;
+        return static::$inflector;
+    }
+
+    /**
+     * Specify the language that should be used by the inflector.
+     *
+     * @param  string  $language
+     * @return void
+     */
+    public static function useLanguage(string $language)
+    {
+        static::$language = $language;
+
+        static::$inflector = null;
     }
 }

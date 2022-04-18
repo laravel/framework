@@ -2,14 +2,24 @@
 
 namespace Illuminate\Tests\Integration\Support;
 
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
 
 class PluralizerPortugueseTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    public function setUp(): void
     {
-        $app['config']->set('app.pluralizer.language', 'portuguese');
+        parent::setUp();
+
+        Pluralizer::useLanguage('portuguese');
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        Pluralizer::useLanguage('english');
     }
 
     public function testBasicSingular()
