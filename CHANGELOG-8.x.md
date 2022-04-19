@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.8...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.9...8.x)
+
+
+## [v8.83.9 (2022-04-19)](https://github.com/laravel/framework/compare/v8.83.8...v8.83.9)
+
+### Fixed
+- Backport Fix PHP warnings when rendering long blade string ([#41970](https://github.com/laravel/framework/pull/41970))
 
 
 ## [v8.83.8 (2022-04-12)](https://github.com/laravel/framework/compare/v8.83.7...v8.83.8)
