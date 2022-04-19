@@ -2961,6 +2961,21 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testMapIntoWithMethod($collection)
+    {
+        $data = new $collection([
+            'first', 'second',
+        ]);
+
+        $data = $data->mapInto(TestCollectionMapIntoObject::class, 'make');
+
+        $this->assertSame('first-through-make', $data->get(0)->value);
+        $this->assertSame('second-through-make', $data->get(1)->value);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testNth($collection)
     {
         $data = new $collection([
@@ -5184,6 +5199,11 @@ class TestCollectionMapIntoObject
     public function __construct($value)
     {
         $this->value = $value;
+    }
+
+    public static function make($value)
+    {
+        return new static($value.'-through-make');
     }
 }
 
