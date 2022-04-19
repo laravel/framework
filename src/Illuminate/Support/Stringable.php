@@ -577,6 +577,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Replace the given keys with their associated values.
+     *
+     * @param  array<string, string>  $search
+     * @return static
+     */
+    public function replaceAssocArray(array $search)
+    {
+        return new static(str_replace(array_keys($search), array_values($search), $this->value));
+    }
+
+    /**
      * Replace the first occurrence of a given value in the string.
      *
      * @param  string  $search

@@ -739,6 +739,17 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo/bar', (string) $this->stringable('?/?')->replaceArray('?', ['x' => 'foo', 'y' => 'bar']));
     }
 
+    public function testReplaceAssocArray()
+    {
+        $replace = [
+            'a' => 'a_a',
+            'b' => 'b_b',
+            'c' => 'c_c',
+        ];
+
+        $this->assertSame('a_a/b_b/c_c', $this->stringable('a/b/c')->replaceAssocArray($replace)->toString());
+    }
+
     public function testReplaceFirst()
     {
         $this->assertSame('fooqux foobar', (string) $this->stringable('foobar foobar')->replaceFirst('bar', 'qux'));
