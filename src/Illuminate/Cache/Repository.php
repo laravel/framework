@@ -394,6 +394,30 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, or execute the given Closure and refresh the result when the TTL expires.
+     *
+     * @param  string                                              $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  Closure                                             $callback
+     * @return mixed
+     */
+    public function refresh($key, $ttl, Closure $callback)
+    {
+        $refreshKey = '~' . $key;
+        $value      = $this->get($key);
+        $fresh      = $this->get($refreshKey);
+
+        if ( ! is_null($value) && ! is_null($fresh)) {
+            return $value;
+        }
+
+        $this->put($refreshKey, true, value($ttl));
+        $this->forever($key, $value = $callback());
+
+        return $value;
+    }
+
+    /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @param  string  $key

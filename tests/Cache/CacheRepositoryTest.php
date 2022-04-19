@@ -145,6 +145,42 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testRefreshMethodCallsRefreshAndReturnsDefault()
+    {
+        $repo = $this->getRepository();
+
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('get')->once()->with('~foo')->andReturn(null);
+
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
+        $repo->getStore()->shouldReceive('put')->once()->with('~foo', true, 1);
+
+        $result = $repo->refresh('foo', 1, function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $result);
+
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('get')->once()->with('~foo')->andReturn(null);
+
+        $repo->getStore()->shouldReceive('put')->once()->with('~foo', true, 1);
+
+        try {
+            $repo->refresh('foo', 1, function () {
+                throw new \Exception('error');
+            });
+        } catch (\Exception) {
+        }
+
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('get')->once()->with('~foo')->andReturn(true);
+
+        $result = $repo->refresh('foo', 1, function () {
+            return 'not';
+        });
+        $this->assertSame('bar', $result);
+    }
+
     public function testPuttingMultipleItemsInCache()
     {
         $repo = $this->getRepository();
