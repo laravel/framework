@@ -73,6 +73,14 @@ interface Repository extends CacheInterface
      */
     public function remember($key, $ttl, Closure $callback);
 
+    /**
+     * Get an item from the cache, or execute the given Closure and refresh the result when the TTL expires.
+     *
+     * @param  string                                              $key
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  Closure                                             $callback
+     * @return mixed
+     */
     public function refresh($key, $ttl, Closure $callback);
 
     /**
