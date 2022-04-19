@@ -5,7 +5,6 @@ namespace Illuminate\Support\Traits;
 use CachingIterator;
 use Closure;
 use Exception;
-use UnitEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
@@ -16,6 +15,7 @@ use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
 use UnexpectedValueException;
+use UnitEnum;
 
 /**
  * @template TKey of array-key

@@ -3087,8 +3087,8 @@ class SupportCollectionTest extends TestCase
         $result = $data->groupBy('type');
 
         $this->assertEquals([
-            "value_1" => [['rating' => 1, 'type' => TestEnum::Value1]],
-            "value_2" => [['rating' => 1, 'type' => TestEnum::Value2]],
+            'value_1' => [['rating' => 1, 'type' => TestEnum::Value1]],
+            'value_2' => [['rating' => 1, 'type' => TestEnum::Value2]],
         ], $result->toArray());
     }
 
@@ -5211,7 +5211,8 @@ class TestCollectionSubclass extends Collection
     //
 }
 
-enum TestEnum: string {
+enum TestEnum: string
+{
     case Value1 = 'value_1';
     case Value2 = 'value_2';
 }
