@@ -2,27 +2,28 @@
 
 namespace Illuminate\Tests\Support;
 
-use ArrayAccess;
-use ArrayIterator;
-use ArrayObject;
-use CachingIterator;
+use stdClass;
 use Exception;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\ItemNotFoundException;
-use Illuminate\Support\LazyCollection;
-use Illuminate\Support\MultipleItemsFoundException;
+use ArrayAccess;
+use ArrayObject;
+use Mockery as m;
+use ArrayIterator;
+use CachingIterator;
+use ReflectionClass;
+use JsonSerializable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use JsonSerializable;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use stdClass;
-use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\LazyCollection;
+use Illuminate\Contracts\Support\Jsonable;
+use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\ItemNotFoundException;
+use Illuminate\Support\MultipleItemsFoundException;
+use Illuminate\Tests\Support\Fixtures\TestEnum;
 
 class SupportCollectionTest extends TestCase
 {
@@ -3078,6 +3079,10 @@ class SupportCollectionTest extends TestCase
      */
     public function testGroupByWithEnumValue($collection)
     {
+        if (version_compare(PHP_VERSION, '8.1') < 0) {
+            $this->markTestSkipped('PHP 8.1 is required.');
+        }
+
         $data = new $collection([
             ['rating' => 1, 'type' => TestEnum::Value1],
             ['rating' => 1, 'type' => TestEnum::Value2],
@@ -5208,10 +5213,4 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
-}
-
-enum TestEnum : string
-{
-    case Value1 = 'value_1';
-    case Value2 = 'value_2';
 }
