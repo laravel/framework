@@ -216,7 +216,7 @@ class MySqlGrammar extends Grammar
             }
 
             return $useUpsertAlias
-                ? $this->wrap($value).' = `laravel_upsert_alias`.`'.$this->wrap($value).'`'
+                ? $this->wrap($value).' = '.$this->wrap('laravel_upsert_alias').'.'.$this->wrap($value)
                 : $this->wrap($value).' = values('.$this->wrap($value).')';
         })->implode(', ');
 
