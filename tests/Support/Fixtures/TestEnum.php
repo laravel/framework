@@ -1,4 +1,5 @@
 <?php
+
 namespace Illuminate\Tests\Support\Fixtures;
 
 enum TestEnum : string
