@@ -3076,7 +3076,6 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-
     public function testGroupByWithEnumValue($collection)
     {
         $data = new $collection([
@@ -5211,7 +5210,7 @@ class TestCollectionSubclass extends Collection
     //
 }
 
-enum TestEnum: string
+enum TestEnum : string
 {
     case Value1 = 'value_1';
     case Value2 = 'value_2';
