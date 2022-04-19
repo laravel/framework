@@ -1842,6 +1842,17 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testSortByCallableStringCaseInsensitive($collection)
+    {
+        $data = new $collection([['sort' => 2], ['sort' => 1]]);
+        $data = $data->sortBy([['sort', 'aSc']]);
+
+        $this->assertEquals([['sort' => 1], ['sort' => 2]], array_values($data->all()));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSortByAlwaysReturnsAssoc($collection)
     {
         $data = new $collection(['a' => 'taylor', 'b' => 'dayle']);

@@ -1332,8 +1332,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
                 $prop = $comparison[0];
 
-                $ascending = Arr::get($comparison, 1, true) === true ||
-                             Arr::get($comparison, 1, true) === 'asc';
+                $ascending = $this->computeAscending($comparison);
 
                 $result = 0;
 
@@ -1358,6 +1357,31 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         });
 
         return new static($items);
+    }
+
+    /**
+     * Computes the comparison order direction.
+     *
+     * @param  array  $comparisons
+     * @return bool
+     */
+    protected function computeAscending(array $comparison)
+    {
+        $ascending = Arr::get($comparison, 1, true);
+
+        if ($ascending === true) {
+            return $ascending;
+        }
+
+        if (! is_string($ascending)) {
+            return false;
+        }
+
+        if (strtolower($ascending) === 'asc') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
