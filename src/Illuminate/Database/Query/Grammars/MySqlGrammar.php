@@ -208,7 +208,7 @@ class MySqlGrammar extends Grammar
             $sql .= ' as laravel_upsert_alias';
         }
 
-        $sql .= ' on duplicate key update';
+        $sql .= ' on duplicate key update ';
 
         $columns = collect($update)->map(function ($value, $key) use ($useUpsertAlias) {
             if (! is_numeric($key)) {
