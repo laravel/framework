@@ -5,6 +5,7 @@ namespace Illuminate\Support\Traits;
 use CachingIterator;
 use Closure;
 use Exception;
+use UnitEnum;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
@@ -1071,7 +1072,12 @@ trait EnumeratesValues
         }
 
         return function ($item) use ($value) {
-            return data_get($item, $value);
+            $outputValue = data_get($item, $value);
+            if ($outputValue instanceof UnitEnum) {
+                return $outputValue->value;
+            }
+
+            return $outputValue;
         };
     }
 

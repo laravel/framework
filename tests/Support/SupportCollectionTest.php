@@ -3076,6 +3076,25 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+
+    public function testGroupByWithEnumValue($collection)
+    {
+        $data = new $collection([
+            ['rating' => 1, 'type' => TestEnum::Value1],
+            ['rating' => 1, 'type' => TestEnum::Value2],
+        ]);
+
+        $result = $data->groupBy('type');
+
+        $this->assertEquals([
+            "value_1" => [['rating' => 1, 'type' => TestEnum::Value1]],
+            "value_2" => [['rating' => 1, 'type' => TestEnum::Value2]],
+        ], $result->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testGroupByAttributePreservingKeys($collection)
     {
         $data = new $collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
@@ -5190,4 +5209,9 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+enum TestEnum: string {
+    case Value1 = 'value_1';
+    case Value2 = 'value_2';
 }
