@@ -121,7 +121,18 @@ class PendingMail
      */
     public function send(MailableContract $mailable)
     {
-        $this->mailer->send($this->fill($mailable));
+        $this->sendHook($mailable);
+    }
+
+    /**
+     * Forward the send call.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendHook(MailableContract $mailable)
+    {
+        return $this->mailer->send($this->fill($mailable));
     }
 
     /**
