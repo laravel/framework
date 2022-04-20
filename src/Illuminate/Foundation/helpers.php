@@ -636,7 +636,7 @@ if (! function_exists('request')) {
      *
      * @param  array|string|null  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return mixed|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\Request
      */
     function request($key = null, $default = null)
     {
