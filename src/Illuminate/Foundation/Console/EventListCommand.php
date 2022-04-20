@@ -65,7 +65,7 @@ class EventListCommand extends Command
             $this->printSeparator($width);
         }
 
-        $this->line('');
+        $this->line(PHP_EOL);
     }
 
     /**
@@ -94,17 +94,17 @@ class EventListCommand extends Command
         $events = [];
 
         foreach ($this->getRawListeners() as $event => $rawListeners) {
-            foreach ($rawListeners as $rawListener) {
-                if (is_string($rawListener)) {
-                    $events[$event][] = [$rawListener, 'handle'];
-                } elseif ($rawListener instanceof Closure) {
-                    $events[$event][] = $this->stringifyClosure($rawListener);
-                } elseif (is_array($rawListener) && count($rawListener) === 2) {
-                    if (is_object($rawListener[0])) {
-                        $rawListener[0] = get_class($rawListener[0]);
+            foreach ($rawListeners as $listener) {
+                if (is_string($listener)) {
+                    $events[$event][] = [$listener, 'handle'];
+                } elseif ($listener instanceof Closure) {
+                    $events[$event][] = $this->stringifyClosure($listener);
+                } elseif (is_array($listener) && count($listener) === 2) {
+                    if (is_object($listener[0])) {
+                        $listener[0] = get_class($listener[0]);
                     }
 
-                    $events[$event][] = $rawListener;
+                    $events[$event][] = $listener;
                 }
             }
         }
@@ -125,6 +125,19 @@ class EventListCommand extends Command
         $path = str_replace([base_path().DIRECTORY_SEPARATOR, '\\'], ['', '/'], $reflection->getFileName() ?: '');
 
         return $path.':'.$reflection->getStartLine();
+    }
+
+    /**
+     * Remove commandline styling tags from the string.
+     *
+     * @param $string
+     * @return string
+     */
+    public function getPrintable($string)
+    {
+        $string = str_replace('</>', '', $string);
+
+        return preg_replace('/<fg=(.*?)>/', '', $string);
     }
 
     /**
@@ -186,37 +199,41 @@ class EventListCommand extends Command
     {
         $colorings = [
             '@' => '<fg=white>@</>',
-            'Closure at: ' => '<fg=blue>Closure at: </>',
-            ' - ' => '<fg=white> - </>',
-            '(ShouldQueue)' => '<fg=blue>(ShouldQueue)</>',
-            '(ShouldBroadcast)' => '<fg=blue>(ShouldBroadcast)</>',
+            '.php:' => '.php<fg=white>:</>',
+            '... ' => '<fg=gray>...</>',
+            '   Closure' => '<fg=blue>   Closure</>',
+            '    Class  ' => '<fg=bright-cyan>    Class  </>',
+            '...ShouldQueue' => '<fg=gray>...</><fg=red>ShouldQueue</>',
+            '...ShouldBroadcast' => '<fg=gray>...</><fg=red>ShouldBroadcast</>',
         ];
 
         foreach ($listeners as $listener) {
             if (is_string($listener)) {
-                $listener = 'Closure at: '.$listener;
+                $listener = '  Closure '.$this->getDots($width, $listener).' '.$listener;
             }
 
+            $interfaces = '';
             if (is_array($listener)) {
                 if ($this->implements($listener[0], ShouldQueue::class)) {
-                    $listener[1] .= ' (ShouldQueue)';
+                    $interfaces .= '...ShouldQueue';
                 }
 
                 if ($this->implements($listener[0], ShouldBroadcast::class)) {
-                    $listener[1] .= ' (ShouldBroadcast)';
+                    $interfaces .= '...ShouldBroadcast';
                 }
 
                 $listener = $listener[0].'@'.$listener[1];
+                $listener = '  Class   '.$interfaces.$this->getDots($width, $listener.$interfaces).' '.$listener;
             }
 
-            $listener = '     - '.$listener;
+            $listener = '  '.$listener;
             if (strlen($this->getPrintable($listener)) >= $width) {
                 $listener = Str::limit($this->getPrintable($listener), $width - 3);
             }
 
             Str::of($listener)
                 ->replace(array_keys($colorings), array_values($colorings))
-                ->pipe(fn ($line) => $this->line($line, 'options=bold;fg=bright-blue'));
+                ->pipe(fn ($line) => $this->line($line, 'fg=bright-blue'));
         }
     }
 
@@ -228,7 +245,7 @@ class EventListCommand extends Command
      */
     protected function printEvent(string $event)
     {
-        $this->line('  '.$event, 'fg=yellow');
+        $this->line('  '.$event, 'fg=bright-yellow');
     }
 
     /**
@@ -244,15 +261,14 @@ class EventListCommand extends Command
     }
 
     /**
-     * Remove commandline styling tags from the string.
+     * Gets a series of styled dots.
      *
-     * @param $line
+     * @param  int  $width
+     * @param  string  $listener
      * @return string
      */
-    protected function getPrintable($line)
+    protected function getDots(int $width, string $listener): string
     {
-        $line = str_replace('</>', '', $line);
-
-        return preg_replace('/<fg=(.*?)>/', '', $line);
+        return '<fg=gray>'.str_repeat('.', max($width - strlen($listener) - 16, 3)).'</>';
     }
 }
