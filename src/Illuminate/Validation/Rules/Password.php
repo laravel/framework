@@ -305,7 +305,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
                 $validator->errors()->add(
                     $attribute,
-                    $this->getErrorMessage('validation.password.mixedCase')
+                    $this->getErrorMessage('validation.password.mixed')
                 );
             }
 
@@ -356,6 +356,29 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Get the translated password error message.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function getErrorMessage($key)
+    {
+        $messages = [
+            'validation.password.mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
+            'validation.password.letters' => 'The :attribute must contain at least one letter.',
+            'validation.password.symbols' => 'The :attribute must contain at least one symbol.',
+            'validation.password.numbers' => 'The :attribute must contain at least one number.',
+            'validation.password.uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
+        ];
+
+        if (($message = $this->validator->getTranslator()->get($key)) !== $key) {
+            return $message;
+        }
+
+        return $messages[$key];
+    }
+
+    /**
      * Adds the given failures, and return false.
      *
      * @param  array|string  $messages
@@ -370,28 +393,5 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         $this->messages = array_merge($this->messages, $messages);
 
         return false;
-    }
-
-    /**
-     * Returns the translated error message.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    protected function getErrorMessage($key)
-    {
-        $messages = [
-            'validation.password.mixedCase' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
-            'validation.password.letters' => 'The :attribute must contain at least one letter.',
-            'validation.password.symbols' => 'The :attribute must contain at least one symbol.',
-            'validation.password.numbers' => 'The :attribute must contain at least one number.',
-            'validation.password.uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
-        ];
-
-        if (($message = $this->validator->getTranslator()->get($key)) !== $key) {
-            return $message;
-        }
-
-        return $messages[$key];
     }
 }
