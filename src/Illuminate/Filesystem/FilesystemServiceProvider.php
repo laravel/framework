@@ -25,7 +25,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function registerNativeFilesystem()
     {
-        $this->app->singleton('files', function () {
+        $this->app->scoped('files', function () {
             return new Filesystem;
         });
     }
@@ -39,11 +39,11 @@ class FilesystemServiceProvider extends ServiceProvider
     {
         $this->registerManager();
 
-        $this->app->singleton('filesystem.disk', function ($app) {
+        $this->app->scoped('filesystem.disk', function ($app) {
             return $app['filesystem']->disk($this->getDefaultDriver());
         });
 
-        $this->app->singleton('filesystem.cloud', function ($app) {
+        $this->app->scoped('filesystem.cloud', function ($app) {
             return $app['filesystem']->disk($this->getCloudDriver());
         });
     }
@@ -55,7 +55,7 @@ class FilesystemServiceProvider extends ServiceProvider
      */
     protected function registerManager()
     {
-        $this->app->singleton('filesystem', function ($app) {
+        $this->app->scoped('filesystem', function ($app) {
             return new FilesystemManager($app);
         });
     }
