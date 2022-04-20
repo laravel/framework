@@ -41,7 +41,7 @@ class TrimStringsTest extends TestCase
             'foo' => 'ム',
             'bar' => '   だ    ',
             'baz' => '   ム    ',
-            'binary' => "  \xE9 ",
+            'binary' => " \xE9  ",
         ]);
         $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
         $request = Request::createFromBase($symfonyRequest);
