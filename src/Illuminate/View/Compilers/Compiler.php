@@ -67,7 +67,7 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
-        return $this->cachePath.'/'.sha1('v2'.Str::after($path, $this->basePath)).'.php';
+        return $this->cachePath.'/'.sha1('v2'.Str::after($path, $this->basePath)).'.compiled';
     }
 
     /**
