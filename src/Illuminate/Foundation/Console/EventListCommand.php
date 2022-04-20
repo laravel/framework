@@ -48,25 +48,28 @@ class EventListCommand extends Command
             return $this->error("Your application doesn't have any events matching the given criteria.");
         }
 
-        $this->table(['Event', 'Listeners'], $events);
+        $this->line(
+            $this->getEvents()->map(fn ($listeners, $event) => [
+                sprintf('  <fg=white>%s</>', $event),
+                collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
+            ])->flatten()->filter()->prepend('')->push('')->toArray()
+        );
     }
 
     /**
      * Get all of the events and listeners configured for the application.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     protected function getEvents()
     {
-        $events = $this->getListenersOnDispatcher();
+        $events = collect($this->getListenersOnDispatcher());
 
         if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);
         }
 
-        return collect($events)->map(function ($listeners, $event) {
-            return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
-        })->sortBy('Event')->values()->toArray();
+        return $events;
     }
 
     /**
@@ -115,18 +118,18 @@ class EventListCommand extends Command
     /**
      * Filter the given events using the provided event name filter.
      *
-     * @param  array  $events
-     * @return array
+     * @param  \Illuminate\Support\Collection  $events
+     * @return \Illuminate\Support\Collection
      */
-    protected function filterEvents(array $events)
+    protected function filterEvents($events)
     {
         if (! $eventName = $this->option('event')) {
             return $events;
         }
 
-        return collect($events)->filter(function ($listeners, $event) use ($eventName) {
-            return str_contains($event, $eventName);
-        })->toArray();
+        return $events->filter(
+            fn ($listeners, $event) => str_contains($event, $eventName)
+        );
     }
 
     /**
