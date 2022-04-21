@@ -51,7 +51,11 @@ class ScheduleWorkCommand extends Command
 
             if (Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
-                $executions[] = $execution = new Process([PHP_BINARY, 'artisan', 'schedule:run']);
+                $executions[] = $execution = new Process([
+                    PHP_BINARY,
+                    defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                    'schedule:run'
+                ]);
 
                 $execution->start();
 
