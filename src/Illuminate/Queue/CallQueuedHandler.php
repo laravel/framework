@@ -112,8 +112,8 @@ class CallQueuedHandler
      */
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
-        if($command instanceof \__PHP_Incomplete_Class) {
-            throw new \Exception('Tried running job that has no matching class ' . json_encode($command));
+        if ($command instanceof \__PHP_Incomplete_Class) {
+            throw new \Exception('Tried running job that has no matching class '.json_encode($command));
         }
 
         return (new Pipeline($this->container))->send($command)
@@ -260,10 +260,9 @@ class CallQueuedHandler
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
-        if($command instanceof \__PHP_Incomplete_Class) {
+        if ($command instanceof \__PHP_Incomplete_Class) {
             return;
         }
-
 
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
