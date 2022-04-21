@@ -1230,17 +1230,17 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWherePast()
     {
-        Carbon::setTestNow('2022-04-20 12:34:56');
+        Carbon::setTestNow('2022-04-20 23:45:06');
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('posts')->wherePast('published_at');
         $this->assertSame('select * from "posts" where "published_at" < ?', $builder->toSql());
-        $this->assertEquals([0 => '2022-04-20 12:34:56'], $builder->getBindings());
+        $this->assertEquals([0 => '2022-04-20 23:45:06'], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('posts')->where('id', '=', 1)->orWherePast('published_at');
         $this->assertSame('select * from "posts" where "id" = ? or "published_at" < ?', $builder->toSql());
-        $this->assertEquals([0 => 1, 1 => '2022-04-20 12:34:56'], $builder->getBindings());
+        $this->assertEquals([0 => 1, 1 => '2022-04-20 23:45:06'], $builder->getBindings());
     }
 
     public function testPassingArrayToWherePast()
@@ -1410,17 +1410,17 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereFuture()
     {
-        Carbon::setTestNow('2022-04-22 01:23:45');
+        Carbon::setTestNow('2022-04-22 21:01:23');
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('posts')->whereFuture('published_at');
         $this->assertSame('select * from "posts" where "published_at" > ?', $builder->toSql());
-        $this->assertEquals([0 => '2022-04-22 01:23:45'], $builder->getBindings());
+        $this->assertEquals([0 => '2022-04-22 21:01:23'], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('posts')->where('id', '=', 1)->orWhereFuture('published_at');
         $this->assertSame('select * from "posts" where "id" = ? or "published_at" > ?', $builder->toSql());
-        $this->assertEquals([0 => 1, 1 => '2022-04-22 01:23:45'], $builder->getBindings());
+        $this->assertEquals([0 => 1, 1 => '2022-04-22 21:01:23'], $builder->getBindings());
     }
 
     public function testPassingArrayToWhereFuture()

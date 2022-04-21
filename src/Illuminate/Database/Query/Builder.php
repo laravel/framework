@@ -1312,7 +1312,7 @@ class Builder implements BuilderContract
     {
         $type = 'Basic';
         $operator = $not ? '>=' : '<';
-        $value = Carbon::now()->format('Y-m-d h:i:s');
+        $value = Carbon::now()->format('Y-m-d H:i:s');
 
         foreach (Arr::wrap($columns) as $column) {
             $this->wheres[] = compact('type', 'column', 'boolean', 'operator', 'value');
@@ -1420,7 +1420,7 @@ class Builder implements BuilderContract
     {
         $type = 'Basic';
         $operator = $not ? '<=' : '>';
-        $value = Carbon::now()->format('Y-m-d h:i:s');
+        $value = Carbon::now()->format('Y-m-d H:i:s');
 
         foreach (Arr::wrap($columns) as $column) {
             $this->wheres[] = compact('type', 'column', 'boolean', 'operator', 'value');
