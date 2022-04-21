@@ -35,7 +35,6 @@ class EventListCommand extends Command
      */
     protected $description = "List the application's events and listeners";
 
-
     /**
      * The events dispatcher resolver callback.
      *
@@ -54,6 +53,7 @@ class EventListCommand extends Command
 
         if ($events->isEmpty()) {
             $this->comment("Your application doesn't have any events matching the given criteria.");
+
             return;
         }
 
