@@ -38,7 +38,7 @@ class ScheduleWorkCommand extends Command
 
             if (Carbon::now()->second === 0 &&
                 ! Carbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)) {
-                $executions[] = $execution = new Process([PHP_BINARY, 'artisan', 'schedule:run']);
+                $executions[] = $execution = new Process([PHP_BINARY, static::artisanBinary(), 'schedule:run']);
 
                 $execution->start();
 
@@ -64,5 +64,15 @@ class ScheduleWorkCommand extends Command
                 }
             }
         }
+    }
+
+    /**
+     * Get the name of the Artisan binary.
+     * 
+     * @return string
+     */
+    protected static function artisanBinary()
+    {
+        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }
 }
