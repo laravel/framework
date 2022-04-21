@@ -113,7 +113,7 @@ class CallQueuedHandler
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
         if ($command instanceof \__PHP_Incomplete_Class) {
-            throw new \Exception('Tried running job that has no matching class '.json_encode($command));
+            throw new \Exception('Job is incomplete class: '.json_encode($command));
         }
 
         return (new Pipeline($this->container))->send($command)
