@@ -112,6 +112,10 @@ class CallQueuedHandler
      */
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
+        if($command instanceof \__PHP_Incomplete_Class) {
+            throw new \Exception('Tried running job that has no matching class ' . json_encode($command));
+        }
+
         return (new Pipeline($this->container))->send($command)
                 ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
                 ->then(function ($command) use ($job) {
@@ -255,6 +259,11 @@ class CallQueuedHandler
         if (! $command instanceof ShouldBeUniqueUntilProcessing) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
+
+        if($command instanceof \__PHP_Incomplete_Class) {
+            return;
+        }
+
 
         $this->ensureFailedBatchJobIsRecorded($uuid, $command, $e);
         $this->ensureChainCatchCallbacksAreInvoked($uuid, $command, $e);
