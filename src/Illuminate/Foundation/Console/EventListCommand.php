@@ -49,7 +49,7 @@ class EventListCommand extends Command
      */
     public function handle()
     {
-        $events = $this->getEvents();
+        $events = $this->getEvents()->sortBy(fn ($v, $k) => $k);
 
         if ($events->isEmpty()) {
             $this->comment("Your application doesn't have any events matching the given criteria.");
