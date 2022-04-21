@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Console\Events;
 
-use Illuminate\Container\Container;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Console\EventListCommand;
 use Orchestra\Testbench\TestCase;
@@ -84,13 +83,11 @@ class ExampleSubscriber
 
 class ExampleEvent
 {
-
 }
 
 class ExampleListener
 {
     public function handle()
     {
-
     }
 }
