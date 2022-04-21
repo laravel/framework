@@ -166,11 +166,11 @@ class EventListCommand extends Command
      *
      * @return Illuminate\Events\Dispatcher
      */
-    public static function getEventsDispatcher()
+    public function getEventsDispatcher()
     {
-        return is_null(static::$eventsResolver)
+        return is_null(self::$eventsResolver)
             ? $this->getLaravel()->make('events')
-            : call_user_func(static::$eventsResolver);
+            : call_user_func(self::$eventsResolver);
     }
 
     /**
