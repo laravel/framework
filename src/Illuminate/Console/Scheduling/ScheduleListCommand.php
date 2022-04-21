@@ -9,12 +9,12 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use ReflectionClass;
 use ReflectionFunction;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Terminal;
 
 #[AsCommand(name: 'schedule:list')]
 class ScheduleListCommand extends Command
 {
-
     /**
      * The console command name.
      *
