@@ -152,7 +152,7 @@ class EventListCommand extends Command
     }
 
     /**
-     * Gets the raw version of event listeners from dispatcher object.
+     * Gets the raw version of event listeners from the event dispatcher.
      *
      * @return array
      */
@@ -162,7 +162,7 @@ class EventListCommand extends Command
     }
 
     /**
-     * Get the events dispatcher object.
+     * Get the event dispatcher.
      *
      * @return Illuminate\Events\Dispatcher
      */
