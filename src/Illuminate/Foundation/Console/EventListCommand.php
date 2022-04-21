@@ -35,21 +35,30 @@ class EventListCommand extends Command
      */
     protected $description = "List the application's events and listeners";
 
+
+    /**
+     * The events dispatcher resolver callback.
+     *
+     * @var \Closure|null
+     */
+    protected static $eventsResolver;
+
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
         $events = $this->getEvents();
 
-        if (empty($events)) {
-            return $this->error("Your application doesn't have any events matching the given criteria.");
+        if ($events->isEmpty()) {
+            $this->comment("Your application doesn't have any events matching the given criteria.");
+            return;
         }
 
         $this->line(
-            $this->getEvents()->map(fn ($listeners, $event) => [
+            $events->map(fn ($listeners, $event) => [
                 sprintf('  <fg=white>%s</>', $event),
                 collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
             ])->flatten()->filter()->prepend('')->push('')->toArray()
@@ -149,6 +158,29 @@ class EventListCommand extends Command
      */
     protected function getRawListeners()
     {
-        return $this->getLaravel()->make('events')->getRawListeners();
+        return $this->getEventsDispatcher()->getRawListeners();
+    }
+
+    /**
+     * Get the events dispatcher object.
+     *
+     * @return Illuminate\Events\Dispatcher
+     */
+    public static function getEventsDispatcher()
+    {
+        return is_null(static::$eventsResolver)
+            ? $this->getLaravel()->make('events')
+            : call_user_func(static::$eventsResolver);
+    }
+
+    /**
+     * Set a callback that should be used when resolving the events dispatcher.
+     *
+     * @param  \Closure|null  $resolver
+     * @return void
+     */
+    public static function resolveEventsUsing($resolver)
+    {
+        static::$eventsResolver = $resolver;
     }
 }
