@@ -54,7 +54,7 @@ class ScheduleWorkCommand extends Command
                 $executions[] = $execution = new Process([
                     PHP_BINARY,
                     defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
-                    'schedule:run'
+                    'schedule:run',
                 ]);
 
                 $execution->start();
