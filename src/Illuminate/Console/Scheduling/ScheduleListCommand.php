@@ -11,14 +11,27 @@ use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\Console\Terminal;
 
+#[AsCommand(name: 'schedule:list')]
 class ScheduleListCommand extends Command
 {
+
     /**
      * The console command name.
      *
      * @var string
      */
     protected $signature = 'schedule:list {--timezone= : The timezone that times should be displayed in}';
+
+    /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     *
+     * @deprecated
+     */
+    protected static $defaultName = 'schedule:list';
 
     /**
      * The console command description.
