@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -93,7 +95,7 @@ class EventListCommand extends Command
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
                 if (is_string($rawListener)) {
-                    $events[$event][] = $rawListener;
+                    $events[$event][] = $this->appendInterfaces(explode('@', $rawListener));
                 } elseif ($rawListener instanceof Closure) {
                     $events[$event][] = $this->stringifyClosure($rawListener);
                 } elseif (is_array($rawListener) && count($rawListener) === 2) {
@@ -101,7 +103,7 @@ class EventListCommand extends Command
                         $rawListener[0] = get_class($rawListener[0]);
                     }
 
-                    $events[$event][] = implode('@', $rawListener);
+                    $events[$event][] = $this->appendInterfaces($rawListener);
                 }
             }
         }
@@ -119,7 +121,7 @@ class EventListCommand extends Command
     {
         $reflection = new ReflectionFunction($rawListener);
 
-        $path = str_replace(base_path(), '', $reflection->getFileName() ?: '');
+        $path = str_replace([base_path(), DIRECTORY_SEPARATOR], ['', '/'], $reflection->getFileName() ?: '');
 
         return 'Closure at: '.$path.':'.$reflection->getStartLine();
     }
@@ -182,5 +184,28 @@ class EventListCommand extends Command
     public static function resolveEventsUsing($resolver)
     {
         static::$eventsResolver = $resolver;
+    }
+
+    /**
+     * Adds the implemented interfaces.
+     *
+     * @param  array  $listener
+     * @return array
+     */
+    protected function appendInterfaces(array $listener)
+    {
+        $interfaces = class_implements($listener[0]);
+
+        $listener = implode('@', $listener);
+
+        if (in_array(ShouldQueue::class, $interfaces)) {
+            $listener .= ' <fg=bright-blue>(ShouldQueue)</>';
+        }
+
+        if (in_array(ShouldBroadcast::class, $interfaces)) {
+            $listener .= ' <fg=bright-blue>(ShouldBroadcast)</>';
+        }
+
+        return $listener;
     }
 }

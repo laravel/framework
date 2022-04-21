@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Console\Events;
 
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Console\EventListCommand;
 use Orchestra\Testbench\TestCase;
@@ -27,9 +29,11 @@ class EventListCommandTest extends TestCase
     {
         $this->dispatcher->subscribe(ExampleSubscriber::class);
         $this->dispatcher->listen(ExampleEvent::class, ExampleListener::class);
+        $this->dispatcher->listen(ExampleEvent::class, ExampleQueueListener::class);
+        $this->dispatcher->listen(ExampleEvent::class, ExampleBroadcastListener::class);
         $this->dispatcher->listen(ExampleEvent::class, fn () => '');
         $closureLineNumber = __LINE__ - 1;
-        $closureFilePath = __FILE__;
+        $unixFilePath = str_replace('\\', '/', __FILE__);
 
         $this->artisan(EventListCommand::class)
             ->assertSuccessful()
@@ -38,7 +42,9 @@ class EventListCommandTest extends TestCase
             ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleSubscriber@b')
             ->expectsOutput('  Illuminate\Tests\Integration\Console\Events\ExampleEvent')
             ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleListener')
-            ->expectsOutput('    ⇂ Closure at: '.$closureFilePath.':'.$closureLineNumber);
+            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleQueueListener (ShouldQueue)')
+            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleBroadcastListener (ShouldBroadcast)')
+            ->expectsOutput('    ⇂ Closure at: '.$unixFilePath.':'.$closureLineNumber);
     }
 
     public function testDisplayFilteredEvent()
@@ -89,5 +95,25 @@ class ExampleListener
 {
     public function handle()
     {
+    }
+}
+
+class ExampleQueueListener implements ShouldQueue
+{
+    public function handle()
+    {
+    }
+}
+
+class ExampleBroadcastListener implements ShouldBroadcast
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function broadcastOn()
+    {
+        //
     }
 }
