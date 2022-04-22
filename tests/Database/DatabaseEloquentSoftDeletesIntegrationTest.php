@@ -893,6 +893,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         self::assertTrue($versionsA->first()->is($taylor));
 
         self::assertCount(0, $versionsT);
+
+        self::assertEquals(1, SoftDeletesTestUser::whereHas('versions')->count());
     }
 
     /**
