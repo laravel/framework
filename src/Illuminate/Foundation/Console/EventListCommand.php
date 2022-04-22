@@ -61,7 +61,7 @@ class EventListCommand extends Command
 
         $this->line(
             $events->map(fn ($listeners, $event) => [
-                sprintf('  <fg=white>%s</>', $event),
+                sprintf('  <fg=white>%s</>', $this->appendEventInterfaces($event)),
                 collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
             ])->flatten()->filter()->prepend('')->push('')->toArray()
         );
@@ -95,7 +95,7 @@ class EventListCommand extends Command
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
                 if (is_string($rawListener)) {
-                    $events[$event][] = $this->appendInterfaces(explode('@', $rawListener));
+                    $events[$event][] = $this->appendListenerInterfaces($rawListener);
                 } elseif ($rawListener instanceof Closure) {
                     $events[$event][] = $this->stringifyClosure($rawListener);
                 } elseif (is_array($rawListener) && count($rawListener) === 2) {
@@ -103,12 +103,50 @@ class EventListCommand extends Command
                         $rawListener[0] = get_class($rawListener[0]);
                     }
 
-                    $events[$event][] = $this->appendInterfaces($rawListener);
+                    $events[$event][] = $this->appendListenerInterfaces(implode('@', $rawListener));
                 }
             }
         }
 
         return $events;
+    }
+
+    /**
+     * Add the event implemented interfaces to the output.
+     *
+     * @param  string  $event
+     * @return string
+     */
+    protected function appendEventInterfaces($event)
+    {
+        $interfaces = class_implements($event);
+
+        if (in_array(ShouldBroadcast::class, $interfaces)) {
+            $event .= ' <fg=bright-blue>(ShouldBroadcast)</>';
+        }
+
+        return $event;
+    }
+
+    /**
+     * Add the listener implemented interfaces to the output.
+     *
+     * @param  string  $listener
+     * @return string
+     */
+    protected function appendListenerInterfaces($listener)
+    {
+        $listener = explode('@', $listener);
+
+        $interfaces = class_implements($listener[0]);
+
+        $listener = implode('@', $listener);
+
+        if (in_array(ShouldQueue::class, $interfaces)) {
+            $listener .= ' <fg=bright-blue>(ShouldQueue)</>';
+        }
+
+        return $listener;
     }
 
     /**
@@ -184,28 +222,5 @@ class EventListCommand extends Command
     public static function resolveEventsUsing($resolver)
     {
         static::$eventsResolver = $resolver;
-    }
-
-    /**
-     * Adds the implemented interfaces.
-     *
-     * @param  array  $listener
-     * @return array
-     */
-    protected function appendInterfaces(array $listener)
-    {
-        $interfaces = class_implements($listener[0]);
-
-        $listener = implode('@', $listener);
-
-        if (in_array(ShouldQueue::class, $interfaces)) {
-            $listener .= ' <fg=bright-blue>(ShouldQueue)</>';
-        }
-
-        if (in_array(ShouldBroadcast::class, $interfaces)) {
-            $listener .= ' <fg=bright-blue>(ShouldBroadcast)</>';
-        }
-
-        return $listener;
     }
 }
