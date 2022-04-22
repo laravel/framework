@@ -104,7 +104,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             [$attribute => array_merge(['string'], $this->customRules)],
             $this->validator->customMessages,
             $this->validator->customAttributes
-        )->after(function ($validator) use($attribute, $value) {
+        )->after(function ($validator) use ($attribute, $value) {
             if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
                 return;
             }
@@ -234,7 +234,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = collect(Arr::wrap($messages))->map( function( $message )
+        $messages = collect(Arr::wrap($messages))->map(function ($message)
         {
             return $this->validator->getTranslator()->get($message);
         } )->all();
