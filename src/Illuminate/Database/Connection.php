@@ -823,7 +823,7 @@ class Connection implements ConnectionInterface
      *
      * @return mixed|false
      *
-     * @throws LostDbConnectionException
+     * @throws \Illuminate\Database\LostConnectionException
      */
     public function reconnect()
     {
@@ -833,7 +833,7 @@ class Connection implements ConnectionInterface
             return call_user_func($this->reconnector, $this);
         }
 
-        throw new LostDbConnectionException('Lost connection and no reconnector available.');
+        throw new LostConnectionException('Lost connection and no reconnector available.');
     }
 
     /**
