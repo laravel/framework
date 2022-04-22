@@ -234,10 +234,9 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = collect(Arr::wrap($messages))->map(function ($message)
-        {
+        $messages = collect(Arr::wrap($messages))->map(function ($message) {
             return $this->validator->getTranslator()->get($message);
-        } )->all();
+        })->all();
 
         $this->messages = array_merge($this->messages, $messages);
 
