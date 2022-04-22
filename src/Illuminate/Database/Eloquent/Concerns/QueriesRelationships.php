@@ -780,9 +780,9 @@ trait QueriesRelationships
     /**
      * Updates the table name part for any columns with qualified names.
      *
-     * @param array $wheres
-     * @param string $from
-     * @param string $to
+     * @param  array  $wheres
+     * @param  string  $from
+     * @param  string  $to
      * @return array
      */
     protected function updateQualifiedNames(array $wheres, string $from, string $to): array
@@ -790,7 +790,7 @@ trait QueriesRelationships
         return collect($wheres)->map(function ($where) use ($from, $to) {
             return collect($where)->map(function ($value) use ($from, $to) {
                 return str_starts_with($value, $from . '.')
-                    ? $to . '.' . Str::afterLast($value, '.')
+                    ? $to.'.'.Str::afterLast($value, '.')
                     : $value;
             });
         })->toArray();
