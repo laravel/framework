@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -59,7 +61,7 @@ class EventListCommand extends Command
 
         $this->line(
             $events->map(fn ($listeners, $event) => [
-                sprintf('  <fg=white>%s</>', $event),
+                sprintf('  <fg=white>%s</>', $this->appendEventInterfaces($event)),
                 collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
             ])->flatten()->filter()->prepend('')->push('')->toArray()
         );
@@ -93,7 +95,7 @@ class EventListCommand extends Command
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
                 if (is_string($rawListener)) {
-                    $events[$event][] = $rawListener;
+                    $events[$event][] = $this->appendListenerInterfaces($rawListener);
                 } elseif ($rawListener instanceof Closure) {
                     $events[$event][] = $this->stringifyClosure($rawListener);
                 } elseif (is_array($rawListener) && count($rawListener) === 2) {
@@ -101,12 +103,54 @@ class EventListCommand extends Command
                         $rawListener[0] = get_class($rawListener[0]);
                     }
 
-                    $events[$event][] = implode('@', $rawListener);
+                    $events[$event][] = $this->appendListenerInterfaces(implode('@', $rawListener));
                 }
             }
         }
 
         return $events;
+    }
+
+    /**
+     * Add the event implemented interfaces to the output.
+     *
+     * @param  string  $event
+     * @return string
+     */
+    protected function appendEventInterfaces($event)
+    {
+        if (! class_exists($event)) {
+            return $event;
+        }
+
+        $interfaces = class_implements($event);
+
+        if (in_array(ShouldBroadcast::class, $interfaces)) {
+            $event .= ' <fg=bright-blue>(ShouldBroadcast)</>';
+        }
+
+        return $event;
+    }
+
+    /**
+     * Add the listener implemented interfaces to the output.
+     *
+     * @param  string  $listener
+     * @return string
+     */
+    protected function appendListenerInterfaces($listener)
+    {
+        $listener = explode('@', $listener);
+
+        $interfaces = class_implements($listener[0]);
+
+        $listener = implode('@', $listener);
+
+        if (in_array(ShouldQueue::class, $interfaces)) {
+            $listener .= ' <fg=bright-blue>(ShouldQueue)</>';
+        }
+
+        return $listener;
     }
 
     /**
@@ -119,7 +163,7 @@ class EventListCommand extends Command
     {
         $reflection = new ReflectionFunction($rawListener);
 
-        $path = str_replace(base_path(), '', $reflection->getFileName() ?: '');
+        $path = str_replace([base_path(), DIRECTORY_SEPARATOR], ['', '/'], $reflection->getFileName() ?: '');
 
         return 'Closure at: '.$path.':'.$reflection->getStartLine();
     }
