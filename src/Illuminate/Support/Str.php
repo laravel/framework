@@ -1028,6 +1028,18 @@ class Str
     }
 
     /**
+     * Uppercase the first character of each word in a string.
+     *
+     * @param  string  $string
+     * @param  string|null  $separators
+     * @return string
+     */
+    public static function ucwords($string, $separators = null)
+    {
+        return ucwords($string, $separators ?? " \t\r\n\f\v");
+    }
+
+    /**
      * Get the number of words a string contains.
      *
      * @param  string  $string
