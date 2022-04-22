@@ -119,6 +119,10 @@ class EventListCommand extends Command
      */
     protected function appendEventInterfaces($event)
     {
+        if (! class_exists($event)) {
+            return $event;
+        }
+
         $interfaces = class_implements($event);
 
         if (in_array(ShouldBroadcast::class, $interfaces)) {

@@ -30,7 +30,7 @@ class EventListCommandTest extends TestCase
         $this->dispatcher->subscribe(ExampleSubscriber::class);
         $this->dispatcher->listen(ExampleEvent::class, ExampleListener::class);
         $this->dispatcher->listen(ExampleEvent::class, ExampleQueueListener::class);
-        $this->dispatcher->listen(ExampleEvent::class, ExampleBroadcastListener::class);
+        $this->dispatcher->listen(ExampleBroadcastEvent::class, ExampleBroadcastListener::class);
         $this->dispatcher->listen(ExampleEvent::class, fn () => '');
         $closureLineNumber = __LINE__ - 1;
         $unixFilePath = str_replace('\\', '/', __FILE__);
@@ -40,10 +40,11 @@ class EventListCommandTest extends TestCase
             ->expectsOutput('  ExampleSubscriberEventName')
             ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleSubscriber@a')
             ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleSubscriber@b')
+            ->expectsOutput('  Illuminate\Tests\Integration\Console\Events\ExampleBroadcastEvent (ShouldBroadcast)')
+            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleBroadcastListener')
             ->expectsOutput('  Illuminate\Tests\Integration\Console\Events\ExampleEvent')
             ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleListener')
             ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleQueueListener (ShouldQueue)')
-            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleBroadcastListener (ShouldBroadcast)')
             ->expectsOutput('    ⇂ Closure at: '.$unixFilePath.':'.$closureLineNumber);
     }
 
@@ -91,6 +92,14 @@ class ExampleEvent
 {
 }
 
+class ExampleBroadcastEvent implements ShouldBroadcast
+{
+    public function broadcastOn()
+    {
+        //
+    }
+}
+
 class ExampleListener
 {
     public function handle()
@@ -105,14 +114,9 @@ class ExampleQueueListener implements ShouldQueue
     }
 }
 
-class ExampleBroadcastListener implements ShouldBroadcast
+class ExampleBroadcastListener
 {
     public function handle()
-    {
-        //
-    }
-
-    public function broadcastOn()
     {
         //
     }
