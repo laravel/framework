@@ -97,7 +97,7 @@ class Store implements Session
     {
         $this->attributes = array_merge($this->attributes, $this->readFromHandler());
 
-        $this->rebuildErrorBag();
+        $this->marshalErrorBag();
     }
 
     /**
@@ -134,6 +134,28 @@ class Store implements Session
     }
 
     /**
+     * Marshal the ViewErrorBag when using JSON serialization for sessions.
+     *
+     * @return void
+     */
+    protected function marshalErrorBag()
+    {
+        if ($this->serialization !== 'json' || $this->missing('errors')) {
+            return;
+        }
+
+        $errorBag = new ViewErrorBag;
+
+        foreach ($this->get('errors') as $key => $value) {
+            $messageBag = new MessageBag($value['messages']);
+
+            $errorBag->put($key, $messageBag->setFormat($value['format']));
+        }
+
+        $this->put('errors', $errorBag);
+    }
+
+    /**
      * Save the session data to storage.
      *
      * @return void
@@ -149,6 +171,29 @@ class Store implements Session
         ));
 
         $this->started = false;
+    }
+
+    /**
+     * Prepare the ViewErrorBag instance for JSON serialization.
+     *
+     * @return void
+     */
+    protected function prepareErrorBagForSerialization()
+    {
+        if ($this->serialization !== 'json' || $this->missing('errors')) {
+            return;
+        }
+
+        $errors = [];
+
+        foreach ($this->attributes['errors']->getBags() as $key => $value) {
+            $errors[$key] = [
+                'format' => $value->getFormat(),
+                'messages' => $value->getMessages()
+            ];
+        }
+
+        $this->attributes['errors'] = $errors;
     }
 
     /**
@@ -708,44 +753,5 @@ class Store implements Session
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
-    }
-
-    /**
-     * Prepare error bag instance for JSON serialization.
-     */
-    private function prepareErrorBagForSerialization()
-    {
-        if ($this->serialization !== 'json' || $this->missing('errors')) {
-            return;
-        }
-
-        $errors = [];
-
-        foreach ($this->attributes['errors']->getBags() as $key => $value) {
-            $errors[$key] = ['format' => $value->getFormat(), 'messages' => $value->getMessages()];
-        }
-
-        $this->attributes['errors'] = $errors;
-    }
-
-    /**
-     * Rebuilds a ViewErrorBag instance from JSON.
-     */
-    private function rebuildErrorBag()
-    {
-        if ($this->serialization !== 'json' || $this->missing('errors')) {
-            return;
-        }
-
-        $errorBag = new ViewErrorBag;
-
-        foreach ($this->get('errors') as $key => $value) {
-            $messageBag = new MessageBag($value['messages']);
-            $messageBag->setFormat($value['format']);
-
-            $errorBag->put($key, $messageBag);
-        }
-
-        $this->put('errors', $errorBag);
     }
 }
