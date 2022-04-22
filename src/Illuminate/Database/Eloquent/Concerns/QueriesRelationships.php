@@ -789,7 +789,7 @@ trait QueriesRelationships
     {
         return collect($wheres)->map(function ($where) use ($from, $to) {
             return collect($where)->map(function ($value) use ($from, $to) {
-                return str_starts_with($value, $from . '.')
+                return str_starts_with($value, $from.'.')
                     ? $to.'.'.Str::afterLast($value, '.')
                     : $value;
             });
