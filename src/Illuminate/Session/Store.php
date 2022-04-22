@@ -5,7 +5,9 @@ namespace Illuminate\Session;
 use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use SessionHandlerInterface;
 use stdClass;
 
@@ -94,6 +96,8 @@ class Store implements Session
     protected function loadSession()
     {
         $this->attributes = array_merge($this->attributes, $this->readFromHandler());
+
+        $this->rebuildErrorBag();
     }
 
     /**
@@ -137,6 +141,8 @@ class Store implements Session
     public function save()
     {
         $this->ageFlashData();
+
+        $this->prepareErrorBagForSerialization();
 
         $this->handler->write($this->getId(), $this->prepareForStorage(
             $this->serialization === 'json' ? json_encode($this->attributes) : serialize($this->attributes)
@@ -702,5 +708,42 @@ class Store implements Session
         if ($this->handlerNeedsRequest()) {
             $this->handler->setRequest($request);
         }
+    }
+
+    /**
+     * Prepare error bag instance for JSON serialization.
+     */
+    private function prepareErrorBagForSerialization() {
+        if ($this->serialization !== 'json' || $this->missing('errors')) {
+            return;
+        }
+
+        $errors = [];
+
+        foreach ($this->attributes['errors']->getBags() as $key => $value) {
+            $errors[$key] = ['format' => $value->getFormat(), 'messages' => $value->getMessages()];
+        }
+
+        $this->attributes['errors'] = $errors;
+    }
+
+    /**
+     * Rebuilds a ViewErrorBag instance from JSON.
+     */
+    private function rebuildErrorBag() {
+        if ($this->serialization !== 'json' || $this->missing('errors')) {
+            return;
+        }
+
+        $errorBag = new ViewErrorBag;
+
+        foreach ($this->get('errors') as $key => $value) {
+            $messageBag = new MessageBag($value['messages']);
+            $messageBag->setFormat($value['format']);
+
+            $errorBag->put($key, $messageBag);
+        }
+
+        $this->put('errors', $errorBag);
     }
 }
