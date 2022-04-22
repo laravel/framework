@@ -1303,7 +1303,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
     }
 
-    public function testPassingArrayToWherePastMySQL()
+    public function testPassingArrayToWhereTodayMySQL()
     {
         Carbon::setTestNow('2022-04-20 12:34:56.123456');
 
@@ -1318,7 +1318,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => '2022-04-20', 2 => '2022-04-20'], $builder->getBindings());
     }
 
-    public function testWhereNotPastMySQL()
+    public function testWhereNotTodayMySQL()
     {
         Carbon::setTestNow('2022-04-20 12:34:56.123456');
 
@@ -1333,7 +1333,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
     }
 
-    public function testPassingArrayToWhereNotPastMySQL()
+    public function testPassingArrayToWhereNotTodayMySQL()
     {
         Carbon::setTestNow('2022-04-20 12:34:56.123456');
 
@@ -1363,7 +1363,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
     }
 
-    public function testPassingArrayToWherePastSqlServer()
+    public function testPassingArrayToWhereTodaySqlServer()
     {
         Carbon::setTestNow('2022-04-20 12:34:56.123456');
 
@@ -1378,7 +1378,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => '2022-04-20', 2 => '2022-04-20'], $builder->getBindings());
     }
 
-    public function testWhereNotPastSqlServer()
+    public function testWhereNotTodaySqlServer()
     {
         Carbon::setTestNow('2022-04-20 12:34:56.123456');
 
@@ -1393,7 +1393,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => '2022-04-20'], $builder->getBindings());
     }
 
-    public function testPassingArrayToWhereNotPastSqlServer()
+    public function testPassingArrayToWhereNotTodaySqlServer()
     {
         Carbon::setTestNow('2022-04-20 12:34:56.123456');
 
