@@ -46,7 +46,7 @@ class ValidationEmailRuleTest extends TestCase
     public function testRfc()
     {
         $this->fails(Email::rfc(), ['foo@.com'], [
-            'The my email must be a valid email address.'
+            'The my email must be a valid email address.',
         ]);
 
         $this->passes(Email::rfc(), ['foo@gmail.com']);
@@ -54,11 +54,11 @@ class ValidationEmailRuleTest extends TestCase
 
     public function testStrict()
     {
-        $this->fails(Email::rfc()->strict(), ['foo@bar' ], [
+        $this->fails(Email::rfc()->strict(), ['foo@bar'], [
             'The my email must be a valid email address.',
         ]);
 
-        $this->fails(Email::rfc()->strict(), ['foo()@bar.com' ], [
+        $this->fails(Email::rfc()->strict(), ['foo()@bar.com'], [
             'The my email must be a valid email address.',
         ]);
 
@@ -67,7 +67,7 @@ class ValidationEmailRuleTest extends TestCase
 
     public function testDns()
     {
-        $this->fails(Email::rfc()->dns(), ['foo@example.com' ], [
+        $this->fails(Email::rfc()->dns(), ['foo@example.com'], [
             'The my email does not have a valid domain.',
         ]);
 
@@ -76,7 +76,7 @@ class ValidationEmailRuleTest extends TestCase
 
     public function testSpoof()
     {
-        $this->fails(Email::rfc()->spoof(), ['Кириллица@example.com' ], [
+        $this->fails(Email::rfc()->spoof(), ['Кириллица@example.com'], [
             'The my email appears to be spoofed.',
         ]);
 
@@ -85,7 +85,7 @@ class ValidationEmailRuleTest extends TestCase
 
     public function testFilter()
     {
-        $this->fails(Email::rfc()->filter(), ['foö@example.com' ], [
+        $this->fails(Email::rfc()->filter(), ['foö@example.com'], [
             'The my email must pass the filter.',
         ]);
 
@@ -94,7 +94,7 @@ class ValidationEmailRuleTest extends TestCase
 
     public function testMultiple()
     {
-        $this->fails(Email::rfc()->strict()->dns()->spoof()->filter(), ['Кириfoö()@example.com' ], [
+        $this->fails(Email::rfc()->strict()->dns()->spoof()->filter(), ['Кириfoö()@example.com'], [
             'The my email must be a valid email address.',
             'The my email does not have a valid domain.',
             'The my email appears to be spoofed.',

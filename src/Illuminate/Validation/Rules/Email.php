@@ -7,11 +7,11 @@ use Egulias\EmailValidator\Validation\DNSCheckValidation;
 use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Validation\Concerns\FilterEmailValidation;
 use InvalidArgumentException;
@@ -19,6 +19,7 @@ use InvalidArgumentException;
 class Email implements Rule, DataAwareRule, ValidatorAwareRule
 {
     use Conditionable;
+
     /**
      * The data under validation.
      *
@@ -48,35 +49,35 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     public static $defaultCallback;
 
     /**
-     * The default validation rule
+     * The default validation rule.
      *
      * @var bool
      */
     protected $rfc = false;
 
     /**
-     * If NoRFCWarningsValidation should be used
+     * If NoRFCWarningsValidation should be used.
      *
      * @var bool
      */
     protected $strict = false;
 
     /**
-     * If DNSCheckValidation should be used
+     * If DNSCheckValidation should be used.
      *
      * @var bool
      */
     protected $dns = false;
 
     /**
-     * If SpoofCheckValidation should be used
+     * If SpoofCheckValidation should be used.
      *
      * @var bool
      */
     protected $spoof = false;
 
     /**
-     * If FilterEmailValidation should be used
+     * If FilterEmailValidation should be used.
      *
      * @var bool
      */
@@ -110,35 +111,35 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 
             $email_validator = new EmailValidator;
 
-            if ($this->rfc && !$email_validator->isValid($value, new RFCValidation)) {
+            if ($this->rfc && ! $email_validator->isValid($value, new RFCValidation)) {
                 $validator->errors()->add(
                     $attribute,
                     $this->getErrorMessage('validation.email.rfc')
                 );
             }
 
-            if ($this->strict && !$email_validator->isValid($value, new NoRFCWarningsValidation)) {
+            if ($this->strict && ! $email_validator->isValid($value, new NoRFCWarningsValidation)) {
                 $validator->errors()->add(
                     $attribute,
                     $this->getErrorMessage('validation.email.strict')
                 );
             }
 
-            if ($this->dns && !$email_validator->isValid($value, new DNSCheckValidation)) {
+            if ($this->dns && ! $email_validator->isValid($value, new DNSCheckValidation)) {
                 $validator->errors()->add(
                     $attribute,
                     $this->getErrorMessage('validation.email.dns')
                 );
             }
 
-            if ($this->spoof && !$email_validator->isValid($value, new SpoofCheckValidation)) {
+            if ($this->spoof && ! $email_validator->isValid($value, new SpoofCheckValidation)) {
                 $validator->errors()->add(
                     $attribute,
                     $this->getErrorMessage('validation.email.spoof')
                 );
             }
 
-            if ($this->filter && !$email_validator->isValid($value, new FilterEmailValidation)) {
+            if ($this->filter && ! $email_validator->isValid($value, new FilterEmailValidation)) {
                 $validator->errors()->add(
                     $attribute,
                     $this->getErrorMessage('validation.email.filter')
@@ -233,12 +234,12 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = collect( Arr::wrap( $messages ) )->map( function( $message )
+        $messages = collect(Arr::wrap($messages))->map( function( $message )
         {
-            return $this->validator->getTranslator()->get( $message );
+            return $this->validator->getTranslator()->get($message);
         } )->all();
 
-        $this->messages = array_merge( $this->messages, $messages );
+        $this->messages = array_merge($this->messages, $messages);
 
         return false;
     }
