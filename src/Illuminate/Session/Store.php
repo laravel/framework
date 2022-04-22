@@ -189,7 +189,7 @@ class Store implements Session
         foreach ($this->attributes['errors']->getBags() as $key => $value) {
             $errors[$key] = [
                 'format' => $value->getFormat(),
-                'messages' => $value->getMessages()
+                'messages' => $value->getMessages(),
             ];
         }
 
