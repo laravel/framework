@@ -809,7 +809,7 @@ class Connection implements ConnectionInterface
     protected function tryAgainIfCausedByLostConnection(QueryException $e, $query, $bindings, Closure $callback)
     {
         if ($this->causedByLostConnection($e->getPrevious())) {
-            $this->reconnect();
+            $this->reconnect($e->getPrevious());
 
             return $this->runQueryCallback($query, $bindings, $callback);
         }
@@ -820,11 +820,12 @@ class Connection implements ConnectionInterface
     /**
      * Reconnect to the database.
      *
+     * @param  string  $cause
      * @return mixed|false
      *
      * @throws \Illuminate\Database\LostConnectionException
      */
-    public function reconnect()
+    public function reconnect($cause = '')
     {
         if (is_callable($this->reconnector)) {
             $this->doctrineConnection = null;
@@ -832,7 +833,7 @@ class Connection implements ConnectionInterface
             return call_user_func($this->reconnector, $this);
         }
 
-        throw new LostConnectionException('Lost connection and no reconnector available.');
+        throw new LostConnectionException('Lost connection and no reconnector available.', $cause);
     }
 
     /**
@@ -843,7 +844,7 @@ class Connection implements ConnectionInterface
     protected function reconnectIfMissingConnection()
     {
         if (is_null($this->pdo)) {
-            $this->reconnect();
+            $this->reconnect('Missing PDO connection.');
         }
     }
 

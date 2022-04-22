@@ -170,7 +170,7 @@ trait ManagesTransactions
     protected function handleBeginTransactionException(Throwable $e)
     {
         if ($this->causedByLostConnection($e)) {
-            $this->reconnect();
+            $this->reconnect($e->getMessage());
 
             $this->getPdo()->beginTransaction();
         } else {
