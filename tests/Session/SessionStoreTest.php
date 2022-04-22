@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Session;
 
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
-use Illuminate\Support\MessageBag;
 use Illuminate\Session\Store;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use Mockery as m;
@@ -500,7 +500,7 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession('json');
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
         $session->start();
-        $session->put('errors', $errorBag = new ViewErrorBag); 
+        $session->put('errors', $errorBag = new ViewErrorBag);
         $messageBag = new MessageBag([
             'first_name' => [
                 'Your first name is required',
@@ -519,7 +519,7 @@ class SessionStoreTest extends TestCase
                         'format' => '<p>:message</p>',
                         'messages' => [
                             'first_name' => [
-                                'Your first name is required', 
+                                'Your first name is required',
                                 'Your first name must be at least 1 character',
                             ],
                         ],
@@ -545,7 +545,7 @@ class SessionStoreTest extends TestCase
                     'format' => '<p>:message</p>',
                     'messages' => [
                         'first_name' => [
-                            'Your first name is required', 
+                            'Your first name is required',
                             'Your first name must be at least 1 character',
                         ],
                     ],
@@ -560,7 +560,7 @@ class SessionStoreTest extends TestCase
         $this->assertInstanceOf(MessageBag::class, $errors->getBags()['default']);
         $this->assertEquals('<p>:message</p>', $errors->getBags()['default']->getFormat());
         $this->assertEquals(['first_name' => [
-            'Your first name is required', 
+            'Your first name is required',
             'Your first name must be at least 1 character',
         ]], $errors->getBags()['default']->getMessages());
     }

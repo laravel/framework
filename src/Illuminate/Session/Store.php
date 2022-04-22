@@ -713,7 +713,8 @@ class Store implements Session
     /**
      * Prepare error bag instance for JSON serialization.
      */
-    private function prepareErrorBagForSerialization() {
+    private function prepareErrorBagForSerialization()
+    {
         if ($this->serialization !== 'json' || $this->missing('errors')) {
             return;
         }
@@ -730,7 +731,8 @@ class Store implements Session
     /**
      * Rebuilds a ViewErrorBag instance from JSON.
      */
-    private function rebuildErrorBag() {
+    private function rebuildErrorBag()
+    {
         if ($this->serialization !== 'json' || $this->missing('errors')) {
             return;
         }
