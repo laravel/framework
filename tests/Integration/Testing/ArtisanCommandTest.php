@@ -73,6 +73,16 @@ class ArtisanCommandTest extends TestCase
              ->assertExitCode(0);
     }
 
+    public function test_console_command_that_fails_from_unexpected_output_substring()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Output "Taylor Otwell" was printed.');
+
+        $this->artisan('contains')
+             ->doesntExpectOutputToContain('Taylor Otwell')
+             ->assertExitCode(0);
+    }
+
     public function test_console_command_that_fails_from_missing_output()
     {
         $this->expectException(AssertionFailedError::class);
