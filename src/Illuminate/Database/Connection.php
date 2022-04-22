@@ -20,7 +20,6 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
-use LogicException;
 use PDO;
 use PDOStatement;
 use RuntimeException;
