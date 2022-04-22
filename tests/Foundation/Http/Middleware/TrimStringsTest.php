@@ -41,6 +41,7 @@ class TrimStringsTest extends TestCase
             'foo' => 'ム',
             'bar' => '   だ    ',
             'baz' => '   ム    ',
+            'binary' => " \xE9  ",
         ]);
         $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
         $request = Request::createFromBase($symfonyRequest);
@@ -52,6 +53,7 @@ class TrimStringsTest extends TestCase
             $this->assertSame('ム', $request->get('foo'));
             $this->assertSame('だ', $request->get('bar'));
             $this->assertSame('ム', $request->get('baz'));
+            $this->assertSame("\xE9", $request->get('binary'));
         });
     }
 }

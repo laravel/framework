@@ -1,6 +1,26 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.8.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.9.0...9.x)
+
+
+## [v9.9.0](https://github.com/laravel/framework/compare/v9.8.1...v9.9.0) - 2022-04-19
+
+### Added
+- Add getAllTables support for SQLite and SQLServer schema builders ([#41896](https://github.com/laravel/framework/pull/41896))
+- Added withoutEagerLoads() method to Builder ([#41950](https://github.com/laravel/framework/pull/41950))
+- Added 'throw' method to PendingRequest ([#41953](https://github.com/laravel/framework/pull/41953))
+- Configurable pluralizer language and uncountables ([#41941](https://github.com/laravel/framework/pull/41941))
+
+### Fixed
+- Fixed Error in Illuminate/Routing/Exceptions/StreamedResponseException ([#41955](https://github.com/laravel/framework/pull/41955))
+- Fix PHP warnings when rendering long blade string ([#41956](https://github.com/laravel/framework/pull/41956))
+- Fix ExcludeIf regression to use Closure over is_callable() ([#41969](https://github.com/laravel/framework/pull/41969))
+- Fixes applying replacements to multi-level localization arrays ([#42022](https://github.com/laravel/framework/pull/42022))
+
+### Changed
+- Improved Illuminate/Foundation/Http/Middleware/TrimStrings.php and Str::squish() ([#41949](https://github.com/laravel/framework/pull/41949), [#41971](https://github.com/laravel/framework/pull/41971))
+- Use config session domain for maintenance cookie ([#41961](https://github.com/laravel/framework/pull/41961))
+- Revert lazy command forcing ([#41982](https://github.com/laravel/framework/pull/41982))
 
 
 ## [v9.8.1](https://github.com/laravel/framework/compare/v9.8.0...v9.8.1) - 2022-04-12

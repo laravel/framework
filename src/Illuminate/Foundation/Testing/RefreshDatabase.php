@@ -16,6 +16,8 @@ trait RefreshDatabase
      */
     public function refreshDatabase()
     {
+        $this->beforeRefreshingDatabase();
+
         $this->usingInMemoryDatabase()
                         ? $this->refreshInMemoryDatabase()
                         : $this->refreshTestDatabase();
@@ -124,6 +126,16 @@ trait RefreshDatabase
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];
+    }
+
+    /**
+     * Perform any work that should take place before the database has started refreshing.
+     *
+     * @return void
+     */
+    protected function beforeRefreshingDatabase()
+    {
+        // ...
     }
 
     /**
