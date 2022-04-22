@@ -300,8 +300,6 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
                 return;
             }
 
-            $value = (string) $value;
-
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
                 $validator->errors()->add(
                     $attribute,
@@ -363,6 +361,10 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function getErrorMessage($key)
     {
+        if (($message = $this->validator->getTranslator()->get($key)) !== $key) {
+            return $message;
+        }
+
         $messages = [
             'validation.password.mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
             'validation.password.letters' => 'The :attribute must contain at least one letter.',
@@ -370,10 +372,6 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'validation.password.numbers' => 'The :attribute must contain at least one number.',
             'validation.password.uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
         ];
-
-        if (($message = $this->validator->getTranslator()->get($key)) !== $key) {
-            return $message;
-        }
 
         return $messages[$key];
     }
