@@ -713,13 +713,21 @@ trait QueriesRelationships
     {
         $whereBindings = $from->getQuery()->getRawBindings()['where'] ?? [];
 
+        $wheres = $from->getQuery()->from !== $this->getQuery()->from
+            ? $this->updateQualifiedNames(
+                $from->getQuery()->wheres,
+                $from->getQuery()->from,
+                $this->getModel()->getTable()
+            )
+            : $from->getQuery()->wheres;
+
         // Here we have some other query that we want to merge the where constraints from. We will
         // copy over any where constraints on the query as well as remove any global scopes the
         // query might have removed. Then we will return ourselves with the finished merging.
         return $this->withoutGlobalScopes(
             $from->removedScopes()
         )->mergeWheres(
-            $from->getQuery()->wheres, $whereBindings
+            $wheres, $whereBindings
         );
     }
 
@@ -767,5 +775,24 @@ trait QueriesRelationships
     protected function canUseExistsForExistenceCheck($operator, $count)
     {
         return ($operator === '>=' || $operator === '<') && $count === 1;
+    }
+
+    /**
+     * Updates the table name part for any columns with qualified names.
+     *
+     * @param array $wheres
+     * @param string $from
+     * @param string $to
+     * @return array
+     */
+    protected function updateQualifiedNames(array $wheres, string $from, string $to): array
+    {
+        return collect($wheres)->map(function ($where) use ($from, $to) {
+            return collect($where)->map(function ($value) use ($from, $to) {
+                return str_starts_with($value, $from . '.')
+                    ? $to . '.' . Str::afterLast($value, '.')
+                    : $value;
+            });
+        })->toArray();
     }
 }
