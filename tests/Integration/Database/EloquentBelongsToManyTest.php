@@ -413,6 +413,77 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertInstanceOf(Tag::class, $post->tags()->findOrNew(666));
     }
 
+    public function testFindOrMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post->tags()->create(['name' => Str::random()]);
+
+        $result = $post->tags()->findOr(1, fn () => 'callback result');
+        $this->assertInstanceOf(Tag::class, $result);
+        $this->assertSame(1, $result->id);
+        $this->assertNotNull($result->name);
+
+        $result = $post->tags()->findOr(1, ['id'], fn () => 'callback result');
+        $this->assertInstanceOf(Tag::class, $result);
+        $this->assertSame(1, $result->id);
+        $this->assertNull($result->name);
+
+        $result = $post->tags()->findOr(2, fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
+    public function testFindOrMethodWithMany()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post->tags()->createMany([
+            ['name' => Str::random()],
+            ['name' => Str::random()],
+        ]);
+
+        $result = $post->tags()->findOr([1, 2], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNotNull($result[0]->name);
+        $this->assertNotNull($result[1]->name);
+
+        $result = $post->tags()->findOr([1, 2], ['id'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNull($result[0]->name);
+        $this->assertNull($result[1]->name);
+
+        $result = $post->tags()->findOr([1, 2, 3], fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
+    public function testFindOrMethodWithManyUsingCollection()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post->tags()->createMany([
+            ['name' => Str::random()],
+            ['name' => Str::random()],
+        ]);
+
+        $result = $post->tags()->findOr(new Collection([1, 2]), fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNotNull($result[0]->name);
+        $this->assertNotNull($result[1]->name);
+
+        $result = $post->tags()->findOr(new Collection([1, 2]), ['id'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNull($result[0]->name);
+        $this->assertNull($result[1]->name);
+
+        $result = $post->tags()->findOr(new Collection([1, 2, 3]), fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
     public function testFirstOrNewMethod()
     {
         $post = Post::create(['title' => Str::random()]);
