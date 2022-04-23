@@ -1452,7 +1452,7 @@ class Builder implements BuilderContract
      */
     public function orWhereFuture($columns, $now = null)
     {
-        return $this->whereFuture($columns, $now , 'or');
+        return $this->whereFuture($columns, $now, 'or');
     }
 
     /**
