@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Query\Criteria;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -1941,6 +1942,17 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('primary', $pivot->taxonomy);
     }
 
+    public function testModelRetrievalWithCriteriaClass()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $this->assertEquals(2, EloquentTestUser::count());
+
+        $this->assertFalse(EloquentTestUser::query()->applyCriteria(new WhereEmail('taylorotwell@gmail.com'))->doesntExist());
+        $this->assertTrue(EloquentTestUser::query()->applyCriteria(new WhereEmail('mohamed@laravel.com'))->doesntExist());
+    }
+
     /**
      * Helpers...
      */
@@ -2235,5 +2247,20 @@ class EloquentTouchingComment extends Eloquent
     public function post()
     {
         return $this->belongsTo(EloquentTouchingPost::class, 'post_id');
+    }
+}
+
+class WhereEmail implements Criteria
+{
+    protected $email;
+
+    public function __construct($email)
+    {
+        $this->email = $email;
+    }
+
+    public function apply($q)
+    {
+        return $q->where('email', $this->email);
     }
 }

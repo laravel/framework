@@ -3571,6 +3571,17 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Apply the criteria to a given query builder.
+     *
+     * @param  \Illuminate\Database\Query\Criteria  $criteria
+     * @return \Illuminate\Contracts\Database\Query\Builder
+     */
+    public function applyCriteria(Criteria $criteria)
+    {
+        return $criteria->apply($this);
+    }
+
+    /**
      * Get a scalar type value from an unknown type of input.
      *
      * @param  mixed  $value
