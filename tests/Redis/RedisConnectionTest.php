@@ -606,7 +606,26 @@ class RedisConnectionTest extends TestCase
 
         $this->assertSame(
             'laravel',
-            $this->getRedisManager('phpredis_persistent')->getPersistentID()
+            $this
+                ->getRedisManager(
+                    'phpredis_persistent',
+                    'phpredis',
+                    [
+                        'cluster' => false,
+                        'default' => [
+                            'host' => env('REDIS_HOST', '127.0.0.1'),
+                            'port' => (int) env('REDIS_PORT', 6379),
+                            'timeout' => 0.5,
+                            'database' => 5,
+                            'persistent' => true,
+                            'persistent_id' => 'laravel',
+                            'options' => [
+                                'name' => 'phpredis_persistent',
+                            ],
+                        ],
+                    ]
+                )
+                ->getPersistentID()
         );
     }
 

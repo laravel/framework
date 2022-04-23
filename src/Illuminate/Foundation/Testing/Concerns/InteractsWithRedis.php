@@ -98,20 +98,9 @@ trait InteractsWithRedis
             case 'phpredis':
                 $config['default']['options']['name'] = 'phpredis';
                 break;
-            case 'phpredis_url':
-                $config['default']['options']['name'] = 'phpredis_url';
-                $config['default']['url'] = "redis://user@{$config['default']['host']}:{$config['default']['port']}";
-                $config['default']['host'] = 'overwrittenByUrl';
-                $config['default']['port'] = 'overwrittenByUrl';
-                break;
             case 'phpredis_prefix':
                 $config['default']['options']['name'] = 'phpredis_prefix';
                 $config['default']['options']['prefix'] = 'laravel:';
-                break;
-            case 'phpredis_persistent':
-                $config['default']['options']['name'] = 'phpredis_persistent';
-                $config['default']['persistent'] = true;
-                $config['default']['persistent_id'] = 'laravel';
                 break;
             case 'phpredis_scan_noretry':
                 $config['default']['options']['name'] = 'phpredis_scan_noretry';
@@ -128,10 +117,6 @@ trait InteractsWithRedis
             case 'phpredis_scan_noprefix':
                 $config['default']['options']['name'] = 'phpredis_scan_noprefix';
                 $config['default']['options']['scan'] = Redis::SCAN_NOPREFIX;
-                break;
-            case 'phpredis_serializer_none':
-                $config['default']['options']['name'] = 'phpredis_serializer_none';
-                $config['default']['options']['serializer'] = Redis::SERIALIZER_NONE;
                 break;
             case 'phpredis_serializer_php':
                 $config['default']['options']['name'] = 'phpredis_serializer_php';
@@ -156,40 +141,12 @@ trait InteractsWithRedis
             case 'phpredis_compression_zstd':
                 $config['default']['options']['name'] = 'phpredis_compression_zstd';
                 $config['default']['options']['compression'] = Redis::COMPRESSION_ZSTD;
-                break;
-            case 'phpredis_compression_zstd_default':
-                $config['default']['options']['name'] = 'phpredis_compression_zstd_default';
-                $config['default']['options']['compression'] = Redis::COMPRESSION_ZSTD;
                 $config['default']['options']['compression_level'] = Redis::COMPRESSION_ZSTD_DEFAULT;
-                break;
-            case 'phpredis_compression_zstd_min':
-                $config['default']['options']['name'] = 'phpredis_compression_zstd_min';
-                $config['default']['options']['compression'] = Redis::COMPRESSION_ZSTD;
-                $config['default']['options']['compression_level'] = Redis::COMPRESSION_ZSTD_MIN;
-                break;
-            case 'phpredis_compression_zstd_max':
-                $config['default']['options']['name'] = 'phpredis_compression_zstd_max';
-                $config['default']['options']['compression'] = Redis::COMPRESSION_ZSTD;
-                $config['default']['options']['compression_level'] = Redis::COMPRESSION_ZSTD_MAX;
                 break;
             case 'phpredis_compression_lz4':
                 $config['default']['options']['name'] = 'phpredis_compression_lz4';
                 $config['default']['options']['compression'] = Redis::COMPRESSION_LZ4;
-                break;
-            case 'phpredis_compression_lz4_default':
-                $config['default']['options']['name'] = 'phpredis_compression_lz4_default';
-                $config['default']['options']['compression'] = Redis::COMPRESSION_LZ4;
                 $config['default']['options']['compression_level'] = 0;
-                break;
-            case 'phpredis_compression_lz4_min':
-                $config['default']['options']['name'] = 'phpredis_compression_lz4_min';
-                $config['default']['options']['compression'] = Redis::COMPRESSION_LZ4;
-                $config['default']['options']['compression_level'] = 1;
-                break;
-            case 'phpredis_compression_lz4_max':
-                $config['default']['options']['name'] = 'phpredis_compression_lz4_max';
-                $config['default']['options']['compression'] = Redis::COMPRESSION_LZ4;
-                $config['default']['options']['compression_level'] = 12;
                 break;
             case 'phpredis_msgpack_and_lz4':
                 $config['default']['options']['name'] = 'phpredis_msgpack_and_lz4';
@@ -230,9 +187,7 @@ trait InteractsWithRedis
         $connections = [
             'predis',
             'phpredis',
-            'phpredis_url',
             'phpredis_prefix',
-            'phpredis_persistent',
         ];
 
         if (defined('Redis::SCAN_NORETRY')) {
@@ -249,10 +204,6 @@ trait InteractsWithRedis
 
         if (defined('Redis::SCAN_NOPREFIX')) {
             $connections[] = 'phpredis_scan_noprefix';
-        }
-
-        if (defined('Redis::SERIALIZER_NONE')) {
-            $connections[] = 'phpredis_serializer_none';
         }
 
         if (defined('Redis::SERIALIZER_PHP')) {
@@ -277,16 +228,10 @@ trait InteractsWithRedis
 
         if (defined('Redis::COMPRESSION_ZSTD')) {
             $connections[] = 'phpredis_compression_zstd';
-            $connections[] = 'phpredis_compression_zstd_default';
-            $connections[] = 'phpredis_compression_zstd_min';
-            $connections[] = 'phpredis_compression_zstd_max';
         }
 
         if (defined('Redis::COMPRESSION_LZ4')) {
             $connections[] = 'phpredis_compression_lz4';
-            $connections[] = 'phpredis_compression_lz4_default';
-            $connections[] = 'phpredis_compression_lz4_min';
-            $connections[] = 'phpredis_compression_lz4_max';
         }
 
         if (defined('Redis::SERIALIZER_MSGPACK') && defined('Redis::COMPRESSION_LZ4')) {
