@@ -1304,15 +1304,20 @@ class Builder implements BuilderContract
      * Add a where clause to determine if "date" column is in the past to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function wherePast($columns, $boolean = 'and', $not = false)
+    public function wherePast($columns, $now = null, $boolean = 'and', $not = false)
     {
         $type = 'Basic';
         $operator = $not ? '>=' : '<';
-        $value = Carbon::now()->format('Y-m-d H:i:s.u');
+        $value = $now ?? Carbon::now();
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('Y-m-d H:i:s.u');
+        }
 
         foreach (Arr::wrap($columns) as $column) {
             $this->wheres[] = compact('type', 'column', 'boolean', 'operator', 'value');
@@ -1326,33 +1331,36 @@ class Builder implements BuilderContract
      * Add an "or where" clause to determine if "date" column is in the past to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @return $this
      */
-    public function orWherePast($columns)
+    public function orWherePast($columns, $now = null)
     {
-        return $this->wherePast($columns, 'or');
+        return $this->wherePast($columns, $now, 'or');
     }
 
     /**
      * Add a where clause to determine if "date" column is not in the past to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @return $this
      */
-    public function whereNotPast($columns)
+    public function whereNotPast($columns, $now = null)
     {
-        return $this->wherePast($columns, 'and', true);
+        return $this->wherePast($columns, $now, 'and', true);
     }
 
     /**
      * Add an "or where" clause to determine if "date" column is in the past to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @return $this
      */
-    public function orWhereNotPast($columns)
+    public function orWhereNotPast($columns, $now = null)
     {
-        return $this->wherePast($columns, 'or', true);
+        return $this->wherePast($columns, $now, 'or', true);
     }
 
     /**
@@ -1412,15 +1420,20 @@ class Builder implements BuilderContract
      * Add a where clause to determine if "date" column is in the future to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function whereFuture($columns, $boolean = 'and', $not = false)
+    public function whereFuture($columns, $now = null, $boolean = 'and', $not = false)
     {
         $type = 'Basic';
         $operator = $not ? '<=' : '>';
-        $value = Carbon::now()->format('Y-m-d H:i:s.u');
+        $value = $now ?? Carbon::now();
+
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('Y-m-d H:i:s.u');
+        }
 
         foreach (Arr::wrap($columns) as $column) {
             $this->wheres[] = compact('type', 'column', 'boolean', 'operator', 'value');
@@ -1434,33 +1447,36 @@ class Builder implements BuilderContract
      * Add an "or where" clause to determine if "date" column is in the future to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @return $this
      */
-    public function orWhereFuture($columns)
+    public function orWhereFuture($columns, $now = null)
     {
-        return $this->whereFuture($columns, 'or');
+        return $this->whereFuture($columns, $now , 'or');
     }
 
     /**
      * Add a where clause to determine if "date" column is not in the future to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @return $this
      */
-    public function whereNotFuture($columns)
+    public function whereNotFuture($columns, $now = null)
     {
-        return $this->whereFuture($columns, 'and', true);
+        return $this->whereFuture($columns, $now, 'and', true);
     }
 
     /**
      * Add an "or where" clause to determine if "date" column is in the future to the query.
      *
      * @param  string|array  $columns
+     * @param  \DateTimeInterface|string|null  $now
      * @return $this
      */
-    public function orWhereNotFuture($columns)
+    public function orWhereNotFuture($columns, $now = null)
     {
-        return $this->whereFuture($columns, 'or', true);
+        return $this->whereFuture($columns, $now, 'or', true);
     }
 
     /**
