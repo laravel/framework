@@ -312,7 +312,9 @@ class Repository implements ArrayAccess, CacheContract
             // this operation should work with a total "atomic" implementation of it.
             if (method_exists($this->store, 'add')) {
                 return $this->store->add(
-                    $this->itemKey($key), $value, $seconds
+                    $this->itemKey($key),
+                    $value,
+                    $seconds
                 );
             }
         }
@@ -410,17 +412,20 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  string  $key
      * @param  \Closure  $callback
+     * @param  bool $override
      * @return mixed
      */
-    public function rememberForever($key, Closure $callback)
+    public function rememberForever($key, Closure $callback, $override = false)
     {
-        $value = $this->get($key);
+        if (!$override) {
+            $value = $this->get($key);
 
-        // If the item exists in the cache we will just return this immediately
-        // and if not we will execute the given Closure and cache the result
-        // of that forever so it is available for all subsequent requests.
-        if (! is_null($value)) {
-            return $value;
+            // If the item exists in the cache we will just return this immediately
+            // and if not we will execute the given Closure and cache the result
+            // of that forever so it is available for all subsequent requests.
+            if (! is_null($value)) {
+                return $value;
+            }
         }
 
         $this->forever($key, $value = $callback());
