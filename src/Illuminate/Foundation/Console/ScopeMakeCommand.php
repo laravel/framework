@@ -77,4 +77,16 @@ class ScopeMakeCommand extends GeneratorCommand
     {
         return is_dir(app_path('Models')) ? $rootNamespace.'\\Models\\Scopes' : $rootNamespace.'\Scopes';
     }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['local', 'l', InputOption::VALUE_NONE, 'Generate a local scope class.'],
+        ];
+    }
 }
