@@ -47,6 +47,10 @@ class ScopeMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('local')) {
+            return $this->resolveStubPath('/stubs/scope.local.stub');
+        }
+
         return $this->resolveStubPath('/stubs/scope.stub');
     }
 
