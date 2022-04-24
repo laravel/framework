@@ -3,7 +3,6 @@
 namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Scope;
 
 class {{ class }}
 {
