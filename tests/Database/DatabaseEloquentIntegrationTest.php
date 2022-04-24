@@ -1949,8 +1949,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals(2, EloquentTestUser::count());
 
-        $this->assertFalse(EloquentTestUser::query()->applyCriteria(new WhereEmail('taylorotwell@gmail.com'))->doesntExist());
-        $this->assertTrue(EloquentTestUser::query()->applyCriteria(new WhereEmail('mohamed@laravel.com'))->doesntExist());
+        $this->assertFalse(EloquentTestUser::applyCriteria(new WhereEmail('taylorotwell@gmail.com'))->doesntExist());
+        $this->assertTrue(EloquentTestUser::applyCriteria(new WhereEmail('mohamed@laravel.com'))->doesntExist());
     }
 
     /**
