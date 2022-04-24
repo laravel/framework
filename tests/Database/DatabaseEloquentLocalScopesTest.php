@@ -31,6 +31,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
 
         $this->assertTrue($model->hasNamedScope('active'));
         $this->assertTrue($model->hasNamedScope('type'));
+        $this->assertTrue($model->hasNamedScope('published'));
 
         $this->assertFalse($model->hasNamedScope('nonExistentLocalScope'));
     }
@@ -52,11 +53,34 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertSame('select * from "table" where "type" = ?', $query->toSql());
         $this->assertEquals(['foo'], $query->getBindings());
     }
+
+    public function testClassBasedLocalScopeIsApplied()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model->newQuery()->published();
+
+        $this->assertSame('select * from "table" where "published" = ?', $query->toSql());
+        $this->assertEquals([true], $query->getBindings());
+    }
+
+    public function testClassBasedDynamicLocalScopeIsApplied()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model->newQuery()->price(1000);
+
+        $this->assertSame('select * from "table" where "price" = ?', $query->toSql());
+        $this->assertEquals([1000], $query->getBindings());
+    }
 }
 
 class EloquentLocalScopesTestModel extends Model
 {
     protected $table = 'table';
+
+    protected static $scopes = [
+        'published' => Published::class,
+        'price' => Price::class,
+    ];
 
     public function scopeActive($query)
     {
@@ -66,5 +90,21 @@ class EloquentLocalScopesTestModel extends Model
     public function scopeType($query, $type)
     {
         $query->where('type', $type);
+    }
+}
+
+class Published
+{
+    public function apply($query)
+    {
+        $query->where('published', true);
+    }
+}
+
+class Price
+{
+    public function apply($query, $value)
+    {
+        $query->where('price', $value);
     }
 }

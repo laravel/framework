@@ -147,6 +147,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static $traitInitializers = [];
 
     /**
+     * The array of named/local scopes on the model.
+     *
+     * @var array
+     */
+    protected static $scopes = [];
+
+    /**
      * The array of global scopes on the model.
      *
      * @var array
@@ -432,7 +439,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             } elseif ($totallyGuarded) {
                 throw new MassAssignmentException(sprintf(
                     'Add [%s] to fillable property to allow mass assignment on [%s].',
-                    $key, get_class($this)
+                    $key,
+                    get_class($this)
                 ));
             }
         }
@@ -1462,7 +1470,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function hasNamedScope($scope)
     {
-        return method_exists($this, 'scope'.ucfirst($scope));
+        return array_key_exists($scope, static::$scopes) || method_exists($this, 'scope'.ucfirst($scope));
     }
 
     /**
@@ -1474,6 +1482,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
+        $class = static::$scopes[$scope] ?? null;
+
+        if ($class) {
+            return (new $class)->apply(...$parameters);
+        }
+
         return $this->{'scope'.ucfirst($scope)}(...$parameters);
     }
 
@@ -1577,7 +1591,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ];
 
         $attributes = Arr::except(
-            $this->getAttributes(), $except ? array_unique(array_merge($except, $defaults)) : $defaults
+            $this->getAttributes(),
+            $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 
         return tap(new static, function ($instance) use ($attributes) {
