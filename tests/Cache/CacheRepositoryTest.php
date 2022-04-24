@@ -143,6 +143,13 @@ class CacheRepositoryTest extends TestCase
             return 'bar';
         });
         $this->assertSame('bar', $result);
+        // override flag test
+        $repo->getStore()->shouldReceive('get')->never();
+        $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'barbar');
+        $result = $repo->rememberForever('foo', function () {
+            return 'barbar';
+        }, true);
+        $this->assertSame('barbar', $result);
     }
 
     public function testPuttingMultipleItemsInCache()
