@@ -71,6 +71,15 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertSame('select * from "table" where "price" = ?', $query->toSql());
         $this->assertEquals([1000], $query->getBindings());
     }
+
+    public function testClassAndMethodBasedLocalScopesAreChainable()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model->newQuery()->type('foo')->price(1000);
+
+        $this->assertSame('select * from "table" where "type" = ? and "price" = ?', $query->toSql());
+        $this->assertEquals(['foo', 1000], $query->getBindings());
+    }
 }
 
 class EloquentLocalScopesTestModel extends Model
