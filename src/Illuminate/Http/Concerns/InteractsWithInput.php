@@ -542,4 +542,28 @@ trait InteractsWithInput
 
         return $this;
     }
+
+    /**
+     * Retrieve input from the request as a stringable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function str($key, $default = null)
+    {
+        return $this->string($key, $default);
+    }
+
+    /**
+     * Retrieve input from the request as a stringable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function string($key, $default = null)
+    {
+        return str($this->input($key, $default));
+    }
 }
