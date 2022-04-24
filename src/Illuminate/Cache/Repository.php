@@ -412,12 +412,12 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  string  $key
      * @param  \Closure  $callback
-     * @param  bool $override
+     * @param  bool  $override
      * @return mixed
      */
     public function rememberForever($key, Closure $callback, $override = false)
     {
-        if (!$override) {
+        if (! $override) {
             $value = $this->get($key);
 
             // If the item exists in the cache we will just return this immediately
