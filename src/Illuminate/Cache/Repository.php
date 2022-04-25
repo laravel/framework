@@ -312,9 +312,7 @@ class Repository implements ArrayAccess, CacheContract
             // this operation should work with a total "atomic" implementation of it.
             if (method_exists($this->store, 'add')) {
                 return $this->store->add(
-                    $this->itemKey($key),
-                    $value,
-                    $seconds
+                    $this->itemKey($key), $value, $seconds
                 );
             }
         }
