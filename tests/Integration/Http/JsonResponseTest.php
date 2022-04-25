@@ -40,7 +40,7 @@ class JsonResponseTest extends TestCase
         {
             public function toJson($options = 0): string
             {
-                return "{}";
+                return '{}';
             }
         });
 
