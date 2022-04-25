@@ -285,6 +285,30 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function str($key, $default = null)
+    {
+        return $this->string($key, $default);
+    }
+
+    /**
+     * Retrieve input from the request as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
+     */
+    public function string($key, $default = null)
+    {
+        return str($this->input($key, $default));
+    }
+
+    /**
      * Retrieve input as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
@@ -541,29 +565,5 @@ trait InteractsWithInput
         VarDumper::dump(count($keys) > 0 ? $this->only($keys) : $this->all());
 
         return $this;
-    }
-
-    /**
-     * Retrieve input from the request as a stringable.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
-     */
-    public function str($key, $default = null)
-    {
-        return $this->string($key, $default);
-    }
-
-    /**
-     * Retrieve input from the request as a stringable.
-     *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
-     */
-    public function string($key, $default = null)
-    {
-        return str($this->input($key, $default));
     }
 }
