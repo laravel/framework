@@ -354,7 +354,9 @@ class BusFake implements QueueingDispatcher
         $chain = collect($expectedChain)->map(fn ($job) => serialize($job))->all();
 
         PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->filter(fn ($job) => $job->chained == $chain)->isNotEmpty(),
+            $this->dispatched($command, $callback)->filter(
+                fn ($job) => $job->chained == $chain
+            )->isNotEmpty(),
             'The expected chain was not dispatched.'
         );
     }
