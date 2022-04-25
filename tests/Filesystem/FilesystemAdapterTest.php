@@ -446,4 +446,16 @@ class FilesystemAdapterTest extends TestCase
 
         $this->fail('Exception was not thrown.');
     }
+
+    public function testGetAllFiles()
+    {
+        $this->filesystem->write('body.txt', 'Hello World');
+        $this->filesystem->write('file1.txt', 'Hello World');
+        $this->filesystem->write('file.txt', 'Hello World');
+        $this->filesystem->write('existing.txt', 'Dear Kate');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertSame($filesystemAdapter->files(),['body.txt','existing.txt','file.txt','file1.txt']);
+    }
 }
