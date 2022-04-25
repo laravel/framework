@@ -74,7 +74,7 @@ class JsonResponse extends BaseJsonResponse
     {
         $this->original = $data;
 
-        // Make sure json_last_error() is cleared...
+        // Ensure json_last_error() is cleared...
         json_decode('[]');
 
         if ($data instanceof Jsonable) {
