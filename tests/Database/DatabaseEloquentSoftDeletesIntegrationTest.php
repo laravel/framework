@@ -886,15 +886,11 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
          */
         [$taylor, $abigail] = $this->createUsers();
 
-        $versionsA = $abigail->versions;
-        $versionsT = $taylor->versions;
+        $this->assertCount(1, $abigail->self_referencing);
+        $this->assertTrue($abigail->self_referencing->first()->is($taylor));
 
-        self::assertCount(1, $versionsA);
-        self::assertTrue($versionsA->first()->is($taylor));
-
-        self::assertCount(0, $versionsT);
-
-        self::assertEquals(1, SoftDeletesTestUser::whereHas('versions')->count());
+        $this->assertCount(0, $taylor->self_referencing);
+        $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
     }
 
     /**
@@ -957,7 +953,7 @@ class SoftDeletesTestUser extends Eloquent
     protected $table = 'users';
     protected $guarded = [];
 
-    public function versions()
+    public function self_referencing()
     {
         return $this->hasMany(SoftDeletesTestUser::class, 'user_id')->onlyTrashed();
     }
