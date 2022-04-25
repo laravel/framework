@@ -725,6 +725,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             ->map(function (StorageAttributes $attributes) {
                 return $attributes->path();
             })
+            ->sortByPath()
             ->toArray();
     }
 
