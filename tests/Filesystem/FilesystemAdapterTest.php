@@ -456,6 +456,6 @@ class FilesystemAdapterTest extends TestCase
 
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        $this->assertSame($filesystemAdapter->files(),['body.txt','existing.txt','file.txt','file1.txt']);
+        $this->assertSame($filesystemAdapter->files(), ['body.txt', 'existing.txt', 'file.txt', 'file1.txt']);
     }
 }
