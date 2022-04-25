@@ -922,6 +922,36 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Increment a column's value by a given amount without raising any events.
+     *
+     * @param  string  $column
+     * @param  float|int  $amount
+     * @param  array  $extra
+     * @return int
+     */
+    protected function incrementQuietly($column, $amount = 1, array $extra = [])
+    {
+        return static::withoutEvents(function () use ($column, $amount, $extra) {
+            return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
+        });
+    }
+
+    /**
+     * Decrement a column's value by a given amount without raising any events.
+     *
+     * @param  string  $column
+     * @param  float|int  $amount
+     * @param  array  $extra
+     * @return int
+     */
+    protected function decrementQuietly($column, $amount = 1, array $extra = [])
+    {
+        return static::withoutEvents(function () use ($column, $amount, $extra) {
+            return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
+        });
+    }
+
+    /**
      * Save the model and all of its relationships.
      *
      * @return bool
