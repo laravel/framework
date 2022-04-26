@@ -354,7 +354,7 @@ class TestEloquentModelWithAttributeCast extends Model
     public function camelCase(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => 'foo',
+            get: fn ($value) => 'foo',
         );
     }
 
