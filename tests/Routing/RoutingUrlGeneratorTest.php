@@ -815,7 +815,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $routes->add($route);
 
         $parameters = [
-            'user' => new class implements UrlRoutable {
+            'user' => new class implements UrlRoutable
+            {
                 public $id = 1;
 
                 public function getRouteKey()
@@ -837,7 +838,7 @@ class RoutingUrlGeneratorTest extends TestCase
                 {
                     // Do nothing
                 }
-            }
+            },
         ];
 
         $this->assertSame('/users/1', $url->toRoute($route, $parameters, false));
