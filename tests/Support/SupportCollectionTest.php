@@ -5173,7 +5173,7 @@ class TestJsonSerializeObject implements JsonSerializable
 
 class TestJsonSerializeToStringObject implements JsonSerializable
 {
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): string
     {
         return 'foobar';
     }

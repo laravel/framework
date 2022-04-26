@@ -877,9 +877,9 @@ trait EnumeratesValues
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return mixed
+     * @return array|string
      */
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array|string
     {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
