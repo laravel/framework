@@ -802,6 +802,47 @@ class RoutingUrlGeneratorTest extends TestCase
 
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
     }
+
+    public function testToRouteWillResolveUrlRoutableParameter()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], '/users/{user}', []);
+        $route->setBindingFields(['user' => 'id']);
+        $routes->add($route);
+
+        $parameters = [
+            'user' => new class implements UrlRoutable {
+                public $id = 1;
+
+                public function getRouteKey()
+                {
+                    return $this->id;
+                }
+
+                public function getRouteKeyName()
+                {
+                    return 'user';
+                }
+
+                public function resolveRouteBinding($value, $field = null)
+                {
+                    // Do nothing
+                }
+
+                public function resolveChildRouteBinding($childType, $value, $field)
+                {
+                    // Do nothing
+                }
+            }
+        ];
+
+        $this->assertSame('/users/1', $url->toRoute($route, $parameters, false));
+        $this->assertSame('http://www.foo.com/users/1', $url->toRoute($route, $parameters, true));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable

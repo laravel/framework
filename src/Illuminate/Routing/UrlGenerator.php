@@ -209,7 +209,7 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         $tail = implode('/', array_map(
-            'rawurlencode', (array) $this->formatParameters($extra))
+            'rawurlencode', $this->formatParameters($extra))
         );
 
         // Once we have the scheme we will compile the "tail" by collapsing the values
@@ -478,7 +478,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function toRoute($route, $parameters, $absolute)
     {
-        $parameters = collect(Arr::wrap($parameters))->map(function ($value, $key) use ($route) {
+        $parameters = collect()->wrap($parameters)->map(function ($value, $key) use ($route) {
             return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
                     ? $value->{$route->bindingFieldFor($key)}
                     : $value;
@@ -535,15 +535,11 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function formatParameters($parameters)
     {
-        $parameters = Arr::wrap($parameters);
-
-        foreach ($parameters as $key => $parameter) {
-            if ($parameter instanceof UrlRoutable) {
-                $parameters[$key] = $parameter->getRouteKey();
-            }
-        }
-
-        return $parameters;
+        return collect()->wrap($parameters)->mapWithKeys(function ($parameter, $key) {
+            return $parameter instanceof UrlRoutable
+                ? [$key => $parameter->getRouteKey()]
+                : [$key => $parameter];
+        })->all();
     }
 
     /**
