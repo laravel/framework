@@ -16,6 +16,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
  * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
+ * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest dd()
  * @method static \Illuminate\Http\Client\PendingRequest dump()
