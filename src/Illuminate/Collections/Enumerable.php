@@ -1200,9 +1200,9 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array<TKey, mixed>
+     * @return mixed
      */
-    public function jsonSerialize(): array;
+    public function jsonSerialize(): mixed;
 
     /**
      * Get the collection of items as JSON.
