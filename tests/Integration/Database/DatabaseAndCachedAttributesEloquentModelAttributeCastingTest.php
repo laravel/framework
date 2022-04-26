@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
+class DatabaseAndCachedAttributesEloquentModelAttributeCastingTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
@@ -331,6 +331,15 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
             $this->assertNotSame($previous, $previous = $model->virtualDateTimeWithoutCachingFluent);
         }
     }
+
+    public function testModelImplementingAttributesWithCamelCaseNameCanBeSerializedToArray()
+    {
+        $model = new TestEloquentModelWithAttributeCast();
+        $model->setAppends(['camelCase']);
+        $this->assertEquals([
+            'camelCase' => 'foo',
+        ], $model->toArray());
+    }
 }
 
 class TestEloquentModelWithAttributeCast extends Model
@@ -341,6 +350,13 @@ class TestEloquentModelWithAttributeCast extends Model
      * @var string[]
      */
     protected $guarded = [];
+
+    public function camelCase(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => 'foo',
+        );
+    }
 
     public function uppercase(): Attribute
     {
