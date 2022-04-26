@@ -351,7 +351,7 @@ class JobChainAddingExistingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    /** @var Carbon|null  */
+    /** @var Carbon|null */
     public static $ranAt = null;
 
     public function handle()
@@ -364,7 +364,7 @@ class JobChainAddingAddedJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    /** @var Carbon|null  */
+    /** @var Carbon|null */
     public static $ranAt = null;
 
     public function handle()
