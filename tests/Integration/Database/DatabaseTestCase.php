@@ -32,4 +32,5 @@ abstract class DatabaseTestCase extends TestCase
         $connection = $app['config']->get('database.default');
 
         $this->driver = $app['config']->get("database.connections.$connection.driver");
+    }
 }
