@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class DatabaseAndCachedAttributesEloquentModelAttributeCastingTest extends DatabaseTestCase
+class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
