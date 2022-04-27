@@ -371,6 +371,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is an list.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateIsList($attribute, $value, $parameters = [])
+    {
+        return is_array($value) && Arr::isList($value);
+    }
+
+    /**
      * Validate that an array has all of the given keys.
      *
      * @param  string  $attribute

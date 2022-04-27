@@ -893,6 +893,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateIsList()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Is_list']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => new File('/tmp/foo', false)], ['foo' => 'Is_list']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['bar' => 'foobar']], ['foo' => 'Is_list']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateCurrentPassword()
     {
         // Fails when user is not logged in.
