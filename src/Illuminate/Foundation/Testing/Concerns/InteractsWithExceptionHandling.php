@@ -2,7 +2,9 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Testing\Assert;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,6 +18,63 @@ trait InteractsWithExceptionHandling
      * @var \Illuminate\Contracts\Debug\ExceptionHandler|null
      */
     protected $originalExceptionHandler;
+
+    /**
+     * Assert that the given test throws an exception with the given message.
+     *
+     * @param  \Closure  $test
+     * @param  class-string<\Throwable>  $expectedClass
+     * @param  string|null  $expectedMessage
+     * @return $this
+     */
+    protected function assertThrows(Closure $test, string $expectedClass = Throwable::class, ?string $expectedMessage = null)
+    {
+        try {
+            $test();
+            $thrown = false;
+        } catch (Throwable $exception) {
+            $thrown = $exception instanceof $expectedClass;
+            $actualMessage = $exception->getMessage();
+        }
+
+        if (! $thrown) {
+            Assert::fail(
+                sprintf(
+                    'Failed asserting that exception of type "%s" is thrown.',
+                    $expectedClass
+                )
+            );
+        }
+
+        if (isset($expectedMessage)) {
+            if (! isset($actualMessage)) {
+                Assert::fail(
+                    sprintf(
+                        'Failed asserting that exception of type "%s" with message "%s" is thrown.',
+                        $expectedClass,
+                        $expectedMessage
+                    )
+                );
+            } else {
+                Assert::assertEquals($expectedMessage, $actualMessage);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given test throws an exception with the given message.
+     *
+     * @param  \Closure  $test
+     * @param  string  $expectedMessage
+     * @param  class-string<\Throwable>  $expectedClass
+     * @return $this
+     */
+    protected function assertThrowsWithMessage(Closure $test, string $expectedMessage, string $expectedClass = Throwable::class)
+    {
+        return $this->assertThrows($test, (string) $expectedClass, $expectedMessage);
+    }
 
     /**
      * Restore exception handling.
