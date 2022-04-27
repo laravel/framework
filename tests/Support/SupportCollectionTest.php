@@ -3506,6 +3506,33 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 'bar'], $c->all());
     }
 
+    public function testPullRemovesItemFromNestedCollection()
+    {
+        $nestedCollection = new Collection([
+            new Collection([
+                'value',
+                new Collection([
+                    'bar' => 'baz',
+                    'test' => 'value',
+                ]),
+            ]),
+            'bar',
+        ]);
+
+        $nestedCollection->pull('0.1.test');
+
+        $actualArray = $nestedCollection->toArray();
+        $expectedArray = [
+            [
+                'value',
+                ['bar' => 'baz'],
+            ],
+            'bar',
+        ];
+
+        $this->assertEquals($expectedArray, $actualArray);
+    }
+
     public function testPullReturnsDefault()
     {
         $c = new Collection([]);
