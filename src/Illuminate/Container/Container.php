@@ -59,14 +59,14 @@ class Container implements ArrayAccess, ContainerContract
     protected $scopedInstances = [];
 
     /**
-     * The registered type aliases.
+     * The registered abstract type aliases.
      *
      * @var string[]
      */
     protected $aliases = [];
 
     /**
-     * The registered aliases keyed by the abstract name.
+     * The registered abstract type keyed by the alias name.
      *
      * @var array[]
      */
@@ -548,8 +548,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Alias a type to a different name.
      *
-     * @param  string  $abstract
      * @param  string  $alias
+     * @param  string  $abstract
      * @return void
      *
      * @throws \LogicException
@@ -560,9 +560,9 @@ class Container implements ArrayAccess, ContainerContract
             throw new LogicException("[{$abstract}] is aliased to itself.");
         }
 
-        $this->aliases[$alias] = $abstract;
+        $this->aliases[$abstract] = $alias;
 
-        $this->abstractAliases[$abstract][] = $alias;
+        $this->abstractAliases[$alias][] = $abstract;
     }
 
     /**
