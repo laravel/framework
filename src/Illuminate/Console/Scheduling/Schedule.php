@@ -153,6 +153,24 @@ class Schedule
     }
 
     /**
+     * Add a new job chain to the schedule.
+     *
+     * @param  array<class-string>  $jobs
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
+     */
+    public function jobChain(array $jobs)
+    {
+        return $this->call(function () use ($jobs) {
+            $jobs = array_map(
+                fn ($job) => is_string($job) ? Container::getInstance()->make($job) : $job,
+                $jobs
+            );
+
+            $this->getDispatcher()->chain($jobs->all())->dispatch();
+        });
+    }
+
+    /**
      * Dispatch the given job to the queue.
      *
      * @param  object  $job
