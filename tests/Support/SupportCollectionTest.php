@@ -3895,6 +3895,7 @@ class SupportCollectionTest extends TestCase
             new TestArrayableObject,
             new TestJsonableObject,
             new TestJsonSerializeObject,
+            new TestJsonSerializeToStringObject,
             'baz',
         ]);
 
@@ -3902,6 +3903,7 @@ class SupportCollectionTest extends TestCase
             ['foo' => 'bar'],
             ['foo' => 'bar'],
             ['foo' => 'bar'],
+            'foobar',
             'baz',
         ], $c->jsonSerialize());
     }
@@ -5193,6 +5195,14 @@ class TestJsonSerializeObject implements JsonSerializable
     public function jsonSerialize(): array
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonSerializeToStringObject implements JsonSerializable
+{
+    public function jsonSerialize(): string
+    {
+        return 'foobar';
     }
 }
 
