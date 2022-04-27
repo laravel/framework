@@ -113,7 +113,7 @@ class ScheduleListCommand extends Command
             ));
 
             // Highlight the parameters...
-            $command = preg_replace("#(=['\"]?)([^'\"]+)(['\"]?)#", '$1<fg=yellow;options=bold>$2</>$3', $command);
+            $command = preg_replace("#(php artisan [\w\-:]+) (.+)#", '$1 <fg=yellow;options=bold>$2</>', $command);
 
             return [sprintf(
                 '  <fg=yellow>%s</>  %s<fg=#6C7280>%s %s%s %s</>',
