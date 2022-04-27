@@ -1,6 +1,14 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.9...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.10...8.x)
+
+
+## [v8.83.10 (2022-04-27)](https://github.com/laravel/framework/compare/v8.83.9...v8.83.10)
+
+### Fixed
+- Fix schedule:work command Artisan binary name ([#42083](https://github.com/laravel/framework/pull/42083))
+- Fix array keys from cached routes in Illuminate/Routing/CompiledRouteCollection::getRoutesByMethod() ([#42078](https://github.com/laravel/framework/pull/42078))
+- Fix json_last_error issue with Illuminate/Http/JsonResponse::setData ([#42125](https://github.com/laravel/framework/pull/42125))
 
 
 ## [v8.83.9 (2022-04-19)](https://github.com/laravel/framework/compare/v8.83.8...v8.83.9)
