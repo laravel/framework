@@ -1,4 +1,5 @@
 parameters:
+  editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
   paths:
     - src
   level: 0
@@ -18,3 +19,5 @@ parameters:
   excludePaths:
     - "src/Illuminate/Testing/ParallelRunner.php"
     - "src/Illuminate/Testing/Constraints/ArraySubset.php"
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon

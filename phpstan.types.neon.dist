@@ -1,4 +1,7 @@
 parameters:
+  editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
   paths:
     - types
   level: max
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
