@@ -1539,9 +1539,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array|string
+     * @return mixed
      */
-    public function jsonSerialize(): array|string
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
