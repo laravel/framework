@@ -877,7 +877,7 @@ trait EnumeratesValues
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return array<TKey, mixed>
      */
     public function jsonSerialize(): array
     {
