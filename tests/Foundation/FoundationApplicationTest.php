@@ -378,9 +378,11 @@ class FoundationApplicationTest extends TestCase
     {
         $app1 = new Application(realpath(__DIR__.'/fixtures/laravel1'));
         $app2 = new Application(realpath(__DIR__.'/fixtures/laravel2'));
+        $app3 = new Application(realpath(__DIR__.'/fixtures/laravel3'));
 
         $this->assertSame('Laravel\\One\\', $app1->getNamespace());
         $this->assertSame('Laravel\\Two\\', $app2->getNamespace());
+        $this->assertSame('Laravel\\Three\\', $app3->getNamespace());
     }
 
     public function testCachePathsResolveToBootstrapCacheDirectory()
