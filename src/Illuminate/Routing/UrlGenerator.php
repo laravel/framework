@@ -331,20 +331,36 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
     {
-        $this->ensureSignedRouteParametersAreNotReserved(
-            $parameters = Arr::wrap($parameters)
-        );
+        $preaperedParameters = $this->validateAndPrepareSignedRouteParameters($parameters, $expiration);
 
-        if ($expiration) {
-            $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
-        }
+        return $this->route($name, $preaperedParameters + [
+            'signature' => $this->createSignatureRouteParameterForUrl(
+                $this->route($name, $preaperedParameters, $absolute)
+            ),
+        ], $absolute);
+    }
 
-        ksort($parameters);
+    /**
+     * Create a signed route URL for an action.
+     *
+     * @param string|array $name
+     * @param mixed $parameters
+     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param bool $absolute
+     * @return string
+     */
+    public function signedRouteForAction(
+        string|array $name,
+        mixed $parameters = [],
+        \DateTimeInterface|\DateInterval|int|null $expiration = null,
+        bool $absolute = true,
+    ): string {
+        $preaperedParameters = $this->validateAndPrepareSignedRouteParameters($parameters, $expiration);
 
-        $key = call_user_func($this->keyResolver);
-
-        return $this->route($name, $parameters + [
-            'signature' => hash_hmac('sha256', $this->route($name, $parameters, $absolute), $key),
+        return $this->action($name, $preaperedParameters + [
+            'signature' => $this->createSignatureRouteParameterForUrl(
+                $this->action($name, $preaperedParameters, $absolute)
+            ),
         ], $absolute);
     }
 
@@ -370,6 +386,44 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     *  Encapsulation of reused parameter logic for creating signed routes.
+     *
+     * @param mixed $parameters
+     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @return array
+     */
+    protected function validateAndPrepareSignedRouteParameters(
+        mixed $parameters,
+        \DateTimeInterface|\DateInterval|int|null $expiration = null
+    ) : array {
+        $this->ensureSignedRouteParametersAreNotReserved(
+            $parameters = Arr::wrap($parameters)
+        );
+
+        if ($expiration) {
+            $parameters += ['expires' => $this->availableAt($expiration)];
+        }
+
+        ksort($parameters);
+
+        return $parameters;
+    }
+
+    /**
+     * Encapsulation of reused signature hash logic for creating signed routes.
+     *
+     * @param string $url
+     * @return string
+     */
+    protected function createSignatureRouteParameterForUrl(string $url): string
+    {
+        $key = call_user_func($this->keyResolver);
+
+        return hash_hmac('sha256', $url, $key);
+    }
+
+
+    /**
      * Create a temporary signed route URL for a named route.
      *
      * @param  string  $name
@@ -381,6 +435,24 @@ class UrlGenerator implements UrlGeneratorContract
     public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true)
     {
         return $this->signedRoute($name, $parameters, $expiration, $absolute);
+    }
+
+    /**
+     * Create a temporary signed route URL for an action.
+     *
+     * @param string|array $name
+     * @param \DateTimeInterface|\DateInterval|int $expiration
+     * @param mixed $parameters
+     * @param bool $absolute
+     * @return string
+     */
+    public function temporarySignedRouteForAction(
+        string|array                         $name,
+        \DateTimeInterface|\DateInterval|int $expiration,
+        mixed                                $parameters = [],
+        bool                                 $absolute = true
+    ): string {
+        return $this->signedRouteForAction($name, $parameters, $expiration, $absolute);
     }
 
     /**

@@ -802,6 +802,110 @@ class RoutingUrlGeneratorTest extends TestCase
 
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
     }
+
+    public function testSignedUrlForAction()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
+        $routes->add($route);
+        $request = Request::create($url->signedRouteForAction('InvokableActionStub'));
+
+        $this->assertTrue($url->hasValidSignature($request));
+
+        $request = Request::create($url->signedRouteForAction('InvokableActionStub').'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request));
+    }
+
+    public function testSignedUrlForActionUrlImplicitModelBinding()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+        $route = new Route(['GET'], 'foo/{user:uuid}', ['controller' => 'InvokableActionStub']);
+        $routes->add($route);
+
+        $user = new RoutingUrlGeneratorTestUser(['uuid' => '0231d4ac-e9e3-4452-a89a-4427cfb23c3e']);
+
+        $request = Request::create($url->signedRouteForAction('InvokableActionStub', $user));
+
+        $this->assertTrue($url->hasValidSignature($request));
+    }
+
+    public function testSignedRelativeUrlForAction()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
+        $routes->add($route);
+
+        $result = $url->signedRouteForAction(name: 'InvokableActionStub', absolute: false);
+
+        $request = Request::create($result);
+
+        $this->assertTrue($url->hasValidSignature($request, false));
+
+        $request = Request::create(
+            $url->signedRouteForAction(name: 'InvokableActionStub', absolute: false).'?tempered=true'
+        );
+
+        $this->assertFalse($url->hasValidSignature($request, false));
+    }
+
+    public function testSignedUrlForActionParameterCannotBeNamedSignature()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{signature}', ['controller' => 'InvokableActionStub']);
+        $routes->add($route);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        Request::create($url->signedRouteForAction('InvokableActionStub', ['signature' => 'bar']));
+    }
+
+    public function testSignedUrlForActionParameterCannotBeNamedExpires()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo/{expires}', ['controller' => 'InvokableActionStub']);
+        $routes->add($route);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        Request::create($url->signedRouteForAction('InvokableActionStub', ['expires' => 253402300799]));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
