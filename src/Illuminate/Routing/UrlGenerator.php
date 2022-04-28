@@ -343,10 +343,10 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Create a signed route URL for an action.
      *
-     * @param string|array $name
-     * @param mixed $parameters
-     * @param \DateTimeInterface|\DateInterval|int|null $expiration
-     * @param bool $absolute
+     * @param  string|array  $name
+     * @param  mixed  $parameters
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @param  bool  $absolute
      * @return string
      */
     public function signedRouteForAction(
@@ -388,14 +388,14 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      *  Encapsulation of reused parameter logic for creating signed routes.
      *
-     * @param mixed $parameters
-     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param  mixed  $parameters
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @return array
      */
     protected function validateAndPrepareSignedRouteParameters(
         mixed $parameters,
         \DateTimeInterface|\DateInterval|int|null $expiration = null
-    ) : array {
+    ): array {
         $this->ensureSignedRouteParametersAreNotReserved(
             $parameters = Arr::wrap($parameters)
         );
@@ -412,7 +412,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Encapsulation of reused signature hash logic for creating signed routes.
      *
-     * @param string $url
+     * @param string  $url
      * @return string
      */
     protected function createSignatureRouteParameterForUrl(string $url): string
@@ -440,17 +440,17 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Create a temporary signed route URL for an action.
      *
-     * @param string|array $name
-     * @param \DateTimeInterface|\DateInterval|int $expiration
-     * @param mixed $parameters
-     * @param bool $absolute
+     * @param  string|array  $name
+     * @param  \DateTimeInterface|\DateInterval|int  $expiration
+     * @param  mixed  $parameters
+     * @param  bool  $absolute
      * @return string
      */
     public function temporarySignedRouteForAction(
-        string|array                         $name,
+        string|array $name,
         \DateTimeInterface|\DateInterval|int $expiration,
-        mixed                                $parameters = [],
-        bool                                 $absolute = true
+        mixed $parameters = [],
+        bool $absolute = true
     ): string {
         return $this->signedRouteForAction($name, $parameters, $expiration, $absolute);
     }
