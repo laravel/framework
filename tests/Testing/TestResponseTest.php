@@ -1643,6 +1643,54 @@ class TestResponseTest extends TestCase
         $response->assertLocation('https://foo.net');
     }
 
+    public function testAssertRedirectQueryParameterEquals()
+    {
+        app()->instance('url', $url = new UrlGenerator(new RouteCollection(), new Request()));
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com?foo=bar')))
+        );
+        $response->assertRedirectQueryParameterEquals('foo', 'bar');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com?foo=baz')))
+        );
+        $response->assertRedirectQueryParameterEquals('foo', 'bar');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com?bar=baz')))
+        );
+        $response->assertRedirectQueryParameterEquals('foo', 'bar');
+    }
+
+    public function testAssertRedirectQueryParameterNotNull()
+    {
+        app()->instance('url', $url = new UrlGenerator(new RouteCollection(), new Request()));
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com?foo=bar')))
+        );
+        $response->assertRedirectQueryParameterNotNull('foo');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com?foo=')))
+        );
+        $response->assertRedirectQueryParameterNotNull('foo');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $response = TestResponse::fromBaseResponse(
+            (new RedirectResponse($url->to('https://foo.com?bar=baz')))
+        );
+        $response->assertRedirectQueryParameterNotNull('foo');
+    }
+
     public function testAssertRedirectContains()
     {
         $response = TestResponse::fromBaseResponse(

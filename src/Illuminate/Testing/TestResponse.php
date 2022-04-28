@@ -307,6 +307,54 @@ EOF;
     }
 
     /**
+     * Assert whether the redirect response has a non-null query parameter
+     *
+     * @param  string  $parameterName
+     * @return $this
+     */
+    public function assertRedirectQueryParameterNotNull($parameterName)
+    {
+        PHPUnit::assertTrue(
+            $this->isRedirect(),
+            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
+        );
+
+        $location = $this->headers->get('location');
+        $queryString = parse_url($location, PHP_URL_QUERY);
+        $parameters = [];
+        parse_str($queryString, $parameters);
+
+        PHPUnit::assertArrayHasKey($parameterName, $parameters, "Query string does not contain {$parameterName} : {$location}");
+        PHPUnit::assertNotNull($parameters[$parameterName], "Query string {$parameterName} is null : {$location}");
+
+        return $this;
+    }
+
+    /**
+     * Assert whether the redirect response has a query parameter with a given value
+     *
+     * @param  string  $parameterName
+     * @return $this
+     */
+    public function assertRedirectQueryParameterEquals($parameterName, $value)
+    {
+        PHPUnit::assertTrue(
+            $this->isRedirect(),
+            $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
+        );
+
+        $location = $this->headers->get('location');
+        $queryString = parse_url($location, PHP_URL_QUERY);
+        $parameters = [];
+        parse_str($queryString, $parameters);
+
+        PHPUnit::assertArrayHasKey($parameterName, $parameters, "Query string does not contain {$parameterName} : {$location}");
+        PHPUnit::assertEquals($parameters[$parameterName], $value, "Query string {$parameterName} is does not match {$value} : {$location}");
+
+        return $this;
+    }
+
+    /**
      * Assert whether the response is redirecting to a given signed route.
      *
      * @param  string|null  $name
