@@ -421,7 +421,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         return hash_hmac('sha256', $url, $key);
     }
-    
+
     /**
      * Create a temporary signed route URL for a named route.
      *
