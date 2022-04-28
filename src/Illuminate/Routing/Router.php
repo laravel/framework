@@ -946,6 +946,19 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Ensure a middleware group is defined.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    protected function ensureMiddlewareGroup($name)
+    {
+        if (! $this->hasMiddlewareGroup($name)) {
+            $this->middlewareGroups[$name] = [];
+        }
+    }
+
+    /**
      * Register a group of middleware.
      *
      * @param  string  $name
@@ -954,6 +967,8 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function middlewareGroup($name, array $middleware)
     {
+        $this->ensureMiddlewareGroup($name);
+
         foreach ($middleware as $m) {
             $this->pushMiddlewareToGroup($name, $m);
         }
@@ -972,7 +987,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function prependMiddlewareToGroup($group, $middleware)
     {
-        if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
+        $this->ensureMiddlewareGroup($group);
+
+        if (! in_array($middleware, $this->middlewareGroups[$group])) {
             array_unshift($this->middlewareGroups[$group], $middleware);
         }
 
@@ -990,9 +1007,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function pushMiddlewareToGroup($group, $middleware)
     {
-        if (! array_key_exists($group, $this->middlewareGroups)) {
-            $this->middlewareGroups[$group] = [];
-        }
+        $this->ensureMiddlewareGroup($group);
 
         if (! in_array($middleware, $this->middlewareGroups[$group])) {
             $this->middlewareGroups[$group][] = $middleware;
