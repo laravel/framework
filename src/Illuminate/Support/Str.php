@@ -259,10 +259,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if (
-                $needle !== '' && $needle !== null
-                && str_ends_with($haystack, $needle)
-            ) {
+            if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
             }
         }
