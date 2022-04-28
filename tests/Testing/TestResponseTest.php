@@ -1650,21 +1650,21 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(
             (new RedirectResponse($url->to('https://foo.com?foo=bar')))
         );
-        $response->assertRedirectQueryParameterEquals('foo', 'bar');
+        $response->assertRedirectQueryParameterEquals('bar', 'foo');
 
         $this->expectException(ExpectationFailedException::class);
 
         $response = TestResponse::fromBaseResponse(
             (new RedirectResponse($url->to('https://foo.com?foo=baz')))
         );
-        $response->assertRedirectQueryParameterEquals('foo', 'bar');
+        $response->assertRedirectQueryParameterEquals('bar', 'foo');
 
         $this->expectException(ExpectationFailedException::class);
 
         $response = TestResponse::fromBaseResponse(
             (new RedirectResponse($url->to('https://foo.com?bar=baz')))
         );
-        $response->assertRedirectQueryParameterEquals('foo', 'bar');
+        $response->assertRedirectQueryParameterEquals('bar', 'foo');
     }
 
     public function testAssertRedirectQueryParameterNotNull()

@@ -333,10 +333,11 @@ EOF;
     /**
      * Assert whether the redirect response has a query parameter with a given value
      *
+     * @param  mixed   $value
      * @param  string  $parameterName
      * @return $this
      */
-    public function assertRedirectQueryParameterEquals($parameterName, $value)
+    public function assertRedirectQueryParameterEquals($value, $parameterName)
     {
         PHPUnit::assertTrue(
             $this->isRedirect(),
