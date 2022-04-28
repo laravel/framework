@@ -412,7 +412,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Encapsulation of reused signature hash logic for creating signed routes.
      *
-     * @param string  $url
+     * @param  string  $url
      * @return string
      */
     protected function createSignatureRouteParameterForUrl(string $url): string
