@@ -349,12 +349,8 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool  $absolute
      * @return string
      */
-    public function signedRouteForAction(
-        string|array $name,
-        mixed $parameters = [],
-        \DateTimeInterface|\DateInterval|int|null $expiration = null,
-        bool $absolute = true,
-    ): string {
+    public function signedRouteForAction($name, $parameters = [], $expiration = null, $absolute = true)
+    {
         $preaperedParameters = $this->validateAndPrepareSignedRouteParameters($parameters, $expiration);
 
         return $this->action($name, $preaperedParameters + [
@@ -392,10 +388,8 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @return array
      */
-    protected function validateAndPrepareSignedRouteParameters(
-        mixed $parameters,
-        \DateTimeInterface|\DateInterval|int|null $expiration = null
-    ): array {
+    protected function validateAndPrepareSignedRouteParameters($parameters, $expiration = null)
+    {
         $this->ensureSignedRouteParametersAreNotReserved(
             $parameters = Arr::wrap($parameters)
         );
@@ -415,7 +409,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $url
      * @return string
      */
-    protected function createSignatureRouteParameterForUrl(string $url): string
+    protected function createSignatureRouteParameterForUrl($url): string
     {
         $key = call_user_func($this->keyResolver);
 
@@ -445,12 +439,8 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool  $absolute
      * @return string
      */
-    public function temporarySignedRouteForAction(
-        string|array $name,
-        \DateTimeInterface|\DateInterval|int $expiration,
-        mixed $parameters = [],
-        bool $absolute = true
-    ): string {
+    public function temporarySignedRouteForAction($name, $expiration, $parameters = [], $absolute = true)
+    {
         return $this->signedRouteForAction($name, $parameters, $expiration, $absolute);
     }
 
