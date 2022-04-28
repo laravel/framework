@@ -252,9 +252,8 @@ class Store implements Session
     {
         $placeholder = new stdClass;
 
-        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
-            return $this->get($key, $placeholder) === $placeholder;
-        });
+        return ! collect(is_array($key) ? $key : func_get_args())->contains(fn ($key) => $this->get($key, $placeholder) === $placeholder
+        );
     }
 
     /**
@@ -372,9 +371,7 @@ class Store implements Session
             return $value;
         }
 
-        return tap($callback(), function ($value) use ($key) {
-            $this->put($key, $value);
-        });
+        return tap($callback(), fn ($value) => $this->put($key, $value));
     }
 
     /**

@@ -20,9 +20,8 @@ class SessionServiceProvider extends ServiceProvider
         $this->registerSessionDriver();
 
         $this->app->singleton(StartSession::class, function ($app) {
-            return new StartSession($app->make(SessionManager::class), function () use ($app) {
-                return $app->make(CacheFactory::class);
-            });
+            return new StartSession($app->make(SessionManager::class), fn () => $app->make(CacheFactory::class)
+            );
         });
     }
 
