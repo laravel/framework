@@ -693,6 +693,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals($period->toArray(), $builder->getBindings());
 
         $builder = $this->getBuilder();
+        $begin   = now()->format('Y-m-d');
+        $end     = now()->addDay()->format('Y-m-d');
+        $builder->select('*')->from('users')->whereBetweenDate('created_at', [$begin,$end]);
+        $this->assertSame('select * from "users" where "date(created_at)" between ? and ?', $builder->toSql());
+        $this->assertEquals([$begin,$end], $builder->getBindings());
+
+        $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
         $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
