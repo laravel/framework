@@ -307,7 +307,7 @@ EOF;
     }
 
     /**
-     * Assert whether the redirect response has a non-null query parameter
+     * Assert whether the redirect response has a non-null query parameter.
      *
      * @param  string  $parameterName
      * @return $this
@@ -331,9 +331,9 @@ EOF;
     }
 
     /**
-     * Assert whether the redirect response has a query parameter with a given value
+     * Assert whether the redirect response has a query parameter with a given value.
      *
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @param  string  $parameterName
      * @return $this
      */
