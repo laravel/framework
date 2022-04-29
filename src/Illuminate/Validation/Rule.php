@@ -21,8 +21,8 @@ class Rule
      * Create a new conditional rule set.
      *
      * @param  callable|bool  $condition
-     * @param  array|string  $rules
-     * @param  array|string  $defaultRules
+     * @param  array|string|\Closure  $rules
+     * @param  array|string|\Closure  $defaultRules
      * @return \Illuminate\Validation\ConditionalRules
      */
     public static function when($condition, $rules, $defaultRules = [])
