@@ -103,7 +103,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Check if the validated input contains one or many keys.
      *
-     * @param $keys
+     * @param  array|mixed  $keys
      * @return bool
      */
     public function has($keys)
@@ -122,7 +122,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Check if the validated input does not contain one or many keys.
      *
-     * @param $keys
+     * @param  array|mixed  $keys
      * @return bool
      */
     public function doesntHave($keys)
