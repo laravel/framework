@@ -30,7 +30,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Get a subset containing the provided keys with values from the input data.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function only($keys)
@@ -55,7 +55,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Get all of the input except for a specified array of items.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function except($keys)
@@ -122,7 +122,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Check if the validated input does not contain one or many keys.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return bool
      */
     public function doesntHave($keys)
