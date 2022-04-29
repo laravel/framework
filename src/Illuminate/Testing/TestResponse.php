@@ -745,6 +745,20 @@ EOF;
     }
 
     /**
+     * Assert that the value of given key is equal to the expected value.
+     *
+     * @param  string  $key
+     * @param  string  $expected
+     * @return $this
+     */
+    public function assertJsonKeyEquals($key, $expected)
+    {
+        $this->decodeResponseJson()->assertKeyEquals($key, $expected);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data

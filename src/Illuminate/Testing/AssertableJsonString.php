@@ -60,6 +60,20 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
+     * Assert that the value of given key is equal to the expected value.
+     *
+     * @param  string  $key
+     * @param  string  $expected
+     * @return $this
+     */
+    public function assertKeyEquals($key, $expected)
+    {
+        $this->assertPath($key, $expected);
+
+        return $this;
+    }
+
+    /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param  int  $count
