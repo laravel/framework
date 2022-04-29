@@ -59,7 +59,7 @@ class SupportTestingEventFakeTest extends TestCase
 
         $fake->assertListening(EventStub::class, ListenerStub::class);
     }
-    
+
     public function testAssertListeningViaArrayHandlerSubscribers()
     {
         $listener = ArraySubscriber::class;
@@ -73,7 +73,7 @@ class SupportTestingEventFakeTest extends TestCase
 
         $fake->assertListening(EventStub::class, ArraySubscriber::class);
     }
-    
+
     public function testAssertListeningViaNonHandleMethodSubscribers()
     {
         $listener = NonHandleMethodSubscriber::class;
