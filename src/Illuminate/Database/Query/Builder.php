@@ -1324,6 +1324,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where between for two dates with different formats.
+     *
+     * @param  string  $column
+     * @param  iterable  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereBetweenDate($column, iterable $values, $boolean = 'and')
+    {
+        return $this->whereBetween( "date($column)", $values, $boolean);
+    }
+
+    /**
      * Add an "or where date" statement to the query.
      *
      * @param  string  $column
