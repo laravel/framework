@@ -62,7 +62,7 @@ class SupportTestingEventFakeTest extends TestCase
     
     public function testAssertListeningViaArrayHandlerSubscribers()
     {
-        $listener = ArraySubscriberStub::class;
+        $listener = ArraySubscriber::class;
 
         $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
@@ -76,7 +76,7 @@ class SupportTestingEventFakeTest extends TestCase
     
     public function testAssertListeningViaNonHandleMethodSubscribers()
     {
-        $listener = NonHandleMethodSubscriberStub::class;
+        $listener = NonHandleMethodSubscriber::class;
 
         $dispatcher = m::mock(Dispatcher::class);
         $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
