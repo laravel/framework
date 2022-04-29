@@ -1333,7 +1333,7 @@ class Builder implements BuilderContract
      */
     public function whereBetweenDate($column, iterable $values, $boolean = 'and')
     {
-        return $this->whereBetween( "date($column)", $values, $boolean);
+        return $this->whereBetween("date($column)", $values, $boolean);
     }
 
     /**
