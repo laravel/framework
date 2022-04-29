@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -493,19 +495,90 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function getSession()
+    public function testValidationErrorsCanBeSerializedAsJson()
+    {
+        $session = $this->getSession('json');
+        $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
+        $session->start();
+        $session->put('errors', $errorBag = new ViewErrorBag);
+        $messageBag = new MessageBag([
+            'first_name' => [
+                'Your first name is required',
+                'Your first name must be at least 1 character',
+            ],
+        ]);
+        $messageBag->setFormat('<p>:message</p>');
+        $errorBag->put('default', $messageBag);
+
+        $session->getHandler()->shouldReceive('write')->once()->with(
+            $this->getSessionId(),
+            json_encode([
+                '_token' => $session->token(),
+                'errors' => [
+                    'default' => [
+                        'format' => '<p>:message</p>',
+                        'messages' => [
+                            'first_name' => [
+                                'Your first name is required',
+                                'Your first name must be at least 1 character',
+                            ],
+                        ],
+                    ],
+                ],
+                '_flash' => [
+                    'old' => [],
+                    'new' => [],
+                ],
+            ])
+        );
+        $session->save();
+
+        $this->assertFalse($session->isStarted());
+    }
+
+    public function testValidationErrorsCanBeReadAsJson()
+    {
+        $session = $this->getSession('json');
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(json_encode([
+            'errors' => [
+                'default' => [
+                    'format' => '<p>:message</p>',
+                    'messages' => [
+                        'first_name' => [
+                            'Your first name is required',
+                            'Your first name must be at least 1 character',
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+        $session->start();
+
+        $errors = $session->get('errors');
+
+        $this->assertInstanceOf(ViewErrorBag::class, $errors);
+        $this->assertInstanceOf(MessageBag::class, $errors->getBags()['default']);
+        $this->assertEquals('<p>:message</p>', $errors->getBags()['default']->getFormat());
+        $this->assertEquals(['first_name' => [
+            'Your first name is required',
+            'Your first name must be at least 1 character',
+        ]], $errors->getBags()['default']->getMessages());
+    }
+
+    public function getSession($serialization = 'php')
     {
         $reflection = new ReflectionClass(Store::class);
 
-        return $reflection->newInstanceArgs($this->getMocks());
+        return $reflection->newInstanceArgs($this->getMocks($serialization));
     }
 
-    public function getMocks()
+    public function getMocks($serialization = 'json')
     {
         return [
             $this->getSessionName(),
             m::mock(SessionHandlerInterface::class),
             $this->getSessionId(),
+            $serialization,
         ];
     }
 

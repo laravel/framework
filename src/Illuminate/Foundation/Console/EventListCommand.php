@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use ReflectionFunction;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -25,37 +27,49 @@ class EventListCommand extends Command
     protected $description = "List the application's events and listeners";
 
     /**
+     * The events dispatcher resolver callback.
+     *
+     * @var \Closure|null
+     */
+    protected static $eventsResolver;
+
+    /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
     public function handle()
     {
-        $events = $this->getEvents();
+        $events = $this->getEvents()->sortKeys();
 
-        if (empty($events)) {
-            return $this->error("Your application doesn't have any events matching the given criteria.");
+        if ($events->isEmpty()) {
+            $this->comment("Your application doesn't have any events matching the given criteria.");
+
+            return;
         }
 
-        $this->table(['Event', 'Listeners'], $events);
+        $this->line(
+            $events->map(fn ($listeners, $event) => [
+                sprintf('  <fg=white>%s</>', $this->appendEventInterfaces($event)),
+                collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
+            ])->flatten()->filter()->prepend('')->push('')->toArray()
+        );
     }
 
     /**
      * Get all of the events and listeners configured for the application.
      *
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     protected function getEvents()
     {
-        $events = $this->getListenersOnDispatcher();
+        $events = collect($this->getListenersOnDispatcher());
 
         if ($this->filteringByEvent()) {
             $events = $this->filterEvents($events);
         }
 
-        return collect($events)->map(function ($listeners, $event) {
-            return ['Event' => $event, 'Listeners' => implode(PHP_EOL, $listeners)];
-        })->sortBy('Event')->values()->toArray();
+        return $events;
     }
 
     /**
@@ -70,7 +84,7 @@ class EventListCommand extends Command
         foreach ($this->getRawListeners() as $event => $rawListeners) {
             foreach ($rawListeners as $rawListener) {
                 if (is_string($rawListener)) {
-                    $events[$event][] = $rawListener;
+                    $events[$event][] = $this->appendListenerInterfaces($rawListener);
                 } elseif ($rawListener instanceof Closure) {
                     $events[$event][] = $this->stringifyClosure($rawListener);
                 } elseif (is_array($rawListener) && count($rawListener) === 2) {
@@ -78,12 +92,54 @@ class EventListCommand extends Command
                         $rawListener[0] = get_class($rawListener[0]);
                     }
 
-                    $events[$event][] = implode('@', $rawListener);
+                    $events[$event][] = $this->appendListenerInterfaces(implode('@', $rawListener));
                 }
             }
         }
 
         return $events;
+    }
+
+    /**
+     * Add the event implemented interfaces to the output.
+     *
+     * @param  string  $event
+     * @return string
+     */
+    protected function appendEventInterfaces($event)
+    {
+        if (! class_exists($event)) {
+            return $event;
+        }
+
+        $interfaces = class_implements($event);
+
+        if (in_array(ShouldBroadcast::class, $interfaces)) {
+            $event .= ' <fg=bright-blue>(ShouldBroadcast)</>';
+        }
+
+        return $event;
+    }
+
+    /**
+     * Add the listener implemented interfaces to the output.
+     *
+     * @param  string  $listener
+     * @return string
+     */
+    protected function appendListenerInterfaces($listener)
+    {
+        $listener = explode('@', $listener);
+
+        $interfaces = class_implements($listener[0]);
+
+        $listener = implode('@', $listener);
+
+        if (in_array(ShouldQueue::class, $interfaces)) {
+            $listener .= ' <fg=bright-blue>(ShouldQueue)</>';
+        }
+
+        return $listener;
     }
 
     /**
@@ -96,7 +152,7 @@ class EventListCommand extends Command
     {
         $reflection = new ReflectionFunction($rawListener);
 
-        $path = str_replace(base_path(), '', $reflection->getFileName() ?: '');
+        $path = str_replace([base_path(), DIRECTORY_SEPARATOR], ['', '/'], $reflection->getFileName() ?: '');
 
         return 'Closure at: '.$path.':'.$reflection->getStartLine();
     }
@@ -104,18 +160,18 @@ class EventListCommand extends Command
     /**
      * Filter the given events using the provided event name filter.
      *
-     * @param  array  $events
-     * @return array
+     * @param  \Illuminate\Support\Collection  $events
+     * @return \Illuminate\Support\Collection
      */
-    protected function filterEvents(array $events)
+    protected function filterEvents($events)
     {
         if (! $eventName = $this->option('event')) {
             return $events;
         }
 
-        return collect($events)->filter(function ($listeners, $event) use ($eventName) {
-            return str_contains($event, $eventName);
-        })->toArray();
+        return $events->filter(
+            fn ($listeners, $event) => str_contains($event, $eventName)
+        );
     }
 
     /**
@@ -129,12 +185,35 @@ class EventListCommand extends Command
     }
 
     /**
-     * Gets the raw version of event listeners from dispatcher object.
+     * Gets the raw version of event listeners from the event dispatcher.
      *
      * @return array
      */
     protected function getRawListeners()
     {
-        return $this->getLaravel()->make('events')->getRawListeners();
+        return $this->getEventsDispatcher()->getRawListeners();
+    }
+
+    /**
+     * Get the event dispatcher.
+     *
+     * @return Illuminate\Events\Dispatcher
+     */
+    public function getEventsDispatcher()
+    {
+        return is_null(self::$eventsResolver)
+            ? $this->getLaravel()->make('events')
+            : call_user_func(self::$eventsResolver);
+    }
+
+    /**
+     * Set a callback that should be used when resolving the events dispatcher.
+     *
+     * @param  \Closure|null  $resolver
+     * @return void
+     */
+    public static function resolveEventsUsing($resolver)
+    {
+        static::$eventsResolver = $resolver;
     }
 }

@@ -37,17 +37,30 @@ abstract class Compiler
     protected $shouldCache;
 
     /**
+     * The compiled view file extension.
+     *
+     * @var string
+     */
+    protected $compiledExtension = 'php';
+
+    /**
      * Create a new compiler instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $cachePath
      * @param  string  $basePath
      * @param  bool  $shouldCache
+     * @param  string  $compiledExtension
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files, $cachePath, $basePath = '', $shouldCache = true)
+    public function __construct(
+        Filesystem $files,
+        $cachePath,
+        $basePath = '',
+        $shouldCache = true,
+        $compiledExtension = 'php')
     {
         if (! $cachePath) {
             throw new InvalidArgumentException('Please provide a valid cache path.');
@@ -57,6 +70,7 @@ abstract class Compiler
         $this->cachePath = $cachePath;
         $this->basePath = $basePath;
         $this->shouldCache = $shouldCache;
+        $this->compiledExtension = $compiledExtension;
     }
 
     /**
@@ -67,7 +81,7 @@ abstract class Compiler
      */
     public function getCompiledPath($path)
     {
-        return $this->cachePath.'/'.sha1('v2'.Str::after($path, $this->basePath)).'.php';
+        return $this->cachePath.'/'.sha1('v2'.Str::after($path, $this->basePath)).'.'.$this->compiledExtension;
     }
 
     /**

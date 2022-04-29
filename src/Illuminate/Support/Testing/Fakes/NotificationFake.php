@@ -223,9 +223,9 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
 
         $notifications = collect($this->notificationsFor($notifiable, $notification));
 
-        return $notifications->filter(function ($arguments) use ($callback) {
-            return $callback(...array_values($arguments));
-        })->pluck('notification');
+        return $notifications->filter(
+            fn ($arguments) => $callback(...array_values($arguments))
+        )->pluck('notification');
     }
 
     /**
