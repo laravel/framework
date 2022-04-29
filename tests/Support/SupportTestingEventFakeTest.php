@@ -71,7 +71,7 @@ class SupportTestingEventFakeTest extends TestCase
 
         $fake = new EventFake($dispatcher);
 
-        $fake->assertListening(EventStub::class, ListenerStub::class);
+        $fake->assertListening(EventStub::class, ArraySubscriber::class);
     }
     
     public function testAssertListeningViaNonHandleMethodSubscribers()
@@ -85,7 +85,7 @@ class SupportTestingEventFakeTest extends TestCase
 
         $fake = new EventFake($dispatcher);
 
-        $fake->assertListening(EventStub::class, ListenerStub::class);
+        $fake->assertListening(EventStub::class, NonHandleMethodSubscriber::class);
     }
 
     public function testAssertDispatchedWithCallbackInt()
