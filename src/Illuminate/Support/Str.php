@@ -495,8 +495,8 @@ class Str
             return $string;
         }
 
-        $start = mb_substr($string, 0, mb_strpos($string, $segment, 0, $encoding), $encoding);
-        $end = mb_substr($string, mb_strpos($string, $segment, 0, $encoding) + mb_strlen($segment, $encoding));
+        $start = mb_substr($string, 0, $index, $encoding);
+        $end = mb_substr($string, $index + mb_strlen($segment, $encoding));
 
         return $start.str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($segment, $encoding)).$end;
     }
