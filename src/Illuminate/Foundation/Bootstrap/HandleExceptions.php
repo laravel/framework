@@ -68,7 +68,7 @@ class HandleExceptions
     public function handleError($level, $message, $file = '', $line = 0, $context = [])
     {
         if ($this->isDeprecation($level)) {
-            return $this->handleDeprecation($level, $message, $file, $line);
+            return $this->handleDeprecation($message, $file, $line);
         }
 
         if (error_reporting() & $level) {
@@ -79,13 +79,12 @@ class HandleExceptions
     /**
      * Reports a deprecation to the "deprecations" logger.
      *
-     * @param  int  $level
      * @param  string  $message
      * @param  string  $file
      * @param  int  $line
      * @return void
      */
-    public function handleDeprecation($level, $message, $file, $line)
+    public function handleDeprecation($message, $file, $line)
     {
         if (! class_exists(LogManager::class)
             || ! static::$app->hasBeenBootstrapped()
@@ -102,8 +101,8 @@ class HandleExceptions
 
         $this->ensureDeprecationLoggerIsConfigured();
 
-        with($logger->channel('deprecations'), function ($log) use ($level, $message, $file, $line) {
-            $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line) {
+            $log->warning((string) new ErrorException($message, 0, E_DEPRECATED, $file, $line));
         });
     }
 
