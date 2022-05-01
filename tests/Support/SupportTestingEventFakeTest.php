@@ -60,34 +60,6 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->assertListening(EventStub::class, ListenerStub::class);
     }
 
-    public function testAssertListeningViaArrayHandlerSubscribers()
-    {
-        $listener = ArraySubscriber::class;
-
-        $dispatcher = m::mock(Dispatcher::class);
-        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
-            return $listener(...array_values($payload));
-        }]);
-
-        $fake = new EventFake($dispatcher);
-
-        $fake->assertListening(EventStub::class, ArraySubscriber::class);
-    }
-
-    public function testAssertListeningViaNonHandleMethodSubscribers()
-    {
-        $listener = NonHandleMethodSubscriber::class;
-
-        $dispatcher = m::mock(Dispatcher::class);
-        $dispatcher->shouldReceive('getListeners')->andReturn([function ($event, $payload) use ($listener) {
-            return $listener(...array_values($payload));
-        }]);
-
-        $fake = new EventFake($dispatcher);
-
-        $fake->assertListening(EventStub::class, NonHandleMethodSubscriber::class);
-    }
-
     public function testAssertDispatchedWithCallbackInt()
     {
         $this->fake->dispatch(EventStub::class);
