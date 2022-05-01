@@ -101,7 +101,7 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Check if the validated input contains one or many keys.
+     * Determine if the validated input has one or more keys.
      *
      * @param  mixed  $keys
      * @return bool
@@ -120,12 +120,12 @@ class ValidatedInput implements ValidatedData
     }
 
     /**
-     * Check if the validated input does not contain one or many keys.
+     * Determine if the validated input is missing one or more keys.
      *
      * @param  mixed  $keys
      * @return bool
      */
-    public function doesntHave($keys)
+    public function missing($keys)
     {
         return ! $this->has($keys);
     }
