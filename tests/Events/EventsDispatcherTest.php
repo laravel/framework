@@ -182,7 +182,7 @@ class EventsDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->push(ExampleEvent::class, $e =  new ExampleEvent);
+        $d->push(ExampleEvent::class, $e = new ExampleEvent);
         $d->listen(ExampleEvent::class, function ($payload) {
             $_SERVER['__event.test'] = $payload;
         });
