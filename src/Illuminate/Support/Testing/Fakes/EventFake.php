@@ -63,7 +63,11 @@ class EventFake implements Dispatcher
                         ->getStaticVariables()['listener'];
 
             if (is_string($actualListener) && Str::contains($actualListener, '@')) {
-                $actualListener = Str::parseCallback($actualListener)[0];
+                $actualListener = Str::parseCallback($actualListener);
+
+                if (is_string($expectedListener) && ! Str::contains($expectedListener, '@')) {
+                    $expectedListener = [$expectedListener, 'handle'];
+                }
             }
 
             if ($actualListener === $expectedListener ||
