@@ -169,7 +169,7 @@ class PostEventSubscriber
             'post-created',
             [PostEventSubscriber::class, 'handlePostCreated']
         );
-        
+
         $events->listen(
             'post-deleted',
             PostEventSubscriber::class.'@handlePostDeleted'
