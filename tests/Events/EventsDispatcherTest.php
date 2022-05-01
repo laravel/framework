@@ -187,7 +187,7 @@ class EventsDispatcherTest extends TestCase
             $_SERVER['__event.test'] = $payload;
         });
 
-        $d->flush( ExampleEvent::class);
+        $d->flush(ExampleEvent::class);
 
         $this->assertSame($e, $_SERVER['__event.test']);
     }
