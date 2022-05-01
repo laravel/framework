@@ -217,6 +217,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
+            $value ??= '';
             $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value);
             $shouldReplace[':'.Str::upper($key)] = Str::upper($value);
             $shouldReplace[':'.$key] = $value;
