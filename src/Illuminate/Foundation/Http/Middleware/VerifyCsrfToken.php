@@ -119,7 +119,7 @@ class VerifyCsrfToken
                 $except = trim($except, '/');
             }
 
-            if ($request->fullUrlIs($except) || $request->is($except)) {
+            if ($request->fullUrlIs($except) || $request->is($except) || $request->route()->getName() === $except) {
                 return true;
             }
         }
@@ -138,8 +138,8 @@ class VerifyCsrfToken
         $token = $this->getTokenFromRequest($request);
 
         return is_string($request->session()->token()) &&
-               is_string($token) &&
-               hash_equals($request->session()->token(), $token);
+            is_string($token) &&
+            hash_equals($request->session()->token(), $token);
     }
 
     /**
@@ -152,7 +152,7 @@ class VerifyCsrfToken
     {
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
-        if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
+        if (!$token && $header = $request->header('X-XSRF-TOKEN')) {
             try {
                 $token = CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
             } catch (DecryptException $e) {
