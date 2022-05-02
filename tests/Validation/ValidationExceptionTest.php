@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
@@ -44,8 +47,17 @@ class ValidationExceptionTest extends TestCase
 
     protected function getException($data = [], $rules = [])
     {
-        $translator = new Translator(new ArrayLoader, 'en');
-        $validator = new Validator($translator, $data, $rules);
+        $container = Container::getInstance();
+
+        $container->bind('translator', function () {
+            return new Translator(
+                new ArrayLoader, 'en'
+            );
+        });
+
+        Facade::setFacadeApplication($container);
+        (new ValidationServiceProvider($container))->register();
+        $validator = new Validator(resolve('translator'), $data, $rules);
 
         return new ValidationException($validator);
     }
