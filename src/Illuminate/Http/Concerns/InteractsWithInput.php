@@ -248,6 +248,28 @@ trait InteractsWithInput
     }
 
     /**
+     * Adds an input key with a value only if it's not set.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return $this
+     */
+    public function add($key, $value)
+    {
+        if ($this->missing($key)) {
+            if ($this->getRealMethod() === 'GET') {
+                $this->query->set($key, $value);
+            } elseif($this->isJson()) {
+                $this->json()->set($key, $value);
+            } else {
+                $this->request->set($key, $value);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @param  array|mixed|null  $keys

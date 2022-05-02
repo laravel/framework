@@ -616,6 +616,46 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo', $request['id']);
     }
 
+    public function testAddMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+
+        $request->add('foo', 'bar');
+        $request->add('name', 'baz');
+        $request->add('age', 'quz');
+
+        $this->assertSame('bar', $request->foo);
+        $this->assertSame('Taylor', $request->name);
+        $this->assertNull($request->age);
+
+        $this->assertSame('bar', $request->query->get('foo')));
+
+        $request = Request::create('/', 'POST', ['name' => 'Taylor', 'age' => null]);
+
+        $request->add('foo', 'bar');
+        $request->add('name', 'baz');
+        $request->add('age', 'quz');
+
+        $this->assertSame('bar', $request->foo);
+        $this->assertSame('Taylor', $request->name);
+        $this->assertNull($request->age);
+
+        $this->assertSame('bar', $request->request->get('foo')));
+
+        $request = Request::create('/', 'POST', ['name' => 'Taylor', 'age' => null]);
+        $request->headers->set('Content-Type', 'application/json');
+
+        $request->add('foo', 'bar');
+        $request->add('name', 'baz');
+        $request->add('age', 'quz');
+
+        $this->assertSame('bar', $request->foo);
+        $this->assertSame('Taylor', $request->name);
+        $this->assertNull($request->age);
+
+        $this->assertSame('bar', $request->json('foo')));
+    }
+
     public function testAllMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
