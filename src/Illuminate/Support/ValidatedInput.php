@@ -111,7 +111,7 @@ class ValidatedInput implements ValidatedData
         $keys = is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $key) {
-            if (! array_key_exists($key, $this->input)) {
+            if (! Arr::has($this->input, $key)) {
                 return false;
             }
         }
