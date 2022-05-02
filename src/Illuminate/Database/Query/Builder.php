@@ -26,6 +26,10 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
+/**
+ * @method $this and(\Closure|string|array $column, mixed $operator = null, mixed $value = null)
+ * @method $this or(\Closure|string|array $column, mixed $operator = null, mixed $value = null)
+ */
 class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
@@ -3675,6 +3679,15 @@ class Builder implements BuilderContract
 
         if (str_starts_with($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
+        }
+
+        $aliases = [
+            'and' => 'where',
+            'or' => 'orWhere',
+        ];
+
+        if ($aliases[$method] ?? false) {
+            return $this->{$aliases[$method]}(...$parameters);
         }
 
         static::throwBadMethodCallException($method);

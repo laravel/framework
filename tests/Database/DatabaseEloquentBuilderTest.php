@@ -934,6 +934,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testOrAnd()
+    {
+        $model = new EloquentBuilderTestStub();
+        $this->mockConnectionForModel($model, 'SQLite');
+        $query = $model->newQuery()
+            ->where('foo', 1)
+            ->or('bar', '=', 2)
+            ->and('baz', 3);
+        $this->assertEquals('select * from "table" where "foo" = ? or "bar" = ? and "baz" = ?', $query->toSql());
+        $this->assertEquals([1, 2, 3], $query->getBindings());
+    }
+
     public function testSimpleOrWhereNot()
     {
         $model = new EloquentBuilderTestStub();
