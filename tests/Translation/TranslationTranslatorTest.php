@@ -203,6 +203,14 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
     }
 
+    public function testEmptyFallbacks()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);
