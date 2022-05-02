@@ -626,7 +626,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Taylor', $request->name);
         $this->assertNull($request->age);
 
-        $this->assertSame('bar', $request->query->get('foo')));
+        $this->assertSame('bar', $request->query->get('foo'));
 
         $request = Request::create('/', 'POST', ['name' => 'Taylor', 'age' => null]);
 
@@ -636,7 +636,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Taylor', $request->name);
         $this->assertNull($request->age);
 
-        $this->assertSame('bar', $request->request->get('foo')));
+        $this->assertSame('bar', $request->request->get('foo'));
 
         $request = Request::create('/', 'POST', ['name' => 'Taylor', 'age' => null]);
         $request->headers->set('Content-Type', 'application/json');
@@ -647,7 +647,7 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Taylor', $request->name);
         $this->assertNull($request->age);
 
-        $this->assertSame('bar', $request->json('foo')));
+        $this->assertSame('bar', $request->json('foo'));
     }
 
     public function testAllMethod()
