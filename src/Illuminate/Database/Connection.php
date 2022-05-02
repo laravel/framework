@@ -167,7 +167,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the callbacks that should be invoked before a query is executed.
      *
-     * @var array
+     * @var \Closure[]
      */
     protected $beforeExecutingCallbacks = [];
 
@@ -181,14 +181,14 @@ class Connection implements ConnectionInterface
     /**
      * Type mappings that should be registered with new Doctrine connections.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $doctrineTypeMappings = [];
 
     /**
      * The connection resolvers.
      *
-     * @var array
+     * @var \Closure[]
      */
     protected static $resolvers = [];
 

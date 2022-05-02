@@ -62,8 +62,12 @@ class EventFake implements Dispatcher
             $actualListener = (new ReflectionFunction($listenerClosure))
                         ->getStaticVariables()['listener'];
 
-            if (is_string($actualListener) && Str::endsWith($actualListener, '@handle')) {
-                $actualListener = Str::parseCallback($actualListener)[0];
+            if (is_string($actualListener) && Str::contains($actualListener, '@')) {
+                $actualListener = Str::parseCallback($actualListener);
+
+                if (is_string($expectedListener) && ! Str::contains($expectedListener, '@')) {
+                    $expectedListener = [$expectedListener, 'handle'];
+                }
             }
 
             if ($actualListener === $expectedListener ||
@@ -172,13 +176,11 @@ class EventFake implements Dispatcher
             return collect();
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $callback = $callback ?: fn () => true;
 
-        return collect($this->events[$event])->filter(function ($arguments) use ($callback) {
-            return $callback(...$arguments);
-        });
+        return collect($this->events[$event])->filter(
+            fn ($arguments) => $callback(...$arguments)
+        );
     }
 
     /**

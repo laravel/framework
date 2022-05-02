@@ -498,6 +498,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 666]));
     }
 
+    // public function testFirstOrNewUnrelatedExisting()
+    // {
+    //     $post = Post::create(['title' => Str::random()]);
+
+    //     $name = Str::random();
+    //     $tag = Tag::create(['name' => $name]);
+
+    //     $postTag = $post->tags()->firstOrNew(['name' => $name]);
+    //     $this->assertTrue($postTag->exists);
+    //     $this->assertTrue($postTag->is($tag));
+    //     $this->assertTrue($tag->is($post->tags()->first()));
+    // }
+
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -511,6 +524,20 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $new = $post->tags()->firstOrCreate(['name' => 'wavez']);
         $this->assertSame('wavez', $new->name);
         $this->assertNotNull($new->id);
+    }
+
+    public function testFirstOrCreateUnrelatedExisting()
+    {
+        /** @var Post $post */
+        $post = Post::create(['title' => Str::random()]);
+
+        $name = Str::random();
+        $tag = Tag::create(['name' => $name]);
+
+        $postTag = $post->tags()->firstOrCreate(['name' => $name]);
+        $this->assertTrue($postTag->exists);
+        $this->assertTrue($postTag->is($tag));
+        $this->assertTrue($tag->is($post->tags()->first()));
     }
 
     public function testFirstOrNewMethodWithValues()
@@ -588,6 +615,20 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->updateOrCreate(['id' => 666], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
+    }
+
+    public function testUpdateOrCreateUnrelatedExisting()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => 'foo']);
+
+        $postTag = $post->tags()->updateOrCreate(['name' => 'foo'], ['name' => 'wavez']);
+        $this->assertTrue($postTag->exists);
+        $this->assertTrue($postTag->is($tag));
+        $this->assertSame('wavez', $tag->fresh()->name);
+        $this->assertSame('wavez', $postTag->name);
+        $this->assertTrue($tag->is($post->tags()->first()));
     }
 
     public function testUpdateOrCreateMethodCreate()
