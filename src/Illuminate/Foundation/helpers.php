@@ -804,6 +804,22 @@ if (! function_exists('storage_path')) {
     }
 }
 
+if (! function_exists('to_action')) {
+    /**
+     * Create a new redirect response to an action.
+     *
+     * @param  string  $action
+     * @param  mixed  $parameters
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    function to_action($action, $parameters = [], $status = 302, $headers = [])
+    {
+        return redirect()->action($action, $parameters, $status, $headers);
+    }
+}
+
 if (! function_exists('to_route')) {
     /**
      * Create a new redirect response to a named route.
