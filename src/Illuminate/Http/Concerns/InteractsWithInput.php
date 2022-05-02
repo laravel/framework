@@ -267,7 +267,7 @@ trait InteractsWithInput
         $key = is_array($key) ? $key : [$key => $value];
 
         foreach ($key as $index => $value) {
-            $data->has($key) || $data->set($key, $value);
+            $data->has($index) || $data->set($index, $value);
         }
 
         return $this;
