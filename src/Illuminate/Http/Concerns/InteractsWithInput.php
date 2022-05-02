@@ -250,20 +250,24 @@ trait InteractsWithInput
     /**
      * Adds an input key with a value only if it's not set.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $value
      * @return $this
      */
-    public function add($key, $value)
+    public function add($key, $value = null)
     {
-        if ($this->missing($key)) {
-            if ($this->getRealMethod() === 'GET') {
-                $this->query->set($key, $value);
-            } elseif($this->isJson()) {
-                $this->json()->set($key, $value);
-            } else {
-                $this->request->set($key, $value);
-            }
+        if ($this->getRealMethod() === 'GET') {
+            $data = $this->query;
+        } elseif($this->isJson()) {
+            $data = $this->json();
+        } else {
+            $data = $this->request;
+        }
+
+        $key = is_array($key) ? $key : [$key => $value];
+
+        foreach ($key as $index => $value) {
+            $data->has($key) || $data->set($key, $value);
         }
 
         return $this;

@@ -620,9 +620,7 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
 
-        $request->add('foo', 'bar');
-        $request->add('name', 'baz');
-        $request->add('age', 'quz');
+        $request->add(['foo' => 'bar', 'name' => 'baz', 'age' => 'quz');
 
         $this->assertSame('bar', $request->foo);
         $this->assertSame('Taylor', $request->name);
@@ -632,9 +630,7 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'POST', ['name' => 'Taylor', 'age' => null]);
 
-        $request->add('foo', 'bar');
-        $request->add('name', 'baz');
-        $request->add('age', 'quz');
+        $request->add(['foo' => 'bar', 'name' => 'baz', 'age' => 'quz');
 
         $this->assertSame('bar', $request->foo);
         $this->assertSame('Taylor', $request->name);
@@ -645,9 +641,7 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'POST', ['name' => 'Taylor', 'age' => null]);
         $request->headers->set('Content-Type', 'application/json');
 
-        $request->add('foo', 'bar');
-        $request->add('name', 'baz');
-        $request->add('age', 'quz');
+        $request->add(['foo' => 'bar', 'name' => 'baz', 'age' => 'quz');
 
         $this->assertSame('bar', $request->foo);
         $this->assertSame('Taylor', $request->name);
