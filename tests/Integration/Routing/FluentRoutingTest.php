@@ -46,6 +46,21 @@ class FluentRoutingTest extends TestCase
         $this->assertSame('1_2', $this->get('before_after')->content());
         $this->assertSame('1_2', $this->get('both_before')->content());
         $this->assertSame('1_2', $this->get('both_after')->content());
+        $this->assertSame('1_2', $this->get('both_after')->content());
+    }
+
+    public function testEmptyMiddlewareGroupAreHandledGracefully()
+    {
+        $controller = function () {
+            return 'Hello World';
+        };
+
+        Route::middlewareGroup('public', []);
+
+        Route::middleware('public')
+            ->get('public', $controller);
+
+        $this->assertSame('Hello World', $this->get('public')->content());
     }
 }
 
