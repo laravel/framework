@@ -83,6 +83,20 @@ class MailMessage extends SimpleMessage implements Renderable
     public $rawAttachments = [];
 
     /**
+     * The tags for the message.
+     *
+     * @var array
+     */
+    public $tags = [];
+
+    /**
+     * The metadata for the message.
+     *
+     * @var array
+     */
+    public $metadata = [];
+
+    /**
      * Priority level of the message.
      *
      * @var int
@@ -249,6 +263,33 @@ class MailMessage extends SimpleMessage implements Renderable
     public function attachData($data, $name, array $options = [])
     {
         $this->rawAttachments[] = compact('data', 'name', 'options');
+
+        return $this;
+    }
+
+    /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        array_push($this->tags, $value);
+
+        return $this;
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        $this->metadata[$key] = $value;
 
         return $this;
     }

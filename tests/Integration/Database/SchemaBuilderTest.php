@@ -50,7 +50,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
 
-        Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');
@@ -72,7 +72,7 @@ class SchemaBuilderTest extends DatabaseTestCase
             $this->markTestSkipped('Test requires a SQLite connection.');
         }
 
-        Schema::registerCustomDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
+        Schema::getConnection()->registerDoctrineType(TinyInteger::class, TinyInteger::NAME, 'TINYINT');
 
         Schema::create('test', function (Blueprint $table) {
             $table->string('test_column');

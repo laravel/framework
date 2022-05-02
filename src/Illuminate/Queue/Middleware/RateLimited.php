@@ -56,7 +56,7 @@ class RateLimited
             return $next($job);
         }
 
-        $limiterResponse = call_user_func($limiter, $job);
+        $limiterResponse = $limiter($job);
 
         if ($limiterResponse instanceof Unlimited) {
             return $next($job);

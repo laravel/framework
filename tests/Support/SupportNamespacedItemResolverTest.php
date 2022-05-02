@@ -30,9 +30,7 @@ class SupportNamespacedItemResolverTest extends TestCase
     public function testParsedItemsMayBeFlushed()
     {
         $r = $this->getMockBuilder(NamespacedItemResolver::class)->onlyMethods(['parseBasicSegments', 'parseNamespacedSegments'])->getMock();
-        $r->expects($this->once())->method('parseBasicSegments')->will(
-            $this->returnValue(['bar'])
-        );
+        $r->expects($this->once())->method('parseBasicSegments')->willReturn(['bar']);
 
         $r->setParsedKey('foo.bar', ['foo']);
         $r->flushParsedKeys();

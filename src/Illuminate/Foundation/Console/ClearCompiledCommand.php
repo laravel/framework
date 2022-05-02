@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'clear-compiled')]
 class ClearCompiledCommand extends Command
 {
     /**
@@ -19,6 +21,8 @@ class ClearCompiledCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'clear-compiled';
 
@@ -44,6 +48,6 @@ class ClearCompiledCommand extends Command
             @unlink($packagesPath);
         }
 
-        $this->info('Compiled services and packages files removed!');
+        $this->info('Compiled services and packages files removed successfully.');
     }
 }

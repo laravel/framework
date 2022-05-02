@@ -15,6 +15,13 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
         Schema::create('users', function (Blueprint $table) {
@@ -39,6 +46,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         });
 
         Schema::create('users_posts', function (Blueprint $table) {
+            $table->increments('id');
             $table->string('user_uuid');
             $table->string('post_uuid');
             $table->tinyInteger('is_draft')->default(1);
@@ -130,7 +138,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tagsWithCustomPivot()->attach($tag->id);
 
         $this->assertInstanceOf(PostTagPivot::class, $post->tagsWithCustomPivot[0]->pivot);
-        $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->created_at);
+        $this->assertSame('1507630210', $post->tagsWithCustomPivot[0]->pivot->created_at);
 
         $this->assertInstanceOf(PostTagPivot::class, $post->tagsWithCustomPivotClass[0]->pivot);
         $this->assertSame('posts_tags', $post->tagsWithCustomPivotClass()->getTable());
@@ -225,8 +233,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
         foreach ($post->tagsWithCustomExtraPivot as $tag) {
             $this->assertSame('exclude', $tag->pivot->flag);
-            $this->assertEquals('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
-            $this->assertEquals('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
+            $this->assertSame('2017-10-10 10:10:10', $tag->pivot->getAttributes()['created_at']);
+            $this->assertSame('2017-10-10 10:10:20', $tag->pivot->getAttributes()['updated_at']); // +10 seconds
         }
     }
 
@@ -405,6 +413,77 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertInstanceOf(Tag::class, $post->tags()->findOrNew(666));
     }
 
+    public function testFindOrMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post->tags()->create(['name' => Str::random()]);
+
+        $result = $post->tags()->findOr(1, fn () => 'callback result');
+        $this->assertInstanceOf(Tag::class, $result);
+        $this->assertSame(1, $result->id);
+        $this->assertNotNull($result->name);
+
+        $result = $post->tags()->findOr(1, ['id'], fn () => 'callback result');
+        $this->assertInstanceOf(Tag::class, $result);
+        $this->assertSame(1, $result->id);
+        $this->assertNull($result->name);
+
+        $result = $post->tags()->findOr(2, fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
+    public function testFindOrMethodWithMany()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post->tags()->createMany([
+            ['name' => Str::random()],
+            ['name' => Str::random()],
+        ]);
+
+        $result = $post->tags()->findOr([1, 2], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNotNull($result[0]->name);
+        $this->assertNotNull($result[1]->name);
+
+        $result = $post->tags()->findOr([1, 2], ['id'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNull($result[0]->name);
+        $this->assertNull($result[1]->name);
+
+        $result = $post->tags()->findOr([1, 2, 3], fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
+    public function testFindOrMethodWithManyUsingCollection()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $post->tags()->createMany([
+            ['name' => Str::random()],
+            ['name' => Str::random()],
+        ]);
+
+        $result = $post->tags()->findOr(new Collection([1, 2]), fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNotNull($result[0]->name);
+        $this->assertNotNull($result[1]->name);
+
+        $result = $post->tags()->findOr(new Collection([1, 2]), ['id'], fn () => 'callback result');
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame(1, $result[0]->id);
+        $this->assertSame(2, $result[1]->id);
+        $this->assertNull($result[0]->name);
+        $this->assertNull($result[1]->name);
+
+        $result = $post->tags()->findOr(new Collection([1, 2, 3]), fn () => 'callback result');
+        $this->assertSame('callback result', $result);
+    }
+
     public function testFirstOrNewMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -419,6 +498,19 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertInstanceOf(Tag::class, $post->tags()->firstOrNew(['id' => 666]));
     }
 
+    // public function testFirstOrNewUnrelatedExisting()
+    // {
+    //     $post = Post::create(['title' => Str::random()]);
+
+    //     $name = Str::random();
+    //     $tag = Tag::create(['name' => $name]);
+
+    //     $postTag = $post->tags()->firstOrNew(['name' => $name]);
+    //     $this->assertTrue($postTag->exists);
+    //     $this->assertTrue($postTag->is($tag));
+    //     $this->assertTrue($tag->is($post->tags()->first()));
+    // }
+
     public function testFirstOrCreateMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -432,6 +524,20 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $new = $post->tags()->firstOrCreate(['name' => 'wavez']);
         $this->assertSame('wavez', $new->name);
         $this->assertNotNull($new->id);
+    }
+
+    public function testFirstOrCreateUnrelatedExisting()
+    {
+        /** @var Post $post */
+        $post = Post::create(['title' => Str::random()]);
+
+        $name = Str::random();
+        $tag = Tag::create(['name' => $name]);
+
+        $postTag = $post->tags()->firstOrCreate(['name' => $name]);
+        $this->assertTrue($postTag->exists);
+        $this->assertTrue($postTag->is($tag));
+        $this->assertTrue($tag->is($post->tags()->first()));
     }
 
     public function testFirstOrNewMethodWithValues()
@@ -509,6 +615,20 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tags()->updateOrCreate(['id' => 666], ['name' => 'dives']);
         $this->assertNotNull($post->tags()->whereName('dives')->first());
+    }
+
+    public function testUpdateOrCreateUnrelatedExisting()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => 'foo']);
+
+        $postTag = $post->tags()->updateOrCreate(['name' => 'foo'], ['name' => 'wavez']);
+        $this->assertTrue($postTag->exists);
+        $this->assertTrue($postTag->is($tag));
+        $this->assertSame('wavez', $tag->fresh()->name);
+        $this->assertSame('wavez', $postTag->name);
+        $this->assertTrue($tag->is($post->tags()->first()));
     }
 
     public function testUpdateOrCreateMethodCreate()
@@ -1007,6 +1127,33 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $relationTag2 = $post->tagsWithCustomExtraPivot()->orderByPivot('flag', 'desc')->first();
         $this->assertEquals($relationTag2->getAttributes(), $tag3->getAttributes());
     }
+
+    public function testFirstOrMethod()
+    {
+        $user1 = User::create(['name' => Str::random()]);
+        $user2 = User::create(['name' => Str::random()]);
+        $user3 = User::create(['name' => Str::random()]);
+        $post1 = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+        $post3 = Post::create(['title' => Str::random()]);
+
+        $user1->posts()->sync([$post1->uuid, $post2->uuid]);
+        $user2->posts()->sync([$post1->uuid, $post2->uuid]);
+
+        $this->assertEquals(
+            $post1->id,
+            $user2->posts()->firstOr(function () {
+                return Post::create(['title' => Str::random()]);
+            })->id
+        );
+
+        $this->assertEquals(
+            $post3->id,
+            $user3->posts()->firstOr(function () use ($post3) {
+                return $post3;
+            })->id
+        );
+    }
 }
 
 class User extends Model
@@ -1022,6 +1169,13 @@ class User extends Model
         static::creating(function ($model) {
             $model->setAttribute('uuid', Str::random());
         });
+    }
+
+    public function posts()
+    {
+        return $this->belongsToMany(Post::class, 'users_posts', 'user_uuid', 'post_uuid', 'uuid', 'uuid')
+            ->withPivot('is_draft')
+            ->withTimestamps();
     }
 
     public function postsWithCustomPivot()
@@ -1047,6 +1201,13 @@ class Post extends Model
         static::creating(function ($model) {
             $model->setAttribute('uuid', Str::random());
         });
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'users_posts', 'post_uuid', 'user_uuid', 'uuid', 'uuid')
+            ->withPivot('is_draft')
+            ->withTimestamps();
     }
 
     public function tags()

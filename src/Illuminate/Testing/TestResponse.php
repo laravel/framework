@@ -224,6 +224,8 @@ class TestResponse implements ArrayAccess
      */
     protected function statusMessageWithException($expected, $actual, $exception)
     {
+        $message = $exception->getMessage();
+
         $exception = (string) $exception;
 
         return <<<EOF
@@ -232,6 +234,11 @@ Expected response status code [$expected] but received $actual.
 The following exception occurred during the request:
 
 $exception
+
+----------------------------------------------------------------------------------
+
+$message
+
 EOF;
     }
 
@@ -500,7 +507,7 @@ EOF;
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
 
         PHPUnit::assertTrue(
-            0 !== $cookie->getExpiresTime() && $expiresAt->lessThan(Carbon::now()),
+            $cookie->getExpiresTime() !== 0 && $expiresAt->lessThan(Carbon::now()),
             "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
         );
 
@@ -523,7 +530,7 @@ EOF;
         $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
 
         PHPUnit::assertTrue(
-            0 === $cookie->getExpiresTime() || $expiresAt->greaterThan(Carbon::now()),
+            $cookie->getExpiresTime() === 0 || $expiresAt->greaterThan(Carbon::now()),
             "Cookie [{$cookieName}] is expired, it expired at [{$expiresAt}]."
         );
 
@@ -1158,8 +1165,6 @@ EOF;
         }
 
         $this->assertSessionHas('errors');
-
-        $keys = (array) $errors;
 
         $sessionErrors = $this->session()->get('errors')->getBag($errorBag)->getMessages();
 

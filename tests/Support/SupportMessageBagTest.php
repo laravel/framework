@@ -115,6 +115,17 @@ class SupportMessageBagTest extends TestCase
         $this->assertFalse($container->has('bar'));
     }
 
+    public function testAddIf()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->addIf(true, 'foo', 'bar');
+        $this->assertTrue($container->has('foo'));
+
+        $container->addIf(false, 'bar', 'biz');
+        $this->assertFalse($container->has('bar'));
+    }
+
     public function testHasWithKeyNull()
     {
         $container = new MessageBag;

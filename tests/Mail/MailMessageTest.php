@@ -41,8 +41,11 @@ class MailMessageTest extends TestCase
 
     public function testToMethod()
     {
-        $this->assertInstanceOf(Message::class, $message = $this->message->to('foo@bar.baz', 'Foo', false));
+        $this->assertInstanceOf(Message::class, $message = $this->message->to('foo@bar.baz', 'Foo'));
         $this->assertEquals(new Address('foo@bar.baz', 'Foo'), $message->getSymfonyMessage()->getTo()[0]);
+
+        $this->assertInstanceOf(Message::class, $message = $this->message->to(['bar@bar.baz' => 'Bar']));
+        $this->assertEquals(new Address('bar@bar.baz', 'Bar'), $message->getSymfonyMessage()->getTo()[0]);
     }
 
     public function testToMethodWithOverride()
@@ -72,7 +75,7 @@ class MailMessageTest extends TestCase
     public function testSubjectMethod()
     {
         $this->assertInstanceOf(Message::class, $message = $this->message->subject('foo'));
-        $this->assertEquals('foo', $message->getSymfonyMessage()->getSubject());
+        $this->assertSame('foo', $message->getSymfonyMessage()->getSubject());
     }
 
     public function testPriorityMethod()
@@ -92,6 +95,6 @@ class MailMessageTest extends TestCase
         $message = new Message(new Email());
         $message->attachData('foo', 'foo.jpg', ['mime' => 'image/jpeg']);
 
-        $this->assertEquals('foo', $message->getSymfonyMessage()->getAttachments()[0]->getBody());
+        $this->assertSame('foo', $message->getSymfonyMessage()->getAttachments()[0]->getBody());
     }
 }

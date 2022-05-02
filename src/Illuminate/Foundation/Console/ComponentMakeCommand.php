@@ -5,8 +5,10 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(name: 'make:component')]
 class ComponentMakeCommand extends GeneratorCommand
 {
     /**
@@ -22,6 +24,8 @@ class ComponentMakeCommand extends GeneratorCommand
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'make:component';
 
@@ -46,6 +50,14 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
+        if ($this->option('view')) {
+            $this->writeView(function () {
+                $this->info($this->type.' created successfully.');
+            });
+
+            return;
+        }
+
         if (parent::handle() === false && ! $this->option('force')) {
             return false;
         }
@@ -58,9 +70,10 @@ class ComponentMakeCommand extends GeneratorCommand
     /**
      * Write the view for the component.
      *
+     * @param  callable|null  $onSuccess
      * @return void
      */
-    protected function writeView()
+    protected function writeView($onSuccess = null)
     {
         $path = $this->viewPath(
             str_replace('.', '/', 'components.'.$this->getView()).'.blade.php'
@@ -82,6 +95,10 @@ class ComponentMakeCommand extends GeneratorCommand
     <!-- '.Inspiring::quote().' -->
 </div>'
         );
+
+        if ($onSuccess) {
+            $onSuccess();
+        }
     }
 
     /**
@@ -167,6 +184,7 @@ class ComponentMakeCommand extends GeneratorCommand
         return [
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the component already exists'],
             ['inline', null, InputOption::VALUE_NONE, 'Create a component that renders an inline view'],
+            ['view', null, InputOption::VALUE_NONE, 'Create an anonymous component with only a view'],
         ];
     }
 }

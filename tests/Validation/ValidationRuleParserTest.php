@@ -20,6 +20,12 @@ class ValidationRuleParserTest extends TestCase
             'city' => ['required', Rule::when(function (Fluent $input) {
                 return true;
             }, ['min:2'])],
+            'state' => ['required', Rule::when(true, function (Fluent $input) {
+                return 'min:2';
+            })],
+            'zip' => ['required', Rule::when(false, [], function (Fluent $input) {
+                return ['min:2'];
+            })],
         ]);
 
         $this->assertEquals([
@@ -29,6 +35,8 @@ class ValidationRuleParserTest extends TestCase
             'username' => ['required', 'min:2'],
             'address' => ['required'],
             'city' => ['required', 'min:2'],
+            'state' => ['required', 'min:2'],
+            'zip' => ['required', 'min:2'],
         ], $rules);
     }
 
@@ -45,6 +53,13 @@ class ValidationRuleParserTest extends TestCase
             'email' => '',
             'password' => ['required', 'min:2'],
         ], $rules);
+    }
+
+    public function testEmptyRulesCanBeExploded()
+    {
+        $parser = new ValidationRuleParser(['foo' => 'bar']);
+
+        $this->assertIsObject($parser->explode(['foo' => []]));
     }
 
     public function testConditionalRulesWithDefault()
@@ -81,6 +96,66 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testExplodeProperlyParsesSingleRegexRule()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'regex:/^(foo|bar)$/i']
+        );
+
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][0]);
+    }
+
+    public function testExplodeProperlyParsesRegexWithArrayOfRules()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => ['in:foo', 'regex:/^(foo|bar)$/i']]
+        );
+
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
+    public function testExplodeProperlyParsesRegexThatDoesNotContainPipe()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'in:foo|regex:/^(bar)$/i']
+        );
+
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
+    public function testExplodeFailsParsingRegexWithOtherRulesInSingleString()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => 'in:foo|regex:/^(foo|bar)$/i']
+        );
+
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][1]);
+        $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][2]);
+    }
+
+    public function testExplodeProperlyFlattensRuleArraysOfArrays()
+    {
+        $data = ['items' => [['type' => 'foo']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['items.*.type' => ['in:foo', [[['regex:/^(foo|bar)$/i']]]]]
+        );
+
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+    }
+
     public function testExplodeGeneratesNestedRules()
     {
         $parser = (new ValidationRuleParser([
@@ -91,8 +166,8 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
-                $this->assertEquals('Taylor Otwell', $value);
-                $this->assertEquals('users.0.name', $attribute);
+                $this->assertSame('Taylor Otwell', $value);
+                $this->assertSame('users.0.name', $attribute);
                 $this->assertEquals($data['users.0.name'], 'Taylor Otwell');
 
                 return [Rule::requiredIf(true)];
@@ -111,8 +186,8 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'name' => Rule::forEach(function ($value, $attribute, $data = null) {
-                $this->assertEquals('Taylor Otwell', $value);
-                $this->assertEquals('name', $attribute);
+                $this->assertSame('Taylor Otwell', $value);
+                $this->assertSame('name', $attribute);
                 $this->assertEquals(['name' => 'Taylor Otwell'], $data);
 
                 return 'required';
@@ -181,18 +256,18 @@ class ValidationRuleParserTest extends TestCase
         $results = $parser->explode([
             'users.*.name' => [
                 Rule::forEach(function ($value, $attribute, $data) {
-                    $this->assertEquals('Taylor Otwell', $value);
-                    $this->assertEquals('users.0.name', $attribute);
+                    $this->assertSame('Taylor Otwell', $value);
+                    $this->assertSame('users.0.name', $attribute);
                     $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                     return Rule::forEach(function ($value, $attribute, $data) {
                         $this->assertNull($value);
-                        $this->assertEquals('users.0.name', $attribute);
+                        $this->assertSame('users.0.name', $attribute);
                         $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                         return Rule::forEach(function ($value, $attribute, $data) {
                             $this->assertNull($value);
-                            $this->assertEquals('users.0.name', $attribute);
+                            $this->assertSame('users.0.name', $attribute);
                             $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                             return [Rule::requiredIf(true)];

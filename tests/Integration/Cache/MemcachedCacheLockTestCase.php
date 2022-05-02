@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Contracts\Cache\LockTimeoutException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -24,8 +23,6 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
 
     public function testMemcachedLocksCanBlockForSeconds()
     {
-        Carbon::setTestNow();
-
         Cache::store('memcached')->lock('foo')->forceRelease();
         $this->assertSame('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
             return 'taylor';
@@ -46,8 +43,6 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
     public function testLocksThrowTimeoutIfBlockExpires()
     {
         $this->expectException(LockTimeoutException::class);
-
-        Carbon::setTestNow();
 
         Cache::store('memcached')->lock('foo')->release();
         Cache::store('memcached')->lock('foo', 5)->get();

@@ -6,7 +6,6 @@ use Illuminate\Http\Client\Factory;
 
 /**
  * @method static \GuzzleHttp\Promise\PromiseInterface response($body = null, $status = 200, $headers = [])
- * @method static \Illuminate\Http\Client\Factory fake($callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest accept(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest acceptJson()
  * @method static \Illuminate\Http\Client\PendingRequest asForm()
@@ -17,10 +16,11 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
  * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
+ * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest dd()
  * @method static \Illuminate\Http\Client\PendingRequest dump()
- * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null)
+ * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
  * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
  * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
@@ -35,6 +35,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method static \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
  * @method static array pool(callable $callback)
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
@@ -43,7 +44,6 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
- * @method static \Illuminate\Http\Client\ResponseSequence fakeSequence(string $urlPattern = '*')
  * @method static void assertSent(callable $callback)
  * @method static void assertSentInOrder(array $callbacks)
  * @method static void assertNotSent(callable $callback)
@@ -63,5 +63,47 @@ class Http extends Facade
     protected static function getFacadeAccessor()
     {
         return Factory::class;
+    }
+
+    /**
+     * Register a stub callable that will intercept requests and be able to return stub responses.
+     *
+     * @param  \Closure|array  $callback
+     * @return \Illuminate\Http\Client\Factory
+     */
+    public static function fake($callback = null)
+    {
+        return tap(static::getFacadeRoot(), function ($fake) use ($callback) {
+            static::swap($fake->fake($callback));
+        });
+    }
+
+    /**
+     * Register a response sequence for the given URL pattern.
+     *
+     * @param  string  $urlPattern
+     * @return \Illuminate\Http\Client\ResponseSequence
+     */
+    public static function fakeSequence(string $urlPattern = '*')
+    {
+        $fake = tap(static::getFacadeRoot(), function ($fake) {
+            static::swap($fake);
+        });
+
+        return $fake->fakeSequence($urlPattern);
+    }
+
+    /**
+     * Stub the given URL using the given callback.
+     *
+     * @param  string  $url
+     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable  $callback
+     * @return \Illuminate\Http\Client\Factory
+     */
+    public static function stubUrl($url, $callback)
+    {
+        return tap(static::getFacadeRoot(), function ($fake) use ($url, $callback) {
+            static::swap($fake->stubUrl($url, $callback));
+        });
     }
 }

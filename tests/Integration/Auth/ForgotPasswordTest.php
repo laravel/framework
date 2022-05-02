@@ -12,6 +12,14 @@ use Orchestra\Testbench\TestCase;
 
 class ForgotPasswordTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ResetPassword::$createUrlCallback = null;
+        ResetPassword::$toMailCallback = null;
+
+        parent::tearDown();
+    }
+
     protected function defineEnvironment($app)
     {
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);

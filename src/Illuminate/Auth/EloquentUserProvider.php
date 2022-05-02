@@ -80,7 +80,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $token
      * @return void
      */
@@ -141,9 +141,7 @@ class EloquentUserProvider implements UserProvider
      */
     protected function firstCredentialKey(array $credentials)
     {
-        foreach ($credentials as $key => $value) {
-            return $key;
-        }
+        return array_key_first($credentials);
     }
 
     /**

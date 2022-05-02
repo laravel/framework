@@ -7,7 +7,6 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
@@ -18,10 +17,13 @@ use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
+use OutOfRangeException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
@@ -49,16 +51,12 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->container = Container::setInstance(new Container);
 
-        $this->container->singleton('config', function () {
-            return $this->config;
-        });
+        $this->container->instance('config', $this->config);
 
-        $this->container->singleton(ResponseFactoryContract::class, function () {
-            return new ResponseFactory(
-                m::mock(Factory::class),
-                m::mock(Redirector::class)
-            );
-        });
+        $this->container->instance(ResponseFactoryContract::class, new ResponseFactory(
+            m::mock(ViewFactory::class),
+            m::mock(Redirector::class)
+        ));
 
         $this->handler = new Handler($this->container);
     }
@@ -72,7 +70,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new RuntimeException('Exception message'));
     }
@@ -81,7 +79,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'bar'])])->once();
+        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::subset(['foo' => 'bar'])])->once();
 
         $this->handler->report(new ContextProvidingException('Exception message'));
     }
@@ -90,9 +88,36 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new UnReportableException('Exception message'));
+    }
+
+    public function testHandlerReportsExceptionWithCustomLogLevel()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('log')->withArgs([LogLevel::CRITICAL, 'Critical message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Error message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('log')->withArgs([LogLevel::WARNING, 'Warning message', m::hasKey('exception')])->once();
+
+        $this->handler->level(InvalidArgumentException::class, LogLevel::CRITICAL);
+        $this->handler->level(OutOfRangeException::class, LogLevel::WARNING);
+
+        $this->handler->report(new InvalidArgumentException('Critical message'));
+        $this->handler->report(new RuntimeException('Error message'));
+        $this->handler->report(new OutOfRangeException('Warning message'));
+    }
+
+    public function testHandlerIgnoresNotReportableExceptions()
+    {
+        $logger = m::mock(LoggerInterface::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldNotReceive('log');
+
+        $this->handler->ignore(RuntimeException::class);
+
+        $this->handler->report(new RuntimeException('Exception message'));
     }
 
     public function testHandlerCallsReportMethodWithDependencies()
@@ -103,7 +128,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->report(new ReportableException('Exception message'));
     }
@@ -115,7 +140,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->reportable(new CustomReporter($reporter));
 
@@ -265,7 +290,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->report(new SuspiciousOperationException('Invalid method override "__CONSTRUCT"'));
     }
@@ -282,7 +307,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldNotReceive('error');
+        $logger->shouldNotReceive('log');
 
         $this->handler->report(new RecordsNotFoundException);
     }
@@ -292,9 +317,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory = m::mock(stdClass::class);
         $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
 
-        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
-            return $viewFactory;
-        });
+        $this->container->instance(ViewFactory::class, $viewFactory);
 
         $handler = new class($this->container) extends Handler
         {
@@ -313,9 +336,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory->shouldReceive('exists')->once()->with('errors::502')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::5xx')->andReturn(true);
 
-        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
-            return $viewFactory;
-        });
+        $this->container->instance(ViewFactory::class, $viewFactory);
 
         $handler = new class($this->container) extends Handler
         {
@@ -334,9 +355,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::4xx')->andReturn(false);
 
-        $this->container->singleton(ViewFactory::class, function () use ($viewFactory) {
-            return $viewFactory;
-        });
+        $this->container->instance(ViewFactory::class, $viewFactory);
 
         $handler = new class($this->container) extends Handler
         {

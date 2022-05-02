@@ -4,7 +4,9 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:retry-batch')]
 class RetryBatchCommand extends Command
 {
     /**
@@ -20,6 +22,8 @@ class RetryBatchCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'queue:retry-batch';
 

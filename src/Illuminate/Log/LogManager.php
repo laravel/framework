@@ -194,7 +194,7 @@ class LogManager implements LoggerInterface
      */
     protected function resolve($name, ?array $config = null)
     {
-        $config = $config ?? $this->configurationFor($name);
+        $config ??= $this->configurationFor($name);
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
@@ -517,10 +517,10 @@ class LogManager implements LoggerInterface
      */
     protected function parseDriver($driver)
     {
-        $driver = $driver ?? $this->getDefaultDriver();
+        $driver ??= $this->getDefaultDriver();
 
         if ($this->app->runningUnitTests()) {
-            $driver = $driver ?? 'null';
+            $driver ??= 'null';
         }
 
         return $driver;

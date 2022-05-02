@@ -30,6 +30,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
  * @method static \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
+ * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
  * @method static \Illuminate\Routing\Router|\Illuminate\Routing\RouteRegistrar group(\Closure|string|array $attributes, \Closure|string $routes)
  * @method static \Illuminate\Routing\ResourceRegistrar resourceVerbs(array $verbs = [])
  * @method static string|null currentRouteAction()

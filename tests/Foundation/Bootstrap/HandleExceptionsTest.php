@@ -4,8 +4,7 @@ namespace Illuminate\Tests\Foundation\Bootstrap;
 
 use ErrorException;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Log\LogManager;
 use Mockery as m;
@@ -17,11 +16,11 @@ class HandleExceptionsTest extends TestCase
 {
     protected function setUp(): void
     {
-        $this->container = Container::setInstance(new Container);
+        $this->app = m::mock(Application::setInstance(new Application));
 
         $this->config = new Config();
 
-        $this->container->singleton('config', function () {
+        $this->app->singleton('config', function () {
             return $this->config;
         });
 
@@ -32,20 +31,24 @@ class HandleExceptionsTest extends TestCase
 
             $property->setValue(
                 $this->handleExceptions,
-                $this->container
+                tap($this->app, function ($app) {
+                    $app->shouldReceive('runningUnitTests')->andReturn(false);
+                    $app->shouldReceive('hasBeenBootstrapped')->andReturn(true);
+                })
             );
         });
     }
 
     protected function tearDown(): void
     {
-        Container::setInstance(null);
+        Application::setInstance(null);
     }
 
     public function testPhpDeprecations()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
         $logger->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
             'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
@@ -64,7 +67,8 @@ class HandleExceptionsTest extends TestCase
     public function testUserDeprecations()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
         $logger->shouldReceive('warning')->with(sprintf('%s in %s on line %s',
             'str_contains(): Passing null to parameter #2 ($needle) of type string is deprecated',
@@ -83,7 +87,8 @@ class HandleExceptionsTest extends TestCase
     public function testErrors()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldNotReceive('channel');
         $logger->shouldNotReceive('warning');
 
@@ -101,7 +106,8 @@ class HandleExceptionsTest extends TestCase
     public function testEnsuresDeprecationsDriver()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldReceive('channel')->andReturnSelf();
         $logger->shouldReceive('warning');
 
@@ -132,7 +138,8 @@ class HandleExceptionsTest extends TestCase
     public function testEnsuresNullDeprecationsDriver()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldReceive('channel')->andReturnSelf();
         $logger->shouldReceive('warning');
 
@@ -152,7 +159,8 @@ class HandleExceptionsTest extends TestCase
     public function testEnsuresNullLogDriver()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldReceive('channel')->andReturnSelf();
         $logger->shouldReceive('warning');
 
@@ -172,7 +180,8 @@ class HandleExceptionsTest extends TestCase
     public function testDoNotOverrideExistingNullLogDriver()
     {
         $logger = m::mock(LogManager::class);
-        $this->container->instance(LogManager::class, $logger);
+        $this->app->instance(LogManager::class, $logger);
+
         $logger->shouldReceive('channel')->andReturnSelf();
         $logger->shouldReceive('warning');
 
@@ -233,13 +242,13 @@ class HandleExceptionsTest extends TestCase
             return $property->getValue($this->handleExceptions);
         });
 
-        $this->assertSame($this->container, $appResolver());
+        $this->assertSame($this->app, $appResolver());
 
         $this->handleExceptions->bootstrap($newApp = tap(m::mock(Application::class), function ($app) {
             $app->shouldReceive('environment')->once()->andReturn(true);
         }));
 
-        $this->assertNotSame($this->container, $appResolver());
+        $this->assertNotSame($this->app, $appResolver());
         $this->assertSame($newApp, $appResolver());
     }
 }

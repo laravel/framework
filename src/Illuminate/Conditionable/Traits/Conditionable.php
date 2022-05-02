@@ -10,11 +10,12 @@ trait Conditionable
     /**
      * Apply the callback if the given "value" is (or resolves to) truthy.
      *
+     * @template TWhenParameter
      * @template TWhenReturnType
      *
-     * @param  bool  $value
-     * @param  (callable($this): TWhenReturnType)|null  $callback
-     * @param  (callable($this): TWhenReturnType)|null  $default
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter  $value
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $callback
+     * @param  (callable($this, TWhenParameter): TWhenReturnType)|null  $default
      * @return $this|TWhenReturnType
      */
     public function when($value, callable $callback = null, callable $default = null)
@@ -26,9 +27,9 @@ trait Conditionable
         }
 
         if ($value) {
-            return $callback($this, $value) ?: $this;
+            return $callback($this, $value) ?? $this;
         } elseif ($default) {
-            return $default($this, $value) ?: $this;
+            return $default($this, $value) ?? $this;
         }
 
         return $this;
@@ -37,11 +38,12 @@ trait Conditionable
     /**
      * Apply the callback if the given "value" is (or resolves to) falsy.
      *
+     * @template TUnlessParameter
      * @template TUnlessReturnType
      *
-     * @param  bool  $value
-     * @param  (callable($this): TUnlessReturnType)  $callback
-     * @param  (callable($this): TUnlessReturnType)|null  $default
+     * @param  (\Closure($this): TUnlessParameter)|TUnlessParameter  $value
+     * @param  (callable($this, TUnlessParameter): TUnlessReturnType)|null  $callback
+     * @param  (callable($this, TUnlessParameter): TUnlessReturnType)|null  $default
      * @return $this|TUnlessReturnType
      */
     public function unless($value, callable $callback = null, callable $default = null)
@@ -53,9 +55,9 @@ trait Conditionable
         }
 
         if (! $value) {
-            return $callback($this, $value) ?: $this;
+            return $callback($this, $value) ?? $this;
         } elseif ($default) {
-            return $default($this, $value) ?: $this;
+            return $default($this, $value) ?? $this;
         }
 
         return $this;

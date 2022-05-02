@@ -2,15 +2,17 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
 {
+    use CompilesJsonPaths;
+
     /**
      * The grammar specific operators.
      *
@@ -19,11 +21,11 @@ class Grammar extends BaseGrammar
     protected $operators = [];
 
     /**
-     * The grammar specific bit operators.
+     * The grammar specific bitwise operators.
      *
      * @var array
      */
-    protected $bitOperators = [];
+    protected $bitwiseOperators = [];
 
     /**
      * The components that make up a select clause.
@@ -190,7 +192,7 @@ class Grammar extends BaseGrammar
      */
     public function compileWheres(Builder $query)
     {
-        // Each type of where clauses has its own compiler function which is responsible
+        // Each type of where clause has its own compiler function, which is responsible
         // for actually creating the where clauses SQL. This helps keep the code nice
         // and maintainable since each clause has a very small method that it uses.
         if (is_null($query->wheres)) {
@@ -263,19 +265,15 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Compile a bit operator where clause.
+     * Compile a bitwise operator where clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
-    protected function whereBit(Builder $query, $where)
+    protected function whereBitwise(Builder $query, $where)
     {
-        $value = $this->parameter($where['value']);
-
-        $operator = str_replace('?', '??', $where['operator']);
-
-        return '('.$this->wrap($where['column']).' '.$operator.' '.$value.') != 0';
+        return $this->whereBasic($query, $where);
     }
 
     /**
@@ -625,6 +623,35 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where JSON contains key" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonContainsKey(Builder $query, $where)
+    {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonContainsKey(
+            $where['column']
+        );
+    }
+
+    /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param  string  $column
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function compileJsonContainsKey($column)
+    {
+        throw new RuntimeException('This database engine does not support JSON contains key operations.');
+    }
+
+    /**
      * Compile a "where JSON length" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -683,7 +710,6 @@ class Grammar extends BaseGrammar
      * Compile the "having" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $havings
      * @return string
      */
     protected function compileHavings(Builder $query)
@@ -696,7 +722,6 @@ class Grammar extends BaseGrammar
     /**
      * Compile a single having clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $having
      * @return string
      */
@@ -979,7 +1004,7 @@ class Grammar extends BaseGrammar
         $columns = $this->columnize(array_keys(reset($values)));
 
         // We need to build a list of parameter place-holders of values that are bound
-        // to the query. Each insert should have the exact same amount of parameter
+        // to the query. Each insert should have the exact same number of parameter
         // bindings so we will loop through the record and parameterize them all.
         $parameters = collect($values)->map(function ($record) {
             return '('.$this->parameterize($record).')';
@@ -1266,64 +1291,6 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Split the given JSON selector into the field and the optional path and wrap them separately.
-     *
-     * @param  string  $column
-     * @return array
-     */
-    protected function wrapJsonFieldAndPath($column)
-    {
-        $parts = explode('->', $column, 2);
-
-        $field = $this->wrap($parts[0]);
-
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], '->') : '';
-
-        return [$field, $path];
-    }
-
-    /**
-     * Wrap the given JSON path.
-     *
-     * @param  string  $value
-     * @param  string  $delimiter
-     * @return string
-     */
-    protected function wrapJsonPath($value, $delimiter = '->')
-    {
-        $value = preg_replace("/([\\\\]+)?\\'/", "''", $value);
-
-        $jsonPath = collect(explode($delimiter, $value))
-            ->map(function ($segment) {
-                return $this->wrapJsonPathSegment($segment);
-            })
-            ->join('.');
-
-        return "'$".(str_starts_with($jsonPath, '[') ? '' : '.').$jsonPath."'";
-    }
-
-    /**
-     * Wrap the given JSON path segment.
-     *
-     * @param  string  $segment
-     * @return string
-     */
-    protected function wrapJsonPathSegment($segment)
-    {
-        if (preg_match('/(\[[^\]]+\])+$/', $segment, $parts)) {
-            $key = Str::beforeLast($segment, $parts[0]);
-
-            if (! empty($key)) {
-                return '"'.$key.'"'.$parts[0];
-            }
-
-            return $parts[0];
-        }
-
-        return '"'.$segment.'"';
-    }
-
-    /**
      * Concatenate an array of segments, removing empties.
      *
      * @param  array  $segments
@@ -1358,12 +1325,12 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Get the grammar specific bit operators.
+     * Get the grammar specific bitwise operators.
      *
      * @return array
      */
-    public function getBitOperators()
+    public function getBitwiseOperators()
     {
-        return $this->bitOperators;
+        return $this->bitwiseOperators;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Support\Testing\Fakes\BusFake;
 use Mockery as m;
@@ -55,7 +56,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched after sending the response.'));
         }
 
         $this->fake->dispatchAfterResponse(new BusJobStub);
@@ -71,7 +72,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\BusJobStub] job was not dispatched after sending the response.'));
         }
     }
 
@@ -196,7 +197,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\OtherBusJobStub] job was not dispatched after sending the response.'));
         }
 
         $this->fake->assertDispatchedAfterResponse(OtherBusJobStub::class, function ($job) {
@@ -316,7 +317,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fake->assertNotDispatchedAfterResponse(BusJobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched after sending the response.'));
         }
     }
 
@@ -330,7 +331,7 @@ class SupportTestingBusFakeTest extends TestCase
             });
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched for after sending the response.'));
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\BusJobStub] job was dispatched after sending the response.'));
         }
     }
 
@@ -374,6 +375,19 @@ class SupportTestingBusFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('Jobs were dispatched unexpectedly.'));
         }
+    }
+
+    public function testAssertChained()
+    {
+        $this->fake->chain([
+            new ChainedJobStub,
+            new OtherBusJobStub,
+        ])->dispatch();
+
+        $this->fake->assertChained([
+            ChainedJobStub::class,
+            OtherBusJobStub::class,
+        ]);
     }
 
     public function testAssertDispatchedWithIgnoreClass()
@@ -445,6 +459,11 @@ class SupportTestingBusFakeTest extends TestCase
 class BusJobStub
 {
     //
+}
+
+class ChainedJobStub
+{
+    use Queueable;
 }
 
 class OtherBusJobStub

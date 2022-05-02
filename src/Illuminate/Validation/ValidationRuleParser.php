@@ -85,15 +85,19 @@ class ValidationRuleParser
     protected function explodeExplicitRule($rule, $attribute)
     {
         if (is_string($rule)) {
-            return explode('|', $rule);
-        } elseif (is_object($rule)) {
+            [$name] = static::parseStringRule($rule);
+
+            return static::ruleIsRegex($name) ? [$rule] : explode('|', $rule);
+        }
+
+        if (is_object($rule)) {
             return Arr::wrap($this->prepareRule($rule, $attribute));
         }
 
         return array_map(
             [$this, 'prepareRule'],
             $rule,
-            array_fill(array_key_first($rule), count($rule), $attribute)
+            array_fill((int) array_key_first($rule), count($rule), $attribute)
         );
     }
 
@@ -272,13 +276,18 @@ class ValidationRuleParser
      */
     protected static function parseParameters($rule, $parameter)
     {
-        $rule = strtolower($rule);
+        return static::ruleIsRegex($rule) ? [$parameter] : str_getcsv($parameter);
+    }
 
-        if (in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
-            return [$parameter];
-        }
-
-        return str_getcsv($parameter);
+    /**
+     * Determine if the rule is a regular expression.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected static function ruleIsRegex($rule)
+    {
+        return in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
     }
 
     /**
@@ -313,8 +322,8 @@ class ValidationRuleParser
 
             if ($attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules->passes($data)
-                                ? array_filter($attributeRules->rules())
-                                : array_filter($attributeRules->defaultRules()), ];
+                                ? array_filter($attributeRules->rules($data))
+                                : array_filter($attributeRules->defaultRules($data)), ];
             }
 
             return [$attribute => collect($attributeRules)->map(function ($rule) use ($data) {
@@ -322,7 +331,7 @@ class ValidationRuleParser
                     return [$rule];
                 }
 
-                return $rule->passes($data) ? $rule->rules() : $rule->defaultRules();
+                return $rule->passes($data) ? $rule->rules($data) : $rule->defaultRules($data);
             })->filter()->flatten(1)->values()->all()];
         })->all();
     }

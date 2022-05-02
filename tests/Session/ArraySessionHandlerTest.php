@@ -9,6 +9,13 @@ use SessionHandlerInterface;
 
 class ArraySessionHandlerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Carbon::setTestNow(null);
+    }
+
     public function test_it_implements_the_session_handler_interface()
     {
         $this->assertInstanceOf(SessionHandlerInterface::class, new ArraySessionHandler(10));
@@ -45,7 +52,6 @@ class ArraySessionHandlerTest extends TestCase
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
         $this->assertSame('bar', $handler->read('foo'));
-        Carbon::setTestNow();
     }
 
     public function test_it_reads_data_from_an_expired_session()
@@ -56,7 +62,6 @@ class ArraySessionHandlerTest extends TestCase
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
         $this->assertSame('', $handler->read('foo'));
-        Carbon::setTestNow();
     }
 
     public function test_it_reads_data_from_a_non_existing_session()
@@ -108,7 +113,5 @@ class ArraySessionHandlerTest extends TestCase
         $this->assertSame(1, $handler->gc(300));
         $this->assertSame('', $handler->read('foo'));
         $this->assertSame('qux', $handler->read('baz'));
-
-        Carbon::setTestNow();
     }
 }

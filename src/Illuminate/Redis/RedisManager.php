@@ -171,6 +171,7 @@ class RedisManager implements Factory
         return match ($this->driver) {
             'predis' => new PredisConnector,
             'phpredis' => new PhpRedisConnector,
+            default => null,
         };
     }
 

@@ -42,11 +42,12 @@ class Queue extends Facade
     /**
      * Replace the bound instance with a fake.
      *
+     * @param  array|string  $jobsToFake
      * @return \Illuminate\Support\Testing\Fakes\QueueFake
      */
-    public static function fake()
+    public static function fake($jobsToFake = [])
     {
-        static::swap($fake = new QueueFake(static::getFacadeApplication()));
+        static::swap($fake = new QueueFake(static::getFacadeApplication(), $jobsToFake, static::getFacadeRoot()));
 
         return $fake;
     }

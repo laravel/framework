@@ -150,6 +150,13 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testUcsplitOnStringable()
+    {
+        $this->assertSame(['Taylor', 'Otwell'], $this->stringable('TaylorOtwell')->ucsplit()->toArray());
+        $this->assertSame(['Hello', 'From', 'Laravel'], $this->stringable('HelloFromLaravel')->ucsplit()->toArray());
+        $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
+    }
+
     public function testWhenEndsWith()
     {
         $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {
@@ -412,6 +419,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('u', (string) $this->stringable('ü')->ascii());
     }
 
+    public function testNewLine()
+    {
+        $this->assertSame('Laravel'.PHP_EOL, (string) $this->stringable('Laravel')->newLine());
+        $this->assertSame('foo'.PHP_EOL.PHP_EOL.'bar', (string) $this->stringable('foo')->newLine(2)->append('bar'));
+    }
+
     public function testAsciiWithSpecificLocale()
     {
         $this->assertSame('h H sht Sht a A ia yo', (string) $this->stringable('х Х щ Щ ъ Ъ иа йо')->ascii('bg'));
@@ -474,6 +487,11 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Malmö')->endsWith('mo'));
     }
 
+    public function testExcerpt()
+    {
+        $this->assertSame('...is a beautiful morn...', (string) $this->stringable('This is a beautiful morning')->excerpt('beautiful', ['radius' => 5]));
+    }
+
     public function testBefore()
     {
         $this->assertSame('han', (string) $this->stringable('hannah')->before('nah'));
@@ -512,6 +530,21 @@ class SupportStringableTest extends TestCase
         $this->assertSame('a]ab[b', (string) $this->stringable('[a]ab[b]')->between('[', ']'));
         $this->assertSame('foo', (string) $this->stringable('foofoobar')->between('foo', 'bar'));
         $this->assertSame('bar', (string) $this->stringable('foobarbar')->between('foo', 'bar'));
+    }
+
+    public function testBetweenFirst()
+    {
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('', 'c'));
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('a', ''));
+        $this->assertSame('abc', (string) $this->stringable('abc')->betweenFirst('', ''));
+        $this->assertSame('b', (string) $this->stringable('abc')->betweenFirst('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('dddabc')->betweenFirst('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('abcddd')->betweenFirst('a', 'c'));
+        $this->assertSame('b', (string) $this->stringable('dddabcddd')->betweenFirst('a', 'c'));
+        $this->assertSame('nn', (string) $this->stringable('hannah')->betweenFirst('ha', 'ah'));
+        $this->assertSame('a', (string) $this->stringable('[a]ab[b]')->betweenFirst('[', ']'));
+        $this->assertSame('foo', (string) $this->stringable('foofoobar')->betweenFirst('foo', 'bar'));
+        $this->assertSame('', (string) $this->stringable('foobarbar')->betweenFirst('foo', 'bar'));
     }
 
     public function testAfter()
@@ -576,6 +609,24 @@ class SupportStringableTest extends TestCase
         $this->assertSame('sometext', (string) $this->stringable('some text')->slug(''));
         $this->assertSame('', (string) $this->stringable('')->slug(''));
         $this->assertSame('', (string) $this->stringable('')->slug());
+    }
+
+    public function testSquish()
+    {
+        $this->assertSame('words with spaces', (string) $this->stringable(' words  with   spaces ')->squish());
+        $this->assertSame('words with spaces', (string) $this->stringable("words\t\twith\n\nspaces")->squish());
+        $this->assertSame('words with spaces', (string) $this->stringable('
+            words
+            with
+            spaces
+        ')->squish());
+        $this->assertSame('laravel php framework', (string) $this->stringable('   laravel   php   framework   ')->squish());
+        $this->assertSame('123', (string) $this->stringable('   123    ')->squish());
+        $this->assertSame('だ', (string) $this->stringable('だ')->squish());
+        $this->assertSame('ム', (string) $this->stringable('ム')->squish());
+        $this->assertSame('だ', (string) $this->stringable('   だ    ')->squish());
+        $this->assertSame('ム', (string) $this->stringable('   ム    ')->squish());
+        $this->assertSame('ム', (string) $this->stringable('﻿   ム ﻿﻿   ﻿')->squish());
     }
 
     public function testStart()
@@ -795,6 +846,14 @@ class SupportStringableTest extends TestCase
         $this->assertSame('', (string) $this->stringable('Б')->substr(2));
     }
 
+    public function testSwap()
+    {
+        $this->assertSame('PHP 8 is fantastic', (string) $this->stringable('PHP is awesome')->swap([
+            'PHP' => 'PHP 8',
+            'awesome' => 'fantastic',
+        ]));
+    }
+
     public function testSubstrCount()
     {
         $this->assertSame(3, $this->stringable('laravelPHPFramework')->substrCount('a'));
@@ -820,18 +879,21 @@ class SupportStringableTest extends TestCase
     {
         $this->assertSame('__Alien___', (string) $this->stringable('Alien')->padBoth(10, '_'));
         $this->assertSame('  Alien   ', (string) $this->stringable('Alien')->padBoth(10));
+        $this->assertSame('  ❤MultiByte☆   ', (string) $this->stringable('❤MultiByte☆')->padBoth(16));
     }
 
     public function testPadLeft()
     {
         $this->assertSame('-=-=-Alien', (string) $this->stringable('Alien')->padLeft(10, '-='));
         $this->assertSame('     Alien', (string) $this->stringable('Alien')->padLeft(10));
+        $this->assertSame('     ❤MultiByte☆', (string) $this->stringable('❤MultiByte☆')->padLeft(16));
     }
 
     public function testPadRight()
     {
         $this->assertSame('Alien-----', (string) $this->stringable('Alien')->padRight(10, '-'));
         $this->assertSame('Alien     ', (string) $this->stringable('Alien')->padRight(10));
+        $this->assertSame('❤MultiByte☆     ', (string) $this->stringable('❤MultiByte☆')->padRight(16));
     }
 
     public function testChunk()
@@ -882,23 +944,23 @@ class SupportStringableTest extends TestCase
 
     public function testMask()
     {
-        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', 3));
-        $this->assertEquals('******@email.com', $this->stringable('taylor@email.com')->mask('*', 0, 6));
-        $this->assertEquals('tay*************', $this->stringable('taylor@email.com')->mask('*', -13));
-        $this->assertEquals('tay***@email.com', $this->stringable('taylor@email.com')->mask('*', -13, 3));
+        $this->assertSame('tay*************', (string) $this->stringable('taylor@email.com')->mask('*', 3));
+        $this->assertSame('******@email.com', (string) $this->stringable('taylor@email.com')->mask('*', 0, 6));
+        $this->assertSame('tay*************', (string) $this->stringable('taylor@email.com')->mask('*', -13));
+        $this->assertSame('tay***@email.com', (string) $this->stringable('taylor@email.com')->mask('*', -13, 3));
 
-        $this->assertEquals('****************', $this->stringable('taylor@email.com')->mask('*', -17));
-        $this->assertEquals('*****r@email.com', $this->stringable('taylor@email.com')->mask('*', -99, 5));
+        $this->assertSame('****************', (string) $this->stringable('taylor@email.com')->mask('*', -17));
+        $this->assertSame('*****r@email.com', (string) $this->stringable('taylor@email.com')->mask('*', -99, 5));
 
-        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16));
-        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('*', 16, 99));
+        $this->assertSame('taylor@email.com', (string) $this->stringable('taylor@email.com')->mask('*', 16));
+        $this->assertSame('taylor@email.com', (string) $this->stringable('taylor@email.com')->mask('*', 16, 99));
 
-        $this->assertEquals('taylor@email.com', $this->stringable('taylor@email.com')->mask('', 3));
+        $this->assertSame('taylor@email.com', (string) $this->stringable('taylor@email.com')->mask('', 3));
 
-        $this->assertEquals('taysssssssssssss', $this->stringable('taylor@email.com')->mask('something', 3));
+        $this->assertSame('taysssssssssssss', (string) $this->stringable('taylor@email.com')->mask('something', 3));
 
-        $this->assertEquals('这是一***', $this->stringable('这是一段中文')->mask('*', 3));
-        $this->assertEquals('**一段中文', $this->stringable('这是一段中文')->mask('*', 0, 2));
+        $this->assertSame('这是一***', (string) $this->stringable('这是一段中文')->mask('*', 3));
+        $this->assertSame('**一段中文', (string) $this->stringable('这是一段中文')->mask('*', 0, 2));
     }
 
     public function testRepeat()
@@ -911,6 +973,12 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals(2, $this->stringable('Hello, world!')->wordCount());
         $this->assertEquals(10, $this->stringable('Hi, this is my first contribution to the Laravel framework.')->wordCount());
+    }
+
+    public function testWrap()
+    {
+        $this->assertEquals('This is me!', $this->stringable('is')->wrap('This ', ' me!'));
+        $this->assertEquals('"value"', $this->stringable('value')->wrap('"'));
     }
 
     public function testToHtmlString()
@@ -934,5 +1002,22 @@ class SupportStringableTest extends TestCase
         $this->assertSame([123456], $this->stringable('SN/123456')->scan('SN/%d')->toArray());
         $this->assertSame(['Otwell', 'Taylor'], $this->stringable('Otwell, Taylor')->scan('%[^,],%s')->toArray());
         $this->assertSame(['filename', 'jpg'], $this->stringable('filename.jpg')->scan('%[^.].%s')->toArray());
+    }
+
+    public function testGet()
+    {
+        $this->assertSame('foo', $this->stringable('foo')->value());
+        $this->assertSame('foo', $this->stringable('foo')->toString());
+    }
+
+    public function testExactly()
+    {
+        $this->assertTrue($this->stringable('foo')->exactly($this->stringable('foo')));
+        $this->assertTrue($this->stringable('foo')->exactly('foo'));
+
+        $this->assertFalse($this->stringable('Foo')->exactly($this->stringable('foo')));
+        $this->assertFalse($this->stringable('Foo')->exactly('foo'));
+        $this->assertFalse($this->stringable('[]')->exactly([]));
+        $this->assertFalse($this->stringable('0')->exactly(0));
     }
 }

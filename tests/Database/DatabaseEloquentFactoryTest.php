@@ -7,11 +7,13 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\CrossJoinSequence;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Mockery;
+use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentFactoryTest extends TestCase
@@ -22,7 +24,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('App\\');
 
         $db = new DB;
@@ -87,7 +89,7 @@ class DatabaseEloquentFactoryTest extends TestCase
      */
     protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
 
         $this->schema()->drop('users');
 
@@ -103,6 +105,10 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $user);
 
         $user = FactoryTestUserFactory::new()->create(['name' => 'Taylor Otwell']);
+        $this->assertInstanceOf(Eloquent::class, $user);
+        $this->assertSame('Taylor Otwell', $user->name);
+
+        $user = FactoryTestUserFactory::new()->set('name', 'Taylor Otwell')->create();
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertSame('Taylor Otwell', $user->name);
 
@@ -413,6 +419,61 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('index: 1', $users[1]->name);
     }
 
+    public function test_counted_sequence()
+    {
+        $factory = FactoryTestUserFactory::new()->forEachSequence(
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Abigail Otwell'],
+            ['name' => 'Dayle Rees']
+        );
+
+        $class = new \ReflectionClass($factory);
+        $prop = $class->getProperty('count');
+        $prop->setAccessible(true);
+        $value = $prop->getValue($factory);
+
+        $this->assertSame(3, $value);
+    }
+
+    public function test_cross_join_sequences()
+    {
+        $assert = function ($users) {
+            $assertions = [
+                ['first_name' => 'Thomas', 'last_name' => 'Anderson'],
+                ['first_name' => 'Thomas', 'last_name' => 'Smith'],
+                ['first_name' => 'Agent', 'last_name' => 'Anderson'],
+                ['first_name' => 'Agent', 'last_name' => 'Smith'],
+            ];
+
+            foreach ($assertions as $key => $assertion) {
+                $this->assertSame(
+                    $assertion,
+                    $users[$key]->only('first_name', 'last_name'),
+                );
+            }
+        };
+
+        $usersByClass = FactoryTestUserFactory::times(4)
+            ->state(
+                new CrossJoinSequence(
+                    [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
+                    [['last_name' => 'Anderson'], ['last_name' => 'Smith']],
+                ),
+            )
+            ->make();
+
+        $assert($usersByClass);
+
+        $usersByMethod = FactoryTestUserFactory::times(4)
+            ->crossJoinSequence(
+                [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
+                [['last_name' => 'Anderson'], ['last_name' => 'Smith']],
+            )
+            ->make();
+
+        $assert($usersByMethod);
+    }
+
     public function test_resolve_nested_model_factories()
     {
         Factory::useNamespace('Factories\\');
@@ -429,9 +490,21 @@ class DatabaseEloquentFactoryTest extends TestCase
         }
     }
 
+    public function test_resolve_nested_model_name_from_factory()
+    {
+        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
+        $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
+
+        Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
+
+        $factory = Price::factory();
+
+        $this->assertSame(Price::class, $factory->modelName());
+    }
+
     public function test_resolve_non_app_nested_model_factories()
     {
-        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('Foo\\');
 
         Factory::useNamespace('Factories\\');

@@ -36,13 +36,17 @@ class UniqueLock
                     ? $job->uniqueId()
                     : ($job->uniqueId ?? '');
 
+        $uniqueFor = method_exists($job, 'uniqueFor')
+                    ? $job->uniqueFor()
+                    : ($job->uniqueFor ?? 0);
+
         $cache = method_exists($job, 'uniqueVia')
                     ? $job->uniqueVia()
                     : $this->cache;
 
         return (bool) $cache->lock(
             $key = 'laravel_unique_job:'.get_class($job).$uniqueId,
-            $job->uniqueFor ?? 0
+            $uniqueFor
         )->get();
     }
 }

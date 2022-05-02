@@ -2,11 +2,20 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailer;
+use Illuminate\Mail\Transport\ArrayTransport;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        m::close();
+    }
+
     public function testMailableSetsRecipientsCorrectly()
     {
         $mailable = new WelcomeMailableStub;
@@ -295,6 +304,13 @@ class MailMailableTest extends TestCase
         }
     }
 
+    public function testMailableSetsSubjectCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->subject('foo');
+        $this->assertTrue($mailable->hasSubject('foo'));
+    }
+
     public function testItIgnoresDuplicatedRawAttachments()
     {
         $mailable = new WelcomeMailableStub;
@@ -416,6 +432,67 @@ class MailMailableTest extends TestCase
         $mailable = unserialize(serialize($mailable));
 
         $this->assertSame('array', $mailable->mailer);
+    }
+
+    public function testMailablePriorityGetsSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->priority(1);
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertStringContainsString('X-Priority: 1 (Highest)', $sentMessage->toString());
+    }
+
+    public function testMailableMetadataGetsSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->metadata('origin', 'test-suite');
+        $mailable->metadata('user_id', 1);
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertStringContainsString('X-Metadata-origin: test-suite', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-user_id: 1', $sentMessage->toString());
+    }
+
+    public function testMailableTagGetsSent()
+    {
+        $view = m::mock(Factory::class);
+
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->tag('test');
+        $mailable->tag('foo');
+
+        $sentMessage = $mailer->send($mailable);
+
+        $this->assertSame('hello@laravel.com', $sentMessage->getEnvelope()->getRecipients()[0]->getAddress());
+        $this->assertStringContainsString('X-Tag: test', $sentMessage->toString());
+        $this->assertStringContainsString('X-Tag: foo', $sentMessage->toString());
     }
 }
 

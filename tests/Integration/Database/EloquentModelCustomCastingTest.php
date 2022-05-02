@@ -156,7 +156,7 @@ class AddressCast implements CastsAttributes
      * @param  string  $key
      * @param  mixed  $value
      * @param  array  $attributes
-     * @return AddressModel
+     * @return \Illuminate\Tests\Integration\Database\AddressModel
      */
     public function get($model, $key, $value, $attributes)
     {
