@@ -441,6 +441,21 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $session->getName());
     }
 
+    public function testKeyHas()
+    {
+        $session = $this->getSession();
+        $session->put('first_name', 'Mehdi');
+        $session->put('last_name', 'Rajabi');
+
+        $this->assertTrue($session->has('first_name'));
+        $this->assertTrue($session->has('last_name'));
+        $this->assertTrue($session->has('first_name', 'last_name'));
+        $this->assertTrue($session->has(['first_name', 'last_name']));
+
+        $this->assertFalse($session->has('first_name', 'foo'));
+        $this->assertFalse($session->has('foo', 'bar'));
+    }
+
     public function testKeyExists()
     {
         $session = $this->getSession();
