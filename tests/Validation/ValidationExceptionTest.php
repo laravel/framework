@@ -61,4 +61,13 @@ class ValidationExceptionTest extends TestCase
 
         return new ValidationException($validator);
     }
+
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
+
+        Facade::clearResolvedInstances();
+
+        Facade::setFacadeApplication(null);
+    }
 }
