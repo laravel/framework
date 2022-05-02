@@ -95,6 +95,13 @@ class Factory
     protected $responseSequences = [];
 
     /**
+     * Require requests to have a fake stub.
+     *
+     * @var bool
+     */
+    protected $enforceFaking = false;
+
+    /**
      * Create a new factory instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
@@ -218,6 +225,30 @@ class Factory
                         ? $callback($request, $options)
                         : $callback;
         });
+    }
+
+    /**
+     * Require requests to have a fake stub.
+     *
+     * @return $this
+     */
+    public function enforceFaking()
+    {
+        $this->enforceFaking = true;
+
+        return $this;
+    }
+
+    /**
+     * Do not require requests to have a fake stub.
+     *
+     * @return $this
+     */
+    public function dontEnforceFaking()
+    {
+        $this->enforceFaking = false;
+
+        return $this;
     }
 
     /**
@@ -390,7 +421,7 @@ class Factory
         }
 
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks);
+            $request->stub($this->stubCallbacks)->enforceFaking($this->enforceFaking);
         })->{$method}(...$parameters);
     }
 }

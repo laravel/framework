@@ -20,6 +20,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
+use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
 class PendingRequest
@@ -137,6 +138,13 @@ class PendingRequest
      * @var \Illuminate\Support\Collection|null
      */
     protected $stubCallbacks;
+
+    /**
+     * Request must have a fake stub.
+     *
+     * @var bool
+     */
+    protected $enforceFaking = false;
 
     /**
      * The middleware callables added by users that will handle requests.
@@ -1040,6 +1048,10 @@ class PendingRequest
                      ->first();
 
                 if (is_null($response)) {
+                    if ($this->enforceFaking) {
+                        throw new RuntimeException('Attempted request to ['.(string) $request->getUri().'] without a matching fake.');
+                    }
+
                     return $handler($request, $options);
                 }
 
@@ -1119,6 +1131,18 @@ class PendingRequest
     public function stub($callback)
     {
         $this->stubCallbacks = collect($callback);
+
+        return $this;
+    }
+
+    /**
+     * Require request to have a fake stub.
+     *
+     * @return $this
+     */
+    public function enforceFaking($enforce = true)
+    {
+        $this->enforceFaking = $enforce;
 
         return $this;
     }
