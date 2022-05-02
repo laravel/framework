@@ -131,11 +131,11 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  \Illuminate\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Dispatcher $events, Container $container = null)
+    public function __construct(Dispatcher $events, Container $container = new Container)
     {
         $this->events = $events;
         $this->routes = new RouteCollection;
-        $this->container = $container ?: new Container;
+        $this->container = $container;
     }
 
     /**

@@ -27,9 +27,9 @@ class Manager
      * @param  \Illuminate\Container\Container|null  $container
      * @return void
      */
-    public function __construct(Container $container = null)
+    public function __construct(Container $container = new Container)
     {
-        $this->setupContainer($container ?: new Container);
+        $this->setupContainer($container);
 
         // Once we have the container setup, we will setup the default configuration
         // options in the container "config" binding. This will make the database
