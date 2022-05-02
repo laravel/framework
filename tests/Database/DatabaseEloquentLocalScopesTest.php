@@ -54,6 +54,15 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertEquals(['foo'], $query->getBindings());
     }
 
+    public function testLocalScopesCanChained()
+    {
+        $model = new EloquentLocalScopesTestModel;
+        $query = $model->newQuery()->active()->type('foo');
+
+        $this->assertSame('select * from "table" where "active" = ? and "type" = ?', $query->toSql());
+        $this->assertEquals([true, 'foo'], $query->getBindings());
+    }
+
     public function testClassBasedLocalScopeIsApplied()
     {
         $model = new EloquentLocalScopesTestModel;
@@ -72,7 +81,7 @@ class DatabaseEloquentLocalScopesTest extends TestCase
         $this->assertEquals([1000], $query->getBindings());
     }
 
-    public function testClassAndMethodBasedLocalScopesAreChainable()
+    public function testClassAndMethodBasedLocalScopesCanBeChained()
     {
         $model = new EloquentLocalScopesTestModel;
         $query = $model->newQuery()->type('foo')->price(1000);

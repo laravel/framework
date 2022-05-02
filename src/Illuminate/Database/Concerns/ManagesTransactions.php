@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
+use Illuminate\Database\DeadlockException;
 use RuntimeException;
 use Throwable;
 
@@ -87,7 +88,11 @@ trait ManagesTransactions
                 $this->getName(), $this->transactions
             );
 
-            throw $e;
+            throw new DeadlockException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e->getPrevious()
+            );
         }
 
         // If there was an exception we will rollback this transaction and then we
@@ -226,8 +231,7 @@ trait ManagesTransactions
     {
         $this->transactions = max(0, $this->transactions - 1);
 
-        if ($this->causedByConcurrencyError($e) &&
-            $currentAttempt < $maxAttempts) {
+        if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
             return;
         }
 

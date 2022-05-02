@@ -55,6 +55,13 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testEmptyRulesCanBeExploded()
+    {
+        $parser = new ValidationRuleParser(['foo' => 'bar']);
+
+        $this->assertIsObject($parser->explode(['foo' => []]));
+    }
+
     public function testConditionalRulesWithDefault()
     {
         $rules = ValidationRuleParser::filterConditionalRules([

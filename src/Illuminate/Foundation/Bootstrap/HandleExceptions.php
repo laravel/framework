@@ -102,9 +102,7 @@ class HandleExceptions
         $this->ensureDeprecationLoggerIsConfigured();
 
         with($logger->channel('deprecations'), function ($log) use ($message, $file, $line) {
-            $log->warning(sprintf('%s in %s on line %s',
-                $message, $file, $line
-            ));
+            $log->warning((string) new ErrorException($message, 0, E_DEPRECATED, $file, $line));
         });
     }
 

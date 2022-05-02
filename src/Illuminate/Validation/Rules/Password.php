@@ -66,14 +66,14 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $symbols = false;
 
     /**
-     * If the password should has not been compromised in data leaks.
+     * If the password should not have been compromised in data leaks.
      *
      * @var bool
      */
     protected $uncompromised = false;
 
     /**
-     * The number of times a password can appear in data leaks before being consider compromised.
+     * The number of times a password can appear in data leaks before being considered compromised.
      *
      * @var int
      */
