@@ -258,7 +258,7 @@ trait InteractsWithInput
     {
         if ($this->getRealMethod() === 'GET') {
             $data = $this->query;
-        } else if($this->isJson()) {
+        } elseif ($this->isJson()) {
             $data = $this->json();
         } else {
             $data = $this->request;
