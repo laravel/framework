@@ -84,7 +84,7 @@ class HandleExceptions
      * @param  int  $line
      * @return void
      *
-     * @deprecated Use doDeprecation instead.
+     * @deprecated Use handleDeprecationError instead.
      */
     public function handleDeprecation($message, $file, $line)
     {
@@ -117,8 +117,16 @@ class HandleExceptions
 
         $this->ensureDeprecationLoggerIsConfigured();
 
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level) {
-            $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+        $options = static::$app['config']->get('logging.deprecations') ?? [];
+
+        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+            if ($options['trace'] ?? false) {
+                $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+            } else {
+                $log->warning(sprintf('%s in %s on line %s',
+                    $message, $file, $line
+                ));
+            }
         });
     }
 
@@ -136,7 +144,9 @@ class HandleExceptions
 
             $this->ensureNullLogDriverIsConfigured();
 
-            $driver = $config->get('logging.deprecations') ?? 'null';
+            $options = $config->get('logging.deprecations');
+
+            $driver = is_array($options) ? $options['channel'] : ($options ?? 'null');
 
             $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
         });
