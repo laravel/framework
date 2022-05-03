@@ -424,7 +424,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function attemptWith(AuthenticatableContract $user, array $credentials = [], $remember = false)
     {
-        $this->fireAttemptEvent(['user' => $user, ...$credentials], $remember);
+        $this->fireAttemptEvent(array_merge(['user' => $user], $credentials), $remember);
 
         $this->lastAttempted = $user;
 

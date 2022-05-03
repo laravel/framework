@@ -181,7 +181,7 @@ class AuthenticationTest extends TestCase
 
         Event::assertDispatched(Attempting::class, function ($event) use ($user, $credentials) {
             $this->assertSame('web', $event->guard);
-            $this->assertEquals(['user' => $user, ...$credentials], $event->credentials);
+            $this->assertEquals(array_merge(['user' => $user], $credentials), $event->credentials);
 
             return true;
         });
