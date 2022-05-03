@@ -105,9 +105,9 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (empty($credentials) ||
-           (count($credentials) === 1 &&
-            str_contains($this->firstCredentialKey($credentials), 'password'))) {
+        $credentials = $this->credentialsWithoutPassword($credentials);
+
+        if (empty($credentials)) {
             return;
         }
 
@@ -117,10 +117,6 @@ class EloquentUserProvider implements UserProvider
         $query = $this->newModelQuery();
 
         foreach ($credentials as $key => $value) {
-            if (str_contains($key, 'password')) {
-                continue;
-            }
-
             if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
@@ -134,14 +130,14 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
-     * Get the first key from the credential array.
+     * Remove password values from credentials array.
      *
      * @param  array  $credentials
-     * @return string|null
+     * @return array
      */
-    protected function firstCredentialKey(array $credentials)
+    protected function credentialsWithoutPassword(array $credentials): array
     {
-        return array_key_first($credentials);
+        return array_filter($credentials, fn ($key) => ! str_contains($key, 'password'), ARRAY_FILTER_USE_KEY);
     }
 
     /**
