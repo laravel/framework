@@ -166,6 +166,72 @@ class AuthenticationTest extends TestCase
         });
     }
 
+    public function testLoggingInFailsViaAttemptWith()
+    {
+        Event::fake();
+
+        $user = AuthenticationTestUser::first();
+
+        $this->assertFalse(
+            $this->app['auth']->attemptWith($user, $credentials = ['password' => 'incorrect-password'])
+        );
+
+        $this->assertFalse($this->app['auth']->check());
+        $this->assertNull($this->app['auth']->user());
+
+        Event::assertDispatched(Attempting::class, function ($event) use ($user, $credentials) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(['user' => $user, ...$credentials], $event->credentials);
+
+            return true;
+        });
+        Event::assertNotDispatched(Validated::class);
+
+        Event::assertDispatched(Failed::class, function ($event) use ($user, $credentials) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals($credentials, $event->credentials);
+            $this->assertEquals($user, $event->user);
+
+            return true;
+        });
+    }
+
+    public function testLoggingInSucceedsViaAttemptWith()
+    {
+        Event::fake();
+
+        $user = AuthenticationTestUser::first();
+
+        $this->assertTrue($this->app['auth']->attemptWith($user, ['password' => 'password']));
+        $this->assertInstanceOf(AuthenticationTestUser::class, $this->app['auth']->user());
+        $this->assertTrue($this->app['auth']->check());
+
+        Event::assertDispatched(Attempting::class, function ($event) use ($user) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(['user' => $user, 'password' => 'password'], $event->credentials);
+
+            return true;
+        });
+        Event::assertDispatched(Validated::class, function ($event) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(1, $event->user->id);
+
+            return true;
+        });
+        Event::assertDispatched(Login::class, function ($event) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(1, $event->user->id);
+
+            return true;
+        });
+        Event::assertDispatched(Authenticated::class, function ($event) {
+            $this->assertSame('web', $event->guard);
+            $this->assertEquals(1, $event->user->id);
+
+            return true;
+        });
+    }
+
     public function testLoggingInUsingId()
     {
         $this->app['auth']->loginUsingId(1);
