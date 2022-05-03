@@ -1,6 +1,20 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.10.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.11.0...9.x)
+
+
+## [v9.11.0](https://github.com/laravel/framework/compare/v9.10.1...v9.11.0) - 2022-05-03
+
+### Added
+- Added Illuminate/Collections/Arr::join() ([#42197](https://github.com/laravel/framework/pull/42197))
+- Added has and missing methods to ValidatedInput ([#42184](https://github.com/laravel/framework/pull/42184))
+- Added deprecation stack trace config option ([#42235](https://github.com/laravel/framework/pull/42235))
+
+### Fixed
+- Fix deprecation issue with translator and empty rules ([#42216](https://github.com/laravel/framework/pull/42216), [#42213](https://github.com/laravel/framework/pull/42213))
+
+### Changed
+- Improve EventFake::assertListening() support for subscribers ([#42193](https://github.com/laravel/framework/pull/42193))
 
 
 ## [v9.10.1](https://github.com/laravel/framework/compare/v9.10.0...v9.10.1) - 2022-04-28
