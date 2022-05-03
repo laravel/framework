@@ -1,6 +1,13 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.10...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.11...8.x)
+
+
+## [v8.83.11 (2022-05-03)](https://github.com/laravel/framework/compare/v8.83.10...v8.83.11)
+
+### Fixed
+- Fix refresh during down in the stub ([#42217](https://github.com/laravel/framework/pull/42217))
+- Fix deprecation issue with translator ([#42216](https://github.com/laravel/framework/pull/42216))
 
 
 ## [v8.83.10 (2022-04-27)](https://github.com/laravel/framework/compare/v8.83.9...v8.83.10)
