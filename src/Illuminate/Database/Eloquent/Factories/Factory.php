@@ -465,7 +465,7 @@ abstract class Factory
                 }
 
                 $definition[$key] = $attribute;
-                
+
                 return $attribute;
             })
             ->all();
