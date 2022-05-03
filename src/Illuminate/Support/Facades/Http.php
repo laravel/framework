@@ -44,7 +44,6 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
- * @method static \Illuminate\Http\Client\Factory dontEnforceFaking()
  * @method static void assertSent(callable $callback)
  * @method static void assertSentInOrder(array $callbacks)
  * @method static void assertNotSent(callable $callback)
@@ -105,18 +104,6 @@ class Http extends Facade
     {
         return tap(static::getFacadeRoot(), function ($fake) use ($url, $callback) {
             static::swap($fake->stubUrl($url, $callback));
-        });
-    }
-
-    /**
-     * Require requests to have a fake stub.
-     *
-     * @return \Illuminate\Http\Client\Factory
-     */
-    public static function enforceFaking()
-    {
-        return tap(static::getFacadeRoot(), function ($fake) {
-            static::swap($fake->enforceFaking());
         });
     }
 }

@@ -99,7 +99,7 @@ class Factory
      *
      * @var bool
      */
-    protected $enforceFaking = false;
+    protected $strictFake = false;
 
     /**
      * Create a new factory instance.
@@ -228,25 +228,14 @@ class Factory
     }
 
     /**
-     * Require requests to have a fake stub.
+     * Indicate that an exception should be thrown if any request is not faked.
      *
+     * @param  bool  $strict
      * @return $this
      */
-    public function enforceFaking()
+    public function strict($strict = true)
     {
-        $this->enforceFaking = true;
-
-        return $this;
-    }
-
-    /**
-     * Do not require requests to have a fake stub.
-     *
-     * @return $this
-     */
-    public function dontEnforceFaking()
-    {
-        $this->enforceFaking = false;
+        $this->strictFake = $strict;
 
         return $this;
     }
@@ -421,7 +410,7 @@ class Factory
         }
 
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->enforceFaking($this->enforceFaking);
+            $request->stub($this->stubCallbacks)->strict($this->strictFake);
         })->{$method}(...$parameters);
     }
 }

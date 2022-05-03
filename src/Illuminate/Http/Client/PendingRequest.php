@@ -144,7 +144,7 @@ class PendingRequest
      *
      * @var bool
      */
-    protected $enforceFaking = false;
+    protected $strictFake = false;
 
     /**
      * The middleware callables added by users that will handle requests.
@@ -1048,7 +1048,7 @@ class PendingRequest
                      ->first();
 
                 if (is_null($response)) {
-                    if ($this->enforceFaking) {
+                    if ($this->strictFake) {
                         throw new RuntimeException('Attempted request to ['.(string) $request->getUri().'] without a matching fake.');
                     }
 
@@ -1136,13 +1136,13 @@ class PendingRequest
     }
 
     /**
-     * Require request to have a fake stub.
+     * Indicate that an exception should be thrown if any request is not faked.
      *
      * @return $this
      */
-    public function enforceFaking($enforce = true)
+    public function strict($strict = true)
     {
-        $this->enforceFaking = $enforce;
+        $this->strictFake = $strict;
 
         return $this;
     }
