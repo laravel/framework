@@ -95,7 +95,7 @@ class Factory
     protected $responseSequences = [];
 
     /**
-     * Require requests to have a fake stub.
+     * Indicates that an exception should be thrown if any request is not faked.
      *
      * @var bool
      */
