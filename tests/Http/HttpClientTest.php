@@ -25,6 +25,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
 class HttpClientTest extends TestCase
@@ -1526,5 +1527,22 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('http://foo.com/api')->throwIf(false);
 
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testItCanEnforceFaking()
+    {
+        $this->factory->preventStrayRequests();
+        $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
+        $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
+
+        $responses = [];
+        $responses[] = $this->factory->get('https://vapor.laravel.com')->body();
+        $responses[] = $this->factory->get('https://forge.laravel.com')->body();
+        $this->assertSame(['ok', 'ok'], $responses);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+
+        $this->factory->get('https://laravel.com');
     }
 }

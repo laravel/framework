@@ -44,6 +44,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
  * @method static void assertSent(callable $callback)
  * @method static void assertSentInOrder(array $callbacks)
  * @method static void assertNotSent(callable $callback)
@@ -91,6 +92,18 @@ class Http extends Facade
         });
 
         return $fake->fakeSequence($urlPattern);
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any request is not faked.
+     *
+     * @return \Illuminate\Http\Client\Factory
+     */
+    public static function preventStrayRequests()
+    {
+        return tap(static::getFacadeRoot(), function ($fake) {
+            static::swap($fake->preventStrayRequests());
+        });
     }
 
     /**
