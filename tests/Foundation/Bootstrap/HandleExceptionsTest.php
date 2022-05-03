@@ -76,7 +76,7 @@ class HandleExceptionsTest extends TestCase
 
         $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
         $logger->shouldReceive('warning')->with(
-            m::on(fn(string $message) => (bool) preg_match(
+            m::on(fn (string $message) => (bool) preg_match(
                 <<<REGEXP
                 #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
                 Stack trace:
@@ -130,7 +130,7 @@ class HandleExceptionsTest extends TestCase
 
         $logger->shouldReceive('channel')->with('deprecations')->andReturnSelf();
         $logger->shouldReceive('warning')->with(
-            m::on(fn(string $message) => (bool) preg_match(
+            m::on(fn (string $message) => (bool) preg_match(
                 <<<REGEXP
                 #ErrorException: str_contains\(\): Passing null to parameter \#2 \(\\\$needle\) of type string is deprecated in /home/user/laravel/routes/web\.php:17
                 Stack trace:
