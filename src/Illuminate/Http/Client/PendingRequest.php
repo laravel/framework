@@ -20,6 +20,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -1099,11 +1100,17 @@ class PendingRequest
      */
     public function runBeforeSendingCallbacks($request, array $options)
     {
-        return tap($request, function ($request) use ($options) {
-            $this->beforeSendingCallbacks->each(function ($callback) use ($request, $options) {
-                call_user_func(
+        return tap($request, function (&$request) use ($options) {
+            $this->beforeSendingCallbacks->each(function ($callback) use (&$request, $options) {
+                $callbackResult = call_user_func(
                     $callback, (new Request($request))->withData($options['laravel_data']), $options, $this
                 );
+
+                if ($callbackResult instanceof RequestInterface) {
+                    $request = $callbackResult;
+                } elseif ($callbackResult instanceof Request) {
+                    $request = $callbackResult->toPsrRequest();
+                }
             });
         });
     }
