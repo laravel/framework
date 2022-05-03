@@ -30,7 +30,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Get a subset containing the provided keys with values from the input data.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function only($keys)
@@ -55,7 +55,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Get all of the input except for a specified array of items.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function except($keys)
@@ -98,6 +98,36 @@ class ValidatedInput implements ValidatedData
     public function all()
     {
         return $this->input;
+    }
+
+    /**
+     * Determine if the validated input has one or more keys.
+     *
+     * @param  mixed  $keys
+     * @return bool
+     */
+    public function has($keys)
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        foreach ($keys as $key) {
+            if (! Arr::has($this->input, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the validated input is missing one or more keys.
+     *
+     * @param  mixed  $keys
+     * @return bool
+     */
+    public function missing($keys)
+    {
+        return ! $this->has($keys);
     }
 
     /**
