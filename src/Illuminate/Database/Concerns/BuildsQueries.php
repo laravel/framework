@@ -168,8 +168,10 @@ trait BuildsQueries
     public function eachById(callable $callback, $count = 1000, $column = null, $alias = null)
     {
         return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
+            $offset = ($page - 1) * $count;
+
             foreach ($results as $key => $value) {
-                if ($callback($value, (($page - 1) * $count) + $key) === false) {
+                if ($callback($value, $offset + $key) === false) {
                     return false;
                 }
             }
