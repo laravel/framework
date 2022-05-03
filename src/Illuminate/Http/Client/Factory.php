@@ -99,7 +99,7 @@ class Factory
      *
      * @var bool
      */
-    protected $strictFake = false;
+    protected $preventStrayRequests = false;
 
     /**
      * Create a new factory instance.
@@ -228,16 +228,26 @@ class Factory
     }
 
     /**
-     * Indicate that an exception should be thrown if any request is not faked.
+     * Indicate that an exception should not be thrown if any request is not faked.
      *
-     * @param  bool  $strict
+     * @param  bool  $prevent
      * @return $this
      */
-    public function strict($strict = true)
+    public function preventStrayRequests($prevent = true)
     {
-        $this->strictFake = $strict;
+        $this->preventStrayRequests = $prevent;
 
         return $this;
+    }
+
+    /**
+     * Indicate that an exception should not be thrown if any request is not faked.
+     *
+     * @return $this
+     */
+    public function allowStrayRequests()
+    {
+        return $this->preventStrayRequests(false);
     }
 
     /**
@@ -410,7 +420,7 @@ class Factory
         }
 
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->strict($this->strictFake);
+            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
         })->{$method}(...$parameters);
     }
 }

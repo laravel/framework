@@ -144,7 +144,7 @@ class PendingRequest
      *
      * @var bool
      */
-    protected $strictFake = false;
+    protected $preventStrayRequests = false;
 
     /**
      * The middleware callables added by users that will handle requests.
@@ -1048,7 +1048,7 @@ class PendingRequest
                      ->first();
 
                 if (is_null($response)) {
-                    if ($this->strictFake) {
+                    if ($this->preventStrayRequests) {
                         throw new RuntimeException('Attempted request to ['.(string) $request->getUri().'] without a matching fake.');
                     }
 
@@ -1138,11 +1138,12 @@ class PendingRequest
     /**
      * Indicate that an exception should be thrown if any request is not faked.
      *
+     * @param  bool  $prevent
      * @return $this
      */
-    public function strict($strict = true)
+    public function preventStrayRequests($prevent = true)
     {
-        $this->strictFake = $strict;
+        $this->preventStrayRequests = $prevent;
 
         return $this;
     }

@@ -1531,7 +1531,7 @@ class HttpClientTest extends TestCase
 
     public function testItCanEnforceFaking()
     {
-        $this->factory->strict();
+        $this->factory->preventStrayRequests();
         $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
         $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
 
