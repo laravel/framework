@@ -326,6 +326,48 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
+    public function testDataSetWithNewElementAsArray()
+    {
+        $dataArray = [];
+        $dataObject = new stdClass();
+
+        data_set($dataArray, 'person.name', 'John', true, true);
+        data_set($dataObject, 'person.name', 'John', true, true);
+
+        $this->assertEquals([
+            'person' => [
+                'name' => 'John'
+            ]
+        ], $dataArray);
+
+        $this->assertEquals((object) [
+            'person' => [
+                'name' => 'John'
+            ]
+        ], $dataObject);
+    }
+
+    public function testDataSetWithNewElementAsObject()
+    {
+        $dataArray = [];
+        $dataObject = new stdClass();
+
+        data_set($dataArray, 'person.name', 'John', true, false);
+        data_set($dataObject, 'person.name', 'John', true, false);
+
+        $this->assertEquals([
+            'person' => (object) [
+                'name' => 'John'
+            ]
+        ], $dataArray);
+
+        $this->assertEquals((object) [
+            'person' => (object) [
+                'name' => 'John'
+            ]
+        ], $dataObject);
+    }
+
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
