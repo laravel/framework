@@ -419,45 +419,6 @@ class FoundationExceptionsHandlerTest extends TestCase
             Assert::fail('assertThrows failed: non matching message are thrown.');
         }
     }
-
-    public function testAssertExceptionIsThrownWithMessage()
-    {
-        $this->assertThrowsWithMessage(function () {
-            throw new Exception('Some message.');
-        }, 'Some message.');
-        $this->assertThrowsWithMessage(function () {
-            throw new CustomException('Some message.');
-        }, 'Some message.');
-        $this->assertThrowsWithMessage(function () {
-            throw new CustomException('Some message.');
-        }, 'Some message.', CustomException::class);
-
-        try {
-            $this->assertThrowsWithMessage(function () {
-                throw new Exception('Some message.');
-            }, 'Some message.', CustomException::class);
-            $testFailed = true;
-        } catch (AssertionFailedError $exception) {
-            $testFailed = false;
-        }
-
-        if ($testFailed) {
-            Assert::fail('assertThrowsWithMessage failed: non matching exceptions are thrown.');
-        }
-
-        try {
-            $this->assertThrowsWithMessage(function () {
-                throw new Exception('Some message.');
-            }, 'Other message.', Exception::class);
-            $testFailed = true;
-        } catch (AssertionFailedError $exception) {
-            $testFailed = false;
-        }
-
-        if ($testFailed) {
-            Assert::fail('assertThrowsWithMessage failed: non matching message are thrown.');
-        }
-    }
 }
 
 class CustomException extends Exception
