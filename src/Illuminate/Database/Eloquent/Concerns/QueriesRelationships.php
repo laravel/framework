@@ -714,12 +714,11 @@ trait QueriesRelationships
         $whereBindings = $from->getQuery()->getRawBindings()['where'] ?? [];
 
         $wheres = $from->getQuery()->from !== $this->getQuery()->from
-            ? $this->updateQualifiedNames(
+            ? $this->requalifyWhereTables(
                 $from->getQuery()->wheres,
                 $from->getQuery()->from,
                 $this->getModel()->getTable()
-            )
-            : $from->getQuery()->wheres;
+            ) : $from->getQuery()->wheres;
 
         // Here we have some other query that we want to merge the where constraints from. We will
         // copy over any where constraints on the query as well as remove any global scopes the
@@ -729,6 +728,25 @@ trait QueriesRelationships
         )->mergeWheres(
             $wheres, $whereBindings
         );
+    }
+
+    /**
+     * Updates the table name for any columns with a new qualified name.
+     *
+     * @param  array  $wheres
+     * @param  string  $from
+     * @param  string  $to
+     * @return array
+     */
+    protected function requalifyWhereTables(array $wheres, string $from, string $to): array
+    {
+        return collect($wheres)->map(function ($where) use ($from, $to) {
+            return collect($where)->map(function ($value) use ($from, $to) {
+                return str_starts_with($value, $from.'.')
+                    ? $to.'.'.Str::afterLast($value, '.')
+                    : $value;
+            });
+        })->toArray();
     }
 
     /**
@@ -775,24 +793,5 @@ trait QueriesRelationships
     protected function canUseExistsForExistenceCheck($operator, $count)
     {
         return ($operator === '>=' || $operator === '<') && $count === 1;
-    }
-
-    /**
-     * Updates the table name part for any columns with qualified names.
-     *
-     * @param  array  $wheres
-     * @param  string  $from
-     * @param  string  $to
-     * @return array
-     */
-    protected function updateQualifiedNames(array $wheres, string $from, string $to): array
-    {
-        return collect($wheres)->map(function ($where) use ($from, $to) {
-            return collect($where)->map(function ($value) use ($from, $to) {
-                return str_starts_with($value, $from.'.')
-                    ? $to.'.'.Str::afterLast($value, '.')
-                    : $value;
-            });
-        })->toArray();
     }
 }
