@@ -33,7 +33,7 @@ class ForeignKeyDefinition extends Fluent
     {
         return $this->restrictOnUpdate()->restrictOnDelete();
     }
-    
+
     /**
      * Indicate that updates should cascade.
      *
