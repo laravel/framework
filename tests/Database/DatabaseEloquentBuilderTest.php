@@ -1201,13 +1201,19 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testWithCountAndMergedWheres()
     {
+        $sql = 'select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_count" from "eloquent_builder_test_model_parent_stubs"';
+        $wheres = function ($query) {
+            $query->where('bam', '>', 'qux');
+        };
+
         $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->select('id')->withCount(['activeFoo' => $wheres]);
+        $this->assertSame($sql, $builder->toSql());
+        $this->assertEquals(['qux', true], $builder->getBindings());
 
-        $builder = $model->select('id')->withCount(['activeFoo' => function ($q) {
-            $q->where('bam', '>', 'qux');
-        }]);
-
-        $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->select('id')->withCount('activeFoo', $wheres);
+        $this->assertSame($sql, $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
@@ -1285,11 +1291,15 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testWithCountMultipleAndPartialRename()
     {
+        $sql = 'select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"';
+
         $model = new EloquentBuilderTestModelParentStub;
-
         $builder = $model->withCount(['foo as foo_bar', 'foo']);
+        $this->assertSame($sql, $builder->toSql());
 
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->withCount('foo as foo_bar', 'foo');
+        $this->assertSame($sql, $builder->toSql());
     }
 
     public function testWithExists()
@@ -1312,13 +1322,19 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testWithExistsAndMergedWheres()
     {
+        $sql = 'select "id", exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_exists" from "eloquent_builder_test_model_parent_stubs"';
+        $wheres = function ($query) {
+            $query->where('bam', '>', 'qux');
+        };
+
         $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->select('id')->withExists(['activeFoo' => $wheres]);
+        $this->assertSame($sql, $builder->toSql());
+        $this->assertEquals(['qux', true], $builder->getBindings());
 
-        $builder = $model->select('id')->withExists(['activeFoo' => function ($q) {
-            $q->where('bam', '>', 'qux');
-        }]);
-
-        $this->assertSame('select "id", exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bam" > ? and "active" = ?) as "active_foo_exists" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->select('id')->withExists('activeFoo', $wheres);
+        $this->assertSame($sql, $builder->toSql());
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
@@ -1374,11 +1390,15 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testWithExistsMultipleAndPartialRename()
     {
+        $sql = 'select "eloquent_builder_test_model_parent_stubs".*, exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_exists" from "eloquent_builder_test_model_parent_stubs"';
+
         $model = new EloquentBuilderTestModelParentStub;
-
         $builder = $model->withExists(['foo as foo_bar', 'foo']);
+        $this->assertSame($sql, $builder->toSql());
 
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", exists(select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_exists" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+        $model = new EloquentBuilderTestModelParentStub;
+        $builder = $model->withExists('foo as foo_bar', 'foo');
+        $this->assertSame($sql, $builder->toSql());
     }
 
     public function testHasWithConstraintsAndHavingInSubquery()
