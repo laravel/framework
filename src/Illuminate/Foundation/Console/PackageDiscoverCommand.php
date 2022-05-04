@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\PackageManifest;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'package:discover')]
 class PackageDiscoverCommand extends Command
 {
     /**

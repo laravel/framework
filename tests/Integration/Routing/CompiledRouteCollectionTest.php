@@ -527,13 +527,13 @@ class CompiledRouteCollectionTest extends TestCase
 
         $this->assertEquals([
             'HEAD' => [
-                'foo.localhost/same/path' => $routes['foo_domain'],
-                'bar.localhost/same/path' => $routes['bar_domain'],
+                'foo.localhostsame/path' => $routes['foo_domain'],
+                'bar.localhostsame/path' => $routes['bar_domain'],
                 'same/path' => $routes['no_domain'],
             ],
             'GET' => [
-                'foo.localhost/same/path' => $routes['foo_domain'],
-                'bar.localhost/same/path' => $routes['bar_domain'],
+                'foo.localhostsame/path' => $routes['foo_domain'],
+                'bar.localhostsame/path' => $routes['bar_domain'],
                 'same/path' => $routes['no_domain'],
             ],
         ], $this->collection()->getRoutesByMethod());

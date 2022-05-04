@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Validation\Rules\ExcludeIf;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ValidationExcludeIfTest extends TestCase
 {
@@ -34,13 +35,18 @@ class ValidationExcludeIfTest extends TestCase
 
     public function testItOnlyCallableAndBooleanAreAcceptableArgumentsOfTheRule()
     {
-        $rule = new ExcludeIf(false);
+        new ExcludeIf(false);
+        new ExcludeIf(true);
+        new ExcludeIf(fn () => true);
 
-        $rule = new ExcludeIf(true);
-
-        $this->expectException(InvalidArgumentException::class);
-
-        $rule = new ExcludeIf('phpinfo');
+        foreach ([1, 1.1, 'phpinfo', new stdClass] as $condition) {
+            try {
+                new ExcludeIf($condition);
+                $this->fail('The ExcludeIf constructor must not accept '.gettype($condition));
+            } catch (InvalidArgumentException $exception) {
+                $this->assertEquals('The provided condition must be a callable or boolean.', $exception->getMessage());
+            }
+        }
     }
 
     public function testItReturnedRuleIsNotSerializable()

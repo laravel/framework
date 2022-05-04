@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertExists(string|array $path)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem assertDirectoryEmpty(string $path)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertMissing(string|array $path)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem cloud()
  * @method static \Illuminate\Contracts\Filesystem\Filesystem build(string|array $root)

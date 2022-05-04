@@ -285,7 +285,7 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part])) {
+                if (isset($array[$part]) && static::accessible($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
@@ -425,6 +425,33 @@ class Arr
     public static function isList($array)
     {
         return ! self::isAssoc($array);
+    }
+
+    /**
+     * Join all items using a string. The final items can use a separate glue string.
+     *
+     * @param  array  $array
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public static function join($array, $glue, $finalGlue = '')
+    {
+        if ($finalGlue === '') {
+            return implode($glue, $array);
+        }
+
+        if (count($array) === 0) {
+            return '';
+        }
+
+        if (count($array) === 1) {
+            return end($array);
+        }
+
+        $finalItem = array_pop($array);
+
+        return implode($glue, $array).$finalGlue.$finalItem;
     }
 
     /**

@@ -25,6 +25,7 @@ use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
 class HttpClientTest extends TestCase
@@ -93,6 +94,30 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $response->json('result.foo'));
         $this->assertSame('default', $response->json('missing_key', 'default'));
         $this->assertSame(['foo' => 'bar'], $response['result']);
+    }
+
+    public function testResponseObjectAsArray()
+    {
+        $this->factory->fake([
+            '*' => [['foo' => 'bar'], ['bar' => 'foo']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
+        $this->assertSame('[{"foo":"bar"},{"bar":"foo"}]', $response->body());
+        $this->assertSame('[{"foo":"bar"},{"bar":"foo"}]', (string) $response);
+        $this->assertIsArray($response->object());
+        $this->assertSame('bar', $response->object()[0]->foo);
+    }
+
+    public function testResponseObjectAsObject()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api');
+
         $this->assertIsObject($response->object());
         $this->assertSame('bar', $response->object()->result->foo);
     }
@@ -1361,5 +1386,163 @@ class HttpClientTest extends TestCase
         $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
 
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+    }
+
+    public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['success'], 200),
+        ]);
+
+        $response = $this->factory
+            ->throw()
+            ->get('http://foo.com/get');
+
+        $this->assertSame(200, $response->status());
+    }
+
+    public function testRequestExceptionIsThrownIfThePendingRequestIsSetToThrowOnFailure()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory
+                ->throw()
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsThrownWithCallbackIfThePendingRequestIsSetToThrowOnFailure()
+    {
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        $flag = false;
+
+        try {
+            $this->factory
+                ->throw(function ($exception) use (&$flag) {
+                    $flag = true;
+                })
+                ->get('http://foo.com/get');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertTrue($flag);
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsThrownIfTheRequestFails()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throw();
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsThrownWithCallbackIfTheRequestFails()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        $flag = false;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throw(function () use (&$flag) {
+                $flag = true;
+            });
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertTrue($flag);
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfTheRequestDoesNotFail()
+    {
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throw();
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testRequestExceptionIsThrowIfConditionIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwIf(true);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownIfConditionIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['result' => ['foo' => 'bar']], 400),
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throwIf(false);
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
+    public function testItCanEnforceFaking()
+    {
+        $this->factory->preventStrayRequests();
+        $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
+        $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
+
+        $responses = [];
+        $responses[] = $this->factory->get('https://vapor.laravel.com')->body();
+        $responses[] = $this->factory->get('https://forge.laravel.com')->body();
+        $this->assertSame(['ok', 'ok'], $responses);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+
+        $this->factory->get('https://laravel.com');
     }
 }

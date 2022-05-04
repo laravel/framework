@@ -3506,6 +3506,33 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 'bar'], $c->all());
     }
 
+    public function testPullRemovesItemFromNestedCollection()
+    {
+        $nestedCollection = new Collection([
+            new Collection([
+                'value',
+                new Collection([
+                    'bar' => 'baz',
+                    'test' => 'value',
+                ]),
+            ]),
+            'bar',
+        ]);
+
+        $nestedCollection->pull('0.1.test');
+
+        $actualArray = $nestedCollection->toArray();
+        $expectedArray = [
+            [
+                'value',
+                ['bar' => 'baz'],
+            ],
+            'bar',
+        ];
+
+        $this->assertEquals($expectedArray, $actualArray);
+    }
+
     public function testPullReturnsDefault()
     {
         $c = new Collection([]);
@@ -3868,6 +3895,7 @@ class SupportCollectionTest extends TestCase
             new TestArrayableObject,
             new TestJsonableObject,
             new TestJsonSerializeObject,
+            new TestJsonSerializeToStringObject,
             'baz',
         ]);
 
@@ -3875,6 +3903,7 @@ class SupportCollectionTest extends TestCase
             ['foo' => 'bar'],
             ['foo' => 'bar'],
             ['foo' => 'bar'],
+            'foobar',
             'baz',
         ], $c->jsonSerialize());
     }
@@ -5166,6 +5195,14 @@ class TestJsonSerializeObject implements JsonSerializable
     public function jsonSerialize(): array
     {
         return ['foo' => 'bar'];
+    }
+}
+
+class TestJsonSerializeToStringObject implements JsonSerializable
+{
+    public function jsonSerialize(): string
+    {
+        return 'foobar';
     }
 }
 

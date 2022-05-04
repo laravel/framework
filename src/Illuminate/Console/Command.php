@@ -3,7 +3,6 @@
 namespace Illuminate\Console;
 
 use Illuminate\Support\Traits\Macroable;
-use ReflectionClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -85,40 +84,6 @@ class Command extends SymfonyCommand
         if (! isset($this->signature)) {
             $this->specifyParameters();
         }
-    }
-
-    /**
-     * Return the command name.
-     *
-     * @return string|null
-     */
-    public static function getDefaultName(): ?string
-    {
-        $class = static::class;
-
-        $signature = (new ReflectionClass($class))->getDefaultProperties()['signature'] ?? null;
-
-        if (isset($signature)) {
-            return Parser::parse($signature)[0];
-        }
-
-        $name = (new ReflectionClass($class))->getDefaultProperties()['name'] ?? null;
-
-        return $name ?: parent::getDefaultName();
-    }
-
-    /**
-     * Return the command description.
-     *
-     * @return string|null
-     */
-    public static function getDefaultDescription(): ?string
-    {
-        $class = static::class;
-
-        $description = (new ReflectionClass($class))->getDefaultProperties()['description'] ?? null;
-
-        return $description ?: parent::getDefaultDescription();
     }
 
     /**

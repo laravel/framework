@@ -344,7 +344,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             is_resource($contents)
                 ? $this->driver->writeStream($path, $contents, $options)
                 : $this->driver->write($path, $contents, $options);
-        } catch (UnableToWriteFile $e) {
+        } catch (UnableToWriteFile|UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
 
             return false;
@@ -581,7 +581,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->writeStream($path, $resource, $options);
-        } catch (UnableToWriteFile $e) {
+        } catch (UnableToWriteFile|UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
 
             return false;
@@ -722,6 +722,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isFile();
             })
+            ->sortByPath()
             ->map(function (StorageAttributes $attributes) {
                 return $attributes->path();
             })
@@ -779,7 +780,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         try {
             $this->driver->createDirectory($path);
-        } catch (UnableToCreateDirectory $e) {
+        } catch (UnableToCreateDirectory|UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
 
             return false;

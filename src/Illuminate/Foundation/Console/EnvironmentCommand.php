@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'env')]
 class EnvironmentCommand extends Command
 {
     /**

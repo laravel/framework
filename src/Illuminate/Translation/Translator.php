@@ -193,9 +193,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
         } elseif (is_array($line) && count($line) > 0) {
-            foreach ($line as $key => $value) {
-                $line[$key] = $this->makeReplacements($value, $replace);
-            }
+            array_walk_recursive($line, function (&$value, $key) use ($replace) {
+                $value = $this->makeReplacements($value, $replace);
+            });
 
             return $line;
         }
@@ -217,8 +217,8 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $shouldReplace = [];
 
         foreach ($replace as $key => $value) {
-            $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value);
-            $shouldReplace[':'.Str::upper($key)] = Str::upper($value);
+            $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
+            $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
             $shouldReplace[':'.$key] = $value;
         }
 

@@ -19,7 +19,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
-use LogicException;
+use Illuminate\Support\Traits\Macroable;
 use PDO;
 use PDOStatement;
 use RuntimeException;
@@ -28,7 +28,8 @@ class Connection implements ConnectionInterface
 {
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
-        Concerns\ManagesTransactions;
+        Concerns\ManagesTransactions,
+        Macroable;
 
     /**
      * The active PDO connection.
@@ -166,7 +167,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the callbacks that should be invoked before a query is executed.
      *
-     * @var array
+     * @var \Closure[]
      */
     protected $beforeExecutingCallbacks = [];
 
@@ -180,14 +181,14 @@ class Connection implements ConnectionInterface
     /**
      * Type mappings that should be registered with new Doctrine connections.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $doctrineTypeMappings = [];
 
     /**
      * The connection resolvers.
      *
-     * @var array
+     * @var \Closure[]
      */
     protected static $resolvers = [];
 
@@ -335,6 +336,33 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Run a select statement and return the first column of the first row.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return mixed
+     *
+     * @throws \Illuminate\Database\MultipleColumnsSelectedException
+     */
+    public function scalar($query, $bindings = [], $useReadPdo = true)
+    {
+        $record = $this->selectOne($query, $bindings, $useReadPdo);
+
+        if (is_null($record)) {
+            return null;
+        }
+
+        $record = (array) $record;
+
+        if (count($record) > 1) {
+            throw new MultipleColumnsSelectedException;
+        }
+
+        return reset($record);
+    }
+
+    /**
      * Run a select statement against the database.
      *
      * @param  string  $query
@@ -424,9 +452,7 @@ class Connection implements ConnectionInterface
     {
         $statement->setFetchMode($this->fetchMode);
 
-        $this->event(new StatementPrepared(
-            $this, $statement
-        ));
+        $this->event(new StatementPrepared($this, $statement));
 
         return $statement;
     }
@@ -794,9 +820,9 @@ class Connection implements ConnectionInterface
     /**
      * Reconnect to the database.
      *
-     * @return void
+     * @return mixed|false
      *
-     * @throws \LogicException
+     * @throws \Illuminate\Database\LostConnectionException
      */
     public function reconnect()
     {
@@ -806,7 +832,7 @@ class Connection implements ConnectionInterface
             return call_user_func($this->reconnector, $this);
         }
 
-        throw new LogicException('Lost connection and no reconnector available.');
+        throw new LostConnectionException('Lost connection and no reconnector available.');
     }
 
     /**
