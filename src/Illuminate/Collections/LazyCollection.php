@@ -606,7 +606,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function containsItems($amount)
     {
-        return $this->take($amount)->count() === $amount;
+        return $this->take($amount + 1)->count() === $amount;
     }
 
     /**
