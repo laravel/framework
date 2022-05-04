@@ -134,17 +134,6 @@ class EloquentUserProvider implements UserProvider
     }
 
     /**
-     * Remove password values from credentials array.
-     *
-     * @param  array  $credentials
-     * @return array
-     */
-    protected function credentialsWithoutPassword(array $credentials): array
-    {
-        return array_filter($credentials, fn ($key) => ! str_contains($key, 'password'), ARRAY_FILTER_USE_KEY);
-    }
-
-    /**
      * Validate a user against the given credentials.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
