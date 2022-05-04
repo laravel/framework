@@ -213,7 +213,10 @@ class NotificationSender
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
                             ->onQueue($queue)
-                            ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
+                            ->delay(is_array($delay) ?
+                                ($delay[$channel] ?? null)
+                                : $delay
+                            )
                             ->through(
                                 array_merge(
                                     method_exists($notification, 'middleware') ? $notification->middleware() : [],
