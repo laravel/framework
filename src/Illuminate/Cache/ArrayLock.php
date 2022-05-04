@@ -59,7 +59,7 @@ class ArrayLock extends Lock
     {
         $expiration = $this->store->locks[$this->name]['expiresAt'] ?? Carbon::now()->addSecond();
 
-        if (!$this->exists() || !$expiration->isFuture()) {
+        if (! $this->exists() || ! $expiration->isFuture()) {
             return false;
         }
 
@@ -88,11 +88,11 @@ class ArrayLock extends Lock
      */
     public function release()
     {
-        if (!$this->exists()) {
+        if (! $this->exists()) {
             return false;
         }
 
-        if (!$this->isOwnedByCurrentProcess()) {
+        if (! $this->isOwnedByCurrentProcess()) {
             return false;
         }
 

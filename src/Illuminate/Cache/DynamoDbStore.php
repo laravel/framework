@@ -97,7 +97,7 @@ class DynamoDbStore implements LockProvider, Store
             'ConsistentRead' => false,
             'Key' => [
                 $this->keyAttribute => [
-                    'S' => $this->prefix . $key,
+                    'S' => $this->prefix.$key,
                 ],
             ],
         ]);
@@ -306,7 +306,7 @@ class DynamoDbStore implements LockProvider, Store
             'TableName' => $this->table,
             'Item' => [
                 $this->keyAttribute => [
-                    'S' => $this->prefix . $key,
+                    'S' => $this->prefix.$key,
                 ],
                 $this->valueAttribute => [
                     $this->type($value) => $this->serialize($value),
