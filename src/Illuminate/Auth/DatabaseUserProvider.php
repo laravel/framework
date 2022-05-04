@@ -99,7 +99,11 @@ class DatabaseUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        $credentials = $this->credentialsWithoutPassword($credentials);
+        $credentials = array_filter(
+            $credentials,
+            fn ($key) => ! str_contains($key, 'password'),
+            ARRAY_FILTER_USE_KEY
+        );
 
         if (empty($credentials)) {
             return;
@@ -143,17 +147,6 @@ class DatabaseUserProvider implements UserProvider
         if (! is_null($user)) {
             return new GenericUser((array) $user);
         }
-    }
-
-    /**
-     * Remove password values from credentials array.
-     *
-     * @param  array  $credentials
-     * @return array
-     */
-    protected function credentialsWithoutPassword(array $credentials): array
-    {
-        return array_filter($credentials, fn ($key) => ! str_contains($key, 'password'), ARRAY_FILTER_USE_KEY);
     }
 
     /**
