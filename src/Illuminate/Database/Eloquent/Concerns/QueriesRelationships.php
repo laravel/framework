@@ -618,10 +618,15 @@ trait QueriesRelationships
      * Add subselect queries to count the relations.
      *
      * @param  mixed  $relations
+     * @param  string|\Closure|null  $callback
      * @return $this
      */
-    public function withCount($relations)
+    public function withCount($relations, $callback = null)
     {
+        if ($callback instanceof Closure) {
+            $relations = [$relations => $callback];
+        }
+
         return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count');
     }
 
@@ -676,12 +681,17 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include the existence of related models.
      *
-     * @param  string|array  $relation
+     * @param  mixed  $relations
+     * @param  string|\Closure|null  $callback
      * @return $this
      */
-    public function withExists($relation)
+    public function withExists($relations, $callback = null)
     {
-        return $this->withAggregate($relation, '*', 'exists');
+        if ($callback instanceof Closure) {
+            $relations = [$relations => $callback];
+        }
+
+        return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'exists');
     }
 
     /**
