@@ -122,7 +122,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $provider = $this->getProviderMock();
         $user = $provider->retrieveByCredentials([
             'password' => 'dayle',
-            'password2' => 'night'
+            'password2' => 'night',
         ]);
 
         $this->assertNull($user);

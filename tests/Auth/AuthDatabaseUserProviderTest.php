@@ -142,7 +142,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByCredentials([
             'password' => 'dayle',
-            'password2' => 'night'
+            'password2' => 'night',
         ]);
 
         $this->assertNull($user);
