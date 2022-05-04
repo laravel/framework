@@ -117,6 +117,17 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame('bar', $user);
     }
 
+    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
+    {
+        $provider = $this->getProviderMock();
+        $user = $provider->retrieveByCredentials([
+            'password' => 'dayle',
+            'password2' => 'night'
+        ]);
+
+        $this->assertNull($user);
+    }
+
     public function testCredentialValidation()
     {
         $hasher = m::mock(Hasher::class);
