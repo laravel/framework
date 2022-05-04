@@ -88,11 +88,11 @@ class ArrayLock extends Lock
      */
     public function release()
     {
-        if (! $this->exists()) {
+        if (!$this->exists()) {
             return false;
         }
 
-        if (! $this->isOwnedByCurrentProcess()) {
+        if (!$this->isOwnedByCurrentProcess()) {
             return false;
         }
 
