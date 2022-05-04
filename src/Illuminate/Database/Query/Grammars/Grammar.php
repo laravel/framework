@@ -407,8 +407,8 @@ class Grammar extends BaseGrammar
     /**
      * Compile a "between" where clause if the column type is DateTime or timestamp and the values have a different format date with it.
      *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @param array $where
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereBetweenDate(Builder $query, $where)
@@ -419,7 +419,7 @@ class Grammar extends BaseGrammar
 
         $max = $this->wrap(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
-        return 'date(' . $this->wrap($where['column']) . ') ' . $between . ' ' . $min . ' and ' . $max;
+        return 'date('.$this->wrap($where['column']).') '.$between.' '.$min.' and '.$max;
     }
 
     /**

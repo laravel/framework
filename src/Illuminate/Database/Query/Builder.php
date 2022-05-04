@@ -1217,10 +1217,10 @@ class Builder implements BuilderContract
     /**
      * Add a where between for two dates with different formats to the query.
      *
-     * @param string $column
-     * @param array $values
-     * @param string $boolean
-     * @param bool $not
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      */
     public function whereBetweenDate($column, array $values, $boolean = 'and', $not = false)
@@ -1241,9 +1241,9 @@ class Builder implements BuilderContract
     /**
      * Add a where not between for two dates with different formats to the query.
      *
-     * @param string $column
-     * @param array $values
-     * @param string $boolean
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
      * @return $this
      */
     public function whereNotBetweenDate($column, iterable $values, $boolean = 'and')
@@ -1359,7 +1359,6 @@ class Builder implements BuilderContract
 
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
-
 
     /**
      * Add an "or where date" statement to the query.
