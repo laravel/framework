@@ -1215,6 +1215,43 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where between for two dates with different formats to the query.
+     *
+     * @param string $column
+     * @param array $values
+     * @param string $boolean
+     * @param bool $not
+     * @return $this
+     */
+    public function whereBetweenDate($column, array $values, $boolean = 'and', $not = false)
+    {
+        $type = 'betweenDate';
+
+        if ($values instanceof CarbonPeriod) {
+            $values = $values->toArray();
+        }
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
+
+        $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add a where not between for two dates with different formats to the query.
+     *
+     * @param string $column
+     * @param array $values
+     * @param string $boolean
+     * @return $this
+     */
+    public function whereNotBetweenDate($column, iterable $values, $boolean = 'and')
+    {
+        return $this->whereBetweenDate($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an or where between statement to the query.
      *
      * @param  string  $column
@@ -1323,18 +1360,6 @@ class Builder implements BuilderContract
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
 
-    /**
-     * Add a where between for two dates with different formats.
-     *
-     * @param  string  $column
-     * @param  iterable  $values
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereBetweenDate($column, iterable $values, $boolean = 'and')
-    {
-        return $this->whereBetween("date($column)", $values, $boolean);
-    }
 
     /**
      * Add an "or where date" statement to the query.
