@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Closure;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -303,6 +304,30 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Execute the query and get the first result or throw the given exception.
+     *
+     * @param  array|\Exception  $columns
+     * @param  \Exception|null  $exception
+     * @return \Illuminate\Database\Eloquent\Model|static
+     *
+     * @throws \Exception
+     */
+    public function firstOrThrow($columns = ['*'], $exception = null)
+    {
+        if ($columns instanceof Exception) {
+            $exception = $columns;
+
+            $columns = ['*'];
+        }
+
+        try {
+            return $this->firstOrFail($columns);
+        } catch (ModelNotFoundException) {
+            throw $exception;
+        }
+    }
+
+    /**
      * Execute the query and get the first result or call a callback.
      *
      * @param  \Closure|array  $columns
@@ -386,6 +411,31 @@ class HasManyThrough extends Relation
         }
 
         throw (new ModelNotFoundException)->setModel(get_class($this->related), $id);
+    }
+
+    /**
+     * Find a related model by its primary key or throw the given exception.
+     *
+     * @param  mixed  $id
+     * @param  array|\Exception  $columns
+     * @param  \Exception|null  $exception
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     *
+     * @throws \Exception
+     */
+    public function findOrThrow($id, $columns = ['*'], $exception = null)
+    {
+        if ($columns instanceof Exception) {
+            $exception = $columns;
+
+            $columns = ['*'];
+        }
+
+        try {
+            return $this->findOrFail($id, $columns);
+        } catch (ModelNotFoundException) {
+            throw $exception;
+        }
     }
 
     /**

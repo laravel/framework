@@ -647,6 +647,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
     }
 
+    public function testFindOrThrow()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $single = EloquentTestUser::findOrThrow(1, new Exception('message'));
+        $multiple = EloquentTestUser::findOrThrow([1, 2], new Exception('message'));
+
+        $this->assertInstanceOf(EloquentTestUser::class, $single);
+        $this->assertSame('taylorotwell@gmail.com', $single->email);
+        $this->assertInstanceOf(Collection::class, $multiple);
+        $this->assertInstanceOf(EloquentTestUser::class, $multiple[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $multiple[1]);
+    }
+
     public function testOneToOneRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);

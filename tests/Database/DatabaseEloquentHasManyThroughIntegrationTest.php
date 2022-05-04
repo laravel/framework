@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
@@ -166,6 +167,16 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
 
+    public function testFirstOrThrowThrowsGivenException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->firstOrThrow(new HttpException(409, 'message'));
+    }
+
     public function testFindOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -199,6 +210,38 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                                  ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(new Collection([1, 2]));
+    }
+
+    public function testFindOrThrowThrowsGivenException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrThrow(1, new HttpException(409, 'message'));
+    }
+
+    public function testFindOrThrowWithManyThrowsGivenException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrThrow([1, 2], new HttpException(409, 'message'));
+    }
+
+    public function testFindOrThrowWithManyUsingCollectionThrowsGivenException()
+    {
+        $this->expectException(HttpException::class);
+
+        HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+
+        HasManyThroughTestCountry::first()->posts()->findOrThrow(new Collection([1, 2]), new HttpException(409, 'message'));
     }
 
     public function testFindOrMethod()
