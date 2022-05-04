@@ -533,6 +533,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testContainsItemsIsLazy()
+    {
+        $this->assertEnumerates(3, function ($collection) {
+            $collection->containsItems(2);
+        });
+    }
+
     public function testJoinIsLazy()
     {
         $this->assertEnumeratesOnce(function ($collection) {

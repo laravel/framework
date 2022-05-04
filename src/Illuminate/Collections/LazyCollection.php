@@ -638,6 +638,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if the collection contains specified amount of items.
+     *
+     * @return bool
+     */
+    public function containsItems($amount)
+    {
+        return $this->take($amount + 1)->count() === $amount;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue

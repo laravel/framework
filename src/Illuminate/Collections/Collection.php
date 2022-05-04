@@ -645,6 +645,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if the collection contains specified amount of items.
+     *
+     * @return bool
+     */
+    public function containsItems($amount)
+    {
+        return $this->count() === $amount;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
