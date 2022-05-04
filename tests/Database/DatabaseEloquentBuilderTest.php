@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use BadMethodCallException;
 use Closure;
+use Exception;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -168,6 +169,22 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrThrow('bar', ['column'], new HttpException(409, 'message'));
     }
 
+    public function testFindOrThrowMethodInitializesAndThrowsGivenException()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getKeyType')->once()->andReturn('int');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn(null);
+        try {
+            $builder->findOrThrow('bar', ['column'], Exception::class);
+            $this->fail('findOrThrow() should throw an exception.');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(ModelNotFoundException::class, $exception->getPrevious());
+        }
+    }
+
     public function testFindOrThrowMethodWithoutColumnsThrowsGivenException()
     {
         $this->expectException(HttpException::class);
@@ -306,6 +323,19 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['*'])->andReturn(null);
         $builder->firstOrThrow(new HttpException(409, 'Message'));
+    }
+
+    public function testFirstOrThrowMethodInitializesAndThrowsGivenException()
+    {
+        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('first')->with(['*'])->andReturn(null);
+        try {
+            $builder->firstOrThrow(Exception::class);
+            $this->fail('firstOrThrow() should throw an exception.');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(ModelNotFoundException::class, $exception->getPrevious());
+        }
     }
 
     public function testFindWithMany()

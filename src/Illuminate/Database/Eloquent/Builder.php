@@ -486,15 +486,15 @@ class Builder implements BuilderContract
      * Find a model by its primary key or throw the given exception.
      *
      * @param  mixed  $id
-     * @param  array|\Exception  $columns
-     * @param  \Exception|null  $exception
+     * @param  array|\Exception|class-string<\Exception>  $columns
+     * @param  \Exception|class-string<\Exception>|null  $exception
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
      * @throws \Exception
      */
     public function findOrThrow($id, $columns = ['*'], $exception = null)
     {
-        if ($columns instanceof Exception) {
+        if ($columns instanceof Exception || is_string($columns)) {
             $exception = $columns;
 
             $columns = ['*'];
@@ -502,7 +502,11 @@ class Builder implements BuilderContract
 
         try {
             return $this->findOrFail($id, $columns);
-        } catch (ModelNotFoundException) {
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            if (is_string($exception)) {
+                $exception = new $exception(previous: $modelNotFoundException);
+            }
+
             throw $exception;
         }
     }
@@ -614,15 +618,15 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or throw the given exception.
      *
-     * @param  array|\Exception  $columns
-     * @param  \Exception|null  $exception
+     * @param  array|\Exception|class-string<\Exception>  $columns
+     * @param  \Exception|class-string<\Exception>|null  $exception
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Exception
      */
     public function firstOrThrow($columns = ['*'], $exception = null)
     {
-        if ($columns instanceof Exception) {
+        if ($columns instanceof Exception || is_string($columns)) {
             $exception = $columns;
 
             $columns = ['*'];
@@ -630,7 +634,11 @@ class Builder implements BuilderContract
 
         try {
             return $this->firstOrFail($columns);
-        } catch (ModelNotFoundException) {
+        } catch (ModelNotFoundException $modelNotFoundException) {
+            if (is_string($exception)) {
+                $exception = new $exception(previous: $modelNotFoundException);
+            }
+
             throw $exception;
         }
     }
