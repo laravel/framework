@@ -499,6 +499,29 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find a model by its primary key or call a callback.
+     *
+     * @param  mixed  $id
+     * @param  \Closure|array  $columns
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
+     */
+    public function findOr($id, $columns = ['*'], Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->find($id, $columns))) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
@@ -1544,6 +1567,16 @@ class Builder implements BuilderContract
         $this->eagerLoad = $eagerLoad;
 
         return $this;
+    }
+
+    /**
+     * Flush the relationships being eagerly loaded.
+     *
+     * @return $this
+     */
+    public function withoutEagerLoads()
+    {
+        return $this->setEagerLoads([]);
     }
 
     /**

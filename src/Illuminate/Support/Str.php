@@ -259,10 +259,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if (
-                $needle !== '' && $needle !== null
-                && str_ends_with($haystack, $needle)
-            ) {
+            if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
             }
         }
@@ -550,7 +547,7 @@ class Str
      */
     public static function padBoth($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_BOTH);
+        return str_pad($value, strlen($value) - mb_strlen($value) + $length, $pad, STR_PAD_BOTH);
     }
 
     /**
@@ -563,7 +560,7 @@ class Str
      */
     public static function padLeft($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_LEFT);
+        return str_pad($value, strlen($value) - mb_strlen($value) + $length, $pad, STR_PAD_LEFT);
     }
 
     /**
@@ -576,7 +573,7 @@ class Str
      */
     public static function padRight($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_RIGHT);
+        return str_pad($value, strlen($value) - mb_strlen($value) + $length, $pad, STR_PAD_RIGHT);
     }
 
     /**
@@ -889,7 +886,7 @@ class Str
      */
     public static function squish($value)
     {
-        return preg_replace('/\s+/', ' ', trim($value));
+        return preg_replace('~(\s|\x{3164})+~u', ' ', preg_replace('~^[\s﻿]+|[\s﻿]+$~u', '', $value));
     }
 
     /**
@@ -926,9 +923,7 @@ class Str
 
         $words = explode(' ', static::replace(['-', '_'], ' ', $value));
 
-        $studlyWords = array_map(function ($word) {
-            return static::ucfirst($word);
-        }, $words);
+        $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
         return static::$studlyCache[$key] = implode($studlyWords);
     }

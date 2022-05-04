@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
@@ -211,6 +212,38 @@ class JobChainingTest extends TestCase
         $this->assertNull(JobChainingTestThirdJob::$usedQueue);
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
+
+    public function testChainJobsCanBePrepended()
+    {
+        JobChainAddingPrependingJob::withChain([new JobChainAddingExistingJob])->dispatch();
+
+        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+        $this->assertNotNull(JobChainAddingExistingJob::$ranAt);
+        $this->assertTrue(JobChainAddingAddedJob::$ranAt->isBefore(JobChainAddingExistingJob::$ranAt));
+    }
+
+    public function testChainJobsCanBePrependedWithoutExistingChain()
+    {
+        JobChainAddingPrependingJob::dispatch();
+
+        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+    }
+
+    public function testChainJobsCanBeAppended()
+    {
+        JobChainAddingAppendingJob::withChain([new JobChainAddingExistingJob])->dispatch();
+
+        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+        $this->assertNotNull(JobChainAddingExistingJob::$ranAt);
+        $this->assertTrue(JobChainAddingAddedJob::$ranAt->isAfter(JobChainAddingExistingJob::$ranAt));
+    }
+
+    public function testChainJobsCanBeAppendedWithoutExistingChain()
+    {
+        JobChainAddingAppendingJob::dispatch();
+
+        $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -291,5 +324,51 @@ class JobChainingTestFailingJob implements ShouldQueue
     public function handle()
     {
         $this->fail();
+    }
+}
+
+class JobChainAddingPrependingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        $this->prependToChain(new JobChainAddingAddedJob);
+    }
+}
+
+class JobChainAddingAppendingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public function handle()
+    {
+        $this->appendToChain(new JobChainAddingAddedJob);
+    }
+}
+
+class JobChainAddingExistingJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    /** @var Carbon|null */
+    public static $ranAt = null;
+
+    public function handle()
+    {
+        static::$ranAt = now();
+    }
+}
+
+class JobChainAddingAddedJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    /** @var Carbon|null */
+    public static $ranAt = null;
+
+    public function handle()
+    {
+        static::$ranAt = now();
     }
 }

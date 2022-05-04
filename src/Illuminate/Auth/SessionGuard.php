@@ -391,7 +391,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  array  $credentials
      * @param  array|callable  $callbacks
-     * @param  false  $remember
+     * @param  bool  $remember
      * @return bool
      */
     public function attemptWhen(array $credentials = [], $callbacks = null, $remember = false)

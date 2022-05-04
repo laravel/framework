@@ -72,8 +72,7 @@ trait CreatesRegularExpressionRouteConstraints
     protected function assignExpressionToParameters($parameters, $expression)
     {
         return $this->where(collect(Arr::wrap($parameters))
-                    ->mapWithKeys(function ($parameter) use ($expression) {
-                        return [$parameter => $expression];
-                    })->all());
+                    ->mapWithKeys(fn ($parameter) => [$parameter => $expression])
+                    ->all());
     }
 }

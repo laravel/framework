@@ -1,7 +1,5 @@
 name: Pull Requests
 
-# Credit: https://github.com/github/docs/blob/main/.github/workflows/notify-when-maintainers-cannot-edit.yaml
-
 on:
   pull_request_target:
     types:
@@ -12,62 +10,4 @@ permissions:
 
 jobs:
   uneditable:
-    if: github.repository == 'laravel/framework'
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            const query = `
-              query($number: Int!) {
-                repository(owner: "laravel", name: "framework") {
-                  pullRequest(number: $number) {
-                    headRepositoryOwner {
-                      login
-                    }
-                    maintainerCanModify
-                  }
-                }
-              }
-            `;
-
-            const pullNumber = context.issue.number;
-            const variables = { number: pullNumber };
-
-            try {
-              console.log(`Check laravel/framework#${pullNumber} for maintainer edit access ...`);
-
-              const result = await github.graphql(query, variables);
-
-              console.log(JSON.stringify(result, null, 2));
-
-              const pullRequest = result.repository.pullRequest;
-
-              if (pullRequest.headRepositoryOwner.login === 'laravel') {
-                console.log('PR owned by laravel');
-
-                return;
-              }
-
-              if (! pullRequest.maintainerCanModify) {
-                console.log('PR not owned by Laravel and does not have maintainer edits enabled');
-
-                await github.rest.issues.createComment({
-                  issue_number: pullNumber,
-                  owner: 'laravel',
-                  repo: 'framework',
-                  body: "Thanks for submitting a PR!\n\nIn order to review and merge PRs most efficiently, we require that all PRs grant maintainer edit access before we review them. For information on how to do this, [see the relevant GitHub documentation](https://docs.github.com/en/github/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork). Additionally, GitHub doesn't allow maintainer permissions from organization accounts. Please resubmit this PR with maintainer permissions enabled."
-                });
-
-                await github.rest.pulls.update({
-                  pull_number: pullNumber,
-                  owner: 'laravel',
-                  repo: 'framework',
-                  state: 'closed'
-                });
-              }
-            } catch(e) {
-              console.log(e);
-            }
+    uses: laravel/.github/.github/workflows/pull-requests.yml@main

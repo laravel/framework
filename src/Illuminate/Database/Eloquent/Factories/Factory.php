@@ -296,9 +296,7 @@ abstract class Factory
      */
     public function lazy(array $attributes = [], ?Model $parent = null)
     {
-        return function () use ($attributes, $parent) {
-            return $this->create($attributes, $parent);
-        };
+        return fn () => $this->create($attributes, $parent);
     }
 
     /**
@@ -449,21 +447,28 @@ abstract class Factory
      */
     protected function expandAttributes(array $definition)
     {
-        return collect($definition)->map(function ($attribute, $key) use (&$definition) {
-            if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
-                $attribute = $attribute($definition);
-            }
+        return collect($definition)
+            ->map(function ($attribute, $key) {
+                if ($attribute instanceof self) {
+                    $attribute = $attribute->create()->getKey();
+                } elseif ($attribute instanceof Model) {
+                    $attribute = $attribute->getKey();
+                }
 
-            if ($attribute instanceof self) {
-                $attribute = $attribute->create()->getKey();
-            } elseif ($attribute instanceof Model) {
-                $attribute = $attribute->getKey();
-            }
+                $definition[$key] = $attribute;
 
-            $definition[$key] = $attribute;
+                return $attribute;
+            })
+            ->map(function ($attribute, $key) use (&$definition) {
+                if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
+                    $attribute = $attribute($definition);
+                }
 
-            return $attribute;
-        })->all();
+                $definition[$key] = $attribute;
+
+                return $attribute;
+            })
+            ->all();
     }
 
     /**
@@ -481,6 +486,18 @@ abstract class Factory
                 },
             ]),
         ]);
+    }
+
+    /**
+     * Set a single model attribute.
+     *
+     * @param  string|int  $key
+     * @param  mixed  $value
+     * @return static
+     */
+    public function set($key, $value)
+    {
+        return $this->state([$key => $value]);
     }
 
     /**
