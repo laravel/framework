@@ -50,6 +50,28 @@ class CacheLock extends Lock
     }
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    public function steal()
+    {
+        if (method_exists($this->store, 'replace') && $this->seconds > 0) {
+            return $this->store->replace(
+                $this->name, $this->owner, $this->seconds
+            );
+        }
+
+        if (is_null($this->store->get($this->name))) {
+            return false;
+        }
+
+        return ($this->seconds > 0)
+                ? $this->store->put($this->name, $this->owner, $this->seconds)
+                : $this->store->forever($this->name, $this->owner);
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool

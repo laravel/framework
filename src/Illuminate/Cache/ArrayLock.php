@@ -51,6 +51,27 @@ class ArrayLock extends Lock
     }
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    public function steal()
+    {
+        $expiration = $this->store->locks[$this->name]['expiresAt'] ?? Carbon::now()->addSecond();
+
+        if (!$this->exists() || !$expiration->isFuture()) {
+            return false;
+        }
+
+        $this->store->locks[$this->name] = [
+            'owner' => $this->owner,
+            'expiresAt' => $this->seconds === 0 ? null : Carbon::now()->addSeconds($this->seconds),
+        ];
+
+        return true;
+    }
+
+    /**
      * Determine if the current lock exists.
      *
      * @return bool

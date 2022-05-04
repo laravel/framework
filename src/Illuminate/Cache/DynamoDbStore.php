@@ -293,6 +293,44 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
+     * Replace an item in the cache if the key exists.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function replace($key, $value, $seconds)
+    {
+        $this->dynamo->putItem([
+            'TableName' => $this->table,
+            'Item' => [
+                $this->keyAttribute => [
+                    'S' => $this->prefix . $key,
+                ],
+                $this->valueAttribute => [
+                    $this->type($value) => $this->serialize($value),
+                ],
+                $this->expirationAttribute => [
+                    'N' => (string) $this->toTimestamp($seconds),
+                ],
+            ],
+            'ConditionExpression' => 'attribute_exists (#key) AND #expires_at > :now',
+            'ExpressionAttributeNames' => [
+                '#key' => $this->keyAttribute,
+                '#expires_at' => $this->expirationAttribute,
+            ],
+            'ExpressionAttributeValues' => [
+                ':now' => [
+                    'N' => (string) Carbon::now()->getTimestamp(),
+                ],
+            ],
+        ]);
+
+        return true;
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key

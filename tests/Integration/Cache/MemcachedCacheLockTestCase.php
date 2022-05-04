@@ -80,4 +80,22 @@ class MemcachedCacheLockTestCase extends MemcachedIntegrationTestCase
 
         $this->assertTrue(Cache::store('memcached')->lock('foo')->get());
     }
+
+    public function testMemcachedLocksCanBeStolen()
+    {
+        Cache::store('memcached')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('memcached')->lock('foo', 1);
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = Cache::store('memcached')->lock('foo', 10);
+        $this->assertTrue($secondLock->steal());
+        $this->assertFalse($firstLock->release());
+
+        sleep(2);
+        $this->assertFalse(Cache::store('memcached')->lock('foo')->acquire());
+
+        $this->assertTrue($secondLock->release());
+        $this->assertTrue(Cache::store('memcached')->lock('foo')->acquire());
+    }
 }

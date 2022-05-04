@@ -95,4 +95,22 @@ class FileCacheLockTest extends TestCase
 
         $this->assertTrue(Cache::lock('foo')->get());
     }
+
+    public function testLocksCanBeStolen()
+    {
+        Cache::lock('foo')->forceRelease();
+
+        $firstLock = Cache::lock('foo', 1);
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = Cache::lock('foo', 10);
+        $this->assertTrue($secondLock->steal());
+        $this->assertFalse($firstLock->release());
+
+        sleep(2);
+        $this->assertFalse(Cache::lock('foo')->acquire());
+
+        $this->assertTrue($secondLock->release());
+        $this->assertTrue(Cache::lock('foo')->acquire());
+    }
 }

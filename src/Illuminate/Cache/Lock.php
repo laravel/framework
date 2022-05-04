@@ -66,6 +66,13 @@ abstract class Lock implements LockContract
     abstract public function acquire();
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    abstract public function steal();
+
+    /**
      * Release the lock.
      *
      * @return bool

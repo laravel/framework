@@ -273,4 +273,22 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertFalse($wannabeOwner->release());
     }
+
+    public function testLocksCanBeStolen()
+    {
+        $store = new ArrayStore;
+
+        $firstLock = $store->lock('foo', 1);
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = $store->lock('foo', 10);
+        $this->assertTrue($secondLock->steal());
+        $this->assertFalse($firstLock->release());
+
+        sleep(2);
+        $this->assertFalse($store->lock('foo')->acquire());
+
+        $this->assertTrue($secondLock->release());
+        $this->assertTrue($store->lock('foo')->acquire());
+    }
 }

@@ -66,6 +66,24 @@ class DynamoDbStoreTest extends TestCase
         });
     }
 
+    public function testLocksCanBeStolen()
+    {
+        Cache::store('dynamodb')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('dynamodb')->lock('foo', 1);
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = Cache::store('dynamodb')->lock('foo', 10);
+        $this->assertTrue($secondLock->steal());
+        $this->assertFalse($firstLock->release());
+
+        sleep(2);
+        $this->assertFalse(Cache::store('dynamodb')->lock('foo')->acquire());
+
+        $this->assertTrue($secondLock->release());
+        $this->assertTrue(Cache::store('dynamodb')->lock('foo')->acquire());
+    }
+
     /**
      * Define environment setup.
      *

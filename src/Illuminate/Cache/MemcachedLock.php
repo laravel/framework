@@ -40,6 +40,18 @@ class MemcachedLock extends Lock
     }
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    public function steal()
+    {
+        return $this->memcached->replace(
+            $this->name, $this->owner, $this->seconds
+        );
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool

@@ -126,6 +126,45 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Replace an item in the cache if the key exists.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function replace($key, $value, $seconds)
+    {
+        $this->ensureCacheDirectoryExists($path = $this->path($key));
+
+        $file = new LockableFile($path, 'c+');
+
+        try {
+            $file->getExclusiveLock();
+        } catch (LockTimeoutException $e) {
+            $file->close();
+
+            return false;
+        }
+
+        $expire = $file->read(10);
+
+        if (empty($expire) || $this->currentTime() >= $expire) {
+            $file->close();
+
+            return false;
+        }
+
+        $file->truncate()
+            ->write($this->expiration($seconds).serialize($value))
+            ->close();
+
+        $this->ensurePermissionsAreCorrect($path);
+
+        return true;
+    }
+
+    /**
      * Create the file cache directory if necessary.
      *
      * @param  string  $path

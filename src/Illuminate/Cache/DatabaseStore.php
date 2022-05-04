@@ -165,6 +165,29 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Replace an item in the cache if the key exists.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function replace($key, $value, $seconds)
+    {
+        $key = $this->prefix.$key;
+        $value = $this->serialize($value);
+        $expiration = $this->getTime() + $seconds;
+
+        return $this->table()
+            ->where('key', $key)
+            ->where('expiration', '<=', $this->getTime())
+            ->update([
+                'value' => $value,
+                'expiration' => $expiration,
+            ]) >= 1;
+    }
+
+    /**
      * Increment the value of an item in the cache.
      *
      * @param  string  $key

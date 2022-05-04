@@ -15,6 +15,16 @@ class NoLock extends Lock
     }
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    public function steal()
+    {
+        return true;
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool

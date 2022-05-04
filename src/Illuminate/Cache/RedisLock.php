@@ -42,6 +42,20 @@ class RedisLock extends Lock
     }
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    public function steal()
+    {
+        if ($this->seconds > 0) {
+            return $this->redis->set($this->name, $this->owner, 'EX', $this->seconds, 'XX') == true;
+        } else {
+            return $this->redis->set($this->name, $this->owner, null, null, 'XX') == true;
+        }
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool

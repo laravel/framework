@@ -108,4 +108,22 @@ class RedisCacheLockTest extends TestCase
 
         $this->assertTrue(Cache::store('redis')->lock('foo')->get());
     }
+
+    public function testRedisLocksCanBeStolen()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 1);
+        $this->assertTrue($firstLock->acquire());
+
+        $secondLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($secondLock->steal());
+        $this->assertFalse($firstLock->release());
+
+        sleep(2);
+        $this->assertFalse(Cache::store('redis')->lock('foo')->acquire());
+
+        $this->assertTrue($secondLock->release());
+        $this->assertTrue(Cache::store('redis')->lock('foo')->acquire());
+    }
 }

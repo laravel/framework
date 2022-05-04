@@ -40,6 +40,18 @@ class DynamoDbLock extends Lock
     }
 
     /**
+     * Attempt to steal an existing lock.
+     *
+     * @return bool
+     */
+    public function steal()
+    {
+        return $this->dynamo->replace(
+            $this->name, $this->owner, $this->seconds
+        );
+    }
+
+    /**
      * Release the lock.
      *
      * @return bool
