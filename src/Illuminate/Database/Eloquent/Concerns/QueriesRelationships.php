@@ -385,6 +385,37 @@ trait QueriesRelationships
         });
     }
 
+
+    /**
+     * Add a basic whereIn clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  array  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function whereInRelation($relation, $column, $value = null)
+    {
+        return $this->whereHas($relation, function ($query) use ($column, $value) {
+            $query->whereIn($column, $value);
+        });
+    }
+
+    /**
+     * Add an "orWhereIn" clause to a relationship query.
+     *
+     * @param  string  $relation
+     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+     * @param  array  $value
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereInRelation($relation, $column, $value = null)
+    {
+        return $this->orWhereHas($relation, function ($query) use ($column, $value) {
+            $query->orWhereIn($column, $value);
+        });
+    }
+
     /**
      * Add a polymorphic relationship condition to the query with a where clause.
      *
