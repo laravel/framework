@@ -385,7 +385,6 @@ trait QueriesRelationships
         });
     }
 
-
     /**
      * Add a basic whereIn clause to a relationship query.
      *
