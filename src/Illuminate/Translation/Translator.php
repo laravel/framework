@@ -325,7 +325,19 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function localeArray($locale)
     {
-        return array_filter([$locale ?: $this->locale, $this->fallback]);
+        $locales = [];
+        if (preg_match_all('/[-_]?(?:[a-zA-Z0-9]+)+/', $locale ?: $this->locale, $matches) > 1) {
+            $parts = $matches[0];
+            for ($i = count($parts); $i > 1; $i--) {
+                $locales[] = implode('', array_slice($parts, 0, $i));
+            }
+            $locales[] = $parts[0];
+        } else {
+            $locales[] = $locale ?: $this->locale;
+        }
+        $locales[] = $this->fallback;
+
+        return array_filter($locales);
     }
 
     /**

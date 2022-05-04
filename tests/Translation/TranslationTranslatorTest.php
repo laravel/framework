@@ -221,6 +221,30 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
     }
 
+    public function testMultiLanguageFallbacks()
+    {
+        $t = new Translator($this->getLoader(), 'en-US');
+        $t->setFallback('fr');
+        $t->getLoader()->shouldReceive('load')->once()->with('en-US', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en-US', 'bar', 'foo')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('fr', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
+        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en-US'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
+    public function testMultiLanguageCustomFallbacks()
+    {
+        $t = new Translator($this->getLoader(), 'en_US');
+        $t->getLoader()->shouldReceive('load')->once()->with('en_US-custom', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en_US', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en_US-custom', 'bar', 'foo')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en_US', 'bar', 'foo')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
+        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en_US-custom'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);
