@@ -50,6 +50,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $selector;
 
     /**
+     * The callable that should be invoked to determine applicable locales.
+     *
+     * @var callable
+     */
+    protected $determineLocalesUsing;
+
+    /**
      * Create a new translator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Loader  $loader
@@ -325,7 +332,20 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function localeArray($locale)
     {
-        return array_filter([$locale ?: $this->locale, $this->fallback]);
+        $locales = array_filter([$locale ?: $this->locale, $this->fallback]);
+
+        return call_user_func($this->determineLocalesUsing ?: fn () => $locales, $locales);
+    }
+
+    /**
+     * Specify a callback that should be invoked to determined the applicable locale array.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function determineLocalesUsing($callback)
+    {
+        $this->determineLocalesUsing = $callback;
     }
 
     /**
