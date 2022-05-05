@@ -1609,6 +1609,20 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
 
+    public function testWhereNotMorphedTo()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+
+        $builder = $model->whereNotMorphedTo('morph', $relatedModel);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
+        $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
     public function testOrWhereMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1623,6 +1637,20 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
 
+    public function testOrWhereNotMorphedTo()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+
+        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', $relatedModel);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
+        $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
     public function testWhereMorphedToClass()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1632,6 +1660,39 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "morph_type" = ?', $builder->toSql());
         $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
+    }
+
+    public function testWhereNotMorphedToClass()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not "morph_type" = ?', $builder->toSql());
+        $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
+    }
+
+    public function testOrWhereMorphedToClass()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or "morph_type" = ?', $builder->toSql());
+        $this->assertEquals(['baz', EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
+    }
+
+    public function testOrWhereNotMorphedToClass()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, '');
+
+        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
+
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not "morph_type" = ?', $builder->toSql());
+        $this->assertEquals(['baz', EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
     }
 
     public function testWhereMorphedToAlias()
