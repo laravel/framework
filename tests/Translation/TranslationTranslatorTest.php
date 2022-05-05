@@ -224,8 +224,9 @@ class TranslationTranslatorTest extends TestCase
     public function testDetermineLocalesUsingMethod()
     {
         $t = new Translator($this->getLoader(), 'en');
-        $t->determineLocalesUsing(function($locales) {
+        $t->determineLocalesUsing(function ($locales) {
             $this->assertSame(['en'], $locales);
+
             return ['en', 'lz'];
         });
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);

@@ -50,9 +50,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $selector;
 
     /**
-     * A callable
+     * A callable.
      *
-     * @var ?callable(array $locales): array
+     * @var ?callable(array): array
      */
     protected $localesGenerator = null;
 
@@ -343,7 +343,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locales = array_filter([$locale ?: $this->locale, $this->fallback]);
 
-        if (!is_null($this->localesGenerator) and is_callable($this->localesGenerator)) {
+        if ((! is_null($this->localesGenerator)) and is_callable($this->localesGenerator)) {
             return call_user_func($this->localesGenerator, $locales);
         }
 
