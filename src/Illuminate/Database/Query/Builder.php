@@ -1227,13 +1227,9 @@ class Builder implements BuilderContract
     {
         $type = 'betweenDate';
 
-        if ($values instanceof CarbonPeriod) {
-            $values = $values->toArray();
-        }
-
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
+        $this->addBinding($this->cleanBindings($values));
 
         return $this;
     }
