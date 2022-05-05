@@ -203,11 +203,10 @@ trait HasRelationships
 
         $instance = $this->newRelatedInstance($related);
 
-        // If no foreign key was supplied, we can use a backtrace to guess the proper
-        // foreign key name by using the name of the relationship function, which
-        // when combined with an "_id" should conventionally match the columns.
+        // If no foreign key was supplied, we will call the getForeignKey method
+        // on related model instance
         if (is_null($foreignKey)) {
-            $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
+            $foreignKey = $instance->getForeignKey();
         }
 
         // Once we have the foreign key names we'll just create a new Eloquent query
