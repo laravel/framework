@@ -50,11 +50,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $selector;
 
     /**
-     * A callable.
+     * The callable that should be invoked to determine applicable locales.
      *
-     * @var ?callable(array): array
+     * @var callable
      */
-    protected $localesGenerator = null;
+    protected $determineLocalesUsing;
 
     /**
      * Create a new translator instance.
@@ -325,12 +325,14 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * @param callable(array $locales):array $method
+     * Specify a callback that should be invoked to determined the applicable locale array.
+     *
+     * @param  callable  $callback
      * @return void
      */
-    public function determineLocalesUsing($method)
+    public function determineLocalesUsing($callback)
     {
-        $this->localesGenerator = $method;
+        $this->determineLocalesUsing = $callback;
     }
 
     /**
@@ -343,8 +345,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $locales = array_filter([$locale ?: $this->locale, $this->fallback]);
 
-        if ((! is_null($this->localesGenerator)) and is_callable($this->localesGenerator)) {
-            return call_user_func($this->localesGenerator, $locales);
+        if (! is_null($this->determineLocalesUsing) &&
+            is_callable($this->determineLocalesUsing)) {
+            return call_user_func($this->determineLocalesUsing, $locales);
         }
 
         return $locales;
