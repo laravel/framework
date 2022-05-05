@@ -325,17 +325,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Specify a callback that should be invoked to determined the applicable locale array.
-     *
-     * @param  callable  $callback
-     * @return void
-     */
-    public function determineLocalesUsing($callback)
-    {
-        $this->determineLocalesUsing = $callback;
-    }
-
-    /**
      * Get the array of locales to be checked.
      *
      * @param  string|null  $locale
@@ -351,6 +340,17 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         }
 
         return $locales;
+    }
+
+    /**
+     * Specify a callback that should be invoked to determined the applicable locale array.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function determineLocalesUsing($callback)
+    {
+        $this->determineLocalesUsing = $callback;
     }
 
     /**
