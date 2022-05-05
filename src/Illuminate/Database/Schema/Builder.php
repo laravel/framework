@@ -32,6 +32,13 @@ class Builder
     protected $resolver;
 
     /**
+     * Indicates if foreign key constraints are active.
+     * 
+     * @var bool
+     */
+    protected $hasForeignKeyConstraints = true;
+
+    /**
      * The default string length for migrations.
      *
      * @var int|null
@@ -366,9 +373,11 @@ class Builder
      */
     public function enableForeignKeyConstraints()
     {
-        return $this->connection->statement(
+        $this->hasForeignKeyConstraints = $this->connection->statement(
             $this->grammar->compileEnableForeignKeyConstraints()
         );
+
+        return $this->hasForeignKeyConstraints;
     }
 
     /**
@@ -378,9 +387,31 @@ class Builder
      */
     public function disableForeignKeyConstraints()
     {
-        return $this->connection->statement(
+        $this->hasForeignKeyConstraints = $this->connection->statement(
             $this->grammar->compileDisableForeignKeyConstraints()
         );
+
+        return $this->hasForeignKeyConstraints;
+    }
+
+    /**
+     * Execute a callback ensuring foreign key constraints are disabled.
+     * 
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function withoutForeignKeyConstraints(callable $callback)
+    {
+        if (! $this->hasForeignKeyConstraints) {
+            return $callback();
+        }
+
+        try {
+            $this->disableForeignKeyConstraints();
+            return $callback();
+        } finally {
+            $this->enableForeignKeyConstraints();
+        }
     }
 
     /**

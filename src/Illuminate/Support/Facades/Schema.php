@@ -12,6 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Schema\Builder enableForeignKeyConstraints()
  * @method static \Illuminate\Database\Schema\Builder rename(string $from, string $to)
  * @method static \Illuminate\Database\Schema\Builder table(string $table, \Closure $callback)
+ * @method static \Illuminate\Database\Schema\Builder withoutForeignKeyConstraints(\Closure $callback)
  * @method static bool hasColumn(string $table, string $column)
  * @method static bool hasColumns(string $table, array $columns)
  * @method static bool dropColumns(string $table, array $columns)
