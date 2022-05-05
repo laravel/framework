@@ -26,7 +26,7 @@ class DatabaseNotification extends Model
      *
      * @var string
      */
-    protected $table = 'notifications';
+    protected string $table = 'notifications';
 
     /**
      * The guarded attributes on the model.
