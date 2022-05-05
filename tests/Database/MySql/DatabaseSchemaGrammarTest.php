@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\MySql;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
@@ -10,7 +10,7 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseMySqlSchemaGrammarTest extends TestCase
+class DatabaseSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void
     {

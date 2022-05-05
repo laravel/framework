@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\SQLite;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
@@ -8,10 +8,10 @@ use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
+use Illuminate\Tests\Database\DatabaseAbstractSchemaGrammarTest;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
-class DatabaseSQLiteBuilderTest extends TestCase
+class DatabaseBuilderTest extends DatabaseAbstractSchemaGrammarTest
 {
     protected function setUp(): void
     {
@@ -25,7 +25,7 @@ class DatabaseSQLiteBuilderTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
+        parent::tearDown();
 
         Container::setInstance(null);
         Facade::setFacadeApplication(null);

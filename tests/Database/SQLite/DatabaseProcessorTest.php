@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\SQLite;
 
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseSQLiteProcessorTest extends TestCase
+class DatabaseProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {

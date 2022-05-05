@@ -1,20 +1,15 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\SqlServer;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
+use Illuminate\Tests\Database\DatabaseAbstractSchemaGrammarTest;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
-class SqlServerBuilderTest extends TestCase
+class DatabaseBuilderTest extends DatabaseAbstractSchemaGrammarTest
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCreateDatabase()
     {
         $grammar = new SqlServerGrammar;

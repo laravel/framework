@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\MySql;
 
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseMySqlProcessorTest extends TestCase
+class DatabaseProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {

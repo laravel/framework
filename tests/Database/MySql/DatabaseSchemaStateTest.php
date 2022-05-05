@@ -1,12 +1,12 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\MySql;
 
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseMySqlSchemaStateTest extends TestCase
+class DatabaseSchemaStateTest extends TestCase
 {
     /**
      * @dataProvider provider

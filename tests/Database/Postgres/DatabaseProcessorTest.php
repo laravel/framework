@@ -1,11 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\Postgres;
 
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use PHPUnit\Framework\TestCase;
 
-class DatabasePostgresProcessorTest extends TestCase
+class DatabaseProcessorTest extends TestCase
 {
     public function testProcessColumnListing()
     {

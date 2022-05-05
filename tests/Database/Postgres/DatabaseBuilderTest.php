@@ -1,21 +1,16 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\Postgres;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\PostgresBuilder;
+use Illuminate\Tests\Database\DatabaseAbstractSchemaGrammarTest;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
-class DatabasePostgresBuilderTest extends TestCase
+class DatabaseBuilderTest extends DatabaseAbstractSchemaGrammarTest
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCreateDatabase()
     {
         $grammar = new PostgresGrammar;

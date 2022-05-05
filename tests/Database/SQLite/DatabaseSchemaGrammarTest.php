@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Database\SQLite;
 
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Connection;
@@ -11,7 +11,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-class DatabaseSQLiteSchemaGrammarTest extends TestCase
+class DatabaseSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void
     {
