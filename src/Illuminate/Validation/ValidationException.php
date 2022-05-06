@@ -96,9 +96,9 @@ class ValidationException extends Exception
         if ($additional = count($messages)) {
             $pluralized = $additional === 1 ? 'error' : 'errors';
 
-            $message .= __(" (and :additional more :pluralized)", [
+            $message .= __(' (and :additional more :pluralized)', [
                 'additional' => $additional,
-                'pluralized' => $pluralized
+                'pluralized' => $pluralized,
             ]);
         }
 
