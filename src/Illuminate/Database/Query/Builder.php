@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query;
 use BackedEnum;
 use Carbon\CarbonPeriod;
 use Closure;
+use DateTime;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1215,7 +1216,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a where between for two dates with different formats to the query.
+     * Add a where between if database column is DateTime and values is Date.
      *
      * @param  string  $column
      * @param  array  $values
@@ -1225,7 +1226,25 @@ class Builder implements BuilderContract
      */
     public function whereBetweenDate($column, array $values, $boolean = 'and', $not = false)
     {
-        $type = 'betweenDate';
+        $type = 'between';
+
+        $begin = reset($values);
+        $end = end($values);
+
+        if (!$begin instanceof DateTimeInterface && !$begin instanceof Expression) {
+            $begin = new DateTime($begin);
+        }
+        if (!$end instanceof DateTimeInterface && !$end instanceof Expression) {
+            $end = new DateTime($end);
+        }
+        if ($begin instanceof DateTimeInterface && !$begin instanceof Expression) {
+            $begin = $begin->format('Y-m-d H:i:s');
+        }
+        if ($end instanceof DateTimeInterface && !$end instanceof Expression) {
+            $end = $end->format('Y-m-d 23:59:59');
+        }
+
+        $values = [$begin, $end];
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
