@@ -144,8 +144,8 @@ class EventFakeTest extends TestCase
         Event::assertListening('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
         Event::assertListening('post-deleted', [PostEventSubscriber::class, 'handlePostDeleted']);
         Event::assertListening(NonImportantEvent::class, Closure::class);
-        Event::assertListening('eloquent.saving: ' . Post::class, PostObserver::class.'@saving');
-        Event::assertListening('eloquent.saving: ' . Post::class, [PostObserver::class, 'saving']);
+        Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
+        Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
     }
 }
 
