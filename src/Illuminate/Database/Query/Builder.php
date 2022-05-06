@@ -1231,16 +1231,16 @@ class Builder implements BuilderContract
         $begin = reset($values);
         $end = end($values);
 
-        if (!$begin instanceof DateTimeInterface && !$begin instanceof Expression) {
+        if (! $begin instanceof DateTimeInterface && ! $begin instanceof Expression) {
             $begin = new DateTime($begin);
         }
-        if (!$end instanceof DateTimeInterface && !$end instanceof Expression) {
+        if (! $end instanceof DateTimeInterface && ! $end instanceof Expression) {
             $end = new DateTime($end);
         }
-        if ($begin instanceof DateTimeInterface && !$begin instanceof Expression) {
+        if ($begin instanceof DateTimeInterface && ! $begin instanceof Expression) {
             $begin = $begin->format('Y-m-d H:i:s');
         }
-        if ($end instanceof DateTimeInterface && !$end instanceof Expression) {
+        if ($end instanceof DateTimeInterface && ! $end instanceof Expression) {
             $end = $end->format('Y-m-d 23:59:59');
         }
 
