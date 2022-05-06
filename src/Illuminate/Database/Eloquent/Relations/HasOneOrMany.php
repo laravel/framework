@@ -298,6 +298,19 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function forceCreate(array $attributes = [])
+    {
+        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
+
+        return $this->related->forceCreate($attributes);
+    }
+
+    /**
      * Create a Collection of new instances of the related model.
      *
      * @param  iterable  $records
