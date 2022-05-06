@@ -4,7 +4,6 @@ namespace Illuminate\Http\Client;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
@@ -705,7 +704,7 @@ class PendingRequest
 
                     $this->dispatchResponseReceivedEvent($response);
                 });
-            } catch (ConnectException $e) {
+            } catch (TransferException $e) {
                 $this->dispatchConnectionFailedEvent();
 
                 throw new ConnectionException($e->getMessage(), 0, $e);
