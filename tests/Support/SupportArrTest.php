@@ -90,6 +90,21 @@ class SupportArrTest extends TestCase
         $this->assertSame([[]], Arr::crossJoin());
     }
 
+    public function testCycle()
+    {
+        $array = ['a', 'b', 'c', 'd', 'e'];
+        $this->assertEquals('a', Arr::cycle($array, 0));
+        $this->assertEquals('b', Arr::cycle($array, 1));
+        $this->assertEquals('c', Arr::cycle($array, 2));
+        $this->assertEquals('d', Arr::cycle($array, 3));
+        $this->assertEquals('e', Arr::cycle($array, 4));
+        $this->assertEquals('a', Arr::cycle($array, 5));
+        $this->assertEquals('b', Arr::cycle($array, 6));
+        $this->assertEquals('c', Arr::cycle($array, 7));
+        $this->assertEquals('d', Arr::cycle($array, 8));
+        $this->assertEquals('e', Arr::cycle($array, 9));
+    }
+
     public function testDivide()
     {
         [$keys, $values] = Arr::divide(['name' => 'Desk']);

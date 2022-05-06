@@ -89,6 +89,20 @@ class Arr
     }
 
     /**
+     * Cycle through items in an array.
+     *
+     * @param array $array
+     * @param int $position
+     * @return mixed
+     */
+    public static function cycle($array, $position)
+    {
+        $array = array_values(static::wrap($array));
+
+        return $array[$position % count($array)];
+    }
+
+    /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
      * @param  array  $array
