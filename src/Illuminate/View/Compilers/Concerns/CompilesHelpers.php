@@ -46,4 +46,15 @@ trait CompilesHelpers
     {
         return "<?php echo method_field{$method}; ?>";
     }
+
+    /**
+     * Compile the "vite" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileVite($arguments)
+    {
+        return "<?php echo vite{$arguments}; ?>";
+    }
 }
