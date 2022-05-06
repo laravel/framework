@@ -2136,9 +2136,9 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('first')->with(['column'])->andReturn($data)->once();
         $builder->shouldReceive('first')->andReturn(null)->once();
 
-        $this->assertSame($data, $builder->findOr(1, fn() => 'callback result'));
-        $this->assertSame($data, $builder->findOr(1, ['column'], fn() => 'callback result'));
-        $this->assertSame('callback result', $builder->findOr(1, fn() => 'callback result'));
+        $this->assertSame($data, $builder->findOr(1, fn () => 'callback result'));
+        $this->assertSame($data, $builder->findOr(1, ['column'], fn () => 'callback result'));
+        $this->assertSame('callback result', $builder->findOr(1, fn () => 'callback result'));
     }
 
     public function testFirstMethodReturnsFirstResult()
