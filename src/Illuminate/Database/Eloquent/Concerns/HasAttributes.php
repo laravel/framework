@@ -1941,9 +1941,10 @@ trait HasAttributes
      */
     public function originalIsEquivalent($key)
     {
-	    if($this->isRelation($key))
+	    if($this->isRelation($key)) {
 		    return true;
-		
+	    }
+
         if (! array_key_exists($key, $this->original)) {
             return false;
         }
