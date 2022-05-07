@@ -68,6 +68,24 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a "between date" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBetweenDate(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+
+        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+
+        return $this->wrap($where['column']).'::date ' . $between . ' ' . $min . ' and ' . $max;
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
