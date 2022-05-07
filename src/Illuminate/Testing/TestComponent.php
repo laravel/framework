@@ -25,7 +25,7 @@ class TestComponent
      * Create a new test component instance.
      *
      * @param  \Illuminate\View\Component  $component
-     * @param  \Illuminate\View\View  $view
+     * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
     public function __construct($component, $view)
