@@ -2,10 +2,10 @@
 
 namespace Illuminate\Testing;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
-use Illuminate\Contracts\View\View;
 
 class TestView
 {
