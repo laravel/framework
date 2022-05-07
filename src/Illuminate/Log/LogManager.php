@@ -544,6 +544,18 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Flush the shared context.
+     *
+     * @return array
+     */
+    public function flushSharedContext()
+    {
+        $this->sharedContext = [];
+
+        return $this;
+    }
+
+    /**
      * Parse the driver name.
      *
      * @param  string|null  $driver
