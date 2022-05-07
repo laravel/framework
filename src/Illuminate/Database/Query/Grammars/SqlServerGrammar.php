@@ -127,7 +127,7 @@ class SqlServerGrammar extends Grammar
 
         $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
-        return 'cast('. $this->wrap($where['column']).' as date) ' . $between . ' ' . $min . ' and ' . $max;
+        return 'cast('.$this->wrap($where['column']).' as date) '.$between.' '.$min.' and '.$max;
     }
 
     /**

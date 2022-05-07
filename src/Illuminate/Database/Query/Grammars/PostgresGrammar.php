@@ -82,7 +82,7 @@ class PostgresGrammar extends Grammar
 
         $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
-        return $this->wrap($where['column']).'::date ' . $between . ' ' . $min . ' and ' . $max;
+        return $this->wrap($where['column']).'::date '.$between.' '.$min.' and '.$max;
     }
 
     /**

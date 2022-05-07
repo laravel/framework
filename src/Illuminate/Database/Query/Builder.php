@@ -1237,7 +1237,7 @@ class Builder implements BuilderContract
             $end = $end->format('Y-m-d');
         }
 
-        $values=[$begin,$end];
+        $values = [$begin, $end];
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
