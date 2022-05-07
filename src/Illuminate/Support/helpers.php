@@ -418,3 +418,37 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('cache_if')) {
+    /**
+     * Cache the given callback if the given condition is true.
+     *
+     * @param bool $condition
+     * @param string $key
+     * @param DateInterval|DateTimeInterface|int $ttl
+     * @param Closure $callback
+     * @return mixed
+     */
+    function cache_if($condition, $key, $ttl, $callback) {
+        if ($condition) {
+            return \Illuminate\Support\Facades\Cache::remember($key, $ttl, $callback);
+        }
+
+        return $callback();
+    }
+}
+
+if (! function_exists('cache_unless')) {
+    /**
+     * Cache the given callback if the given condition is false.
+     *
+     * @param bool $condition
+     * @param string $key
+     * @param DateInterval|DateTimeInterface|int $ttl
+     * @param Closure $callback
+     * @return mixed
+     */
+    function cache_unless($condition, $key, $ttl, $callback) {
+        return cache_if(! $condition, $key, $ttl, $callback);
+    }
+}

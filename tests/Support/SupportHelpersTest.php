@@ -6,6 +6,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Stringable;
 use IteratorAggregate;
@@ -22,6 +23,23 @@ class SupportHelpersTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+    }
+
+    public function testCacheIf()
+    {
+        $time = time();
+
+        cache_if(true, 'test-cache-if-true', 3, function () use ($time) {
+            return $time;
+        });
+
+        $this->assertSame(Cache::get('test-cache-if-true'), $time);
+
+        cache_if(false, 'test-cache-if-false', 3, function () use ($time) {
+            return $time;
+        });
+
+        $this->assertNotSame(Cache::get('test-cache-if-true'), $time);
     }
 
     public function testE()
