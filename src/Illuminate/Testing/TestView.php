@@ -5,7 +5,7 @@ namespace Illuminate\Testing;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
-use Illuminate\View\View;
+use Illuminate\Contracts\View\View;
 
 class TestView
 {
@@ -14,7 +14,7 @@ class TestView
     /**
      * The original view.
      *
-     * @var \Illuminate\View\View
+     * @var \Illuminate\Contracts\View\View
      */
     protected $view;
 
@@ -28,7 +28,7 @@ class TestView
     /**
      * Create a new test view instance.
      *
-     * @param  \Illuminate\View\View  $view
+     * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
     public function __construct(View $view)
