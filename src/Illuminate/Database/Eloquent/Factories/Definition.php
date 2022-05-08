@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Definition implements ArrayAccess
 {
     /**
-     * Attributes to fill the model
+     * Attributes to fill into the model.
      *
      * @var array<string, mixed>
      */
@@ -48,7 +48,7 @@ class Definition implements ArrayAccess
         return match (true) {
             $value instanceof Factory => $value->create()->getKey(),
             $value instanceof Model => $value->getKey(),
-            is_callable($value) && !is_string($value) && !is_array($value) => $value($this),
+            is_callable($value) && ! is_string($value) && ! is_array($value) => $value($this),
             default => $value,
         };
     }
