@@ -137,6 +137,55 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('taylor-options', $user->options);
     }
 
+    public function test_expanded_closure_attributes_are_resolved_recursively()
+    {
+        $user = FactoryTestUserFactory::new()->create([
+            'name' => function () {
+                return 'taylor';
+            },
+            'options' => function ($attributes) {
+                return $attributes['name'].'-options';
+            },
+        ]);
+
+        $this->assertSame('taylor-options', $user->options);
+
+        $user = FactoryTestUserFactory::new()->make([
+            'surname' => function ($attributes) {
+                return $attributes['options'].'-otwell';
+            },
+            'options' => function ($attributes) {
+                return $attributes['name'].'-options';
+            },
+            'name' => function () {
+                return 'taylor';
+            },
+        ]);
+
+        $this->assertSame('taylor-options', $user->options);
+        $this->assertSame('taylor-options-otwell', $user->surname);
+    }
+
+    public function test_expanded_closure_is_only_resolved_once()
+    {
+        $resolved = 0;
+
+        FactoryTestUserFactory::new()->make([
+            'name' => function () use (&$resolved) {
+                ++$resolved;
+                return 'taylor';
+            },
+            'options' => function ($attributes) {
+                return $attributes['name'].'-options';
+            },
+            'surname' => function ($attributes) {
+                return $attributes['name'].'-otwell';
+            }
+        ]);
+
+        $this->assertSame(1, $resolved);
+    }
+
     public function test_make_creates_unpersisted_model_instance()
     {
         $user = FactoryTestUserFactory::new()->makeOne();

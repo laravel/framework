@@ -141,7 +141,7 @@ abstract class Factory
     /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return \Illuminate\Database\Eloquent\Factories\Definition|array<string, mixed>
      */
     abstract public function definition();
 
@@ -401,14 +401,14 @@ abstract class Factory
      */
     protected function getExpandedAttributes(?Model $parent)
     {
-        return $this->expandAttributes($this->getRawAttributes($parent));
+        return $this->getRawAttributes($parent)->all();
     }
 
     /**
      * Get the raw attributes for the model as an array.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Factories\Definition
      */
     protected function getRawAttributes(?Model $parent)
     {
@@ -421,8 +421,8 @@ abstract class Factory
                 $state = $state->bindTo($this);
             }
 
-            return array_merge($carry, $state($carry, $parent));
-        }, $this->definition());
+            return $carry->merge($state($carry, $parent));
+        }, Definition::wrap($this->definition()));
     }
 
     /**
@@ -437,31 +437,6 @@ abstract class Factory
         return $this->for->map(function (BelongsToRelationship $for) use ($model) {
             return $for->attributesFor($model);
         })->collapse()->all();
-    }
-
-    /**
-     * Expand all attributes to their underlying values.
-     *
-     * @param  array  $definition
-     * @return array
-     */
-    protected function expandAttributes(array $definition)
-    {
-        return collect($definition)->map(function ($attribute, $key) use (&$definition) {
-            if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
-                $attribute = $attribute($definition);
-            }
-
-            if ($attribute instanceof self) {
-                $attribute = $attribute->create()->getKey();
-            } elseif ($attribute instanceof Model) {
-                $attribute = $attribute->getKey();
-            }
-
-            $definition[$key] = $attribute;
-
-            return $attribute;
-        })->all();
     }
 
     /**
