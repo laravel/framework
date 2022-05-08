@@ -91,8 +91,8 @@ class Arr
     /**
      * Cycle through items in an array.
      *
-     * @param array $array
-     * @param int $position
+     * @param  array  $array
+     * @param  int  $position
      * @return mixed
      */
     public static function cycle($array, $position)
