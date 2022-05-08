@@ -45,7 +45,7 @@ class Definition implements ArrayAccess
      */
     protected function expand($value)
     {
-        return match(true) {
+        return match (true) {
             $value instanceof Factory => $value->create()->getKey(),
             $value instanceof Model => $value->getKey(),
             is_callable($value) && !is_string($value) && !is_array($value) => $value($this),
