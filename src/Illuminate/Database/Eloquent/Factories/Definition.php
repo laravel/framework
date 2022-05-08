@@ -38,12 +38,12 @@ class Definition implements ArrayAccess
     }
 
     /**
-     * Expands the definition attribute to its final value.
+     * Expands an attribute value to its final value.
      *
      * @param  mixed  $value
      * @return mixed
      */
-    public function expand($value)
+    protected function expand($value)
     {
         return match(true) {
             $value instanceof Factory => $value->create()->getKey(),
@@ -54,7 +54,7 @@ class Definition implements ArrayAccess
     }
 
     /**
-     * Get an expanded attribute from this instance.
+     * Get an attribute final value from this instance.
      *
      * @param  string  $key
      * @param  mixed  $default
@@ -70,7 +70,7 @@ class Definition implements ArrayAccess
     }
 
     /**
-     * Return all expanded attributes of this definition instance.
+     * Return all expanded attributes of this definition instance as an array.
      *
      * @return array<string, mixed>
      */
@@ -84,7 +84,7 @@ class Definition implements ArrayAccess
     }
 
     /**
-     * Merges attributes on top of the definition attributes.
+     * Merges attributes on top of the current definition attributes.
      *
      * @param  static|array<string, mixed>  $attributes
      * @return $this
@@ -190,7 +190,7 @@ class Definition implements ArrayAccess
     }
 
     /**
-     * Create a new definition instance if it's not.
+     * Wraps an iterable of attributes into a Definition instance.
      *
      * @param  static|iterable<string, mixed>  $attributes
      * @return static
