@@ -401,28 +401,20 @@ abstract class Factory
      */
     protected function getExpandedAttributes(?Model $parent)
     {
-        return $this->getRawAttributes($parent)->all();
-    }
+        return $this->states
+            ->pipe(function ($states) {
+                return $this->for->isEmpty() ? $states : new Collection(array_merge([function () {
+                    return $this->parentResolvers();
+                }], $states->all()));
+            })
+            ->reduce(function ($carry, $state) use ($parent) {
+                if ($state instanceof Closure) {
+                    $state = $state->bindTo($this);
+                }
 
-    /**
-     * Get the raw attributes for the model as an array.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
-     * @return \Illuminate\Database\Eloquent\Factories\Definition
-     */
-    protected function getRawAttributes(?Model $parent)
-    {
-        return $this->states->pipe(function ($states) {
-            return $this->for->isEmpty() ? $states : new Collection(array_merge([function () {
-                return $this->parentResolvers();
-            }], $states->all()));
-        })->reduce(function ($carry, $state) use ($parent) {
-            if ($state instanceof Closure) {
-                $state = $state->bindTo($this);
-            }
-
-            return $carry->merge($state($carry, $parent));
-        }, Definition::wrap($this->definition()));
+                return $carry->merge($state($carry, $parent));
+            }, Definition::wrap($this->definition()))
+            ->all();
     }
 
     /**
