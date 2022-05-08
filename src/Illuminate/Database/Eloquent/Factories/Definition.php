@@ -15,13 +15,6 @@ class Definition implements ArrayAccess
     protected $attributes = [];
 
     /**
-     * If the attributes has been expended.
-     *
-     * @var bool
-     */
-    protected $expanded = false;
-
-    /**
      * Create a new definition instance.
      *
      * @param  iterable<string, mixed>  $attributes
