@@ -139,17 +139,6 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_expanded_closure_attributes_are_resolved_recursively()
     {
-        $user = FactoryTestUserFactory::new()->create([
-            'name' => function () {
-                return 'taylor';
-            },
-            'options' => function ($attributes) {
-                return $attributes['name'].'-options';
-            },
-        ]);
-
-        $this->assertSame('taylor-options', $user->options);
-
         $user = FactoryTestUserFactory::new()->make([
             'surname' => function ($attributes) {
                 return $attributes['options'].'-otwell';
