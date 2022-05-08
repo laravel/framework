@@ -97,7 +97,7 @@ class Arr
      */
     public static function cycle($array, $position)
     {
-        $array = array_values(static::wrap($array));
+        $array = static::wrap($array);
 
         return $array[$position % count($array)];
     }
