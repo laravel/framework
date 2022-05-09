@@ -1260,6 +1260,53 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where between if the column is Timestamp and values is Date that will format the values Y-m-d 00:00:00 to Y-m-d 23:59:59 to get exact result.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereTimestampBetweenDate($column, array $values, $boolean = 'and', $not = false)
+    {
+        $type = 'between';
+
+        $begin = reset($values);
+        $end = end($values);
+
+        if (!$begin instanceof DateTimeInterface) {
+            $begin = new \DateTime($begin);
+        }
+        if (!$end instanceof DateTimeInterface) {
+            $end = new \DateTime($end);
+        }
+
+        $begin = $begin->format('Y-m-d 00:00:00');
+        $end = $end->format('Y-m-d 23:59:59');
+        $values = [$begin, $end];
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
+
+        $this->addBinding($this->cleanBindings($values));
+
+        return $this;
+    }
+
+    /**
+     * Add a where not between if the column is Timestamp and values is Date that will format the values Y-m-d 00:00:00 to Y-m-d 23:59:59 to get exact result.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotTimestampBetweenDate($column, iterable $values, $boolean = 'and')
+    {
+        return $this->whereTimestampBetweenDate($column, $values, $boolean, true);
+    }
+
+    /**
      * Add an or where between statement to the query.
      *
      * @param  string  $column
