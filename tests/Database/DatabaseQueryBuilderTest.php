@@ -2128,6 +2128,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testFindOrReturnsFirstResultByID()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $data = m::mock(stdClass::class);
+        $builder->shouldReceive('first')->andReturn($data)->once();
+        $builder->shouldReceive('first')->with(['column'])->andReturn($data)->once();
+        $builder->shouldReceive('first')->andReturn(null)->once();
+
+        $this->assertSame($data, $builder->findOr(1, fn () => 'callback result'));
+        $this->assertSame($data, $builder->findOr(1, ['column'], fn () => 'callback result'));
+        $this->assertSame('callback result', $builder->findOr(1, fn () => 'callback result'));
+    }
+
     public function testFirstMethodReturnsFirstResult()
     {
         $builder = $this->getBuilder();
