@@ -1485,41 +1485,6 @@ class Builder implements BuilderContract
         }];
     }
 
-    //protected function normalizeRelations(array $relations)
-    //{
-    //    $normalizedRelations = [];
-
-    //    foreach ($this->flattenRelations($relations) as $name => $constraints) {
-    //        if (! is_numeric($name)) {
-    //            $normalizedRelations[$name] = $constraints;
-
-    //            continue;
-    //        }
-
-    //        [$name, $selectConstraint] = Str::contains($name, ':')
-    //            ? $this->createSelectWithConstraint($name)
-    //            : [$name, static function () {
-    //                //
-    //            }];
-
-    //        if (! isset($normalizedRelations[$name])) {
-    //            $normalizedRelations[$constraints] = $selectConstraint;
-
-    //            continue;
-    //        }
-
-    //        $normalizedRelations[$name] = static function ($builder) use ($normalizedRelations, $name, $selectConstraint) {
-    //            $selectConstraint($builder);
-
-    //            $normalizedRelations[$name]($builder);
-    //        };
-
-    //        continue;
-    //    }
-
-    //    return $normalizedRelations;
-    //}
-
     /**
      * Parse a list of relations into individuals.
      *
