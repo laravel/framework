@@ -1421,25 +1421,55 @@ class Builder implements BuilderContract
     {
         $flattenedRelations = [];
 
+        if ($prefix !== '') {
+            $prefix .= '.';
+        }
+
+        // Loop over all relations and find any specified as
+        // "user" => ["post", "comments"] and flatten them out (recurse)
+        // then merge the flattened keys back in.
         foreach ($relations as $key => $value) {
             if (is_string($key) && is_array($value)) {
-                $flattenedRelations = array_merge($flattenedRelations, $this->flattenRelations($value, "{$prefix}{$key}."));
+                 // TODO: what happens when the key has already been specified in the OG relation.
+                $flattenedRelations = array_merge($flattenedRelations, $this->flattenRelations($value, "{$prefix}{$key}"));
 
                 unset($relations[$key]);
             }
         }
 
+        // Loop over each relation for ones in the format [ 3 => 'relation:id,name'] and
+        // create select statements for the keys that need it.
         foreach ($relations as $key => $value) {
             if (is_numeric($key) && is_string($value)) {
-                $flattenedRelations = $this->addFlattenedRelation($flattenedRelations, "{$prefix}{$value}.");
+                $constraint = $this->parseAttributeSelectionConstraint($value);
+
+                if ($constraint === null) {
+                    $flattenedRelations[] = "{$prefix}{$value}";
+
+                    continue;
+                }
+
+                // TODO what happens if this is already set?
+                $flattenedRelations["{$prefix}{$value}"] = $constraint;
+
+                // unset($flattenedRelations[$key]);
 
                 continue;
             }
 
-            $flattenedRelations = $this->addFlattenedRelation($flattenedRelations, "{$prefix}{$key}.", $value);
+            // $flattenedRelations = $this->addFlattenedRelation($flattenedRelations, "{$prefix}{$key}.", $value);
         }
 
         return $flattenedRelations;
+    }
+
+    protected function parseAttributeSelectionConstraint($name)
+    {
+        if (! Str::contains($name, ':')) {
+            return null;
+        }
+
+        return $this->createSelectWithConstraint($name);
     }
 
     protected function addFlattenedRelation($relations, $name, $constraint = null)
@@ -1448,65 +1478,63 @@ class Builder implements BuilderContract
             //
         };
 
-        dump($name);
-
         [$name, $selectConstraint] = Str::contains($name, ':')
                 ? $this->createSelectWithConstraint($name)
                 : [$name, static function () {
                     //
                 }];
 
-        $relations[$name] = isset($relations[$name])
-            ? function ($builder) use ($relations, $name, $constraint, $selectConstraint) {
-                $relations[$name]($builder);
+        // $relations[$name] = isset($relations[$name])
+        //     ? function ($builder) use ($relations, $name, $constraint, $selectConstraint) {
+        //         $relations[$name]($builder);
 
-                $constraint($builder);
+        //         $constraint($builder);
 
-                $selectConstraint($builder);
-            }
-        : function ($builder) use ($constraint, $selectConstraint) {
-            $constraint($builder);
+        //         $selectConstraint($builder);
+        //     }
+        // : function ($builder) use ($constraint, $selectConstraint) {
+        //     $constraint($builder);
 
-            $selectConstraint($builder);
-        };
+        //     $selectConstraint($builder);
+        // };
 
-        return $relations;
+        // return $relations;
     }
 
-    protected function normalizeRelations(array $relations)
-    {
-        $normalizedRelations = [];
+    //protected function normalizeRelations(array $relations)
+    //{
+    //    $normalizedRelations = [];
 
-        foreach ($this->flattenRelations($relations) as $name => $constraints) {
-            if (! is_numeric($name)) {
-                $normalizedRelations[$name] = $constraints;
+    //    foreach ($this->flattenRelations($relations) as $name => $constraints) {
+    //        if (! is_numeric($name)) {
+    //            $normalizedRelations[$name] = $constraints;
 
-                continue;
-            }
+    //            continue;
+    //        }
 
-            [$name, $selectConstraint] = Str::contains($name, ':')
-                ? $this->createSelectWithConstraint($name)
-                : [$name, static function () {
-                    //
-                }];
+    //        [$name, $selectConstraint] = Str::contains($name, ':')
+    //            ? $this->createSelectWithConstraint($name)
+    //            : [$name, static function () {
+    //                //
+    //            }];
 
-            if (! isset($normalizedRelations[$name])) {
-                $normalizedRelations[$constraints] = $selectConstraint;
+    //        if (! isset($normalizedRelations[$name])) {
+    //            $normalizedRelations[$constraints] = $selectConstraint;
 
-                continue;
-            }
+    //            continue;
+    //        }
 
-            $normalizedRelations[$name] = static function ($builder) use ($normalizedRelations, $name, $selectConstraint) {
-                $selectConstraint($builder);
+    //        $normalizedRelations[$name] = static function ($builder) use ($normalizedRelations, $name, $selectConstraint) {
+    //            $selectConstraint($builder);
 
-                $normalizedRelations[$name]($builder);
-            };
+    //            $normalizedRelations[$name]($builder);
+    //        };
 
-            continue;
-        }
+    //        continue;
+    //    }
 
-        return $normalizedRelations;
-    }
+    //    return $normalizedRelations;
+    //}
 
     /**
      * Parse a list of relations into individuals.
@@ -1522,7 +1550,11 @@ class Builder implements BuilderContract
             return [];
         }
 
-        foreach ($this->flattenRelations($relations) as $name => $constraints) {
+        // $flattendRelations = $this->flattenRelations($relations);
+
+        // $blah = $this->addFlattenedRelation($flattendRelations, )
+
+        foreach ($relations as $name => $constraints) {
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.

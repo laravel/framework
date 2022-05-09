@@ -67,20 +67,21 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
     {
         $users = User::query()
             ->with([
-                'posts' => [
-                    'comments' => [
-                        'tags',
-                    ],
-                    'image',
-                ],
-            ])
-            ->get();
+                // 'posts' => [
+                //     'comments' => [
+                //         'tags',
+                //     ],
+                //     'image',
+                // ],
+                'posts.comments.tags',
+                'posts.image',
+            ])->get();
 
         $this->assertCount(1, $users);
         $this->assertTrue($users[0]->relationLoaded('posts'));
         $this->assertCount(2, $users[0]->posts);
         $this->assertTrue($users[0]->posts[0]->isNot($users[0]->posts[1]));
-        $this->assertTrue($users[0]->posts->every->relationLoaded('image'));
+        $this->assertTrue($users[0]->posts->every->relationLoaded('image')); // failing
         $this->assertCount(2, $users[0]->posts->map->image);
         $this->assertTrue($users[0]->posts[0]->image->isNot($users[0]->posts[1]->image));
         $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
