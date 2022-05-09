@@ -184,7 +184,6 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-
         $this->assertInstanceOf(NullHandler::class, $handler);
 
         $config->set('logging.channels.null2', [
