@@ -1417,6 +1417,8 @@ class Builder implements BuilderContract
         );
     }
 
+    // TODO: whenever a relation is added to the flat relations pile, we need
+    // to ensure it is not already set, and if it is we need to merge them wisely.
     protected function flattenRelations(array $relations, string $prefix = ''): array
     {
         $flattenedRelations = [];
@@ -1425,39 +1427,32 @@ class Builder implements BuilderContract
             $prefix .= '.';
         }
 
-        // Loop over all relations and find any specified as
-        // "user" => ["post", "comments"] and flatten them out (recurse)
-        // then merge the flattened keys back in.
         foreach ($relations as $key => $value) {
             if (is_string($key) && is_array($value)) {
-                 // TODO: what happens when the key has already been specified in the OG relation.
                 $flattenedRelations = array_merge($flattenedRelations, $this->flattenRelations($value, "{$prefix}{$key}"));
 
                 unset($relations[$key]);
-            }
-        }
-
-        // Loop over each relation for ones in the format [ 3 => 'relation:id,name'] and
-        // create select statements for the keys that need it.
-        foreach ($relations as $key => $value) {
-            if (is_numeric($key) && is_string($value)) {
-                $constraint = $this->parseAttributeSelectionConstraint($value);
-
-                if ($constraint === null) {
-                    $flattenedRelations[] = "{$prefix}{$value}";
-
-                    continue;
-                }
-
-                // TODO what happens if this is already set?
-                $flattenedRelations["{$prefix}{$value}"] = $constraint;
-
-                // unset($flattenedRelations[$key]);
 
                 continue;
             }
 
-            // $flattenedRelations = $this->addFlattenedRelation($flattenedRelations, "{$prefix}{$key}.", $value);
+            if (is_string($key)) {
+                $flattenedRelations["{$prefix}{$key}"] = $value;
+
+                unset($relations[$key]);
+
+                continue;
+            }
+        }
+
+        foreach ($relations as $key => $value) {
+            if (is_numeric($key) && is_string($value)) {
+                $flattenedRelations[] = $prefix.$value;
+
+                unset($relations[$key]);
+
+                continue;
+            }
         }
 
         return $flattenedRelations;
@@ -1465,11 +1460,11 @@ class Builder implements BuilderContract
 
     protected function parseAttributeSelectionConstraint($name)
     {
-        if (! Str::contains($name, ':')) {
-            return null;
-        }
-
-        return $this->createSelectWithConstraint($name);
+        return str_contains($name, ':')
+            ? $this->createSelectWithConstraint($name)
+            : [$name, static function () {
+                //
+            }];
     }
 
     protected function addFlattenedRelation($relations, $name, $constraint = null)
@@ -1478,7 +1473,7 @@ class Builder implements BuilderContract
             //
         };
 
-        [$name, $selectConstraint] = Str::contains($name, ':')
+        return [$name, $selectConstraint] = Str::contains($name, ':')
                 ? $this->createSelectWithConstraint($name)
                 : [$name, static function () {
                     //
@@ -1544,17 +1539,25 @@ class Builder implements BuilderContract
      */
     protected function parseWithRelations(array $relations)
     {
-        $results = [];
-
         if ($relations === []) {
             return [];
         }
 
-        // $flattendRelations = $this->flattenRelations($relations);
+        $results = [];
 
-        // $blah = $this->addFlattenedRelation($flattendRelations, )
+        $flattenedRelations = $this->flattenRelations($relations);
 
-        foreach ($relations as $name => $constraints) {
+        foreach ($flattenedRelations as $name => $constraints) {
+            if (is_numeric($name)) {
+                $name = $constraints;
+
+                [$name, $constraints] = str_contains($name, ':')
+                    ? $this->createSelectWithConstraint($name)
+                    : [$name, static function () {
+                        //
+                    }];
+            }
+
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.

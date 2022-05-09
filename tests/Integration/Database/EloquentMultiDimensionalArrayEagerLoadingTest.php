@@ -67,14 +67,12 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
     {
         $users = User::query()
             ->with([
-                // 'posts' => [
-                //     'comments' => [
-                //         'tags',
-                //     ],
-                //     'image',
-                // ],
-                'posts.comments.tags',
-                'posts.image',
+                'posts' => [
+                    'comments' => [
+                        'tags',
+                    ],
+                    'image',
+                ],
             ])->get();
 
         $this->assertCount(1, $users);
