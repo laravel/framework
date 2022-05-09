@@ -2039,6 +2039,53 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the number of alphabetical words is greater than a minimum value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateWordsMin($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'min');
+
+        return str_word_count($value) >= $parameters[0];
+    }
+
+    /**
+     * Validate the number of alphabetical words is between a set of values.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateWordsBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'between');
+
+        $count = str_word_count($value);
+
+        return $count >= $parameters[0] && $count <= $parameters[1];
+    }
+
+    /**
+     * Validate the count of alphabetical words is less than a maximum value.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateWordsMax($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'max');
+
+        return str_word_count($value) <= $parameters[0];
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute

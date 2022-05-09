@@ -6479,6 +6479,55 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
+    public function testValidatesWordsMin()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar'], ['foo' => 'words_min:3']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar baz'], ['foo' => 'words_min:3']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidatesWordsBetween()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar'], ['foo' => 'words_between:3,4']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar baz'], ['foo' => 'words_between:3,4']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar baz quz'], ['foo' => 'words_between:3,4']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar baz quz qux'], ['foo' => 'words_between:3,4']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidatesWordsMax()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => ''], ['foo' => 'words_max:2']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo'], ['foo' => 'words_max:2']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar'], ['foo' => 'words_max:2']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'foo bar baz'], ['foo' => 'words_max:2']);
+        $this->assertFalse($v->passes());
+    }
+
     public function providesPassingExcludeIfData()
     {
         return [
