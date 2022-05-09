@@ -312,9 +312,7 @@ class Builder implements BuilderContract
     public function orWhere($column, $operator = null, $value = null)
     {
         [$value, $operator] = $this->query->prepareValueAndOperator(
-            $value,
-            $operator,
-            func_num_args() === 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -468,8 +466,7 @@ class Builder implements BuilderContract
         if (is_array($id)) {
             if (count($result) !== count(array_unique($id))) {
                 throw (new ModelNotFoundException())->setModel(
-                    get_class($this->model),
-                    array_diff($id, $result->modelKeys())
+                    get_class($this->model), array_diff($id, $result->modelKeys())
                 );
             }
 
@@ -478,8 +475,7 @@ class Builder implements BuilderContract
 
         if (is_null($result)) {
             throw (new ModelNotFoundException())->setModel(
-                get_class($this->model),
-                $id
+                get_class($this->model), $id
             );
         }
 
@@ -587,7 +583,7 @@ class Builder implements BuilderContract
             return $model;
         }
 
-        throw (new ModelNotFoundException())->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel(get_class($this->model));
     }
 
     /**
@@ -626,7 +622,7 @@ class Builder implements BuilderContract
         try {
             return $this->baseSole($columns);
         } catch (RecordsNotFoundException $exception) {
-            throw (new ModelNotFoundException())->setModel(get_class($this->model));
+            throw (new ModelNotFoundException)->setModel(get_class($this->model));
         }
     }
 
@@ -747,8 +743,7 @@ class Builder implements BuilderContract
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
             $relation->initRelation($models, $name),
-            $relation->getEager(),
-            $name
+            $relation->getEager(), $name
         );
     }
 
@@ -1039,9 +1034,7 @@ class Builder implements BuilderContract
     public function increment($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->increment(
-            $column,
-            $amount,
-            $this->addUpdatedAtColumn($extra)
+            $column, $amount, $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -1056,9 +1049,7 @@ class Builder implements BuilderContract
     public function decrement($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->decrement(
-            $column,
-            $amount,
-            $this->addUpdatedAtColumn($extra)
+            $column, $amount, $this->addUpdatedAtColumn($extra)
         );
     }
 
