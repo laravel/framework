@@ -1215,7 +1215,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a where between if database column is DateTime and values is Date.
+     * Add a where date between statement to the query that casting the column to date.
      *
      * @param  string  $column
      * @param  array  $values
@@ -1247,7 +1247,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a where not between for two dates with different formats to the query.
+     * Add a where date not between statement to the query that casting the column to date.
      *
      * @param  string  $column
      * @param  array  $values
