@@ -1943,8 +1943,8 @@ trait HasAttributes
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
-            return $this->castAttribute($key, $attribute) ==
-                $this->castAttribute($key, $original);
+            return $this->fromJson($attribute) ===
+                $this->fromJson($original);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
                 return false;
