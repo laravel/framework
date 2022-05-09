@@ -1428,40 +1428,50 @@ class Builder implements BuilderContract
         }
 
         foreach ($relations as $key => $value) {
-            if (is_string($key) && is_array($value)) {
-                [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($key);
-
-                $flattenedRelations = array_merge(
-                    $flattenedRelations,
-                    $this->flattenRelations($value, "{$prefix}{$attribute}"),
-                    ["{$prefix}{$attribute}" => $attributeSelectConstraint],
-                );
-
-                unset($relations[$key]);
-
+            if (! is_string($key) || ! is_array($value)) {
                 continue;
             }
+
+            [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($key);
+
+            $flattenedRelations = array_merge(
+                $flattenedRelations,
+                $this->flattenRelations($value, "{$prefix}{$attribute}"),
+                ["{$prefix}{$attribute}" => $attributeSelectConstraint],
+            );
+
+            unset($relations[$key]);
         }
 
         foreach ($relations as $key => $value) {
             if (is_numeric($key) && is_string($value)) {
-                [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
+                [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($value);
 
-                $flattenedRelations[$prefix.$key] = $value;
+                $flattenedRelations[$prefix.$attribute] = $attributeSelectConstraint;
 
                 unset($relations[$key]);
 
                 continue;
             }
 
-            [$key, $value] = $this->parseNameAndMixExistingConstraintWithAttributeSelectionConstraint($key, $value);
-
-            $flattenedRelations["{$prefix}{$key}"] = $value;
+            $flattenedRelations[$prefix.$key] = $this->mixConstrains([
+                $flattenedRelations[$prefix.$key] ?? static function () {},
+                $value
+            ]);
 
             unset($relations[$key]);
         }
 
         return $flattenedRelations;
+    }
+
+    protected function mixConstrains(array $constraints)
+    {
+        return function ($builder) use ($constraints) {
+            foreach ($constraints as $constraint) {
+                $constraint($builder);
+            }
+        };
     }
 
     protected function parseNameAndAttributeSelectionConstraint(string $name): array
@@ -1478,7 +1488,6 @@ class Builder implements BuilderContract
         [$name, $attributeSelectionConstraint] = $this->parseNameAndAttributeSelectionConstraint($name);
 
         return [$name, function ($builder) use ($existingConstraint, $attributeSelectionConstraint) {
-
             $existingConstraint($builder);
 
             $attributeSelectionConstraint($builder);
