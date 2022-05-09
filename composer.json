@@ -25,7 +25,7 @@
         "laravel/serializable-closure": "^1.0",
         "league/commonmark": "^2.2",
         "league/flysystem": "^3.0",
-        "monolog/monolog": "^2.0",
+        "monolog/monolog": "^3.0",
         "nesbot/carbon": "^2.53.1",
         "psr/container": "^1.1.1|^2.0.1",
         "psr/log": "^1.0|^2.0|^3.0",
