@@ -1454,7 +1454,7 @@ class Builder implements BuilderContract
                 continue;
             }
 
-            $flattenedRelations[$prefix.$key] = $this->mixConstrains([
+            $flattenedRelations[$prefix.$key] = static::mixConstrains([
                 $flattenedRelations[$prefix.$key] ?? static function () {},
                 $value
             ]);
@@ -1465,7 +1465,8 @@ class Builder implements BuilderContract
         return $flattenedRelations;
     }
 
-    protected function mixConstrains(array $constraints)
+    // TODO: pipeline?
+    protected static function mixConstrains(array $constraints)
     {
         return function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
@@ -1481,17 +1482,6 @@ class Builder implements BuilderContract
             : [$name, static function () {
                 //
             }];
-    }
-
-    protected function parseNameAndMixExistingConstraintWithAttributeSelectionConstraint(string $name, Closure $existingConstraint): array
-    {
-        [$name, $attributeSelectionConstraint] = $this->parseNameAndAttributeSelectionConstraint($name);
-
-        return [$name, function ($builder) use ($existingConstraint, $attributeSelectionConstraint) {
-            $existingConstraint($builder);
-
-            $attributeSelectionConstraint($builder);
-        }];
     }
 
     /**
