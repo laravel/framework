@@ -1262,11 +1262,12 @@ class Builder implements BuilderContract
     /**
      * Add a where between if the column is Timestamp and values is Date that will format the values Y-m-d 00:00:00 to Y-m-d 23:59:59 to get exact result.
      *
-     * @param string $column
-     * @param array $values
-     * @param string $boolean
-     * @param bool $not
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
+     *
      * @throws \Exception
      */
     public function whereTimestampBetweenDate($column, array $values, $boolean = 'and', $not = false)
@@ -1297,10 +1298,11 @@ class Builder implements BuilderContract
     /**
      * Add a where not between if the column is Timestamp and values is Date that will format the values Y-m-d 00:00:00 to Y-m-d 23:59:59 to get exact result.
      *
-     * @param string $column
-     * @param array $values
-     * @param string $boolean
+     * @param  string  $column
+     * @param  array  $values
+     * @param  string  $boolean
      * @return $this
+     *
      * @throws \Exception
      */
     public function whereNotTimestampBetweenDate($column, iterable $values, $boolean = 'and')
