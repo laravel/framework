@@ -446,6 +446,45 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Share context across channels and stacks.
+     *
+     * @param  array  $context
+     * @return $this
+     */
+    public function shareContext(array $context)
+    {
+        foreach ($this->channels as $channel) {
+            $channel->withContext($context);
+        }
+
+        $this->sharedContext = array_merge($this->sharedContext, $context);
+
+        return $this;
+    }
+
+    /**
+     * The context shared across channels and stacks.
+     *
+     * @return array
+     */
+    public function sharedContext()
+    {
+        return $this->sharedContext;
+    }
+
+    /**
+     * Flush the shared context.
+     *
+     * @return array
+     */
+    public function flushSharedContext()
+    {
+        $this->sharedContext = [];
+
+        return $this;
+    }
+
+    /**
      * Get fallback log channel name.
      *
      * @return string
@@ -514,45 +553,6 @@ class LogManager implements LoggerInterface
         if (isset($this->channels[$driver])) {
             unset($this->channels[$driver]);
         }
-    }
-
-    /**
-     * Share context across channels and stacks.
-     *
-     * @param  array  $context
-     * @return $this
-     */
-    public function shareContext(array $context)
-    {
-        foreach ($this->channels as $channel) {
-            $channel->withContext($context);
-        }
-
-        $this->sharedContext = array_merge($this->sharedContext, $context);
-
-        return $this;
-    }
-
-    /**
-     * The context shared across channels and stacks.
-     *
-     * @return array
-     */
-    public function sharedContext()
-    {
-        return $this->sharedContext;
-    }
-
-    /**
-     * Flush the shared context.
-     *
-     * @return array
-     */
-    public function flushSharedContext()
-    {
-        $this->sharedContext = [];
-
-        return $this;
     }
 
     /**
