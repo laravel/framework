@@ -38,6 +38,13 @@ class LogManager implements LoggerInterface
     protected $channels = [];
 
     /**
+     * The context shared across channels and stacks.
+     *
+     * @var array
+     */
+    protected $sharedContext = [];
+
+    /**
      * The registered custom driver creators.
      *
      * @var array
@@ -50,13 +57,6 @@ class LogManager implements LoggerInterface
      * @var string
      */
     protected $dateFormat = 'Y-m-d H:i:s';
-
-    /**
-     * The context shared across channels and stacks.
-     *
-     * @var array
-     */
-    protected $sharedContext = [];
 
     /**
      * Create a new Log manager instance.
