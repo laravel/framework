@@ -465,7 +465,7 @@ class Builder implements BuilderContract
 
         if (is_array($id)) {
             if (count($result) !== count(array_unique($id))) {
-                throw (new ModelNotFoundException())->setModel(
+                throw (new ModelNotFoundException)->setModel(
                     get_class($this->model), array_diff($id, $result->modelKeys())
                 );
             }
@@ -474,7 +474,7 @@ class Builder implements BuilderContract
         }
 
         if (is_null($result)) {
-            throw (new ModelNotFoundException())->setModel(
+            throw (new ModelNotFoundException)->setModel(
                 get_class($this->model), $id
             );
         }
@@ -1205,8 +1205,7 @@ class Builder implements BuilderContract
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callNamedScope(
-                $scope,
-                Arr::wrap($parameters)
+                $scope, Arr::wrap($parameters)
             );
         }
 
@@ -1310,13 +1309,11 @@ class Builder implements BuilderContract
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-            $query,
-            array_slice($allWheres, 0, $originalWhereCount)
+            $query, array_slice($allWheres, 0, $originalWhereCount)
         );
 
         $this->groupWhereSliceForScope(
-            $query,
-            array_slice($allWheres, $originalWhereCount)
+            $query, array_slice($allWheres, $originalWhereCount)
         );
     }
 
@@ -1336,8 +1333,7 @@ class Builder implements BuilderContract
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {
             $query->wheres[] = $this->createNestedWhere(
-                $whereSlice,
-                $whereBooleans->first()
+                $whereSlice, $whereBooleans->first()
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
@@ -1553,8 +1549,8 @@ class Builder implements BuilderContract
                 }
 
                 return $query instanceof BelongsToMany
-                    ? $query->getRelated()->getTable().'.'.$column
-                    : $column;
+                        ? $query->getRelated()->getTable().'.'.$column
+                        : $column;
             }, explode(',', explode(':', $name)[1])));
         }];
     }
@@ -1875,8 +1871,8 @@ class Builder implements BuilderContract
     protected static function registerMixin($mixin, $replace)
     {
         $methods = (new ReflectionClass($mixin))->getMethods(
-            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
-        );
+                ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+            );
 
         foreach ($methods as $method) {
             if ($replace || ! static::hasGlobalMacro($method->name)) {
