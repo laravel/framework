@@ -213,6 +213,28 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo baz', $t->get('foo :message', ['message' => 'baz']));
     }
 
+    public function testEmptyFallbacks()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
+    }
+
+    public function testDetermineLocalesUsingMethod()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->determineLocalesUsing(function ($locales) {
+            $this->assertSame(['en'], $locales);
+
+            return ['en', 'lz'];
+        });
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lz', 'foo', '*')->andReturn([]);
+        $this->assertSame('foo', $t->get('foo'));
+    }
+
     protected function getLoader()
     {
         return m::mock(Loader::class);

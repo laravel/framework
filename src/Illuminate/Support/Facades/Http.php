@@ -36,6 +36,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method static \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
+ * @method static \Illuminate\Http\Client\PendingRequest throwIf($condition)
  * @method static array pool(callable $callback)
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
@@ -44,6 +45,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response post(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response put(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ * @method static \Illuminate\Http\Client\Factory allowStrayRequests()
  * @method static void assertSent(callable $callback)
  * @method static void assertSentInOrder(array $callbacks)
  * @method static void assertNotSent(callable $callback)
@@ -91,6 +93,18 @@ class Http extends Facade
         });
 
         return $fake->fakeSequence($urlPattern);
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any request is not faked.
+     *
+     * @return \Illuminate\Http\Client\Factory
+     */
+    public static function preventStrayRequests()
+    {
+        return tap(static::getFacadeRoot(), function ($fake) {
+            static::swap($fake->preventStrayRequests());
+        });
     }
 
     /**

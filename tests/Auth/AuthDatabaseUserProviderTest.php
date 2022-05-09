@@ -135,6 +135,19 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
+    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
+    {
+        $conn = m::mock(Connection::class);
+        $hasher = m::mock(Hasher::class);
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByCredentials([
+            'password' => 'dayle',
+            'password2' => 'night',
+        ]);
+
+        $this->assertNull($user);
+    }
+
     public function testCredentialValidation()
     {
         $conn = m::mock(Connection::class);

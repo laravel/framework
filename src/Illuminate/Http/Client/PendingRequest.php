@@ -20,6 +20,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Psr\Http\Message\MessageInterface;
+use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
 class PendingRequest
@@ -137,6 +138,13 @@ class PendingRequest
      * @var \Illuminate\Support\Collection|null
      */
     protected $stubCallbacks;
+
+    /**
+     * Indicates that an exception should be thrown if any request is not faked.
+     *
+     * @var bool
+     */
+    protected $preventStrayRequests = false;
 
     /**
      * The middleware callables added by users that will handle requests.
@@ -565,6 +573,17 @@ class PendingRequest
         $this->throwCallback = $callback ?: fn () => null;
 
         return $this;
+    }
+
+    /**
+     * Throw an exception if a server or client error occurred and the given condition evaluates to true.
+     *
+     * @param  bool  $condition
+     * @return $this
+     */
+    public function throwIf($condition)
+    {
+        return $condition ? $this->throw() : $this;
     }
 
     /**
@@ -1040,6 +1059,10 @@ class PendingRequest
                      ->first();
 
                 if (is_null($response)) {
+                    if ($this->preventStrayRequests) {
+                        throw new RuntimeException('Attempted request to ['.(string) $request->getUri().'] without a matching fake.');
+                    }
+
                     return $handler($request, $options);
                 }
 
@@ -1119,6 +1142,19 @@ class PendingRequest
     public function stub($callback)
     {
         $this->stubCallbacks = collect($callback);
+
+        return $this;
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any request is not faked.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayRequests($prevent = true)
+    {
+        $this->preventStrayRequests = $prevent;
 
         return $this;
     }
