@@ -4,7 +4,6 @@ namespace Illuminate\Log;
 
 use InvalidArgumentException;
 use Monolog\Level;
-use Monolog\Logger as Monolog;
 
 trait ParsesLogConfiguration
 {
