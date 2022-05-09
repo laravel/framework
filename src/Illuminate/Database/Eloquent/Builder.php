@@ -1429,15 +1429,13 @@ class Builder implements BuilderContract
 
         foreach ($relations as $key => $value) {
             if (is_string($key) && is_array($value)) {
-                $flattenedRelations = array_merge($flattenedRelations, $this->flattenRelations($value, "{$prefix}{$key}"));
+                [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($key);
 
-                unset($relations[$key]);
-
-                continue;
-            }
-
-            if (is_string($key)) {
-                $flattenedRelations["{$prefix}{$key}"] = $value;
+                $flattenedRelations = array_merge(
+                    $flattenedRelations,
+                    $this->flattenRelations($value, "{$prefix}{$attribute}"),
+                    ["{$prefix}{$attribute}" => $attributeSelectConstraint],
+                );
 
                 unset($relations[$key]);
 
@@ -1447,18 +1445,26 @@ class Builder implements BuilderContract
 
         foreach ($relations as $key => $value) {
             if (is_numeric($key) && is_string($value)) {
-                $flattenedRelations[] = $prefix.$value;
+                [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
+
+                $flattenedRelations[$prefix.$key] = $value;
 
                 unset($relations[$key]);
 
                 continue;
             }
+
+            [$key, $value] = $this->parseNameAndMixExistingConstraintWithAttributeSelectionConstraint($key, $value);
+
+            $flattenedRelations["{$prefix}{$key}"] = $value;
+
+            unset($relations[$key]);
         }
 
         return $flattenedRelations;
     }
 
-    protected function parseAttributeSelectionConstraint($name)
+    protected function parseNameAndAttributeSelectionConstraint(string $name): array
     {
         return str_contains($name, ':')
             ? $this->createSelectWithConstraint($name)
@@ -1467,33 +1473,16 @@ class Builder implements BuilderContract
             }];
     }
 
-    protected function addFlattenedRelation($relations, $name, $constraint = null)
+    protected function parseNameAndMixExistingConstraintWithAttributeSelectionConstraint(string $name, Closure $existingConstraint): array
     {
-        $constraint = $constraint ?: function () {
-            //
-        };
+        [$name, $attributeSelectionConstraint] = $this->parseNameAndAttributeSelectionConstraint($name);
 
-        return [$name, $selectConstraint] = Str::contains($name, ':')
-                ? $this->createSelectWithConstraint($name)
-                : [$name, static function () {
-                    //
-                }];
+        return [$name, function ($builder) use ($existingConstraint, $attributeSelectionConstraint) {
 
-        // $relations[$name] = isset($relations[$name])
-        //     ? function ($builder) use ($relations, $name, $constraint, $selectConstraint) {
-        //         $relations[$name]($builder);
+            $existingConstraint($builder);
 
-        //         $constraint($builder);
-
-        //         $selectConstraint($builder);
-        //     }
-        // : function ($builder) use ($constraint, $selectConstraint) {
-        //     $constraint($builder);
-
-        //     $selectConstraint($builder);
-        // };
-
-        // return $relations;
+            $attributeSelectionConstraint($builder);
+        }];
     }
 
     //protected function normalizeRelations(array $relations)
@@ -1548,16 +1537,6 @@ class Builder implements BuilderContract
         $flattenedRelations = $this->flattenRelations($relations);
 
         foreach ($flattenedRelations as $name => $constraints) {
-            if (is_numeric($name)) {
-                $name = $constraints;
-
-                [$name, $constraints] = str_contains($name, ':')
-                    ? $this->createSelectWithConstraint($name)
-                    : [$name, static function () {
-                        //
-                    }];
-            }
-
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.
