@@ -1578,4 +1578,26 @@ class HttpClientTest extends TestCase
 
         $this->factory->get('https://laravel.com');
     }
+
+    public function testItCanAddAuthorizationHeaderIntoRequestUsingBeforeSendingCallback()
+    {
+        $this->factory->fake();
+
+        $this->factory->beforeSending(function (Request $request) {
+            $requestLine = sprintf(
+                '%s %s HTTP/%s',
+                $request->toPsrRequest()->getMethod(),
+                $request->toPsrRequest()->getUri()->withScheme('')->withHost(''),
+                $request->toPsrRequest()->getProtocolVersion()
+            );
+
+            return $request->toPsrRequest()->withHeader('Authorization', 'Bearer '.$requestLine);
+        })->get('http://foo.com/json');
+
+        $this->factory->assertSent(function (Request $request) {
+            return
+                $request->url() === 'http://foo.com/json' &&
+                $request->hasHeader('Authorization', 'Bearer GET /json HTTP/1.1');
+        });
+    }
 }
