@@ -230,6 +230,23 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Updates an existing item on the cache, refreshing its expiration time.
+     *
+     * @param  string  $key
+     * @param  \Closure  $callback
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return mixed
+     */
+    public function upsert($key, Closure $callback, $ttl = null)
+    {
+        return tap($callback($this->get($key)), function ($result) use ($key, $ttl) {
+            if (!is_null($result)) {
+                $this->put($key, $result, $ttl);
+            }
+        });
+    }
+
+    /**
      * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values

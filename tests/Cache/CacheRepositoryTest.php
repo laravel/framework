@@ -186,6 +186,60 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testUpsertPutsNonExistingItemForever()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
+
+        $result = $repo->upsert('foo', function ($item) {
+            return $item . 'bar';
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testUpsertPutsNonExistingItemWithTtl()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->with('foo', 'bar', 60);
+
+        $result = $repo->upsert('foo', function ($item) {
+            return $item . 'bar';
+        }, 60);
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testUpsertUpdatesExistingItem()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
+
+        $result = $repo->upsert('foo', function ($item) {
+            $this->assertSame('bar', $item);
+            return ($item ?? 'quz') . '.baz';
+        });
+
+        $this->assertSame('bar.baz', $result);
+    }
+
+    public function testUpsertDoesntInsertsOrUpdatesIfCallbackReturnsNull()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('put')->never();
+        $repo->getStore()->shouldReceive('forever')->never();
+
+        $result = $repo->upsert('foo', function () {
+            return null;
+        });
+
+        $this->assertNull($result);
+    }
+
     public function testPutManyWithNullTTLRemembersItemsForever()
     {
         $repo = $this->getRepository();
