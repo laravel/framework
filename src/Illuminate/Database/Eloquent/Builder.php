@@ -1456,16 +1456,7 @@ class Builder implements BuilderContract
         // attribute contraints if needed or merge in existing contraints.
         foreach ($relations as $key => $value) {
             if (is_numeric($key) && is_string($value)) {
-                [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($value);
-
-                $preparedRelationships[$prefix.$attribute] = $this->combineContraints([
-                    $attributeSelectConstraint,
-                    $preparedRelationships[$prefix.$attribute] ?? static function () {
-                        //
-                    },
-                ]);
-
-                continue;
+                [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
             }
 
             $preparedRelationships[$prefix.$key] = $this->combineContraints([
