@@ -13,6 +13,7 @@ use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
+use Monolog\Level;
 use Monolog\Logger as Monolog;
 use Monolog\Processor\UidProcessor;
 use Orchestra\Testbench\TestCase;
@@ -70,8 +71,8 @@ class LogManagerTest extends TestCase
         $this->assertCount(2, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
         $this->assertInstanceOf(StreamHandler::class, $handlers[1]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
-        $this->assertEquals(Monolog::INFO, $handlers[1]->getLevel());
+        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
+        $this->assertEquals(Level::Info, $handlers[1]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
         $this->assertTrue($handlers[1]->getBubble());
     }
@@ -100,7 +101,7 @@ class LogManagerTest extends TestCase
         $this->assertSame('foobar', $logger->getName());
         $this->assertCount(1, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
+        $this->assertEquals(Level::Notice, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
 
         $url = new ReflectionProperty(get_class($handlers[0]), 'url');
@@ -183,12 +184,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-        if (Monolog::API === 1) {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-            $this->assertInstanceOf(HtmlFormatter::class, $handler->getFormatter());
-        } else {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-        }
+        $this->assertInstanceOf(NullHandler::class, $handler);
 
         $config->set('logging.channels.null2', [
             'driver' => 'monolog',
@@ -198,12 +194,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('null2');
         $handler = $logger->getLogger()->getHandlers()[0];
 
-        if (Monolog::API === 1) {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-            $this->assertInstanceOf(LineFormatter::class, $handler->getFormatter());
-        } else {
-            $this->assertInstanceOf(NullHandler::class, $handler);
-        }
+        $this->assertInstanceOf(NullHandler::class, $handler);
     }
 
     public function testItUtilisesTheNullDriverDuringTestsWhenNullDriverUsed()
@@ -469,7 +460,7 @@ class LogManagerTest extends TestCase
         $actionLevelProp->setAccessible(true);
         $actionLevelValue = $actionLevelProp->getValue($activationStrategyValue);
 
-        $this->assertEquals(Monolog::CRITICAL, $actionLevelValue);
+        $this->assertEquals(Level::Critical, $actionLevelValue);
 
         if (method_exists($expectedFingersCrossedHandler, 'getHandler')) {
             $expectedStreamHandler = $expectedFingersCrossedHandler->getHandler();
@@ -479,6 +470,6 @@ class LogManagerTest extends TestCase
             $expectedStreamHandler = $handlerProp->getValue($expectedFingersCrossedHandler);
         }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
-        $this->assertEquals(Monolog::DEBUG, $expectedStreamHandler->getLevel());
+        $this->assertEquals(Level::Debug, $expectedStreamHandler->getLevel());
     }
 }

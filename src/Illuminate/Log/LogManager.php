@@ -413,7 +413,7 @@ class LogManager implements LoggerInterface
             $handler = new FingersCrossedHandler($handler, $this->actionLevel($config));
         }
 
-        if (Monolog::API !== 1 && (Monolog::API !== 2 || ! $handler instanceof FormattableHandlerInterface)) {
+        if (! $handler instanceof FormattableHandlerInterface) {
             return $handler;
         }
 
