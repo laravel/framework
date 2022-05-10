@@ -586,7 +586,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        // Make sure only one dot at max is present...
+        // Make sure there is not more than one dot...
         if (($length - strlen(str_replace('.', '', (string) $value))) > 1) {
             return false;
         }
