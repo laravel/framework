@@ -1417,8 +1417,6 @@ class Builder implements BuilderContract
         );
     }
 
-    // TODO: whenever a relation is added to the flat relations pile, we need
-    // to ensure it is not already set, and if it is we need to merge them wisely.
     protected function flattenRelations(array $relations, string $prefix = ''): array
     {
         $flattenedRelations = [];
@@ -1465,7 +1463,6 @@ class Builder implements BuilderContract
         return $flattenedRelations;
     }
 
-    // TODO: pipeline?
     protected static function mixConstrains(array $constraints)
     {
         return function ($builder) use ($constraints) {
@@ -1498,10 +1495,7 @@ class Builder implements BuilderContract
 
         $results = [];
 
-        $flattenedRelations = $this->flattenRelations($relations);
-        dd($flattenedRelations);
-
-        foreach ($flattenedRelations as $name => $constraints) {
+        foreach ($this->flattenRelations($relations) as $name => $constraints) {
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.
