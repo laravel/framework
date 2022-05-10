@@ -9,14 +9,14 @@ class TrimStrings extends TransformsRequest
     /**
      * All of the registered skip callbacks.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected static $skipCallbacks = [];
 
     /**
      * The attributes that should not be trimmed.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $except = [
         //
