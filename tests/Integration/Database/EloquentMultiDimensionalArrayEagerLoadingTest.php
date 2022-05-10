@@ -8,6 +8,24 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
+// Not supported...
+// User::query()
+//     ->with([
+//         'posts.comments' => fn ($q) => $q->addSelect(['id']),
+//         'posts' => fn ($query) => $query->with([
+//             'comments' => function ($q) {
+//                 $q->addSelect(['post_id']);
+//             }]),
+//     ])->get();
+//
+// User::query()
+//     ->with([
+//         'posts' => fn ($query) => $query->with([
+//             'comments:post_id,title'
+//         ]),
+//         'posts.comments:id',
+//     ])
+//     ->get();
 class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
@@ -196,55 +214,6 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($users[0]->posts->flatMap->comments->every(fn ($comment) => $comment->tags_count === 3));
         $this->assertTrue($users[0]->posts->flatMap->comments->every->relationLoaded('tags'));
         $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
-    }
-
-    public function testItAppliesConstaintsViaClosuresAndMergesWithAttributeSelection()
-    {
-        DB::enableQueryLog();
-
-        $users = User::query()
-            ->with([
-                'posts' => fn ($query) => $query->with([
-                    'comments:post_id,title'
-                ]),
-                'posts.comments:id',
-            ])
-            ->get();
-
-        dd($users[0]->posts[0]->comments);
-
-        $this->assertCount(3, DB::getQueryLog());
-        $this->assertCount(1, $users);
-        $this->assertTrue($users[0]->relationLoaded('posts'));
-        $this->assertCount(2, $users[0]->posts);
-        $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
-        $this->assertCount(2, $users[0]->posts->flatMap->comments);
-    }
-    public function testItAppliesConstaintsViaClosuresAndMergesAddSelectContraints()
-    {
-        DB::enableQueryLog();
-        $query = null;
-
-        $users = User::query()
-            ->with([
-                'posts.comments' => fn ($q) => $q->addSelect(['id']),
-                'posts' => fn ($query) => $query->with([
-                    'comments' => function ($q) {
-                        $q->addSelect(['post_id']);
-                    }]),
-            ])->getEagerLoads();
-            // ->get();
-        // dd($users);
-
-        // dd($query);
-
-        $this->assertCount(3, DB::getQueryLog());
-        $this->assertCount(1, $users);
-        $this->assertTrue($users[0]->relationLoaded('posts'));
-        $this->assertCount(2, $users[0]->posts);
-        $this->assertTrue($users[0]->posts->every(fn ($post) => $post->comments_count === 1));
-        $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
-        $this->assertCount(2, $users[0]->posts->flatMap->comments);
     }
 }
 
