@@ -1292,6 +1292,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
+    public function testWithAggregateAndSelfRelationConstrain()
+    {
+        EloquentBuilderTestStub::resolveRelationUsing('children', function ($model) {
+            return $model->hasMany(EloquentBuilderTestStub::class, 'parent_id', 'id')->where('enum_value', new stdClass);
+        });
+
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $relationHash = $model->children()->getRelationCountHash(false);
+
+        $builder = $model->withCount('children');
+
+        $this->assertSame(vsprintf('select "table".*, (select count(*) from "table" as "%s" where "table"."id" = "%s"."parent_id" and "enum_value" = ?) as "children_count" from "table"', [$relationHash, $relationHash]), $builder->toSql());
+    }
+
     public function testWithExists()
     {
         $model = new EloquentBuilderTestModelParentStub;
