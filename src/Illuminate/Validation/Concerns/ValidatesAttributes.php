@@ -582,6 +582,15 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
+        if (((string) $value) === '.') {
+            return false;
+        }
+
+        // Make sure there is not more than one dot...
+        if (($length - strlen(str_replace('.', '', (string) $value))) > 1) {
+            return false;
+        }
+
         return ! preg_match('/[^0-9.]/', $value)
                     && $length >= $parameters[0] && $length <= $parameters[1];
     }
