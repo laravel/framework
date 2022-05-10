@@ -1,6 +1,16 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.11...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.12...8.x)
+
+
+## [v8.83.12 (2022-05-10)](https://github.com/laravel/framework/compare/v8.83.11...v8.83.12)
+
+### Fixed
+- Fixed multiple dots for digits_between rule ([#42330](https://github.com/laravel/framework/pull/42330))
+
+### Changed
+- Enable to modify HTTP Client request headers when using beforeSending() callback ([#42244](https://github.com/laravel/framework/pull/42244))
+- Set relation parent key when using forceCreate on HasOne and HasMany relations ([#42281](https://github.com/laravel/framework/pull/42281))
 
 
 ## [v8.83.11 (2022-05-03)](https://github.com/laravel/framework/compare/v8.83.10...v8.83.11)
