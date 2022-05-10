@@ -49,20 +49,7 @@ class Recaller
      */
     public function hash()
     {
-        return explode('|', $this->recaller, 4)[2];
-    }
-
-    /**
-     * Get the custom segments from the recaller.
-     *
-     * @return array
-     */
-    public function customSegments()
-    {
-        $segments = explode('|', $this->recaller);
-        array_splice($segments, 0, 3);
-
-        return $segments;
+        return explode('|', $this->recaller, 3)[2];
     }
 
     /**
@@ -95,5 +82,15 @@ class Recaller
         $segments = explode('|', $this->recaller);
 
         return count($segments) >= 3 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
+    }
+
+    /**
+     * Get the recaller's segments.
+     *
+     * @return array
+     */
+    public function segments()
+    {
+        return explode('|', $this->recaller);
     }
 }
