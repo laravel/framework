@@ -1300,10 +1300,11 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $model = new EloquentBuilderTestStub;
         $this->mockConnectionForModel($model, '');
+        $relationHash = $model->children()->getRelationCountHash(false);
 
         $builder = $model->withCount('children');
 
-        $this->assertSame('select "table".*, (select count(*) from "table" as "laravel_reserved_0" where "table"."id" = "laravel_reserved_0"."parent_id" and "enum_value" = ?) as "children_count" from "table"', $builder->toSql());
+        $this->assertSame(vsprintf('select "table".*, (select count(*) from "table" as "%s" where "table"."id" = "%s"."parent_id" and "enum_value" = ?) as "children_count" from "table"', [$relationHash, $relationHash]), $builder->toSql());
     }
 
     public function testWithExists()
