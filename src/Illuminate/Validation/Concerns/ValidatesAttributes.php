@@ -579,19 +579,30 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'digits_between');
 
-        $length = strlen((string) $value);
-
-        if (((string) $value) === '.') {
+        if (! is_numeric($value)) {
             return false;
         }
 
-        // Make sure there is not more than one dot...
-        if (($length - strlen(str_replace('.', '', (string) $value))) > 1) {
+        if (is_string($value)) {
+            // value must not be a dot or contain more than single dot
+            if ($value === '.' || substr_count($value, '.') > 1) {
+                return false;
+            }
+        } else {
+            $value = strval($value);
+        }
+
+        $length = strlen($value);
+
+        if ($length < $parameters[0] || $length > $parameters[1]) {
             return false;
         }
 
-        return ! preg_match('/[^0-9.]/', $value)
-                    && $length >= $parameters[0] && $length <= $parameters[1];
+        if (isset($parameters[2]) && $parameters[2] === 'strict') {
+            return ! preg_match('/[^0-9]/', $value);
+        }
+
+        return ! preg_match('/[^0-9.]/', $value);
     }
 
     /**
