@@ -1417,14 +1417,24 @@ class Builder implements BuilderContract
         );
     }
 
-    protected function flattenRelations(array $relations, string $prefix = ''): array
+    /**
+     * Prepare nested with relationships.
+     *
+     * @param  array  $relations
+     * @param  string $prefix
+     * @return array
+     */
+    protected function prepareNestedWithRelationships($relations, $prefix = '')
     {
-        $flattenedRelations = [];
+        $preparedRelationships = [];
 
         if ($prefix !== '') {
             $prefix .= '.';
         }
 
+        // For any relationship that is in the [$attribute => array()] syntax,
+        // we will to loop over the nested relations and prepend each key
+        // of the array and flatten it into our prepared relationships.
         foreach ($relations as $key => $value) {
             if (! is_string($key) || ! is_array($value)) {
                 continue;
@@ -1432,38 +1442,50 @@ class Builder implements BuilderContract
 
             [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($key);
 
-            $flattenedRelations = array_merge(
-                $flattenedRelations,
-                $this->flattenRelations($value, "{$prefix}{$attribute}"),
+            $preparedRelationships = array_merge(
+                $preparedRelationships,
                 ["{$prefix}{$attribute}" => $attributeSelectConstraint],
+                $this->prepareNestedWithRelationships($value, "{$prefix}{$attribute}"),
             );
 
             unset($relations[$key]);
         }
 
+        // We now know that any remaining relationships are [ $attribute ] or
+        // [ $attribute => Closure ] formated. Loop over them and either add
+        // attribute contraints if needed or merge in existing contraints.
         foreach ($relations as $key => $value) {
             if (is_numeric($key) && is_string($value)) {
                 [$attribute, $attributeSelectConstraint] = $this->parseNameAndAttributeSelectionConstraint($value);
 
-                $flattenedRelations[$prefix.$attribute] = $attributeSelectConstraint;
-
-                unset($relations[$key]);
+                $preparedRelationships[$prefix.$attribute] = $this->combineContraints([
+                    $attributeSelectConstraint,
+                    $preparedRelationships[$prefix.$attribute] ?? static function () {
+                        //
+                    },
+                ]);
 
                 continue;
             }
 
-            $flattenedRelations[$prefix.$key] = static::mixConstrains([
-                $flattenedRelations[$prefix.$key] ?? static function () {},
-                $value
+            $preparedRelationships[$prefix.$key] = $this->combineContraints([
+                $value,
+                $preparedRelationships[$prefix.$key] ?? static function () {
+                    //
+                },
             ]);
-
-            unset($relations[$key]);
         }
 
-        return $flattenedRelations;
+        return $preparedRelationships;
     }
 
-    protected static function mixConstrains(array $constraints)
+    /**
+     * Combine an array of constraints into a single constraint.
+     *
+     * @param  array  $constriants
+     * @return \Closure
+     */
+    protected function combineContraints(array $constraints)
     {
         return function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
@@ -1472,7 +1494,13 @@ class Builder implements BuilderContract
         };
     }
 
-    protected function parseNameAndAttributeSelectionConstraint(string $name): array
+    /**
+     * Parse the attribute select constraints from the name.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseNameAndAttributeSelectionConstraint($name)
     {
         return str_contains($name, ':')
             ? $this->createSelectWithConstraint($name)
@@ -1495,7 +1523,7 @@ class Builder implements BuilderContract
 
         $results = [];
 
-        foreach ($this->flattenRelations($relations) as $name => $constraints) {
+        foreach ($this->prepareNestedWithRelationships($relations) as $name => $constraints) {
             // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
             // the relationship with its own key in the array of eager-load names.

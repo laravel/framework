@@ -198,56 +198,54 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
     }
 
-    // public function testItAppliesConstaintsViaClosuresAndMergesWithAttributeSelection()
-    // {
-    //     DB::enableQueryLog();
+    public function testItAppliesConstaintsViaClosuresAndMergesWithAttributeSelection()
+    {
+        DB::enableQueryLog();
 
-    //     $users = User::query()
-    //         ->with([
-    //             'posts.comments:post_id,title',
-    //             'posts' => fn ($query) => $query->with([
-    //                 'comments:id'
-    //             ]),
-    //         ])
-    //         ->get();
+        $users = User::query()
+            ->with([
+                'posts' => fn ($query) => $query->with([
+                    'comments:post_id,title'
+                ]),
+                'posts.comments:id',
+            ])
+            ->get();
 
-    //     $this->assertCount(3, DB::getQueryLog());
-    //     $this->assertCount(1, $users);
-    //     $this->assertTrue($users[0]->relationLoaded('posts'));
-    //     $this->assertCount(2, $users[0]->posts);
-    //     $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
-    //     $this->assertCount(2, $users[0]->posts->flatMap->comments);
-    // }
-    // public function testItAppliesConstaintsViaClosuresAndMergesAddSelectContraints()
-    // {
-    //     DB::enableQueryLog();
+        dd($users[0]->posts[0]->comments);
 
-    //     $users = User::query()
-    //         ->with([
-    //             'posts.comments' => fn ($q) =>
-    //             'posts' => [
-    //                 'comments' => fn ($q) => $q->latest(),
-    //             ],
-    //         ])
-    //         ->get();
+        $this->assertCount(3, DB::getQueryLog());
+        $this->assertCount(1, $users);
+        $this->assertTrue($users[0]->relationLoaded('posts'));
+        $this->assertCount(2, $users[0]->posts);
+        $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
+        $this->assertCount(2, $users[0]->posts->flatMap->comments);
+    }
+    public function testItAppliesConstaintsViaClosuresAndMergesAddSelectContraints()
+    {
+        DB::enableQueryLog();
+        $query = null;
 
-        // $users = User::query()
-        //     ->with([
-        //         'posts.comments' => fn ($q) => dd('here'),
-        //         'posts' => fn ($query) => $query->with([
-        //             'comments' => fn ($q) => $q->latest(),
-        //         ]),
-        //     ])
-        //     ->get();
+        $users = User::query()
+            ->with([
+                'posts.comments' => fn ($q) => $q->addSelect(['id']),
+                'posts' => fn ($query) => $query->with([
+                    'comments' => function ($q) {
+                        $q->addSelect(['post_id']);
+                    }]),
+            ])->getEagerLoads();
+            // ->get();
+        // dd($users);
 
-        // $this->assertCount(3, DB::getQueryLog());
-        // $this->assertCount(1, $users);
-        // $this->assertTrue($users[0]->relationLoaded('posts'));
-        // $this->assertCount(2, $users[0]->posts);
-        // $this->assertTrue($users[0]->posts->every(fn ($post) => $post->comments_count === 1));
-        // $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
-        // $this->assertCount(2, $users[0]->posts->flatMap->comments);
-    // }
+        // dd($query);
+
+        $this->assertCount(3, DB::getQueryLog());
+        $this->assertCount(1, $users);
+        $this->assertTrue($users[0]->relationLoaded('posts'));
+        $this->assertCount(2, $users[0]->posts);
+        $this->assertTrue($users[0]->posts->every(fn ($post) => $post->comments_count === 1));
+        $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
+        $this->assertCount(2, $users[0]->posts->flatMap->comments);
+    }
 }
 
 class User extends Model
