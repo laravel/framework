@@ -572,4 +572,17 @@ class LogManagerTest extends TestCase
             'invocation-start' => 1651800456,
         ], $manager->sharedContext());
     }
+
+    public function testFlushSharedContext()
+    {
+        $manager = new LogManager($this->app);
+
+        $manager->shareContext($context = ['foo' => 'bar']);
+
+        $this->assertSame($context, $manager->sharedContext());
+
+        $manager->flushSharedContext();
+
+        $this->assertEmpty($manager->sharedContext());
+    }
 }
