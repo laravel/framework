@@ -475,7 +475,7 @@ class LogManager implements LoggerInterface
     /**
      * Flush the shared context.
      *
-     * @return array
+     * @return $this
      */
     public function flushSharedContext()
     {
