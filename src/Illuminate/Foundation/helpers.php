@@ -679,12 +679,13 @@ if (! function_exists('rescue')) {
 
 if (! function_exists('resolve')) {
     /**
-     * Resolve a service from the container.
-     *
-     * @param  string  $name
-     * @param  array  $parameters
-     * @return mixed
-     */
+    * Resolve a service from the container.
+    *
+    * @param    class-string<T>  $name
+    * @param    array            $parameters
+    * @return   T
+    * @template T
+    */
     function resolve($name, array $parameters = [])
     {
         return app($name, $parameters);
