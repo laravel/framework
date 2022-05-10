@@ -123,7 +123,7 @@ class PusherBroadcaster extends Broadcaster
 
         try {
             $channels->chunk(100)->each(function ($channels) use ($event, $payload, $parameters) {
-                $this->pusher->trigger($channels, $event, $payload, $parameters);
+                $this->pusher->trigger($channels->toArray(), $event, $payload, $parameters);
             });
         } catch (ApiErrorException $e) {
             throw new BroadcastException(
