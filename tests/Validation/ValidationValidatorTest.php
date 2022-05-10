@@ -2294,6 +2294,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'digits_between:1,10']);
         $this->assertTrue($v->fails());
 
+        $v = new Validator($trans, ['foo' => '123.456.7'], ['foo' => 'digits_between:1,10']);
+        $this->assertTrue($v->fails());
+
         $v = new Validator($trans, ['foo' => '...'], ['foo' => 'digits_between:1,10']);
         $this->assertTrue($v->fails());
     }
