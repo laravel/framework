@@ -337,4 +337,25 @@ trait CompilesConditionals
     {
         return "<?php if{$condition}: echo 'disabled'; endif; ?>";
     }
+
+    /**
+     * Compile a route-is into valid PHP.
+     *
+     * @param  string|array  $route
+     * @return string
+     */
+    protected function compileRouteIs($route)
+    {
+        return "<?php if(request()->routeIs($route)): ?>";
+    }
+
+    /**
+     * Compile an end-route-is block into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndRouteIs()
+    {
+        return '<?php endif; ?>';
+    }
 }
