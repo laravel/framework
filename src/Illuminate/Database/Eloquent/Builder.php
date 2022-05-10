@@ -1499,6 +1499,7 @@ class Builder implements BuilderContract
         $results = [];
 
         $flattenedRelations = $this->flattenRelations($relations);
+        dd($flattenedRelations);
 
         foreach ($flattenedRelations as $name => $constraints) {
             // We need to separate out any nested includes, which allows the developers

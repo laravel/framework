@@ -3,9 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMultiDimensionalArrayEagerLoadingTest;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
@@ -16,6 +14,11 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+        });
+
+        Schema::create('avatars', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
         });
 
         Schema::create('posts', function (Blueprint $table) {
@@ -43,6 +46,7 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         });
 
         $user = User::create();
+        $user->avatar()->create();
         $posts = $user->posts()->createMany([
             [
                 'title' => '1. post title',
@@ -63,10 +67,13 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $comments->map->tags()->each->create();
     }
 
-    public function testEagerLoadingWithArrayNotation()
+    public function testItCanEagerLoad()
     {
+        DB::enableQueryLog();
+
         $users = User::query()
             ->with([
+                'avatar',
                 'posts' => [
                     'comments' => [
                         'tags',
@@ -75,11 +82,14 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
                 ],
             ])->get();
 
+        $this->assertCount(6, DB::getQueryLog());
         $this->assertCount(1, $users);
+        $this->assertTrue($users[0]->relationLoaded('avatar'));
+        $this->assertNotNull($users[0]->avatar);
         $this->assertTrue($users[0]->relationLoaded('posts'));
         $this->assertCount(2, $users[0]->posts);
         $this->assertTrue($users[0]->posts[0]->isNot($users[0]->posts[1]));
-        $this->assertTrue($users[0]->posts->every->relationLoaded('image')); // failing
+        $this->assertTrue($users[0]->posts->every->relationLoaded('image'));
         $this->assertCount(2, $users[0]->posts->map->image);
         $this->assertTrue($users[0]->posts[0]->image->isNot($users[0]->posts[1]->image));
         $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
@@ -89,8 +99,10 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
     }
 
-    public function testItAppliesConstaintsViaClosuresAndContinueEagerLoading()
+    public function testItAppliesConstaintsViaClosuresAndCanContinueEagerLoading()
     {
+        DB::enableQueryLog();
+
         $users = User::query()
             ->with([
                 'posts' => fn ($query) => $query->withCount('comments')->with([
@@ -101,6 +113,7 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
             ])
             ->get();
 
+        $this->assertCount(4, DB::getQueryLog());
         $this->assertCount(1, $users);
         $this->assertTrue($users[0]->relationLoaded('posts'));
         $this->assertCount(2, $users[0]->posts);
@@ -110,8 +123,11 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $this->assertTrue($users[0]->posts->flatMap->comments->every->relationLoaded('tags'));
     }
 
-    public function testItSpecifiesAttributesToSelectInKey()
+
+    public function testItCanSpecifyAttributesToSelectInKeys()
     {
+        DB::enableQueryLog();
+
         $users = User::query()
             ->with([
                 'posts:id,title,user_id' => [
@@ -122,6 +138,7 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
             ])
             ->get();
 
+        $this->assertCount(4, DB::getQueryLog());
         $this->assertCount(1, $users);
         $this->assertTrue($users[0]->relationLoaded('posts'));
         $this->assertCount(2, $users[0]->posts);
@@ -133,8 +150,10 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
         $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
     }
 
-    public function testItMixesDotNotation()
+    public function testItMixesWithDotNotation()
     {
+        DB::enableQueryLog();
+
         $users = User::query()
             ->with([
                 'posts' => [
@@ -144,6 +163,7 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
             ])
             ->get();
 
+        $this->assertCount(4, DB::getQueryLog());
         $this->assertCount(1, $users);
         $this->assertTrue($users[0]->relationLoaded('posts'));
         $this->assertCount(2, $users[0]->posts);
@@ -155,32 +175,79 @@ class EloquentMultiDimensionalArrayEagerLoadingTest extends DatabaseTestCase
 
     public function testItMixesConstraintsFromDotNotation()
     {
+        DB::enableQueryLog();
+
         $users = User::query()
             ->with([
-                // TODO: add attribute selection to both of these.
                 'posts.comments' => fn ($query) => $query->with('tags'),
-                'posts' => [
+                'posts:id,title,user_id' => [
                     'comments' => fn ($query) => $query->withCount('tags'),
                 ],
             ])
             ->get();
 
+        $this->assertCount(4, DB::getQueryLog());
+        $this->assertCount(1, $users);
+        $this->assertTrue($users[0]->relationLoaded('posts'));
+        $this->assertCount(2, $users[0]->posts);
+        $this->assertTrue($users[0]->posts->every(fn ($post) => $post->content === null));
+        $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
+        $this->assertCount(2, $users[0]->posts->flatMap->comments);
+        $this->assertTrue($users[0]->posts->flatMap->comments->every(fn ($comment) => $comment->tags_count === 3));
+        $this->assertTrue($users[0]->posts->flatMap->comments->every->relationLoaded('tags'));
+        $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
+    }
+
+    public function testItAppliesConstaintsViaClosuresAndMergesWithAttributeSelection()
+    {
+        DB::enableQueryLog();
+
+        $users = User::query()
+            ->with([
+                'posts.comments:post_id,title',
+                'posts' => fn ($query) => $query->with([
+                    'comments:id'
+                ]),
+            ])
+            ->get();
+
+        $this->assertCount(3, DB::getQueryLog());
         $this->assertCount(1, $users);
         $this->assertTrue($users[0]->relationLoaded('posts'));
         $this->assertCount(2, $users[0]->posts);
         $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
         $this->assertCount(2, $users[0]->posts->flatMap->comments);
-        $this->assertTrue($users[0]->posts->flatMap->comments->every(fn ($comment) => $comment->tags_count === 3)); // fails
-        $this->assertTrue($users[0]->posts->flatMap->comments->every->relationLoaded('tags'));
-        $this->assertCount(6, $users[0]->posts->flatMap->comments->flatMap->tags);
     }
+    // public function testItAppliesConstaintsViaClosuresAndMergesAddSelectContraints()
+    // {
+    //     DB::enableQueryLog();
 
-    public function testItHandlesNestedRelationshipsWithTheSameName()
-    {
-        DB::enableQueryLog();
-        User::with('posts:id')->with('posts:content')->get();
-        //
-    }
+    //     $users = User::query()
+    //         ->with([
+    //             'posts.comments' => fn ($q) =>
+    //             'posts' => [
+    //                 'comments' => fn ($q) => $q->latest(),
+    //             ],
+    //         ])
+    //         ->get();
+
+        // $users = User::query()
+        //     ->with([
+        //         'posts.comments' => fn ($q) => dd('here'),
+        //         'posts' => fn ($query) => $query->with([
+        //             'comments' => fn ($q) => $q->latest(),
+        //         ]),
+        //     ])
+        //     ->get();
+
+        // $this->assertCount(3, DB::getQueryLog());
+        // $this->assertCount(1, $users);
+        // $this->assertTrue($users[0]->relationLoaded('posts'));
+        // $this->assertCount(2, $users[0]->posts);
+        // $this->assertTrue($users[0]->posts->every(fn ($post) => $post->comments_count === 1));
+        // $this->assertTrue($users[0]->posts->every->relationLoaded('comments'));
+        // $this->assertCount(2, $users[0]->posts->flatMap->comments);
+    // }
 }
 
 class User extends Model
@@ -192,6 +259,11 @@ class User extends Model
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function avatar()
+    {
+        return $this->hasOne(Avatar::class);
     }
 }
 
@@ -236,4 +308,16 @@ class Tag extends Model
     protected $guarded = [];
 
     public $timestamps = false;
+}
+
+class Avatar extends Model
+{
+    protected $guarded = [];
+
+    public $timestamps = false;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
