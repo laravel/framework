@@ -14,6 +14,15 @@ interface Registrar
     public function get($uri, $action);
 
     /**
+     * Register a new HEAD route with the router.
+     *
+     * @param  string  $uri
+     * @param  array|string|callable  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function head($uri, $action = null);
+
+    /**
      * Register a new POST route with the router.
      *
      * @param  string  $uri
