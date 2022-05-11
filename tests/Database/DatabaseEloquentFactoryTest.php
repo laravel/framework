@@ -137,6 +137,18 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('taylor-options', $user->options);
     }
 
+    public function test_expanded_closure_attribute_returning_a_factory_is_resolved()
+    {
+        $post = FactoryTestPostFactory::new()->create([
+            'title' => 'post',
+            'user_id' => fn ($attributes) => FactoryTestUserFactory::new([
+                'options' => $attributes['title'].'-options',
+            ]),
+        ]);
+
+        $this->assertEquals('post-options', $post->user->options);
+    }
+
     public function test_make_creates_unpersisted_model_instance()
     {
         $user = FactoryTestUserFactory::new()->makeOne();
