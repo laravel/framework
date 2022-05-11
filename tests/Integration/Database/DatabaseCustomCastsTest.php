@@ -126,6 +126,25 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $model->array_object_json->toArray()
         );
     }
+
+    public function test_custom_casting_nullable_values_null()
+    {
+        $model = new TestEloquentModelWithCustomCastsNullable();
+
+        $model->array_object = null;
+        $model->array_object_json = null;
+        $model->collection = null;
+        $model->stringable = null;
+        $model->save();
+
+        $this->assertDatabaseHas(TestEloquentModelWithCustomCastsNullable::class, [
+            'id' => $model->id,
+            'array_object' => null,
+            'array_object_json' => null,
+            'collection' => null,
+            'stringable' => null,
+        ]);
+    }
 }
 
 class TestEloquentModelWithCustomCasts extends Model
