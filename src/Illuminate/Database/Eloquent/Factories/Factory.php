@@ -9,7 +9,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -516,7 +515,7 @@ abstract class Factory
      */
     public function password($password = 'password')
     {
-        return $this->passwords[$password] ??= app('hash')->make($password);
+        return $this->passwords[$password] ??= Container::getInstance()->make('hash')->make($password);
     }
 
     /**
