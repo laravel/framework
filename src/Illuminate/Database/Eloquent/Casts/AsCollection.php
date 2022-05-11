@@ -31,11 +31,7 @@ class AsCollection implements Castable
 
             public function set($model, $key, $value, $attributes)
             {
-                if (! is_null($value)) {
-                    return [$key => json_encode($value)];
-                }
-
-                return null;
+                return [$key => json_encode($value)];
             }
         };
     }
