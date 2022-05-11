@@ -2,6 +2,8 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Foundation\Vite;
+
 trait CompilesHelpers
 {
     /**
@@ -55,6 +57,8 @@ trait CompilesHelpers
      */
     protected function compileVite($arguments)
     {
-        return "<?php echo vite{$arguments}; ?>";
+        $class = Vite::class;
+
+        return "<?php echo app('$class'){$arguments}; ?>";
     }
 }

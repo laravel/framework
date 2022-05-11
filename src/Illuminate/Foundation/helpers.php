@@ -523,22 +523,6 @@ if (! function_exists('method_field')) {
     }
 }
 
-if (! function_exists('vite')) {
-    /**
-     * Generate Vite tags for entrypoints.
-     *
-     * @param  string|string[]  $entrypoints
-     * @param  string  $buildDirectory
-     * @return \Illuminate\Support\HtmlString
-     *
-     * @throws \Exception
-     */
-    function vite($entrypoints, $buildDirectory = 'build')
-    {
-        return app(Vite::class)(...func_get_args());
-    }
-}
-
 if (! function_exists('mix')) {
     /**
      * Get the path to a versioned Mix file.

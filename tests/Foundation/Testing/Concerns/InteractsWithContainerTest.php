@@ -13,7 +13,7 @@ class InteractsWithContainerTest extends TestCase
     {
         $instance = $this->withoutVite();
 
-        $this->assertSame('', vite(['resources/js/app.js']));
+        $this->assertSame('', app(Vite::class)(['resources/js/app.js']));
         $this->assertSame($this, $instance);
     }
 

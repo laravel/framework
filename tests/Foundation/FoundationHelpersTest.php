@@ -43,62 +43,6 @@ class FoundationHelpersTest extends TestCase
         $this->assertSame('default', cache('baz', 'default'));
     }
 
-    public function testViteWithoutCss()
-    {
-        $this->makeViteManifest();
-
-        $result = vite(['resources/js/app-without-css.js']);
-
-        $this->cleanViteManifest();
-
-        $this->assertSame('<script type="module" src="/build/assets/app-without-css.versioned.js"></script>', $result->toHtml());
-    }
-
-    public function testViteWithCss()
-    {
-        $this->makeViteManifest();
-
-        $result = vite(['resources/js/app-with-css.js']);
-
-        $this->cleanViteManifest();
-
-        $this->assertSame(
-            '<link rel="stylesheet" href="/build/assets/app.versioned.css" />'
-            . '<script type="module" src="/build/assets/app-with-css.versioned.js"></script>',
-            $result->toHtml()
-        );
-    }
-
-    public function testViteWithSharedCss()
-    {
-        $this->makeViteManifest();
-
-        $result = vite(['resources/js/app-with-shared-css.js']);
-
-        $this->cleanViteManifest();
-
-        $this->assertSame(
-            '<link rel="stylesheet" href="/build/assets/app.versioned.css" />'
-            . '<script type="module" src="/build/assets/app-with-shared-css.versioned.js"></script>',
-            $result->toHtml()
-        );
-    }
-
-    public function testViteHotModuleReplacement()
-    {
-        $this->makeViteHotFile();
-
-        $result = vite(['resources/js/app-with-css.js']);
-
-        $this->cleanViteHotFile();
-
-        $this->assertSame(
-            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
-            . '<script type="module" src="http://localhost:3000/resources/js/app-with-css.js"></script>',
-            $result->toHtml()
-        );
-    }
-
     public function testMixDoesNotIncludeHost()
     {
         $app = new Application;
@@ -299,57 +243,5 @@ class FoundationHelpersTest extends TestCase
         });
 
         $this->assertSame('expected', mix('asset.png'));
-    }
-
-    protected function makeViteManifest()
-    {
-        app()->singleton('path.public', fn () => __DIR__);
-
-        if (! file_exists(public_path('build'))) {
-            mkdir(public_path('build'));
-        }
-
-        $manifest = json_encode([
-            'resources/js/app-without-css.js' => [
-                'file' => 'assets/app-without-css.versioned.js',
-            ],
-            'resources/js/app-with-css.js' => [
-                'file' => 'assets/app-with-css.versioned.js',
-                'css' => [
-                    'assets/app.versioned.css',
-                ],
-            ],
-            'resources/js/app-with-shared-css.js' => [
-                'file' => 'assets/app-with-shared-css.versioned.js',
-                'imports' => [
-                    '_someFile.js',
-                ],
-            ],
-            '_someFile.js' => [
-                'css' => [
-                    'assets/app.versioned.css',
-                ],
-            ],
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-        file_put_contents(public_path('build/manifest.json'), $manifest);
-    }
-
-    private function cleanViteManifest()
-    {
-        unlink(public_path('build/manifest.json'));
-        rmdir(public_path('build'));
-    }
-
-    private function makeViteHotFile()
-    {
-        app()->singleton('path.public', fn () => __DIR__);
-
-        file_put_contents(public_path('hot'), 'http://localhost:3000');
-    }
-
-    private function cleanViteHotFile()
-    {
-        unlink(public_path('hot'));
     }
 }
