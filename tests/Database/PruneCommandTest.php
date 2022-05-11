@@ -92,6 +92,16 @@ No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
 EOF, str_replace("\r", '', $output->fetch()));
     }
 
+    public function testNonPrunableTestWithATrait()
+    {
+        $output = $this->artisan(['--model' => NonPrunableTrait::class]);
+
+        $this->assertEquals(<<<'EOF'
+No prunable models found.
+
+EOF, str_replace("\r", '', $output->fetch()));
+    }
+
     public function testTheCommandMayBePretended()
     {
         $db = new DB;
@@ -226,4 +236,9 @@ class PrunableTestModelWithoutPrunableRecords extends Model
 class NonPrunableTestModel extends Model
 {
     // ..
+}
+
+trait NonPrunableTrait
+{
+    use Prunable;
 }
