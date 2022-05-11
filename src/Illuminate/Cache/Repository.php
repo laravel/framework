@@ -239,7 +239,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function upsert($key, Closure $callback, $ttl = null)
     {
-        $expire = new class($ttl) {
+        $expire = new class($ttl)
+        {
             public function __construct(public $at)
             {
                 //
