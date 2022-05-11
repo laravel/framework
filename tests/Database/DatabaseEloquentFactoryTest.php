@@ -739,7 +739,7 @@ class FactoryTestPasswordFactory extends Factory
     public function definition()
     {
         return [
-            'password' => $this->password()
+            'password' => $this->password(),
         ];
     }
 }
