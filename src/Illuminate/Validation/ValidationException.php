@@ -88,15 +88,22 @@ class ValidationException extends Exception
         $messages = $validator->errors()->all();
 
         if (! count($messages)) {
-            return 'The given data was invalid.';
+            $message = trans('validation.invalid_data');
+
+            return $message === 'validation.invalid_data'
+                ? 'The given data was invalid.'
+                : $message;
         }
 
         $message = array_shift($messages);
 
         if ($additional = count($messages)) {
             $pluralized = $additional === 1 ? 'error' : 'errors';
+            $and = trans('validation.and');
+            $more = trans('validation.more');
 
-            $message .= " (and {$additional} more {$pluralized})";
+            $message .= " (" .($and === 'validation.and'? 'and': $and) ." {$additional} "
+                    .($more === 'validation.more'? 'more': $more) ." {$pluralized})";
         }
 
         return $message;

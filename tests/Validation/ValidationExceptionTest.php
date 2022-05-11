@@ -45,6 +45,7 @@ class ValidationExceptionTest extends TestCase
     protected function getException($data = [], $rules = [])
     {
         $translator = new Translator(new ArrayLoader, 'en');
+        app()->instance('translator', $translator);
         $validator = new Validator($translator, $data, $rules);
 
         return new ValidationException($validator);
