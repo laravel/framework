@@ -637,11 +637,12 @@ class Builder implements BuilderContract
     {
         $result = $this->update($attributes);
 
-        if (is_null($result)) {
+        // if the operation fails callback won't we called
+        if (!$result || is_null($result)) {
             return null;
         }
 
-        return $callback($result);
+        return $callback($this->getModels());
     }
 
     /**

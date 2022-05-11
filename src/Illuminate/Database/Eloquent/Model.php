@@ -888,6 +888,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * @param  $attributes
+     * @param  \Closure  $callback
+     * @param  array  $options
+     * @return mixed|null
+     */
+    public function updateAnd($attributes = [], \Closure $callback, array $options = [])
+    {
+        $result = $this->update($attributes, $options);
+
+        if (!$result || is_null($result)) {
+            return null;
+        }
+
+        return $callback($this);
+    }
+
+    /**
      * Update the model in the database within a transaction.
      *
      * @param  array  $attributes
