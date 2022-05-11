@@ -981,7 +981,6 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonMissingPathCanFail()
     {
-
         $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -991,7 +990,6 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonMissingPathCanFail2()
     {
-
         $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -1001,7 +999,6 @@ class TestResponseTest extends TestCase
 
     public function testAssertJsonMissingPathCanFail3()
     {
-
         $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
