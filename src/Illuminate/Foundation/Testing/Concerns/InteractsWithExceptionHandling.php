@@ -170,14 +170,10 @@ trait InteractsWithExceptionHandling
             $actualMessage = $exception->getMessage();
         }
 
-        if (! $thrown) {
-            Assert::fail(
-                sprintf(
-                    'Failed asserting that exception of type "%s" is thrown.',
-                    $expectedClass
-                )
-            );
-        }
+        Assert::assertTrue(
+            $thrown,
+            sprintf('Failed asserting that exception of type "%s" is thrown.', $expectedClass)
+        );
 
         if (isset($expectedMessage)) {
             if (! isset($actualMessage)) {
