@@ -346,7 +346,7 @@ trait CompilesConditionals
      */
     protected function compileRouteIs($patterns)
     {
-        return "<?php if (request()->routeIs{$patterns}): ?>";
+        return "<?php if(request()->routeIs{$patterns}): ?>";
     }
 
     /**
