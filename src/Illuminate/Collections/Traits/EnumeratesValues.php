@@ -334,7 +334,7 @@ trait EnumeratesValues
             return data_get($value, $key, $default);
         }
 
-        return $default;
+        return value($default);
     }
 
     /**
