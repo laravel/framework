@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -86,6 +87,13 @@ abstract class Factory
      * @var \Faker\Generator
      */
     protected $faker;
+
+    /**
+     * List of already hashed passwords.
+     *
+     * @var array<string, string>
+     */
+    protected $passwords = [];
 
     /**
      * The default namespace where factories reside.
@@ -498,6 +506,17 @@ abstract class Factory
     public function set($key, $value)
     {
         return $this->state([$key => $value]);
+    }
+
+    /**
+     * Hashes a password only once.
+     *
+     * @param  string  $password
+     * @return string
+     */
+    public function password($password = 'password')
+    {
+        return $this->passwords[$password] ??= app('hash')->make($password);
     }
 
     /**

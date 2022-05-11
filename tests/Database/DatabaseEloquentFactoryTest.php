@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\CrossJoinSequence;
@@ -383,6 +384,20 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.role.creating-role']);
     }
 
+    public function test_password()
+    {
+        $hasher = m::mock(Hasher::class);
+
+        $hasher->expects('make')->with('password')->times(2)->andReturn('hashed_password');
+
+        Container::getInstance()->instance('hash', $hasher);
+
+        $factory = FactoryTestPasswordFactory::new();
+
+        $this->assertCount(2, $factory->count(2)->make()->where('password', 'hashed_password'));
+        $this->assertCount(3, $factory->count(3)->state([])->make()->where('password', 'hashed_password'));
+    }
+
     public function test_sequences()
     {
         $users = FactoryTestUserFactory::times(2)->sequence(
@@ -714,5 +729,17 @@ class FactoryTestRole extends Eloquent
     public function users()
     {
         return $this->belongsToMany(FactoryTestUser::class, 'role_user', 'role_id', 'user_id')->withPivot('admin');
+    }
+}
+
+class FactoryTestPasswordFactory extends Factory
+{
+    protected $model = FactoryTestUser::class;
+
+    public function definition()
+    {
+        return [
+            'password' => $this->password()
+        ];
     }
 }
