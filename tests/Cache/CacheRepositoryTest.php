@@ -193,7 +193,7 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
 
         $result = $repo->upsert('foo', function ($item) {
-            return $item . 'bar';
+            return $item.'bar';
         });
 
         $this->assertSame('bar', $result);
@@ -206,7 +206,7 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('put')->with('foo', 'bar', 60);
 
         $result = $repo->upsert('foo', function ($item) {
-            return $item . 'bar';
+            return $item.'bar';
         }, 60);
 
         $this->assertSame('bar', $result);
@@ -220,7 +220,7 @@ class CacheRepositoryTest extends TestCase
 
         $result = $repo->upsert('foo', function ($item) {
             $this->assertSame('bar', $item);
-            return ($item ?? 'quz') . '.baz';
+            return ($item ?? 'quz').'.baz';
         });
 
         $this->assertSame('bar.baz', $result);
@@ -249,7 +249,7 @@ class CacheRepositoryTest extends TestCase
         $repo->upsert('foo', function ($item, $expire) {
             $expire->at = 90;
 
-            return ($item ?? 'quz') . '.baz';
+            return ($item ?? 'quz').'.baz';
         });
     }
 
@@ -262,7 +262,7 @@ class CacheRepositoryTest extends TestCase
         $repo->upsert('foo', function ($item, $expire) {
             $expire->never();
 
-            return ($item ?? 'quz') . '.baz';
+            return ($item ?? 'quz').'.baz';
         });
     }
 
@@ -275,7 +275,7 @@ class CacheRepositoryTest extends TestCase
         $repo->upsert('foo', function ($item, $expire) {
             $expire->now();
 
-            return ($item ?? 'quz') . '.baz';
+            return ($item ?? 'quz').'.baz';
         });
     }
 
