@@ -609,6 +609,42 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Create record in database and call user given callback with created model.
+     *
+     * @param  array  $attributes
+     * @param  Closure  $callback
+     * @return mixed|null
+     */
+    public function createAnd(array $attributes, \Closure $callback)
+    {
+        $model = $this->create($attributes);
+
+        if (is_null($model)) {
+            return null;
+        }
+
+        return $callback($model);
+    }
+
+    /**
+     * Update records in database and call user given callback with updated model.
+     *
+     * @param array $attributes
+     * @param Closure $callback
+     * @return mixed|null
+     */
+    public function updateAnd(array $attributes, \Closure $callback)
+    {
+        $result = $this->update($attributes);
+
+        if (is_null($result)) {
+            return null;
+        }
+
+        return $callback($result);
+    }
+
+    /**
      * Execute the query and get the first result if it's the sole matching record.
      *
      * @param  array|string  $columns
