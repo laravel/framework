@@ -387,11 +387,11 @@ class Migrator
             $migration->getConnection()
         );
 
-        $callback = function () use ($migration, $method) {
+        $callback = function () use ($connection, $migration, $method) {
             if (method_exists($migration, $method)) {
                 $this->fireMigrationEvent(new MigrationStarted($migration, $method));
 
-                $migration->{$method}();
+                $this->runMethod($connection, $migration, $method);
 
                 $this->fireMigrationEvent(new MigrationEnded($migration, $method));
             }
@@ -447,11 +447,32 @@ class Migrator
             $migration->getConnection()
         );
 
-        return $db->pretend(function () use ($migration, $method) {
+        return $db->pretend(function () use ($db, $migration, $method) {
             if (method_exists($migration, $method)) {
-                $migration->{$method}();
+                $this->runMethod($db, $migration, $method);
             }
         });
+    }
+
+    /**
+     * Run a migration method on the given connection.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  object  $migration
+     * @param  string  $method
+     * @return void
+     */
+    protected function runMethod($connection, $migration, $method)
+    {
+        $previousConnection = $this->resolver->getDefaultConnection();
+
+        try {
+            $this->resolver->setDefaultConnection($connection->getName());
+
+            $migration->{$method}();
+        } finally {
+            $this->resolver->setDefaultConnection($previousConnection);
+        }
     }
 
     /**

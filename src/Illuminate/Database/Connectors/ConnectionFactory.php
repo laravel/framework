@@ -177,7 +177,7 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
-            foreach (Arr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
+            foreach (Arr::shuffle($this->parseHosts($config)) as $host) {
                 $config['host'] = $host;
 
                 try {
@@ -218,9 +218,7 @@ class ConnectionFactory
      */
     protected function createPdoResolverWithoutHosts(array $config)
     {
-        return function () use ($config) {
-            return $this->createConnector($config)->connect($config);
-        };
+        return fn () => $this->createConnector($config)->connect($config);
     }
 
     /**

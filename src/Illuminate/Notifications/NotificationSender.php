@@ -203,14 +203,17 @@ class NotificationSender
                     $queue = $notification->viaQueues()[$channel] ?? null;
                 }
 
+                $delay = $notification->delay;
+
+                if (method_exists($notification, 'withDelay')) {
+                    $delay = $notification->withDelay($notifiable, $channel) ?? null;
+                }
+
                 $this->bus->dispatch(
                     (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
                             ->onQueue($queue)
-                            ->delay(is_array($notification->delay) ?
-                                    ($notification->delay[$channel] ?? null)
-                                    : $notification->delay
-                            )
+                            ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
                             ->through(
                                 array_merge(
                                     method_exists($notification, 'middleware') ? $notification->middleware() : [],

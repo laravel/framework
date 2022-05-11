@@ -22,7 +22,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void forget(string $event)
  * @method static void forgetPushed()
  * @method static void listen(\Closure|string|array $events, \Closure|string|array $listener = null)
- * @method static void push(string $event, array $payload = [])
+ * @method static void push(string $event, object|array $payload = [])
  * @method static void subscribe(object|string $subscriber)
  *
  * @see \Illuminate\Events\Dispatcher

@@ -8,7 +8,9 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:retry')]
 class RetryCommand extends Command
 {
     /**
@@ -27,6 +29,8 @@ class RetryCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'queue:retry';
 

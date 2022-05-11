@@ -64,7 +64,7 @@ trait InteractsWithIO
      * Get the value of a command argument.
      *
      * @param  string|null  $key
-     * @return string|array|null
+     * @return array|string|bool|null
      */
     public function argument($key = null)
     {
@@ -217,7 +217,7 @@ trait InteractsWithIO
      *
      * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
-     * @param  string  $tableStyle
+     * @param  \Symfony\Component\Console\Helper\TableStyle|string  $tableStyle
      * @param  array  $columnStyles
      * @return void
      */
@@ -372,11 +372,13 @@ trait InteractsWithIO
      * Write a blank line.
      *
      * @param  int  $count
-     * @return void
+     * @return $this
      */
     public function newLine($count = 1)
     {
         $this->output->newLine($count);
+
+        return $this;
     }
 
     /**

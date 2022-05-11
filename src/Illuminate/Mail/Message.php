@@ -106,6 +106,22 @@ class Message
     }
 
     /**
+     * Remove all "to" addresses from the message.
+     *
+     * @return $this
+     */
+    public function forgetTo()
+    {
+        if ($header = $this->message->getHeaders()->get('To')) {
+            $this->addAddressDebugHeader('X-To', $this->message->getTo());
+
+            $header->setAddresses([]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a carbon copy to the message.
      *
      * @param  string|array  $address
@@ -134,6 +150,8 @@ class Message
     public function forgetCc()
     {
         if ($header = $this->message->getHeaders()->get('Cc')) {
+            $this->addAddressDebugHeader('X-Cc', $this->message->getCC());
+
             $header->setAddresses([]);
         }
 
@@ -169,6 +187,8 @@ class Message
     public function forgetBcc()
     {
         if ($header = $this->message->getHeaders()->get('Bcc')) {
+            $this->addAddressDebugHeader('X-Bcc', $this->message->getBcc());
+
             $header->setAddresses([]);
         }
 
@@ -200,13 +220,17 @@ class Message
         if (is_array($address)) {
             $type = lcfirst($type);
 
-            $addresses = collect($address)->map(function (string|array $address, $key) {
+            $addresses = collect($address)->map(function ($address, $key) {
                 if (is_string($key) && is_string($address)) {
                     return new Address($key, $address);
                 }
 
                 if (is_array($address)) {
                     return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
+                }
+
+                if (is_null($address)) {
+                    return new Address($key);
                 }
 
                 return $address;
@@ -216,6 +240,23 @@ class Message
         } else {
             $this->message->{"add{$type}"}(new Address($address, (string) $name));
         }
+
+        return $this;
+    }
+
+    /**
+     * Add an address debug header for a list of recipients.
+     *
+     * @param  string  $header
+     * @param  \Symfony\Component\Mime\Address[]  $addresses
+     * @return $this
+     */
+    protected function addAddressDebugHeader(string $header, array $addresses)
+    {
+        $this->message->getHeaders()->addTextHeader(
+            $header,
+            implode(', ', array_map(fn ($a) => $a->toString(), $addresses)),
+        );
 
         return $this;
     }

@@ -65,6 +65,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Append a new line to the string.
+     *
+     * @param  int  $count
+     * @return $this
+     */
+    public function newLine($count = 1)
+    {
+        return $this->append(str_repeat(PHP_EOL, $count));
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $language
@@ -131,6 +142,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Get the smallest possible portion of a string between two given values.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return static
+     */
+    public function betweenFirst($from, $to)
+    {
+        return new static(Str::betweenFirst($this->value, $from, $to));
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @return static
@@ -143,7 +166,7 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public function contains($needles)
@@ -176,7 +199,7 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public function endsWith($needles)
@@ -187,11 +210,15 @@ class Stringable implements JsonSerializable
     /**
      * Determine if the string is an exact match with the given value.
      *
-     * @param  string  $value
+     * @param  \Illuminate\Support\Stringable|string  $value
      * @return bool
      */
     public function exactly($value)
     {
+        if ($value instanceof Stringable) {
+            $value = $value->toString();
+        }
+
         return $this->value === $value;
     }
 
@@ -602,6 +629,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Remove all "extra" blank space from the given string.
+     *
+     * @return static
+     */
+    public function squish()
+    {
+        return new static(Str::squish($this->value));
+    }
+
+    /**
      * Begin a string with a single instance of a given value.
      *
      * @param  string  $prefix
@@ -689,7 +726,7 @@ class Stringable implements JsonSerializable
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @return bool
      */
     public function startsWith($needles)
@@ -790,6 +827,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Make a string's first character lowercase.
+     *
+     * @return static
+     */
+    public function lcfirst()
+    {
+        return new static(Str::lcfirst($this->value));
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @return static
@@ -812,7 +859,7 @@ class Stringable implements JsonSerializable
     /**
      * Execute the given callback if the string contains a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
@@ -862,7 +909,7 @@ class Stringable implements JsonSerializable
     /**
      * Execute the given callback if the string ends with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
@@ -925,7 +972,7 @@ class Stringable implements JsonSerializable
     /**
      * Execute the given callback if the string starts with a given substring.
      *
-     * @param  string|array  $needles
+     * @param  string|string[]  $needles
      * @param  callable  $callback
      * @param  callable|null  $default
      * @return static
@@ -968,6 +1015,18 @@ class Stringable implements JsonSerializable
     public function wordCount()
     {
         return str_word_count($this->value);
+    }
+
+    /**
+     * Wrap the string with the given strings.
+     *
+     * @param  string  $before
+     * @param  string|null  $after
+     * @return static
+     */
+    public function wrap($before, $after = null)
+    {
+        return new static($before.$this->value.($after ??= $before));
     }
 
     /**

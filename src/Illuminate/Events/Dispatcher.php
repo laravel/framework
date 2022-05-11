@@ -147,7 +147,7 @@ class Dispatcher implements DispatcherContract
      * Register an event and payload to be fired later.
      *
      * @param  string  $event
-     * @param  array  $payload
+     * @param  object|array  $payload
      * @return void
      */
     public function push($event, $payload = [])
@@ -612,22 +612,24 @@ class Dispatcher implements DispatcherContract
      * Propagate listener options to the job.
      *
      * @param  mixed  $listener
-     * @param  mixed  $job
+     * @param  \Illuminate\Events\CallQueuedListener  $job
      * @return mixed
      */
     protected function propagateListenerOptions($listener, $job)
     {
         return tap($job, function ($job) use ($listener) {
+            $data = array_values($job->data);
+
             $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
-            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff() : ($listener->backoff ?? null);
+            $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
-            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil() : null;
+            $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
             $job->tries = $listener->tries ?? null;
 
             $job->through(array_merge(
-                method_exists($listener, 'middleware') ? $listener->middleware() : [],
+                method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
                 $listener->middleware ?? []
             ));
         });

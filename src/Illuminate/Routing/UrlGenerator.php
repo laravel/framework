@@ -167,6 +167,19 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
+     * Get the previous path info for the request.
+     *
+     * @param  mixed  $fallback
+     * @return string
+     */
+    public function previousPath($fallback = false)
+    {
+        $previousPath = str_replace($this->to('/'), '', rtrim(preg_replace('/\?.*/', '', $this->previous($fallback)), '/'));
+
+        return $previousPath === '' ? '/' : $previousPath;
+    }
+
+    /**
      * Get the previous URL from the session if possible.
      *
      * @return string|null

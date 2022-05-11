@@ -3,7 +3,9 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:forget')]
 class ForgetFailedCommand extends Command
 {
     /**
@@ -19,6 +21,8 @@ class ForgetFailedCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
+     *
+     * @deprecated
      */
     protected static $defaultName = 'queue:forget';
 
@@ -37,7 +41,7 @@ class ForgetFailedCommand extends Command
     public function handle()
     {
         if ($this->laravel['queue.failer']->forget($this->argument('id'))) {
-            $this->info('Failed job deleted successfully!');
+            $this->info('Failed job deleted successfully.');
         } else {
             $this->error('No failed job matches the given ID.');
         }

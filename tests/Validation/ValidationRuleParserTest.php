@@ -55,6 +55,13 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testEmptyRulesCanBeExploded()
+    {
+        $parser = new ValidationRuleParser(['foo' => 'bar']);
+
+        $this->assertIsObject($parser->explode(['foo' => []]));
+    }
+
     public function testConditionalRulesWithDefault()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
@@ -97,7 +104,7 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => 'regex:/^(foo|bar)$/i']
         );
 
-        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][0]);
     }
 
     public function testExplodeProperlyParsesRegexWithArrayOfRules()
@@ -108,8 +115,8 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => ['in:foo', 'regex:/^(foo|bar)$/i']]
         );
 
-        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
-        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
     public function testExplodeProperlyParsesRegexThatDoesNotContainPipe()
@@ -120,8 +127,8 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => 'in:foo|regex:/^(bar)$/i']
         );
 
-        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
-        $this->assertEquals('regex:/^(bar)$/i', $exploded->rules['items.0.type'][1]);
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
     public function testExplodeFailsParsingRegexWithOtherRulesInSingleString()
@@ -132,9 +139,9 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => 'in:foo|regex:/^(foo|bar)$/i']
         );
 
-        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
-        $this->assertEquals('regex:/^(foo', $exploded->rules['items.0.type'][1]);
-        $this->assertEquals('bar)$/i', $exploded->rules['items.0.type'][2]);
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo', $exploded->rules['items.0.type'][1]);
+        $this->assertSame('bar)$/i', $exploded->rules['items.0.type'][2]);
     }
 
     public function testExplodeProperlyFlattensRuleArraysOfArrays()
@@ -145,8 +152,8 @@ class ValidationRuleParserTest extends TestCase
             ['items.*.type' => ['in:foo', [[['regex:/^(foo|bar)$/i']]]]]
         );
 
-        $this->assertEquals('in:foo', $exploded->rules['items.0.type'][0]);
-        $this->assertEquals('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
+        $this->assertSame('in:foo', $exploded->rules['items.0.type'][0]);
+        $this->assertSame('regex:/^(foo|bar)$/i', $exploded->rules['items.0.type'][1]);
     }
 
     public function testExplodeGeneratesNestedRules()
@@ -159,8 +166,8 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'users.*.name' => Rule::forEach(function ($value, $attribute, $data) {
-                $this->assertEquals('Taylor Otwell', $value);
-                $this->assertEquals('users.0.name', $attribute);
+                $this->assertSame('Taylor Otwell', $value);
+                $this->assertSame('users.0.name', $attribute);
                 $this->assertEquals($data['users.0.name'], 'Taylor Otwell');
 
                 return [Rule::requiredIf(true)];
@@ -179,8 +186,8 @@ class ValidationRuleParserTest extends TestCase
 
         $results = $parser->explode([
             'name' => Rule::forEach(function ($value, $attribute, $data = null) {
-                $this->assertEquals('Taylor Otwell', $value);
-                $this->assertEquals('name', $attribute);
+                $this->assertSame('Taylor Otwell', $value);
+                $this->assertSame('name', $attribute);
                 $this->assertEquals(['name' => 'Taylor Otwell'], $data);
 
                 return 'required';
@@ -249,18 +256,18 @@ class ValidationRuleParserTest extends TestCase
         $results = $parser->explode([
             'users.*.name' => [
                 Rule::forEach(function ($value, $attribute, $data) {
-                    $this->assertEquals('Taylor Otwell', $value);
-                    $this->assertEquals('users.0.name', $attribute);
+                    $this->assertSame('Taylor Otwell', $value);
+                    $this->assertSame('users.0.name', $attribute);
                     $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                     return Rule::forEach(function ($value, $attribute, $data) {
                         $this->assertNull($value);
-                        $this->assertEquals('users.0.name', $attribute);
+                        $this->assertSame('users.0.name', $attribute);
                         $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                         return Rule::forEach(function ($value, $attribute, $data) {
                             $this->assertNull($value);
-                            $this->assertEquals('users.0.name', $attribute);
+                            $this->assertSame('users.0.name', $attribute);
                             $this->assertEquals(['users.0.name' => 'Taylor Otwell'], $data);
 
                             return [Rule::requiredIf(true)];

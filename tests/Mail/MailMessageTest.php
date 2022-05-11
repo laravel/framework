@@ -75,7 +75,7 @@ class MailMessageTest extends TestCase
     public function testSubjectMethod()
     {
         $this->assertInstanceOf(Message::class, $message = $this->message->subject('foo'));
-        $this->assertEquals('foo', $message->getSymfonyMessage()->getSubject());
+        $this->assertSame('foo', $message->getSymfonyMessage()->getSubject());
     }
 
     public function testPriorityMethod()
@@ -95,6 +95,6 @@ class MailMessageTest extends TestCase
         $message = new Message(new Email());
         $message->attachData('foo', 'foo.jpg', ['mime' => 'image/jpeg']);
 
-        $this->assertEquals('foo', $message->getSymfonyMessage()->getAttachments()[0]->getBody());
+        $this->assertSame('foo', $message->getSymfonyMessage()->getAttachments()[0]->getBody());
     }
 }
