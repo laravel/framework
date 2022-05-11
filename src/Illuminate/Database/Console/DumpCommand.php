@@ -9,9 +9,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'schema:dump')]
 class DumpCommand extends Command
 {
     /**
@@ -30,8 +28,6 @@ class DumpCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'schema:dump';
 

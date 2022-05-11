@@ -91,7 +91,7 @@ class PendingChain
     }
 
     /**
-     * Set the desired delay in seconds for the chain.
+     * Set the desired delay for the chain.
      *
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return $this

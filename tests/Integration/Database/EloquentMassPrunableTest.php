@@ -94,7 +94,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         $this->assertEquals(2000, MassPrunableSoftDeleteTestModel::withTrashed()->count());
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 

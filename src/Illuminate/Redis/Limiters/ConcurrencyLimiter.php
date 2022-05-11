@@ -58,13 +58,12 @@ class ConcurrencyLimiter
      *
      * @param  int  $timeout
      * @param  callable|null  $callback
-     * @param  int  $sleep
-     * @return mixed
+     * @return bool
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      * @throws \Throwable
      */
-    public function block($timeout, $callback = null, $sleep = 250)
+    public function block($timeout, $callback = null)
     {
         $starting = time();
 
@@ -75,7 +74,7 @@ class ConcurrencyLimiter
                 throw new LimiterTimeoutException;
             }
 
-            usleep($sleep * 1000);
+            usleep(250 * 1000);
         }
 
         if (is_callable($callback)) {

@@ -13,7 +13,7 @@ interface Monitor
     public function looping($callback);
 
     /**
-     * Register a callback to be executed when a job fails after the maximum number of retries.
+     * Register a callback to be executed when a job fails after the maximum amount of retries.
      *
      * @param  mixed  $callback
      * @return void

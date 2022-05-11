@@ -25,7 +25,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
-     * @param  string|int|float  $key
+     * @param  string  $key
      * @param  mixed  $value
      * @return array
      */
@@ -142,7 +142,7 @@ class Arr
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
-     * @param  array|string|int|float  $keys
+     * @param  array|string  $keys
      * @return array
      */
     public static function except($array, $keys)
@@ -167,10 +167,6 @@ class Arr
 
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
-        }
-
-        if (is_float($key)) {
-            $key = (string) $key;
         }
 
         return array_key_exists($key, $array);
@@ -256,7 +252,7 @@ class Arr
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
-     * @param  array|string|int|float  $keys
+     * @param  array|string  $keys
      * @return void
      */
     public static function forget(&$array, $keys)
@@ -285,7 +281,7 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && static::accessible($array[$part])) {
+                if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
@@ -425,45 +421,6 @@ class Arr
     public static function isList($array)
     {
         return ! self::isAssoc($array);
-    }
-
-    /**
-     * Join all items using a string. The final items can use a separate glue string.
-     *
-     * @param  array  $array
-     * @param  string  $glue
-     * @param  string  $finalGlue
-     * @return string
-     */
-    public static function join($array, $glue, $finalGlue = '')
-    {
-        if ($finalGlue === '') {
-            return implode($glue, $array);
-        }
-
-        if (count($array) === 0) {
-            return '';
-        }
-
-        if (count($array) === 1) {
-            return end($array);
-        }
-
-        $finalItem = array_pop($array);
-
-        return implode($glue, $array).$finalGlue.$finalItem;
-    }
-
-    /**
-     * Key an associative array by a field or using a callback.
-     *
-     * @param  array  $array
-     * @param  callable|array|string
-     * @return array
-     */
-    public static function keyBy($array, $keyBy)
-    {
-        return Collection::make($array)->keyBy($keyBy)->all();
     }
 
     /**
@@ -630,7 +587,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string|int|null  $key
+     * @param  string|null  $key
      * @param  mixed  $value
      * @return array
      */

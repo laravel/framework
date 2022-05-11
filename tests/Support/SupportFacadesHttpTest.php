@@ -48,11 +48,4 @@ class SupportFacadesHttpTest extends TestCase
         $factory = $this->app->make(Factory::class);
         $this->assertSame('OK!', $factory->get('https://laravel.com')->body());
     }
-
-    public function testFacadeRootIsSharedWhenEnforcingFaking(): void
-    {
-        $client = Http::preventStrayRequests();
-
-        $this->assertSame($client, $this->app->make(Factory::class));
-    }
 }

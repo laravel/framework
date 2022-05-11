@@ -23,13 +23,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
-    }
-
     protected function tearDown(): void
     {
         m::close();
@@ -263,8 +256,10 @@ class CacheRepositoryTest extends TestCase
 
     public function dataProviderTestGetSeconds()
     {
+        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
+
         return [
-            [Carbon::parse($this->getTestDate())->addMinutes(5)],
+            [Carbon::now()->addMinutes(5)],
             [(new DateTime($this->getTestDate()))->modify('+5 minutes')],
             [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')],
             [new DateInterval('PT5M')],
@@ -279,6 +274,8 @@ class CacheRepositoryTest extends TestCase
      */
     public function testGetSeconds($duration)
     {
+        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
+
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 300);
         $repo->put($key, $value, $duration);

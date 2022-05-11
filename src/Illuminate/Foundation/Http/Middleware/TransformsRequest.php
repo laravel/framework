@@ -62,7 +62,7 @@ class TransformsRequest
             $data[$key] = $this->cleanValue($keyPrefix.$key, $value);
         }
 
-        return $data;
+        return collect($data)->all();
     }
 
     /**

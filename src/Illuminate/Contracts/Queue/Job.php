@@ -33,7 +33,9 @@ interface Job
     public function fire();
 
     /**
-     * Release the job back into the queue after (n) seconds.
+     * Release the job back into the queue.
+     *
+     * Accepts a delay specified in seconds.
      *
      * @param  int  $delay
      * @return void

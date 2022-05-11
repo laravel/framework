@@ -15,8 +15,6 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasColumn(string $table, string $column)
  * @method static bool hasColumns(string $table, array $columns)
  * @method static bool dropColumns(string $table, array $columns)
- * @method static void whenTableHasColumn(string $table, string $column, \Closure $callback)
- * @method static void whenTableDoesntHaveColumn(string $table, string $column, \Closure $callback)
  * @method static bool hasTable(string $table)
  * @method static void defaultStringLength(int $length)
  * @method static array getColumnListing(string $table)

@@ -346,7 +346,7 @@ class BroadcastManager implements FactoryContract
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = $name ?? $this->getDefaultDriver();
 
         unset($this->drivers[$name]);
     }

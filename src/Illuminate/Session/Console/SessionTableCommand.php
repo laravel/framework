@@ -5,9 +5,7 @@ namespace Illuminate\Session\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'session:table')]
 class SessionTableCommand extends Command
 {
     /**
@@ -23,8 +21,6 @@ class SessionTableCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'session:table';
 
@@ -73,7 +69,7 @@ class SessionTableCommand extends Command
 
         $this->files->put($fullPath, $this->files->get(__DIR__.'/stubs/database.stub'));
 
-        $this->info('Migration created successfully.');
+        $this->info('Migration created successfully!');
 
         $this->composer->dumpAutoloads();
     }

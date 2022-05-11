@@ -111,7 +111,7 @@ class PreventRequestsDuringMaintenance
      */
     protected function inExceptArray($request)
     {
-        foreach ($this->getExcludedPaths() as $except) {
+        foreach ($this->except as $except) {
             if ($except !== '/') {
                 $except = trim($except, '/');
             }

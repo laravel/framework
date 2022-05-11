@@ -40,7 +40,7 @@ class ConvertEmptyStringsToNull extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        return $value === '' ? null : $value;
+        return is_string($value) && $value === '' ? null : $value;
     }
 
     /**

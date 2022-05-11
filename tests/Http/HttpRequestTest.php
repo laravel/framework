@@ -8,7 +8,6 @@ use Illuminate\Routing\Route;
 use Illuminate\Session\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -949,26 +948,6 @@ class HttpRequestTest extends TestCase
         $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
         $request->setLaravelSession($session);
         $this->assertSame('boom', $request->old('foo', 'bar'));
-    }
-
-    public function testOldMethodCallsSessionWhenDefaultIsArray()
-    {
-        $request = Request::create('/');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('foo', ['bar'])->andReturn(['bar']);
-        $request->setLaravelSession($session);
-        $this->assertSame(['bar'], $request->old('foo', ['bar']));
-    }
-
-    public function testOldMethodCanGetDefaultValueFromModelByKey()
-    {
-        $request = Request::create('/');
-        $model = m::mock(Price::class);
-        $model->shouldReceive('getAttribute')->once()->with('name')->andReturn('foobar');
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getOldInput')->once()->with('name', 'foobar')->andReturn('foobar');
-        $request->setLaravelSession($session);
-        $this->assertSame('foobar', $request->old('name', $model));
     }
 
     public function testFlushMethodCallsSession()

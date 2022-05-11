@@ -88,7 +88,7 @@ class PendingDispatch
     }
 
     /**
-     * Set the desired delay in seconds for the job.
+     * Set the desired delay for the job.
      *
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return $this

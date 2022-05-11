@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Mockery as m;
@@ -433,52 +432,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" varchar(100) null default \'bar\'', $statements[0]);
-    }
-
-    public function testAddingStringWithoutLengthLimit()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->string('foo');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" varchar(255) not null', $statements[0]);
-
-        Builder::$defaultStringLength = null;
-
-        $blueprint = new Blueprint('users');
-        $blueprint->string('foo');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        try {
-            $this->assertCount(1, $statements);
-            $this->assertSame('alter table "users" add column "foo" varchar not null', $statements[0]);
-        } finally {
-            Builder::$defaultStringLength = 255;
-        }
-    }
-
-    public function testAddingCharWithoutLengthLimit()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->char('foo');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add column "foo" char(255) not null', $statements[0]);
-
-        Builder::$defaultStringLength = null;
-
-        $blueprint = new Blueprint('users');
-        $blueprint->char('foo');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        try {
-            $this->assertCount(1, $statements);
-            $this->assertSame('alter table "users" add column "foo" char not null', $statements[0]);
-        } finally {
-            Builder::$defaultStringLength = 255;
-        }
     }
 
     public function testAddingText()

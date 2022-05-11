@@ -171,7 +171,7 @@ EOF, str_replace("\r", '', $output->fetch()));
         return $output;
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 

@@ -3,9 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'storage:link')]
 class StorageLinkCommand extends Command
 {
     /**
@@ -23,8 +21,6 @@ class StorageLinkCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'storage:link';
 

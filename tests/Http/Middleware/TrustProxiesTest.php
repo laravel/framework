@@ -26,9 +26,9 @@ class TrustProxiesTest extends TestCase
     {
         $req = $this->createProxiedRequest();
 
-        $this->assertSame('192.168.10.10', $req->getClientIp(), 'Assert untrusted proxy x-forwarded-for header not used');
-        $this->assertSame('http', $req->getScheme(), 'Assert untrusted proxy x-forwarded-proto header not used');
-        $this->assertSame('localhost', $req->getHost(), 'Assert untrusted proxy x-forwarded-host header not used');
+        $this->assertEquals('192.168.10.10', $req->getClientIp(), 'Assert untrusted proxy x-forwarded-for header not used');
+        $this->assertEquals('http', $req->getScheme(), 'Assert untrusted proxy x-forwarded-proto header not used');
+        $this->assertEquals('localhost', $req->getHost(), 'Assert untrusted proxy x-forwarded-host header not used');
         $this->assertEquals(8888, $req->getPort(), 'Assert untrusted proxy x-forwarded-port header not used');
         $this->assertSame('', $req->getBaseUrl(), 'Assert untrusted proxy x-forwarded-prefix header not used');
     }
@@ -44,11 +44,11 @@ class TrustProxiesTest extends TestCase
         $req = $this->createProxiedRequest();
         $req->setTrustedProxies(['192.168.10.10'], $this->headerAll);
 
-        $this->assertSame('173.174.200.38', $req->getClientIp(), 'Assert trusted proxy x-forwarded-for header used');
-        $this->assertSame('https', $req->getScheme(), 'Assert trusted proxy x-forwarded-proto header used');
-        $this->assertSame('serversforhackers.com', $req->getHost(), 'Assert trusted proxy x-forwarded-host header used');
+        $this->assertEquals('173.174.200.38', $req->getClientIp(), 'Assert trusted proxy x-forwarded-for header used');
+        $this->assertEquals('https', $req->getScheme(), 'Assert trusted proxy x-forwarded-proto header used');
+        $this->assertEquals('serversforhackers.com', $req->getHost(), 'Assert trusted proxy x-forwarded-host header used');
         $this->assertEquals(443, $req->getPort(), 'Assert trusted proxy x-forwarded-port header used');
-        $this->assertSame('/prefix', $req->getBaseUrl(), 'Assert trusted proxy x-forwarded-prefix header used');
+        $this->assertEquals('/prefix', $req->getBaseUrl(), 'Assert trusted proxy x-forwarded-prefix header used');
     }
 
     /**
@@ -61,7 +61,7 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used with wildcard proxy setting');
+            $this->assertEquals('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used with wildcard proxy setting');
         });
     }
 
@@ -75,7 +75,7 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used with wildcard proxy setting');
+            $this->assertEquals('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used with wildcard proxy setting');
         });
     }
 
@@ -89,7 +89,7 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used');
+            $this->assertEquals('173.174.200.38', $request->getClientIp(), 'Assert trusted proxy x-forwarded-for header used');
         });
     }
 
@@ -112,7 +112,7 @@ class TrustProxiesTest extends TestCase
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
                 $ips = $request->getClientIps();
-                $this->assertSame('192.0.2.2', end($ips), 'Assert sets the '.$forwardedForHeader);
+                $this->assertEquals('192.0.2.2', end($ips), 'Assert sets the '.$forwardedForHeader);
             });
         }
     }
@@ -135,7 +135,7 @@ class TrustProxiesTest extends TestCase
             $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedForHeader]);
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
-                $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
+                $this->assertEquals('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
             });
         }
     }
@@ -158,7 +158,7 @@ class TrustProxiesTest extends TestCase
             $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_FOR' => $forwardedForHeader]);
 
             $trustedProxy->handle($request, function ($request) use ($forwardedForHeader) {
-                $this->assertSame('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
+                $this->assertEquals('192.0.2.2', $request->getClientIp(), 'Assert sets the '.$forwardedForHeader);
             });
         }
     }
@@ -179,11 +179,11 @@ class TrustProxiesTest extends TestCase
         ]);
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('173.174.200.40', $request->getClientIp(),
+            $this->assertEquals('173.174.200.40', $request->getClientIp(),
                 'Assert trusted proxy used forwarded header for IP');
-            $this->assertSame('https', $request->getScheme(),
+            $this->assertEquals('https', $request->getScheme(),
                 'Assert trusted proxy used forwarded header for scheme');
-            $this->assertSame('serversforhackers.com', $request->getHost(),
+            $this->assertEquals('serversforhackers.com', $request->getHost(),
                 'Assert trusted proxy used forwarded header for host');
             $this->assertEquals(443, $request->getPort(), 'Assert trusted proxy used forwarded header for port');
         });
@@ -199,11 +199,11 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('173.174.200.38', $request->getClientIp(),
+            $this->assertEquals('173.174.200.38', $request->getClientIp(),
                 'Assert trusted proxy used forwarded header for IP');
-            $this->assertSame('http', $request->getScheme(),
+            $this->assertEquals('http', $request->getScheme(),
                 'Assert trusted proxy did not use forwarded header for scheme');
-            $this->assertSame('localhost', $request->getHost(),
+            $this->assertEquals('localhost', $request->getHost(),
                 'Assert trusted proxy did not use forwarded header for host');
             $this->assertEquals(8888, $request->getPort(), 'Assert trusted proxy did not use forwarded header for port');
             $this->assertSame('', $request->getBaseUrl(), 'Assert trusted proxy did not use forwarded header for prefix');
@@ -220,11 +220,11 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest(['HTTP_X_FORWARDED_HOST' => 'serversforhackers.com:8888']);
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('192.168.10.10', $request->getClientIp(),
+            $this->assertEquals('192.168.10.10', $request->getClientIp(),
                 'Assert trusted proxy did not use forwarded header for IP');
-            $this->assertSame('http', $request->getScheme(),
+            $this->assertEquals('http', $request->getScheme(),
                 'Assert trusted proxy did not use forwarded header for scheme');
-            $this->assertSame('serversforhackers.com', $request->getHost(),
+            $this->assertEquals('serversforhackers.com', $request->getHost(),
                 'Assert trusted proxy used forwarded header for host');
             $this->assertEquals(8888, $request->getPort(), 'Assert trusted proxy did not use forwarded header for port');
             $this->assertSame('', $request->getBaseUrl(), 'Assert trusted proxy did not use forwarded header for prefix');
@@ -241,11 +241,11 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('192.168.10.10', $request->getClientIp(),
+            $this->assertEquals('192.168.10.10', $request->getClientIp(),
                 'Assert trusted proxy did not use forwarded header for IP');
-            $this->assertSame('http', $request->getScheme(),
+            $this->assertEquals('http', $request->getScheme(),
                 'Assert trusted proxy did not use forwarded header for scheme');
-            $this->assertSame('localhost', $request->getHost(),
+            $this->assertEquals('localhost', $request->getHost(),
                 'Assert trusted proxy did not use forwarded header for host');
             $this->assertEquals(443, $request->getPort(), 'Assert trusted proxy used forwarded header for port');
             $this->assertSame('', $request->getBaseUrl(), 'Assert trusted proxy did not use forwarded header for prefix');
@@ -262,14 +262,14 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('192.168.10.10', $request->getClientIp(),
+            $this->assertEquals('192.168.10.10', $request->getClientIp(),
                 'Assert trusted proxy did not use forwarded header for IP');
-            $this->assertSame('http', $request->getScheme(),
+            $this->assertEquals('http', $request->getScheme(),
                 'Assert trusted proxy did not use forwarded header for scheme');
-            $this->assertSame('localhost', $request->getHost(),
+            $this->assertEquals('localhost', $request->getHost(),
                 'Assert trusted proxy did not use forwarded header for host');
             $this->assertEquals(8888, $request->getPort(), 'Assert trusted proxy did not use forwarded header for port');
-            $this->assertSame('/prefix', $request->getBaseUrl(), 'Assert trusted proxy used forwarded header for prefix');
+            $this->assertEquals('/prefix', $request->getBaseUrl(), 'Assert trusted proxy used forwarded header for prefix');
         });
     }
 
@@ -283,11 +283,11 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('192.168.10.10', $request->getClientIp(),
+            $this->assertEquals('192.168.10.10', $request->getClientIp(),
                 'Assert trusted proxy did not use forwarded header for IP');
-            $this->assertSame('https', $request->getScheme(),
+            $this->assertEquals('https', $request->getScheme(),
                 'Assert trusted proxy used forwarded header for scheme');
-            $this->assertSame('localhost', $request->getHost(),
+            $this->assertEquals('localhost', $request->getHost(),
                 'Assert trusted proxy did not use forwarded header for host');
             $this->assertEquals(8888, $request->getPort(), 'Assert trusted proxy did not use forwarded header for port');
             $this->assertSame('', $request->getBaseUrl(), 'Assert trusted proxy did not use forwarded header for prefix');
@@ -309,14 +309,14 @@ class TrustProxiesTest extends TestCase
         $request = $this->createProxiedRequest();
 
         $trustedProxy->handle($request, function ($request) {
-            $this->assertSame('173.174.200.38', $request->getClientIp(),
+            $this->assertEquals('173.174.200.38', $request->getClientIp(),
                 'Assert trusted proxy used forwarded header for IP');
-            $this->assertSame('https', $request->getScheme(),
+            $this->assertEquals('https', $request->getScheme(),
                 'Assert trusted proxy used forwarded header for scheme');
-            $this->assertSame('serversforhackers.com', $request->getHost(),
+            $this->assertEquals('serversforhackers.com', $request->getHost(),
                 'Assert trusted proxy used forwarded header for host');
             $this->assertEquals(443, $request->getPort(), 'Assert trusted proxy used forwarded header for port');
-            $this->assertSame('/prefix', $request->getBaseUrl(), 'Assert trusted proxy used forwarded header for prefix');
+            $this->assertEquals('/prefix', $request->getBaseUrl(), 'Assert trusted proxy used forwarded header for prefix');
         });
     }
 

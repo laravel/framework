@@ -7,9 +7,7 @@ use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\PrunableBatchRepository;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:prune-batches')]
 class PruneBatchesCommand extends Command
 {
     /**
@@ -27,8 +25,6 @@ class PruneBatchesCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'queue:prune-batches';
 
@@ -56,7 +52,7 @@ class PruneBatchesCommand extends Command
 
         $this->info("{$count} entries deleted!");
 
-        if ($this->option('unfinished')) {
+        if ($unfinished = $this->option('unfinished')) {
             $count = 0;
 
             if ($repository instanceof DatabaseBatchRepository) {

@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\Support\Str;
-
 class BladePushTest extends AbstractBladeTestCase
 {
     public function testPushIsCompiled()
@@ -24,22 +22,6 @@ test
 @endPushOnce';
 
         $expected = '<?php if (! $__env->hasRenderedOnce(\'bar\')): $__env->markAsRenderedOnce(\'bar\');
-$__env->startPush(\'foo\'); ?>
-test
-<?php $__env->stopPush(); endif; ?>';
-
-        $this->assertEquals($expected, $this->compiler->compileString($string));
-    }
-
-    public function testPushOnceIsCompiledWhenIdIsMissing()
-    {
-        Str::createUuidsUsing(fn () => 'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f');
-
-        $string = '@pushOnce(\'foo\')
-test
-@endPushOnce';
-
-        $expected = '<?php if (! $__env->hasRenderedOnce(\'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f\')): $__env->markAsRenderedOnce(\'e60e8f77-9ac3-4f71-9f8e-a044ef481d7f\');
 $__env->startPush(\'foo\'); ?>
 test
 <?php $__env->stopPush(); endif; ?>';

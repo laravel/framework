@@ -78,7 +78,7 @@ class ValidationException extends Exception
     }
 
     /**
-     * Create an error message summary from the validation errors.
+     * Create a error message summary from the validation errors.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return string
@@ -94,7 +94,7 @@ class ValidationException extends Exception
         $message = array_shift($messages);
 
         if ($additional = count($messages)) {
-            $pluralized = $additional === 1 ? 'error' : 'errors';
+            $pluralized = 1 === $additional ? 'error' : 'errors';
 
             $message .= " (and {$additional} more {$pluralized})";
         }

@@ -459,7 +459,7 @@ class LogManagerTest extends TestCase
         $this->assertCount(1, $handlers);
 
         $expectedFingersCrossedHandler = $handlers[0];
-        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler);
+        $this->assertInstanceOf(FingersCrossedHandler::class, $expectedFingersCrossedHandler, );
 
         $activationStrategyProp = new ReflectionProperty(get_class($expectedFingersCrossedHandler), 'activationStrategy');
         $activationStrategyProp->setAccessible(true);
@@ -480,109 +480,5 @@ class LogManagerTest extends TestCase
         }
         $this->assertInstanceOf(StreamHandler::class, $expectedStreamHandler);
         $this->assertEquals(Monolog::DEBUG, $expectedStreamHandler->getLevel());
-    }
-
-    public function testItSharesContextWithAlreadyResolvedChannels()
-    {
-        $manager = new LogManager($this->app);
-        $channel = $manager->channel('single');
-        $context = null;
-
-        $channel->listen(function ($message) use (&$context) {
-            $context = $message->context;
-        });
-        $manager->shareContext([
-            'invocation-id' => 'expected-id',
-        ]);
-        $channel->info('xxxx');
-
-        $this->assertSame(['invocation-id' => 'expected-id'], $context);
-    }
-
-    public function testItSharesContextWithFreshlyResolvedChannels()
-    {
-        $manager = new LogManager($this->app);
-        $context = null;
-
-        $manager->shareContext([
-            'invocation-id' => 'expected-id',
-        ]);
-        $manager->channel('single')->listen(function ($message) use (&$context) {
-            $context = $message->context;
-        });
-        $manager->channel('single')->info('xxxx');
-
-        $this->assertSame(['invocation-id' => 'expected-id'], $context);
-    }
-
-    public function testContextCanBePublicallyAccessedByOtherLoggingSystems()
-    {
-        $manager = new LogManager($this->app);
-        $context = null;
-
-        $manager->shareContext([
-            'invocation-id' => 'expected-id',
-        ]);
-
-        $this->assertSame($manager->sharedContext(), ['invocation-id' => 'expected-id']);
-    }
-
-    public function testItSharesContextWithStacksWhenTheyAreResolved()
-    {
-        $manager = new LogManager($this->app);
-        $context = null;
-
-        $manager->shareContext([
-            'invocation-id' => 'expected-id',
-        ]);
-        $stack = $manager->stack(['single']);
-        $stack->listen(function ($message) use (&$context) {
-            $context = $message->context;
-        });
-        $stack->info('xxxx');
-
-        $this->assertSame(['invocation-id' => 'expected-id'], $context);
-    }
-
-    public function testItMergesSharedContextRatherThanReplacing()
-    {
-        $manager = new LogManager($this->app);
-        $context = null;
-
-        $manager->shareContext([
-            'invocation-id' => 'expected-id',
-        ]);
-        $manager->shareContext([
-            'invocation-start' => 1651800456,
-        ]);
-        $manager->channel('single')->listen(function ($message) use (&$context) {
-            $context = $message->context;
-        });
-        $manager->channel('single')->info('xxxx', [
-            'logged' => 'context',
-        ]);
-
-        $this->assertSame([
-            'invocation-id' => 'expected-id',
-            'invocation-start' => 1651800456,
-            'logged' => 'context',
-        ], $context);
-        $this->assertSame([
-            'invocation-id' => 'expected-id',
-            'invocation-start' => 1651800456,
-        ], $manager->sharedContext());
-    }
-
-    public function testFlushSharedContext()
-    {
-        $manager = new LogManager($this->app);
-
-        $manager->shareContext($context = ['foo' => 'bar']);
-
-        $this->assertSame($context, $manager->sharedContext());
-
-        $manager->flushSharedContext();
-
-        $this->assertEmpty($manager->sharedContext());
     }
 }

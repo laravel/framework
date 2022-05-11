@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Testing;
 
 use Illuminate\Support\Facades\Artisan;
-use Mockery as m;
+use Mockery;
 use Mockery\Exception\InvalidCountException;
 use Mockery\Exception\InvalidOrderException;
 use Orchestra\Testbench\TestCase;
@@ -31,10 +31,6 @@ class ArtisanCommandTest extends TestCase
             $this->line($this->ask('Who?'));
             $this->line($this->ask('What?'));
             $this->line($this->ask('Huh?'));
-        });
-
-        Artisan::command('contains', function () {
-            $this->line('My name is Taylor Otwell');
         });
     }
 
@@ -70,16 +66,6 @@ class ArtisanCommandTest extends TestCase
              ->expectsQuestion('What is your name?', 'Taylor Otwell')
              ->expectsQuestion('Which language do you prefer?', 'PHP')
              ->doesntExpectOutput('Your name is Taylor Otwell and you prefer PHP.')
-             ->assertExitCode(0);
-    }
-
-    public function test_console_command_that_fails_from_unexpected_output_substring()
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Output "Taylor Otwell" was printed.');
-
-        $this->artisan('contains')
-             ->doesntExpectOutputToContain('Taylor Otwell')
              ->assertExitCode(0);
     }
 
@@ -124,25 +110,6 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
-    public function test_console_command_that_passes_if_the_output_contains()
-    {
-        $this->artisan('contains')
-             ->expectsOutputToContain('Taylor Otwell')
-             ->assertExitCode(0);
-    }
-
-    public function test_console_command_that_fails_if_the_output_does_not_contain()
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Output does not contain "Otwell Taylor".');
-
-        $this->ignoringMockOnceExceptions(function () {
-            $this->artisan('contains')
-                 ->expectsOutputToContain('Otwell Taylor')
-                 ->assertExitCode(0);
-        });
-    }
-
     /**
      * Don't allow Mockery's InvalidCountException to be reported. Mocks setup
      * in PendingCommand cause PHPUnit tearDown() to later throw the exception.
@@ -156,7 +123,7 @@ class ArtisanCommandTest extends TestCase
             $callback();
         } finally {
             try {
-                m::close();
+                Mockery::close();
             } catch (InvalidCountException $e) {
                 // Ignore mock exception from PendingCommand::expectsOutput().
             }

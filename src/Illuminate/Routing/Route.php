@@ -270,22 +270,12 @@ class Route
     public function getController()
     {
         if (! $this->controller) {
-            $class = $this->getControllerClass();
+            $class = $this->parseControllerCallback()[0];
 
             $this->controller = $this->container->make(ltrim($class, '\\'));
         }
 
         return $this->controller;
-    }
-
-    /**
-     * Get the controller class used for the route.
-     *
-     * @return string
-     */
-    public function getControllerClass()
-    {
-        return $this->parseControllerCallback()[0];
     }
 
     /**
@@ -790,7 +780,7 @@ class Route
      */
     public function prefix($prefix)
     {
-        $prefix ??= '';
+        $prefix = $prefix ?? '';
 
         $this->updatePrefixOnAction($prefix);
 
@@ -1110,7 +1100,7 @@ class Route
     /**
      * Indicate that the route should enforce scoping of multiple implicit Eloquent bindings.
      *
-     * @return $this
+     * @return bool
      */
     public function scopeBindings()
     {

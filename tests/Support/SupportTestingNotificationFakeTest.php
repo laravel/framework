@@ -106,32 +106,6 @@ class SupportTestingNotificationFakeTest extends TestCase
         }
     }
 
-    public function testAssertNothingSent()
-    {
-        $this->fake->assertNothingSent();
-        $this->fake->send($this->user, new NotificationStub);
-
-        try {
-            $this->fake->assertNothingSent();
-            $this->fail();
-        } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Notifications were sent unexpectedly.'));
-        }
-    }
-
-    public function testAssertNothingSentTo()
-    {
-        $this->fake->assertNothingSentTo($this->user);
-        $this->fake->send($this->user, new NotificationStub);
-
-        try {
-            $this->fake->assertNothingSentTo($this->user);
-            $this->fail();
-        } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('Notifications were sent unexpectedly.'));
-        }
-    }
-
     public function testAssertSentToFailsForEmptyArray()
     {
         $this->expectException(Exception::class);

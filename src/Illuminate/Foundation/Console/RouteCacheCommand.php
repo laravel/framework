@@ -6,9 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'route:cache')]
 class RouteCacheCommand extends Command
 {
     /**
@@ -24,8 +22,6 @@ class RouteCacheCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'route:cache';
 
@@ -79,7 +75,7 @@ class RouteCacheCommand extends Command
             $this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($routes)
         );
 
-        $this->info('Routes cached successfully.');
+        $this->info('Routes cached successfully!');
     }
 
     /**

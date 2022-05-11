@@ -135,7 +135,9 @@ class ParallelRunner implements RunnerInterface
     {
         collect(range(1, $this->options->processes()))->each(function ($token) use ($callback) {
             tap($this->createApplication(), function ($app) use ($callback, $token) {
-                ParallelTesting::resolveTokenUsing(fn () => $token);
+                ParallelTesting::resolveTokenUsing(function () use ($token) {
+                    return $token;
+                });
 
                 $callback($app);
             })->flush();

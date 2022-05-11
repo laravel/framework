@@ -23,15 +23,9 @@ class PhpRedisConnector implements Connector
      */
     public function connect(array $config, array $options)
     {
-        $formattedOptions = Arr::pull($config, 'options', []);
-
-        if (isset($config['prefix'])) {
-            $formattedOptions['prefix'] = $config['prefix'];
-        }
-
-        $connector = function () use ($config, $options, $formattedOptions) {
+        $connector = function () use ($config, $options) {
             return $this->createClient(array_merge(
-                $config, $options, $formattedOptions
+                $config, $options, Arr::pull($config, 'options', [])
             ));
         };
 
@@ -90,11 +84,7 @@ class PhpRedisConnector implements Connector
             $this->establishConnection($client, $config);
 
             if (! empty($config['password'])) {
-                if (isset($config['username']) && $config['username'] !== '' && is_string($config['password'])) {
-                    $client->auth([$config['username'], $config['password']]);
-                } else {
-                    $client->auth($config['password']);
-                }
+                $client->auth($config['password']);
             }
 
             if (isset($config['database'])) {

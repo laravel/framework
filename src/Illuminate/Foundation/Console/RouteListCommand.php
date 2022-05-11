@@ -11,12 +11,9 @@ use Illuminate\Routing\ViewController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use ReflectionClass;
-use ReflectionFunction;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Terminal;
 
-#[AsCommand(name: 'route:list')]
 class RouteListCommand extends Command
 {
     /**
@@ -32,8 +29,6 @@ class RouteListCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'route:list';
 
@@ -103,7 +98,7 @@ class RouteListCommand extends Command
     {
         $this->router->flushMiddlewareGroups();
 
-        if (! $this->router->getRoutes()->count()) {
+        if (empty($this->router->getRoutes())) {
             return $this->error("Your application doesn't have any routes.");
         }
 
@@ -125,10 +120,8 @@ class RouteListCommand extends Command
             return $this->getRouteInformation($route);
         })->filter()->all();
 
-        if (($sort = $this->option('sort')) !== null) {
+        if (($sort = $this->option('sort')) !== 'precedence') {
             $routes = $this->sortRoutes($sort, $routes);
-        } else {
-            $routes = $this->sortRoutes('uri', $routes);
         }
 
         if ($this->option('reverse')) {
@@ -153,7 +146,6 @@ class RouteListCommand extends Command
             'name' => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => $this->getMiddleware($route),
-            'vendor' => $this->isVendorRoute($route),
         ]);
     }
 
@@ -213,48 +205,6 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Determine if the route has been defined outside of the application.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return bool
-     */
-    protected function isVendorRoute(Route $route)
-    {
-        if ($route->action['uses'] instanceof Closure) {
-            $path = (new ReflectionFunction($route->action['uses']))
-                                ->getFileName();
-        } elseif (is_string($route->action['uses']) &&
-                  str_contains($route->action['uses'], 'SerializableClosure')) {
-            return false;
-        } elseif (is_string($route->action['uses'])) {
-            if ($this->isFrameworkController($route)) {
-                return false;
-            }
-
-            $path = (new ReflectionClass($route->getControllerClass()))
-                                ->getFileName();
-        } else {
-            return false;
-        }
-
-        return str_starts_with($path, base_path('vendor'));
-    }
-
-    /**
-     * Determine if the route uses a framework controller.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return bool
-     */
-    protected function isFrameworkController(Route $route)
-    {
-        return in_array($route->getControllerClass(), [
-            '\Illuminate\Routing\RedirectController',
-            '\Illuminate\Routing\ViewController',
-        ], true);
-    }
-
-    /**
      * Filter the route by URI and / or name.
      *
      * @param  array  $route
@@ -262,11 +212,10 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
-        if (($this->option('name') && ! Str::contains((string) $route['name'], $this->option('name'))) ||
+        if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
             ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
-            ($this->option('domain') && ! Str::contains((string) $route['domain'], $this->option('domain'))) ||
-            ($this->option('except-vendor') && $route['vendor'])) {
+            ($this->option('domain') && ! Str::contains($route['domain'], $this->option('domain')))) {
             return;
         }
 
@@ -311,7 +260,7 @@ class RouteListCommand extends Command
     {
         $results = [];
 
-        foreach ($columns as $column) {
+        foreach ($columns as $i => $column) {
             if (str_contains($column, ',')) {
                 $results = array_merge($results, explode(',', $column));
             } else {
@@ -352,7 +301,7 @@ class RouteListCommand extends Command
             fn ($route) => array_merge($route, [
                 'action' => $this->formatActionForCli($route),
                 'method' => $route['method'] == 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS' ? 'ANY' : $route['method'],
-                'uri' => $route['domain'] ? ($route['domain'].'/'.ltrim($route['uri'], '/')) : $route['uri'],
+                'uri' => $route['domain'] ? ($route['domain'].'/'.$route['uri']) : $route['uri'],
             ]),
         );
 
@@ -474,8 +423,7 @@ class RouteListCommand extends Command
             ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],
             ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
-            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
-            ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
+            ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (precedence, domain, method, uri, name, action, middleware) to sort by', 'uri'],
         ];
     }
 }

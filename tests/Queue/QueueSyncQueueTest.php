@@ -74,7 +74,7 @@ class QueueSyncQueueTest extends TestCase
         try {
             $sync->push(new SyncQueueJob());
         } catch (LogicException $e) {
-            $this->assertSame('extraValue', $e->getMessage());
+            $this->assertEquals('extraValue', $e->getMessage());
         }
     }
 }

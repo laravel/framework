@@ -5,11 +5,9 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
-use Illuminate\Validation\Rules\ExcludeIf;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
-use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
 
@@ -21,8 +19,8 @@ class Rule
      * Create a new conditional rule set.
      *
      * @param  callable|bool  $condition
-     * @param  array|string|\Closure  $rules
-     * @param  array|string|\Closure  $defaultRules
+     * @param  array|string  $rules
+     * @param  array|string  $defaultRules
      * @return \Illuminate\Validation\ConditionalRules
      */
     public static function when($condition, $rules, $defaultRules = [])
@@ -103,28 +101,6 @@ class Rule
     public static function requiredIf($callback)
     {
         return new RequiredIf($callback);
-    }
-
-    /**
-     * Get a exclude_if constraint builder instance.
-     *
-     * @param  callable|bool  $callback
-     * @return \Illuminate\Validation\Rules\ExcludeIf
-     */
-    public static function excludeIf($callback)
-    {
-        return new ExcludeIf($callback);
-    }
-
-    /**
-     * Get a prohibited_if constraint builder instance.
-     *
-     * @param  callable|bool  $callback
-     * @return \Illuminate\Validation\Rules\ProhibitedIf
-     */
-    public static function prohibitedIf($callback)
-    {
-        return new ProhibitedIf($callback);
     }
 
     /**

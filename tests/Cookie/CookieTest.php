@@ -120,10 +120,10 @@ class CookieTest extends TestCase
         $cookieJar->expire('foobar', '/path', '/domain');
 
         $cookie = $cookieJar->queued('foobar');
-        $this->assertSame('foobar', $cookie->getName());
+        $this->assertEquals('foobar', $cookie->getName());
         $this->assertEquals(null, $cookie->getValue());
-        $this->assertSame('/path', $cookie->getPath());
-        $this->assertSame('/domain', $cookie->getDomain());
+        $this->assertEquals('/path', $cookie->getPath());
+        $this->assertEquals('/domain', $cookie->getDomain());
         $this->assertTrue($cookie->getExpiresTime() < time());
         $this->assertCount(1, $cookieJar->getQueuedCookies());
     }

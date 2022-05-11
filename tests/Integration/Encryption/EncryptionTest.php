@@ -21,7 +21,7 @@ class EncryptionTest extends TestCase
 
     public function testEncryptionProviderBind()
     {
-        $this->assertInstanceOf(Encrypter::class, $this->app->make('encrypter'));
+        self::assertInstanceOf(Encrypter::class, $this->app->make('encrypter'));
     }
 
     public function testEncryptionWillNotBeInstantiableWhenMissingAppKey()

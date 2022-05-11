@@ -97,22 +97,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBitwise(Builder $query, $where)
-    {
-        $value = $this->parameter($where['value']);
-
-        $operator = str_replace('?', '??', $where['operator']);
-
-        return '('.$this->wrap($where['column']).' '.$operator.' '.$value.') != 0';
-    }
-
-    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -166,31 +150,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile a "JSON contains key" statement into SQL.
-     *
-     * @param  string  $column
-     * @return string
-     */
-    protected function compileJsonContainsKey($column)
-    {
-        $segments = explode('->', $column);
-
-        $lastSegment = array_pop($segments);
-
-        if (preg_match('/\[([0-9]+)\]$/', $lastSegment, $matches)) {
-            $segments[] = Str::beforeLast($lastSegment, $matches[0]);
-
-            $key = $matches[1];
-        } else {
-            $key = "'".str_replace("'", "''", $lastSegment)."'";
-        }
-
-        [$field, $path] = $this->wrapJsonFieldAndPath(implode('->', $segments));
-
-        return $key.' in (select [key] from openjson('.$field.$path.'))';
-    }
-
-    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column
@@ -203,36 +162,6 @@ class SqlServerGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return '(select count(*) from openjson('.$field.$path.')) '.$operator.' '.$value;
-    }
-
-    /**
-     * Compile a single having clause.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHaving(array $having)
-    {
-        if ($having['type'] === 'Bitwise') {
-            return $this->compileHavingBitwise($having);
-        }
-
-        return parent::compileHaving($having);
-    }
-
-    /**
-     * Compile a having clause involving a bitwise operator.
-     *
-     * @param  array  $having
-     * @return string
-     */
-    protected function compileHavingBitwise($having)
-    {
-        $column = $this->wrap($having['column']);
-
-        $parameter = $this->parameter($having['value']);
-
-        return '('.$column.' '.$having['operator'].' '.$parameter.') != 0';
     }
 
     /**

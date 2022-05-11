@@ -69,7 +69,7 @@ class StatusCommand extends BaseCommand
     }
 
     /**
-     * Get the status for the given run migrations.
+     * Get the status for the given ran migrations.
      *
      * @param  array  $ran
      * @param  array  $batches

@@ -38,13 +38,6 @@ class LogManager implements LoggerInterface
     protected $channels = [];
 
     /**
-     * The context shared across channels and stacks.
-     *
-     * @var array
-     */
-    protected $sharedContext = [];
-
-    /**
      * The registered custom driver creators.
      *
      * @var array
@@ -91,10 +84,10 @@ class LogManager implements LoggerInterface
      */
     public function stack(array $channels, $channel = null)
     {
-        return (new Logger(
+        return new Logger(
             $this->createStackDriver(compact('channels', 'channel')),
             $this->app['events']
-        ))->withContext($this->sharedContext);
+        );
     }
 
     /**
@@ -130,7 +123,7 @@ class LogManager implements LoggerInterface
     {
         try {
             return $this->channels[$name] ?? with($this->resolve($name, $config), function ($logger) use ($name) {
-                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']))->withContext($this->sharedContext);
+                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -201,7 +194,7 @@ class LogManager implements LoggerInterface
      */
     protected function resolve($name, ?array $config = null)
     {
-        $config ??= $this->configurationFor($name);
+        $config = $config ?? $this->configurationFor($name);
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
@@ -446,45 +439,6 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Share context across channels and stacks.
-     *
-     * @param  array  $context
-     * @return $this
-     */
-    public function shareContext(array $context)
-    {
-        foreach ($this->channels as $channel) {
-            $channel->withContext($context);
-        }
-
-        $this->sharedContext = array_merge($this->sharedContext, $context);
-
-        return $this;
-    }
-
-    /**
-     * The context shared across channels and stacks.
-     *
-     * @return array
-     */
-    public function sharedContext()
-    {
-        return $this->sharedContext;
-    }
-
-    /**
-     * Flush the shared context.
-     *
-     * @return $this
-     */
-    public function flushSharedContext()
-    {
-        $this->sharedContext = [];
-
-        return $this;
-    }
-
-    /**
      * Get fallback log channel name.
      *
      * @return string
@@ -563,10 +517,10 @@ class LogManager implements LoggerInterface
      */
     protected function parseDriver($driver)
     {
-        $driver ??= $this->getDefaultDriver();
+        $driver = $driver ?? $this->getDefaultDriver();
 
         if ($this->app->runningUnitTests()) {
-            $driver ??= 'null';
+            $driver = $driver ?? 'null';
         }
 
         return $driver;

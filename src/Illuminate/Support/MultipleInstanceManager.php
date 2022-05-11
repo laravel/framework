@@ -139,7 +139,7 @@ abstract class MultipleInstanceManager
      */
     public function forgetInstance($name = null)
     {
-        $name ??= $this->getDefaultInstance();
+        $name = $name ?? $this->getDefaultInstance();
 
         foreach ((array) $name as $instanceName) {
             if (isset($this->instances[$instanceName])) {
@@ -158,7 +158,7 @@ abstract class MultipleInstanceManager
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultInstance();
+        $name = $name ?? $this->getDefaultInstance();
 
         unset($this->instances[$name]);
     }

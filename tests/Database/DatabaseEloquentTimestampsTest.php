@@ -62,7 +62,6 @@ class DatabaseEloquentTimestampsTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('users_created_at');
         $this->schema()->drop('users_updated_at');
-        Carbon::setTestNow(null);
     }
 
     /**
@@ -70,8 +69,7 @@ class DatabaseEloquentTimestampsTest extends TestCase
      */
     public function testUserWithCreatedAtAndUpdatedAt()
     {
-        Carbon::setTestNow($now = Carbon::now());
-
+        $now = Carbon::now();
         $user = UserWithCreatedAndUpdated::create([
             'email' => 'test@test.com',
         ]);
@@ -82,8 +80,7 @@ class DatabaseEloquentTimestampsTest extends TestCase
 
     public function testUserWithCreatedAt()
     {
-        Carbon::setTestNow($now = Carbon::now());
-
+        $now = Carbon::now();
         $user = UserWithCreated::create([
             'email' => 'test@test.com',
         ]);
@@ -93,8 +90,7 @@ class DatabaseEloquentTimestampsTest extends TestCase
 
     public function testUserWithUpdatedAt()
     {
-        Carbon::setTestNow($now = Carbon::now());
-
+        $now = Carbon::now();
         $user = UserWithUpdated::create([
             'email' => 'test@test.com',
         ]);

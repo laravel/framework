@@ -47,7 +47,7 @@ class WorkerOptions
     public $rest;
 
     /**
-     * The maximum number of times a job may be attempted.
+     * The maximum amount of times a job may be attempted.
      *
      * @var int
      */

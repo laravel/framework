@@ -96,6 +96,8 @@ class Env
 
                 return $value;
             })
-            ->getOrCall(fn () => value($default));
+            ->getOrCall(function () use ($default) {
+                return value($default);
+            });
     }
 }

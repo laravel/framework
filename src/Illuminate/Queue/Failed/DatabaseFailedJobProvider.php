@@ -57,7 +57,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
     {
         $failed_at = Date::now();
 
-        $exception = (string) mb_convert_encoding($exception, 'UTF-8');
+        $exception = (string) $exception;
 
         return $this->getTable()->insertGetId(compact(
             'connection', 'queue', 'payload', 'exception', 'failed_at'

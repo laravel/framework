@@ -272,7 +272,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $this->escapeNames($tables)).' cascade';
+        return 'drop table "'.implode('","', $tables).'" cascade';
     }
 
     /**
@@ -283,7 +283,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view '.implode(',', $this->escapeNames($views)).' cascade';
+        return 'drop view "'.implode('","', $views).'" cascade';
     }
 
     /**
@@ -294,7 +294,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropAllTypes($types)
     {
-        return 'drop type '.implode(',', $this->escapeNames($types)).' cascade';
+        return 'drop type "'.implode('","', $types).'" cascade';
     }
 
     /**
@@ -305,7 +305,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileGetAllTables($searchPath)
     {
-        return "select tablename, concat('\"', schemaname, '\".\"', tablename, '\"') as qualifiedname from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
+        return "select tablename from pg_catalog.pg_tables where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**
@@ -316,7 +316,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileGetAllViews($searchPath)
     {
-        return "select viewname, concat('\"', schemaname, '\".\"', viewname, '\"') as qualifiedname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
+        return "select viewname from pg_catalog.pg_views where schemaname in ('".implode("','", (array) $searchPath)."')";
     }
 
     /**
@@ -487,21 +487,6 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Quote-escape the given tables, views, or types.
-     *
-     * @param  array  $names
-     * @return array
-     */
-    public function escapeNames($names)
-    {
-        return array_map(static function ($name) {
-            return '"'.collect(explode('.', $name))
-                ->map(fn ($segment) => trim($segment, '\'"'))
-                ->implode('"."').'"';
-        }, $names);
-    }
-
-    /**
      * Create the column definition for a char type.
      *
      * @param  \Illuminate\Support\Fluent  $column
@@ -509,11 +494,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeChar(Fluent $column)
     {
-        if ($column->length) {
-            return "char({$column->length})";
-        }
-
-        return 'char';
+        return "char({$column->length})";
     }
 
     /**
@@ -524,11 +505,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeString(Fluent $column)
     {
-        if ($column->length) {
-            return "varchar({$column->length})";
-        }
-
-        return 'varchar';
+        return "varchar({$column->length})";
     }
 
     /**

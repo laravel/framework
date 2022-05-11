@@ -25,7 +25,7 @@ class StreamedResponseException extends RuntimeException
     {
         $this->originalException = $originalException;
 
-        parent::__construct($originalException->getMessage());
+        parent::__construct($originalException->message);
     }
 
     /**

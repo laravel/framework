@@ -36,7 +36,7 @@ abstract class TrustHosts
      * Handle the incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  callable  $next
      * @return \Illuminate\Http\Response
      */
     public function handle(Request $request, $next)

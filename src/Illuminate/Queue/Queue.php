@@ -58,7 +58,7 @@ abstract class Queue
     }
 
     /**
-     * Push a new job onto a specific queue after (n) seconds.
+     * Push a new job onto the queue after a delay.
      *
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
@@ -104,7 +104,7 @@ abstract class Queue
 
         $payload = json_encode($this->createPayloadArray($job, $queue, $data), \JSON_UNESCAPED_UNICODE);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             throw new InvalidPayloadException(
                 'Unable to JSON encode payload. Error code: '.json_last_error()
             );

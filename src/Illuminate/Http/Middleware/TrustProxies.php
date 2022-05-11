@@ -47,7 +47,7 @@ class TrustProxies
      */
     protected function setTrustedProxyIpAddresses(Request $request)
     {
-        $trustedIps = $this->proxies() ?: config('trustedproxy.proxies');
+        $trustedIps = $this->proxies();
 
         if ($trustedIps === '*' || $trustedIps === '**') {
             return $this->setTrustedProxyIpAddressesToTheCallingIp($request);

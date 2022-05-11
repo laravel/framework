@@ -97,7 +97,7 @@ class TestDatabasesTest extends TestCase
         ];
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
 

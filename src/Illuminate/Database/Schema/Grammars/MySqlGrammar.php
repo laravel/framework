@@ -1150,7 +1150,7 @@ class MySqlGrammar extends Grammar
      */
     protected function modifySrid(Blueprint $blueprint, Fluent $column)
     {
-        if (is_int($column->srid) && $column->srid > 0) {
+        if (! is_null($column->srid) && is_int($column->srid) && $column->srid > 0) {
             return ' srid '.$column->srid;
         }
     }

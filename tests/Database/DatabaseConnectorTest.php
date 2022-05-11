@@ -89,103 +89,27 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    /**
-     * @dataProvider provideSearchPaths
-     *
-     * @param  string  $searchPath
-     * @param  string  $expectedSql
-     */
-    public function testPostgresSearchPathIsSet($searchPath, $expectedSql)
+    public function testPostgresSearchPathIsSet()
     {
         $dsn = 'pgsql:host=foo;dbname=\'bar\'';
-        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => $searchPath, 'charset' => 'utf8'];
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => 'public', 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
         $statement = m::mock(PDOStatement::class);
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
-        $connection->shouldReceive('prepare')->once()->with($expectedSql)->andReturn($statement);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "public"')->andReturn($statement);
         $statement->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);
     }
 
-    public function provideSearchPaths()
-    {
-        return [
-            'all-lowercase' => [
-                'public',
-                'set search_path to "public"',
-            ],
-            'case-sensitive' => [
-                'Public',
-                'set search_path to "Public"',
-            ],
-            'special characters' => [
-                '¡foo_bar-Baz!.Áüõß',
-                'set search_path to "¡foo_bar-Baz!.Áüõß"',
-            ],
-            'single-quoted' => [
-                "'public'",
-                'set search_path to "public"',
-            ],
-            'double-quoted' => [
-                '"public"',
-                'set search_path to "public"',
-            ],
-            'variable' => [
-                '$user',
-                'set search_path to "$user"',
-            ],
-            'delimit space' => [
-                'public user',
-                'set search_path to "public", "user"',
-            ],
-            'delimit newline' => [
-                "public\nuser\r\n\ttest",
-                'set search_path to "public", "user", "test"',
-            ],
-            'delimit comma' => [
-                'public,user',
-                'set search_path to "public", "user"',
-            ],
-            'delimit comma and space' => [
-                'public, user',
-                'set search_path to "public", "user"',
-            ],
-            'single-quoted many' => [
-                "'public', 'user'",
-                'set search_path to "public", "user"',
-            ],
-            'double-quoted many' => [
-                '"public", "user"',
-                'set search_path to "public", "user"',
-            ],
-            'quoted space is unsupported in string' => [
-                '"public user"',
-                'set search_path to "public", "user"',
-            ],
-            'array' => [
-                ['public', 'user'],
-                'set search_path to "public", "user"',
-            ],
-            'array with variable' => [
-                ['public', '$user'],
-                'set search_path to "public", "$user"',
-            ],
-            'array with delimiter characters' => [
-                ['public', '"user"', "'test'", 'spaced schema'],
-                'set search_path to "public", "user", "test", "spaced schema"',
-            ],
-        ];
-    }
-
-    public function testPostgresSearchPathFallbackToConfigKeySchema()
+    public function testPostgresSearchPathArraySupported()
     {
         $dsn = 'pgsql:host=foo;dbname=\'bar\'';
-        $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', '"user"'], 'charset' => 'utf8'];
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => ['public', '"user"'], 'charset' => 'utf8'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
@@ -194,6 +118,38 @@ class DatabaseConnectorTest extends TestCase
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($statement);
         $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($statement);
         $statement->shouldReceive('execute')->twice();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresSearchPathCommaSeparatedValueSupported()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => 'public, "user"', 'charset' => 'utf8'];
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock('stdClass');
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "public", "user"')->andReturn($connection);
+        $connection->shouldReceive('execute')->twice();
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testPostgresSearchPathVariablesSupported()
+    {
+        $dsn = 'pgsql:host=foo;dbname=\'bar\'';
+        $config = ['host' => 'foo', 'database' => 'bar', 'search_path' => '"$user", public, user', 'charset' => 'utf8'];
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock('stdClass');
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set search_path to "$user", "public", "user"')->andReturn($connection);
+        $connection->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 
         $this->assertSame($result, $connection);

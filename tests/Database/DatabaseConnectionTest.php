@@ -11,7 +11,6 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
-use Illuminate\Database\MultipleColumnsSelectedException;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -55,28 +54,6 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection(['select']);
         $connection->expects($this->once())->method('select')->with('foo', ['bar' => 'baz'])->willReturn(['foo']);
         $this->assertSame('foo', $connection->selectOne('foo', ['bar' => 'baz']));
-    }
-
-    public function testScalarCallsSelectOneAndReturnsSingleResult()
-    {
-        $connection = $this->getMockConnection(['selectOne']);
-        $connection->expects($this->once())->method('selectOne')->with('select count(*) from tbl')->willReturn((object) ['count(*)' => 5]);
-        $this->assertSame(5, $connection->scalar('select count(*) from tbl'));
-    }
-
-    public function testScalarThrowsExceptionIfMultipleColumnsAreSelected()
-    {
-        $connection = $this->getMockConnection(['selectOne']);
-        $connection->expects($this->once())->method('selectOne')->with('select a, b from tbl')->willReturn((object) ['a' => 'a', 'b' => 'b']);
-        $this->expectException(MultipleColumnsSelectedException::class);
-        $connection->scalar('select a, b from tbl');
-    }
-
-    public function testScalarReturnsNullIfUnderlyingSelectReturnsNoRows()
-    {
-        $connection = $this->getMockConnection(['selectOne']);
-        $connection->expects($this->once())->method('selectOne')->with('select foo from tbl where 0=1')->willReturn(null);
-        $this->assertNull($connection->scalar('select foo from tbl where 0=1'));
     }
 
     public function testSelectProperlyCallsPDO()

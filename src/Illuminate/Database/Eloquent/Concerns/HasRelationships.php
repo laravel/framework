@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -115,7 +114,7 @@ trait HasRelationships
      */
     public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
-        $through = $this->newRelatedThroughInstance($through);
+        $through = new $through;
 
         $firstKey = $firstKey ?: $this->getForeignKey();
 
@@ -210,9 +209,9 @@ trait HasRelationships
             $foreignKey = Str::snake($relation).'_'.$instance->getKeyName();
         }
 
-        // Once we have the foreign key names we'll just create a new Eloquent query
-        // for the related models and return the relationship instance which will
-        // actually be responsible for retrieving and hydrating every relation.
+        // Once we have the foreign key names, we'll just create a new Eloquent query
+        // for the related models and returns the relationship instance which will
+        // actually be responsible for retrieving and hydrating every relations.
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return $this->newBelongsTo(
@@ -387,7 +386,7 @@ trait HasRelationships
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
-        $through = $this->newRelatedThroughInstance($through);
+        $through = new $through;
 
         $firstKey = $firstKey ?: $this->getForeignKey();
 
@@ -554,9 +553,9 @@ trait HasRelationships
 
         $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
 
-        // Now we're ready to create a new query builder for the related model and
-        // the relationship instances for this relation. This relation will set
-        // appropriate query constraints then entirely manage the hydrations.
+        // Now we're ready to create a new query builder for this related model and
+        // the relationship instances for this relation. This relations will set
+        // appropriate query constraints then entirely manages the hydrations.
         if (! $table) {
             $words = preg_split('/(_)/u', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -733,10 +732,6 @@ trait HasRelationships
             return array_search(static::class, $morphMap, true);
         }
 
-        if (static::class === Pivot::class) {
-            return static::class;
-        }
-
         if (Relation::requiresMorphMap()) {
             throw new ClassMorphViolationException($this);
         }
@@ -757,17 +752,6 @@ trait HasRelationships
                 $instance->setConnection($this->connection);
             }
         });
-    }
-
-    /**
-     * Create a new model instance for a related "through" model.
-     *
-     * @param  string  $class
-     * @return mixed
-     */
-    protected function newRelatedThroughInstance($class)
-    {
-        return new $class;
     }
 
     /**

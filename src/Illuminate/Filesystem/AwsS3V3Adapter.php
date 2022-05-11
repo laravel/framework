@@ -69,7 +69,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
         ], $options));
 
         $uri = $this->client->createPresignedRequest(
-            $command, $expiration, $options
+            $command, $expiration
         )->getUri();
 
         // If an explicit base URL has been set on the disk configuration then we will use
@@ -80,15 +80,5 @@ class AwsS3V3Adapter extends FilesystemAdapter
         }
 
         return (string) $uri;
-    }
-
-    /**
-     * Get the underlying S3 client.
-     *
-     * @return \Aws\S3\S3Client
-     */
-    public function getClient()
-    {
-        return $this->client;
     }
 }

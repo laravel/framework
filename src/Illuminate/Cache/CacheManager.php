@@ -264,7 +264,7 @@ class CacheManager implements FactoryContract
             'endpoint' => $config['endpoint'] ?? null,
         ];
 
-        if (isset($config['key'], $config['secret'])) {
+        if (isset($config['key']) && isset($config['secret'])) {
             $dynamoConfig['credentials'] = Arr::only(
                 $config, ['key', 'secret', 'token']
             );
@@ -368,7 +368,7 @@ class CacheManager implements FactoryContract
      */
     public function forgetDriver($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = $name ?? $this->getDefaultDriver();
 
         foreach ((array) $name as $cacheName) {
             if (isset($this->stores[$cacheName])) {
@@ -387,7 +387,7 @@ class CacheManager implements FactoryContract
      */
     public function purge($name = null)
     {
-        $name ??= $this->getDefaultDriver();
+        $name = $name ?? $this->getDefaultDriver();
 
         unset($this->stores[$name]);
     }

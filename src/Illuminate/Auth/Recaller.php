@@ -49,7 +49,7 @@ class Recaller
      */
     public function hash()
     {
-        return explode('|', $this->recaller, 4)[2];
+        return explode('|', $this->recaller, 3)[2];
     }
 
     /**
@@ -81,16 +81,6 @@ class Recaller
     {
         $segments = explode('|', $this->recaller);
 
-        return count($segments) >= 3 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
-    }
-
-    /**
-     * Get the recaller's segments.
-     *
-     * @return array
-     */
-    public function segments()
-    {
-        return explode('|', $this->recaller);
+        return count($segments) === 3 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
     }
 }

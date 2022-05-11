@@ -117,47 +117,6 @@ class BusBatchTest extends TestCase
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
     }
 
-    public function test_jobs_can_be_added_to_pending_batch()
-    {
-        $batch = new PendingBatch(new Container, collect());
-        $this->assertCount(0, $batch->jobs);
-
-        $job = new class
-        {
-            use Batchable;
-        };
-        $batch->add([$job]);
-        $this->assertCount(1, $batch->jobs);
-
-        $secondJob = new class
-        {
-            use Batchable;
-
-            public $anotherProperty;
-        };
-        $batch->add($secondJob);
-        $this->assertCount(2, $batch->jobs);
-    }
-
-    public function test_jobs_can_be_added_to_the_pending_batch_from_iterable()
-    {
-        $batch = new PendingBatch(new Container, collect());
-        $this->assertCount(0, $batch->jobs);
-
-        $count = 3;
-        $generator = function (int $jobsCount) {
-            for ($i = 0; $i < $jobsCount; $i++) {
-                yield new class
-                {
-                    use Batchable;
-                };
-            }
-        };
-
-        $batch->add($generator($count));
-        $this->assertCount($count, $batch->jobs);
-    }
-
     public function test_processed_jobs_can_be_calculated()
     {
         $queue = m::mock(Factory::class);

@@ -23,7 +23,8 @@ class Reflector
             return is_callable($var, $syntaxOnly);
         }
 
-        if (! isset($var[0], $var[1]) || ! is_string($var[1] ?? null)) {
+        if ((! isset($var[0]) || ! isset($var[1])) ||
+            ! is_string($var[1] ?? null)) {
             return false;
         }
 

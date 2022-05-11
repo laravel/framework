@@ -74,7 +74,7 @@ abstract class Component
         $resolver = function ($view) {
             $factory = Container::getInstance()->make('view');
 
-            return strlen($view) <= PHP_MAXPATHLEN && $factory->exists($view)
+            return $factory->exists($view)
                         ? $view
                         : $this->createBladeViewFromString($factory, $view);
         };

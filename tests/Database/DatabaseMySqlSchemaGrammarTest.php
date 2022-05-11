@@ -1297,21 +1297,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))))", $statements[0]);
     }
 
-    public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->create();
-        $blueprint->string('my_json_column')->virtualAsJson('my_json_column->foo[0][1]');
-
-        $conn = $this->getConnection();
-        $conn->shouldReceive('getConfig')->andReturn(null);
-
-        $statements = $blueprint->toSql($conn, $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"foo\"[0][1]'))))", $statements[0]);
-    }
-
     public function testCreateTableWithStoredAsColumn()
     {
         $conn = $this->getConnection();

@@ -5,30 +5,27 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Support\Arr;
 
-/**
- * @template TModel of \Illuminate\Database\Eloquent\Model
- */
 class ModelNotFoundException extends RecordsNotFoundException
 {
     /**
      * Name of the affected Eloquent model.
      *
-     * @var class-string<TModel>
+     * @var string
      */
     protected $model;
 
     /**
      * The affected model IDs.
      *
-     * @var array<int, int|string>
+     * @var int|array
      */
     protected $ids;
 
     /**
      * Set the affected Eloquent model and instance ids.
      *
-     * @param  class-string<TModel>  $model
-     * @param  array<int, int|string>|int|string  $ids
+     * @param  string  $model
+     * @param  int|array  $ids
      * @return $this
      */
     public function setModel($model, $ids = [])
@@ -50,7 +47,7 @@ class ModelNotFoundException extends RecordsNotFoundException
     /**
      * Get the affected Eloquent model.
      *
-     * @return class-string<TModel>
+     * @return string
      */
     public function getModel()
     {
@@ -60,7 +57,7 @@ class ModelNotFoundException extends RecordsNotFoundException
     /**
      * Get the affected Eloquent model IDs.
      *
-     * @return array<int, int|string>
+     * @return int|array
      */
     public function getIds()
     {

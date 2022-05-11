@@ -45,13 +45,6 @@ class DurationLimiterBuilder
     public $timeout = 3;
 
     /**
-     * The number of milliseconds to wait between attempts to acquire the lock.
-     *
-     * @var int
-     */
-    public $sleep = 750;
-
-    /**
      * Create a new builder instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $connection
@@ -104,19 +97,6 @@ class DurationLimiterBuilder
     }
 
     /**
-     * The number of milliseconds to wait between lock acquisition attempts.
-     *
-     * @param  int  $sleep
-     * @return $this
-     */
-    public function sleep($sleep)
-    {
-        $this->sleep = $sleep;
-
-        return $this;
-    }
-
-    /**
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
      * @param  callable  $callback
@@ -130,7 +110,7 @@ class DurationLimiterBuilder
         try {
             return (new DurationLimiter(
                 $this->connection, $this->name, $this->maxLocks, $this->decay
-            ))->block($this->timeout, $callback, $this->sleep);
+            ))->block($this->timeout, $callback);
         } catch (LimiterTimeoutException $e) {
             if ($failure) {
                 return $failure($e);

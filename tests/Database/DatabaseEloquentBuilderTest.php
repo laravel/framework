@@ -154,75 +154,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail(new Collection([1, 2]), ['column']);
     }
 
-    public function testFindOrMethod()
-    {
-        $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
-        $model = $this->getMockModel();
-        $model->shouldReceive('getKeyType')->andReturn('int');
-        $builder->setModel($model);
-        $builder->getQuery()->shouldReceive('where')->with('foo_table.foo', '=', 1)->twice();
-        $builder->getQuery()->shouldReceive('where')->with('foo_table.foo', '=', 2)->once();
-        $builder->shouldReceive('first')->andReturn($model)->once();
-        $builder->shouldReceive('first')->with(['column'])->andReturn($model)->once();
-        $builder->shouldReceive('first')->andReturn(null)->once();
-
-        $this->assertSame($model, $builder->findOr(1, fn () => 'callback result'));
-        $this->assertSame($model, $builder->findOr(1, ['column'], fn () => 'callback result'));
-        $this->assertSame('callback result', $builder->findOr(2, fn () => 'callback result'));
-    }
-
-    public function testFindOrMethodWithMany()
-    {
-        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $model1 = $this->getMockModel();
-        $model2 = $this->getMockModel();
-        $builder->setModel($model1);
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2])->twice();
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2, 3])->once();
-        $builder->shouldReceive('get')->andReturn(new Collection([$model1, $model2]))->once();
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model1, $model2]))->once();
-        $builder->shouldReceive('get')->andReturn(null)->once();
-
-        $result = $builder->findOr([1, 2], fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr([1, 2], ['column'], fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr([1, 2, 3], fn () => 'callback result');
-        $this->assertSame('callback result', $result);
-    }
-
-    public function testFindOrMethodWithManyUsingCollection()
-    {
-        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
-        $model1 = $this->getMockModel();
-        $model2 = $this->getMockModel();
-        $builder->setModel($model1);
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2])->twice();
-        $builder->getQuery()->shouldReceive('whereIn')->with('foo_table.foo', [1, 2, 3])->once();
-        $builder->shouldReceive('get')->andReturn(new Collection([$model1, $model2]))->once();
-        $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([$model1, $model2]))->once();
-        $builder->shouldReceive('get')->andReturn(null)->once();
-
-        $result = $builder->findOr(new Collection([1, 2]), fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr(new Collection([1, 2]), ['column'], fn () => 'callback result');
-        $this->assertInstanceOf(Collection::class, $result);
-        $this->assertSame($model1, $result[0]);
-        $this->assertSame($model2, $result[1]);
-
-        $result = $builder->findOr(new Collection([1, 2, 3]), fn () => 'callback result');
-        $this->assertSame('callback result', $result);
-    }
-
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
@@ -735,19 +666,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo'], $results);
     }
 
-    public function testEagerLoadRelationsCanBeFlushed()
-    {
-        $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
-
-        $builder->setEagerLoads(['foo']);
-
-        $this->assertSame(['foo'], $builder->getEagerLoads());
-
-        $builder->withoutEagerLoads();
-
-        $this->assertEmpty($builder->getEagerLoads());
-    }
-
     public function testRelationshipEagerLoadProcess()
     {
         $builder = m::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
@@ -914,28 +832,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
-    public function testQueryDynamicScopes()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->getQuery()->shouldReceive('where')->once()->with('bar', 'foo');
-        $builder->setModel($model = new EloquentBuilderTestDynamicScopeStub);
-        $result = $builder->dynamic('bar', 'foo');
-
-        $this->assertEquals($builder, $result);
-    }
-
-    public function testQueryDynamicScopesNamed()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'foo');
-        $builder->setModel($model = new EloquentBuilderTestDynamicScopeStub);
-        $result = $builder->dynamic(bar: 'foo');
-
-        $this->assertEquals($builder, $result);
-    }
-
     public function testNestedWhere()
     {
         $nestedQuery = m::mock(Builder::class);
@@ -988,62 +884,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 9000], $query->getBindings());
     }
 
-    public function testSimpleWhereNot()
-    {
-        $model = new EloquentBuilderTestStub();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
-    }
-
-    public function testWhereNot()
-    {
-        $nestedQuery = m::mock(Builder::class);
-        $nestedRawQuery = $this->getMockQueryBuilder();
-        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
-        $model = $this->getMockModel()->makePartial();
-        $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->setModel($model);
-        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and not');
-        $nestedQuery->shouldReceive('foo')->once();
-
-        $result = $builder->whereNot(function ($query) {
-            $query->foo();
-        });
-        $this->assertEquals($builder, $result);
-    }
-
-    public function testSimpleOrWhereNot()
-    {
-        $model = new EloquentBuilderTestStub();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
-    }
-
-    public function testOrWhereNot()
-    {
-        $nestedQuery = m::mock(Builder::class);
-        $nestedRawQuery = $this->getMockQueryBuilder();
-        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
-        $model = $this->getMockModel()->makePartial();
-        $model->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($nestedQuery);
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('from');
-        $builder->setModel($model);
-        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'or not');
-        $nestedQuery->shouldReceive('foo')->once();
-
-        $result = $builder->orWhereNot(function ($query) {
-            $query->foo();
-        });
-        $this->assertEquals($builder, $result);
-    }
-
     public function testRealQueryHigherOrderOrWhereScopes()
     {
         $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
@@ -1058,38 +898,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->mockConnectionForModel($model, 'SQLite');
         $query = $model->newQuery()->one()->orWhere->two()->orWhere->three();
         $this->assertSame('select * from "table" where "one" = ? or ("two" = ?) or ("three" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryHigherOrderWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->whereNot->two();
-        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryChainedHigherOrderWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->whereNot->two()->whereNot->three();
-        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?) and not ("three" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryHigherOrderOrWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->orWhereNot->two();
-        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryChainedHigherOrderOrWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->orWhereNot->two()->orWhereNot->three();
-        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?) or not ("three" = ?)', $query->toSql());
     }
 
     public function testSimpleWhere()
@@ -1123,7 +931,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
+        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
 
         $result = $builder->whereBelongsTo($parent);
         $this->assertEquals($result, $builder);
@@ -1131,33 +939,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
         $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2], 'and');
+        $builder->getQuery()->shouldReceive('where')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', '=', 2, 'and');
 
         $result = $builder->whereBelongsTo($parent, 'parent');
-        $this->assertEquals($result, $builder);
-
-        $parents = new Collection([new EloquentBuilderTestWhereBelongsToStub([
-            'id' => 2,
-            'parent_id' => 1,
-        ]), new EloquentBuilderTestWhereBelongsToStub([
-            'id' => 3,
-            'parent_id' => 1,
-        ])]);
-
-        $builder = $this->getBuilder();
-        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
-        $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
-
-        $result = $builder->whereBelongsTo($parents);
-        $this->assertEquals($result, $builder);
-
-        $builder = $this->getBuilder();
-        $builder->shouldReceive('from')->with('eloquent_builder_test_where_belongs_to_stubs');
-        $builder->setModel($related);
-        $builder->getQuery()->shouldReceive('whereIn')->once()->with('eloquent_builder_test_where_belongs_to_stubs.parent_id', [2, 3], 'and');
-
-        $result = $builder->whereBelongsTo($parents, 'parent');
         $this->assertEquals($result, $builder);
     }
 
@@ -1186,17 +970,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $model->select('id')->withCount('foo');
 
         $this->assertSame('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
-    }
-
-    public function testWithCountSecondRelationWithClosure()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-
-        $builder = $model->withCount(['address', 'foo' => function ($query) {
-            $query->where('active', false);
-        }]);
-
-        $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "address_count", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "active" = ?) as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
     public function testWithCountAndMergedWheres()
@@ -1290,21 +1063,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = $model->withCount(['foo as foo_bar', 'foo']);
 
         $this->assertSame('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
-    }
-
-    public function testWithAggregateAndSelfRelationConstrain()
-    {
-        EloquentBuilderTestStub::resolveRelationUsing('children', function ($model) {
-            return $model->hasMany(EloquentBuilderTestStub::class, 'parent_id', 'id')->where('enum_value', new stdClass);
-        });
-
-        $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
-        $relationHash = $model->children()->getRelationCountHash(false);
-
-        $builder = $model->withCount('children');
-
-        $this->assertSame(vsprintf('select "table".*, (select count(*) from "table" as "%s" where "table"."id" = "%s"."parent_id" and "enum_value" = ?) as "children_count" from "table"', [$relationHash, $relationHash]), $builder->toSql());
     }
 
     public function testWithExists()
@@ -1624,20 +1382,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
 
-    public function testWhereNotMorphedTo()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
-
-        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
-        $relatedModel->id = 1;
-
-        $builder = $model->whereNotMorphedTo('morph', $relatedModel);
-
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
-        $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
-    }
-
     public function testOrWhereMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1652,20 +1396,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
     }
 
-    public function testOrWhereNotMorphedTo()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
-
-        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
-        $relatedModel->id = 1;
-
-        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', $relatedModel);
-
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not ("morph_type" = ? and "morph_id" = ?)', $builder->toSql());
-        $this->assertEquals(['baz', $relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
-    }
-
     public function testWhereMorphedToClass()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1675,39 +1405,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "morph_type" = ?', $builder->toSql());
         $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
-    }
-
-    public function testWhereNotMorphedToClass()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
-
-        $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
-
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not "morph_type" = ?', $builder->toSql());
-        $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
-    }
-
-    public function testOrWhereMorphedToClass()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
-
-        $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
-
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or "morph_type" = ?', $builder->toSql());
-        $this->assertEquals(['baz', EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
-    }
-
-    public function testOrWhereNotMorphedToClass()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
-
-        $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
-
-        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not "morph_type" = ?', $builder->toSql());
-        $this->assertEquals(['baz', EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
     }
 
     public function testWhereMorphedToAlias()
@@ -1994,20 +1691,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
-    public function testUpdateWithQualifiedTimestampValue()
-    {
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
-        $builder = new Builder($query);
-        $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
-        $builder->setModel($model);
-        $builder->getConnection()->shouldReceive('update')->once()
-            ->with('update "table" set "table"."foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
-
-        $result = $builder->update(['table.foo' => 'bar', 'table.updated_at' => null]);
-        $this->assertEquals(1, $result);
-    }
-
     public function testUpdateWithoutTimestamp()
     {
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
@@ -2036,24 +1719,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->from('table as alias')->update(['foo' => 'bar']);
         $this->assertEquals(1, $result);
-    }
-
-    public function testUpdateWithAliasWithQualifiedTimestampValue()
-    {
-        Carbon::setTestNow($now = '2017-10-10 10:10:10');
-
-        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
-        $builder = new Builder($query);
-        $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
-        $builder->setModel($model);
-        $builder->getConnection()->shouldReceive('update')->once()
-            ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', null])->andReturn(1);
-
-        $result = $builder->from('table as alias')->update(['foo' => 'bar', 'alias.updated_at' => null]);
-        $this->assertEquals(1, $result);
-
-        Carbon::setTestNow(null);
     }
 
     public function testUpsert()
@@ -2151,14 +1816,6 @@ class EloquentBuilderTestScopeStub extends Model
     public function scopeApproved($query)
     {
         $query->where('foo', 'bar');
-    }
-}
-
-class EloquentBuilderTestDynamicScopeStub extends Model
-{
-    public function scopeDynamic($query, $foo = 'foo', $bar = 'bar')
-    {
-        $query->where($foo, $bar);
     }
 }
 

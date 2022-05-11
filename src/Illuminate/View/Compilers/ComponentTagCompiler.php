@@ -216,7 +216,7 @@ class ComponentTagCompiler
             return [Str::camel($key) => $value];
         });
 
-        // If the component doesn't exist as a class, we'll assume it's a class-less
+        // If the component doesn't exists as a class we'll assume it's a class-less
         // component and pass the component as a view parameter to the data so it
         // can be accessed within the component and we can render out the view.
         if (! class_exists($class)) {
@@ -271,29 +271,12 @@ class ComponentTagCompiler
             return $class;
         }
 
-        $guess = collect($this->blade->getAnonymousComponentNamespaces())
-            ->filter(function ($directory, $prefix) use ($component) {
-                return Str::startsWith($component, $prefix.'::');
-            })
-            ->prepend('components', $component)
-            ->reduce(function ($carry, $directory, $prefix) use ($component, $viewFactory) {
-                if (! is_null($carry)) {
-                    return $carry;
-                }
+        if ($viewFactory->exists($view = $this->guessViewName($component))) {
+            return $view;
+        }
 
-                $componentName = Str::after($component, $prefix.'::');
-
-                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory))) {
-                    return $view;
-                }
-
-                if ($viewFactory->exists($view = $this->guessViewName($componentName, $directory).'.index')) {
-                    return $view;
-                }
-            });
-
-        if (! is_null($guess)) {
-            return $guess;
+        if ($viewFactory->exists($view = $this->guessViewName($component).'.index')) {
+            return $view;
         }
 
         throw new InvalidArgumentException(
@@ -313,7 +296,7 @@ class ComponentTagCompiler
 
         $prefix = $segments[0];
 
-        if (! isset($this->namespaces[$prefix], $segments[1])) {
+        if (! isset($this->namespaces[$prefix]) || ! isset($segments[1])) {
             return;
         }
 
@@ -358,14 +341,11 @@ class ComponentTagCompiler
      * Guess the view name for the given component.
      *
      * @param  string  $name
-     * @param  string  $prefix
      * @return string
      */
-    public function guessViewName($name, $prefix = 'components.')
+    public function guessViewName($name)
     {
-        if (! Str::endsWith($prefix, '.')) {
-            $prefix .= '.';
-        }
+        $prefix = 'components.';
 
         $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
 
@@ -385,7 +365,7 @@ class ComponentTagCompiler
      */
     public function partitionDataAndAttributes($class, array $attributes)
     {
-        // If the class doesn't exist, we'll assume it is a class-less component and
+        // If the class doesn't exists, we'll assume it's a class-less component and
         // return all of the attributes as both data and attributes since we have
         // now way to partition them. The user can exclude attributes manually.
         if (! class_exists($class)) {

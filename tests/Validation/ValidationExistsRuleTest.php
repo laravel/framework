@@ -94,12 +94,6 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertFalse($v->passes());
         $v->setData(['id' => 4]);
         $this->assertFalse($v->passes());
-
-        // array values
-        $v->setData(['id' => [1, 2]]);
-        $this->assertTrue($v->passes());
-        $v->setData(['id' => [3, 4]]);
-        $this->assertFalse($v->passes());
     }
 
     public function testItChoosesValidRecordsUsingWhereNotInRule()
@@ -123,12 +117,6 @@ class ValidationExistsRuleTest extends TestCase
         $v->setData(['id' => 3]);
         $this->assertTrue($v->passes());
         $v->setData(['id' => 4]);
-        $this->assertTrue($v->passes());
-
-        // array values
-        $v->setData(['id' => [1, 2]]);
-        $this->assertFalse($v->passes());
-        $v->setData(['id' => [3, 4]]);
         $this->assertTrue($v->passes());
     }
 
@@ -159,12 +147,6 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertTrue($v->passes());
         $v->setData(['id' => 4]);
         $this->assertTrue($v->passes());
-
-        // array values
-        $v->setData(['id' => [1, 2]]);
-        $this->assertFalse($v->passes());
-        $v->setData(['id' => [3, 4]]);
-        $this->assertTrue($v->passes());
     }
 
     public function testItChoosesValidRecordsUsingWhereNotInAndWhereNotInRulesTogether()
@@ -176,7 +158,6 @@ class ValidationExistsRuleTest extends TestCase
         User::create(['id' => '2', 'type' => 'bar']);
         User::create(['id' => '3', 'type' => 'baz']);
         User::create(['id' => '4', 'type' => 'other']);
-        User::create(['id' => '5', 'type' => 'baz']);
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], ['id' => $rule]);
@@ -190,14 +171,6 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertTrue($v->passes());
         $v->setData(['id' => 4]);
         $this->assertFalse($v->passes());
-        $v->setData(['id' => 5]);
-        $this->assertTrue($v->passes());
-
-        // array values
-        $v->setData(['id' => [1, 2, 4]]);
-        $this->assertFalse($v->passes());
-        $v->setData(['id' => [3, 5]]);
-        $this->assertTrue($v->passes());
     }
 
     public function testItIgnoresSoftDeletes()

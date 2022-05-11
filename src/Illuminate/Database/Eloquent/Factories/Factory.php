@@ -76,7 +76,7 @@ abstract class Factory
     /**
      * The name of the database connection that will be used to create the models.
      *
-     * @var string|null
+     * @var string
      */
     protected $connection;
 
@@ -129,11 +129,11 @@ abstract class Factory
                                 $connection = null)
     {
         $this->count = $count;
-        $this->states = $states ?? new Collection;
-        $this->has = $has ?? new Collection;
-        $this->for = $for ?? new Collection;
-        $this->afterMaking = $afterMaking ?? new Collection;
-        $this->afterCreating = $afterCreating ?? new Collection;
+        $this->states = $states ?: new Collection;
+        $this->has = $has ?: new Collection;
+        $this->for = $for ?: new Collection;
+        $this->afterMaking = $afterMaking ?: new Collection;
+        $this->afterCreating = $afterCreating ?: new Collection;
         $this->connection = $connection;
         $this->faker = $this->withFaker();
     }
@@ -207,7 +207,7 @@ abstract class Factory
     }
 
     /**
-     * Create a single model and persist it to the database without dispatching any model events.
+     * Create a single model and persist it to the database.
      *
      * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $attributes
      * @return \Illuminate\Database\Eloquent\Model|TModel
@@ -233,7 +233,7 @@ abstract class Factory
     }
 
     /**
-     * Create a collection of models and persist them to the database without dispatching any model events.
+     * Create a collection of models and persist them to the database.
      *
      * @param  iterable<int, array<string, mixed>>  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model|TModel>
@@ -274,7 +274,7 @@ abstract class Factory
     }
 
     /**
-     * Create a collection of models and persist them to the database without dispatching any model events.
+     * Create a collection of models and persist them to the database.
      *
      * @param  array<string, mixed>  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
@@ -296,7 +296,9 @@ abstract class Factory
      */
     public function lazy(array $attributes = [], ?Model $parent = null)
     {
-        return fn () => $this->create($attributes, $parent);
+        return function () use ($attributes, $parent) {
+            return $this->create($attributes, $parent);
+        };
     }
 
     /**
@@ -447,34 +449,27 @@ abstract class Factory
      */
     protected function expandAttributes(array $definition)
     {
-        return collect($definition)
-            ->map($evaluateRelations = function ($attribute) {
-                if ($attribute instanceof self) {
-                    $attribute = $attribute->create()->getKey();
-                } elseif ($attribute instanceof Model) {
-                    $attribute = $attribute->getKey();
-                }
+        return collect($definition)->map(function ($attribute, $key) use (&$definition) {
+            if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
+                $attribute = $attribute($definition);
+            }
 
-                return $attribute;
-            })
-            ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
-                if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
-                    $attribute = $attribute($definition);
-                }
+            if ($attribute instanceof self) {
+                $attribute = $attribute->create()->getKey();
+            } elseif ($attribute instanceof Model) {
+                $attribute = $attribute->getKey();
+            }
 
-                $attribute = $evaluateRelations($attribute);
+            $definition[$key] = $attribute;
 
-                $definition[$key] = $attribute;
-
-                return $attribute;
-            })
-            ->all();
+            return $attribute;
+        })->all();
     }
 
     /**
      * Add a new state transformation to the model definition.
      *
-     * @param  (callable(array<string, mixed>, \Illuminate\Database\Eloquent\Model|null=): array<string, mixed>)|array<string, mixed>  $state
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $state
      * @return static
      */
     public function state($state)
@@ -489,18 +484,6 @@ abstract class Factory
     }
 
     /**
-     * Set a single model attribute.
-     *
-     * @param  string|int  $key
-     * @param  mixed  $value
-     * @return static
-     */
-    public function set($key, $value)
-    {
-        return $this->state([$key => $value]);
-    }
-
-    /**
      * Add a new sequenced state transformation to the model definition.
      *
      * @param  array  $sequence
@@ -509,17 +492,6 @@ abstract class Factory
     public function sequence(...$sequence)
     {
         return $this->state(new Sequence(...$sequence));
-    }
-
-    /**
-     * Add a new sequenced state transformation to the model definition and update the pending creation count to the size of the sequence.
-     *
-     * @param  array  $sequence
-     * @return static
-     */
-    public function forEachSequence(...$sequence)
-    {
-        return $this->state(new Sequence(...$sequence))->count(count($sequence));
     }
 
     /**
@@ -544,7 +516,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'has' => $this->has->concat([new Relationship(
-                $factory, $relationship ?? $this->guessRelationship($factory->modelName())
+                $factory, $relationship ?: $this->guessRelationship($factory->modelName())
             )]),
         ]);
     }
@@ -576,7 +548,7 @@ abstract class Factory
             'has' => $this->has->concat([new BelongsToManyRelationship(
                 $factory,
                 $pivot,
-                $relationship ?? Str::camel(Str::plural(class_basename(
+                $relationship ?: Str::camel(Str::plural(class_basename(
                     $factory instanceof Factory
                         ? $factory->modelName()
                         : Collection::wrap($factory)->first()
@@ -596,7 +568,7 @@ abstract class Factory
     {
         return $this->newInstance(['for' => $this->for->concat([new BelongsToRelationship(
             $factory,
-            $relationship ?? Str::camel(class_basename(
+            $relationship ?: Str::camel(class_basename(
                 $factory instanceof Factory ? $factory->modelName() : $factory
             ))
         )])]);
@@ -716,7 +688,7 @@ abstract class Factory
      */
     public function modelName()
     {
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
+        $resolver = static::$modelNameResolver ?: function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
                 'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
             );
@@ -730,13 +702,13 @@ abstract class Factory
                         : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?? $resolver($this);
+        return $this->model ?: $resolver($this);
     }
 
     /**
      * Specify the callback that should be invoked to guess model names based on factory names.
      *
-     * @param  callable(self): class-string<\Illuminate\Database\Eloquent\Model|TModel>  $callback
+     * @param  callable(): class-string<\Illuminate\Database\Eloquent\Model|TModel>  $callback
      * @return void
      */
     public static function guessModelNamesUsing(callable $callback)
@@ -771,7 +743,7 @@ abstract class Factory
     /**
      * Specify the callback that should be invoked to guess factory names based on dynamic relationship names.
      *
-     * @param  callable(class-string<\Illuminate\Database\Eloquent\Model>): class-string<\Illuminate\Database\Eloquent\Factories\Factory>  $callback
+     * @param  callable(): class-string<\Illuminate\Database\Eloquent\Model|TModel>  $callback
      * @return void
      */
     public static function guessFactoryNamesUsing(callable $callback)
@@ -797,7 +769,7 @@ abstract class Factory
      */
     public static function resolveFactoryName(string $modelName)
     {
-        $resolver = static::$factoryNameResolver ?? function (string $modelName) {
+        $resolver = static::$factoryNameResolver ?: function (string $modelName) {
             $appNamespace = static::appNamespace();
 
             $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
@@ -848,7 +820,7 @@ abstract class Factory
         $relatedModel = get_class($this->newModel()->{$relationship}()->getRelated());
 
         if (method_exists($relatedModel, 'newFactory')) {
-            $factory = $relatedModel::newFactory() ?? static::factoryForModel($relatedModel);
+            $factory = $relatedModel::newFactory() ?: static::factoryForModel($relatedModel);
         } else {
             $factory = static::factoryForModel($relatedModel);
         }

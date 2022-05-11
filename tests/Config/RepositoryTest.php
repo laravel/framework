@@ -24,7 +24,6 @@ class RepositoryTest extends TestCase
             'bar' => 'baz',
             'baz' => 'bat',
             'null' => null,
-            'boolean' => true,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',
@@ -36,30 +35,9 @@ class RepositoryTest extends TestCase
             'x' => [
                 'z' => 'zoo',
             ],
-            'a.b' => 'c',
-            'a' => [
-                'b.c' => 'd',
-            ],
         ]);
 
         parent::setUp();
-    }
-
-    public function testGetValueWhenKeyContainDot()
-    {
-        $this->assertSame(
-            $this->repository->get('a.b'), 'c'
-        );
-        $this->assertNull(
-            $this->repository->get('a.b.c')
-        );
-    }
-
-    public function testGetBooleanValue()
-    {
-        $this->assertTrue(
-            $this->repository->get('boolean')
-        );
     }
 
     public function testConstruct()

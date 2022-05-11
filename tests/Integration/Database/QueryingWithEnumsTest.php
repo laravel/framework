@@ -38,7 +38,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
         $this->assertNotNull($record);
         $this->assertNotNull($record2);
         $this->assertNotNull($record3);
-        $this->assertSame('pending', $record->string_status);
+        $this->assertEquals('pending', $record->string_status);
         $this->assertEquals(1, $record2->integer_status);
     }
 
@@ -52,7 +52,7 @@ class QueryingWithEnumsTest extends DatabaseTestCase
         $record = DB::table('enum_casts')->where('string_status', StringStatus::pending)->first();
 
         $this->assertNotNull($record);
-        $this->assertSame('pending', $record->string_status);
+        $this->assertEquals('pending', $record->string_status);
         $this->assertEquals(1, $record->integer_status);
     }
 }

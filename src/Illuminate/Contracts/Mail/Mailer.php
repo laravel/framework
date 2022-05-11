@@ -25,7 +25,7 @@ interface Mailer
      *
      * @param  string  $text
      * @param  mixed  $callback
-     * @return \Illuminate\Mail\SentMessage|null
+     * @return void
      */
     public function raw($text, $callback);
 
@@ -35,7 +35,7 @@ interface Mailer
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  array  $data
      * @param  \Closure|string|null  $callback
-     * @return \Illuminate\Mail\SentMessage|null
+     * @return void
      */
     public function send($view, array $data = [], $callback = null);
 }

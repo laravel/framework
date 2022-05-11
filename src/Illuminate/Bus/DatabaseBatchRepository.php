@@ -59,7 +59,9 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         return $this->connection->table($this->table)
                             ->orderByDesc('id')
                             ->take($limit)
-                            ->when($before, fn ($q) => $q->where('id', '<', $before))
+                            ->when($before, function ($q) use ($before) {
+                                return $q->where('id', '<', $before);
+                            })
                             ->get()
                             ->map(function ($batch) {
                                 return $this->toBatch($batch);
@@ -284,7 +286,9 @@ class DatabaseBatchRepository implements PrunableBatchRepository
      */
     public function transaction(Closure $callback)
     {
-        return $this->connection->transaction(fn () => $callback());
+        return $this->connection->transaction(function () use ($callback) {
+            return $callback();
+        });
     }
 
     /**

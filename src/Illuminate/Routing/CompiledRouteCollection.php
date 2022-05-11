@@ -252,7 +252,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
             })
             ->map(function (Collection $routes) {
                 return $routes->mapWithKeys(function (Route $route) {
-                    return [$route->getDomain().$route->uri => $route];
+                    if ($domain = $route->getDomain()) {
+                        return [$domain.'/'.$route->uri => $route];
+                    }
+
+                    return [$route->uri => $route];
                 })->all();
             })
             ->all();

@@ -127,7 +127,7 @@ trait Queueable
     }
 
     /**
-     * Set the desired delay in seconds for the job.
+     * Set the desired delay for the job.
      *
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return $this
@@ -187,32 +187,6 @@ trait Queueable
         $this->chained = collect($chain)->map(function ($job) {
             return $this->serializeJob($job);
         })->all();
-
-        return $this;
-    }
-
-    /**
-     * Prepend a job to the current chain so that it is run after the currently running job.
-     *
-     * @param  mixed  $job
-     * @return $this
-     */
-    public function prependToChain($job)
-    {
-        $this->chained = Arr::prepend($this->chained, $this->serializeJob($job));
-
-        return $this;
-    }
-
-    /**
-     * Append a job to the end of the current chain.
-     *
-     * @param  mixed  $job
-     * @return $this
-     */
-    public function appendToChain($job)
-    {
-        $this->chained = array_merge($this->chained, [$this->serializeJob($job)]);
 
         return $this;
     }

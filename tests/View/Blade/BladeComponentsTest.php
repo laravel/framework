@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
 use Mockery as m;
 
@@ -57,7 +56,7 @@ class BladeComponentsTest extends AbstractBladeTestCase
     {
         $attributes = new ComponentAttributeBag(['foo' => 'baz', 'other' => 'ok']);
 
-        $component = m::mock(Component::class);
+        $component = m::mock(\Illuminate\View\Component::class);
         $component->shouldReceive('withName', 'test');
         $component->shouldReceive('shouldRender')->andReturn(false);
 

@@ -12,8 +12,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
-use Mockery as m;
-use Mockery\MockInterface;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
@@ -44,7 +43,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         $this->schema()->create('users', function ($table) {
             $table->increments('id');
-            $table->integer('user_id')->nullable(); // circular reference to parent User
             $table->integer('group_id')->nullable();
             $table->string('email')->unique();
             $table->timestamps();
@@ -119,19 +117,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->createUsers();
 
         $query = SoftDeletesTestUser::query()->toBase();
-
-        $this->assertInstanceOf(Builder::class, $query);
-        $this->assertCount(1, $query->get());
-    }
-
-    public function testSoftDeletesAreNotRetrievedFromRelationshipBaseQuery()
-    {
-        [, $abigail] = $this->createUsers();
-
-        $abigail->posts()->create(['title' => 'Foo']);
-        $abigail->posts()->create(['title' => 'Bar'])->delete();
-
-        $query = $abigail->posts()->toBase();
 
         $this->assertInstanceOf(Builder::class, $query);
         $this->assertCount(1, $query->get());
@@ -227,7 +212,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
             public function newModelQuery()
             {
-                return m::spy(parent::newModelQuery(), function (MockInterface $mock) {
+                return Mockery::spy(parent::newModelQuery(), function (Mockery\MockInterface $mock) {
                     $mock->shouldReceive('forceDelete')->andThrow(new Exception());
                 });
             }
@@ -325,7 +310,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function testUpdateModelAfterSoftDeleting()
     {
-        Carbon::setTestNow($now = Carbon::now());
+        $now = Carbon::now();
         $this->createUsers();
 
         /** @var \Illuminate\Tests\Database\SoftDeletesTestUser $userModel */
@@ -879,33 +864,15 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertNull($comment->owner);
     }
 
-    public function testSelfReferencingRelationshipWithSoftDeletes()
-    {
-        /*
-         * https://github.com/laravel/framework/issues/42075
-         */
-        [$taylor, $abigail] = $this->createUsers();
-
-        $this->assertCount(1, $abigail->self_referencing);
-        $this->assertTrue($abigail->self_referencing->first()->is($taylor));
-
-        $this->assertCount(0, $taylor->self_referencing);
-        $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
-    }
-
     /**
      * Helpers...
-     *
-     * @return \Illuminate\Tests\Database\SoftDeletesTestUser[]
      */
     protected function createUsers()
     {
-        $taylor = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'user_id' => 2]);
-        $abigail = SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        $taylor = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $taylor->delete();
-
-        return [$taylor, $abigail];
     }
 
     /**
@@ -952,11 +919,6 @@ class SoftDeletesTestUser extends Eloquent
 
     protected $table = 'users';
     protected $guarded = [];
-
-    public function self_referencing()
-    {
-        return $this->hasMany(SoftDeletesTestUser::class, 'user_id')->onlyTrashed();
-    }
 
     public function posts()
     {

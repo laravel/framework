@@ -50,7 +50,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             ->orderBy('user_id', 'desc')
             ->cursorPaginate(1);
 
-        $this->assertSame(['user_id'], $result->getOptions()['parameters']);
+        self::assertSame(['user_id'], $result->getOptions()['parameters']);
     }
 
     public function testPaginationWithDistinct()

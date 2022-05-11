@@ -79,9 +79,9 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             return $route->isFallback;
         });
 
-        return $routes->merge($fallbacks)->first(
-            fn (Route $route) => $route->matches($request, $includingMethod)
-        );
+        return $routes->merge($fallbacks)->first(function (Route $route) use ($request, $includingMethod) {
+            return $route->matches($request, $includingMethod);
+        });
     }
 
     /**
@@ -212,7 +212,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
         }
 
         if (! $name) {
-            $route->name($this->generateRouteName());
+            $route->name($name = $this->generateRouteName());
 
             $this->add($route);
         } elseif (! is_null($symfonyRoutes->get($name))) {

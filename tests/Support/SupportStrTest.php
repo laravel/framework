@@ -242,21 +242,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('bar', Str::between('foobarbar', 'foo', 'bar'));
     }
 
-    public function testStrBetweenFirst()
-    {
-        $this->assertSame('abc', Str::betweenFirst('abc', '', 'c'));
-        $this->assertSame('abc', Str::betweenFirst('abc', 'a', ''));
-        $this->assertSame('abc', Str::betweenFirst('abc', '', ''));
-        $this->assertSame('b', Str::betweenFirst('abc', 'a', 'c'));
-        $this->assertSame('b', Str::betweenFirst('dddabc', 'a', 'c'));
-        $this->assertSame('b', Str::betweenFirst('abcddd', 'a', 'c'));
-        $this->assertSame('b', Str::betweenFirst('dddabcddd', 'a', 'c'));
-        $this->assertSame('nn', Str::betweenFirst('hannah', 'ha', 'ah'));
-        $this->assertSame('a', Str::betweenFirst('[a]ab[b]', '[', ']'));
-        $this->assertSame('foo', Str::betweenFirst('foofoobar', 'foo', 'bar'));
-        $this->assertSame('', Str::betweenFirst('foobarbar', 'foo', 'bar'));
-    }
-
     public function testStrAfter()
     {
         $this->assertSame('nah', Str::after('hannah', 'han'));
@@ -538,24 +523,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
     }
 
-    public function testSquish()
-    {
-        $this->assertSame('laravel php framework', Str::squish(' laravel   php  framework '));
-        $this->assertSame('laravel php framework', Str::squish("laravel\t\tphp\n\nframework"));
-        $this->assertSame('laravel php framework', Str::squish('
-            laravel
-            php
-            framework
-        '));
-        $this->assertSame('laravel php framework', Str::squish('   laravel   php   framework   '));
-        $this->assertSame('123', Str::squish('   123    '));
-        $this->assertSame('だ', Str::squish('だ'));
-        $this->assertSame('ム', Str::squish('ム'));
-        $this->assertSame('だ', Str::squish('   だ    '));
-        $this->assertSame('ム', Str::squish('   ム    '));
-        $this->assertSame('laravel php framework', Str::squish('laravelㅤㅤㅤphpㅤframework'));
-    }
-
     public function testStudly()
     {
         $this->assertSame('LaravelPHPFramework', Str::studly('laravel_p_h_p_framework'));
@@ -592,19 +559,6 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('这是一***', Str::mask('这是一段中文', '*', 3));
         $this->assertSame('**一段中文', Str::mask('这是一段中文', '*', 0, 2));
-
-        $this->assertSame('ma*n@email.com', Str::mask('maan@email.com', '*', 2, 1));
-        $this->assertSame('ma***email.com', Str::mask('maan@email.com', '*', 2, 3));
-        $this->assertSame('ma************', Str::mask('maan@email.com', '*', 2));
-
-        $this->assertSame('mari*@email.com', Str::mask('maria@email.com', '*', 4, 1));
-        $this->assertSame('tamar*@email.com', Str::mask('tamara@email.com', '*', 5, 1));
-
-        $this->assertSame('*aria@email.com', Str::mask('maria@email.com', '*', 0, 1));
-        $this->assertSame('maria@email.co*', Str::mask('maria@email.com', '*', -1, 1));
-        $this->assertSame('maria@email.co*', Str::mask('maria@email.com', '*', -1));
-        $this->assertSame('***************', Str::mask('maria@email.com', '*', -15));
-        $this->assertSame('***************', Str::mask('maria@email.com', '*', 0));
     }
 
     public function testMatch()
@@ -669,14 +623,6 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
-    public function testLcfirst()
-    {
-        $this->assertSame('laravel', Str::lcfirst('Laravel'));
-        $this->assertSame('laravel framework', Str::lcfirst('Laravel framework'));
-        $this->assertSame('мама', Str::lcfirst('Мама'));
-        $this->assertSame('мама мыла раму', Str::lcfirst('Мама мыла раму'));
-    }
-
     public function testUcfirst()
     {
         $this->assertSame('Laravel', Str::ucfirst('laravel'));
@@ -714,21 +660,18 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('__Alien___', Str::padBoth('Alien', 10, '_'));
         $this->assertSame('  Alien   ', Str::padBoth('Alien', 10));
-        $this->assertSame('  ❤MultiByte☆   ', Str::padBoth('❤MultiByte☆', 16));
     }
 
     public function testPadLeft()
     {
         $this->assertSame('-=-=-Alien', Str::padLeft('Alien', 10, '-='));
         $this->assertSame('     Alien', Str::padLeft('Alien', 10));
-        $this->assertSame('     ❤MultiByte☆', Str::padLeft('❤MultiByte☆', 16));
     }
 
     public function testPadRight()
     {
         $this->assertSame('Alien-----', Str::padRight('Alien', 10, '-'));
         $this->assertSame('Alien     ', Str::padRight('Alien', 10));
-        $this->assertSame('❤MultiByte☆     ', Str::padRight('❤MultiByte☆', 16));
     }
 
     public function testSwapKeywords(): void
@@ -753,15 +696,6 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals(2, Str::wordCount('Hello, world!'));
         $this->assertEquals(10, Str::wordCount('Hi, this is my first contribution to the Laravel framework.'));
-
-        $this->assertEquals(0, Str::wordCount('мама'));
-        $this->assertEquals(0, Str::wordCount('мама мыла раму'));
-
-        $this->assertEquals(1, Str::wordCount('мама', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-        $this->assertEquals(3, Str::wordCount('мама мыла раму', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-
-        $this->assertEquals(1, Str::wordCount('МАМА', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
-        $this->assertEquals(3, Str::wordCount('МАМА МЫЛА РАМУ', 'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'));
     }
 
     public function validUuidList()

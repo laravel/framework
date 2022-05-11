@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertExists(string|array $path)
- * @method static \Illuminate\Contracts\Filesystem\Filesystem assertDirectoryEmpty(string $path)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem assertMissing(string|array $path)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem cloud()
  * @method static \Illuminate\Contracts\Filesystem\Filesystem build(string|array $root)
@@ -71,9 +70,7 @@ class Storage extends Facade
             'root' => $root,
         ])));
 
-        return tap($fake)->buildTemporaryUrlsUsing(function ($path, $expiration) {
-            return URL::to($path.'?expiration='.$expiration->getTimestamp());
-        });
+        return $fake;
     }
 
     /**

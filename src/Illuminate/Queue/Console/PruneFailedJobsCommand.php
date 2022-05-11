@@ -5,9 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Failed\PrunableFailedJobProvider;
 use Illuminate\Support\Carbon;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:prune-failed')]
 class PruneFailedJobsCommand extends Command
 {
     /**
@@ -24,8 +22,6 @@ class PruneFailedJobsCommand extends Command
      * This name is used to identify the command during lazy loading.
      *
      * @var string|null
-     *
-     * @deprecated
      */
     protected static $defaultName = 'queue:prune-failed';
 
@@ -44,6 +40,8 @@ class PruneFailedJobsCommand extends Command
     public function handle()
     {
         $failer = $this->laravel['queue.failer'];
+
+        $count = 0;
 
         if ($failer instanceof PrunableFailedJobProvider) {
             $count = $failer->prune(Carbon::now()->subHours($this->option('hours')));

@@ -89,12 +89,17 @@ class B extends A
     }
 }
 
+if (PHP_MAJOR_VERSION >= 8) {
+    eval('
+namespace Illuminate\Tests\Support;
+
 class C
 {
     public function f(A|Model $x)
     {
         //
     }
+}');
 }
 
 class TestClassWithCall

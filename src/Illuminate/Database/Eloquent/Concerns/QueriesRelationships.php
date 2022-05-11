@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -13,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 
 trait QueriesRelationships
 {
@@ -449,35 +447,6 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a not morph-to relationship condition to the query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function whereNotMorphedTo($relation, $model, $boolean = 'and')
-    {
-        if (is_string($relation)) {
-            $relation = $this->getRelationWithoutConstraints($relation);
-        }
-
-        if (is_string($model)) {
-            $morphMap = Relation::morphMap();
-
-            if (! empty($morphMap) && in_array($model, $morphMap)) {
-                $model = array_search($model, $morphMap, true);
-            }
-
-            return $this->whereNot($relation->getMorphType(), $model, null, $boolean);
-        }
-
-        return $this->whereNot(function ($query) use ($relation, $model) {
-            $query->where($relation->getMorphType(), $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), $model->getKey());
-        }, null, null, $boolean);
-    }
-
-    /**
      * Add a morph-to relationship condition to the query with an "or where" clause.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
@@ -490,21 +459,9 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a not morph-to relationship condition to the query with an "or where" clause.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\MorphTo|string  $relation
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public function orWhereNotMorphedTo($relation, $model)
-    {
-        return $this->whereNotMorphedTo($relation, $model, 'or');
-    }
-
-    /**
      * Add a "belongs to" relationship where clause to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>  $related
+     * @param  \Illuminate\Database\Eloquent\Model  $related
      * @param  string|null  $relationshipName
      * @param  string  $boolean
      * @return $this
@@ -513,18 +470,6 @@ trait QueriesRelationships
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
-        if (! $related instanceof Collection) {
-            $relatedCollection = $related->newCollection([$related]);
-        } else {
-            $relatedCollection = $related;
-
-            $related = $relatedCollection->first();
-        }
-
-        if ($relatedCollection->isEmpty()) {
-            throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
-        }
-
         if ($relationshipName === null) {
             $relationshipName = Str::camel(class_basename($related));
         }
@@ -539,9 +484,10 @@ trait QueriesRelationships
             throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
         }
 
-        $this->whereIn(
+        $this->where(
             $relationship->getQualifiedForeignKeyName(),
-            $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray(),
+            '=',
+            $related->getAttributeValue($relationship->getOwnerKeyName()),
             $boolean,
         );
 
@@ -635,7 +581,7 @@ trait QueriesRelationships
             // Finally, we will make the proper column alias to the query and run this sub-select on
             // the query builder. Then, we will return the builder instance back to the developer
             // for further constraint chaining that needs to take place on the query as needed.
-            $alias ??= Str::snake(
+            $alias = $alias ?? Str::snake(
                 preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
             );
 
@@ -754,40 +700,14 @@ trait QueriesRelationships
     {
         $whereBindings = $from->getQuery()->getRawBindings()['where'] ?? [];
 
-        $wheres = $from->getQuery()->from !== $this->getQuery()->from
-            ? $this->requalifyWhereTables(
-                $from->getQuery()->wheres,
-                $from->getQuery()->from,
-                $this->getModel()->getTable()
-            ) : $from->getQuery()->wheres;
-
         // Here we have some other query that we want to merge the where constraints from. We will
         // copy over any where constraints on the query as well as remove any global scopes the
         // query might have removed. Then we will return ourselves with the finished merging.
         return $this->withoutGlobalScopes(
             $from->removedScopes()
         )->mergeWheres(
-            $wheres, $whereBindings
+            $from->getQuery()->wheres, $whereBindings
         );
-    }
-
-    /**
-     * Updates the table name for any columns with a new qualified name.
-     *
-     * @param  array  $wheres
-     * @param  string  $from
-     * @param  string  $to
-     * @return array
-     */
-    protected function requalifyWhereTables(array $wheres, string $from, string $to): array
-    {
-        return collect($wheres)->map(function ($where) use ($from, $to) {
-            return collect($where)->map(function ($value) use ($from, $to) {
-                return is_string($value) && str_starts_with($value, $from.'.')
-                    ? $to.'.'.Str::afterLast($value, '.')
-                    : $value;
-            });
-        })->toArray();
     }
 
     /**

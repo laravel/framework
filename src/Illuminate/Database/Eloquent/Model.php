@@ -384,10 +384,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling lazy loading violations.
      *
-     * @param  callable|null  $callback
+     * @param  callable  $callback
      * @return void
      */
-    public static function handleLazyLoadingViolationUsing(?callable $callback)
+    public static function handleLazyLoadingViolationUsing(callable $callback)
     {
         static::$lazyLoadingViolationCallback = $callback;
     }
@@ -493,7 +493,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
         // hydration of new objects via the Eloquent query builder instances.
-        $model = new static;
+        $model = new static((array) $attributes);
 
         $model->exists = $exists;
 
@@ -504,8 +504,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $model->setTable($this->getTable());
 
         $model->mergeCasts($this->casts);
-
-        $model->fill((array) $attributes);
 
         return $model;
     }
@@ -919,36 +917,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return $this->fill($attributes)->saveQuietly($options);
-    }
-
-    /**
-     * Increment a column's value by a given amount without raising any events.
-     *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
-     * @return int
-     */
-    protected function incrementQuietly($column, $amount = 1, array $extra = [])
-    {
-        return static::withoutEvents(function () use ($column, $amount, $extra) {
-            return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
-        });
-    }
-
-    /**
-     * Decrement a column's value by a given amount without raising any events.
-     *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
-     * @return int
-     */
-    protected function decrementQuietly($column, $amount = 1, array $extra = [])
-    {
-        return static::withoutEvents(function () use ($column, $amount, $extra) {
-            return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
-        });
     }
 
     /**
@@ -1529,7 +1497,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $json = json_encode($this->jsonSerialize(), $options);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             throw JsonEncodingException::forModel($this, json_last_error_msg());
         }
 
@@ -1539,9 +1507,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return mixed
+     * @return array
      */
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
@@ -1864,7 +1832,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             }
 
             if ($relation instanceof QueueableEntity) {
-                foreach ($relation->getQueueableRelations() as $entityValue) {
+                foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
                     $relations[] = $key.'.'.$entityValue;
                 }
             }

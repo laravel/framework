@@ -2,9 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Exception;
 use Illuminate\Validation\Rules\RequiredIf;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationRequiredIfTest extends TestCase
@@ -38,14 +36,14 @@ class ValidationRequiredIfTest extends TestCase
 
         $rule = new RequiredIf(true);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $rule = new RequiredIf('phpinfo');
     }
 
     public function testItReturnedRuleIsNotSerializable()
     {
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
 
         $rule = serialize(new RequiredIf(function () {
             return true;

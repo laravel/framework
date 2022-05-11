@@ -32,8 +32,6 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals(['surname' => 'Mövsümov'], Arr::add([], 'surname', 'Mövsümov'));
         $this->assertEquals(['developer' => ['name' => 'Ferid']], Arr::add([], 'developer.name', 'Ferid'));
-        $this->assertEquals([1 => 'hAz'], Arr::add([], 1, 'hAz'));
-        $this->assertEquals([1 => [1 => 'hAz']], Arr::add([], 1.1, 'hAz'));
     }
 
     public function testCollapse()
@@ -149,10 +147,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'taylor'], Arr::except($array, 'framework'));
         $this->assertEquals(['name' => 'taylor', 'framework' => ['name' => 'Laravel']], Arr::except($array, 'framework.language'));
         $this->assertEquals(['framework' => ['language' => 'PHP']], Arr::except($array, ['name', 'framework.name']));
-
-        $array = [1 => 'hAz', 2 => [5 => 'foo', 12 => 'baz']];
-        $this->assertEquals([1 => 'hAz'], Arr::except($array, 2));
-        $this->assertEquals([1 => 'hAz', 2 => [12 => 'baz']], Arr::except($array, 2.5));
     }
 
     public function testExists()
@@ -210,19 +204,6 @@ class SupportArrTest extends TestCase
         $this->assertNull($value2);
         $this->assertSame('bar', $value3);
         $this->assertSame('baz', $value4);
-    }
-
-    public function testJoin()
-    {
-        $this->assertSame('a, b, c', Arr::join(['a', 'b', 'c'], ', '));
-
-        $this->assertSame('a, b and c', Arr::join(['a', 'b', 'c'], ', ', ' and '));
-
-        $this->assertSame('a and b', Arr::join(['a', 'b'], ', ', ' and '));
-
-        $this->assertSame('a', Arr::join(['a'], ', ', ' and '));
-
-        $this->assertSame('', Arr::join([], ', ', ' and '));
     }
 
     public function testLast()
@@ -779,9 +760,6 @@ class SupportArrTest extends TestCase
         $array = ['products' => 'table'];
         Arr::set($array, 'products.desk.price', 300);
         $this->assertSame(['products' => ['desk' => ['price' => 300]]], $array);
-
-        $array = [1 => 'test'];
-        $this->assertEquals([1 => 'hAz'], Arr::set($array, 1, 'hAz'));
     }
 
     public function testShuffleWithSeed()
@@ -883,7 +861,7 @@ class SupportArrTest extends TestCase
             'mt-4',
         ]);
 
-        $this->assertSame('font-bold mt-4', $classes);
+        $this->assertEquals('font-bold mt-4', $classes);
 
         $classes = Arr::toCssClasses([
             'font-bold',
@@ -892,7 +870,7 @@ class SupportArrTest extends TestCase
             'mr-2' => false,
         ]);
 
-        $this->assertSame('font-bold mt-4 ml-2', $classes);
+        $this->assertEquals('font-bold mt-4 ml-2', $classes);
     }
 
     public function testWhere()
@@ -964,14 +942,6 @@ class SupportArrTest extends TestCase
         $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
         Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
-
-        $array = ['name' => 'hAz', '1' => 'test', 2 => 'bAz'];
-        Arr::forget($array, 1);
-        $this->assertEquals(['name' => 'hAz', 2 => 'bAz'], $array);
-
-        $array = [2 => [1 =>'products', 3 => 'users']];
-        Arr::forget($array, 2.3);
-        $this->assertEquals([2 => [1 =>'products']], $array);
     }
 
     public function testWrap()
@@ -1050,20 +1020,5 @@ class SupportArrTest extends TestCase
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 2]],
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
         ], $sortedWithCallable);
-    }
-
-    public function testKeyBy()
-    {
-        $array = [
-            ['id' => '123', 'data' => 'abc'],
-            ['id' => '345', 'data' => 'def'],
-            ['id' => '498', 'data' => 'hgi'],
-        ];
-
-        $this->assertEquals([
-            '123' => ['id' => '123', 'data' => 'abc'],
-            '345' => ['id' => '345', 'data' => 'def'],
-            '498' => ['id' => '498', 'data' => 'hgi'],
-        ], Arr::keyBy($array, 'id'));
     }
 }

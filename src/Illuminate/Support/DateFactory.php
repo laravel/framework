@@ -211,7 +211,7 @@ class DateFactory
 
         $dateClass = static::$dateClass ?: $defaultClassName;
 
-        // Check if the date can be created using the public class method...
+        // Check if date can be created using public class method...
         if (method_exists($dateClass, $method) ||
             method_exists($dateClass, 'hasMacro') && $dateClass::hasMacro($method)) {
             return $dateClass::$method(...$parameters);

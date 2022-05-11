@@ -182,7 +182,7 @@ class CacheEventsTest extends TestCase
             }
 
             foreach ($properties as $name => $value) {
-                if ($value != $event->$name) {
+                if ($event->$name != $value) {
                     return false;
                 }
             }
