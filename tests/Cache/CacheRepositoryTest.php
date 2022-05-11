@@ -220,6 +220,7 @@ class CacheRepositoryTest extends TestCase
 
         $result = $repo->upsert('foo', function ($item) {
             $this->assertSame('bar', $item);
+
             return ($item ?? 'quz').'.baz';
         });
 
