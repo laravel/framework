@@ -239,9 +239,26 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function upsert($key, Closure $callback, $ttl = null)
     {
-        return tap($callback($this->get($key)), function ($result) use ($key, $ttl) {
-            if (!is_null($result)) {
-                $this->put($key, $result, $ttl);
+        $expire = new class($ttl) {
+            public function __construct(public $at)
+            {
+                //
+            }
+
+            public function never()
+            {
+                $this->at = null;
+            }
+
+            public function now()
+            {
+                $this->at = 0;
+            }
+        };
+
+        return tap($callback($this->get($key), $expire), function ($result) use ($key, $expire) {
+            if (! is_null($result)) {
+                $this->put($key, $result, $expire->at);
             }
         });
     }

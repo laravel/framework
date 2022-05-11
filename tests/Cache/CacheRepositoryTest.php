@@ -240,6 +240,45 @@ class CacheRepositoryTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function testUpsertUsesComputedTtl()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 90);
+
+        $repo->upsert('foo', function ($item, $expire) {
+            $expire->at = 90;
+
+            return ($item ?? 'quz') . '.baz';
+        });
+    }
+
+    public function testUpsertUsesNeverTtl()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
+
+        $repo->upsert('foo', function ($item, $expire) {
+            $expire->never();
+
+            return ($item ?? 'quz') . '.baz';
+        });
+    }
+
+    public function testUpsertDeletesItemFromInside()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forget')->with('foo');
+
+        $repo->upsert('foo', function ($item, $expire) {
+            $expire->now();
+
+            return ($item ?? 'quz') . '.baz';
+        });
+    }
+
     public function testPutManyWithNullTTLRemembersItemsForever()
     {
         $repo = $this->getRepository();
