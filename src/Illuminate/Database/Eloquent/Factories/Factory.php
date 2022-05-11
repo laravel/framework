@@ -448,21 +448,21 @@ abstract class Factory
     protected function expandAttributes(array $definition)
     {
         return collect($definition)
-            ->map(function ($attribute, $key) {
+            ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
                     $attribute = $attribute->create()->getKey();
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
 
-                $definition[$key] = $attribute;
-
                 return $attribute;
             })
-            ->map(function ($attribute, $key) use (&$definition) {
+            ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
                 if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
                     $attribute = $attribute($definition);
                 }
+
+                $attribute = $evaluateRelations($attribute);
 
                 $definition[$key] = $attribute;
 
