@@ -10,12 +10,15 @@ use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+use function func_get_arg;
+use function is_array;
 
 /**
  * @mixin \Illuminate\Contracts\Cache\Store
@@ -230,38 +233,14 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Updates an existing item on the cache, refreshing its expiration time.
+     * Starts an upsert operation for the given item key.
      *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
-     * @return mixed
+     * @return \Illuminate\Cache\UpsertOperation
      */
-    public function upsert($key, Closure $callback, $ttl = null)
+    public function of($key)
     {
-        $expire = new class($ttl)
-        {
-            public function __construct(public $at)
-            {
-                //
-            }
-
-            public function never()
-            {
-                $this->at = null;
-            }
-
-            public function now()
-            {
-                $this->at = 0;
-            }
-        };
-
-        return tap($callback($this->get($key), $expire), function ($result) use ($key, $expire) {
-            if (! is_null($result)) {
-                $this->put($key, $result, $expire->at);
-            }
-        });
+        return new UpsertOperation($this, $key);
     }
 
     /**

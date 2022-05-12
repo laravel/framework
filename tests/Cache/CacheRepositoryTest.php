@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use ArrayIterator;
 use BadMethodCallException;
+use Closure;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -13,7 +14,10 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Cache\TaggedCache;
+use Illuminate\Cache\UpsertOperation;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
@@ -192,7 +196,7 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
 
-        $result = $repo->upsert('foo', function ($item) {
+        $result = $repo->of('foo')->upsert(function ($item) {
             return $item.'bar';
         });
 
@@ -205,9 +209,11 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->with('foo', 'bar', 60);
 
-        $result = $repo->upsert('foo', function ($item) {
+        $result = $repo->of('foo')->upsert(function ($item, $expire) {
+            $expire->at = 60;
+
             return $item.'bar';
-        }, 60);
+        });
 
         $this->assertSame('bar', $result);
     }
@@ -218,7 +224,7 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $result = $repo->upsert('foo', function ($item) {
+        $result = $repo->of('foo')->upsert(function ($item) {
             $this->assertSame('bar', $item);
 
             return ($item ?? 'quz').'.baz';
@@ -234,7 +240,7 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('put')->never();
         $repo->getStore()->shouldReceive('forever')->never();
 
-        $result = $repo->upsert('foo', function () {
+        $result = $repo->of('foo')->upsert(function () {
             return null;
         });
 
@@ -247,8 +253,8 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 90);
 
-        $repo->upsert('foo', function ($item, $expire) {
-            $expire->at = 90;
+        $repo->of('foo')->upsert(function ($item, $expire) {
+            $expire->at(90);
 
             return ($item ?? 'quz').'.baz';
         });
@@ -260,7 +266,7 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $repo->upsert('foo', function ($item, $expire) {
+        $repo->of('foo')->upsert(function ($item, $expire) {
             $expire->never();
 
             return ($item ?? 'quz').'.baz';
@@ -273,11 +279,36 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forget')->with('foo');
 
-        $repo->upsert('foo', function ($item, $expire) {
+        $repo->of('foo')->upsert(function ($item, $expire) {
             $expire->now();
 
             return ($item ?? 'quz').'.baz';
         });
+    }
+
+    public function testUpsertUsesLockIfStoreSupportsIt()
+    {
+        $repo = new Repository(m::mock(Store::class, LockProvider::class));
+
+        $lock = m::mock(Lock::class);
+
+        $lock->shouldReceive('block')
+            ->with(15, m::type(Closure::class))
+            ->andReturnUsing(function ($lock, $callback) {
+                return $callback();
+            });
+
+        $repo->getStore()->shouldReceive('lock')->with('foo:laravel-upsert', 15, null)
+            ->andReturn($lock);
+
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
+
+        $result = $repo->of('foo')->upsert(function () {
+            return 'bar.baz';
+        });
+
+        $this->assertSame('bar.baz', $result);
     }
 
     public function testPutManyWithNullTTLRemembersItemsForever()
