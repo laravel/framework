@@ -784,7 +784,7 @@ trait ValidatesAttributes
         // that the columns being "verified" shares the given attribute's name.
         $column = $this->getQueryColumn($parameters, $attribute);
 
-        $expected = is_array($value) ? count(array_unique($value)) : 1;
+        $expected = is_array($value) ? count(array_unique($value, 3)) : 1;
 
         if (is_array($value)) {
             // Extract only keys from $values if it is an array of objects
