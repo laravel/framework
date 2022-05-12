@@ -154,7 +154,7 @@ class HttpClientTest extends TestCase
 
     public function testSendRequestBodyWithManyAmpersands()
     {
-        $body = str_repeat('A thousand &. ', 10000);
+        $body = str_repeat('A thousand &. ', 1000);
 
         $fakeRequest = function (Request $request) use ($body) {
             self::assertSame($body, $request->body());
