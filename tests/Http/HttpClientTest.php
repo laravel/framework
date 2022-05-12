@@ -152,6 +152,21 @@ class HttpClientTest extends TestCase
         $this->factory->withBody($body, 'application/json')->send('get', 'http://foo.com/api');
     }
 
+    public function testSendRequestBodyWithManyAmpersands()
+    {
+        $body = str_repeat('A thousand &. ', 1000);
+
+        $fakeRequest = function (Request $request) use ($body) {
+            self::assertSame($body, $request->body());
+
+            return ['my' => 'response'];
+        };
+
+        $this->factory->fake($fakeRequest);
+
+        $this->factory->withBody($body, 'text/plain')->send('post', 'http://foo.com/api');
+    }
+
     public function testUrlsCanBeStubbedByPath()
     {
         $this->factory->fake([
