@@ -3,6 +3,13 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static \Illuminate\Routing\Route index($name, $controller)
+ * @method static \Illuminate\Routing\Route store($name, $controller)
+ * @method static \Illuminate\Routing\Route create($name, $controller)
+ * @method static \Illuminate\Routing\Route show($name, $controller)
+ * @method static \Illuminate\Routing\Route update($name, $controller)
+ * @method static \Illuminate\Routing\Route destroy($name, $controller)
+ * @method static \Illuminate\Routing\Route edit($name, $controller)
  * @method static \Illuminate\Routing\PendingResourceRegistration apiResource(string $name, string $controller, array $options = [])
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = [])
  * @method static \Illuminate\Routing\Route any(string $uri, array|string|callable|null $action = null)
