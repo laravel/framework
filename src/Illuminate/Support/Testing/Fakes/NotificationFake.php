@@ -213,7 +213,7 @@ class NotificationFake implements NotificationDispatcher, NotificationFactory
      */
     public function assertCount($expectedCount)
     {
-        $actualCount = count($this->notifications);
+        $actualCount = collect($this->notifications)->flatten(3)->count();
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
