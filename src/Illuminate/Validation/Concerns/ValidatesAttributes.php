@@ -786,9 +786,33 @@ trait ValidatesAttributes
 
         $expected = is_array($value) ? count(array_unique($value)) : 1;
 
+        if (is_array($value)) {
+            // Extract only keys from $values if it is an array of objects
+            $value = $this->extractExistsValues($value, $column);
+        }
+
         return $this->getExistCount(
             $connection, $table, $column, $value, $parameters
         ) >= $expected;
+    }
+
+    /**
+     * Get only keys for the given values.
+     *
+     * @param array $values
+     * @param $column
+     * @return array
+     */
+    private function extractExistsValues(array $values, $column): array
+    {
+        // Extract only keys from $values if it is an array of objects
+        return array_map(function ($value) use ($column) {
+            if (is_array($value) && Arr::isAssoc($value)) {
+                return $value[$column];
+            }
+
+            return $value;
+        }, $values);
     }
 
     /**
