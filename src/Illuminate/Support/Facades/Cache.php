@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed pull(string $key, mixed $default = null)
  * @method static mixed remember(string $key, \DateTimeInterface|\DateInterval|int $ttl, \Closure $callback)
  * @method static mixed rememberForever(string $key, \Closure $callback)
- * @method static \Illuminate\Cache\UpsertOperation of(string $key)
+ * @method static \Illuminate\Cache\GetSetOperation getset(string $key)
  * @method static mixed sear(string $key, \Closure $callback)
  *
  * @see \Illuminate\Cache\CacheManager

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Cache\Repository;
 /**
  * @template TValue
  */
-class UpsertOperation
+class GetSetOperation
 {
     /**
      * The cache repository to use for upserting.
@@ -53,15 +53,24 @@ class UpsertOperation
     protected $callback;
 
     /**
+     * Lifetime of the key.
+     *
+     * @var \DateTimeInterface|\DateInterval|int|null  $ttl
+     */
+    protected $ttl;
+
+    /**
      * Create a new upsert operation instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $repository
      * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      */
-    public function __construct(Repository $repository, string $key)
+    public function __construct(Repository $repository, string $key, $ttl)
     {
         $this->cache = $repository;
         $this->key = $key;
+        $this->ttl = $ttl;
     }
 
     /**
@@ -78,7 +87,7 @@ class UpsertOperation
     }
 
     /**
-     * Sets the amount of time to wait for the lock.
+     * Sets the amount of time to wait for the lock when it cannot be acquired.
      *
      * @param  int  $wait
      * @return $this
@@ -109,7 +118,7 @@ class UpsertOperation
      * @param  callable<TValue|mixed>  $callback
      * @return TValue|mixed
      */
-    public function upsert(callable $callback)
+    public function push(callable $callback)
     {
         $this->callback = $callback;
 
@@ -146,7 +155,7 @@ class UpsertOperation
         $result = ($this->callback)($this->cache->get($this->key), $expire);
 
         return tap($result, function ($result) use ($expire) {
-            if (!is_null($result)) {
+            if (!is_null($result) && $expire->at !== 0) {
                 $this->cache->put($this->key, $result, $expire->at);
             }
         });
@@ -159,7 +168,7 @@ class UpsertOperation
      */
     protected function expireObject()
     {
-        return new class(null)
+        return new class($this->ttl)
         {
             public function __construct(public $at)
             {

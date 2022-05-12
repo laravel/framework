@@ -14,7 +14,7 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Cache\TaggedCache;
-use Illuminate\Cache\UpsertOperation;
+use Illuminate\Cache\GetSetOperation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
@@ -190,41 +190,97 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testUpsertPutsNonExistingItemForever()
+    public function testGetSetPutsNonExistingItemForever()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
 
-        $result = $repo->of('foo')->upsert(function ($item) {
+        $result = $repo->getSet('foo', function ($item) {
             return $item.'bar';
         });
 
         $this->assertSame('bar', $result);
     }
 
-    public function testUpsertPutsNonExistingItemWithTtl()
+    public function testGetSetUsesCustomTtl()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 90);
+
+        $repo->getSet('foo', function ($item, $expire) {
+            $this->assertSame(90, $expire->at);
+
+            return ($item ?? 'quz').'.baz';
+        }, 90);
+    }
+
+    public function testGetSetUsesComputedTtl()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->with('foo', 'bar', 60);
 
-        $result = $repo->of('foo')->upsert(function ($item, $expire) {
+        $result = $repo->getSet('foo', function ($item, $expire) {
             $expire->at = 60;
 
             return $item.'bar';
-        });
+        }, 90);
 
         $this->assertSame('bar', $result);
     }
 
-    public function testUpsertUpdatesExistingItem()
+    public function testGetSetUsesComputedNeverTtl()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
+
+        $repo->getSet('foo')->push(function ($item, $expire) {
+            $expire->never();
+
+            return $item.'bar';
+        });
+    }
+
+    public function testGetSetUsesComputedNowTtlRemovesItFromCacheStore()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forget')->with('foo')->andReturnTrue();
+        $repo->getStore()->shouldNotReceive('put');
+        $repo->getStore()->shouldNotReceive('forever');
+
+        $repo->getSet('foo', function ($item, $expire) {
+            $expire->now();
+
+            return $item.'bar';
+        });
+    }
+
+    public function testGetSetUsesComputedNowTtlDoesntRemovesNonExistingItemFromCache()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldNotReceive('forget');
+        $repo->getStore()->shouldNotReceive('put');
+        $repo->getStore()->shouldNotReceive('forever');
+
+        $repo->getSet('foo')->push(function ($item, $expire) {
+            $expire->now();
+
+            return $item.'bar';
+        });
+    }
+
+    public function testGetSetUpdatesExistingItem()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $result = $repo->of('foo')->upsert(function ($item) {
+        $result = $repo->getSet('foo', function ($item) {
             $this->assertSame('bar', $item);
 
             return ($item ?? 'quz').'.baz';
@@ -233,60 +289,21 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar.baz', $result);
     }
 
-    public function testUpsertDoesntInsertsOrUpdatesIfCallbackReturnsNull()
+    public function testGetSetDoesntInsertsOrUpdatesIfCallbackReturnsNull()
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('put')->never();
-        $repo->getStore()->shouldReceive('forever')->never();
+        $repo->getStore()->shouldNotReceive('put');
+        $repo->getStore()->shouldNotReceive('forever');
 
-        $result = $repo->of('foo')->upsert(function () {
+        $result = $repo->getSet('foo', function () {
             return null;
         });
 
         $this->assertNull($result);
     }
 
-    public function testUpsertUsesComputedTtl()
-    {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 90);
-
-        $repo->of('foo')->upsert(function ($item, $expire) {
-            $expire->at(90);
-
-            return ($item ?? 'quz').'.baz';
-        });
-    }
-
-    public function testUpsertUsesNeverTtl()
-    {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
-
-        $repo->of('foo')->upsert(function ($item, $expire) {
-            $expire->never();
-
-            return ($item ?? 'quz').'.baz';
-        });
-    }
-
-    public function testUpsertDeletesItemFromInside()
-    {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forget')->with('foo');
-
-        $repo->of('foo')->upsert(function ($item, $expire) {
-            $expire->now();
-
-            return ($item ?? 'quz').'.baz';
-        });
-    }
-
-    public function testUpsertUsesLockIfStoreSupportsIt()
+    public function testGetSetUsesLockIfStoreSupportsIt()
     {
         $repo = new Repository(m::mock(Store::class, LockProvider::class));
 
@@ -298,15 +315,40 @@ class CacheRepositoryTest extends TestCase
                 return $callback();
             });
 
-        $repo->getStore()->shouldReceive('lock')->with('foo:laravel-upsert', 15, null)
-            ->andReturn($lock);
-
+        $repo->getStore()->shouldReceive('lock')->with('foo:laravel-upsert', 15, null)->andReturn($lock);
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $result = $repo->of('foo')->upsert(function () {
+        $result = $repo->getSet('foo', function () {
             return 'bar.baz';
         });
+
+        $this->assertSame('bar.baz', $result);
+    }
+
+    public function testGetSetUsesLockConfig()
+    {
+        $repo = new Repository(m::mock(Store::class, LockProvider::class));
+
+        $lock = m::mock(Lock::class);
+
+        $lock->shouldReceive('block')
+            ->with(20, m::type(Closure::class))
+            ->andReturnUsing(function ($lock, $callback) {
+                return $callback();
+            });
+
+        $repo->getStore()->shouldReceive('lock')->with('foo:laravel-upsert', 30, 'test_owner')->andReturn($lock);
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 50);
+
+        $result = $repo->getSet('foo', null, 50)->lockBy(30)
+            ->waitFor(20)
+            ->ownedBy('test_owner')
+            ->push(function ($item, $expire) {
+                $this->assertSame(50, $expire->at);
+                return 'bar.baz';
+            });
 
         $this->assertSame('bar.baz', $result);
     }

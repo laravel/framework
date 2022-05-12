@@ -230,14 +230,18 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Starts an upsert operation for the given item key.
+     * Retrieves an item temporarily and updates it, refreshing its lifetime.
      *
      * @param  string  $key
-     * @return \Illuminate\Cache\UpsertOperation
+     * @param  \Closure|null  $callback
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return \Illuminate\Cache\GetSetOperation|mixed
      */
-    public function of($key)
+    public function getSet($key, $callback = null, $ttl = null)
     {
-        return new UpsertOperation($this, $key);
+        $operation = new GetSetOperation($this, $key, $ttl);
+
+        return $callback ? $operation->push($callback) : $operation;
     }
 
     /**
