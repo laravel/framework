@@ -16,6 +16,7 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -1582,6 +1583,46 @@ class TestResponseTest extends TestCase
             json_decode($response->getContent(), true),
             $response->json()
         );
+    }
+
+    /**
+     * @group 1
+     */
+    public function testResponseCanBeReturnedAsCollection()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->assertInstanceOf(Collection::class, $response->collect());
+        $this->assertEquals(collect([
+            'foo' => 'bar',
+            'foobar' => [
+                'foobar_foo' => 'foo',
+                'foobar_bar' => 'bar',
+            ],
+            '0' => ['foo'],
+            'bars' => [
+                ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+            'baz' => [
+                ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
+                ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
+            ],
+            'barfoo' => [
+                ['bar' => ['bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0', 'foo' => 'foo 0']],
+                ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+            ],
+            'numeric_keys' => [
+                2 => ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+        ]), $response->collect());
+        $this->assertEquals(collect(['foobar_foo' => 'foo', 'foobar_bar' => 'bar']), $response->collect('foobar'));
+        $this->assertEquals(collect(['bar']), $response->collect('foobar.foobar_bar'));
+        $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
     public function testItCanBeTapped()
