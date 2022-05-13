@@ -337,17 +337,13 @@ class CacheRepositoryTest extends TestCase
                 return $callback();
             });
 
-        $repo->getStore()->shouldReceive('lock')->with('foo:laravel_get_set', 30, 'test_owner')->andReturn($lock);
+        $repo->getStore()->shouldReceive('lock')->with('test_lock', 20, 'test_owner')->andReturn($lock);
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 50);
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $result = $repo->getSet('foo', null, 50)->lockBy(30)
-            ->waitFor(20)
-            ->ownedBy('test_owner')
-            ->push(function ($item, $expire) {
-                $this->assertSame(50, $expire->at);
-
-                return 'bar.baz';
+        $result = $repo->getSet('foo')->lock('test_lock', 20, 'test_owner')
+            ->push(function ($item) {
+                return $item . '.baz';
             });
 
         $this->assertSame('bar.baz', $result);

@@ -29,7 +29,7 @@ class GetSetOperation
      *
      * @var int
      */
-    protected $lock = 15;
+    protected $seconds = 15;
 
     /**
      * How much time to wait for the lock to release.
@@ -60,6 +60,13 @@ class GetSetOperation
     protected $ttl;
 
     /**
+     * The name of the lock. Defaults to key + ":laravel_get_set".
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * Create a new upsert operation instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $repository
@@ -71,17 +78,21 @@ class GetSetOperation
         $this->cache = $repository;
         $this->key = $key;
         $this->ttl = $ttl;
+
+        $this->name = $this->key.':laravel_get_set';
     }
 
     /**
-     * Locks the key for a given amount of time.
+     * Changes cache lock configuration.
      *
-     * @param  int  $lock
+     * @param  string  $name
+     * @param  int|null  $seconds
+     * @param  string|null  $owner
      * @return $this
      */
-    public function lockBy($lock)
+    public function lock($name, $seconds = null, $owner = null)
     {
-        $this->lock = $lock;
+        [$this->name, $this->seconds, $this->owner] = [$name, $seconds ?? $this->seconds, $owner ?? $this->owner];
 
         return $this;
     }
@@ -89,25 +100,12 @@ class GetSetOperation
     /**
      * Sets the amount of time to wait for the lock when it cannot be acquired.
      *
-     * @param  int  $wait
+     * @param  int  $seconds
      * @return $this
      */
-    public function waitFor($wait)
+    public function waitFor($seconds)
     {
-        $this->wait = $wait;
-
-        return $this;
-    }
-
-    /**
-     * Sets the owner of the upsert lock.
-     *
-     * @param  string  $owner
-     * @return $this
-     */
-    public function ownedBy($owner)
-    {
-        $this->owner = $owner;
+        $this->wait = $seconds;
 
         return $this;
     }
@@ -136,9 +134,9 @@ class GetSetOperation
      */
     protected function putWithLock()
     {
-        $lock = $this->cache->getStore()->lock($this->key.':laravel_get_set', $this->lock, $this->owner);
+        $lock = $this->cache->getStore()->lock($this->name, $this->seconds, $this->owner);
 
-        return $lock->block($this->wait ?? $this->lock, function () {
+        return $lock->block($this->wait ?? $this->seconds, function () {
             return $this->put();
         });
     }
