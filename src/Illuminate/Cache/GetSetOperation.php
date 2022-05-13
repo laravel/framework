@@ -36,7 +36,7 @@ class GetSetOperation
      *
      * @var int
      */
-    protected $wait;
+    protected $wait = 15;
 
     /**
      * The owner of the lock.
@@ -134,11 +134,11 @@ class GetSetOperation
      */
     protected function putWithLock()
     {
-        $lock = $this->cache->getStore()->lock($this->name, $this->seconds, $this->owner);
-
-        return $lock->block($this->wait ?? $this->seconds, function () {
-            return $this->put();
-        });
+        return $this->cache->getStore()
+            ->lock($this->name, $this->seconds, $this->owner)
+            ->block($this->wait, function () {
+                return $this->put();
+            });
     }
 
     /**

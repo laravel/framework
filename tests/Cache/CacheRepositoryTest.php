@@ -332,7 +332,7 @@ class CacheRepositoryTest extends TestCase
         $lock = m::mock(Lock::class);
 
         $lock->shouldReceive('block')
-            ->with(20, m::type(Closure::class))
+            ->with(30, m::type(Closure::class))
             ->andReturnUsing(function ($lock, $callback) {
                 return $callback();
             });
@@ -341,7 +341,9 @@ class CacheRepositoryTest extends TestCase
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $result = $repo->getSet('foo')->lock('test_lock', 20, 'test_owner')
+        $result = $repo->getSet('foo')
+            ->lock('test_lock', 20, 'test_owner')
+            ->waitFor(30)
             ->push(function ($item) {
                 return $item . '.baz';
             });
