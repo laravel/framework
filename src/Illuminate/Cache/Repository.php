@@ -10,6 +10,7 @@ use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -230,21 +231,6 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Retrieves an item temporarily and updates it, refreshing its lifetime.
-     *
-     * @param  string  $key
-     * @param  \Closure|null  $callback
-     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
-     * @return \Illuminate\Cache\GetSetOperation|mixed
-     */
-    public function getSet($key, $callback = null, $ttl = null)
-    {
-        $operation = new GetSetOperation($this, $key, $ttl);
-
-        return $callback ? $operation->push($callback) : $operation;
-    }
-
-    /**
      * Store multiple items in the cache for a given number of seconds.
      *
      * @param  array  $values
@@ -441,6 +427,25 @@ class Repository implements ArrayAccess, CacheContract
         $this->forever($key, $value = $callback());
 
         return $value;
+    }
+
+    /**
+     * Retrieves an item temporarily and updates it, refreshing its lifetime.
+     *
+     * @param  string  $key
+     * @param  \Closure|null  $callback
+     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return \Illuminate\Cache\RefreshOperation|mixed
+     */
+    public function refresh($key, $callback = null, $ttl = null)
+    {
+        if (!$this->store instanceof LockProvider) {
+            throw new BadMethodCallException('This cache store does not support atomic locks.');
+        }
+
+        $operation = new RefreshOperation($this, $key, $ttl);
+
+        return $callback ? $operation->put($callback) : $operation;
     }
 
     /**

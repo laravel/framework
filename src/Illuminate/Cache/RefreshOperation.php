@@ -2,18 +2,17 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
 
 /**
  * @template TValue
  */
-class GetSetOperation
+class RefreshOperation
 {
     /**
-     * The cache repository to use for get-set.
+     * The cache repository to use to refresh the item.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Repository|\Illuminate\Contracts\Cache\LockProvider
      */
     protected $cache;
 
@@ -25,35 +24,14 @@ class GetSetOperation
     protected $key;
 
     /**
-     * Seconds to hold the lock and release it.
+     * Seconds to hold the lock and release it, if any.
      *
      * @var int
      */
     protected $seconds = 0;
 
     /**
-     * How much time to wait for the lock to release.
-     *
-     * @var int
-     */
-    protected $wait = 10;
-
-    /**
-     * The owner of the lock, if any.
-     *
-     * @var string|null
-     */
-    protected $owner;
-
-    /**
-     * The upsert operation.
-     *
-     * @var callable
-     */
-    protected $callback;
-
-    /**
-     * Lifetime of the key.
+     * Lifetime of the item.
      *
      * @var \DateTimeInterface|\DateInterval|int|null
      */
@@ -67,7 +45,28 @@ class GetSetOperation
     protected $name;
 
     /**
-     * Create a new upsert operation instance.
+     * The owner of the lock, if any.
+     *
+     * @var string|null
+     */
+    protected $owner;
+
+    /**
+     * How much time to wait for the lock to release.
+     *
+     * @var int
+     */
+    protected $wait = 10;
+
+    /**
+     * The refresh operation.
+     *
+     * @var callable
+     */
+    protected $callback;
+
+    /**
+     * Create a new refresh operation instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $repository
      * @param  string  $key
@@ -79,7 +78,7 @@ class GetSetOperation
         $this->key = $key;
         $this->ttl = $ttl;
 
-        $this->name = $this->key.':laravel_get_set';
+        $this->name = $this->key.':refresh';
     }
 
     /**
@@ -98,7 +97,7 @@ class GetSetOperation
     }
 
     /**
-     * Sets the amount of time to wait for the lock when it cannot be acquired.
+     * Sets the seconds to wait to acquire the lock.
      *
      * @param  int  $seconds
      * @return $this
@@ -111,56 +110,49 @@ class GetSetOperation
     }
 
     /**
-     * Upserts the item from the cache using a callback, saving its result back into the cache.
+     * Retrieves and refreshes the item from the cache through a callback.
      *
      * @param  callable<TValue|mixed>  $callback
      * @return TValue|mixed
      */
-    public function push(callable $callback)
+    public function put(callable $callback)
     {
         $this->callback = $callback;
 
-        if ($this->cache->getStore() instanceof LockProvider) {
-            return $this->putWithLock();
-        }
-
-        return $this->put();
-    }
-
-    /**
-     * Executes the upsert operation using a lock.
-     *
-     * @return TValue|mixed
-     */
-    protected function putWithLock()
-    {
-        return $this->cache->getStore()
+        return $this->cache
             ->lock($this->name, $this->seconds, $this->owner)
             ->block($this->wait, function () {
-                return $this->put();
+                return $this->refresh();
             });
     }
 
     /**
-     * Executes the upsert operation.
+     * Executes the refresh operation.
      *
      * @return TValue|mixed
      */
-    protected function put()
+    protected function refresh()
     {
         $expire = $this->expireObject();
 
-        $result = ($this->callback)($this->cache->get($this->key), $expire);
+        $item = $this->cache->get($this->key);
 
-        return tap($result, function ($result) use ($expire) {
-            if (! is_null($result) && $expire->at !== 0) {
+        $result = ($this->callback)($item, $expire);
+
+        $exists = ! is_null($item);
+
+        return tap($result, function ($result) use ($expire, $exists) {
+            // We will call the cache store only on two cases: when this callback returns
+            // something to be put, and when there is something to forget in the cache.
+            // This way we can save a cache call when there is nothing to manipulate.
+            if (($exists && $expire->at === 0) || !is_null($result)) {
                 $this->cache->put($this->key, $result, $expire->at);
             }
         });
     }
 
     /**
-     * Creates a simple object to hold expiration data.
+     * Creates a simple object to manage the item lifetime.
      *
      * @return object
      */
@@ -168,14 +160,11 @@ class GetSetOperation
     {
         return new class($this->ttl)
         {
-            public function __construct(public $at)
-            {
-                //
-            }
+            public $at;
 
-            public function never()
+            public function __construct($at)
             {
-                $this->at = null;
+                $this->at($at);
             }
 
             public function at($at)
@@ -183,9 +172,19 @@ class GetSetOperation
                 $this->at = $at;
             }
 
+            public function in($at)
+            {
+                $this->at($at);
+            }
+
             public function now()
             {
-                $this->at = 0;
+                $this->at(0);
+            }
+
+            public function never()
+            {
+                $this->at(null);
             }
         };
     }

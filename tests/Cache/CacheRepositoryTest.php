@@ -189,166 +189,192 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testGetSetPutsNonExistingItemForever()
+    public function testRefreshFailsIfRepositoryNotLockProvider()
     {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('This cache store does not support atomic locks');
 
-        $result = $repo->getSet('foo', function ($item) {
-            return $item.'bar';
+        $this->getRepository()->refresh('foo', function ($item) {
+            return $item ?? 'new';
         });
-
-        $this->assertSame('bar', $result);
     }
 
-    public function testGetSetUsesCustomTtl()
+    public function testRefreshPutsNonExistingItemForeverByDefault()
     {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 90);
+        $repo = $this->getRepositoryWithLockProvider();
 
-        $repo->getSet('foo', function ($item, $expire) {
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'new');
+
+        $result = $repo->refresh('foo', function ($item) {
+            return $item ?? 'new';
+        });
+
+        $this->assertSame('new', $result);
+    }
+
+    public function testRefreshUsesCustomTtl()
+    {
+        $repo = $this->getRepositoryWithLockProvider();
+
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('put')->with('foo', 'new', 90);
+
+        $repo->refresh('foo', function ($item, $expire) {
             $this->assertSame(90, $expire->at);
 
-            return ($item ?? 'quz').'.baz';
+            return $item ?? 'new';
         }, 90);
     }
 
-    public function testGetSetUsesComputedTtl()
+    public function testRefreshUsesComputedTtl()
     {
-        $repo = $this->getRepository();
+        $repo = $this->getRepositoryWithLockProvider();
+
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
-        $repo->getStore()->shouldReceive('put')->with('foo', 'bar', 60);
+        $repo->getStore()->shouldReceive('put')->with('foo', 'new', 60);
 
-        $result = $repo->getSet('foo', function ($item, $expire) {
-            $expire->at = 60;
+        $repo->refresh('foo', function ($item, $expire) {
+            $expire->at(60);
 
-            return $item.'bar';
+            return $item ?? 'new';
         }, 90);
-
-        $this->assertSame('bar', $result);
     }
 
-    public function testGetSetUsesComputedNeverTtl()
+    public function testRefreshUsesComputedNeverTtl()
     {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
+        $repo = $this->getRepositoryWithLockProvider();
 
-        $repo->getSet('foo')->push(function ($item, $expire) {
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'new');
+
+        $repo->refresh('foo')->put(function ($item, $expire) {
             $expire->never();
 
-            return $item.'bar';
+            return $item ?? 'new';
         });
     }
 
-    public function testGetSetUsesComputedNowTtlRemovesItFromCacheStore()
+    public function testRefreshDoesntCallCacheIfNothingToRefresh()
     {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forget')->with('foo')->andReturnTrue();
-        $repo->getStore()->shouldNotReceive('put');
-        $repo->getStore()->shouldNotReceive('forever');
+        $repo = $this->getRepositoryWithLockProvider();
 
-        $repo->getSet('foo', function ($item, $expire) {
-            $expire->now();
-
-            return $item.'bar';
-        });
-    }
-
-    public function testGetSetUsesComputedNowTtlDoesntRemovesNonExistingItemFromCache()
-    {
-        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
         $repo->getStore()->shouldNotReceive('forget');
         $repo->getStore()->shouldNotReceive('put');
         $repo->getStore()->shouldNotReceive('forever');
 
-        $repo->getSet('foo')->push(function ($item, $expire) {
+        $repo->refresh('foo')->put(function () {
+            return null;
+        });
+    }
+
+    public function testRefreshForgetsItemIfExistsAndExpireIsNow()
+    {
+        $repo = $this->getRepositoryWithLockProvider();
+
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('foo');
+        $repo->getStore()->shouldReceive('forget')->with('foo');
+
+        $repo->refresh('foo')->put(function ($item, $expire) {
             $expire->now();
 
-            return $item.'bar';
+            return null;
         });
     }
 
-    public function testGetSetUpdatesExistingItem()
+    public function testRefreshDoesntCallCacheIfNothingToForget()
     {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
+        $repo = $this->getRepositoryWithLockProvider();
 
-        $result = $repo->getSet('foo', function ($item) {
-            $this->assertSame('bar', $item);
-
-            return ($item ?? 'quz').'.baz';
-        });
-
-        $this->assertSame('bar.baz', $result);
-    }
-
-    public function testGetSetDoesntInsertsOrUpdatesIfCallbackReturnsNull()
-    {
-        $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn(null);
+        $repo->getStore()->shouldNotReceive('forget');
         $repo->getStore()->shouldNotReceive('put');
         $repo->getStore()->shouldNotReceive('forever');
 
-        $result = $repo->getSet('foo', function () {
+        $result = $repo->refresh('foo', function ($item, $expire) {
+            $expire->now();
+
             return null;
         });
 
         $this->assertNull($result);
     }
 
-    public function testGetSetUsesLockIfStoreSupportsIt()
+    public function testRefreshRemovesItemFromCacheStoreWithExpirationNow()
     {
-        $repo = new Repository(m::mock(Store::class, LockProvider::class));
+        $repo = $this->getRepositoryWithLockProvider();
 
-        $lock = m::mock(Lock::class);
-
-        $lock->shouldReceive('block')
-            ->with(10, m::type(Closure::class))
-            ->andReturnUsing(function ($lock, $callback) {
-                return $callback();
-            });
-
-        $repo->getStore()->shouldReceive('lock')->with('foo:laravel_get_set', 0, null)->andReturn($lock);
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
+        $repo->getStore()->shouldReceive('forget')->with('foo')->andReturnTrue();
+        $repo->getStore()->shouldNotReceive('put');
+        $repo->getStore()->shouldNotReceive('forever');
 
-        $result = $repo->getSet('foo', function () {
-            return 'bar.baz';
+        $result = $repo->refresh('foo', function ($item, $expire) {
+            $expire->now();
+
+            return $item ?? 'bar';
         });
 
-        $this->assertSame('bar.baz', $result);
+        $this->assertSame('bar', $result);
     }
 
-    public function testGetSetUsesLockConfig()
+    public function testRefreshUpdatesExistingItem()
     {
-        $repo = new Repository(m::mock(Store::class, LockProvider::class));
+        $repo = $this->getRepositoryWithLockProvider();
 
-        $lock = m::mock(Lock::class);
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
 
-        $lock->shouldReceive('block')
-            ->with(30, m::type(Closure::class))
-            ->andReturnUsing(function ($lock, $callback) {
-                return $callback();
-            });
+        $result = $repo->refresh('foo', function ($item) {
+            $this->assertSame('bar', $item);
 
-        $repo->getStore()->shouldReceive('lock')->with('test_lock', 20, 'test_owner')->andReturn($lock);
+            return $item ?? 'new';
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRefreshesUsesLockIfStoreSupportsIt()
+    {
+        $repo = $this->getRepositoryWithLockProvider();
+
+        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
-        $result = $repo->getSet('foo')
+        $result = $repo->refresh('foo', function ($item) {
+            return $item ?? 'new';
+        });
+
+        $this->assertSame('new', $result);
+    }
+
+    public function testRefreshUsesLockConfig()
+    {
+        $repo = $this->getRepositoryWithLockProvider();
+
+        $repo->getStore()->shouldReceive('lock')->with('test_lock', 20, 'test_owner')->andReturn($this->getMockedLock(30));
+        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
+        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
+
+        $result = $repo->refresh('foo')
             ->lock('test_lock', 20, 'test_owner')
             ->waitFor(30)
-            ->push(function ($item) {
-                return $item . '.baz';
+            ->put(function ($item) {
+                return $item ?? 'new';
             });
 
-        $this->assertSame('bar.baz', $result);
+        $this->assertSame('bar', $result);
     }
 
     public function testPutManyWithNullTTLRemembersItemsForever()
@@ -601,6 +627,29 @@ class CacheRepositoryTest extends TestCase
         $repository->setEventDispatcher($dispatcher);
 
         return $repository;
+    }
+
+    protected function getRepositoryWithLockProvider()
+    {
+        $dispatcher = new Dispatcher(m::mock(Container::class));
+        $repository = new Repository(m::mock(Store::class, LockProvider::class));
+
+        $repository->setEventDispatcher($dispatcher);
+
+        return $repository;
+    }
+
+    protected function getMockedLock($block = 10)
+    {
+        $lock = m::mock(Lock::class);
+
+        $lock->shouldReceive('block')
+            ->with($block, m::type(Closure::class))
+            ->andReturnUsing(function ($lock, $callback) {
+                return $callback();
+            });
+
+        return $lock;
     }
 
     protected function getTestDate()
