@@ -11,35 +11,35 @@ use Illuminate\Contracts\Cache\Repository;
 class GetSetOperation
 {
     /**
-     * The cache repository to use for upserting.
+     * The cache repository to use for get-set.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 
     /**
-     * The key to use when upserting the value.
+     * The key of the cached item.
      *
      * @var string
      */
     protected $key;
 
     /**
-     * How much time to hold the lock and release it.
+     * Seconds to hold the lock and release it.
      *
      * @var int
      */
-    protected $seconds = 15;
+    protected $seconds = 0;
 
     /**
      * How much time to wait for the lock to release.
      *
      * @var int
      */
-    protected $wait = 15;
+    protected $wait = 10;
 
     /**
-     * The owner of the lock.
+     * The owner of the lock, if any.
      *
      * @var string|null
      */
@@ -60,7 +60,7 @@ class GetSetOperation
     protected $ttl;
 
     /**
-     * The name of the lock. Defaults to key + ":laravel_get_set".
+     * The name of the lock.
      *
      * @var string
      */

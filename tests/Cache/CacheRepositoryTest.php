@@ -309,12 +309,12 @@ class CacheRepositoryTest extends TestCase
         $lock = m::mock(Lock::class);
 
         $lock->shouldReceive('block')
-            ->with(15, m::type(Closure::class))
+            ->with(10, m::type(Closure::class))
             ->andReturnUsing(function ($lock, $callback) {
                 return $callback();
             });
 
-        $repo->getStore()->shouldReceive('lock')->with('foo:laravel_get_set', 15, null)->andReturn($lock);
+        $repo->getStore()->shouldReceive('lock')->with('foo:laravel_get_set', 0, null)->andReturn($lock);
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
