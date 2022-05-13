@@ -14,7 +14,6 @@ use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Cache\TaggedCache;
-use Illuminate\Cache\GetSetOperation;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
@@ -347,6 +346,7 @@ class CacheRepositoryTest extends TestCase
             ->ownedBy('test_owner')
             ->push(function ($item, $expire) {
                 $this->assertSame(50, $expire->at);
+
                 return 'bar.baz';
             });
 

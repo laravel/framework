@@ -55,7 +55,7 @@ class GetSetOperation
     /**
      * Lifetime of the key.
      *
-     * @var \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @var \DateTimeInterface|\DateInterval|int|null
      */
     protected $ttl;
 
@@ -155,7 +155,7 @@ class GetSetOperation
         $result = ($this->callback)($this->cache->get($this->key), $expire);
 
         return tap($result, function ($result) use ($expire) {
-            if (!is_null($result) && $expire->at !== 0) {
+            if (! is_null($result) && $expire->at !== 0) {
                 $this->cache->put($this->key, $result, $expire->at);
             }
         });
