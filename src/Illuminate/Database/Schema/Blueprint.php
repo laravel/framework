@@ -1171,6 +1171,22 @@ class Blueprint
     }
 
     /**
+     * Add not nullable creation and update timestamps to the table.
+     *
+     * Creation timestamp is set to use CURRENT_TIMESTAMP as a default value
+     * Update timestamp is set to use CURRENT_TIMESTAMP when either creating or updating
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function notNullableTimestamps($precision = 0)
+    {
+        $this->timestamp('created_at', $precision)->useCurrent();
+
+        $this->timestamp('updated_at', $precision)->useCurrent()->useCurrentOnUpdate();
+    }
+
+    /**
      * Add nullable creation and update timestamps to the table.
      *
      * Alias for self::timestamps().
