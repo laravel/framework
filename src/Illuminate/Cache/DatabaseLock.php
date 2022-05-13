@@ -117,7 +117,7 @@ class DatabaseLock extends Lock
     /**
      * Clear expired locks from database table, if lottery hits.
      *
-     * @return int
+     * @return void
      */
     protected function clearExpiredLocks()
     {
