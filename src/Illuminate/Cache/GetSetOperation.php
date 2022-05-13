@@ -136,7 +136,7 @@ class GetSetOperation
      */
     protected function putWithLock()
     {
-        $lock = $this->cache->getStore()->lock($this->key.':laravel-upsert', $this->lock, $this->owner);
+        $lock = $this->cache->getStore()->lock($this->key.':laravel_get_set', $this->lock, $this->owner);
 
         return $lock->block($this->wait ?? $this->lock, function () {
             return $this->put();

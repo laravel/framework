@@ -314,7 +314,7 @@ class CacheRepositoryTest extends TestCase
                 return $callback();
             });
 
-        $repo->getStore()->shouldReceive('lock')->with('foo:laravel-upsert', 15, null)->andReturn($lock);
+        $repo->getStore()->shouldReceive('lock')->with('foo:laravel_get_set', 15, null)->andReturn($lock);
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
 
@@ -337,7 +337,7 @@ class CacheRepositoryTest extends TestCase
                 return $callback();
             });
 
-        $repo->getStore()->shouldReceive('lock')->with('foo:laravel-upsert', 30, 'test_owner')->andReturn($lock);
+        $repo->getStore()->shouldReceive('lock')->with('foo:laravel_get_set', 30, 'test_owner')->andReturn($lock);
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
         $repo->getStore()->shouldReceive('put')->with('foo', 'bar.baz', 50);
 
