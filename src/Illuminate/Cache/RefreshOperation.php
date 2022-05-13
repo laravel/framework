@@ -145,7 +145,7 @@ class RefreshOperation
             // We will call the cache store only on two cases: when this callback returns
             // something to be put, and when there is something to forget in the cache.
             // This way we can save a cache call when there is nothing to manipulate.
-            if (($exists && $expire->at === 0) || !is_null($result)) {
+            if (($exists && $expire->at === 0) || ! is_null($result)) {
                 $this->cache->put($this->key, $result, $expire->at);
             }
         });

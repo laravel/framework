@@ -439,7 +439,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function refresh($key, $callback = null, $ttl = null)
     {
-        if (!$this->store instanceof LockProvider) {
+        if (! $this->store instanceof LockProvider) {
             throw new BadMethodCallException('This cache store does not support atomic locks.');
         }
 
