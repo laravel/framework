@@ -58,6 +58,7 @@ trait DetectsLostConnections
             'SQLSTATE[08006] [7] could not translate host name',
             'TCP Provider: Error code 0x274C',
             'SQLSTATE[HY000] [2002] No such file or directory',
+            'SSL: Operation timed out',
         ]);
     }
 }
