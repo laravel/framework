@@ -344,21 +344,6 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
-    public function testRefreshesUsesLockIfStoreSupportsIt()
-    {
-        $repo = $this->getRepositoryWithLockProvider();
-
-        $repo->getStore()->shouldReceive('lock')->with('foo:refresh', 0, null)->andReturn($this->getMockedLock());
-        $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar.baz');
-
-        $result = $repo->refresh('foo', function ($item) {
-            return $item ?? 'new';
-        });
-
-        $this->assertSame('new', $result);
-    }
-
     public function testRefreshUsesLockConfig()
     {
         $repo = $this->getRepositoryWithLockProvider();
