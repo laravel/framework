@@ -434,21 +434,36 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    public function testItGetsMultipleHashFields()
+    public function testItGetsMultipleHashFieldsUsingPredis()
     {
-        foreach ($this->connections() as $redis) {
-            $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
+        $redis = $this->connections()['predis'];
+        $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
 
-            $this->assertEquals(['mohamed', 'diving'],
-                $redis->hmget('hash', 'name', 'hobby')
-            );
+        $this->assertEquals(['mohamed', 'diving'],
+            $redis->hmget('hash', 'name', 'hobby')
+        );
 
-            $this->assertEquals(['mohamed', 'diving'],
-                $redis->hmget('hash', ['name', 'hobby'])
-            );
+        $this->assertEquals(['mohamed', 'diving'],
+            $redis->hmget('hash', ['name', 'hobby'])
+        );
 
-            $redis->flushall();
-        }
+        $redis->flushall();
+    }
+
+    public function testItGetsMultipleHashFieldsUsingPhpRedis()
+    {
+        $redis = $this->connections()['phpredis'];
+        $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving', 'friend' => 'timndus']);
+
+        $this->assertEquals(['name' => 'mohamed', 'friend' => 'timndus'],
+            $redis->hmget('hash', 'name', 'friend')
+        );
+
+        $this->assertEquals(['name' => 'mohamed', 'friend' => 'timndus'],
+            $redis->hmget('hash', ['name', 'friend'])
+        );
+
+        $redis->flushall();
     }
 
     public function testItGetsMultipleKeys()
