@@ -350,14 +350,14 @@ class CacheRepositoryTest extends TestCase
 
         $repo->getStore()->shouldReceive('lock')->with('test_lock', 20, 'test_owner')->andReturn($this->getMockedLock(30));
         $repo->getStore()->shouldReceive('get')->with('foo')->andReturn('bar');
-        $repo->getStore()->shouldReceive('forever')->with('foo', 'bar');
+        $repo->getStore()->shouldReceive('put')->with('foo', 'bar', 90);
 
         $result = $repo->refresh('foo')
             ->lock('test_lock', 20, 'test_owner')
             ->waitFor(30)
             ->put(function ($item) {
                 return $item ?? 'new';
-            });
+            }, 90);
 
         $this->assertSame('bar', $result);
     }

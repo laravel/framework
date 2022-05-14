@@ -443,9 +443,9 @@ class Repository implements ArrayAccess, CacheContract
             throw new BadMethodCallException('This cache store does not support atomic locks.');
         }
 
-        $operation = new RefreshOperation($this, $key, $ttl);
+        $operation = new RefreshOperation($this, $key);
 
-        return $callback ? $operation->put($callback) : $operation;
+        return $callback ? $operation->put($callback, $ttl) : $operation;
     }
 
     /**

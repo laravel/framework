@@ -70,13 +70,11 @@ class RefreshOperation
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $repository
      * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      */
-    public function __construct(Repository $repository, string $key, $ttl)
+    public function __construct(Repository $repository, string $key)
     {
         $this->cache = $repository;
         $this->key = $key;
-        $this->ttl = $ttl;
 
         $this->name = $this->key.':refresh';
     }
@@ -113,11 +111,12 @@ class RefreshOperation
      * Retrieves and refreshes the item from the cache through a callback.
      *
      * @param  callable<TValue|mixed>  $callback
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return TValue|mixed
      */
-    public function put(callable $callback)
+    public function put(callable $callback, $ttl = null)
     {
-        $this->callback = $callback;
+        [$this->callback, $this->ttl] = [$callback, $ttl];
 
         return $this->cache
             ->lock($this->name, $this->seconds, $this->owner)
@@ -137,9 +136,9 @@ class RefreshOperation
 
         $item = $this->cache->get($this->key);
 
-        $result = ($this->callback)($item, $expire);
-
         $exists = ! is_null($item);
+
+        $result = ($this->callback)($item, $expire);
 
         return tap($result, function ($result) use ($expire, $exists) {
             // We will call the cache store only on two cases: when this callback returns
