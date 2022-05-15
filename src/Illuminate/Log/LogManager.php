@@ -38,6 +38,13 @@ class LogManager implements LoggerInterface
     protected $channels = [];
 
     /**
+     * The context shared across channels and stacks.
+     *
+     * @var array
+     */
+    protected $sharedContext = [];
+
+    /**
      * The registered custom driver creators.
      *
      * @var array
@@ -84,10 +91,10 @@ class LogManager implements LoggerInterface
      */
     public function stack(array $channels, $channel = null)
     {
-        return new Logger(
+        return (new Logger(
             $this->createStackDriver(compact('channels', 'channel')),
             $this->app['events']
-        );
+        ))->withContext($this->sharedContext);
     }
 
     /**
@@ -123,7 +130,7 @@ class LogManager implements LoggerInterface
     {
         try {
             return $this->channels[$name] ?? with($this->resolve($name, $config), function ($logger) use ($name) {
-                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
+                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']))->withContext($this->sharedContext);
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -436,6 +443,45 @@ class LogManager implements LoggerInterface
         return tap(new LineFormatter(null, $this->dateFormat, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
+    }
+
+    /**
+     * Share context across channels and stacks.
+     *
+     * @param  array  $context
+     * @return $this
+     */
+    public function shareContext(array $context)
+    {
+        foreach ($this->channels as $channel) {
+            $channel->withContext($context);
+        }
+
+        $this->sharedContext = array_merge($this->sharedContext, $context);
+
+        return $this;
+    }
+
+    /**
+     * The context shared across channels and stacks.
+     *
+     * @return array
+     */
+    public function sharedContext()
+    {
+        return $this->sharedContext;
+    }
+
+    /**
+     * Flush the shared context.
+     *
+     * @return $this
+     */
+    public function flushSharedContext()
+    {
+        $this->sharedContext = [];
+
+        return $this;
     }
 
     /**

@@ -322,6 +322,22 @@ trait EnumeratesValues
     }
 
     /**
+     * Get a single key's value from the first matching item in the collection.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function value($key, $default = null)
+    {
+        if ($value = $this->firstWhere($key)) {
+            return data_get($value, $key, $default);
+        }
+
+        return value($default);
+    }
+
+    /**
      * Determine if the collection is not empty.
      *
      * @return bool

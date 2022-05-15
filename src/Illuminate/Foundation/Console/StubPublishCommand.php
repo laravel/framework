@@ -35,8 +35,8 @@ class StubPublishCommand extends Command
         }
 
         $files = [
-            __DIR__.'/stubs/cast.stub' => $stubsPath.'/cast.stub',
             __DIR__.'/stubs/cast.inbound.stub' => $stubsPath.'/cast.inbound.stub',
+            __DIR__.'/stubs/cast.stub' => $stubsPath.'/cast.stub',
             __DIR__.'/stubs/console.stub' => $stubsPath.'/console.stub',
             __DIR__.'/stubs/event.stub' => $stubsPath.'/event.stub',
             __DIR__.'/stubs/job.queued.stub' => $stubsPath.'/job.queued.stub',
@@ -53,8 +53,8 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/policy.stub' => $stubsPath.'/policy.stub',
             __DIR__.'/stubs/provider.stub' => $stubsPath.'/provider.stub',
             __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
-            __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
             __DIR__.'/stubs/resource.stub' => $stubsPath.'/resource.stub',
+            __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
             __DIR__.'/stubs/rule.stub' => $stubsPath.'/rule.stub',
             __DIR__.'/stubs/scope.stub' => $stubsPath.'/scope.stub',
             __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',

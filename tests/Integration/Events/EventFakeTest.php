@@ -133,6 +133,10 @@ class EventFakeTest extends TestCase
             // do something
         });
 
+        Post::observe(new PostObserver);
+
+        ($post = new Post)->save();
+
         Event::assertListening('event', 'listener');
         Event::assertListening('event', PostEventSubscriber::class);
         Event::assertListening('event', PostAutoEventSubscriber::class);
@@ -140,12 +144,21 @@ class EventFakeTest extends TestCase
         Event::assertListening('post-created', [PostEventSubscriber::class, 'handlePostCreated']);
         Event::assertListening('post-deleted', [PostEventSubscriber::class, 'handlePostDeleted']);
         Event::assertListening(NonImportantEvent::class, Closure::class);
+        Event::assertListening('eloquent.saving: '.Post::class, PostObserver::class.'@saving');
+        Event::assertListening('eloquent.saving: '.Post::class, [PostObserver::class, 'saving']);
     }
 }
 
 class Post extends Model
 {
     public $table = 'posts';
+
+    public function save(array $options = [])
+    {
+        if ($this->fireModelEvent('saving') === false) {
+            return false;
+        }
+    }
 }
 
 class NonImportantEvent

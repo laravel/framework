@@ -16,6 +16,7 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -967,6 +968,45 @@ class TestResponseTest extends TestCase
         $response->assertJsonMissingExact(['id' => 20, 'foo' => 'bar']);
     }
 
+    public function testAssertJsonMissingPath()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // With simple key
+        $response->assertJsonMissingPath('missing');
+
+        // With nested key
+        $response->assertJsonMissingPath('foobar.missing');
+        $response->assertJsonMissingPath('numeric_keys.0');
+    }
+
+    public function testAssertJsonMissingPathCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('foo');
+    }
+
+    public function testAssertJsonMissingPathCanFail2()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('foobar.foobar_foo');
+    }
+
+    public function testAssertJsonMissingPathCanFail3()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertJsonMissingPath('numeric_keys.3');
+    }
+
     public function testAssertJsonValidationErrors()
     {
         $data = [
@@ -1543,6 +1583,46 @@ class TestResponseTest extends TestCase
             json_decode($response->getContent(), true),
             $response->json()
         );
+    }
+
+    /**
+     * @group 1
+     */
+    public function testResponseCanBeReturnedAsCollection()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->assertInstanceOf(Collection::class, $response->collect());
+        $this->assertEquals(collect([
+            'foo' => 'bar',
+            'foobar' => [
+                'foobar_foo' => 'foo',
+                'foobar_bar' => 'bar',
+            ],
+            '0' => ['foo'],
+            'bars' => [
+                ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+            'baz' => [
+                ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
+                ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
+            ],
+            'barfoo' => [
+                ['bar' => ['bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0', 'foo' => 'foo 0']],
+                ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+            ],
+            'numeric_keys' => [
+                2 => ['bar' => 'foo 0', 'foo' => 'bar 0'],
+                3 => ['bar' => 'foo 1', 'foo' => 'bar 1'],
+                4 => ['bar' => 'foo 2', 'foo' => 'bar 2'],
+            ],
+        ]), $response->collect());
+        $this->assertEquals(collect(['foobar_foo' => 'foo', 'foobar_bar' => 'bar']), $response->collect('foobar'));
+        $this->assertEquals(collect(['bar']), $response->collect('foobar.foobar_bar'));
+        $this->assertEquals(collect(), $response->collect('missing_key'));
     }
 
     public function testItCanBeTapped()
