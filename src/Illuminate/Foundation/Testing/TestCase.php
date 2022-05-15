@@ -143,6 +143,14 @@ abstract class TestCase extends BaseTestCase
             $this->setUpFaker();
         }
 
+        foreach ($uses as $trait) {
+            $method = 'boot'.class_basename($trait);
+
+            if (method_exists($this, $method)) {
+                $this->{$method}();
+            }
+        }
+
         return $uses;
     }
 
