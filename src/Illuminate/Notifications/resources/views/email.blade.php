@@ -20,7 +20,7 @@
 @isset($actionText)
 <?php
     $color = match ($level) {
-        'success' => null,
+        'success' => $level,
         'error' => $level,
         default => 'primary',
     };
