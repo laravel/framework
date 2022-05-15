@@ -51,7 +51,7 @@ class SesTransport extends AbstractTransport
         if ($message->getOriginalMessage() instanceof Message) {
             foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
                 if ($header instanceof MetadataHeader) {
-                    $options['EmailTags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                    $options['Tags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
                 }
             }
         }
