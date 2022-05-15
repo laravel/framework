@@ -1005,6 +1005,17 @@ EOF;
     }
 
     /**
+     * Get the JSON decoded body of the response as a collection.
+     *
+     * @param  string|null  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key = null)
+    {
+        return Collection::make($this->json($key));
+    }
+
+    /**
      * Assert that the response view equals the given value.
      *
      * @param  string  $value
