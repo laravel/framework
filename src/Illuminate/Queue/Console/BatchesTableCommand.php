@@ -36,7 +36,7 @@ class BatchesTableCommand extends Command
     protected $composer;
 
     /**
-     * Create a new failed queue jobs table command instance.
+     * Create a new batched queue jobs table command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  \Illuminate\Support\Composer  $composer
@@ -74,7 +74,7 @@ class BatchesTableCommand extends Command
      * @param  string  $table
      * @return string
      */
-    protected function createBaseMigration($table = 'failed_jobs')
+    protected function createBaseMigration($table = 'job_batches')
     {
         return $this->laravel['migration.creator']->create(
             'create_'.$table.'_table', $this->laravel->databasePath().'/migrations'
@@ -82,7 +82,7 @@ class BatchesTableCommand extends Command
     }
 
     /**
-     * Replace the generated migration with the failed job table stub.
+     * Replace the generated migration with the batches job table stub.
      *
      * @param  string  $path
      * @param  string  $table
