@@ -431,7 +431,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
         $this->assertEquals([
-            'comment on "posts" is "Look at my comment, it is amazing"',
+            'comment on table "posts" is \'Look at my comment, it is amazing\'',
         ], $blueprint->toSql($connection, new PostgresGrammar));
     }
 }

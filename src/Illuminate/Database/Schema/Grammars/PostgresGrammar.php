@@ -495,9 +495,9 @@ class PostgresGrammar extends Grammar
      */
     public function compileTableComment(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('comment on %s is %s',
+        return sprintf('comment on table %s is %s',
             $this->wrapTable($blueprint),
-            $this->wrap($command->comment)
+            "'".str_replace("'", "''", $command->comment)."'"
         );
     }
 
