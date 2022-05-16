@@ -180,6 +180,7 @@ class ScheduleListCommand extends Command
 
         if ($callback instanceof Closure) {
             $function = new ReflectionFunction($callback);
+
             return sprintf(
                 '%s:%s',
                 str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
