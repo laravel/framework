@@ -531,6 +531,22 @@ class Arr
     }
 
     /**
+     * Run a map over each of the items in the array.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function map(array $array, callable $callback)
+    {
+        $keys = array_keys($array);
+
+        $items = array_map($callback, $array, $keys);
+
+        return array_combine($keys, $items);
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
