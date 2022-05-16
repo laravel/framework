@@ -441,6 +441,14 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $session->getName());
     }
 
+    public function testKeyPush()
+    {
+        $session = $this->getSession();
+        $session->put('language', ['PHP' => ['Laravel']]);
+        $session->push('language.PHP', 'Symfony');
+
+        $this->assertEquals(['PHP' => ['Laravel', 'Symfony']], $session->get('language'));
+    }
     public function testKeyPull()
     {
         $session = $this->getSession();
