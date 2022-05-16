@@ -426,7 +426,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
         $this->assertEquals([
-            'alter table `posts` comment = `Look at my comment, it is amazing`',
+            'alter table `posts` comment = \'Look at my comment, it is amazing\'',
         ], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;

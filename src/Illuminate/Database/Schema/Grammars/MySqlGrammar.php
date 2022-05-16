@@ -503,7 +503,7 @@ class MySqlGrammar extends Grammar
     {
         return sprintf('alter table %s comment = %s',
             $this->wrapTable($blueprint),
-            $this->wrap($command->comment)
+            "'".str_replace("'", "''", $command->comment)."'"
         );
     }
 
