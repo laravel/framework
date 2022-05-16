@@ -335,6 +335,17 @@ class Blueprint
     }
 
     /**
+     * Adds a comment to the table.
+     *
+     * @param  string  $comment
+     * @return \Illuminate\Support\Fluent
+     */
+    public function comment($comment)
+    {
+        return $this->addCommand('tableComment', compact('comment'));
+    }
+
+    /**
      * Indicate that the given primary key should be dropped.
      *
      * @param  string|array|null  $index
