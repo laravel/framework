@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Closure;
 use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Application;
@@ -173,15 +174,25 @@ class ScheduleListCommand extends Command
      */
     private function getClosureLocation(CallbackEvent $event)
     {
-        $function = new ReflectionFunction(tap((new ReflectionClass($event))->getProperty('callback'))
+        $callback = tap((new ReflectionClass($event))->getProperty('callback'))
                         ->setAccessible(true)
-                        ->getValue($event));
+                        ->getValue($event);
 
-        return sprintf(
-            '%s:%s',
-            str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
-            $function->getStartLine()
-        );
+        if ($callback instanceof Closure) {
+            $function = new ReflectionFunction($callback);
+
+            return sprintf(
+                '%s:%s',
+                str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
+                $function->getStartLine()
+            );
+        }
+
+        if (is_array($callback)) {
+            return sprintf('%s::%s', $callback[0]::class, $callback[1]);
+        }
+
+        return sprintf('%s::__invoke', $callback::class);
     }
 
     /**
