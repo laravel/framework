@@ -441,6 +441,16 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $session->getName());
     }
 
+    public function testKeyPull()
+    {
+        $session = $this->getSession();
+        $session->put('name', 'Taylor');
+
+        $this->assertTrue('Taylor', $session->pull('name'));
+        $this->assertTrue('Taylor Otwell', $session->pull('name', 'Taylor Otwell'));
+        $this->assertNull('Taylor', $session->pull('name'));
+
+    }
     public function testKeyHas()
     {
         $session = $this->getSession();
