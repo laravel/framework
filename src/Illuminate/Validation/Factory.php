@@ -34,35 +34,35 @@ class Factory implements FactoryContract
     /**
      * All of the custom validator extensions.
      *
-     * @var array
+     * @var array<string, \Closure|string>
      */
     protected $extensions = [];
 
     /**
      * All of the custom implicit validator extensions.
      *
-     * @var array
+     * @var array<string, \Closure|string>
      */
     protected $implicitExtensions = [];
 
     /**
      * All of the custom dependent validator extensions.
      *
-     * @var array
+     * @var array<string, \Closure|string>
      */
     protected $dependentExtensions = [];
 
     /**
      * All of the custom validator message replacers.
      *
-     * @var array
+     * @var array<string, \Closure|string>
      */
     protected $replacers = [];
 
     /**
      * All of the fallback messages for custom rules.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $fallbackMessages = [];
 
