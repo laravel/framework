@@ -27,7 +27,7 @@ class Factory implements FactoryContract
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Illuminate\Contracts\Container\Container|null
      */
     protected $container;
 
@@ -313,7 +313,7 @@ class Factory implements FactoryContract
     /**
      * Get the container instance used by the validation factory.
      *
-     * @return \Illuminate\Contracts\Container\Container
+     * @return \Illuminate\Contracts\Container\Container|null
      */
     public function getContainer()
     {
