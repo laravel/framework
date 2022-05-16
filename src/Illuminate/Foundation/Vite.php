@@ -79,6 +79,11 @@ class Vite
         return new HtmlString($stylesheets->join('').$scripts->join(''));
     }
 
+    /**
+     * Generate React refresh runtime script
+     *
+     * @return \Illuminate\Support\HtmlString|void
+     */
     public function reactRefresh()
     {
         if (! is_file(public_path('/hot'))) {
