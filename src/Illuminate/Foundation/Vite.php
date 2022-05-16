@@ -79,6 +79,30 @@ class Vite
         return new HtmlString($stylesheets->join('').$scripts->join(''));
     }
 
+    public function reactRefresh()
+    {
+        if (! is_file(public_path('/hot'))) {
+            return;
+        }
+
+        $url = rtrim(file_get_contents(public_path('/hot')));
+
+        return new HtmlString(
+            sprintf(
+                <<<'HTML'
+                <script type="module">
+                    import RefreshRuntime from '%s/@react-refresh'
+                    RefreshRuntime.injectIntoGlobalHook(window)
+                    window.$RefreshReg$ = () => {}
+                    window.$RefreshSig$ = () => (type) => type
+                    window.__vite_plugin_react_preamble_installed__ = true
+                </script>
+                HTML,
+                $url
+            )
+        );
+    }
+
     /**
      * Generate a script tag for the given URL.
      *

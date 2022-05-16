@@ -61,4 +61,16 @@ trait CompilesHelpers
 
         return "<?php echo app('$class'){$arguments}; ?>";
     }
+
+    /**
+     * Compile the "viteReactRefresh" statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileViteReactRefresh()
+    {
+        $class = Vite::class;
+
+        return "<?php echo app('$class')->reactRefresh(); ?>";
+    }
 }
