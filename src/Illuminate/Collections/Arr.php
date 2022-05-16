@@ -547,20 +547,6 @@ class Arr
     }
 
     /**
-     * Transform each item in the array using a callback.
-     *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @return array
-     */
-    public static function transform(&$array, callable $callback)
-    {
-        $array = Arr::map($array, $callback);
-
-        return $array;
-    }
-
-    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array

@@ -632,16 +632,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
-    public function testTransform()
-    {
-        $data = ['first' => 'taylor', 'last' => 'otwell'];
-        $mapped = Arr::transform($data, function ($value, $key) {
-            return $key.'-'.strrev($value);
-        });
-        $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $mapped);
-        $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data);
-    }
-
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
