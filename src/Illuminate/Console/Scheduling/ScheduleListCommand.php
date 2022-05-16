@@ -182,7 +182,7 @@ class ScheduleListCommand extends Command
             $function = new ReflectionFunction($callback);
             return sprintf(
                 '%s:%s',
-                str_replace($this->laravel->basePath() . DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
+                str_replace($this->laravel->basePath().DIRECTORY_SEPARATOR, '', $function->getFileName() ?: ''),
                 $function->getStartLine()
             );
         }
