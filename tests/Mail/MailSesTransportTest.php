@@ -10,6 +10,7 @@ use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\View\Factory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mime\Email;
 
 class MailSesTransportTest extends TestCase
@@ -55,6 +56,7 @@ class MailSesTransportTest extends TestCase
         $message->sender('myself@example.com');
         $message->to('me@example.com');
         $message->bcc('you@example.com');
+        $message->getHeaders()->add(new MetadataHeader('FooTag', 'TagValue'));
 
         $client = m::mock(SesClient::class);
         $sesResult = m::mock();
@@ -63,6 +65,11 @@ class MailSesTransportTest extends TestCase
             ->once()
             ->andReturn('ses-message-id');
         $client->shouldReceive('sendRawEmail')->once()
+            ->with(m::on(function ($arg) {
+                return $arg['Source'] === 'myself@example.com' &&
+                    $arg['Destinations'] === ['me@example.com', 'you@example.com'] &&
+                    $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']];
+            }))
             ->andReturn($sesResult);
 
         (new SesTransport($client))->send($message);
