@@ -111,6 +111,66 @@ class BusDispatcherTest extends TestCase
 
         $dispatcher->dispatch($job);
     }
+
+    public function testCommandsShouldDispatchIsQueued()
+    {
+        $container = new Container;
+        $dispatcher = new Dispatcher($container, function () {
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('push')->once();
+
+            return $mock;
+        });
+
+        $job = m::mock(ShouldQueueWithShouldDispatch::class);
+        $job->shouldReceive('shouldDispatch')->once()->andReturnTrue();
+
+        $dispatcher->dispatch($job);
+    }
+
+    public function testCommandsShouldDispatchIsNotQueued()
+    {
+        $container = new Container;
+        $dispatcher = new Dispatcher($container, function () {
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('push')->never();
+
+            return $mock;
+        });
+
+        $job = m::mock(ShouldQueueWithShouldDispatch::class);
+        $job->shouldReceive('shouldDispatch')->once()->andReturnFalse();
+
+        $dispatcher->dispatch($job);
+    }
+
+    public function testCommandsShouldDispatchIsDispatchingNow()
+    {
+        $container = new Container;
+        $dispatcher = new Dispatcher($container, function () {
+            return m::mock(Queue::class);
+        });
+
+        $job = m::mock(NotShouldQueueWithShouldDispatch::class);
+        $job->shouldReceive('shouldDispatch')->once()->andReturnTrue();
+        $job->shouldReceive('handle')->once();
+
+        $dispatcher->dispatch($job);
+    }
+
+    public function testCommandsShouldDispatchNotDispatchingNow()
+    {
+        $container = new Container;
+        $dispatcher = new Dispatcher($container, function () {
+            return m::mock(Queue::class);
+        });
+
+        $job = m::mock(NotShouldQueueWithShouldDispatch::class);
+        $job->shouldReceive('shouldDispatch')->once()->andReturnFalse();
+        $job->shouldReceive('handle')->never();
+
+        $dispatcher->dispatch($job);
+    }
 }
 
 class BusInjectionStub
@@ -167,5 +227,26 @@ class ShouldNotBeDispatched implements ShouldQueue
     public function handle()
     {
         throw new RuntimeException('This should not be run');
+    }
+}
+
+class ShouldQueueWithShouldDispatch implements ShouldQueue
+{
+    public function shouldDispatch()
+    {
+        //
+    }
+}
+
+class NotShouldQueueWithShouldDispatch
+{
+    public function shouldDispatch()
+    {
+        //
+    }
+
+    public function handle()
+    {
+        //
     }
 }

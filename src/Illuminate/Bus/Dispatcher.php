@@ -107,6 +107,10 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchNow($command, $handler = null)
     {
+        if (method_exists($command, 'shouldDispatch') && ! $command->shouldDispatch()) {
+            return;
+        }
+
         $uses = class_uses_recursive($command);
 
         if (in_array(InteractsWithQueue::class, $uses) &&
@@ -214,6 +218,10 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchToQueue($command)
     {
+        if (method_exists($command, 'shouldDispatch') && ! $command->shouldDispatch()) {
+            return;
+        }
+
         $connection = $command->connection ?? null;
 
         $queue = call_user_func($this->queueResolver, $connection);
