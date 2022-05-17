@@ -605,6 +605,8 @@ class DatabaseEloquentFactoryTest extends TestCase
         $post = FactoryTestPostFactory::new()->trashed($deleted_at)->create();
 
         $this->assertTrue($deleted_at->equalTo($post->deleted_at));
+
+        Carbon::setTestNow();
     }
 
     public function test_dynamic_trashed_state_respects_existing_state()
@@ -614,6 +616,8 @@ class DatabaseEloquentFactoryTest extends TestCase
         $comment = FactoryTestCommentFactory::new()->trashed()->create();
 
         $this->assertTrue($comment->deleted_at->equalTo($now->subWeek()));
+
+        Carbon::setTestNow();
     }
 
     public function test_dynamic_trashed_state_throws_exception_when_not_a_softdeletes_model()
