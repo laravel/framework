@@ -1710,6 +1710,10 @@ class Builder implements BuilderContract
      */
     public function __call($method, $parameters)
     {
+        if (str_starts_with($method, 'whereRelation')) {
+            return $this->dynamicWhereRelation($method, $parameters);
+        }
+
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
 
