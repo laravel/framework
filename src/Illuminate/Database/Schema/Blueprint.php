@@ -335,17 +335,6 @@ class Blueprint
     }
 
     /**
-     * Adds a comment to the table.
-     *
-     * @param  string  $comment
-     * @return \Illuminate\Support\Fluent
-     */
-    public function comment($comment)
-    {
-        return $this->addCommand('tableComment', compact('comment'));
-    }
-
-    /**
      * Indicate that the given primary key should be dropped.
      *
      * @param  string|array|null  $index
@@ -1516,6 +1505,17 @@ class Blueprint
     public function rememberToken()
     {
         return $this->string('remember_token', 100)->nullable();
+    }
+
+    /**
+     * Add a comment to the table.
+     *
+     * @param  string  $comment
+     * @return \Illuminate\Support\Fluent
+     */
+    public function comment($comment)
+    {
+        return $this->addCommand('tableComment', compact('comment'));
     }
 
     /**
