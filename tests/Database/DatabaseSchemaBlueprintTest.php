@@ -415,4 +415,87 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "posts" add "note" nvarchar(255) null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
+
+    public function testMySqlGrammarCanAutomaticallyConstrainAndIndexForeignIdFor()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        Blueprint::constrainForeignFor();
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `eloquent_model_uuid_stub_id` char(36) not null',
+            'alter table `posts` add constraint `posts_eloquent_model_uuid_stub_id_foreign` foreign key (`eloquent_model_uuid_stub_id`) references `eloquent_model_uuid_stubs` (`id`)',
+            'alter table `posts` add index `posts_eloquent_model_uuid_stub_id_index`(`eloquent_model_uuid_stub_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testPostgresGrammarCanAutomaticallyConstrainAndIndexForeignIdFor()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        Blueprint::constrainForeignFor();
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table "posts" add column "eloquent_model_uuid_stub_id" uuid not null',
+            'alter table "posts" add constraint "posts_eloquent_model_uuid_stub_id_foreign" foreign key ("eloquent_model_uuid_stub_id") references "eloquent_model_uuid_stubs" ("id")',
+            'create index "posts_eloquent_model_uuid_stub_id_index" on "posts" ("eloquent_model_uuid_stub_id")',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+    }
+
+    public function testSqlServerGrammarCanAutomaticallyConstrainAndIndexForeignIdFor()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        Blueprint::constrainForeignFor();
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table "posts" add "eloquent_model_uuid_stub_id" uniqueidentifier not null',
+            'alter table "posts" add constraint "posts_eloquent_model_uuid_stub_id_foreign" foreign key ("eloquent_model_uuid_stub_id") references "eloquent_model_uuid_stubs" ("id")',
+            'create index "posts_eloquent_model_uuid_stub_id_index" on "posts" ("eloquent_model_uuid_stub_id")',
+        ], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testConstrainForeignForHasNoAffectOnSQLiteGrammar()
+    {
+        require_once __DIR__.'/stubs/EloquentModelUuidStub.php';
+
+        Blueprint::constrainForeignFor();
+
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor('EloquentModelUuidStub');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table "posts" add column "eloquent_model_uuid_stub_id" varchar not null',
+            'create index "posts_eloquent_model_uuid_stub_id_index" on "posts" ("eloquent_model_uuid_stub_id")',
+        ], $blueprint->toSql($connection, new SQLiteGrammar));
+    }
 }

@@ -79,6 +79,13 @@ class Blueprint
     public $after;
 
     /**
+     * Whether to index and constrain foreignIdFor by default.
+     *
+     * @var bool
+     */
+    private static bool $constrainForeignFor = false;
+
+    /**
      * Create a new schema blueprint.
      *
      * @param  string  $table
@@ -94,6 +101,17 @@ class Blueprint
         if (! is_null($callback)) {
             $callback($this);
         }
+    }
+
+    /**
+     * Constrain and Index ForeignIds by when true.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function constrainForeignFor($value = true)
+    {
+        static::$constrainForeignFor = $value;
     }
 
     /**
@@ -931,9 +949,15 @@ class Blueprint
             $model = new $model;
         }
 
-        return $model->getKeyType() === 'int' && $model->getIncrementing()
+        $definition = $model->getKeyType() === 'int' && $model->getIncrementing()
                     ? $this->foreignId($column ?: $model->getForeignKey())
                     : $this->foreignUuid($column ?: $model->getForeignKey());
+
+        if (self::$constrainForeignFor === true) {
+            return $definition->index()->constrained();
+        }
+
+        return $definition;
     }
 
     /**
