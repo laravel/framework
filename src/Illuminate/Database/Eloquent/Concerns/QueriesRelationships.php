@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -834,5 +835,17 @@ trait QueriesRelationships
     protected function canUseExistsForExistenceCheck($operator, $count)
     {
         return ($operator === '>=' || $operator === '<') && $count === 1;
+    }
+
+    /**
+     * @param  string  $relation
+     * @param  array  $params
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    protected function dynamicWhereRelation($relation, $params)
+    {
+        $relation = substr($relation, 13);
+
+        return $this->whereRelation(...array_merge(Arr::wrap(lcfirst($relation)), $params));
     }
 }
