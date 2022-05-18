@@ -2167,6 +2167,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testGetIdentifierOfPersistentRow()
+    {
+        $model = new EloquentModelStub(['id' => 1]);
+        $model->setTable('foo');
+        $model->setConnection('bar');
+
+        $this->assertEquals('1__foo__bar', $model->getIdentifierOfPersistentRow());
+    }
+
     public function testWithoutTouchingCallback()
     {
         new EloquentModelStub(['id' => 1]);

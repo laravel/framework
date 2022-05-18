@@ -1627,10 +1627,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function is($model)
     {
-        return ! is_null($model) &&
-               $this->getKey() === $model->getKey() &&
-               $this->getTable() === $model->getTable() &&
-               $this->getConnectionName() === $model->getConnectionName();
+        return ! is_null($model)
+            && $this->getIdentifierOfPersistentRow() === $model->getIdentifierOfPersistentRow();
+    }
+
+    /**
+     * Get a string that uniquely identifies the database row represented by the model.
+     *
+     * @return string
+     */
+    public function getIdentifierOfPersistentRow()
+    {
+        return implode('__', [
+            $this->getKey(),
+            $this->getTable(),
+            $this->getConnectionName(),
+        ]);
     }
 
     /**
