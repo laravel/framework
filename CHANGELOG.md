@@ -1,6 +1,31 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.12.2...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.13.0...9.x)
+
+
+## [v9.13.0](https://github.com/laravel/framework/compare/v9.12.2...v9.13.0) - 2022-05-17
+
+### Added
+- Added Illuminate/Collections/Traits/EnumeratesValues::value() ([#42257](https://github.com/laravel/framework/pull/42257))
+- Added new TestResponse helper: assertJsonMissingPath ([#42361](https://github.com/laravel/framework/pull/42361))
+- Added Illuminate/Support/Testing/Fakes/NotificationFake::assertCount() ([#42366](https://github.com/laravel/framework/pull/42366))
+- Added new DetectLostConnections ([#42377](https://github.com/laravel/framework/pull/42377), [#42382](https://github.com/laravel/framework/pull/42382))
+- Added Illuminate/Testing/TestResponse::collect() ([#42384](https://github.com/laravel/framework/pull/42384))
+- Added full callable support to schedule:list ([#42400](https://github.com/laravel/framework/pull/42400))
+- Added `Illuminate/Collections/Arr::map()` ([#42398](https://github.com/laravel/framework/pull/42398))
+
+### Fixed
+- Fixed PruneCommand finding its usage within other traits ([#42350](https://github.com/laravel/framework/pull/42350))
+- Fix assert that exception is thrown without message ([#42360](https://github.com/laravel/framework/pull/42360))
+
+### Changed
+- Skip parameter parsing for raw post body in HTTP Client ([#42364](https://github.com/laravel/framework/pull/42364))
+- Consistency between digits and digits_between validation rules ([#42358](https://github.com/laravel/framework/pull/42358))
+- Corrects the use of "failed_jobs" instead of "job_batches" in BatchedTableCommand ([#42389](https://github.com/laravel/framework/pull/42389))
+- Update email.blade.php ([#42388](https://github.com/laravel/framework/pull/42388))
+- Remove old monolog 1.x compat code ([#42392](https://github.com/laravel/framework/pull/42392))
+- SesTransport: use correct Tags argument ([#42390](https://github.com/laravel/framework/pull/42390))
+- Implement robust handling of forwarding of exception codes ([#42393](https://github.com/laravel/framework/pull/42393))
 
 
 ## [v9.12.2](https://github.com/laravel/framework/compare/v9.12.1...v9.12.2) - 2022-05-11
