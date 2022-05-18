@@ -11,6 +11,7 @@ use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\LogEntriesHandler;
 use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\NullHandler;
+use Monolog\Handler\GroupHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger as Monolog;
@@ -68,12 +69,20 @@ class LogManagerTest extends TestCase
 
         $this->assertInstanceOf(Logger::class, $logger);
         $this->assertCount(2, $handlers);
-        $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
-        $this->assertInstanceOf(StreamHandler::class, $handlers[1]);
-        $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
-        $this->assertEquals(Monolog::INFO, $handlers[1]->getLevel());
-        $this->assertFalse($handlers[0]->getBubble());
-        $this->assertTrue($handlers[1]->getBubble());
+
+        // Check loggers
+        $to_check = [
+            ["level" => Monolog::NOTICE, "bubble" => static::isFalse()],
+            ["level" => Monolog::INFO, "bubble" => static::isTrue()],
+        ];
+        foreach ($to_check as $index => $data) {
+            $this->assertInstanceOf(GroupHandler::class, $handlers[$index]);
+            $group = $handlers[$index]->getHandlers();
+            $this->assertCount(1, $group);
+            $this->assertInstanceOf(StreamHandler::class, $group[0]);
+            $this->assertEquals($data["level"], $group[0]->getLevel());
+            $this->assertThat($group[0]->getBubble(), $data["bubble"]);
+        }
     }
 
     public function testLogManagerCreatesConfiguredMonologHandler()
@@ -423,9 +432,8 @@ class LogManagerTest extends TestCase
         $logger = $manager->stack(['test', $channel]);
 
         $handler = $logger->getLogger()->getHandlers()[1];
-        $processor = $logger->getLogger()->getProcessors()[0];
-
-        $this->assertInstanceOf(StreamHandler::class, $handler);
+        $this->assertInstanceOf(GroupHandler::class, $handler);
+        $processor = $handler->getProcessors()[0];
         $this->assertInstanceOf(UidProcessor::class, $processor);
 
         $url = new ReflectionProperty(get_class($handler), 'url');
