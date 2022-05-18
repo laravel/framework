@@ -73,7 +73,13 @@ class SesTransport extends AbstractTransport
                 )
             );
         } catch (AwsException $e) {
-            throw new Exception('Request to AWS SES API failed.', is_int($e->getCode()) ? $e->getCode() : 0, $e);
+            $reason = $e->getAwsErrorMessage() ?? $e->getMessage();
+
+            throw new Exception(
+                sprintf('Request to AWS SES API failed. Reason: %s.', $reason),
+                is_int($e->getCode()) ? $e->getCode() : 0,
+                $e
+            );
         }
 
         $messageId = $result->get('MessageId');
