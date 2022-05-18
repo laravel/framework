@@ -130,6 +130,63 @@ class TestResponseTest extends TestCase
         $response->assertViewHas('foos', $collection);
     }
 
+    public function testAssertViewHasEloquentCollectionRespectsOrder()
+    {
+        $collection = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 3]),
+            new TestModel(['id' => 2]),
+            new TestModel(['id' => 1]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $collection],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $collection->reverse()->values());
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsType()
+    {
+        $actual = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $actual],
+        ]);
+
+        $expected = new \Illuminate\Database\Eloquent\Collection([
+            new AnotherTestModel(['id' => 1]),
+            new AnotherTestModel(['id' => 2]),
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $expected);
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsSize()
+    {
+        $actual = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $actual],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $actual->concat([new TestModel(['id' => 3])]));
+    }
+
     public function testAssertViewMissing()
     {
         $response = $this->makeMockResponse([
@@ -1965,9 +2022,9 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
 class TestModel extends Model
 {
     protected $guarded = [];
+}
 
-    public function is($model)
-    {
-        return $this->getKey() == $model->getKey();
-    }
+class AnotherTestModel extends Model
+{
+    protected $guarded = [];
 }

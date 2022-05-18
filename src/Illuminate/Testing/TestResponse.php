@@ -1053,7 +1053,10 @@ EOF;
         } elseif ($value instanceof Model) {
             PHPUnit::assertTrue($value->is(Arr::get($this->original->gatherData(), $key)));
         } elseif ($value instanceof EloquentCollection) {
-            PHPUnit::assertEquals($value->modelKeys(), Arr::get($this->original->gatherData(), $key)->modelKeys());
+            $actual = Arr::get($this->original->gatherData(), $key);
+            PHPUnit::assertInstanceOf(EloquentCollection::class, $actual);
+            PHPUnit::assertSameSize($value, $actual);
+            $value->each(fn ($item, $index) => PHPUnit::assertTrue($actual->get($index)->is($item)));
         } else {
             PHPUnit::assertEquals($value, Arr::get($this->original->gatherData(), $key));
         }
