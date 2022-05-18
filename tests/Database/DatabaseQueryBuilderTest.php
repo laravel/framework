@@ -316,12 +316,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', [12]);
         $this->assertSame('select * from "users" where "id" in (?)', $builder->toSql());
         $this->assertEquals([0 => 12], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', [12, 30]);
         $this->assertSame('select * from "users" where "id" in (?, ?)', $builder->toSql());
         $this->assertEquals([0 => 12, 1 => 30], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('id', '=', [12, 30]);
         $this->assertSame('select * from "users" where "id" = ?', $builder->toSql());
@@ -1716,12 +1716,12 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereNot()
     {
-    
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNot('id', [12, 30]);
         $this->assertSame('select * from "users" where "id" not in (?, ?)', $builder->toSql());
         $this->assertEquals([0 => 12, 1 => 30], $builder->getBindings());
-        
+
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNot(function ($q) {
             $q->where('email', '=', 'foo');
