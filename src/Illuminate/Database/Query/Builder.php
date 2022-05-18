@@ -712,7 +712,7 @@ class Builder implements BuilderContract
         // If operator is an array and has multiple values, we will assume the developer
         // wants a “where in” clause instead. We also assume the developer wants a
         // "where not in" if they use the "whereNot" function.
-        if(is_array($operator) && count($operator) > 1) {
+        if(is_array($operator) || $operator instanceof Arrayable) {
             return $this->whereIn($column, $operator, str_ireplace(' not', '', $boolean), str_contains($boolean, 'not'));
         }
 
