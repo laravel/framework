@@ -1,6 +1,17 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.12.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.12.1...9.x)
+
+
+## [v9.12.1](https://github.com/laravel/framework/compare/v9.12.0...v9.12.1) - 2022-05-10
+
+### Fixed
+- Fix TypeError in DeadlockException ([#42337](https://github.com/laravel/framework/pull/42337))
+- Fixed type mismatch on Pusher::validate_channels() ([#42340](https://github.com/laravel/framework/pull/42340))
+
+### Changed
+- Add custom segments on "remember me" for session rebuild ([#42316](https://github.com/laravel/framework/pull/42316))
+
 
 ## [v9.12.0](https://github.com/laravel/framework/compare/v9.11.0...v9.12.0) - 2022-05-10
 
