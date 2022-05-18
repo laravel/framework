@@ -2634,7 +2634,7 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
+     * @param  int|callable  $perPage
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
@@ -2645,6 +2645,8 @@ class Builder implements BuilderContract
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $total = $this->getCountForPagination();
+
+        $perPage = $perPage instanceof Closure ? $perPage($total) : $perPage;
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
 

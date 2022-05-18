@@ -864,7 +864,7 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query.
      *
-     * @param  int|null  $perPage
+     * @param  int|null|callable  $perPage
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
@@ -876,11 +876,16 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ?: $this->model->getPerPage();
+        $total = $this->toBase()->getCountForPagination();
 
-        $results = ($total = $this->toBase()->getCountForPagination())
-                                    ? $this->forPage($page, $perPage)->get($columns)
-                                    : $this->model->newCollection();
+        $perPage = ($perPage instanceof Closure
+            ? $perPage($total)
+            : $perPage
+        ) ?: $this->model->getPerPage();
+
+        $results = $total
+            ? $this->forPage($page, $perPage)->get($columns)
+            : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
