@@ -1716,7 +1716,6 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereNot()
     {
-
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNot('id', [12, 30]);
         $this->assertSame('select * from "users" where "id" not in (?, ?)', $builder->toSql());
