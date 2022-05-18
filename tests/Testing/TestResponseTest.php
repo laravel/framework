@@ -54,13 +54,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasModel()
     {
-        $model = new class extends Model
-        {
-            public function is($model)
-            {
-                return $this == $model;
-            }
-        };
+        $model = new TestModel();
 
         $response = $this->makeMockResponse([
             'render' => 'hello world',
@@ -120,6 +114,22 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertViewHas('foo.nested', 'bar');
+    }
+
+    public function testAssertViewHasEloquentCollection()
+    {
+        $collection = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+            new TestModel(['id' => 3]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $collection],
+        ]);
+
+        $response->assertViewHas('foos', $collection);
     }
 
     public function testAssertViewMissing()
@@ -1951,5 +1961,15 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
             ['id' => 20, 'foo' => 'bar'],
             ['id' => 30, 'foo' => 'bar'],
         ];
+    }
+}
+
+class TestModel extends Model
+{
+    protected $guarded = [];
+
+    public function is($model)
+    {
+        return $this == $model;
     }
 }
