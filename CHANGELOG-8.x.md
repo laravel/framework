@@ -1,6 +1,16 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.12...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.13...8.x)
+
+
+## [v8.83.13 (2022-05-17)](https://github.com/laravel/framework/compare/v8.83.12...v8.83.13)
+
+### Fixed
+- Fix PruneCommand finding its usage within other traits ([#42350](https://github.com/laravel/framework/pull/42350))
+
+### Changed
+- Consistency between digits and digits_between validation rules ([#42358](https://github.com/laravel/framework/pull/42358))
+- Corrects the use of "failed_jobs" instead of "job_batches" in BatchedTableCommand ([#42389](https://github.com/laravel/framework/pull/42389))
 
 
 ## [v8.83.12 (2022-05-10)](https://github.com/laravel/framework/compare/v8.83.11...v8.83.12)
