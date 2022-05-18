@@ -75,7 +75,7 @@ class LogManagerTest extends TestCase
             ["level" => Monolog::NOTICE, "bubble" => static::isFalse()],
             ["level" => Monolog::INFO, "bubble" => static::isTrue()],
         ];
-        $handler_ref = new \ReflectionProperty(GroupHandler::class, "handlers");
+        $handler_ref = new ReflectionProperty(GroupHandler::class, "handlers");
         $handler_ref->setAccessible(true);
 
         foreach ($to_check as $index => $data) {
@@ -437,15 +437,20 @@ class LogManagerTest extends TestCase
         $handler = $logger->getLogger()->getHandlers()[1];
         $this->assertInstanceOf(GroupHandler::class, $handler);
 
-        $processor_ref = new \ReflectionProperty(GroupHandler::class, "processors");
+        $processor_ref = new ReflectionProperty(GroupHandler::class, "processors");
         $processor_ref->setAccessible(true);
         $processor = $processor_ref->getValue($handler)[0];
         $this->assertInstanceOf(UidProcessor::class, $processor);
 
-        $url = new ReflectionProperty(get_class($handler), 'url');
+        $handler_ref = new ReflectionProperty(GroupHandler::class, "handlers");
+        $handler_ref->setAccessible(true);
+        $group = $handler_ref->getValue($handler);
+        $this->assertInstanceOf(StreamHandler::class, $group[0]);
+
+        $url = new ReflectionProperty(get_class($group[0]), 'url');
         $url->setAccessible(true);
 
-        $this->assertSame(storage_path('logs/custom.log'), $url->getValue($handler));
+        $this->assertSame(storage_path('logs/custom.log'), $url->getValue($group[0]));
     }
 
     public function testWrappingHandlerInFingersCrossedWhenActionLevelIsUsed()
