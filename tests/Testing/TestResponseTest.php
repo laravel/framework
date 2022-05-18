@@ -54,14 +54,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasModel()
     {
-        $model = new TestModel();
+        $model = new TestModel(['id' => 1]);
 
         $response = $this->makeMockResponse([
             'render' => 'hello world',
             'gatherData' => ['foo' => $model],
         ]);
-
-        $response->original->foo = $model;
 
         $response->assertViewHas('foo', $model);
     }
@@ -1970,6 +1968,6 @@ class TestModel extends Model
 
     public function is($model)
     {
-        return $this == $model;
+        return $this->getKey() == $model->getKey();
     }
 }
