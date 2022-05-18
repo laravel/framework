@@ -44,11 +44,15 @@ class RouteUri
         $bindingFields = [];
 
         foreach ($matches[0] as $match) {
-            if (! str_contains($match, ':')) {
+            $parameter = trim($match, '{}?');
+
+            if (! str_contains($parameter, ':')) {
+                $bindingFields[$parameter] = null;
+
                 continue;
             }
 
-            $segments = explode(':', trim($match, '{}?'));
+            $segments = explode(':', $parameter);
 
             $bindingFields[$segments[0]] = $segments[1];
 
@@ -56,6 +60,10 @@ class RouteUri
                     ? str_replace($match, '{'.$segments[0].'?}', $uri)
                     : str_replace($match, '{'.$segments[0].'}', $uri);
         }
+
+        $bindingFields = ! empty(array_filter($bindingFields))
+            ? $bindingFields
+            : [];
 
         return new static($uri, $bindingFields);
     }
