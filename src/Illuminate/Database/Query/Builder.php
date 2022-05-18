@@ -708,6 +708,13 @@ class Builder implements BuilderContract
         if (is_array($column)) {
             return $this->addArrayOfWheres($column, $boolean);
         }
+        
+        // If operator is an array and has multiple values, we will assume the developer
+        // wants a “where in” clause instead. We also assume the developer wants a
+        // "where not in" if they use the "whereNot" function.
+        if(is_array($operator) && count($operator) > 1) {
+            return $this->whereIn($column, $operator, str_ireplace(' not', '', $boolean), str_contains($boolean, 'not'));
+        }
 
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
