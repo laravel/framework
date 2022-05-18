@@ -75,9 +75,12 @@ class LogManagerTest extends TestCase
             ["level" => Monolog::NOTICE, "bubble" => static::isFalse()],
             ["level" => Monolog::INFO, "bubble" => static::isTrue()],
         ];
+        $handler_ref = new \ReflectionProperty(GroupHandler::class, "handlers");
+        $handler_ref->setAccessible(true);
+
         foreach ($to_check as $index => $data) {
             $this->assertInstanceOf(GroupHandler::class, $handlers[$index]);
-            $group = $handlers[$index]->getHandlers();
+            $group = $handler_ref->getValue($handlers[$index]);
             $this->assertCount(1, $group);
             $this->assertInstanceOf(StreamHandler::class, $group[0]);
             $this->assertEquals($data["level"], $group[0]->getLevel());
@@ -433,7 +436,10 @@ class LogManagerTest extends TestCase
 
         $handler = $logger->getLogger()->getHandlers()[1];
         $this->assertInstanceOf(GroupHandler::class, $handler);
-        $processor = $handler->getProcessors()[0];
+
+        $processor_ref = new \ReflectionProperty(GroupHandler::class, "processors");
+        $processor_ref->setAccessible(true);
+        $processor = $processor_ref->getValue($handler)[0];
         $this->assertInstanceOf(UidProcessor::class, $processor);
 
         $url = new ReflectionProperty(get_class($handler), 'url');
