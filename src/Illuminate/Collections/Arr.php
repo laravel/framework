@@ -467,6 +467,22 @@ class Arr
     }
 
     /**
+     * Prepend the key names of an associative array
+     *
+     * @param  array  $array
+     * @param  string $prependWidth
+     * @return array
+     */
+    public static function prependKeysWith($array, $prependWidth)
+    {
+        $keys = array_keys($array);
+        foreach($keys as $key) {
+            $keys[array_search($key, $keys)] = $prependWidth . $key;
+        }
+        return array_combine($keys, $array);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
