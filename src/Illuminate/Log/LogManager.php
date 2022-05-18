@@ -14,6 +14,7 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
+use Monolog\Handler\GroupHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Logger as Monolog;
 use Psr\Log\LoggerInterface;
@@ -249,23 +250,26 @@ class LogManager implements LoggerInterface
             $config['channels'] = explode(',', $config['channels']);
         }
 
-        $handlers = collect($config['channels'])->flatMap(function ($channel) {
-            return $channel instanceof LoggerInterface
-                ? $channel->getHandlers()
-                : $this->channel($channel)->getHandlers();
-        })->all();
+        $handlers = collect($config['channels'])->map(function ($channel) {
+            /* Convert channel names to Logger instance */
+            if (is_string($channel)) {
+                $channel = $this->channel($channel);
+            }
 
-        $processors = collect($config['channels'])->flatMap(function ($channel) {
-            return $channel instanceof LoggerInterface
-                ? $channel->getProcessors()
-                : $this->channel($channel)->getProcessors();
+            /* Group handlers from Logger */
+            $handler = new GroupHandler($channel->getHandlers());
+            foreach ($channel->getProcessors() as $processor) {
+                $handler->pushProcessor($processor);
+            }
+
+            return $handler;
         })->all();
 
         if ($config['ignore_exceptions'] ?? false) {
             $handlers = [new WhatFailureGroupHandler($handlers)];
         }
 
-        return new Monolog($this->parseChannel($config), $handlers, $processors);
+        return new Monolog($this->parseChannel($config), $handlers);
     }
 
     /**
