@@ -1154,6 +1154,19 @@ class Route
     }
 
     /**
+     * Alias for `block($lockSeconds, $waitSeconds, true)`
+     *
+     * @param  int|null  $lockSeconds
+     * @param  int|null  $waitSeconds
+     * @return $this
+     */
+    public function blockTooEarly($lockSeconds = 10, $waitSeconds = 10)
+    {
+
+        return $this->block($lockSeconds, $waitSeconds, true);
+    }
+
+    /**
      * Specify that the route should allow concurrent requests from the same session.
      *
      * @return $this
