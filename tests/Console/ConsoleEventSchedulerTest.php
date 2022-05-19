@@ -166,11 +166,9 @@ class ConsoleCommandStub extends Command
     protected $description = 'This is a description about the command';
 
     protected $foo;
-
-    public function __construct(FooClassStub $foo)
+    
+    public function handle()
     {
-        parent::__construct();
-
-        $this->foo = $foo;
+        $this->foo = $this->laravel->make(FooClassStub::class);
     }
 }
