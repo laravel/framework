@@ -1154,6 +1154,42 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             })->id
         );
     }
+
+    public function testUpdateOrCreateQueryBuilderIsolation()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        $user->postsWithCustomPivot()->attach($post);
+
+        $instance = $user->postsWithCustomPivot()->updateOrCreate(
+            ['uuid' => $post->uuid],
+            ['title' => Str::random()],
+        );
+
+        $this->assertArrayNotHasKey(
+            'user_uuid',
+            $instance->toArray(),
+        );
+    }
+
+    public function testFirstOrCreateQueryBuilderIsolation()
+    {
+        $user = User::create(['name' => Str::random()]);
+        $post = Post::create(['title' => Str::random()]);
+
+        $user->postsWithCustomPivot()->attach($post);
+
+        $instance = $user->postsWithCustomPivot()->firstOrCreate(
+            ['uuid' => $post->uuid],
+            ['title' => Str::random()],
+        );
+
+        $this->assertArrayNotHasKey(
+            'user_uuid',
+            $instance->toArray(),
+        );
+    }
 }
 
 class User extends Model
