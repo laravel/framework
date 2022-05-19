@@ -467,6 +467,20 @@ class Arr
     }
 
     /**
+     * Prepend the key names of an associative array.
+     *
+     * @param  array  $array
+     * @param  string  $prependWith
+     * @return array
+     */
+    public static function prependKeysWith($array, $prependWith)
+    {
+        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
+            return [$prependWith.$key => $item];
+        })->all();
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array

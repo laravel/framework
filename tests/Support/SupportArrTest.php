@@ -1076,4 +1076,25 @@ class SupportArrTest extends TestCase
             '498' => ['id' => '498', 'data' => 'hgi'],
         ], Arr::keyBy($array, 'id'));
     }
+
+    public function testPrependKeysWith()
+    {
+        $array = [
+            'id' => '123',
+            'data' => '456',
+            'list' => [1, 2, 3],
+            'meta' => [
+                'key' => 1,
+            ],
+        ];
+
+        $this->assertEquals([
+            'test.id' => '123',
+            'test.data' => '456',
+            'test.list' => [1, 2, 3],
+            'test.meta' => [
+                'key' => 1,
+            ],
+        ], Arr::prependKeysWith($array, 'test.'));
+    }
 }
