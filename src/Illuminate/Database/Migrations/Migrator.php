@@ -93,17 +93,21 @@ class Migrator
      *
      * @param  array|string  $paths
      * @param  array  $options
+     * @param  array  $except
      * @return array
      */
-    public function run($paths = [], array $options = [])
+    public function run($paths = [], array $options = [], array $except = [])
     {
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
         $files = $this->getMigrationFiles($paths);
 
+        $files = $this->guessMigrationFiles($files, array_filter($except));
+
         $this->requireFiles($migrations = $this->pendingMigrations(
-            $files, $this->repository->getRan()
+            $files,
+            $this->repository->getRan()
         ));
 
         // Once we have all these migrations that are outstanding we are ready to run
@@ -533,6 +537,26 @@ class Migrator
         })->sortBy(function ($file, $key) {
             return $key;
         })->all();
+    }
+
+    /**
+     * Get all filtered of the migration files using the given except array.
+     *
+     * @param  array  $files
+     * @param  array  $except
+     * @return array
+     */
+    public function guessMigrationFiles(array $files, array $except)
+    {
+        foreach ($files as $fileName => $filePath) {
+            foreach ($except as $index => $exc) {
+                if (str_contains($fileName, $exc)) {
+                    $except[$index] = $filePath;
+                }
+            }
+        }
+
+        return array_diff($files, $except);
     }
 
     /**
