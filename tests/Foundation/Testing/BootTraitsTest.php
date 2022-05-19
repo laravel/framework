@@ -10,7 +10,7 @@ trait TestTrait
 {
     public $booted = false;
 
-    public function bootTestTrait()
+    public function setUpTestTrait()
     {
         $this->booted = true;
     }
