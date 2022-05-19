@@ -1567,16 +1567,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Reload the current model instance with fresh attributes from the database.
      *
+     * @param  bool  $withoutScopes
      * @return $this
      */
-    public function refresh()
+    public function refresh(bool $withoutScopes = true)
     {
         if (! $this->exists) {
             return $this;
         }
 
         $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            $this->setKeysForSelectQuery($withoutScopes ? $this->newQueryWithoutScopes() : $this->newQuery())
                 ->useWritePdo()
                 ->firstOrFail()
                 ->attributes
