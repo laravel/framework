@@ -300,11 +300,12 @@ class Builder
     /**
      * Drop all tables from the database.
      *
+     * @param  string  $except
      * @return void
      *
      * @throws \LogicException
      */
-    public function dropAllTables()
+    public function dropAllTables(string $except)
     {
         throw new LogicException('This database driver does not support dropping all tables.');
     }
