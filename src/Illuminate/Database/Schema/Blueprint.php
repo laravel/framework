@@ -1508,6 +1508,17 @@ class Blueprint
     }
 
     /**
+     * Add a comment to the table.
+     *
+     * @param  string  $comment
+     * @return \Illuminate\Support\Fluent
+     */
+    public function comment($comment)
+    {
+        return $this->addCommand('tableComment', compact('comment'));
+    }
+
+    /**
      * Add a new index command to the blueprint.
      *
      * @param  string  $type
