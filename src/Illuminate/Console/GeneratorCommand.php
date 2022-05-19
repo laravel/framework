@@ -103,23 +103,6 @@ abstract class GeneratorCommand extends Command
     ];
 
     /**
-     * Create a new controller creator command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
-     */
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-
-        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            $this->addTestOptions();
-        }
-
-        $this->files = $files;
-    }
-
-    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -135,6 +118,12 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+            $this->addTestOptions();
+        }
+
+        $this->files = $this->laravel->make(Filesystem::class);
+        
         // First we need to ensure that the given name is not a reserved word within the PHP
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
