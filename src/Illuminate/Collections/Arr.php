@@ -470,7 +470,7 @@ class Arr
      * Prepend the key names of an associative array
      *
      * @param  array  $array
-     * @param  string $prependWidth
+     * @param  string $prependWith
      * @return array
      */
     public static function prependKeysWith($array, $prependWith)
