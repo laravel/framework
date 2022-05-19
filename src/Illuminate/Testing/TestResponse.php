@@ -1054,8 +1054,10 @@ EOF;
             PHPUnit::assertTrue($value->is(Arr::get($this->original->gatherData(), $key)));
         } elseif ($value instanceof EloquentCollection) {
             $actual = Arr::get($this->original->gatherData(), $key);
+
             PHPUnit::assertInstanceOf(EloquentCollection::class, $actual);
             PHPUnit::assertSameSize($value, $actual);
+
             $value->each(fn ($item, $index) => PHPUnit::assertTrue($actual->get($index)->is($item)));
         } else {
             PHPUnit::assertEquals($value, Arr::get($this->original->gatherData(), $key));
