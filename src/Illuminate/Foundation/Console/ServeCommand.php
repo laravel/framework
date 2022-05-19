@@ -45,11 +45,11 @@ class ServeCommand extends Command
     protected $portOffset = 0;
 
     /**
-     * The env variables that should be passed from host machine to the php server process.
+     * The environment variables that should be passed from host machine to the PHP server process.
      *
      * @var string[]
      */
-    public static $passthruEnv = [
+    public static $passthroughVariables = [
         'APP_ENV',
         'LARAVEL_SAIL',
         'PHP_CLI_SERVER_WORKERS',
@@ -127,7 +127,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, static::$passthruEnv) ? [$key => $value] : [$key => false];
+            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
         $process->start(function ($type, $buffer) {
