@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Tests\Database\SQLite;
+
 use DateTime;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;

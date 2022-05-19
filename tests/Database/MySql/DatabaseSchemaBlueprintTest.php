@@ -132,8 +132,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $connection = m::mock(Connection::class);
 
-
-
         $this->assertEquals([
             'alter table `comments` add `commentable_type` varchar(255) not null, add `commentable_id` char(36) not null',
             'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
