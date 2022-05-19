@@ -68,6 +68,10 @@ class ConsoleMakeCommand extends GeneratorCommand
     {
         $relativePath = '/stubs/console.stub';
 
+        if ($this->confirm('Do you want to create a protected command?')) {
+            $relativePath = '/stubs/console-protected.stub';
+        }
+        
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
             : __DIR__.$relativePath;
