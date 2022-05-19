@@ -115,7 +115,7 @@ class Route
     protected $waitSeconds;
 
     /**
-     * Indicates to throw HttpException(429, 'Too Early') instead of LockTimeoutException
+     * Indicates to throw HttpException(429, 'Too Early') instead of LockTimeoutException.
      *
      * @var bool
      */
@@ -1154,7 +1154,7 @@ class Route
     }
 
     /**
-     * Alias for `block($lockSeconds, $waitSeconds, true)`
+     * Alias for `block($lockSeconds, $waitSeconds, true)`.
      *
      * @param  int|null  $lockSeconds
      * @param  int|null  $waitSeconds
