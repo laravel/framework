@@ -96,9 +96,9 @@ class StartSession
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
-        } catch(LockTimeoutException) {
+        } catch(LockTimeoutException $e) {
 
-            throw new HttpException(425, 'Too Early');
+            throw ($request->route()->dontReport() ? new HttpException(425, 'Too Early') : $e);
         } finally {
             $lock?->release();
         }
