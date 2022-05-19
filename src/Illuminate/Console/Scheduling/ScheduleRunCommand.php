@@ -77,18 +77,6 @@ class ScheduleRunCommand extends Command
     protected $handler;
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->startedAt = Date::now();
-
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
@@ -98,6 +86,8 @@ class ScheduleRunCommand extends Command
      */
     public function handle(Schedule $schedule, Dispatcher $dispatcher, ExceptionHandler $handler)
     {
+        $this->startedAt = Date::now();
+        
         $this->schedule = $schedule;
         $this->dispatcher = $dispatcher;
         $this->handler = $handler;
