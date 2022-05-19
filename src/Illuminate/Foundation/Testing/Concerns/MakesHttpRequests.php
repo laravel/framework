@@ -666,4 +666,21 @@ trait MakesHttpRequests
             );
         });
     }
+
+    /**
+     * Create the request instance.
+     *
+     * @param $method
+     * @param $uri
+     * @return Illuminate\Http\Request
+     */
+    protected function createRequest($method, $uri): Request
+    {
+        $symfonyRequest = SymfonyRequest::create(
+            $uri,
+            $method,
+        );
+
+        return Request::createFromBase($symfonyRequest);
+    }
 }
