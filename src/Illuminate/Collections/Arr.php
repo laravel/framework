@@ -475,7 +475,7 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-        return collect($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
+        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
             return [$prependWith . $key => $item];
         })->all();
 
