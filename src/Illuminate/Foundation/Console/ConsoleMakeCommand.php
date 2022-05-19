@@ -4,11 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-#[AsCommand(name: 'make:command')]
 class ConsoleMakeCommand extends GeneratorCommand
 {
     use CreatesMatchingTest;
@@ -19,17 +17,6 @@ class ConsoleMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $name = 'make:command';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'make:command';
 
     /**
      * The console command description.
@@ -71,7 +58,7 @@ class ConsoleMakeCommand extends GeneratorCommand
         if ($this->confirm('Do you want to create a protected command?')) {
             $relativePath = '/stubs/console-protected.stub';
         }
-        
+
         return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
             ? $customPath
             : __DIR__.$relativePath;
