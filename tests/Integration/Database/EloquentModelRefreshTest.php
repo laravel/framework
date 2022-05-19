@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EloquentModelRefreshTest extends DatabaseTestCase
 {
@@ -71,6 +73,15 @@ class EloquentModelRefreshTest extends DatabaseTestCase
 
         $post->children->first()->refresh();
     }
+
+    public function testItRefreshesModelWithGlobalScopes()
+    {
+        $post = Post::create(['title' => 'Taylor']);
+        
+        $post->refresh(false);
+
+        $this->assertEquals('taylor', $post->slug);
+    }
 }
 
 class Post extends Model
@@ -87,6 +98,10 @@ class Post extends Model
 
         static::addGlobalScope('age', function ($query) {
             $query->where('title', '!=', 'mohamed');
+        });
+        static::addGlobalScope('slug', function ($query) {
+            $query->select('*');
+            $query->addSelect(DB::raw('lower(title) as slug'));
         });
     }
 }
