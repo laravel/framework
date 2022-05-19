@@ -605,6 +605,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('maria@email.co*', Str::mask('maria@email.com', '*', -1));
         $this->assertSame('***************', Str::mask('maria@email.com', '*', -15));
         $this->assertSame('***************', Str::mask('maria@email.com', '*', 0));
+
+        $this->assertSame('ssssssssss*s', Str::mask('ssssssssssss', '*', -26, 1));
     }
 
     public function testMatch()

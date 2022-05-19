@@ -495,18 +495,15 @@ class Str
             return $string;
         }
 
-        $strlen = mb_strlen($string, $encoding);
-        $startIndex = $index;
-
-        if ($index < 0) {
-            $startIndex = $index < -$strlen ? 0 : $strlen + $index;
+        $posIndex = $index;
+        while ($posIndex < 0) {
+            $posIndex += mb_strlen($string);
         }
 
-        $start = mb_substr($string, 0, $startIndex, $encoding);
-        $segmentLen = mb_strlen($segment, $encoding);
-        $end = mb_substr($string, $startIndex + $segmentLen);
+        $start = mb_substr($string, 0, mb_strpos($string, $segment, $posIndex, $encoding), $encoding);
+        $end = mb_substr($string, mb_strpos($string, $segment, $posIndex, $encoding) + mb_strlen($segment, $encoding));
 
-        return $start.str_repeat(mb_substr($character, 0, 1, $encoding), $segmentLen).$end;
+        return $start . str_repeat(mb_substr($character, 0, 1, $encoding), mb_strlen($segment, $encoding)) . $end;
     }
 
     /**
