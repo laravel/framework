@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Schema;
 
+use Exception;
+
 class MySqlBuilder extends Builder
 {
     /**
@@ -63,19 +65,31 @@ class MySqlBuilder extends Builder
     }
 
     /**
-     * Drop all tables from the database.
+     * Drop all tables except the given table(s) string from the database.
      *
+     * @param  string  $except
      * @return void
+     *
+     * @throws \Exception
      */
-    public function dropAllTables()
+    public function dropAllTables($except)
     {
         $tables = [];
+        $exceptTables = array_filter(explode(',', $except));
+
+        foreach ($exceptTables as $table) {
+            if (!empty($table) && !$this->hasTable($table)) {
+                throw new Exception("The {$table} table does not exist.");
+            }
+        }
 
         foreach ($this->getAllTables() as $row) {
             $row = (array) $row;
 
             $tables[] = reset($row);
         }
+
+        $tables = array_diff($tables, $exceptTables);
 
         if (empty($tables)) {
             return;
