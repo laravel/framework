@@ -15,6 +15,13 @@ class SeeInOrder extends Constraint
     protected $content;
 
     /**
+     * Whether the comparison is case-sensitive
+     *
+     * @var bool
+     */
+    protected $caseSensitive;
+
+    /**
      * The last value that failed to pass validation.
      *
      * @var string
@@ -27,9 +34,10 @@ class SeeInOrder extends Constraint
      * @param  string  $content
      * @return void
      */
-    public function __construct($content)
+    public function __construct($content, $caseSensitive = true)
     {
         $this->content = $content;
+        $this->caseSensitive = $caseSensitive;
     }
 
     /**
@@ -47,7 +55,9 @@ class SeeInOrder extends Constraint
                 continue;
             }
 
-            $valuePosition = mb_strpos($this->content, $value, $position);
+            $valuePosition = $this->caseSensitive ?
+                mb_strpos($this->content, $value, $position) :
+                mb_stripos($this->content, $value, $position);
 
             if ($valuePosition === false || $valuePosition < $position) {
                 $this->failedValue = $value;

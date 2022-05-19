@@ -255,6 +255,29 @@ class TestResponseTest extends TestCase
         $response->assertSee(['bar & baz', 'baz & qux']);
     }
 
+    public function testAssertSeeIgnoringCase()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>Foo</li><li>bar</li><li>Baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeIgnoringCase('foo');
+        $response->assertSeeIgnoringCase(['baz', 'bar']);
+    }
+
+    public function testAssertSeeIgnoringCaseCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeIgnoringCase('Item');
+        $response->assertSeeIgnoringCase(['Not', 'found']);
+    }
+
+
     public function testAssertSeeInOrder()
     {
         $response = $this->makeMockResponse([
@@ -286,6 +309,38 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+    }
+
+    public function testAssertSeeInOrderIgnoringCase()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>Bar</li><li>Baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeInOrderIgnoringCase(['foo', 'bar', 'baz']);
+        $response->assertSeeInOrderIgnoringCase(['foo', 'bar', 'Baz', 'Foo']);
+    }
+
+    public function testAssertSeeInOrderIgnoringCaseCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeInOrderIgnoringCase(['baz', 'bar', 'foo']);
+    }
+
+    public function testAssertSeeInOrderIgnoringCaseCanFail2()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertSeeInOrderIgnoringCase(['foo', 'qux', 'bar', 'baz']);
     }
 
     public function testAssertSeeText()
@@ -332,6 +387,28 @@ class TestResponseTest extends TestCase
         $response->assertSeeText(['foo & bar', 'bar & baz']);
     }
 
+    public function testAssertSeeTextIgnoringCase()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>baz<strong>qUx</strong>',
+        ]);
+
+        $response->assertSeeTextIgnoringCase('fooBar');
+        $response->assertSeeTextIgnoringCase(['bazQux', 'foobar']);
+    }
+
+    public function testAssertSeeTextIgnoringCaseCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>',
+        ]);
+
+        $response->assertSeeTextIgnoringCase('baZfoo');
+        $response->assertSeeTextIgnoringCase(['bazfoo', 'barqux']);
+    }
+
     public function testAssertSeeTextInOrder()
     {
         $response = $this->makeMockResponse([
@@ -372,6 +449,39 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+    }
+
+    public function testAssertSeeTextInOrderIgnoringCase()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foO</strong>',
+        ]);
+
+        $response->assertSeeTextInOrderIgnoringCase(['Foobar', 'baZ']);
+
+        $response->assertSeeTextInOrderIgnoringCase(['foObar', 'baZ', 'foo']);
+    }
+
+    public function testAssertSeeTextInOrderIgnoringCaseCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+        ]);
+
+        $response->assertSeeTextInOrderIgnoringCase(['baz', 'foobar']);
+    }
+
+    public function testAssertSeeTextInOrderIgnoringCaseCanFail2()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>baR</strong> baz <strong>foo</strong>',
+        ]);
+
+        $response->assertSeeTextInOrderIgnoringCase(['foobar', 'qux', 'baz']);
     }
 
     public function testAssertDontSee()
@@ -418,6 +528,28 @@ class TestResponseTest extends TestCase
         $response->assertDontSee(['php & friends', 'laravel & php']);
     }
 
+    public function testAssertDontSeeIgnoringCase()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertDontSeeIgnoringCase('laravel');
+        $response->assertDontSeeIgnoringCase(['php', 'friends']);
+    }
+
+    public function testAssertDontSeeCanFailIgnoringCase()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
+
+        $response->assertDontSeeIgnoringCase('Foo');
+        $response->assertDontSeeIgnoringCase(['baz', 'Bar']);
+    }
+
     public function testAssertDontSeeText()
     {
         $response = $this->makeMockResponse([
@@ -460,6 +592,28 @@ class TestResponseTest extends TestCase
 
         $response->assertDontSeeText('laravel & php');
         $response->assertDontSeeText(['php & friends', 'laravel & php']);
+    }
+
+    public function testAssertDontSeeTextIgnoringCase()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',
+        ]);
+
+        $response->assertDontSeeTextIgnoringCase('laravelphp');
+        $response->assertDontSeeTextIgnoringCase(['phpfriends', 'laravelphp']);
+    }
+
+    public function testAssertDontSeeTextIgnoringCaseCanFail()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>baz<strong>qux</strong>',
+        ]);
+
+        $response->assertDontSeeTextIgnoringCase('foobaR');
+        $response->assertDontSeeTextIgnoringCase(['bazQux', 'Foobar']);
     }
 
     public function testAssertOk()

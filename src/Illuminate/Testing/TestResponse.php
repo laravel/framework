@@ -610,6 +610,23 @@ EOF;
     }
 
     /**
+     * Assert that the given string or array of strings are contained within the response, ignoring the case of the given strings.
+     *
+     * @param string|array $value
+     * @return $this
+     */
+    public function assertSeeIgnoringCase($value)
+    {
+        $values = Arr::wrap($value);
+
+        foreach ($values as $value) {
+            PHPUnit::assertStringContainsStringIgnoringCase((string) $value, $this->getContent());
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given strings are contained in order within the response.
      *
      * @param  array  $values
@@ -621,6 +638,20 @@ EOF;
         $values = $escape ? array_map('e', ($values)) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
+
+        return $this;
+    }
+
+    /**
+     *  Assert that the given strings are contained in order within the response, ignoring the case
+     *
+     * @param array $values
+     * @return $this
+     */
+    public function assertSeeInOrderIgnoringCase(array $values)
+    {
+
+        PHPUnit::assertThat($values, new SeeInOrder($this->getContent(), caseSensitive: false));
 
         return $this;
     }
@@ -648,6 +679,27 @@ EOF;
     }
 
     /**
+     * Assert that the given string or array of strings are contained within the response text, ignoring the case.
+     *
+     * @param $value
+     * @return $this
+     */
+    public function assertSeeTextIgnoringCase($value)
+    {
+
+        $values = Arr::wrap($value);
+
+        tap(strip_tags($this->getContent()), function ($content) use ($values) {
+            foreach ($values as $value) {
+                PHPUnit::assertStringContainsStringIgnoringCase((string) $value, $content);
+            }
+        });
+
+        return $this;
+
+    }
+
+    /**
      * Assert that the given strings are contained in order within the response text.
      *
      * @param  array  $values
@@ -659,6 +711,20 @@ EOF;
         $values = $escape ? array_map('e', ($values)) : $values;
 
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
+
+        return $this;
+    }
+
+
+    /**
+     * Assert that the given strings are contained in order within the response text, ignoring the case.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeTextInOrderIgnoringCase(array $values)
+    {
+        PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent()), caseSensitive: false));
 
         return $this;
     }
@@ -684,6 +750,23 @@ EOF;
     }
 
     /**
+     * Assert that the given string or array of strings are not contained within the response, ignoring the case.
+     *
+     * @param  string|array  $value
+     * @return $this
+     */
+    public function assertDontSeeIgnoringCase($value)
+    {
+        $values = Arr::wrap($value);
+
+        foreach ($values as $value) {
+            PHPUnit::assertStringNotContainsStringIgnoringCase((string) $value, $this->getContent());
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string or array of strings are not contained within the response text.
      *
      * @param  string|array  $value
@@ -699,6 +782,25 @@ EOF;
         tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {
                 PHPUnit::assertStringNotContainsString((string) $value, $content);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given string or array of strings are not contained within the response text, ignoring the case.
+     *
+     * @param  string|array  $value
+     * @return $this
+     */
+    public function assertDontSeeTextIgnoringCase($value)
+    {
+        $values = Arr::wrap($value);
+
+        tap(strip_tags($this->getContent()), function ($content) use ($values) {
+            foreach ($values as $value) {
+                PHPUnit::assertStringNotContainsStringIgnoringCase((string) $value, $content);
             }
         });
 
