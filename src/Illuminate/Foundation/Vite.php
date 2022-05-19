@@ -56,12 +56,14 @@ class Vite
             }
 
             $scripts->push(
-                $this->makeScriptTag("{$buildDirectory}/{$manifest[$entrypoint]['file']}")
+                $this->makeScriptTag(asset("{$buildDirectory}/{$manifest[$entrypoint]['file']}"))
             );
 
             if (isset($manifest[$entrypoint]['css'])) {
                 foreach ($manifest[$entrypoint]['css'] as $css) {
-                    $stylesheets->push($this->makeStylesheetTag("{$buildDirectory}/{$css}"));
+                    $stylesheets->push(
+                        $this->makeStylesheetTag(asset("{$buildDirectory}/{$css}"))
+                    );
                 }
             }
 
@@ -69,7 +71,9 @@ class Vite
                 foreach ($manifest[$entrypoint]['imports'] as $import) {
                     if (isset($manifest[$import]['css'])) {
                         foreach ($manifest[$import]['css'] as $css) {
-                            $stylesheets->push($this->makeStylesheetTag("{$buildDirectory}/{$css}"));
+                            $stylesheets->push(
+                                $this->makeStylesheetTag(asset("{$buildDirectory}/{$css}"))
+                            );
                         }
                     }
                 }

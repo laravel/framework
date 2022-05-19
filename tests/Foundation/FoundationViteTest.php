@@ -2,14 +2,27 @@
 
 namespace Illuminate\Foundation;
 
+use Illuminate\Routing\UrlGenerator;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class FoundationViteTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        app()->instance('url', tap(
+            m::mock(UrlGenerator::class),
+            fn ($url) => $url
+                ->shouldReceive('asset')
+                ->andReturnUsing(fn ($value) => "https://example.com{$value}")
+        ));
+    }
+
     protected function tearDown(): void
     {
         $this->cleanViteManifest();
         $this->cleanViteHotFile();
+        m::close();
     }
 
     public function testViteWithoutCss()
@@ -18,7 +31,7 @@ class FoundationViteTest extends TestCase
 
         $result = (new Vite)(['resources/js/app-without-css.js']);
 
-        $this->assertSame('<script type="module" src="/build/assets/app-without-css.versioned.js"></script>', $result->toHtml());
+        $this->assertSame('<script type="module" src="https://example.com/build/assets/app-without-css.versioned.js"></script>', $result->toHtml());
     }
 
     public function testViteWithCss()
@@ -28,8 +41,8 @@ class FoundationViteTest extends TestCase
         $result = (new Vite)(['resources/js/app-with-css.js']);
 
         $this->assertSame(
-            '<link rel="stylesheet" href="/build/assets/app.versioned.css" />'
-            . '<script type="module" src="/build/assets/app-with-css.versioned.js"></script>',
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            . '<script type="module" src="https://example.com/build/assets/app-with-css.versioned.js"></script>',
             $result->toHtml()
         );
     }
@@ -41,8 +54,8 @@ class FoundationViteTest extends TestCase
         $result = (new Vite)(['resources/js/app-with-shared-css.js']);
 
         $this->assertSame(
-            '<link rel="stylesheet" href="/build/assets/app.versioned.css" />'
-            . '<script type="module" src="/build/assets/app-with-shared-css.versioned.js"></script>',
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            . '<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
             $result->toHtml()
         );
     }
