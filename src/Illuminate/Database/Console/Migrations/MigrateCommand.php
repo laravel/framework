@@ -19,6 +19,7 @@ class MigrateCommand extends BaseCommand
      */
     protected $signature = 'migrate {--database= : The database connection to use}
                 {--force : Force the operation to run when in production}
+                {--except= : The except(s) to except some table(s) while migration}
                 {--path=* : The path(s) to the migrations files to be executed}
                 {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
                 {--schema-path= : The path to a schema dump file}
@@ -81,9 +82,9 @@ class MigrateCommand extends BaseCommand
             // we will use the path relative to the root of this installation folder
             // so that migrations may be run for any path within the applications.
             $this->migrator->setOutput($this->output)
-                    ->run($this->getMigrationPaths(), [
+                    ->run($this->getMigrationPaths(), [], explode(",", $this->option('except')), [
                         'pretend' => $this->option('pretend'),
-                        'step' => $this->option('step'),
+                        'step' => $this->option('step')
                     ]);
 
             // Finally, if the "seed" option has been given, we will re-run the database
