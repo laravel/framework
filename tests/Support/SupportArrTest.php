@@ -1085,7 +1085,7 @@ class SupportArrTest extends TestCase
             'list' => [1, 2, 3],
             'meta' => [
                 'key' => 1
-            ]
+            ],
         ];
 
         $this->assertEquals([
@@ -1094,7 +1094,7 @@ class SupportArrTest extends TestCase
             'test.list' => [1, 2, 3],
             'test.meta' => [
                 'key' => 1
-            ]
+            ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
 }
