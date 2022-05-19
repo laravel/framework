@@ -44,6 +44,7 @@ class FreshCommand extends Command
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
             '--force' => true,
+            '--except' => $this->option('except'),
         ]));
 
         $this->call('migrate', array_filter([
@@ -53,6 +54,7 @@ class FreshCommand extends Command
             '--schema-path' => $this->input->getOption('schema-path'),
             '--force' => true,
             '--step' => $this->option('step'),
+            '--except' => $this->option('except'),
         ]));
 
         if ($this->laravel->bound(Dispatcher::class)) {
@@ -104,6 +106,7 @@ class FreshCommand extends Command
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use'],
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
+            ['except', null, InputOption::VALUE_OPTIONAL, 'Drop all tables except the given string of tables separated by comma (,)'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to be executed'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
