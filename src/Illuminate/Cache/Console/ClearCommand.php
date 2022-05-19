@@ -52,27 +52,15 @@ class ClearCommand extends Command
     protected $files;
 
     /**
-     * Create a new cache clear command instance.
-     *
-     * @param  \Illuminate\Cache\CacheManager  $cache
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
-     */
-    public function __construct(CacheManager $cache, Filesystem $files)
-    {
-        parent::__construct();
-
-        $this->cache = $cache;
-        $this->files = $files;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void
      */
     public function handle()
     {
+        $this->cache = $this->laravel->make(CacheManager::class);
+        $this->files = $this->laravel->make(Filesystem::class);
+        
         $this->laravel['events']->dispatch(
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
