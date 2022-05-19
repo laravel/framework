@@ -6,13 +6,17 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationViteTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        $this->cleanViteManifest();
+        $this->cleanViteHotFile();
+    }
+
     public function testViteWithoutCss()
     {
         $this->makeViteManifest();
 
         $result = (new Vite)(['resources/js/app-without-css.js']);
-
-        $this->cleanViteManifest();
 
         $this->assertSame('<script type="module" src="/build/assets/app-without-css.versioned.js"></script>', $result->toHtml());
     }
@@ -22,8 +26,6 @@ class FoundationViteTest extends TestCase
         $this->makeViteManifest();
 
         $result = (new Vite)(['resources/js/app-with-css.js']);
-
-        $this->cleanViteManifest();
 
         $this->assertSame(
             '<link rel="stylesheet" href="/build/assets/app.versioned.css" />'
@@ -38,8 +40,6 @@ class FoundationViteTest extends TestCase
 
         $result = (new Vite)(['resources/js/app-with-shared-css.js']);
 
-        $this->cleanViteManifest();
-
         $this->assertSame(
             '<link rel="stylesheet" href="/build/assets/app.versioned.css" />'
             . '<script type="module" src="/build/assets/app-with-shared-css.versioned.js"></script>',
@@ -52,8 +52,6 @@ class FoundationViteTest extends TestCase
         $this->makeViteHotFile();
 
         $result = (new Vite)(['resources/js/app-with-css.js']);
-
-        $this->cleanViteHotFile();
 
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'
@@ -98,8 +96,13 @@ class FoundationViteTest extends TestCase
 
     protected function cleanViteManifest()
     {
-        unlink(public_path('build/manifest.json'));
-        rmdir(public_path('build'));
+        if (file_exists(public_path('build/manifest.json'))) {
+            unlink(public_path('build/manifest.json'));
+        }
+
+        if (file_exists(public_path('build'))) {
+            rmdir(public_path('build'));
+        }
     }
 
     protected function makeViteHotFile()
@@ -111,6 +114,8 @@ class FoundationViteTest extends TestCase
 
     protected function cleanViteHotFile()
     {
-        unlink(public_path('hot'));
+        if (file_exists(public_path('hot'))) {
+            unlink(public_path('hot'));
+        }
     }
 }
