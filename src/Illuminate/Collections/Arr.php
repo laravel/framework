@@ -473,13 +473,12 @@ class Arr
      * @param  string $prependWidth
      * @return array
      */
-    public static function prependKeysWith($array, $prependWidth)
+    public static function prependKeysWith($array, $prependWith)
     {
-        $keys = array_keys($array);
-        foreach($keys as $key) {
-            $keys[array_search($key, $keys)] = $prependWidth . $key;
-        }
-        return array_combine($keys, $array);
+        return collect($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
+            return [$prependWith . $key => $item];
+        })->all();
+
     }
 
     /**
