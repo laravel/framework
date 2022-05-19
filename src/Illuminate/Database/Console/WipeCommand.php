@@ -79,7 +79,7 @@ class WipeCommand extends Command
     {
         $this->laravel['db']->connection($database)
                     ->getSchemaBuilder()
-                    ->dropAllTables();
+                    ->dropAllTables($this->option('except'));
     }
 
     /**
@@ -120,6 +120,7 @@ class WipeCommand extends Command
             ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views'],
             ['drop-types', null, InputOption::VALUE_NONE, 'Drop all tables and types (Postgres only)'],
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+            ['except', null, InputOption::VALUE_OPTIONAL, 'Drop all tables except the given string of tables separated by comma (,)'],
         ];
     }
 }
