@@ -115,6 +115,13 @@ class Route
     protected $waitSeconds;
 
     /**
+     * Indicates to throw HttpException(429, 'Too Early') instead of LockTimeoutException
+     *
+     * @var bool
+     */
+    protected $dontReport;
+
+    /**
      * The computed gathered middleware.
      *
      * @var array|null
@@ -1134,12 +1141,14 @@ class Route
      *
      * @param  int|null  $lockSeconds
      * @param  int|null  $waitSeconds
+     * @param  bool  $dontReport
      * @return $this
      */
-    public function block($lockSeconds = 10, $waitSeconds = 10)
+    public function block($lockSeconds = 10, $waitSeconds = 10, $dontReport = false)
     {
         $this->lockSeconds = $lockSeconds;
         $this->waitSeconds = $waitSeconds;
+        $this->dontReport = $dontReport;
 
         return $this;
     }
@@ -1172,6 +1181,16 @@ class Route
     public function waitsFor()
     {
         return $this->waitSeconds;
+    }
+
+    /**
+     * Get the exception that should be thrown when a lock is not acquired.
+     *
+     * @return bool
+     */
+    public function dontReport()
+    {
+        return $this->dontReport;
     }
 
     /**
