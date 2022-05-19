@@ -3,6 +3,7 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -11,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class StartSession
 {
@@ -94,6 +96,9 @@ class StartSession
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
+        } catch(LockTimeoutException) {
+
+            throw new HttpException(425, 'Too Early');
         } finally {
             $lock?->release();
         }
