@@ -864,7 +864,7 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query.
      *
-     * @param  int|null|callable  $perPage
+     * @param  int|null|\Closure  $perPage
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page

@@ -2634,7 +2634,7 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int|callable  $perPage
+     * @param  int|\Closure  $perPage
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
