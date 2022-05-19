@@ -1,0 +1,42 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Console\Command;
+use Illuminate\Console\ProtectedCommand;
+
+/**
+* Use __invoke method
+*
+* This console command is protected.
+* To make the current command unprotected change extend class to "Command"
+*
+* Example: class {{ class }} extends Command {}
+* @see Command
+*/
+class {{ class }} extends ProtectedCommand
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = '{{ command }}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Command description';
+
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function __invoke()
+    {
+        return 0;
+    }
+}
