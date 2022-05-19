@@ -4,14 +4,13 @@ namespace Illuminate\Console;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class ProtectedCommand
- * @package Illuminate\Console
- */
 class ProtectedCommand extends Command
 {
     /**
+     * Create a new console command instance.
      * Not used for protected command
+     *
+     * @return void
      */
     final public function __construct()
     {
@@ -19,11 +18,14 @@ class ProtectedCommand extends Command
     }
 
     /**
+     * Execute the console command.
      * Not used for protected command
+     *
+     * @return int
      */
     final public function handle()
     {
-        // Not implement handle() method.
+        return 0;
     }
 
     /**
@@ -36,6 +38,7 @@ class ProtectedCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (method_exists($this, '__invoke')) {
+            
             return (int) $this->laravel->call([$this, '__invoke']);
         }
 
