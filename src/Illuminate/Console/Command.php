@@ -61,7 +61,7 @@ class Command extends SymfonyCommand
      *
      * @return void
      */
-    public function __construct()
+    final public function __construct()
     {
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
