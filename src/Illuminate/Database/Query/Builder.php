@@ -2465,6 +2465,27 @@ class Builder implements BuilderContract
     {
         return $this->union($query, true);
     }
+    
+    /**
+     * Add a basic where clause to all the queries of union statement.
+     *
+     * @param  \Closure|string|array  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @param  bool  $all
+     * @return $this
+     */
+    public function whereAllUnion($query, $column, $operator = null, $value = null, $boolean = 'and', $all = false)
+    {
+        $query->where($column, $operator, $value, $boolean);
+
+        $this->where($column, $operator, $value, $boolean);
+
+        $this->union($query, $all);
+
+        return $this;
+    }
 
     /**
      * Lock the selected rows in the table.
