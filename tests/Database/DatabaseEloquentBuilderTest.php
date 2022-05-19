@@ -955,48 +955,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
-    public function testRealNestedWhereWithScopes()
-    {
-        $model = new EloquentBuilderTestNestedStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
-            $query->where('baz', '>', 9000);
-        });
-        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
-        $this->assertEquals(['bar', 9000], $query->getBindings());
-    }
-
-    public function testRealNestedWhereWithScopesMacro()
-    {
-        $model = new EloquentBuilderTestNestedStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->where('foo', '=', 'bar')->where(function ($query) {
-            $query->where('baz', '>', 9000)->onlyTrashed();
-        })->withTrashed();
-        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ? and "table"."deleted_at" is not null)', $query->toSql());
-        $this->assertEquals(['bar', 9000], $query->getBindings());
-    }
-
-    public function testRealNestedWhereWithMultipleScopesAndOneDeadScope()
-    {
-        $model = new EloquentBuilderTestNestedStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->empty()->where('foo', '=', 'bar')->empty()->where(function ($query) {
-            $query->empty()->where('baz', '>', 9000);
-        });
-        $this->assertSame('select * from "table" where "foo" = ? and ("baz" > ?) and "table"."deleted_at" is null', $query->toSql());
-        $this->assertEquals(['bar', 9000], $query->getBindings());
-    }
-
-    public function testSimpleWhereNot()
-    {
-        $model = new EloquentBuilderTestStub();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->whereNot('name', 'foo')->whereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? and not "name" <> ?', $query->toSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
-    }
-
     public function testWhereNot()
     {
         $nestedQuery = m::mock(Builder::class);
@@ -1014,15 +972,6 @@ class DatabaseEloquentBuilderTest extends TestCase
             $query->foo();
         });
         $this->assertEquals($builder, $result);
-    }
-
-    public function testSimpleOrWhereNot()
-    {
-        $model = new EloquentBuilderTestStub();
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->orWhereNot('name', 'foo')->orWhereNot('name', '<>', 'bar');
-        $this->assertEquals('select * from "table" where not "name" = ? or not "name" <> ?', $query->toSql());
-        $this->assertEquals(['foo', 'bar'], $query->getBindings());
     }
 
     public function testOrWhereNot()
@@ -1044,67 +993,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
-    public function testRealQueryHigherOrderOrWhereScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->orWhere->two();
-        $this->assertSame('select * from "table" where "one" = ? or ("two" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryChainedHigherOrderOrWhereScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->orWhere->two()->orWhere->three();
-        $this->assertSame('select * from "table" where "one" = ? or ("two" = ?) or ("three" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryHigherOrderWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->whereNot->two();
-        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryChainedHigherOrderWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->whereNot->two()->whereNot->three();
-        $this->assertSame('select * from "table" where "one" = ? and not ("two" = ?) and not ("three" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryHigherOrderOrWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->orWhereNot->two();
-        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?)', $query->toSql());
-    }
-
-    public function testRealQueryChainedHigherOrderOrWhereNotScopes()
-    {
-        $model = new EloquentBuilderTestHigherOrderWhereScopeStub;
-        $this->mockConnectionForModel($model, 'SQLite');
-        $query = $model->newQuery()->one()->orWhereNot->two()->orWhereNot->three();
-        $this->assertSame('select * from "table" where "one" = ? or not ("two" = ?) or not ("three" = ?)', $query->toSql());
-    }
-
     public function testSimpleWhere()
     {
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar');
         $result = $builder->where('foo', '=', 'bar');
-        $this->assertEquals($result, $builder);
-    }
-
-    public function testPostgresOperatorsWhere()
-    {
-        $builder = $this->getBuilder();
-        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '@>', 'bar');
-        $result = $builder->where('foo', '@>', 'bar');
         $this->assertEquals($result, $builder);
     }
 
@@ -1299,7 +1192,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
 
         $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $relationHash = $model->children()->getRelationCountHash(false);
 
         $builder = $model->withCount('children');
@@ -1613,7 +1506,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $relatedModel->id = 1;
@@ -1627,7 +1520,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereNotMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $relatedModel->id = 1;
@@ -1641,7 +1534,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testOrWhereMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $relatedModel->id = 1;
@@ -1655,7 +1548,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testOrWhereNotMorphedTo()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
         $relatedModel->id = 1;
@@ -1669,7 +1562,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereMorphedToClass()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $builder = $model->whereMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
@@ -1680,7 +1573,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereNotMorphedToClass()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
@@ -1691,7 +1584,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testOrWhereMorphedToClass()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $builder = $model->where('bar', 'baz')->orWhereMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
@@ -1702,7 +1595,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testOrWhereNotMorphedToClass()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         $builder = $model->where('bar', 'baz')->orWhereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
 
@@ -1713,7 +1606,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereMorphedToAlias()
     {
         $model = new EloquentBuilderTestModelParentStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
 
         Relation::morphMap([
             'alias' => EloquentBuilderTestModelCloseRelatedStub::class,
@@ -1894,7 +1787,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testWhereIn()
     {
         $model = new EloquentBuilderTestNestedStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $query = $model->newQuery()->withoutGlobalScopes()->whereIn('foo', $model->newQuery()->select('id'));
         $expected = 'select * from "table" where "foo" in (select "id" from "table" where "table"."deleted_at" is null)';
         $this->assertEquals($expected, $query->toSql());
@@ -1971,7 +1864,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $builder->setModel($model);
         $builder->getConnection()->shouldReceive('update')->once()
             ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', $now])->andReturn(1);
@@ -1985,7 +1878,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $builder->setModel($model);
         $builder->getConnection()->shouldReceive('update')->once()
             ->with('update "table" set "foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
@@ -1999,7 +1892,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $builder->setModel($model);
         $builder->getConnection()->shouldReceive('update')->once()
             ->with('update "table" set "table"."foo" = ?, "table"."updated_at" = ?', ['bar', null])->andReturn(1);
@@ -2013,7 +1906,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStubWithoutTimestamp;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $builder->setModel($model);
         $builder->getConnection()->shouldReceive('update')->once()
             ->with('update "table" set "foo" = ?', ['bar'])->andReturn(1);
@@ -2029,7 +1922,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $builder->setModel($model);
         $builder->getConnection()->shouldReceive('update')->once()
             ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', $now])->andReturn(1);
@@ -2045,7 +1938,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
         $builder = new Builder($query);
         $model = new EloquentBuilderTestStub;
-        $this->mockConnectionForModel($model, '');
+        $this->mockConnectionForModel($model);
         $builder->setModel($model);
         $builder->getConnection()->shouldReceive('update')->once()
             ->with('update "table" as "alias" set "foo" = ?, "alias"."updated_at" = ?', ['bar', null])->andReturn(1);
@@ -2101,12 +1994,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "email" = ?', $clone->toSql());
     }
 
-    protected function mockConnectionForModel($model, $database)
+    protected function mockConnectionForModel($model)
     {
-        $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
-        $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
-        $grammar = new $grammarClass;
-        $processor = new $processorClass;
+        $grammar = new Grammar;
+        $processor = new Processor;
         $connection = m::mock(ConnectionInterface::class, ['getQueryGrammar' => $grammar, 'getPostProcessor' => $processor]);
         $connection->shouldReceive('query')->andReturnUsing(function () use ($connection, $grammar, $processor) {
             return new BaseBuilder($connection, $grammar, $processor);
