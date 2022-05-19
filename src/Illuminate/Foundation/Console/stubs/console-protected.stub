@@ -6,7 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ProtectedCommand;
 
 /**
-* Use __invoke method
+* Use "__invoke()" method
+* Inject dependencies "__invoke(Application $application)"
 *
 * This console command is protected.
 * To make the current command unprotected change extend class to "Command"
