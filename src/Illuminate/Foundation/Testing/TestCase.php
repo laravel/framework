@@ -144,7 +144,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         foreach ($uses as $trait) {
-            $method = 'boot'.class_basename($trait);
+            $method = 'setUp'.class_basename($trait);
 
             if (method_exists($this, $method)) {
                 $this->{$method}();
