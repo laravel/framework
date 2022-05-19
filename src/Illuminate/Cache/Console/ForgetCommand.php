@@ -42,25 +42,14 @@ class ForgetCommand extends Command
     protected $cache;
 
     /**
-     * Create a new cache clear command instance.
-     *
-     * @param  \Illuminate\Cache\CacheManager  $cache
-     * @return void
-     */
-    public function __construct(CacheManager $cache)
-    {
-        parent::__construct();
-
-        $this->cache = $cache;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void
      */
     public function handle()
     {
+        $this->cache = $this->laravel->make(CacheManager::class);
+        
         $this->cache->store($this->argument('store'))->forget(
             $this->argument('key')
         );
