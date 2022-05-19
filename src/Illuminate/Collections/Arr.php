@@ -478,7 +478,6 @@ class Arr
         return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
             return [$prependWith.$key => $item];
         })->all();
-
     }
 
     /**

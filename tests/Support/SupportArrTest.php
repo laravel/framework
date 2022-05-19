@@ -1084,7 +1084,7 @@ class SupportArrTest extends TestCase
             'data' => '456',
             'list' => [1, 2, 3],
             'meta' => [
-                'key' => 1
+                'key' => 1,
             ],
         ];
 
@@ -1093,7 +1093,7 @@ class SupportArrTest extends TestCase
             'test.data' => '456',
             'test.list' => [1, 2, 3],
             'test.meta' => [
-                'key' => 1
+                'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
