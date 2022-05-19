@@ -1162,7 +1162,6 @@ class Route
      */
     public function blockTooEarly($lockSeconds = 10, $waitSeconds = 10)
     {
-
         return $this->block($lockSeconds, $waitSeconds, true);
     }
 
