@@ -516,6 +516,13 @@ class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider imple
             return new stdClass;
         });
     }
+
+    public function provides()
+    {
+        return [
+            'foo'
+        ];
+    }
 }
 
 class ApplicationDeferredServiceProviderCountStub extends ServiceProvider implements DeferrableProvider
@@ -527,6 +534,13 @@ class ApplicationDeferredServiceProviderCountStub extends ServiceProvider implem
         static::$count++;
         $this->app['foo'] = new stdClass;
     }
+
+    public function provides()
+    {
+        return [
+            'foo'
+        ];
+    }
 }
 
 class ApplicationDeferredServiceProviderStub extends ServiceProvider implements DeferrableProvider
@@ -537,6 +551,13 @@ class ApplicationDeferredServiceProviderStub extends ServiceProvider implements 
     {
         static::$initialized = true;
         $this->app['foo'] = 'foo';
+    }
+
+    public function provides()
+    {
+        return [
+            'foo'
+        ];
     }
 }
 
@@ -566,6 +587,13 @@ class InterfaceToImplementationDeferredServiceProvider extends ServiceProvider i
     {
         $this->app->bind(SampleInterface::class, SampleImplementation::class);
     }
+
+    public function provides()
+    {
+        return [
+            SampleInterface::class
+        ];
+    }
 }
 
 class SampleImplementationDeferredServiceProvider extends ServiceProvider implements DeferrableProvider
@@ -575,6 +603,13 @@ class SampleImplementationDeferredServiceProvider extends ServiceProvider implem
         $this->app->when(SampleImplementation::class)->needs('$primitive')->give(function () {
             return 'foo';
         });
+    }
+
+    public function provides()
+    {
+        return [
+            '$primitive'
+        ];
     }
 }
 
@@ -588,6 +623,13 @@ class ApplicationFactoryProviderStub extends ServiceProvider implements Deferrab
             return ++$count;
         });
     }
+
+    public function provides()
+    {
+        return [
+            'foo'
+        ];
+    }
 }
 
 class ApplicationMultiProviderStub extends ServiceProvider implements DeferrableProvider
@@ -600,6 +642,14 @@ class ApplicationMultiProviderStub extends ServiceProvider implements Deferrable
         $this->app->singleton('bar', function ($app) {
             return $app['foo'].'bar';
         });
+    }
+
+    public function provides()
+    {
+        return [
+            'foo',
+            'bar'
+        ];
     }
 }
 
