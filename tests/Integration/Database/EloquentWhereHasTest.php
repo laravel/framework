@@ -90,7 +90,6 @@ class EloquentWhereHasTest extends DatabaseTestCase
     public function dataProviderWhereRelationCallback()
     {
         $callbackArray = function ($value) {
-
             $callbackEloquent = function (EloquentBuilder $builder) use ($value) {
                 $builder->selectRaw('id')->where('public', $value);
             };
