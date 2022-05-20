@@ -43,8 +43,9 @@ class AggregateServiceProvider extends ServiceProvider
 
         foreach ($this->providers as $provider) {
             $instance = $this->app->resolveProvider($provider);
-
-            $provides = array_merge($provides, $instance->provides());
+            if ($instance->isDeferred()) {
+                $provides = array_merge($provides, $instance->provides());
+            }
         }
 
         return $provides;

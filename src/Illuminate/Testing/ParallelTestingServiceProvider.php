@@ -35,4 +35,14 @@ class ParallelTestingServiceProvider extends ServiceProvider implements Deferrab
             });
         }
     }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [];
+    }
 }
