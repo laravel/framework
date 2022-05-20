@@ -136,4 +136,15 @@ class CacheRateLimiterTest extends TestCase
 
         $this->assertTrue($rateLimiter->tooManyAttempts('jôhn', 1));
     }
+
+    public function testKeyIsSanitizedOnlyOnce()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->once()->with('john&#039;doe', 0)->andReturn(1);
+        $cache->shouldReceive('has')->once()->with('john&#039;doe:timer')->andReturn(true);
+        $cache->shouldReceive('add')->never();
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertTrue($rateLimiter->tooManyAttempts("john'doe", 1));
+    }
 }
