@@ -28,7 +28,7 @@ class ConsoleMakeCommand extends GeneratorCommand
      * @deprecated
      */
     protected static $defaultName = 'make:command';
-    
+
     /**
      * The console command description.
      *
