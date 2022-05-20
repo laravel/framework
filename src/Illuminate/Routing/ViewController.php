@@ -41,7 +41,7 @@ class ViewController extends Controller
         return $this->response->view($args['view'], $args['data'], $args['status'], $args['headers']);
     }
 
-     /**
+    /**
      * Execute an action on the controller.
      *
      * @param  string  $method
