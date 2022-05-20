@@ -269,6 +269,69 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('foo@gmail.com', $models[0]->email);
     }
 
+    public function testPaginatedModelCollectionRetrievalUsingCallablePerPage()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(3, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[2]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+        $this->assertSame('foo@gmail.com', $models[2]->email);
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(0, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+
+        EloquentTestUser::create(['id' => 4, 'email' => 'bar@gmail.com']);
+
+        Paginator::currentPageResolver(function () {
+            return 1;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('taylorotwell@gmail.com', $models[0]->email);
+        $this->assertSame('abigailotwell@gmail.com', $models[1]->email);
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+        $models = EloquentTestUser::oldest('id')->paginate(function ($total) {
+            return $total <= 3 ? 3 : 2;
+        });
+
+        $this->assertCount(2, $models);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $models);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
+        $this->assertInstanceOf(EloquentTestUser::class, $models[1]);
+        $this->assertSame('foo@gmail.com', $models[0]->email);
+        $this->assertSame('bar@gmail.com', $models[1]->email);
+    }
+
     public function testPaginatedModelCollectionRetrievalWhenNoElements()
     {
         Paginator::currentPageResolver(function () {

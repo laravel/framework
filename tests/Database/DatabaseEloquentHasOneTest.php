@@ -129,6 +129,20 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
+    public function testForceCreateMethodProperlyCreatesNewModel()
+    {
+        $relation = $this->getRelation();
+        $attributes = ['name' => 'taylor', $relation->getForeignKeyName() => $relation->getParentKey()];
+
+        $created = m::mock(Model::class);
+        $created->shouldReceive('getAttribute')->with($relation->getForeignKeyName())->andReturn($relation->getParentKey());
+
+        $relation->getRelated()->shouldReceive('forceCreate')->once()->with($attributes)->andReturn($created);
+
+        $this->assertEquals($created, $relation->forceCreate(['name' => 'taylor']));
+        $this->assertEquals(1, $created->getAttribute('foreign_key'));
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();

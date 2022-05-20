@@ -65,8 +65,12 @@ class EventFake implements Dispatcher
             if (is_string($actualListener) && Str::contains($actualListener, '@')) {
                 $actualListener = Str::parseCallback($actualListener);
 
-                if (is_string($expectedListener) && ! Str::contains($expectedListener, '@')) {
-                    $expectedListener = [$expectedListener, 'handle'];
+                if (is_string($expectedListener)) {
+                    if (Str::contains($expectedListener, '@')) {
+                        $expectedListener = Str::parseCallback($expectedListener);
+                    } else {
+                        $expectedListener = [$expectedListener, 'handle'];
+                    }
                 }
             }
 

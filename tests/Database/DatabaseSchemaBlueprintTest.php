@@ -415,4 +415,23 @@ class DatabaseSchemaBlueprintTest extends TestCase
             'alter table "posts" add "note" nvarchar(255) null',
         ], $blueprint->toSql($connection, new SqlServerGrammar));
     }
+
+    public function testTableComment()
+    {
+        $base = new Blueprint('posts', function (Blueprint $table) {
+            $table->comment('Look at my comment, it is amazing');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'alter table `posts` comment = \'Look at my comment, it is amazing\'',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+
+        $blueprint = clone $base;
+        $this->assertEquals([
+            'comment on table "posts" is \'Look at my comment, it is amazing\'',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+    }
 }

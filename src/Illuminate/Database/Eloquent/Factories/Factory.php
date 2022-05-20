@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -448,21 +450,21 @@ abstract class Factory
     protected function expandAttributes(array $definition)
     {
         return collect($definition)
-            ->map(function ($attribute, $key) {
+            ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
                     $attribute = $attribute->create()->getKey();
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
 
-                $definition[$key] = $attribute;
-
                 return $attribute;
             })
-            ->map(function ($attribute, $key) use (&$definition) {
+            ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
                 if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
                     $attribute = $attribute($definition);
                 }
+
+                $attribute = $evaluateRelations($attribute);
 
                 $definition[$key] = $attribute;
 
@@ -837,6 +839,12 @@ abstract class Factory
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if ($method === 'trashed' && in_array(SoftDeletes::class, class_uses_recursive($this->modelName()))) {
+            return $this->state([
+                $this->newModel()->getDeletedAtColumn() => $parameters[0] ?? Carbon::now()->subDay(),
+            ]);
         }
 
         if (! Str::startsWith($method, ['for', 'has'])) {

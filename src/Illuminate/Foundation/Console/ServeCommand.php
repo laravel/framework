@@ -45,6 +45,22 @@ class ServeCommand extends Command
     protected $portOffset = 0;
 
     /**
+     * The environment variables that should be passed from host machine to the PHP server process.
+     *
+     * @var string[]
+     */
+    public static $passthroughVariables = [
+        'APP_ENV',
+        'LARAVEL_SAIL',
+        'PHP_CLI_SERVER_WORKERS',
+        'PHP_IDE_CONFIG',
+        'SYSTEMROOT',
+        'XDEBUG_CONFIG',
+        'XDEBUG_MODE',
+        'XDEBUG_SESSION',
+    ];
+
+    /**
      * Execute the console command.
      *
      * @return int
@@ -111,16 +127,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, [
-                'APP_ENV',
-                'LARAVEL_SAIL',
-                'PHP_CLI_SERVER_WORKERS',
-                'PHP_IDE_CONFIG',
-                'SYSTEMROOT',
-                'XDEBUG_CONFIG',
-                'XDEBUG_MODE',
-                'XDEBUG_SESSION',
-            ]) ? [$key => $value] : [$key => false];
+            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
         $process->start(function ($type, $buffer) {

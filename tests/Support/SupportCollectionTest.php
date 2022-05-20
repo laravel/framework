@@ -1124,6 +1124,26 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testValue($collection)
+    {
+        $c = new $collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
+
+        $this->assertEquals('Hello', $c->value('name'));
+        $this->assertEquals('World', $c->where('id', 2)->value('name'));
+
+        $c = new $collection([
+            ['id' => 1, 'pivot' => ['value' => 'foo']],
+            ['id' => 2, 'pivot' => ['value' => 'bar']],
+        ]);
+
+        $this->assertEquals(['value' => 'foo'], $c->value('pivot'));
+        $this->assertEquals('foo', $c->value('pivot.value'));
+        $this->assertEquals('bar', $c->where('id', 2)->value('pivot.value'));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testBetween($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);

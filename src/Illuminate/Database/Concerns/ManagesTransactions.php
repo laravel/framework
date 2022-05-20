@@ -88,11 +88,7 @@ trait ManagesTransactions
                 $this->getName(), $this->transactions
             );
 
-            throw new DeadlockException(
-                $e->getMessage(),
-                $e->getCode(),
-                $e->getPrevious()
-            );
+            throw new DeadlockException($e->getMessage(), is_int($e->getCode()) ? $e->getCode() : 0, $e);
         }
 
         // If there was an exception we will rollback this transaction and then we
