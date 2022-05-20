@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentWhereHasTest;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class EloquentWhereHasTest extends DatabaseTestCase
 {
@@ -55,8 +55,8 @@ class EloquentWhereHasTest extends DatabaseTestCase
     public function testWhereRelationCallback($callbackEloquent, $callbackQuery)
     {
         $userWhereRelation = User::whereRelation("posts", $callbackEloquent);
-        $userWhereHas      = User::whereHas("posts", $callbackEloquent);
-        $query             = DB::table("users")->whereExists($callbackQuery);
+        $userWhereHas = User::whereHas("posts", $callbackEloquent);
+        $query = DB::table("users")->whereExists($callbackQuery);
 
         $this->assertEquals($userWhereRelation->getQuery()->toSql(), $query->toSql());
         $this->assertEquals($userWhereRelation->getQuery()->toSql(), $userWhereHas->toSql());
@@ -75,8 +75,8 @@ class EloquentWhereHasTest extends DatabaseTestCase
     public function testOrWhereRelationCallback($callbackEloquent, $callbackQuery)
     {
         $userOrWhereRelation = User::orWhereRelation("posts", $callbackEloquent);
-        $userOrWhereHas      = User::orWhereHas("posts", $callbackEloquent);
-        $query               = DB::table("users")->orWhereExists($callbackQuery);
+        $userOrWhereHas = User::orWhereHas("posts", $callbackEloquent);
+        $query = DB::table("users")->orWhereExists($callbackQuery);
 
         $this->assertEquals($userOrWhereRelation->getQuery()->toSql(), $query->toSql());
         $this->assertEquals($userOrWhereRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
@@ -92,27 +92,27 @@ class EloquentWhereHasTest extends DatabaseTestCase
         $callbackArray = function ($value) {
 
             $callbackEloquent = function (EloquentBuilder $builder) use ($value) {
-                $builder->selectRaw("id")->where("public", $value);
+                $builder->selectRaw('id')->where('public', $value);
             };
 
             $callbackQuery = function (QueryBuilder $builder) use ($value) {
                 $hasMany = app()->make(User::class)->posts();
 
-                $builder->from("posts")->addSelect(['*'])->whereColumn(
+                $builder->from('posts')->addSelect(['*'])->whereColumn(
                     $hasMany->getQualifiedParentKeyName(),
                     '=',
                     $hasMany->getQualifiedForeignKeyName()
                 );
 
-                $builder->selectRaw("id")->where("public", $value);
+                $builder->selectRaw('id')->where("public", $value);
             };
 
             return [$callbackEloquent, $callbackQuery];
         };
 
         return [
-            "Find user with post.public = true"  => $callbackArray(true),
-            "Find user with post.public = false" => $callbackArray(false),
+            'Find user with post.public = true'  => $callbackArray(true),
+            'Find user with post.public = false' => $callbackArray(false),
         ];
     }
 
