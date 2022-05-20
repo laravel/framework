@@ -297,8 +297,14 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeClassCastableAttribute($key, $attributes[$key]);
             }
 
-            if ($this->isEnumCastable($key) && (! ($attributes[$key] ?? null) instanceof Arrayable)) {
-                $attributes[$key] = isset($attributes[$key]) ? $attributes[$key]->value : null;
+            if ($this->isEnumCastable($key)) {
+                if (is_array($attributes[$key] ?? null)) {
+                    $attributes[$key] = array_map(function ($item) {
+                        return $item instanceof Arrayable ? $item->toArray() : ($item ? $item->value : null);
+                    }, $attributes[$key]);
+                } elseif (!($attributes[$key] ?? null) instanceof Arrayable) {
+                    $attributes[$key] = isset($attributes[$key]) ? $attributes[$key]->value : null;
+                }
             }
 
             if ($attributes[$key] instanceof Arrayable) {
@@ -799,13 +805,25 @@ trait HasAttributes
             return;
         }
 
-        $castType = $this->getCasts()[$key];
+        @list($castType, $type) = explode(':', $this->getCasts()[$key]);
 
-        if ($value instanceof $castType) {
-            return $value;
+        $caster = function ($castType, $value) {
+            if ($value instanceof $castType) {
+                return $value;
+            }
+
+            return $castType::from($value);
+        };
+
+        if ($type) {
+            if ($type == 'array') {
+                return array_map(function ($item) use ($caster, $castType) {
+                    return $caster($castType, $item);
+                }, $this->fromJson($value));
+            }
+        } else {
+            return $caster($castType, $value);
         }
-
-        return $castType::from($value);
     }
 
     /**
@@ -1098,14 +1116,30 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        $enumClass = $this->getCasts()[$key];
+        @list($enumClass, $type) = explode(':', $this->getCasts()[$key]);
+
+        $caster = function ($enumClass, $value) {
+            if ($value instanceof $enumClass) {
+                return $value->value;
+            } else {
+                return $enumClass::from($value)->value;
+            }
+        };
 
         if (! isset($value)) {
             $this->attributes[$key] = null;
-        } elseif ($value instanceof $enumClass) {
-            $this->attributes[$key] = $value->value;
         } else {
-            $this->attributes[$key] = $enumClass::from($value)->value;
+            if ($type) {
+                if ($type == 'array') {
+                    $values = array_map(function($item) use ($caster, $enumClass) {
+                        return $caster($enumClass, $item);
+                    }, (array)$value);
+
+                    $this->attributes[$key] = $this->asJson($values);
+                }
+            } else {
+                $this->attributes[$key] = $caster($enumClass, $value);
+            }
         }
     }
 
@@ -1514,7 +1548,7 @@ trait HasAttributes
             return false;
         }
 
-        $castType = $this->getCasts()[$key];
+        list($castType) = explode(':', $this->getCasts()[$key]);
 
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;
