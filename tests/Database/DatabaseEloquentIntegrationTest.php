@@ -21,7 +21,6 @@ use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
@@ -1603,19 +1602,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('2017-11-14 08:23:19', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    public function testTimestampsUsingDefaultSqlServerDateFormat()
-    {
-        $model = new EloquentTestUser;
-        $model->setDateFormat('Y-m-d H:i:s.v'); // Default SQL Server date format
-        $model->setRawAttributes([
-            'created_at' => '2017-11-14 08:23:19.000',
-            'updated_at' => '2017-11-14 08:23:19.734',
-        ]);
-
-        $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
-        $this->assertSame('2017-11-14 08:23:19.734', $model->fromDateTime($model->getAttribute('updated_at')));
-    }
-
     public function testTimestampsUsingCustomDateFormat()
     {
         // Simulating using custom precisions with timestamps(4)
@@ -1629,34 +1615,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
         // Note: when storing databases would truncate the value to the given precision
         $this->assertSame('2017-11-14 08:23:19.000000', $model->fromDateTime($model->getAttribute('created_at')));
         $this->assertSame('2017-11-14 08:23:19.734800', $model->fromDateTime($model->getAttribute('updated_at')));
-    }
-
-    public function testTimestampsUsingOldSqlServerDateFormat()
-    {
-        $model = new EloquentTestUser;
-        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
-        $model->setRawAttributes([
-            'created_at' => '2017-11-14 08:23:19.000',
-        ]);
-
-        $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
-    }
-
-    public function testTimestampsUsingOldSqlServerDateFormatFallbackToDefaultParsing()
-    {
-        $model = new EloquentTestUser;
-        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
-        $model->setRawAttributes([
-            'updated_at' => '2017-11-14 08:23:19.734',
-        ]);
-
-        $date = $model->getAttribute('updated_at');
-        $this->assertSame('2017-11-14 08:23:19.734', $date->format('Y-m-d H:i:s.v'), 'the date should contains the precision');
-        $this->assertSame('2017-11-14 08:23:19.000', $model->fromDateTime($date), 'the format should trims it');
-        // No longer throwing exception since Laravel 7,
-        // but Date::hasFormat() can be used instead to check date formatting:
-        $this->assertTrue(Date::hasFormat('2017-11-14 08:23:19.000', $model->getDateFormat()));
-        $this->assertFalse(Date::hasFormat('2017-11-14 08:23:19.734', $model->getDateFormat()));
     }
 
     public function testSpecialFormats()
