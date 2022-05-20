@@ -591,7 +591,7 @@ class InterfaceToImplementationDeferredServiceProvider extends ServiceProvider i
     public function provides()
     {
         return [
-            SampleInterface::class
+            SampleInterface::class,
         ];
     }
 }
@@ -648,7 +648,7 @@ class ApplicationMultiProviderStub extends ServiceProvider implements Deferrable
     {
         return [
             'foo',
-            'bar'
+            'bar',
         ];
     }
 }
