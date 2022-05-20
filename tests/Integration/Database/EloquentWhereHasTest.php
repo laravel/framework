@@ -54,9 +54,9 @@ class EloquentWhereHasTest extends DatabaseTestCase
      */
     public function testWhereRelationCallback($callbackEloquent, $callbackQuery)
     {
-        $userWhereRelation = User::whereRelation("posts", $callbackEloquent);
-        $userWhereHas = User::whereHas("posts", $callbackEloquent);
-        $query = DB::table("users")->whereExists($callbackQuery);
+        $userWhereRelation = User::whereRelation('posts', $callbackEloquent);
+        $userWhereHas = User::whereHas('posts', $callbackEloquent);
+        $query = DB::table('users')->whereExists($callbackQuery);
 
         $this->assertEquals($userWhereRelation->getQuery()->toSql(), $query->toSql());
         $this->assertEquals($userWhereRelation->getQuery()->toSql(), $userWhereHas->toSql());
@@ -74,9 +74,9 @@ class EloquentWhereHasTest extends DatabaseTestCase
      */
     public function testOrWhereRelationCallback($callbackEloquent, $callbackQuery)
     {
-        $userOrWhereRelation = User::orWhereRelation("posts", $callbackEloquent);
-        $userOrWhereHas = User::orWhereHas("posts", $callbackEloquent);
-        $query = DB::table("users")->orWhereExists($callbackQuery);
+        $userOrWhereRelation = User::orWhereRelation('posts', $callbackEloquent);
+        $userOrWhereHas = User::orWhereHas('posts', $callbackEloquent);
+        $query = DB::table('users')->orWhereExists($callbackQuery);
 
         $this->assertEquals($userOrWhereRelation->getQuery()->toSql(), $query->toSql());
         $this->assertEquals($userOrWhereRelation->getQuery()->toSql(), $userOrWhereHas->toSql());
@@ -104,7 +104,7 @@ class EloquentWhereHasTest extends DatabaseTestCase
                     $hasMany->getQualifiedForeignKeyName()
                 );
 
-                $builder->selectRaw('id')->where("public", $value);
+                $builder->selectRaw('id')->where('public', $value);
             };
 
             return [$callbackEloquent, $callbackQuery];
