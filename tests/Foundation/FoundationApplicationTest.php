@@ -520,7 +520,7 @@ class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider imple
     public function provides()
     {
         return [
-            'foo'
+            'foo',
         ];
     }
 }
@@ -538,7 +538,7 @@ class ApplicationDeferredServiceProviderCountStub extends ServiceProvider implem
     public function provides()
     {
         return [
-            'foo'
+            'foo',
         ];
     }
 }
@@ -556,7 +556,7 @@ class ApplicationDeferredServiceProviderStub extends ServiceProvider implements 
     public function provides()
     {
         return [
-            'foo'
+            'foo',
         ];
     }
 }
@@ -608,7 +608,7 @@ class SampleImplementationDeferredServiceProvider extends ServiceProvider implem
     public function provides()
     {
         return [
-            '$primitive'
+            '$primitive',
         ];
     }
 }
@@ -627,7 +627,7 @@ class ApplicationFactoryProviderStub extends ServiceProvider implements Deferrab
     public function provides()
     {
         return [
-            'foo'
+            'foo',
         ];
     }
 }
