@@ -32,13 +32,18 @@ class ViewController extends Controller
      */
     public function __invoke(...$args)
     {
-        $parameters = array_filter($args, function ($key) {
+        $routeParameters = array_filter($args, function ($key) {
             return ! in_array($key, ['view', 'data', 'status', 'headers']);
         }, ARRAY_FILTER_USE_KEY);
 
-        $args['data'] = array_merge($args['data'], $parameters);
+        $args['data'] = array_merge($args['data'], $routeParameters);
 
-        return $this->response->view($args['view'], $args['data'], $args['status'], $args['headers']);
+        return $this->response->view(
+            $args['view'],
+            $args['data'],
+            $args['status'],
+            $args['headers']
+        );
     }
 
     /**
