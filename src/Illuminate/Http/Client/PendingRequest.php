@@ -506,15 +506,15 @@ class PendingRequest
      * Specify the number of times the request should be attempted.
      *
      * @param  int  $times
-     * @param  int  $sleep
+     * @param  int  $sleepMilliseconds
      * @param  callable|null  $when
      * @param  bool  $throw
      * @return $this
      */
-    public function retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
+    public function retry(int $times, int $sleepMilliseconds = 0, ?callable $when = null, bool $throw = true)
     {
         $this->tries = $times;
-        $this->retryDelay = $sleep;
+        $this->retryDelay = $sleepMilliseconds;
         $this->retryThrow = $throw;
         $this->retryWhenCallback = $when;
 
