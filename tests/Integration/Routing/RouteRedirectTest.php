@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\Fluent\AssertableUri;
 use Orchestra\Testbench\TestCase;
 
 class RouteRedirectTest extends TestCase
@@ -18,6 +19,23 @@ class RouteRedirectTest extends TestCase
         $response = $this->get($requestUri);
         $response->assertRedirect($redirectUri);
         $response->assertStatus(301);
+    }
+
+    public function testRouteRedirectUsingAssertableUri()
+    {
+        Route::redirect('from', 'https://foo.bar:8080/auth/token?scope=profile&include_granted_scopes=true', 301);
+
+        $response = $this->get('from');
+
+        $response->assertRedirect(function (AssertableUri $uri) {
+            $uri
+                ->whereScheme('https')
+                ->whereHost('foo.bar')
+                ->wherePort(8080)
+                ->wherePath('/auth/token')
+                ->whereQuery('scope', 'profile')
+                ->whereQuery('include_granted_scopes', 'true');
+        });
     }
 
     public function routeRedirectDataSets()
