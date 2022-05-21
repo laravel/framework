@@ -754,7 +754,7 @@ class Filesystem
     }
 
     /**
-     * Get the Size of the given Directory
+     * Get the Size of the given Directory.
      *
      * @param $directory
      * @return int
@@ -763,7 +763,7 @@ class Filesystem
     {
         $size = 0;
 
-        foreach($this->allFiles($directory) as $file) {
+        foreach( $this->allFiles($directory) as $file) {
             $size += $this->size($file->getPathname());
         }
 

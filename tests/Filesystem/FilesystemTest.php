@@ -594,14 +594,16 @@ class FilesystemTest extends TestCase
         $this->assertSame('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash(self::$tempDir.'/foo.txt'));
     }
 
-    public function testGetDirectorySizeWithoutSubDirectories() {
+    public function testGetDirectorySizeWithoutSubDirectories()
+    {
         $filesystem = new Filesystem();
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
         file_put_contents(self::$tempDir.'/bar.txt', 'bar');
         $this->assertSame(6, $filesystem->getDirectorySize(self::$tempDir));
     }
 
-    public function testGetDirectorySizeWithSubDirectories() {
+    public function testGetDirectorySizeWithSubDirectories()
+    {
         $filesystem = new Filesystem();
         mkdir(self::$tempDir.'/sub', 0777, true);
         file_put_contents(self::$tempDir.'/root.txt', 'root');
