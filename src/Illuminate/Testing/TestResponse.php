@@ -22,6 +22,7 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -796,6 +797,16 @@ EOF;
         $this->decodeResponseJson()->assertMissing($data, $exact);
 
         return $this;
+    }
+
+    /**
+     * Assert that the response equal to specified resource
+     *
+     * @return $this
+     */
+    public function assertJsonResource(JsonResource $resource)
+    {
+        return $this->assertExactJson($resource->response()->getData(true));
     }
 
     /**
