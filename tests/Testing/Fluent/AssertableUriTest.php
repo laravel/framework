@@ -326,7 +326,9 @@ class AssertableUriTest extends TestCase
 
     public function testCanDisableInteractionCheck()
     {
-        $this->assert->whereQuery('foo', 'bar')
+        $assert = new AssertableUri('https://foo.bar?name=Taylor&id=1');
+
+        $assert->whereQuery('name', 'Taylor')
             ->etc()
             ->interacted();
     }
