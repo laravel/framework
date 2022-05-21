@@ -752,4 +752,21 @@ class Filesystem
     {
         return $this->deleteDirectory($directory, true);
     }
+
+    /**
+     * Get the Size of the given Directory
+     *
+     * @param $directory
+     * @return int
+     */
+    public function getDirectorySize($directory)
+    {
+        $size = 0;
+
+        foreach($this->allFiles($directory) as $file) {
+            $size += $this->size($file->getPathname());
+        }
+
+        return $size;
+    }
 }
