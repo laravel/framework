@@ -763,7 +763,7 @@ class Filesystem
     {
         $size = 0;
 
-        foreach( $this->allFiles($directory) as $file) {
+        foreach ($this->allFiles($directory) as $file) {
             $size += $this->size($file->getPathname());
         }
 
