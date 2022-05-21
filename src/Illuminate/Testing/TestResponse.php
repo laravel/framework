@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -22,7 +23,6 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use LogicException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -800,7 +800,7 @@ EOF;
     }
 
     /**
-     * Assert that the response equal to specified resource
+     * Assert that the response equal to specified resource.
      *
      * @return $this
      */
