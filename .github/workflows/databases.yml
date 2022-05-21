@@ -2,6 +2,9 @@ name: databases
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   mysql_57:
     runs-on: ubuntu-20.04
