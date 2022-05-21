@@ -454,6 +454,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Set the foreign key for a relationship to another model.
+     *
+     * @param Model $model
+     * @param string|null $relationship
+     * @return $this
+     */
+    public function forModel($model, $relationship = null)
+    {
+        $relationship ??= Str::camel(class_basename($model));
+
+        $foreignKey = $this->{$relationship}()->getForeignKeyName();
+
+        $this->fill([$foreignKey => $model->getKey()]);
+
+        return $this;
+    }
+
+    /**
      * Qualify the given column name by the model's table.
      *
      * @param  string  $column
@@ -2156,6 +2174,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this->$method(...$parameters);
         }
 
+        if ($method === 'for') {
+            return $this->forModel(...$parameters);
+        }
+
         if ($resolver = (static::$relationResolvers[get_class($this)][$method] ?? null)) {
             return $resolver($this);
         }
@@ -2172,6 +2194,12 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function __callStatic($method, $parameters)
     {
+        if ($method === 'for') {
+            $model = new static;
+
+            return $model->forwardCallTo($model->newQuery(), $method, $parameters);
+        }
+
         return (new static)->$method(...$parameters);
     }
 

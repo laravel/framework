@@ -128,6 +128,13 @@ class Builder implements BuilderContract
     protected $removedScopes = [];
 
     /**
+     * The models that the queried models will be related to via a foreign key.
+     *
+     * @var array
+     */
+    protected $for = [];
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -146,7 +153,7 @@ class Builder implements BuilderContract
      */
     public function make(array $attributes = [])
     {
-        return $this->newModelInstance($attributes);
+        return $this->newModelInstance($this->mergeForeignKeys($attributes));
     }
 
     /**
@@ -534,7 +541,7 @@ class Builder implements BuilderContract
             return $instance;
         }
 
-        return $this->newModelInstance(array_merge($attributes, $values));
+        return $this->newModelInstance($this->mergeForeignKeys(array_merge($attributes, $values)));
     }
 
     /**
@@ -550,7 +557,7 @@ class Builder implements BuilderContract
             return $instance;
         }
 
-        return tap($this->newModelInstance(array_merge($attributes, $values)), function ($instance) {
+        return tap($this->newModelInstance($this->mergeForeignKeys(array_merge($attributes, $values))), function ($instance) {
             $instance->save();
         });
     }
@@ -565,7 +572,7 @@ class Builder implements BuilderContract
     public function updateOrCreate(array $attributes, array $values = [])
     {
         return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values)->save();
+            $instance->fill($this->mergeForeignKeys($values))->save();
         });
     }
 
@@ -970,7 +977,7 @@ class Builder implements BuilderContract
      */
     public function create(array $attributes = [])
     {
-        return tap($this->newModelInstance($attributes), function ($instance) {
+        return tap($this->newModelInstance($this->mergeForeignKeys($attributes)), function ($instance) {
             $instance->save();
         });
     }
@@ -984,7 +991,7 @@ class Builder implements BuilderContract
     public function forceCreate(array $attributes)
     {
         return $this->model->unguarded(function () use ($attributes) {
-            return $this->newModelInstance()->create($attributes);
+            return $this->newModelInstance()->create($this->mergeForeignKeys($attributes));
         });
     }
 
@@ -996,7 +1003,7 @@ class Builder implements BuilderContract
      */
     public function update(array $values)
     {
-        return $this->toBase()->update($this->addUpdatedAtColumn($values));
+        return $this->toBase()->update($this->addUpdatedAtColumn($this->mergeForeignKeys($values)));
     }
 
     /**
@@ -1138,6 +1145,23 @@ class Builder implements BuilderContract
         }
 
         return $update;
+    }
+
+    /**
+     * Merge the attributes that will be used in the query with the specific foreign keys.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function mergeForeignKeys($attributes)
+    {
+        if (count($this->for)) {
+            foreach ($this->for as $model) {
+                $attributes[$model['foreignKey']] = $model['model']->getKey();
+            }
+        }
+
+        return $attributes;
     }
 
     /**
@@ -1407,6 +1431,27 @@ class Builder implements BuilderContract
         $this->eagerLoad = [];
 
         return $this->with($relations);
+    }
+
+    /**
+     * Set the foreign key for a relationship to another model.
+     *
+     * @param Model $model
+     * @param string $relationship
+     * @return $this
+     */
+    public function for($model, $relationship = null)
+    {
+        $relationship ??= Str::camel(class_basename($model));
+
+        $foreignKey = $this->model->{$relationship}()->getForeignKeyName();
+
+        $this->for[] = [
+            'model' => $model,
+            'foreignKey' => $foreignKey,
+        ];
+
+        return $this;
     }
 
     /**
