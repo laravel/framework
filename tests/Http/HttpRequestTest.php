@@ -586,7 +586,7 @@ class HttpRequestTest extends TestCase
         $request->date('date', 'invalid_format');
     }
 
-    public function testJsDate()
+    public function testJsonDate()
     {
         $request = Request::create('/', 'GET', [
             'as_null' => null,
@@ -600,16 +600,16 @@ class HttpRequestTest extends TestCase
 
         $date = Carbon::create(2020, 1, 1, 16, 30, 25);
 
-        $this->assertNull($request->jsDate('as_null'));
-        $this->assertNull($request->jsDate('doesnt_exists'));
+        $this->assertNull($request->jsonDate('as_null'));
+        $this->assertNull($request->jsonDate('doesnt_exists'));
 
-        $this->assertEquals($date, $request->jsDate('as_js_date'));
-        $this->assertEquals($date, $request->jsDate('as_js_date_tz'));
-        $this->assertEquals($date->milli(123), $request->jsDate('as_js_date_milli'));
-        $this->assertEquals($date->micro(123456), $request->jsDate('as_js_date_micro'));
+        $this->assertEquals($date, $request->jsonDate('as_js_date'));
+        $this->assertEquals($date, $request->jsonDate('as_js_date_tz'));
+        $this->assertEquals($date->milli(123), $request->jsonDate('as_js_date_milli'));
+        $this->assertEquals($date->micro(123456), $request->jsonDate('as_js_date_micro'));
     }
 
-    public function testJsDateMethodExceptionWhenFormatInvalid()
+    public function testJsonDateMethodExceptionWhenFormatInvalid()
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -617,7 +617,7 @@ class HttpRequestTest extends TestCase
             'date' => '2020-01-01T21:30:25@05:00',
         ]);
 
-        $request->jsDate('date');
+        $request->jsonDate('date');
     }
 
     public function testArrayAccess()

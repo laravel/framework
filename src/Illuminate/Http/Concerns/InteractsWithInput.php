@@ -350,7 +350,7 @@ trait InteractsWithInput
      * @param  string  $key
      * @return \Illuminate\Support\Carbon|null
      */
-    public function jsDate($key)
+    public function jsonDate($key)
     {
         return $this->date($key, DateFactory::JSON_DATE)?->utc();
     }
