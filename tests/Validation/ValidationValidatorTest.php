@@ -4078,6 +4078,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => '17:43'], ['x' => 'date_format:H:i']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2000-01-01T00:00:00.000000+00:30'], ['x' => 'date_format:json']);
+        $this->assertTrue($v->passes());
     }
 
     public function testDateEquals()

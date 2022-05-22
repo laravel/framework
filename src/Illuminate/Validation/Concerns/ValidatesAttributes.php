@@ -13,6 +13,7 @@ use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\DateFactory;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
@@ -501,6 +502,10 @@ trait ValidatesAttributes
         }
 
         foreach ($parameters as $format) {
+            if ($format === 'json') {
+                $format = DateFactory::JSON_DATE;
+            }
+
             $date = DateTime::createFromFormat('!'.$format, $value);
 
             if ($date && $date->format($format) == $value) {
