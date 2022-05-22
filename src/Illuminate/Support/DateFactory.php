@@ -91,6 +91,13 @@ class DateFactory
     const DEFAULT_CLASS_NAME = Carbon::class;
 
     /**
+     * The default format of JSON encoded Date Javascript objects with 1 to 6 subsecond precision.
+     *
+     * @var string
+     */
+    const JSON_DATE = "Y-m-d\TH:i:s.uP";
+
+    /**
      * The type (class) of dates that should be created.
      *
      * @var string

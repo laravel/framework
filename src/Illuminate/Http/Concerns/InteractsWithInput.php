@@ -4,6 +4,7 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\DateFactory;
 use Illuminate\Support\Facades\Date;
 use SplFileInfo;
 use stdClass;
@@ -341,6 +342,17 @@ trait InteractsWithInput
         }
 
         return Date::createFromFormat($format, $this->input($key), $tz);
+    }
+
+    /**
+     * Retrieve a ISO-8601/RFC-3339 date from the request as a Carbon instance in UTC.
+     *
+     * @param  string  $key
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function jsDate($key)
+    {
+        return $this->date($key, DateFactory::JSON_DATE)?->utc();
     }
 
     /**

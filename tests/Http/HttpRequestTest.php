@@ -586,6 +586,40 @@ class HttpRequestTest extends TestCase
         $request->date('date', 'invalid_format');
     }
 
+    public function testJsDate()
+    {
+        $request = Request::create('/', 'GET', [
+            'as_null' => null,
+            'as_invalid' => 'invalid',
+
+            'as_js_date' => '2020-01-01T16:30:25.000Z',
+            'as_js_date_tz' => '2020-01-01T21:30:25.000+05:00',
+            'as_js_date_milli' => '2020-01-01T21:30:25.123+05:00',
+            'as_js_date_micro' => '2020-01-01T21:30:25.123456+05:00',
+        ]);
+
+        $date = Carbon::create(2020, 1, 1, 16, 30, 25);
+
+        $this->assertNull($request->jsDate('as_null'));
+        $this->assertNull($request->jsDate('doesnt_exists'));
+
+        $this->assertEquals($date, $request->jsDate('as_js_date'));
+        $this->assertEquals($date, $request->jsDate('as_js_date_tz'));
+        $this->assertEquals($date->milli(123), $request->jsDate('as_js_date_milli'));
+        $this->assertEquals($date->micro(123456), $request->jsDate('as_js_date_micro'));
+    }
+
+    public function testJsDateMethodExceptionWhenFormatInvalid()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $request = Request::create('/', 'GET', [
+            'date' => '2020-01-01T21:30:25@05:00',
+        ]);
+
+        $request->jsDate('date');
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
