@@ -607,6 +607,10 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($date, $request->jsonDate('as_js_date_tz'));
         $this->assertEquals($date->milli(123), $request->jsonDate('as_js_date_milli'));
         $this->assertEquals($date->micro(123456), $request->jsonDate('as_js_date_micro'));
+
+        $this->assertTrue($request->jsonDate('as_js_date')->isUtc());
+        $this->assertFalse($request->jsonDate('as_js_date_tz')->isUtc());
+        $this->assertTrue($request->jsonDate('as_js_date_tz', true)->isUtc());
     }
 
     public function testJsonDateMethodExceptionWhenFormatInvalid()

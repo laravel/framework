@@ -345,14 +345,17 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve a ISO-8601/RFC-3339 date from the request as a Carbon instance in UTC.
+     * Retrieve a ISO-8601/RFC-3339 date from the request as a Carbon instance.
      *
      * @param  string  $key
+     * @param  bool  $asUtc
      * @return \Illuminate\Support\Carbon|null
      */
-    public function jsonDate($key)
+    public function jsonDate($key, $asUtc = false)
     {
-        return $this->date($key, DateFactory::JSON_DATE)?->utc();
+        $date = $this->date($key, DateFactory::JSON_DATE);
+
+        return $asUtc ? $date?->utc() : $date;
     }
 
     /**
