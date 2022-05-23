@@ -302,7 +302,7 @@ trait HasAttributes
                     $attributes[$key] = array_map(function ($item) {
                         return $item instanceof Arrayable ? $item->toArray() : ($item ? $item->value : null);
                     }, $attributes[$key]);
-                } elseif (!($attributes[$key] ?? null) instanceof Arrayable) {
+                } elseif (! ($attributes[$key] ?? null) instanceof Arrayable) {
                     $attributes[$key] = isset($attributes[$key]) ? $attributes[$key]->value : null;
                 }
             }
@@ -805,7 +805,7 @@ trait HasAttributes
             return;
         }
 
-        @list($castType, $type) = explode(':', $this->getCasts()[$key]);
+        @[$castType, $type] = explode(':', $this->getCasts()[$key]);
 
         $caster = function ($castType, $value) {
             if ($value instanceof $castType) {
@@ -816,11 +816,13 @@ trait HasAttributes
         };
 
         if ($type) {
-            if ($type == 'array') {
-                return array_map(function ($item) use ($caster, $castType) {
-                    return $caster($castType, $item);
-                }, $this->fromJson($value));
-            }
+            $values = match ($type) {
+                'set' => explode(',', $value),
+                'json' => $this->fromJson($value),
+            };
+            return array_map(function ($item) use ($caster, $castType) {
+                return $caster($castType, $item);
+            }, $values);
         } else {
             return $caster($castType, $value);
         }
@@ -1116,7 +1118,7 @@ trait HasAttributes
      */
     protected function setEnumCastableAttribute($key, $value)
     {
-        @list($enumClass, $type) = explode(':', $this->getCasts()[$key]);
+        @[$enumClass, $type] = explode(':', $this->getCasts()[$key]);
 
         $caster = function ($enumClass, $value) {
             if ($value instanceof $enumClass) {
@@ -1130,13 +1132,13 @@ trait HasAttributes
             $this->attributes[$key] = null;
         } else {
             if ($type) {
-                if ($type == 'array') {
-                    $values = array_map(function($item) use ($caster, $enumClass) {
-                        return $caster($enumClass, $item);
-                    }, (array)$value);
-
-                    $this->attributes[$key] = $this->asJson($values);
-                }
+                $values = array_map(function($item) use ($caster, $enumClass) {
+                    return $caster($enumClass, $item);
+                }, (array) $value);
+                $this->attributes[$key] = match ($type) {
+                    'set' => implode(',', $values),
+                    'json' => $this->asJson($values),
+                };
             } else {
                 $this->attributes[$key] = $caster($enumClass, $value);
             }
