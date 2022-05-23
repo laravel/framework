@@ -1132,7 +1132,7 @@ trait HasAttributes
             $this->attributes[$key] = null;
         } else {
             if ($type) {
-                $values = array_map(function($item) use ($caster, $enumClass) {
+                $values = array_map(function ($item) use ($caster, $enumClass) {
                     return $caster($enumClass, $item);
                 }, (array) $value);
                 $this->attributes[$key] = match ($type) {
@@ -1550,7 +1550,7 @@ trait HasAttributes
             return false;
         }
 
-        list($castType) = explode(':', $this->getCasts()[$key]);
+        [$castType] = explode(':', $this->getCasts()[$key]);
 
         if (in_array($castType, static::$primitiveCastTypes)) {
             return false;
