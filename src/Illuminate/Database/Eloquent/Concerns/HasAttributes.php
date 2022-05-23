@@ -820,6 +820,7 @@ trait HasAttributes
                 'set' => explode(',', $value),
                 'json' => $this->fromJson($value),
             };
+
             return array_map(function ($item) use ($caster, $castType) {
                 return $caster($castType, $item);
             }, $values);
