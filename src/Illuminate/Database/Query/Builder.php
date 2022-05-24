@@ -678,7 +678,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $wheres
      * @param  array  $bindings
-     * @return Builder
+     * @return $this
      */
     public function mergeWheres($wheres, $bindings)
     {
