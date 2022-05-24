@@ -362,17 +362,22 @@ class AssertTest extends TestCase
     public function testAssertWhereMatchesValueUsingArrayableWhenSortedDifferently()
     {
         $assert = AssertableJson::fromArray([
-            'bar' => [
-                'baz' => 'foo',
-                'example' => 'value',
+            'data' => [
+                'status' => 200,
+                'user' => [
+                    'id' => 1,
+                    'name' => 'Taylor',
+                ],
             ],
         ]);
 
-        $assert->where('bar', function ($value) {
-            $this->assertInstanceOf(Collection::class, $value);
-
-            return $value->count() === 2;
-        });
+        $assert->where('data', [
+            'user' => [
+                'name' => 'Taylor',
+                'id' => 1,
+            ],
+            'status' => 200,
+        ]);
     }
 
     public function testAssertWhereFailsWhenDoesNotMatchValueUsingArrayable()
