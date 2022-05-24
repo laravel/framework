@@ -183,16 +183,6 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
-     * Get the original response content.
-     *
-     * @return null
-     */
-    public function getOriginalContent()
-    {
-        //
-    }
-
-    /**
      * Get the request instance.
      *
      * @return \Illuminate\Http\Request|null
