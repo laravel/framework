@@ -185,6 +185,19 @@ class Builder implements BuilderContract
 
         return $this;
     }
+    
+    /**
+     * Prevent the specified relations count from being eager loaded.
+     *
+     * @param  mixed  $relationNames
+     * @return $this
+     */
+    public function withoutCount($relationNames)
+    {
+        $this->withCount = array_diff($this->withCount, is_string($relationNames) ? func_get_args() : $relationNames);
+
+        return $this;
+    }
 
     /**
      * Remove all or passed registered global scopes.
