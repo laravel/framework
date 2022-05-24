@@ -185,7 +185,7 @@ class Builder implements BuilderContract
 
         return $this;
     }
-    
+
     /**
      * Prevent the specified relations count from being eager loaded.
      *
