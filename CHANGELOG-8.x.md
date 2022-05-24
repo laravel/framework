@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.13...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.14...8.x)
+
+
+## [v8.83.14 (2022-05-24)](https://github.com/laravel/framework/compare/v8.83.13...v8.83.14)
+
+### Fixed
+- Add flush handler to output buffer for streamed test response (bugfix) ([#42481](https://github.com/laravel/framework/pull/42481))
+
+### Changed
+- Use duplicate instead of createFromBase to clone request when routes are cached ([#42420](https://github.com/laravel/framework/pull/42420))
 
 
 ## [v8.83.13 (2022-05-17)](https://github.com/laravel/framework/compare/v8.83.12...v8.83.13)
