@@ -32,6 +32,7 @@ class AssertableUri
      * An URI string is composed of 8 components.
      *
      * @link https://www.php.net/manual/en/function.parse-url.php
+     *
      * @var array
      */
     protected $components = ['fragment', 'host', 'pass', 'path', 'port', 'query', 'scheme', 'user'];
@@ -184,6 +185,7 @@ class AssertableUri
      * @param  string  $method
      * @param  array  $arguments
      * @return $this
+     *
      * @throws \BadMethodCallException
      */
     public function __call($method, $arguments)
