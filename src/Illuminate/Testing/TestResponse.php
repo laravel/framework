@@ -19,6 +19,7 @@ use Illuminate\Support\Traits\Tappable;
 use Illuminate\Testing\Assert as PHPUnit;
 use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Testing\Fluent\AssertableUri;
 use LogicException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -270,18 +271,18 @@ EOF;
     /**
      * Assert whether the response is redirecting to a given URI.
      *
-     * @param  string|null  $uri
+     * @param  string|callable|null  $value
      * @return $this
      */
-    public function assertRedirect($uri = null)
+    public function assertRedirect($value = null)
     {
         PHPUnit::assertTrue(
             $this->isRedirect(),
             $this->statusMessageWithDetails('201, 301, 302, 303, 307, 308', $this->getStatusCode()),
         );
 
-        if (! is_null($uri)) {
-            $this->assertLocation($uri);
+        if (! is_null($value)) {
+            $this->assertLocation($value);
         }
 
         return $this;
@@ -388,14 +389,22 @@ EOF;
     /**
      * Assert that the current location header matches the given URI.
      *
-     * @param  string  $uri
+     * @param  string|callable  $value
      * @return $this
      */
-    public function assertLocation($uri)
+    public function assertLocation($value)
     {
-        PHPUnit::assertEquals(
-            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
-        );
+        $location = app('url')->to($this->headers->get('Location'));
+
+        if (is_string($value)) {
+            PHPUnit::assertEquals(app('url')->to($value), $location);
+        } else {
+            $assert = new AssertableUri($location);
+
+            $value($assert);
+
+            $assert->interacted();
+        }
 
         return $this;
     }
