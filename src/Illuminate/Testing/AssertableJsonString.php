@@ -212,6 +212,19 @@ class AssertableJsonString implements ArrayAccess, Countable
     }
 
     /**
+     * Assert that the response does not contain the given path.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function assertMissingPath($path)
+    {
+        PHPUnit::assertFalse(Arr::has($this->json(), $path));
+
+        return $this;
+    }
+
+    /**
      * Assert that the expected value and type exists at the given path in the response.
      *
      * @param  string  $path

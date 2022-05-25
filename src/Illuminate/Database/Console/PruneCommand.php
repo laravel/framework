@@ -87,7 +87,9 @@ class PruneCommand extends Command
     protected function models()
     {
         if (! empty($models = $this->option('model'))) {
-            return collect($models);
+            return collect($models)->filter(function ($model) {
+                return class_exists($model);
+            })->values();
         }
 
         $except = $this->option('except');
@@ -111,6 +113,8 @@ class PruneCommand extends Command
                 });
             })->filter(function ($model) {
                 return $this->isPrunable($model);
+            })->filter(function ($model) {
+                return class_exists($model);
             })->values();
     }
 

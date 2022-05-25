@@ -563,7 +563,18 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'digits');
 
-        return ! preg_match('/[^0-9]/', $value)
+        $length = strlen((string) $value);
+
+        if (((string) $value) === '.') {
+            return false;
+        }
+
+        // Make sure there is not more than one dot...
+        if (($length - strlen(str_replace('.', '', (string) $value))) > 1) {
+            return false;
+        }
+
+        return ! preg_match('/[^0-9.]/', $value)
                     && strlen((string) $value) == $parameters[0];
     }
 
