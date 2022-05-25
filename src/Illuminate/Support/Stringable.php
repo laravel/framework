@@ -308,6 +308,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Determine if a given string is valid JSON.
+     *
+     * @return bool
+     */
+    public function isJson()
+    {
+        return Str::isJson($this->value);
+    }
+
+    /**
      * Determine if the given string is empty.
      *
      * @return bool
