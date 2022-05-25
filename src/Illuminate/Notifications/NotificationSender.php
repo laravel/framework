@@ -193,6 +193,8 @@ class NotificationSender
 
                 $notification->id = $notificationId;
 
+                $notification->locale = $this->preferredLocale($notifiable, $notification);
+
                 if (! is_null($this->locale)) {
                     $notification->locale = $this->locale;
                 }
