@@ -76,10 +76,13 @@ class EloquentModelTest extends DatabaseTestCase
         $user->name = $newName = Str::random();
 
         $original = $user->getOriginal();
+        $rawOriginal = $user->getRawOriginal();
 
         $user->save();
 
         $this->assertEquals($original, $user->getPrevious());
+        $this->assertEquals($rawOriginal, $user->getRawPrevious());
+        
         $this->assertEquals($oldName, $user->getPrevious('name'));
         $this->assertEquals($newName, $user->getOriginal('name'));
     }
