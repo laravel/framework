@@ -613,7 +613,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  Closure  $callback
-     * @return mixed|null
+     * @return mixed
      */
     public function createAnd(array $attributes, \Closure $callback)
     {
