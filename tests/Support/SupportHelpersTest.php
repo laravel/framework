@@ -398,6 +398,18 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
+    public function testPipe()
+    {
+        $object = (object) ['id' => 1];
+        $this->assertEquals(2, pipe($object, function ($object) {
+            return 2;
+        }));
+
+        $mock = m::mock();
+        $mock->shouldReceive('foo')->once()->andReturn('bar');
+        $this->assertEquals($mock, tap($mock)->foo());
+    }
+
     public function testThrow()
     {
         $this->expectException(LogicException::class);
