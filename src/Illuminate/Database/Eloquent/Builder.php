@@ -642,7 +642,8 @@ class Builder implements BuilderContract
             return null;
         }
 
-        return $callback($this->getModels());
+        $models = new Collection($this->get());
+        return $callback($models);
     }
 
     /**

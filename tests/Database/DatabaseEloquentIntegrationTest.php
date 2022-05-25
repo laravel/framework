@@ -412,6 +412,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['name' => 'Nuno Maduro']
         );
 
+        // test u
         $this->assertSame('Nuno Maduro', $user1->name);
     }
 
@@ -468,6 +469,70 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertSame('Mohamed Said', $user3->name);
         $this->assertEquals(2, EloquentTestUser::count());
+    }
+
+    public function testCreateAnd()
+    {
+        $number = 1;
+        $result = EloquentTestUser::query()
+            ->createAnd(
+                [
+                    'email' => 'taylorotwell@gmail.com',
+                    'name' => 'Taylor Otwell'
+                ],
+                function ($model) use (&$number) {
+                    $number++;
+                    return $model;
+                }
+            );
+
+        // user created test
+        $this->assertSame('taylorotwell@gmail.com', $result->email);
+        $this->assertSame('Taylor Otwell', $result->name);
+        $this->assertEquals(2, $number);
+    }
+
+    public function testUpdateAnd()
+    {
+        $number1 = 1;
+        $user1 = EloquentTestUser::query()
+            ->create([
+                'email' => 'taylorotwell@gmail.com',
+                'name' => 'Taylor Otwell'
+            ]);
+
+        $user1Updated = $user1->updateAnd([
+            'name' => 'Taylor Otwell Changed'
+        ], function ($model_updated) use(&$number1) {
+            $number1++;
+            return $model_updated;
+        });
+
+        $this->assertSame('Taylor Otwell Changed', $user1Updated->name);
+        $this->assertEquals(2, $number1);
+
+        $number2 = 1;
+        $user2 = EloquentTestUser::query()
+            ->create([
+                'email' => 'taylorotwell2@gmail.com',
+                'name' => 'Taylor Otwell2'
+            ]);
+
+        $users = User::query();
+        $usersUpdated = $users->updateAnd([
+            'name' => 'Taylor Otwell Same Changed'
+        ], function ($modelsUpdated) use(&$number2) {
+            $number2++;
+            return $modelsUpdated;
+        });
+
+        $user1Updated = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
+        $user2Updated = EloquentTestUser::where('email', 'taylorotwell2@gmail.com')->first();
+
+        $this->assertEquals(2, $number2);
+        $this->assertInstanceOf(Collection::class, $usersUpdated);
+        $this->assertSame('Taylor Otwell Same Changed', $user1Updated->name);
+        $this->assertSame('Taylor Otwell Same Changed', $user2Updated->name);
     }
 
     public function testUpdateOrCreateOnDifferentConnection()
@@ -533,7 +598,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $i = 0;
         EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
-            if (! $i) {
+            if (!$i) {
                 $this->assertSame(' First', $users[0]->name);
                 $this->assertSame(' Second', $users[1]->name);
             } else {
@@ -927,7 +992,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
 
         $user->posts()->create(['name' => 'Post 2'])
-             ->photos()->create(['name' => 'photo.jpg']);
+            ->photos()->create(['name' => 'photo.jpg']);
 
         $query = EloquentTestUser::has('postWithPhotos');
 
@@ -2019,7 +2084,7 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
     public function friends()
     {
         return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
-                        ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
+            ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
 }
 
