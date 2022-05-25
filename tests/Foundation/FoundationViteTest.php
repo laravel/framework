@@ -25,6 +25,18 @@ class FoundationViteTest extends TestCase
         m::close();
     }
 
+    public function testViteWithDefaultEntrypoint()
+    {
+        $this->makeViteManifest();
+
+        $result = (new Vite)();
+
+        $this->assertSame(
+            '<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $result->toHtml()
+        );
+    }
+
     public function testViteWithoutCss()
     {
         $this->makeViteManifest();
@@ -82,6 +94,9 @@ class FoundationViteTest extends TestCase
         }
 
         $manifest = json_encode([
+            'resources/js/app.js' => [
+                'file' => 'assets/app.versioned.js',
+            ],
             'resources/js/app-without-css.js' => [
                 'file' => 'assets/app-without-css.versioned.js',
             ],

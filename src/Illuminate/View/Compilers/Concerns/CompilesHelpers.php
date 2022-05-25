@@ -57,6 +57,8 @@ trait CompilesHelpers
      */
     protected function compileVite($arguments)
     {
+        $arguments ??= '()';
+
         $class = Vite::class;
 
         return "<?php echo app('$class'){$arguments}; ?>";
