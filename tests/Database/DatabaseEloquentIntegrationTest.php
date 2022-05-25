@@ -412,7 +412,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ['name' => 'Nuno Maduro']
         );
 
-        // test u
         $this->assertSame('Nuno Maduro', $user1->name);
     }
 
