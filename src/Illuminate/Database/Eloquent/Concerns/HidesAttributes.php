@@ -7,14 +7,14 @@ trait HidesAttributes
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array
+     * @var string[]
      */
     protected $hidden = [];
 
     /**
      * The attributes that should be visible in serialization.
      *
-     * @var array
+     * @var string[]
      */
     protected $visible = [];
 

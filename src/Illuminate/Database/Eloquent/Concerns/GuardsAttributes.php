@@ -28,7 +28,7 @@ trait GuardsAttributes
     /**
      * The actual columns that exist on the database and can be guarded.
      *
-     * @var array
+     * @var string[]
      */
     protected static $guardableColumns = [];
 
