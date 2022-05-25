@@ -305,6 +305,20 @@ if (! function_exists('tap')) {
     }
 }
 
+if (! function_exists('pipe')) {
+    /**
+     * Pass the value to the given callback and return the result.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @return mixed
+     */
+    function pipe($value, $callback)
+    {
+        return $callback($value);
+    }
+}
+
 if (! function_exists('throw_if')) {
     /**
      * Throw the given exception if the given condition is true.
