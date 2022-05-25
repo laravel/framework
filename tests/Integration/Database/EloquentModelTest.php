@@ -82,7 +82,7 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertEquals($original, $user->getPrevious());
         $this->assertEquals($rawOriginal, $user->getRawPrevious());
-        
+
         $this->assertEquals($oldName, $user->getPrevious('name'));
         $this->assertEquals($newName, $user->getOriginal('name'));
     }

@@ -1765,7 +1765,7 @@ trait HasAttributes
 
     /**
      * Get the model's attribute values prior to an update.
-     * 
+     *
      * @param  string|null  $key
      * @param  mixed  $default
      * @return mixed|array
