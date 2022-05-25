@@ -20,7 +20,7 @@ trait DatabaseTransactions
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
-            
+
             if ($this->app->resolved('db.transactions')) {
                 $this->app->make('db.transactions')->callbacksShouldIgnore(
                     $this->app->make('db.transactions')->getTransactions()->first()
