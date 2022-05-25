@@ -52,7 +52,7 @@ trait CompilesHelpers
     /**
      * Compile the "vite" statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param  ?string  $arguments
      * @return string
      */
     protected function compileVite($arguments)
