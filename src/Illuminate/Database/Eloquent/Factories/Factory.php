@@ -90,6 +90,13 @@ abstract class Factory
     protected $faker;
 
     /**
+     * The "is creating" is true when a factory is created.
+     *
+     * @var bool
+     */
+    protected $isCreating = false;
+
+    /**
      * The default namespace where factories reside.
      *
      * @var string
@@ -256,6 +263,8 @@ abstract class Factory
      */
     public function create($attributes = [], ?Model $parent = null)
     {
+        $this->isCreating = true;
+
         if (! empty($attributes)) {
             return $this->state($attributes)->create([], $parent);
         }
@@ -452,7 +461,7 @@ abstract class Factory
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
-                    $attribute = $attribute->create()->getKey();
+                    $attribute = ($this->isCreating) ? $attribute->create()->getKey() : null;
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();
                 }
