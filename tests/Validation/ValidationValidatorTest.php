@@ -1006,6 +1006,92 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateFloat()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'float:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'float:200']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+2.37'], ['foo' => 'float:5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2e7'], ['foo' => 'float:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'float:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'float:5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'float:4']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '123.456.789'], ['foo' => 'float:10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '...'], ['foo' => 'float:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '.'], ['foo' => 'float:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '.2'], ['foo' => 'float:2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2.'], ['foo' => 'float:2']);
+        $this->assertTrue($v->fails());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'float_between:1,6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'float_between:1,10']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'float_between:4,5']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123456789'], ['foo' => 'float_between:4,8']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '12345678'], ['foo' => 'float_between:4,8']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1234'], ['foo' => 'float_between:4,4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'float_between:1,6']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'float_between:1,10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'float_between:1,5']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'float_between:1,10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '123.456.789'], ['foo' => 'float_between:1,10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '...'], ['foo' => 'float_between:1,10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '.'], ['foo' => 'float_between:1,10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '.2'], ['foo' => 'float_between:0,10']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo' => '2.'], ['foo' => 'float_between:1,10']);
+        $this->assertTrue($v->fails());
+    }
+
     public function testValidationStopsAtFailedPresenceCheck()
     {
         $trans = $this->getIlluminateArrayTranslator();

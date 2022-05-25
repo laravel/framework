@@ -1031,6 +1031,54 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute has a given number of digits.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateFloat($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'float');
+
+        if (!is_numeric($value)) {
+            return false;
+        }
+
+        if (!is_string($value)) {
+            $value = strval($value);
+        }
+
+        return strlen($value) == $parameters[0] && ctype_digit($value);
+    }
+
+    /**
+     * Validate that an attribute is between a given number of digits.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateFloatBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'float_between');
+
+        if (!is_numeric($value)) {
+            return false;
+        }
+
+        if (!is_string($value)) {
+            $value = strval($value);
+        }
+
+        $length = strlen($value);
+
+        return $length >= $parameters[0] && $length <= $parameters[1] && ctype_digit($value);
+    }
+
+    /**
      * Validate that an attribute is greater than another attribute.
      *
      * @param  string  $attribute
