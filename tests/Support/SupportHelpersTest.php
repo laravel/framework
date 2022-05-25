@@ -402,7 +402,9 @@ class SupportHelpersTest extends TestCase
     {
         $object = (object) ['id' => 1];
         $this->assertEquals(2, pipe($object, function ($object) {
-            return 2;
+            $object->id = 2;
+
+            return $object->id;
         }));
 
         $mock = m::mock();
