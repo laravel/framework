@@ -622,6 +622,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Uppercase the first character of each word in a string.
+     *
+     * @param  string  $separators
+     * @return static
+     */
+    public function ucwords($separators = " \t\r\n\f\v")
+    {
+        return new static(Str::ucwords($this->value, $separators));
+    }
+
+    /**
      * Convert the given string to title case.
      *
      * @return static

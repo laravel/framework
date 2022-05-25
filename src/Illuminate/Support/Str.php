@@ -739,6 +739,18 @@ class Str
     }
 
     /**
+     * Uppercase the first character of each word in a string.
+     *
+     * @param  string  $value
+     * @param  string  $separators
+     * @return string
+     */
+    public static function ucwords($value, $separators = " \t\r\n\f\v")
+    {
+        return ucwords($value, $separators);
+    }
+
+    /**
      * Convert the given string to title case.
      *
      * @param  string  $value

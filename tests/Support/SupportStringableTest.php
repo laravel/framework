@@ -646,6 +646,12 @@ class SupportStringableTest extends TestCase
         $this->assertSame('FOO BAR BAZ', (string) $this->stringable('foO bAr BaZ')->upper());
     }
 
+    public function testUcwords()
+    {
+        $this->assertSame('Foo Bar Baz', (string) $this->stringable('foo bar baz')->ucwords());
+        $this->assertSame('FoO BAr BaZ', (string) $this->stringable('foO bAr BaZ')->ucwords());
+    }
+
     public function testLimit()
     {
         $this->assertSame('Laravel is...',
