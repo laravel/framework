@@ -2299,6 +2299,80 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
     }
 
+    public function testGetPreviousCastsAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->intAttribute = '1';
+        $model->floatAttribute = '0.1234';
+        $model->stringAttribute = 432;
+        $model->boolAttribute = '1';
+        $model->booleanAttribute = '0';
+        $stdClass = new stdClass;
+        $stdClass->json_key = 'json_value';
+        $model->objectAttribute = $stdClass;
+        $array = [
+            'foo' => 'bar',
+        ];
+        $collection = collect($array);
+        $model->arrayAttribute = $array;
+        $model->jsonAttribute = $array;
+        $model->collectionAttribute = $collection;
+
+        $model->syncOriginal();
+        $model->syncPrevious();
+
+        $model->intAttribute = 2;
+        $model->floatAttribute = 0.443;
+        $model->stringAttribute = '12';
+        $model->boolAttribute = true;
+        $model->booleanAttribute = false;
+        $model->objectAttribute = $stdClass;
+        $model->arrayAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->jsonAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->collectionAttribute = collect([
+            'foo' => 'bar2',
+        ]);
+
+        $this->assertIsInt($model->getPrevious('intAttribute'));
+        $this->assertEquals(1, $model->getPrevious('intAttribute'));
+        $this->assertEquals(2, $model->intAttribute);
+        $this->assertEquals(2, $model->getAttribute('intAttribute'));
+
+        $this->assertIsFloat($model->getPrevious('floatAttribute'));
+        $this->assertEquals(0.1234, $model->getPrevious('floatAttribute'));
+        $this->assertEquals(0.443, $model->floatAttribute);
+
+        $this->assertIsString($model->getPrevious('stringAttribute'));
+        $this->assertSame('432', $model->getPrevious('stringAttribute'));
+        $this->assertSame('12', $model->stringAttribute);
+
+        $this->assertIsBool($model->getPrevious('boolAttribute'));
+        $this->assertTrue($model->getPrevious('boolAttribute'));
+        $this->assertTrue($model->boolAttribute);
+
+        $this->assertIsBool($model->getPrevious('booleanAttribute'));
+        $this->assertFalse($model->getPrevious('booleanAttribute'));
+        $this->assertFalse($model->booleanAttribute);
+
+        $this->assertEquals($stdClass, $model->getPrevious('objectAttribute'));
+        $this->assertEquals($model->getAttribute('objectAttribute'), $model->getPrevious('objectAttribute'));
+
+        $this->assertEquals($array, $model->getPrevious('arrayAttribute'));
+        $this->assertEquals(['foo' => 'bar'], $model->getPrevious('arrayAttribute'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('arrayAttribute'));
+
+        $this->assertEquals($array, $model->getPrevious('jsonAttribute'));
+        $this->assertEquals(['foo' => 'bar'], $model->getPrevious('jsonAttribute'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttribute'));
+
+        $this->assertEquals(['foo' => 'bar'], $model->getPrevious('collectionAttribute')->toArray());
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
+    }
+
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;

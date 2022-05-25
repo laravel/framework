@@ -52,6 +52,13 @@ trait HasAttributes
     protected $changes = [];
 
     /**
+     * The previous model attributes.
+     *
+     * @var array
+     */
+    protected $previous = [];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array
@@ -1757,6 +1764,32 @@ trait HasAttributes
     }
 
     /**
+     * Get the model's attribute values prior to an update.
+     * 
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed|array
+     */
+    public function getPrevious($key = null, $default = null)
+    {
+        return (new static)->setRawAttributes(
+            $this->previous, $sync = true
+        )->getOriginalWithoutRewindingModel($key, $default);
+    }
+
+    /**
+     * Get the model's raw previous attribute values.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed|array
+     */
+    public function getRawPrevious($key = null, $default = null)
+    {
+        return Arr::get($this->previous, $key, $default);
+    }
+
+    /**
      * Get a subset of the model's attributes.
      *
      * @param  array|mixed  $attributes
@@ -1823,6 +1856,18 @@ trait HasAttributes
     public function syncChanges()
     {
         $this->changes = $this->getDirty();
+
+        return $this;
+    }
+
+    /**
+     * Sync the previous attributes.
+     *
+     * @return $this
+     */
+    public function syncPrevious()
+    {
+        $this->previous = $this->getRawOriginal();
 
         return $this;
     }

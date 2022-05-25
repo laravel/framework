@@ -64,6 +64,25 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
+
+    public function testPreviousAttributes()
+    {
+        $user = TestModel2::create([
+            'name' => $oldName = Str::random(), 'title' => Str::random(),
+        ]);
+
+        $this->assertEmpty($user->getPrevious());
+
+        $user->name = $newName = Str::random();
+
+        $original = $user->getOriginal();
+
+        $user->save();
+
+        $this->assertEquals($original, $user->getPrevious());
+        $this->assertEquals($oldName, $user->getPrevious('name'));
+        $this->assertEquals($newName, $user->getOriginal('name'));
+    }
 }
 
 class TestModel1 extends Model
