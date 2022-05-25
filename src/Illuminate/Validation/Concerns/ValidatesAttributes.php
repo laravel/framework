@@ -1042,11 +1042,11 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'float');
 
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return false;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             $value = strval($value);
         }
 
@@ -1065,11 +1065,11 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(2, $parameters, 'float_between');
 
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return false;
         }
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             $value = strval($value);
         }
 
