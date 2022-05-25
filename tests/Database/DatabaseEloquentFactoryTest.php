@@ -182,6 +182,17 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         $post = FactoryTestPostFactory::new()->raw(['title' => 'Test Title']);
         $this->assertIsArray($post);
+        $this->assertNull($post['user_id']);
+        $this->assertSame('Test Title', $post['title']);
+    }
+
+    public function test_expanded_model_attributes_can_be_created_and_set()
+    {
+        $post = FactoryTestPostFactory::new()->raw();
+        $this->assertIsArray($post);
+
+        $post = FactoryTestPostFactory::new()->raw(['title' => 'Test Title', 'user_id' => 1]);
+        $this->assertIsArray($post);
         $this->assertIsInt($post['user_id']);
         $this->assertSame('Test Title', $post['title']);
     }
