@@ -197,7 +197,7 @@ class RepositoryTest extends TestCase
             'y' => 'yyy',
         ], $this->repository['associate']);
     }
-
+    
     public function testOffsetSet()
     {
         $this->assertNull($this->repository['key']);
