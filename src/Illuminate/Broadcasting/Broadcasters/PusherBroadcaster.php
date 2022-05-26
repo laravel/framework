@@ -55,6 +55,38 @@ class PusherBroadcaster extends Broadcaster
     }
 
     /**
+     * Respond to the Pusher's authentication of the incoming connection request.
+     * This should return a response according to the Pusher protocol.
+     *
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#response
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function userAuthentication($request)
+    {
+        if (! $user = parent::userAuthentication($request)) {
+            throw new AccessDeniedHttpException;
+        }
+
+        $settings = $this->pusher->getSettings();
+        $encodedUser = json_encode($user);
+        $decodedString = "{$request->socket_id}::user::{$encodedUser}";
+
+        $auth = $settings['auth_key'] . ':' . hash_hmac(
+            'sha256', $decodedString, $settings['secret']
+        );
+
+        return [
+            'auth' => $auth,
+            'user_data' => $encodedUser,
+        ];
+    }
+
+    /**
      * Return the valid authentication response.
      *
      * @param  \Illuminate\Http\Request  $request

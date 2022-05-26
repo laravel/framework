@@ -22,4 +22,20 @@ class BroadcastController extends Controller
 
         return Broadcast::auth($request);
     }
+
+    /**
+     * Authenticate the request for user authorization.
+     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#user-authentication
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function authenticateUser(Request $request)
+    {
+        if ($request->hasSession()) {
+            $request->session()->reflash();
+        }
+
+        return Broadcast::userAuthentication($request);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use Closure;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
@@ -32,6 +33,13 @@ abstract class Broadcaster implements BroadcasterContract
     protected $channelOptions = [];
 
     /**
+     * The callback to resolve the user authentication on connection.
+     *
+     * @var \Closure|null
+     */
+    protected $resolveUserAuthCallback = null;
+
+    /**
      * The binding registrar instance.
      *
      * @var \Illuminate\Contracts\Routing\BindingRegistrar
@@ -59,6 +67,38 @@ abstract class Broadcaster implements BroadcasterContract
         $this->channelOptions[$channel] = $options;
 
         return $this;
+    }
+
+    /**
+     * Register the user retrieval callback to authenticate connections.
+     *
+     * @param \Closure $callback
+     * @return void
+     */
+    public function resolveUserAuthentication(Closure $callback)
+    {
+        $this->resolveUserAuthCallback = $callback;
+    }
+
+    /**
+     * Authenticate the incoming connection request for a given user.
+     * Expecting an array with the user details or false.
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function userAuthentication($request)
+    {
+        // Resolve the auth callback as default in case the providers
+        // does not support user authentication on connection.
+        if (! $this->resolveUserAuthCallback) {
+            throw new AccessDeniedHttpException;
+        }
+
+        return $this->resolveUserAuthCallback->__invoke($request);
     }
 
     /**
