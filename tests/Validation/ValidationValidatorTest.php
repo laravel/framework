@@ -2325,30 +2325,6 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '2e7'], ['foo' => 'Digits:3']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'digits:3']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'digits:5']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'digits:4']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '123.456.789'], ['foo' => 'digits:10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '...'], ['foo' => 'digits:3']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.'], ['foo' => 'digits:1']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.2'], ['foo' => 'digits:2']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '2.'], ['foo' => 'digits:2']);
-        $this->assertTrue($v->passes());
-
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'digits_between:1,6']);
         $this->assertTrue($v->passes());
@@ -2367,24 +2343,6 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'digits_between:1,5']);
         $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '123.456.789'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '...'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.2'], ['foo' => 'digits_between:0,10']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '2.'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->passes());
     }
 
     public function testValidateSize()
