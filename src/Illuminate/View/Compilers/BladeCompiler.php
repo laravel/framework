@@ -272,11 +272,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
         if (! empty($this->echoHandlers)) {
             $result = $this->addBladeCompilerVariable($result);
         }
-        
+
         // In debug only, this wraps every component with a comment so that when
         // inspecting the source in the browser, it is easier to find back what
         // file is being rendered.
-        if (config('app.debug')) {
+        if (Container::getInstance()->make('config')->get('app.debug')) {
             $result = '<!--- START: ' . $this->path .' -->' . $result . '<!--- END: ' . $this->path .' -->';
         }
 
