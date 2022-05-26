@@ -25,7 +25,7 @@ class BroadcastController extends Controller
 
     /**
      * Authenticate the request for user authorization.
-     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#user-authentication
+     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#user-authentication.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response

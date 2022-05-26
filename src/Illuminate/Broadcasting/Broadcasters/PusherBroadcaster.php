@@ -76,7 +76,7 @@ class PusherBroadcaster extends Broadcaster
         $encodedUser = json_encode($user);
         $decodedString = "{$request->socket_id}::user::{$encodedUser}";
 
-        $auth = $settings['auth_key'] . ':' . hash_hmac(
+        $auth = $settings['auth_key'].':'.hash_hmac(
             'sha256', $decodedString, $settings['secret']
         );
 

@@ -72,7 +72,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Register the user retrieval callback to authenticate connections.
      *
-     * @param \Closure $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function resolveUserAuthentication(Closure $callback)
@@ -83,7 +83,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Authenticate the incoming connection request for a given user.
      * Expecting an array with the user details or false.
-     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
