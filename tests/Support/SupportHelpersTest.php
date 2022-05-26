@@ -598,7 +598,8 @@ class SupportHelpersTest extends TestCase
             }
 
             throw new RuntimeException;
-        }, function ($attempt) {
+        }, function ($attempt, $exception) {
+            $this->assertInstanceOf(RuntimeException::class, $exception);
             return $attempt * 100;
         });
 
