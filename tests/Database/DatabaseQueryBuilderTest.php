@@ -478,6 +478,134 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereCreatedBefore()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedBefore('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `created_at` < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereCreatedBefore()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedAfter('2022-05-28 06:10:00')->orWhereCreatedBefore('2022-05-28 03:10:00');
+        $this->assertSame('select * from `users` where `created_at` > ? or `created_at` < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00', 1 => '2022-05-28 03:10:00'], $builder->getBindings());
+    }
+
+    public function testAndWhereCreatedBefore()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedAfter('2022-05-28 06:10:00')->andWhereCreatedBefore('2022-05-28 03:10:00');
+        $this->assertSame('select * from `users` where `created_at` > ? and `created_at` < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00', 1 => '2022-05-28 03:10:00'], $builder->getBindings());
+    }
+
+    public function testWhereCreatedAfter()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedAfter('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `created_at` > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereCreatedAfter()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedBefore('2022-05-28 03:10:00')->orWhereCreatedAfter('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `created_at` < ? or `created_at` > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 03:10:00', 1 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testAndWhereCreatedAfter()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedBefore('2022-05-28 03:10:00')->andWhereCreatedAfter('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `created_at` < ? and `created_at` > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 03:10:00', 1 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testWhereUpdatedBefore()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedBefore('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `updated_at` < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereUpdatedBefore()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedAfter('2022-05-28 06:10:00')->orWhereUpdatedBefore('2022-05-28 03:10:00');
+        $this->assertSame('select * from `users` where `updated_at` > ? or `updated_at` < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00', 1 => '2022-05-28 03:10:00'], $builder->getBindings());
+    }
+
+    public function testAndWhereUpdatedBefore()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedAfter('2022-05-28 06:10:00')->andWhereUpdatedBefore('2022-05-28 03:10:00');
+        $this->assertSame('select * from `users` where `updated_at` > ? and `updated_at` < ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 06:10:00', 1 => '2022-05-28 03:10:00'], $builder->getBindings());
+    }
+
+    public function testWhereUpdatedAfter()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedAfter('22:00');
+        $this->assertSame('select * from `users` where `updated_at` > ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testOrWhereUpdatedAfter()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedBefore('2022-05-28 03:10:00')->orWhereUpdatedAfter('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `updated_at` < ? or `updated_at` > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 03:10:00', 1 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testAndWhereUpdatedAfter()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedBefore('2022-05-28 03:10:00')->andWhereUpdatedAfter('2022-05-28 06:10:00');
+        $this->assertSame('select * from `users` where `updated_at` < ? and `updated_at` > ?', $builder->toSql());
+        $this->assertEquals([0 => '2022-05-28 03:10:00', 1 => '2022-05-28 06:10:00'], $builder->getBindings());
+    }
+
+    public function testWhereCreatedBeforeMySqlAcceptsCustomColumn()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedBefore('22:00', 'created');
+        $this->assertSame('select * from `users` where `created` < ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereUpdatedBeforeAcceptsCustomColumn()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedBefore('22:00', 'updated');
+        $this->assertSame('select * from `users` where `updated` < ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereUpdatedAfterAcceptsCustomColumn()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereUpdatedAfter('22:00', 'updated');
+        $this->assertSame('select * from `users` where `updated` > ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereCreatedAfterAcceptsCustomColumn()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereCreatedAfter('22:00', 'created');
+        $this->assertSame('select * from `users` where `created` > ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
     public function testWhereTimeOperatorOptionalPostgres()
     {
         $builder = $this->getPostgresBuilder();

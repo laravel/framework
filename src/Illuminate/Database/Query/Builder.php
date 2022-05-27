@@ -1534,6 +1534,150 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where created before statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function whereCreatedBefore($value, $column = 'created_at')
+    {
+        return $this->where($column, '<', $value);
+    }
+
+    /**
+     * Add a where created before statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function orWhereCreatedBefore($value, $column = 'created_at')
+    {
+        return $this->where($column, '<', $value, 'or');
+    }
+
+    /**
+     * Add a where created before statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function andWhereCreatedBefore($value, $column = 'created_at')
+    {
+        return $this->where($column, '<', $value, 'and');
+    }
+
+    /**
+     * Add a where created after statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function whereCreatedAfter($value, $column = 'created_at')
+    {
+        return $this->where($column, '>', $value);
+    }
+
+    /**
+     * Add a where created after statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function orWhereCreatedAfter($value, $column = 'created_at')
+    {
+        return $this->where($column, '>', $value, 'or');
+    }
+
+    /**
+     * Add a where created after statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function andWhereCreatedAfter($value, $column = 'created_at')
+    {
+        return $this->where($column, '>', $value, 'and');
+    }
+
+    /**
+     * Add a where updated before statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function whereUpdatedBefore($value, $column = 'updated_at')
+    {
+        return $this->where($column, '<', $value);
+    }
+
+    /**
+     * Add a where updated before statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function orWhereUpdatedBefore($value, $column = 'updated_at')
+    {
+        return $this->where($column, '<', $value, 'or');
+    }
+
+    /**
+     * Add a where updated before statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function andWhereUpdatedBefore($value, $column = 'updated_at')
+    {
+        return $this->where($column, '<', $value, 'and');
+    }
+
+    /**
+     * Add a where updated after statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function whereUpdatedAfter($value, $column = 'updated_at')
+    {
+        return $this->where($column, '>', $value);
+    }
+
+    /**
+     * Add a where updated after statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function orWhereUpdatedAfter($value, $column = 'updated_at')
+    {
+        return $this->where($column, '>', $value, 'or');
+    }
+
+    /**
+     * Add a where updated after statement to the query.
+     *
+     * @param mixed $value
+     * @param string $column
+     * @return $this
+     */
+    public function andWhereUpdatedAfter($value, $column = 'updated_at')
+    {
+        return $this->where($column, '>', $value, 'and');
+    }
+
+    /**
      * Add a nested where statement to the query.
      *
      * @param  \Closure  $callback
