@@ -106,9 +106,11 @@ if (! function_exists('app')) {
     /**
      * Get the available container instance.
      *
-     * @param  string|null  $abstract
+     * @template T
+     *
+     * @param  class-string<T>|null  $abstract
      * @param  array  $parameters
-     * @return mixed|\Illuminate\Contracts\Foundation\Application
+     * @return T|\Illuminate\Contracts\Foundation\Application
      */
     function app($abstract = null, array $parameters = [])
     {
@@ -681,9 +683,11 @@ if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
      *
-     * @param  string  $name
+     * @template T
+     *
+     * @param  class-string<T>  $name
      * @param  array  $parameters
-     * @return mixed
+     * @return T
      */
     function resolve($name, array $parameters = [])
     {
