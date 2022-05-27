@@ -54,7 +54,7 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->sync([$user->id => ['role' => 'owner'], $user2->id => ['role' => 'contributor']]);
-        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
 
         PivotEventsTestCollaborator::$eventsCalled = [];
         $project->collaborators()->detach($user);
