@@ -406,6 +406,14 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUuid($uuid));
     }
 
+    public function testGlue()
+    {
+        $subjects = ['foo/', '/bar', ' /baz', 'quz/qux'];
+
+        $this->assertSame('foo/bar/ /baz/quz/qux', Str::glue($subjects, '/'));
+        $this->assertSame('/foo/barfoo /bazfooquz/qux', Str::glue($subjects, 'foo'));
+    }
+
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));

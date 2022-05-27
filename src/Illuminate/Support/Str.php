@@ -386,6 +386,30 @@ class Str
     }
 
     /**
+     * Implode multiple subjects with a string that doesn't repeat between each subject.
+     *
+     * @param  array<int|string, string>  $subjects
+     * @param  string  $glue
+     * @return string
+     */
+    public static function glue($subjects, $glue)
+    {
+        foreach ($subjects as $key => $subject) {
+            if (str_starts_with($subject, $glue)) {
+                $subject = substr($subject, strlen($glue));
+            }
+
+            if (str_ends_with($subject, $glue)) {
+                $subject = substr($subject, 0, strlen($subject) - strlen($glue));
+            }
+
+            $subjects[$key] = $subject;
+        }
+
+        return implode($glue, $subjects);
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
