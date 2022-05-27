@@ -54,20 +54,12 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasModel()
     {
-        $model = new class extends Model
-        {
-            public function is($model)
-            {
-                return $this == $model;
-            }
-        };
+        $model = new TestModel(['id' => 1]);
 
         $response = $this->makeMockResponse([
             'render' => 'hello world',
             'gatherData' => ['foo' => $model],
         ]);
-
-        $response->original->foo = $model;
 
         $response->assertViewHas('foo', $model);
     }
@@ -120,6 +112,79 @@ class TestResponseTest extends TestCase
         ]);
 
         $response->assertViewHas('foo.nested', 'bar');
+    }
+
+    public function testAssertViewHasEloquentCollection()
+    {
+        $collection = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+            new TestModel(['id' => 3]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $collection],
+        ]);
+
+        $response->assertViewHas('foos', $collection);
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsOrder()
+    {
+        $collection = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 3]),
+            new TestModel(['id' => 2]),
+            new TestModel(['id' => 1]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $collection],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $collection->reverse()->values());
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsType()
+    {
+        $actual = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $actual],
+        ]);
+
+        $expected = new \Illuminate\Database\Eloquent\Collection([
+            new AnotherTestModel(['id' => 1]),
+            new AnotherTestModel(['id' => 2]),
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $expected);
+    }
+
+    public function testAssertViewHasEloquentCollectionRespectsSize()
+    {
+        $actual = new \Illuminate\Database\Eloquent\Collection([
+            new TestModel(['id' => 1]),
+            new TestModel(['id' => 2]),
+        ]);
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'gatherData' => ['foos' => $actual],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $response->assertViewHas('foos', $actual->concat([new TestModel(['id' => 3])]));
     }
 
     public function testAssertViewMissing()
@@ -1952,4 +2017,14 @@ class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
             ['id' => 30, 'foo' => 'bar'],
         ];
     }
+}
+
+class TestModel extends Model
+{
+    protected $guarded = [];
+}
+
+class AnotherTestModel extends Model
+{
+    protected $guarded = [];
 }

@@ -465,6 +465,20 @@ class Arr
     }
 
     /**
+     * Prepend the key names of an associative array.
+     *
+     * @param  array  $array
+     * @param  string  $prependWith
+     * @return array
+     */
+    public static function prependKeysWith($array, $prependWith)
+    {
+        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
+            return [$prependWith.$key => $item];
+        })->all();
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
@@ -526,6 +540,22 @@ class Arr
         $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
+    }
+
+    /**
+     * Run a map over each of the items in the array.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function map(array $array, callable $callback)
+    {
+        $keys = array_keys($array);
+
+        $items = array_map($callback, $array, $keys);
+
+        return array_combine($keys, $items);
     }
 
     /**

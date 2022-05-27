@@ -39,7 +39,7 @@ trait HasTimestamps
     /**
      * Update the creation and update timestamps.
      *
-     * @return void
+     * @return $this
      */
     public function updateTimestamps()
     {
@@ -56,6 +56,8 @@ trait HasTimestamps
         if (! $this->exists && ! is_null($createdAtColumn) && ! $this->isDirty($createdAtColumn)) {
             $this->setCreatedAt($time);
         }
+
+        return $this;
     }
 
     /**
