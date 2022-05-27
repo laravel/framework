@@ -388,7 +388,7 @@ class Str
     /**
      * Implode multiple subjects with a string that doesn't repeat between each subject.
      *
-     * @param  iterable<int|string, string>  $subjects
+     * @param  array<int|string, string>  $subjects
      * @param  string  $glue
      * @return string
      */
