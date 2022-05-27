@@ -413,7 +413,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isJson('[1,   2,   3]'));
         $this->assertTrue(Str::isJson('{"first": "John", "last": "Doe"}'));
         $this->assertTrue(Str::isJson('[{"first": "John", "last": "Doe"}, {"first": "Jane", "last": "Doe"}]'));
-   
+
         $this->assertFalse(Str::isJson('1,'));
         $this->assertFalse(Str::isJson('[1,2,3'));
         $this->assertFalse(Str::isJson('[1,   2   3]'));

@@ -45,7 +45,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('[1,   2,   3]')->isJson());
         $this->assertTrue($this->stringable('{"first": "John", "last": "Doe"}')->isJson());
         $this->assertTrue($this->stringable('[{"first": "John", "last": "Doe"}, {"first": "Jane", "last": "Doe"}]')->isJson());
-   
+
         $this->assertFalse($this->stringable('1,')->isJson());
         $this->assertFalse($this->stringable('[1,2,3')->isJson());
         $this->assertFalse($this->stringable('[1,   2   3]')->isJson());
