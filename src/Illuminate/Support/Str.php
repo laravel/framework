@@ -388,18 +388,25 @@ class Str
     /**
      * Implode multiple subjects with a string that doesn't repeat between each subject.
      *
-     * @param  array<int|string, string>  $subjects
+     * @param  iterable<int|string, string>  $subjects
      * @param  string  $glue
      * @return string
      */
     public static function glue($subjects, $glue)
     {
+        $first = array_key_first($subjects);
+        $last = array_key_last($subjects);
+
         foreach ($subjects as $key => $subject) {
-            if (str_starts_with($subject, $glue)) {
+            if ($subject === $glue) {
+                continue;
+            }
+
+            if ($first !== $key && str_starts_with($subject, $glue)) {
                 $subject = substr($subject, strlen($glue));
             }
 
-            if (str_ends_with($subject, $glue)) {
+            if ($key !== $last && str_ends_with($subject, $glue)) {
                 $subject = substr($subject, 0, strlen($subject) - strlen($glue));
             }
 
