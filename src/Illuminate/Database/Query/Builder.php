@@ -1632,8 +1632,8 @@ class Builder implements BuilderContract
     /**
      * Add a where updated before statement to the query.
      *
-     * @param  mixed $value
-     * @param  string $column
+     * @param  mixed  $value
+     * @param  string  $column
      * @return $this
      */
     public function andWhereUpdatedBefore($value, $column = 'updated_at')
