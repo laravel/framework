@@ -19,7 +19,7 @@
         "illuminate/contracts": "^10.0",
         "illuminate/macroable": "^10.0",
         "illuminate/support": "^10.0",
-        "symfony/finder": "^6.1"
+        "symfony/finder": "^6.2"
     },
     "autoload": {
         "psr-4": {
@@ -39,8 +39,8 @@
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.0).",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.0).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "symfony/filesystem": "Required to enable support for relative symbolic links (^6.1).",
-        "symfony/mime": "Required to enable support for guessing extensions (^6.1)."
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^6.2).",
+        "symfony/mime": "Required to enable support for guessing extensions (^6.2)."
     },
     "config": {
         "sort-packages": true
