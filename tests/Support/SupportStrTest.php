@@ -410,9 +410,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('', Str::glue([], ' '));
         $this->assertSame('foo', Str::glue(['foo'], ' '));
+        $this->assertSame('foo', Str::glue(['foo'], ' ', '+'));
+
         $this->assertSame('foo bar', Str::glue(['foo', 'bar'], ' '));
+        $this->assertSame('foo+bar', Str::glue(['foo', 'bar'], ' ' , '+'));
+        $this->assertSame('foo+bar', Str::glue(['foo+', '+bar'], ' ' , '+'));
+
         $this->assertSame(' foo bar baz qux ', Str::glue([' foo ', ' bar ', ' baz ', ' qux '], ' '));
         $this->assertSame('foo/bar/baz/quz/qux', Str::glue(['foo/', '/bar/', '/baz', '/quz/qux'], '/'));
+        $this->assertSame('foo/bar/baz+quz/qux', Str::glue(['foo/', '/bar/', '/baz', '+quz/qux'], '/', '+'));
+        $this->assertSame('+foo/bar/baz+quz/qux+', Str::glue(['+foo/', '/bar/', '/baz', '+quz/qux+'], '/', '+'));
+
         $this->assertSame('foofoobarfoobaz', Str::glue(['foo', 'bar', 'baz'], 'foo'));
         $this->assertSame('foobarbarbarbaz', Str::glue(['foo', 'bar', 'baz'], 'bar'));
         $this->assertSame('foobazbarbazbaz', Str::glue(['foo', 'bar', 'baz'], 'baz'));

@@ -390,30 +390,44 @@ class Str
      *
      * @param  array<int|string, string>  $subjects
      * @param  string  $glue
+     * @param  string  $finalGlue
      * @return string
      */
-    public static function glue($subjects, $glue)
+    public static function glue($subjects, $glue, $finalGlue = '')
     {
-        $first = array_key_first($subjects);
-        $last = array_key_last($subjects);
-
-        foreach ($subjects as $key => $subject) {
-            if ($subject === $glue) {
-                continue;
-            }
-
-            if ($first !== $key && str_starts_with($subject, $glue)) {
-                $subject = substr($subject, strlen($glue));
-            }
-
-            if ($key !== $last && str_ends_with($subject, $glue)) {
-                $subject = substr($subject, 0, strlen($subject) - strlen($glue));
-            }
-
-            $subjects[$key] = $subject;
+        if (count($subjects) === 0) {
+            return '';
         }
 
-        return implode($glue, $subjects);
+        if (count ($subjects) === 1) {
+            return end($subjects);
+        }
+
+        if ($finalGlue === '') {
+            $finalGlue = $glue;
+        } elseif (count($subjects) === 2) {
+            $glue = $finalGlue;
+        }
+
+        $first = array_shift($subjects);
+        $last = array_pop($subjects);
+
+        $first = static::beforeLast($first, $glue) ?: $first;
+        $last = static::after($last, $finalGlue) ?: $last;
+
+        if (count($subjects) === 0) {
+            return $first.$finalGlue.$last;
+        }
+
+        foreach ($subjects as $key => $subject) {
+            if ($subject !== $glue) {
+                $subjects[$key] = static::between($subject, $glue, $glue);
+            }
+        }
+
+        array_unshift($subjects, $first);
+
+        return implode($glue, $subjects).$finalGlue.$last;
     }
 
     /**
