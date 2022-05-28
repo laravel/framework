@@ -42,6 +42,26 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
     }
 
+    public function testJobCanBeFinished()
+    {
+        CallQueuedHandlerWithFinishedMethod::$finished = false;
+
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+        $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('isReleased')->andReturn(false);
+        $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+
+        $instance->call($job, [
+            'command' => serialize(new CallQueuedHandlerWithFinishedMethod),
+        ]);
+
+        $this->assertTrue(CallQueuedHandlerWithFinishedMethod::$finished);
+    }
+
     public function testJobCanBeDispatchedThroughMiddleware()
     {
         CallQueuedHandlerTestJobWithMiddleware::$handled = false;
@@ -193,5 +213,21 @@ class TestJobMiddleware
         $_SERVER['__test.dispatchMiddleware'] = true;
 
         return $next($command);
+    }
+}
+
+class CallQueuedHandlerWithFinishedMethod {
+    use InteractsWithQueue;
+
+    public static $finished = false;
+
+    public function handle()
+    {
+        //
+    }
+
+    public function finished()
+    {
+        static::$finished = true;
     }
 }

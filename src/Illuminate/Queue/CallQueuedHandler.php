@@ -77,6 +77,10 @@ class CallQueuedHandler
             $this->ensureSuccessfulBatchJobIsRecorded($command);
         }
 
+        if (method_exists($command, 'finished')) {
+            $command->finished();
+        }
+
         if (! $job->isDeletedOrReleased()) {
             $job->delete();
         }
