@@ -831,6 +831,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('fooBarBaz', (string) $this->stringable('foo-bar_baz')->camel());
     }
 
+    public function testCharAt()
+    {
+        $this->assertSame('L', (string) $this->stringable('Laravel_p_h_p_framework')->charAt(0));
+        $this->assertSame('_', (string) $this->stringable('Laravel_p_h_p_framework')->charAt(7));
+        $this->assertSame('k', (string) $this->stringable('Laravel_p_h_p_framework')->charAt(-1));
+        $this->assertSame('r', (string) $this->stringable('Laravel_p_h_p_framework')->charAt(-2));
+        $this->assertSame('T', (string) $this->stringable('Tay')->charAt(-3));
+        $this->assertEmpty((string) $this->stringable('Tay')->charAt(3));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', (string) $this->stringable('БГДЖИЛЁ')->substr(-1));

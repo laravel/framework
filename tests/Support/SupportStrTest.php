@@ -633,6 +633,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('fooBarBaz', Str::camel('foo-bar_baz'));
     }
 
+    public function testCharAt()
+    {
+        $this->assertSame('L', Str::charAt('Laravel_p_h_p_framework', 0));
+        $this->assertSame('_', Str::charAt('Laravel_p_h_p_framework', 7));
+        $this->assertSame('k', Str::charAt('Laravel_p_h_p_framework', -1));
+        $this->assertSame('r', Str::charAt('Laravel_p_h_p_framework', -2));
+        $this->assertSame('T', Str::charAt('Tay', -3));
+        $this->assertEmpty(Str::charAt('Tay', 3));
+    }
+
     public function testSubstr()
     {
         $this->assertSame('Ё', Str::substr('БГДЖИЛЁ', -1));
