@@ -819,10 +819,10 @@ class Arr
     }
 
     /**
-     * Insert new item in array on any position
+     * Insert new item in array on any position.
      *
-     * @param array $array
-     * @param int $pos
+     * @param  array  $array
+     * @param  int  $pos
      * @param $value
      * @return array
      */
@@ -834,5 +834,4 @@ class Arr
             array_slice($array, $pos, null, true)
         );
     }
-
 }
