@@ -202,6 +202,17 @@ class Str
     }
 
     /**
+     * Retrieve character at specified position in string.
+     *
+     * @param string  $value
+     * @param int  $index
+     * @return string
+     */
+    public static function charAt($value, $index) {
+        return static::substr($value, $index, 1);
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
