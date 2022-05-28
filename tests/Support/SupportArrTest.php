@@ -225,6 +225,29 @@ class SupportArrTest extends TestCase
         $this->assertSame('', Arr::join([], ', ', ' and '));
     }
 
+    public function testGlue()
+    {
+        $this->assertSame('', Arr::glue([], ' '));
+        $this->assertSame('a', Arr::glue(['a'], ' '));
+        $this->assertSame('a', Arr::glue(['a'], ' ', '+'));
+
+        $this->assertSame('a, b', Arr::glue(['a', 'b'], ', '));
+        $this->assertSame('a and b', Arr::glue(['a', 'b'], ' ' , ' and '));
+        $this->assertSame('a and b', Arr::glue(['a and ', ' and b'], ' ' , ' and '));
+
+        $this->assertSame(' a b c d ', Arr::glue([' a ', ' b ', ' c ', ' d '], ' '));
+        $this->assertSame('a/b/c/d/e', Arr::glue(['a/', '/b/', '/c', '/d/e'], '/'));
+        $this->assertSame('a/b/c+d/e', Arr::glue(['a/', '/b/', '/c', '+d/e'], '/', '+'));
+        $this->assertSame('+a/b/c+d/e+', Arr::glue(['+a/', '/b/', '/c', '+d/e+'], '/', '+'));
+
+        $this->assertSame('aabac', Arr::glue(['a', 'b', 'c'], 'a'));
+        $this->assertSame('aab+c', Arr::glue(['a', 'b', 'c'], 'a', '+'));
+        $this->assertSame('abbbc', Arr::glue(['a', 'b', 'c'], 'b'));
+        $this->assertSame('abb+c', Arr::glue(['a', 'b', 'c'], 'b', '+'));
+        $this->assertSame('acbcc', Arr::glue(['a', 'b', 'c'], 'c'));
+        $this->assertSame('acb+c', Arr::glue(['a', 'b', 'c'], 'c', '+'));
+    }
+
     public function testLast()
     {
         $array = [100, 200, 300];

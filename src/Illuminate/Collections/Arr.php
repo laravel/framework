@@ -455,6 +455,51 @@ class Arr
     }
 
     /**
+     * Implode multiple subjects with a string that doesn't repeat between each subject.
+     *
+     * @param  array<int|string, string>  $subjects
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public static function glue($subjects, $glue, $finalGlue = '')
+    {
+        if (count($subjects) === 0) {
+            return '';
+        }
+
+        if (count ($subjects) === 1) {
+            return end($subjects);
+        }
+
+        if ($finalGlue === '') {
+            $finalGlue = $glue;
+        } elseif (count($subjects) === 2) {
+            $glue = $finalGlue;
+        }
+
+        $first = array_shift($subjects);
+        $last = array_pop($subjects);
+
+        $first = Str::beforeLast($first, $glue) ?: $first;
+        $last = Str::after($last, $finalGlue) ?: $last;
+
+        if (count($subjects) === 0) {
+            return $first.$finalGlue.$last;
+        }
+
+        foreach ($subjects as $key => $subject) {
+            if ($subject !== $glue) {
+                $subjects[$key] = Str::between($subject, $glue, $glue);
+            }
+        }
+
+        array_unshift($subjects, $first);
+
+        return implode($glue, $subjects).$finalGlue.$last;
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @param  array  $array
