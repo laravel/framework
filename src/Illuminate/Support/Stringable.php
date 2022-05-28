@@ -164,6 +164,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Retrieve character at specified position in string.
+     *
+     * @param int  $index
+     * @return static
+     */
+    public function charAt($index)
+    {
+        return new static(Str::charAt($this->value, $index));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string|string[]  $needles
