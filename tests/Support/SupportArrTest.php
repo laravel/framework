@@ -1097,4 +1097,15 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testInsert()
+    {
+        $alphabet = ['a', 'b', 'd'];
+
+        $alphabet = Arr::insert($alphabet, 2, 'c');
+        $this->assertEquals(['a', 'b', 'c', 'd'], $alphabet);
+
+        $alphabet = Arr::insert($alphabet, 4, 'e');
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e'], $alphabet);
+    }
 }
