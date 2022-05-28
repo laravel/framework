@@ -216,7 +216,8 @@ class TestJobMiddleware
     }
 }
 
-class CallQueuedHandlerWithFinishedMethod {
+class CallQueuedHandlerWithFinishedMethod
+{
     use InteractsWithQueue;
 
     public static $finished = false;
