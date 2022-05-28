@@ -60,14 +60,13 @@ class RouteListCommandTest extends TestCase
 
         $this->artisan(RouteListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('')
+            ->expectsOutputToContain('Showing [6] routes')
             ->expectsOutput('  GET|HEAD   / ..................................................... ')
             ->expectsOutput('  GET|HEAD   {account}.example.com/ ................................ ')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
             ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
-            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
-            ->expectsOutput('');
+            ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show');
     }
 
     public function testDisplayRoutesForCliInVerboseMode()
@@ -86,13 +85,12 @@ class RouteListCommandTest extends TestCase
 
         $this->artisan(RouteListCommand::class, ['-v' => true])
             ->assertSuccessful()
-            ->expectsOutput('')
+            ->expectsOutputToContain('Showing [4] routes')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
             ->expectsOutput('  POST       controller-invokable Illuminate\\Tests\\Testing\\Console\\FooController')
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\Console\\FooController@show')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
-            ->expectsOutput('             ⇂ web')
-            ->expectsOutput('');
+            ->expectsOutput('             ⇂ web');
     }
 
     public function testRouteCanBeFilteredByName()
@@ -108,9 +106,8 @@ class RouteListCommandTest extends TestCase
 
         $this->artisan(RouteListCommand::class, ['--name' => 'foo'])
             ->assertSuccessful()
-            ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD       foo ...................................... foo.show')
-            ->expectsOutput('');
+            ->expectsOutputToContain('Showing [1] route')
+            ->expectsOutput('  GET|HEAD       foo ...................................... foo.show');
     }
 
     public function testDisplayRoutesExceptVendor()
@@ -121,11 +118,10 @@ class RouteListCommandTest extends TestCase
 
         $this->artisan(RouteListCommand::class, ['-v' => true, '--except-vendor' => true])
             ->assertSuccessful()
-            ->expectsOutput('')
+            ->expectsOutputToContain('Showing [3] routes')
             ->expectsOutput('  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
             ->expectsOutput('  ANY            redirect .... Illuminate\Routing\RedirectController')
-            ->expectsOutput('  GET|HEAD       view .............................................. ')
-            ->expectsOutput('');
+            ->expectsOutput('  GET|HEAD       view .............................................. ');
     }
 
     protected function tearDown(): void
