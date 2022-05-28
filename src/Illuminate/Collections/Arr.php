@@ -817,4 +817,22 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Insert new item in array on any position
+     *
+     * @param array $array
+     * @param int $pos
+     * @param $value
+     * @return array
+     */
+    public static function insert(array &$array, int $pos, $value)
+    {
+        return array_merge(
+            array_slice($array, 0, $pos),
+            static::wrap($value),
+            array_slice($array, $pos, null, true)
+        );
+    }
+
 }
