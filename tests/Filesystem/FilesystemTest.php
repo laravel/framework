@@ -463,11 +463,13 @@ class FilesystemTest extends TestCase
         $this->assertTrue($files->hasFiles(self::$tempDir.'/foo-dir', true));
         $this->assertTrue($files->hasFiles(self::$tempDir.'/bar-dir'));
         $this->assertFalse($files->hasFiles(self::$tempDir.'/bar-dir/foo.txt'));
+        $this->assertFalse($files->hasFiles(self::$tempDir.'/bar-dir/foo.txt'), false);
 
         $this->assertTrue($files->hasNoFiles(self::$tempDir.'/foo-dir'));
         $this->assertFalse($files->hasNoFiles(self::$tempDir.'/foo-dir', true));
         $this->assertFalse($files->hasNoFiles(self::$tempDir.'/bar-dir'));
         $this->assertTrue($files->hasNoFiles(self::$tempDir.'/bar-dir/foo.txt'));
+        $this->assertTrue($files->hasNoFiles(self::$tempDir.'/bar-dir/foo.txt'), false);
     }
 
     public function testGlobFindsFiles()
