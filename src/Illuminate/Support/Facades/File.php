@@ -19,6 +19,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool isFile(string $file)
  * @method static bool isReadable(string $path)
  * @method static bool isWritable(string $path)
+ * @method static bool hasFiles(string $directory, bool $hidden = false)
+ * @method static bool hasNoFiles(string $directory, bool $hidden = false)
  * @method static bool makeDirectory(string $path, int $mode = 0755, bool $recursive = false, bool $force = false)
  * @method static bool missing(string $path)
  * @method static bool move(string $path, string $target)
