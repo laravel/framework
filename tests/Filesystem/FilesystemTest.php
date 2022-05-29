@@ -468,8 +468,8 @@ class FilesystemTest extends TestCase
         $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir'));
         $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir', true));
         $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir'));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'), false);
+        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'));
+        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'), false);
     }
 
     public function testGlobFindsFiles()
