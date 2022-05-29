@@ -162,6 +162,20 @@ class RoutingRedirectorTest extends TestCase
         $this->assertSame('http://foo.com/bar', $response->getTargetUrl());
     }
 
+    public function testHomeRouteResolver()
+    {
+        $this->url->shouldReceive('route')->with('resolved')->andReturn('http://foo.com/resolved');
+        $this->url->shouldReceive('route')->with('resolved', [])->andReturn('http://foo.com/resolved');
+        $this->url->shouldReceive('to')->with('http://foo.com/resolved', [], null)->andReturn('http://foo.com/resolved');
+
+        $this->redirect->resolveHomeUsing(function (UrlGenerator $generator) {
+            return $generator->route('resolved');
+        });
+
+        $response = $this->redirect->home();
+        $this->assertSame('http://foo.com/resolved', $response->getTargetUrl());
+    }
+
     public function testSignedRoute()
     {
         $this->url->shouldReceive('signedRoute')->with('home', [], null)->andReturn('http://foo.com/bar?signature=secret');

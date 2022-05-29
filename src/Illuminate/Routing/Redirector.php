@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Support\Traits\Macroable;
@@ -25,6 +26,13 @@ class Redirector
     protected $session;
 
     /**
+     * The home resolver callback.
+     *
+     * @var \Closure
+     */
+    protected $homeResolver;
+
+    /**
      * Create a new Redirector instance.
      *
      * @param  \Illuminate\Routing\UrlGenerator  $generator
@@ -36,6 +44,19 @@ class Redirector
     }
 
     /**
+     * Set the home route resolver callback.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function resolveHomeUsing(Closure $callback)
+    {
+        $this->homeResolver = $callback;
+
+        return $this;
+    }
+
+    /**
      * Create a new redirect response to the "home" route.
      *
      * @param  int  $status
@@ -43,7 +64,9 @@ class Redirector
      */
     public function home($status = 302)
     {
-        return $this->to($this->generator->route('home'), $status);
+        $homeResolver = $this->homeResolver ?: fn (UrlGenerator $generator) => $generator->route('home');
+
+        return $this->to($homeResolver($this->generator), $status);
     }
 
     /**
