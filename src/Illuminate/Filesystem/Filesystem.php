@@ -484,7 +484,7 @@ class Filesystem
      * @param  bool  $hidden
      * @return bool
      */
-    public function hasFiles($directory, $hidden = false)
+    public function isDirectoryEmpty($directory, $hidden = false)
     {
         return $this->isDirectory($directory)
             && Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->count();
@@ -497,9 +497,9 @@ class Filesystem
      * @param  bool  $hidden
      * @return bool
      */
-    public function hasNoFiles($directory, $hidden = false)
+    public function isDirectoryNotEmpty($directory, $hidden = false)
     {
-        return !$this->hasFiles($directory, $hidden);
+        return !$this->isDirectoryEmpty($directory, $hidden);
     }
 
     /**

@@ -450,7 +450,7 @@ class FilesystemTest extends TestCase
         $this->assertFalse($files->isReadable(self::$tempDir.'/doesnotexist.txt'));
     }
 
-    public function testHasFiles()
+    public function testIsDirEmpty()
     {
         mkdir(self::$tempDir.'/foo-dir');
         file_put_contents(self::$tempDir.'/foo-dir/.hidden', 'foo');
@@ -459,17 +459,17 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
 
-        $this->assertFalse($files->hasFiles(self::$tempDir.'/foo-dir'));
-        $this->assertTrue($files->hasFiles(self::$tempDir.'/foo-dir', true));
-        $this->assertTrue($files->hasFiles(self::$tempDir.'/bar-dir'));
-        $this->assertFalse($files->hasFiles(self::$tempDir.'/bar-dir/foo.txt'));
-        $this->assertFalse($files->hasFiles(self::$tempDir.'/bar-dir/foo.txt'), false);
+        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/foo-dir'));
+        $this->assertTrue($files->isDirectoryEmpty(self::$tempDir.'/foo-dir', true));
+        $this->assertTrue($files->isDirectoryEmpty(self::$tempDir.'/bar-dir'));
+        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir/foo.txt'));
+        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir/foo.txt'), false);
 
-        $this->assertTrue($files->hasNoFiles(self::$tempDir.'/foo-dir'));
-        $this->assertFalse($files->hasNoFiles(self::$tempDir.'/foo-dir', true));
-        $this->assertFalse($files->hasNoFiles(self::$tempDir.'/bar-dir'));
-        $this->assertTrue($files->hasNoFiles(self::$tempDir.'/bar-dir/foo.txt'));
-        $this->assertTrue($files->hasNoFiles(self::$tempDir.'/bar-dir/foo.txt'), false);
+        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir'));
+        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir', true));
+        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir'));
+        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'));
+        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'), false);
     }
 
     public function testGlobFindsFiles()
