@@ -478,6 +478,31 @@ class Filesystem
     }
 
     /**
+     * Determine if the given path is a directory and has at least one file.
+     *
+     * @param  string  $directory
+     * @param  bool  $hidden
+     * @return bool
+     */
+    public function hasFiles($directory, $hidden = false)
+    {
+        return $this->isDirectory($directory)
+            && Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->count();
+    }
+
+    /**
+     * Determine if the given path has no files.
+     *
+     * @param  string  $directory
+     * @param  bool  $hidden
+     * @return bool
+     */
+    public function hasNoFiles($directory, $hidden = false)
+    {
+        return !$this->hasFiles($directory, $hidden);
+    }
+
+    /**
      * Determine if the given path is readable.
      *
      * @param  string  $path

@@ -450,6 +450,26 @@ class FilesystemTest extends TestCase
         $this->assertFalse($files->isReadable(self::$tempDir.'/doesnotexist.txt'));
     }
 
+    public function testHasFiles()
+    {
+        mkdir(self::$tempDir.'/foo-dir');
+        file_put_contents(self::$tempDir.'/foo-dir/.hidden', 'foo');
+        mkdir(self::$tempDir.'/bar-dir');
+        file_put_contents(self::$tempDir.'/bar-dir/foo.txt', 'foo');
+
+        $files = new Filesystem;
+
+        $this->assertFalse($files->hasFiles(self::$tempDir.'/foo-dir'));
+        $this->assertTrue($files->hasFiles(self::$tempDir.'/foo-dir', true));
+        $this->assertTrue($files->hasFiles(self::$tempDir.'/bar-dir'));
+        $this->assertFalse($files->hasFiles(self::$tempDir.'/bar-dir/foo.txt'));
+
+        $this->assertTrue($files->hasNoFiles(self::$tempDir.'/foo-dir'));
+        $this->assertFalse($files->hasNoFiles(self::$tempDir.'/foo-dir', true));
+        $this->assertFalse($files->hasNoFiles(self::$tempDir.'/bar-dir'));
+        $this->assertTrue($files->hasNoFiles(self::$tempDir.'/bar-dir/foo.txt'));
+    }
+
     public function testGlobFindsFiles()
     {
         file_put_contents(self::$tempDir.'/foo.txt', 'foo');
