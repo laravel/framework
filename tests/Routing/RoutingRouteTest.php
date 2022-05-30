@@ -1706,6 +1706,23 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('2|another-test-slug|3', $router->dispatch(Request::create('foo/2/another-test-slug/3', 'GET'))->getContent());
     }
 
+    public function testApiResourceScopingWhenChildDoesNotBelongToParent()
+    {
+        ResourceRegistrar::singularParameters();
+        $router = $this->getRouter();
+        $router->apiResource(
+            'teams.users',
+            RouteTestNestedResourceControllerWithMissingUser::class,
+            ['only' => ['show']],
+        )
+            ->middleware(SubstituteBindings::class)
+            ->scoped();
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $router->dispatch(Request::create('teams/1/users/2', 'GET'));
+    }
+
     public function testParentChildImplicitBindingsProperlyCamelCased()
     {
         $router = $this->getRouter();
@@ -2109,6 +2126,13 @@ class RouteTestResourceControllerWithModelParameter extends Controller
     }
 }
 
+class RouteTestNestedResourceControllerWithMissingUser extends Controller
+{
+    public function show(RoutingTestTeamWithoutUserModel $team, RoutingTestUserModel $user)
+    {
+    }
+}
+
 class RouteTestClosureMiddlewareController extends Controller
 {
     public function __construct()
@@ -2363,6 +2387,14 @@ class RoutingTestNonExistingUserModel extends RoutingTestUserModel
     public function firstOrFail()
     {
         throw new ModelNotFoundException;
+    }
+}
+
+class RoutingTestTeamWithoutUserModel extends RoutingTestTeamModel
+{
+    public function users()
+    {
+        throw new ModelNotFoundException();
     }
 }
 
