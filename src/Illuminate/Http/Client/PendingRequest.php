@@ -586,7 +586,7 @@ class PendingRequest
     {
         return $condition ? $this->throw() : $this;
     }
-    
+
     /**
      * Throw an exception if a server or client error occurred and the given condition evaluates to false.
      *
