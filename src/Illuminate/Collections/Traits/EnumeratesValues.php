@@ -796,7 +796,7 @@ trait EnumeratesValues
 
             if (! is_array($result)) {
                 throw new UnexpectedValueException(sprintf(
-                    "%s::reduceMany expects reducer to return an array, but got a '%s' instead.",
+                    "%s::reduceSpread expects reducer to return an array, but got a '%s' instead.",
                     class_basename(static::class), gettype($result)
                 ));
             }
