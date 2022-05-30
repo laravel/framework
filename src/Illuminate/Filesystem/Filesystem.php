@@ -478,7 +478,7 @@ class Filesystem
     }
 
     /**
-     * Determine if the given path is a directory and has at least one file.
+     * Determine if the given path is a directory without files or directories.
      *
      * @param  string  $directory
      * @param  bool  $hidden
@@ -487,11 +487,11 @@ class Filesystem
     public function isDirectoryEmpty($directory, $hidden = false)
     {
         return $this->isDirectory($directory)
-            && Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->count();
+            && ! Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->hasResults();
     }
 
     /**
-     * Determine if the given path has no files.
+     * Determine if the given directory as any file or directory.
      *
      * @param  string  $directory
      * @param  bool  $hidden
@@ -500,7 +500,7 @@ class Filesystem
     public function isDirectoryNotEmpty($directory, $hidden = false)
     {
         return $this->isDirectory($directory)
-            && ! Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->count();
+            && Finder::create()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->hasResults();
     }
 
     /**
