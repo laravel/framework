@@ -405,7 +405,7 @@ class RouteListCommand extends Command
         })
             ->flatten()
             ->filter()
-            ->prepend('')->prepend($routeCount)->prepend('')
+            ->prepend('')
             ->push('')->push($routeCount)->push('')
             ->toArray();
     }
