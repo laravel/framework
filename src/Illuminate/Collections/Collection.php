@@ -1651,7 +1651,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function addUnique($item)
     {
-        if (!$this->contains($item)) {
+        if (! $this->contains($item)) {
             $this->items[] = $item;
         }
 
