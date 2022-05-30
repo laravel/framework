@@ -486,8 +486,7 @@ class Filesystem
      */
     public function isDirectoryEmpty($directory, $hidden = false)
     {
-        return $this->isDirectory($directory)
-            && ! Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->hasResults();
+        return ! Finder::create()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->hasResults();
     }
 
     /**
@@ -499,8 +498,7 @@ class Filesystem
      */
     public function isDirectoryNotEmpty($directory, $hidden = false)
     {
-        return $this->isDirectory($directory)
-            && Finder::create()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->hasResults();
+        return !$this->isDirectoryEmpty($directory, $hidden);
     }
 
     /**

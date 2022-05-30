@@ -467,8 +467,6 @@ class FilesystemTest extends TestCase
         $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/foo-dir', true));
         $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir'));
         $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir', true));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir/foo.txt'));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir/foo.txt', true));
         $this->assertTrue($files->isDirectoryEmpty(self::$tempDir.'/baz-dir'));
         $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/baz-dir', true));
         $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/quz-dir'));
@@ -478,8 +476,6 @@ class FilesystemTest extends TestCase
         $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir', true));
         $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir'));
         $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir', true));
-        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt'));
-        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir/foo.txt', true));
         $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/baz-dir'));
         $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/baz-dir', true));
         $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/quz-dir'));
