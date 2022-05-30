@@ -582,7 +582,7 @@ trait ValidatesAttributes
 
         $length = strlen((string) $value);
 
-        return ! preg_match('/[^0-9.]/', $value)
+        return ! preg_match('/[^0-9]/', $value)
                     && $length >= $parameters[0] && $length <= $parameters[1];
     }
 
