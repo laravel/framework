@@ -1644,6 +1644,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Add an unique item to the collection.
+     *
+     * @param  TValue  $item
+     * @return $this
+     */
+    public function addUnique($item)
+    {
+        if (!$this->contains($item)) {
+            $this->items[] = $item;
+        }
+
+        return $this;
+    }
+
+    /**
      * Get a base Support collection instance from this collection.
      *
      * @return \Illuminate\Support\Collection<TKey, TValue>
