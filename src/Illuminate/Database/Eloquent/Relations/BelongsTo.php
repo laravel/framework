@@ -120,6 +120,7 @@ class BelongsTo extends Relation
 
         if ($eagerModelKeys === []) {
             $this->hasValidConstrains = false;
+
             return;
         }
 
