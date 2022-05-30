@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use JsonException;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
@@ -368,6 +369,27 @@ class Str
     public static function isAscii($value)
     {
         return ASCII::is_ascii((string) $value);
+    }
+
+    /**
+     * Determine if a given string is valid JSON.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isJson($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        try {
+            json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

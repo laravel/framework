@@ -365,7 +365,11 @@ trait QueriesRelationships
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
         });
     }
 
@@ -381,7 +385,11 @@ trait QueriesRelationships
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
         return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
         });
     }
 

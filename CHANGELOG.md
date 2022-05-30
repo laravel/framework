@@ -1,6 +1,28 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.13.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.14.0...9.x)
+
+
+## [v9.14.0](https://github.com/laravel/framework/compare/v9.13.0...v9.14.0) - 2022-05-24
+
+### Added
+- Added ability to add table comments for MySQL and Postgres ([#42401](https://github.com/laravel/framework/pull/42401))
+- Added dynamic trashed factory state ([#42414](https://github.com/laravel/framework/pull/42414))
+- Added Illuminate/Collections/Arr::prependKeysWith() ([#42448](https://github.com/laravel/framework/pull/42448))
+- Added bootable traits to TestCase ([#42394](https://github.com/laravel/framework/pull/42394))
+
+### Fixed
+- Fix clone issue on updateOrCreate and firstOrCreate ([#42434](https://github.com/laravel/framework/pull/42434))
+- Prevent double sanitized key in RateLimiter@tooManyAttempts ([#42462](https://github.com/laravel/framework/pull/42462))
+- Add flush handler to output buffer for streamed test response (bugfix) ([#42481](https://github.com/laravel/framework/pull/42481))
+
+### Changed
+- Adds attaches a concise error message to SES exceptions ([#42426](https://github.com/laravel/framework/pull/42426))
+- Use duplicate instead of createFromBase to clone request when routes are cached ([#42420](https://github.com/laravel/framework/pull/42420))
+- Use model route key when route parameter does not specifiy custom binding field but a different parameter does ([#42425](https://github.com/laravel/framework/pull/42425))
+- Adds ability to have paginate() $perPage parameter as callable with access to $total ([#42429](https://github.com/laravel/framework/pull/42429))
+- Extract ServeCommand env list to static property ([#42444](https://github.com/laravel/framework/pull/42444))
+- Use route parameters in view ([#42461](https://github.com/laravel/framework/pull/42461))
 
 
 ## [v9.13.0](https://github.com/laravel/framework/compare/v9.12.2...v9.13.0) - 2022-05-17
