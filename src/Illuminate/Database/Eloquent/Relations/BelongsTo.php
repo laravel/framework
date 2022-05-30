@@ -15,6 +15,8 @@ class BelongsTo extends Relation
         InteractsWithDictionary,
         SupportsDefaultModels;
 
+    protected bool $hasValidConstrains = true;
+
     /**
      * The child model instance of the relation.
      *
@@ -113,7 +115,15 @@ class BelongsTo extends Relation
 
         $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
 
-        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
+        // Do trigger query if there is nothing to load
+        $eagerModelKeys = $this->getEagerModelKeys($models);
+
+        if ($eagerModelKeys === []) {
+            $this->hasValidConstrains = false;
+            return;
+        }
+
+        $this->query->{$whereIn}($key, $eagerModelKeys);
     }
 
     /**
@@ -138,6 +148,15 @@ class BelongsTo extends Relation
         sort($keys);
 
         return array_values(array_unique($keys));
+    }
+
+    public function getEager()
+    {
+        if ($this->hasValidConstrains) {
+            return parent::getEager();
+        }
+
+        return new Collection();
     }
 
     /**
