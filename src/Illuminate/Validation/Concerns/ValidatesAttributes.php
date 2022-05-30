@@ -407,7 +407,7 @@ trait ValidatesAttributes
 
         $size = $this->getSize($attribute, $value);
 
-        return $size >= $parameters[0] && $size <= $parameters[1];
+        return $size >= str_replace('_', '', (string) $parameters[0]) && $size <= str_replace('_', '', (string) $parameters[1]);
     }
 
     /**
