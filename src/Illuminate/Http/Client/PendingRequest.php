@@ -595,7 +595,7 @@ class PendingRequest
      */
     public function throwUnless($condition)
     {
-        return $this->throwIf(!$condition);
+        return $this->throwIf(! $condition);
     }
 
     /**
