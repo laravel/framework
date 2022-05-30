@@ -586,6 +586,17 @@ class PendingRequest
     {
         return $condition ? $this->throw() : $this;
     }
+    
+    /**
+     * Throw an exception if a server or client error occurred and the given condition evaluates to false.
+     *
+     * @param  bool  $condition
+     * @return $this
+     */
+    public function throwUnless($condition)
+    {
+        return $this->throwIf(! $condition);
+    }
 
     /**
      * Dump the request before sending.
