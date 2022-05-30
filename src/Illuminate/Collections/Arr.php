@@ -490,7 +490,7 @@ class Arr
 
         foreach ($subjects as $key => $subject) {
             if ($subject !== $glue) {
-                $subjects[$key] = Str::between($subject, $glue, $glue);
+                $subjects[$key] = Str::beforeLast(Str::after($subject, $glue) ?: $subject, $glue);
             }
         }
 

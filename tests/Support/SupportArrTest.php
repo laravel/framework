@@ -235,6 +235,9 @@ class SupportArrTest extends TestCase
         $this->assertSame('a and b', Arr::glue(['a', 'b'], ' ' , ' and '));
         $this->assertSame('a and b', Arr::glue(['a and ', ' and b'], ' ' , ' and '));
 
+        $this->assertSame('a, b and c', Arr::glue(['a, ', 'b, ', ' and c'], ', ', ' and '));
+        $this->assertSame('a, b and c', Arr::glue(['a, ', ', b', ' and c'], ', ', ' and '));
+
         $this->assertSame(' a b c d ', Arr::glue([' a ', ' b ', ' c ', ' d '], ' '));
         $this->assertSame('a/b/c/d/e', Arr::glue(['a/', '/b/', '/c', '/d/e'], '/'));
         $this->assertSame('a/b/c+d/e', Arr::glue(['a/', '/b/', '/c', '+d/e'], '/', '+'));
