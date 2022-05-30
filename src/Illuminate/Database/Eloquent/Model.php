@@ -1987,7 +1987,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        return $query->where($field ?? $this->getRouteKeyName(), $value);
+        return $query->where($field ?? $this->getTable() . '.' . $this->getRouteKeyName(), $value);
     }
 
     /**
