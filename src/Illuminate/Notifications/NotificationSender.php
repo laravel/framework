@@ -191,7 +191,9 @@ class NotificationSender
             foreach ((array) $original->via($notifiable) as $channel) {
                 $notification = clone $original;
 
-                $notification->id = $notificationId;
+                if (! $notification->id) {
+                    $notification->id = $notificationId;
+                }
 
                 if (! is_null($this->locale)) {
                     $notification->locale = $this->locale;
