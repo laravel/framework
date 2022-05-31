@@ -72,7 +72,7 @@ class Arr
      */
     public static function combine($keys, $values = null)
     {
-        if ($values === nul) {
+        if ($values === null) {
             return array_combine($keys, $keys);
         }
 
