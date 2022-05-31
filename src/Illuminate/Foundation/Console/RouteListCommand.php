@@ -411,23 +411,6 @@ class RouteListCommand extends Command
     }
 
     /**
-     * Determine and return the output for displaying the number of routes in the CLI output.
-     *
-     * @param  \Illuminate\Support\Collection  $routes
-     * @param  int  $terminalWidth
-     * @return string
-     */
-    protected function determineRouteCountOutput($routes, $terminalWidth)
-    {
-        $routeCountText = 'Showing ['.$routes->count().'] routes';
-
-        $offset = $terminalWidth - mb_strlen($routeCountText) - 2;
-        $spaces = str_repeat(' ', $offset);
-
-        return $spaces.'<fg=blue;options=bold>Showing ['.$routes->count().'] routes</>';
-    }
-
-    /**
      * Get the formatted action for display on the CLI.
      *
      * @param  array  $route
@@ -459,6 +442,24 @@ class RouteListCommand extends Command
         }
 
         return $name.$action;
+    }
+
+    /**
+     * Determine and return the output for displaying the number of routes in the CLI output.
+     *
+     * @param  \Illuminate\Support\Collection  $routes
+     * @param  int  $terminalWidth
+     * @return string
+     */
+    protected function determineRouteCountOutput($routes, $terminalWidth)
+    {
+        $routeCountText = 'Showing ['.$routes->count().'] routes';
+
+        $offset = $terminalWidth - mb_strlen($routeCountText) - 2;
+
+        $spaces = str_repeat(' ', $offset);
+
+        return $spaces.'<fg=blue;options=bold>Showing ['.$routes->count().'] routes</>';
     }
 
     /**
