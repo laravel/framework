@@ -3,12 +3,24 @@
 namespace Illuminate\Tests;
 
 use PHPUnit\Framework\TestResult;
-use PHPUnit\TextUI\DefaultResultPrinter;
+use PHPUnit\Runner\Version;
+use PHPUnit\TextUI\DefaultResultPrinter as PHPUnit9ResultPrinter;
+use PHPUnit\TextUI\ResultPrinter as PHPUnit8ResultPrinter;
 
-class IgnoreSkippedPrinter extends DefaultResultPrinter
-{
-    protected function printSkipped(TestResult $result): void
+if (class_exists(Version::class) && (int) Version::series()[0] >= 9) {
+    class IgnoreSkippedPrinter extends PHPUnit9ResultPrinter
     {
-        //
+        protected function printSkipped(TestResult $result): void
+        {
+            //
+        }
+    }
+} else {
+    class IgnoreSkippedPrinter extends PHPUnit8ResultPrinter
+    {
+        protected function printSkipped(TestResult $result): void
+        {
+            //
+        }
     }
 }
