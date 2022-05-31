@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/laravel/framework/compare/v8.83.15...8.x)
 
 
-## [v8.83.14 (2022-05-31)](https://github.com/laravel/framework/compare/v8.83.14...v8.83.15)
+## [v8.83.15 (2022-05-31)](https://github.com/laravel/framework/compare/v8.83.14...v8.83.15)
 
 ### Reverted
 - Revert digits changes in Validator ([c6d1a2d](https://github.com/laravel/framework/commit/c6d1a2da17e3aaaeb0ff5b8cc4879816d214b527), [#42562](https://github.com/laravel/framework/pull/42562))
