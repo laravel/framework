@@ -255,7 +255,8 @@ class RouteListCommand extends Command
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
             ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
             ($this->option('domain') && ! Str::contains((string) $route['domain'], $this->option('domain'))) ||
-            ($this->option('except-vendor') && $route['vendor'])) {
+            ($this->option('except-vendor') && $route['vendor']) ||
+            ($this->option('only-vendor') && ! $route['vendor'])) {
             return;
         }
 
@@ -465,6 +466,7 @@ class RouteListCommand extends Command
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
+            ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
         ];
     }
 }

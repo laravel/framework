@@ -406,6 +406,24 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isUuid($uuid));
     }
 
+    public function testIsJson()
+    {
+        $this->assertTrue(Str::isJson('1'));
+        $this->assertTrue(Str::isJson('[1,2,3]'));
+        $this->assertTrue(Str::isJson('[1,   2,   3]'));
+        $this->assertTrue(Str::isJson('{"first": "John", "last": "Doe"}'));
+        $this->assertTrue(Str::isJson('[{"first": "John", "last": "Doe"}, {"first": "Jane", "last": "Doe"}]'));
+
+        $this->assertFalse(Str::isJson('1,'));
+        $this->assertFalse(Str::isJson('[1,2,3'));
+        $this->assertFalse(Str::isJson('[1,   2   3]'));
+        $this->assertFalse(Str::isJson('{first: "John"}'));
+        $this->assertFalse(Str::isJson('[{first: "John"}, {first: "Jane"}]'));
+        $this->assertFalse(Str::isJson(''));
+        $this->assertFalse(Str::isJson(null));
+        $this->assertFalse(Str::isJson([]));
+    }
+
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
