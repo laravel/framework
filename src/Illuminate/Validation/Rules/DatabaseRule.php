@@ -76,16 +76,35 @@ trait DatabaseRule
 
         return $table;
     }
+    
+    /**
+     * Add an array of where clauses to the query.
+     *
+     * @param  array  $column
+     * @return $this
+     */
+    protected function addArrayOfWheres($column)
+    {
+        collect($column)->each(function ($value) {
+            $this->wheres[] = ['column' => $value[0], 'value' => $value[1]];
+        });
+
+        return $this;
+    }
 
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  \Closure|string  $column
+     * @param  \Closure|array|string  $column
      * @param  \Illuminate\Contracts\Support\Arrayable|array|string|int|null  $value
      * @return $this
      */
     public function where($column, $value = null)
     {
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column);
+        }
+        
         if ($value instanceof Arrayable || is_array($value)) {
             return $this->whereIn($column, $value);
         }
