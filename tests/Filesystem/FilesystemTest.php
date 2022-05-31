@@ -463,23 +463,14 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
 
-        $this->assertTrue($files->isDirectoryEmpty(self::$tempDir.'/foo-dir'));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/foo-dir', true));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir'));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/bar-dir', true));
-        $this->assertTrue($files->isDirectoryEmpty(self::$tempDir.'/baz-dir'));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/baz-dir', true));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/quz-dir'));
-        $this->assertFalse($files->isDirectoryEmpty(self::$tempDir.'/quz-dir', true));
-
-        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir'));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/foo-dir', true));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir'));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/bar-dir', true));
-        $this->assertFalse($files->isDirectoryNotEmpty(self::$tempDir.'/baz-dir'));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/baz-dir', true));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/quz-dir'));
-        $this->assertTrue($files->isDirectoryNotEmpty(self::$tempDir.'/quz-dir', true));
+        $this->assertTrue($files->isEmptyDirectory(self::$tempDir.'/foo-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/foo-dir'));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/bar-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/bar-dir'));
+        $this->assertTrue($files->isEmptyDirectory(self::$tempDir.'/baz-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/baz-dir'));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/quz-dir', true));
+        $this->assertFalse($files->isEmptyDirectory(self::$tempDir.'/quz-dir'));
     }
 
     public function testGlobFindsFiles()
