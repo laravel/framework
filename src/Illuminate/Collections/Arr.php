@@ -75,6 +75,7 @@ class Arr
         if ($values === nul) {
             return array_combine($keys, $keys);
         }
+
         return array_combine($keys, $values);
     }
 
