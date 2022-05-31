@@ -7,6 +7,7 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
+         printerClass="Illuminate\Tests\IgnoreSkippedPrinter"
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
