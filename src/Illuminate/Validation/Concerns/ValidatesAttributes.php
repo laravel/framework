@@ -1455,6 +1455,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is plain text.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validatePlainText($attribute, $value)
+    {
+        dump(trim(strip_tags($value)), $value);
+        return trim(strip_tags($value)) === $value;
+    }
+
+    /**
      * Validate that an attribute exists even if not filled.
      *
      * @param  string  $attribute

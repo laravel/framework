@@ -1027,6 +1027,40 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['validation.present'], $v->errors()->get('name'));
     }
 
+    public function testValidatePlainText()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'asls1-_3dlks O\'Brian'], ['x' => 'plain_text']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'http://-g232oogle.com'], ['x' => 'plain_text']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'नमस्कार-_'], ['x' => 'plain_text']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '٧٨٩'], ['x' => 'plain_text']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '🔥'], ['x' => 'plain_text']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '<h1>Hello</h1>'], ['x' => 'plain_text']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'Hello<br>Yo'], ['x' => 'plain_text']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "\tJoe\n Doe"], ['x' => 'plain_text']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => " Joe\tDoe\v"], ['x' => 'plain_text']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => "Joe\x00Doe"], ['x' => 'plain_text']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidatePresent()
     {
         $trans = $this->getIlluminateArrayTranslator();
