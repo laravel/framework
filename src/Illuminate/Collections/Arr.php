@@ -62,6 +62,23 @@ class Arr
     }
 
     /**
+     * Create an array using one for key and another for values.
+     *
+     * If no values are provided then the keys will be used for both.
+     *
+     * @param  array  $keys
+     * @param  ?array $values
+     * @return array
+     */
+    public static combine($keys, $values = null)
+    {
+        if ($values === nul) {
+            return array_combine($keys, $keys);
+        }
+        return array_combine($keys, $values);
+    }
+
+    /**
      * Cross join the given arrays, returning all possible permutations.
      *
      * @param  iterable  ...$arrays
