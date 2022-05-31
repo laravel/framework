@@ -478,27 +478,15 @@ class Filesystem
     }
 
     /**
-     * Determine if the given path is a directory without files or directories.
+     * Determine if the given path is a directory that does not contain any other files or directories.
      *
      * @param  string  $directory
-     * @param  bool  $hidden
+     * @param  bool  $ignoreDotFiles
      * @return bool
      */
-    public function isDirectoryEmpty($directory, $hidden = false)
+    public function isEmptyDirectory($directory, $ignoreDotFiles = false)
     {
-        return ! Finder::create()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->hasResults();
-    }
-
-    /**
-     * Determine if the given directory as any file or directory.
-     *
-     * @param  string  $directory
-     * @param  bool  $hidden
-     * @return bool
-     */
-    public function isDirectoryNotEmpty($directory, $hidden = false)
-    {
-        return !$this->isDirectoryEmpty($directory, $hidden);
+        return ! Finder::create()->ignoreDotFiles($ignoreDotFiles)->in($directory)->depth(0)->hasResults();
     }
 
     /**
