@@ -154,7 +154,7 @@ trait QueriesRelationships
 
     /**
      * Add a relationship count / exists condition to the query with where clauses.
-     * 
+     *
      * Also load the relationship with same condition.
      *
      * @param  string  $relation
