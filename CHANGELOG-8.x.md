@@ -1,6 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.14...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.15...8.x)
+
+
+## [v8.83.14 (2022-05-31)](https://github.com/laravel/framework/compare/v8.83.14...v8.83.15)
+
+### Reverted
+- Revert digits changes in Validator ([c6d1a2d](https://github.com/laravel/framework/commit/c6d1a2da17e3aaaeb0ff5b8cc4879816d214b527), [#42562](https://github.com/laravel/framework/pull/42562))
+
+### Changed
+- Retain the original attribute value during validation of an array key with a dot for correct failure message ([#42395](https://github.com/laravel/framework/pull/42395))
 
 
 ## [v8.83.14 (2022-05-24)](https://github.com/laravel/framework/compare/v8.83.13...v8.83.14)
