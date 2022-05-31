@@ -67,7 +67,7 @@ class Arr
      * If no values are provided then the keys will be used for both.
      *
      * @param  array  $keys
-     * @param  ?array $values
+     * @param  array $values
      * @return array
      */
     public static function combine($keys, $values = null)
