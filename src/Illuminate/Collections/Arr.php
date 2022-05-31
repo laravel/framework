@@ -70,7 +70,7 @@ class Arr
      * @param  ?array $values
      * @return array
      */
-    public static combine($keys, $values = null)
+    public static function combine($keys, $values = null)
     {
         if ($values === nul) {
             return array_combine($keys, $keys);
