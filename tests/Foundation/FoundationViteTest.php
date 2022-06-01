@@ -54,7 +54,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertSame(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
-            . '<script type="module" src="https://example.com/build/assets/app-with-css.versioned.js"></script>',
+            .'<script type="module" src="https://example.com/build/assets/app-with-css.versioned.js"></script>',
             $result->toHtml()
         );
     }
@@ -67,7 +67,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertSame(
             '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
-            . '<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
+            .'<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
             $result->toHtml()
         );
     }
@@ -80,7 +80,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'
-            . '<script type="module" src="http://localhost:3000/resources/js/app-with-css.js"></script>',
+            .'<script type="module" src="http://localhost:3000/resources/js/app-with-css.js"></script>',
             $result->toHtml()
         );
     }

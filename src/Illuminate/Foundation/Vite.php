@@ -84,7 +84,7 @@ class Vite
     }
 
     /**
-     * Generate React refresh runtime script
+     * Generate React refresh runtime script.
      *
      * @return \Illuminate\Support\HtmlString|void
      */
