@@ -478,6 +478,38 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Nuno Maduro', $user1->name);
     }
 
+    public function testFirstOrTap()
+    {
+        $user1 = EloquentTestUser::firstOrTap(
+            function (EloquentTestUser $user) {
+                $user->name = 'Taylor Otwell';
+            },
+            ['email' => 'taylorotwell@gmail.com']
+        );
+
+        $this->assertFalse($user1->exists);
+        $this->assertSame('Taylor Otwell', $user1->name);
+        $this->assertSame('taylorotwell@gmail.com', $user1->email);
+
+        $user2 = EloquentTestUser::firstOrTap(
+            function (EloquentTestUser $user) {
+                $user->save();
+            },
+            ['email' => 'taylorotwell@gmail.com']
+        );
+
+        $this->assertTrue($user2->exists);
+        $this->assertSame('taylorotwell@gmail.com', $user2->email);
+
+        $user3 = EloquentTestUser::firstOrTap(
+            function (EloquentTestUser $user) {
+                $user->email = 'nuno@laravel.com';
+            }
+        );
+        
+        $this->assertSame($user2->email, $user3->email);
+    }
+
     public function testFirstOrCreate()
     {
         $user1 = EloquentTestUser::firstOrCreate(['email' => 'taylorotwell@gmail.com']);
