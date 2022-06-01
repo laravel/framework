@@ -19,4 +19,3 @@ enum AnimalBackedEnum: int
     case Platypus = 0;
     case Penguin = 1;
 }
-
