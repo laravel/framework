@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 trait TracksPreviousAttributes
