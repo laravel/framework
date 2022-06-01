@@ -1463,7 +1463,6 @@ trait ValidatesAttributes
      */
     public function validatePlainText($attribute, $value)
     {
-        dump(trim(strip_tags($value)), $value);
         return trim(strip_tags($value)) === $value;
     }
 
