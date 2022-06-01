@@ -177,6 +177,18 @@ class Arr
     }
 
     /**
+     * Filter the array using the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function filter($array, callable $callback)
+    {
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  iterable  $array
@@ -787,7 +799,7 @@ class Arr
      */
     public static function where($array, callable $callback)
     {
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        return static::filter($array, $callback);
     }
 
     /**
