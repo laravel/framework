@@ -14,10 +14,15 @@ class ImplicitBackedEnumRouteBindingTest extends TestCase
         $this->defineCacheRoutes(<<<PHP
 <?php
 
+use Illuminate\Tests\Integration\Routing\AnimalBackedEnum;
 use Illuminate\Tests\Integration\Routing\CategoryBackedEnum;
 
 Route::get('/categories/{category}', function (CategoryBackedEnum \$category) {
     return \$category->value;
+})->middleware('web');
+
+Route::get('/animals/{animal}', function (AnimalBackedEnum \$animal) {
+    return \$animal->value;
 })->middleware('web');
 PHP);
 
@@ -28,6 +33,15 @@ PHP);
         $response->assertSee('people');
 
         $response = $this->get('/categories/cars');
+        $response->assertNotFound(404);
+
+        $response = $this->get('/animals/0');
+        $response->assertSee(0);
+
+        $response = $this->get('/animals/1');
+        $response->assertSee(1);
+
+        $response = $this->get('/animals/2');
         $response->assertNotFound(404);
     }
 
@@ -46,6 +60,19 @@ PHP);
         $response->assertSee('people');
 
         $response = $this->post('/categories/cars');
+        $response->assertNotFound(404);
+
+        Route::post('/animals/{animal}', function (AnimalBackedEnum $animal) {
+            return $animal->value;
+        })->middleware(['web']);
+
+        $response = $this->post('/animals/0');
+        $response->assertSee(0);
+
+        $response = $this->post('/animals/1');
+        $response->assertSee(1);
+
+        $response = $this->post('/animals/2');
         $response->assertNotFound(404);
     }
 }
