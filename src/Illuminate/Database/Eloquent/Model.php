@@ -1104,7 +1104,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $this->setKeysForSaveQuery($query)->update($dirty);
 
             $this->syncChanges();
-            $this->syncPrevious();
 
             $this->fireModelEvent('updated', false);
         }
