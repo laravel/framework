@@ -277,7 +277,7 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
             $query->where('logins.id', $latestLogin->id);
         })->first();
 
-        $this->assertTrue((bool)$found);
+        $this->assertTrue((bool) $found);
         $this->assertTrue($found->relationLoaded('latest_login'));
         $this->assertEquals($found->latest_login->id, $latestLogin->id);
 
