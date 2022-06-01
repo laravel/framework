@@ -1351,4 +1351,13 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
+
+    public function testHasQueryMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], []);
+        $this->assertFalse($request->hasQuery('foo'));
+
+        $request = Request::create('/', 'GET', ['foo' => 'bar'], [], []);
+        $this->assertTrue($request->hasQuery('foo'));
+    }
 }

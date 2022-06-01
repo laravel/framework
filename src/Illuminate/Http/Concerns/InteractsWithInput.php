@@ -566,4 +566,15 @@ trait InteractsWithInput
 
         return $this;
     }
+
+    /**
+     * Determine if a query key is set on the request.
+     *
+     * @param $key
+     * @return bool
+     */
+    public function hasQuery($key): bool
+    {
+        return ! is_null($this->query($key));
+    }
 }
