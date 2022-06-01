@@ -25,7 +25,7 @@ class BroadcastController extends Controller
     }
 
     /**
-     * Authenticate the request for user authorization.
+     * Authenticate the current user.
      *
      * See: https://pusher.com/docs/channels/server_api/authenticating-users/#user-authentication.
      *
