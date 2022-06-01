@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BroadcasterTest extends TestCase
@@ -282,6 +283,36 @@ class BroadcasterTest extends TestCase
                 ->withNoArgs();
 
         $this->broadcaster->retrieveUser($request, 'somechannel');
+    }
+
+    public function testUserAuthenticationWithValidUser()
+    {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function ($request) {
+            return ['id' => '12345', 'socket' => $request->socket_id];
+        });
+
+        $user = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
+
+        $this->assertSame([
+            'id' => '12345',
+            'socket' => '1234.1234',
+        ], $user);
+    }
+
+    public function testUserAuthenticationWithInvalidUser()
+    {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function ($request) {
+            return null;
+        });
+
+        $user = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
+
+        $this->assertNull($user);
+    }
+
+    public function testUserAuthenticationWithoutResolve()
+    {
+        $this->assertNull($this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234'])));
     }
 
     /**

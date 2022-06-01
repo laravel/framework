@@ -32,6 +32,35 @@ class PusherBroadcaster extends Broadcaster
     }
 
     /**
+     * Resolve the authenticated user payload for an incoming connection request.
+     *
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#response
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|null
+     */
+    public function resolveAuthenticatedUser($request)
+    {
+        if (! $user = parent::resolveAuthenticatedUser($request)) {
+            return;
+        }
+
+        $settings = $this->pusher->getSettings();
+        $encodedUser = json_encode($user);
+        $decodedString = "{$request->socket_id}::user::{$encodedUser}";
+
+        $auth = $settings['auth_key'].':'.hash_hmac(
+            'sha256', $decodedString, $settings['secret']
+        );
+
+        return [
+            'auth' => $auth,
+            'user_data' => $encodedUser,
+        ];
+    }
+
+    /**
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
