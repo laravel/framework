@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -202,6 +203,20 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $instance;
+    }
+
+    /**
+     * Get the first matching related model record or tap a new instance.
+     *
+     * @param Closure $callback
+     * @param array   $attributes
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstOrTap(Closure $callback, array $attributes = [])
+    {
+        $instance = $this->firstOrNew($attributes);
+
+        return $instance->exists ? $instance : tap($instance, $callback);
     }
 
     /**

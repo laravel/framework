@@ -522,6 +522,20 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first matching record or tap a new instance.
+     *
+     * @param Closure $callback
+     * @param array   $attributes
+     * @return \Illuminate\Database\Eloquent\Model|static
+     */
+    public function firstOrTap(Closure $callback, array $attributes = [])
+    {
+        $instance = $this->firstOrNew($attributes);
+
+        return $instance->exists ? $instance : tap($instance, $callback);
+    }
+
+    /**
      * Get the first record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
@@ -535,20 +549,6 @@ class Builder implements BuilderContract
         }
 
         return $this->newModelInstance(array_merge($attributes, $values));
-    }
-    
-    /**
-     * Get the first matching record or tap a new instance.
-     *
-     * @param Closure $callback
-     * @param array   $attributes
-     * @return \Illuminate\Database\Eloquent\Model|static
-     */
-    public function firstOrTap(Closure $callback, array $attributes = [])
-    {
-        $instance = $this->firstOrNew($attributes);
-
-        return $instance->exists ? $instance : tap($instance, $callback);
     }
 
     /**
