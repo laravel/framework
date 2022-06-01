@@ -20,7 +20,7 @@ trait TracksPreviousAttributes
      */
     public static function bootTracksPreviousAttributes()
     {
-        static::updating(function (Model $model) {
+        static::updated(function (Model $model) {
             $model->syncPrevious();
         });
     }
