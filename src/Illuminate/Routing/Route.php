@@ -538,7 +538,7 @@ class Route
         if (is_int($parameter)) {
             $parameters = $this->parameterNames();
 
-            if (!isset($parameters[$parameter])) {
+            if (! isset($parameters[$parameter])) {
                 return null;
             }
 
