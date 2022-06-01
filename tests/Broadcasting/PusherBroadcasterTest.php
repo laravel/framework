@@ -157,11 +157,11 @@ class PusherBroadcasterTest extends TestCase
 
         $this->broadcaster = new PusherBroadcaster($this->pusher);
 
-        $this->broadcaster->resolveUserAuthentication(function () {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function () {
             return ['id' => '12345'];
         });
 
-        $response = $this->broadcaster->userAuthentication(new Request(['socket_id' => '1234.1234']));
+        $response = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
 
         // The result is hard-coded from the Pusher docs
         // See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication

@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Broadcast;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class BroadcastController extends Controller
 {
@@ -25,6 +26,7 @@ class BroadcastController extends Controller
 
     /**
      * Authenticate the request for user authorization.
+     *
      * See: https://pusher.com/docs/channels/server_api/authenticating-users/#user-authentication.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -36,6 +38,7 @@ class BroadcastController extends Controller
             $request->session()->reflash();
         }
 
-        return Broadcast::userAuthentication($request);
+        return Broadcast::resolveAuthenticatedUser($request)
+                    ?? throw new AccessDeniedHttpException;
     }
 }

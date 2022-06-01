@@ -33,11 +33,11 @@ abstract class Broadcaster implements BroadcasterContract
     protected $channelOptions = [];
 
     /**
-     * The callback to resolve the user authentication on connection.
+     * The callback to resolve the authenticated user information.
      *
      * @var \Closure|null
      */
-    protected $resolveUserAuthCallback = null;
+    protected $authenticatedUserCallback = null;
 
     /**
      * The binding registrar instance.
@@ -67,38 +67,6 @@ abstract class Broadcaster implements BroadcasterContract
         $this->channelOptions[$channel] = $options;
 
         return $this;
-    }
-
-    /**
-     * Register the user retrieval callback to authenticate connections.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function resolveUserAuthentication(Closure $callback)
-    {
-        $this->resolveUserAuthCallback = $callback;
-    }
-
-    /**
-     * Authenticate the incoming connection request for a given user.
-     * Expecting an array with the user details or false.
-     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
-    public function userAuthentication($request)
-    {
-        // Resolve the auth callback as default in case the providers
-        // does not support user authentication on connection.
-        if (! $this->resolveUserAuthCallback) {
-            throw new AccessDeniedHttpException;
-        }
-
-        return $this->resolveUserAuthCallback->__invoke($request);
     }
 
     /**
@@ -373,5 +341,33 @@ abstract class Broadcaster implements BroadcasterContract
     protected function channelNameMatchesPattern($channel, $pattern)
     {
         return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
+    }
+
+    /**
+     * Resolve the authenticated user payload for the incoming connection request.
+     *
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|null
+     */
+    public function resolveAuthenticatedUser($request)
+    {
+        if ($this->authenticatedUserCallback) {
+            return $this->authenticatedUserCallback->__invoke($request);
+        }
+    }
+
+    /**
+     * Register the user retrieval callback used to authenticate connections.
+     *
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function resolveAuthenticatedUserUsing(Closure $callback)
+    {
+        $this->authenticatedUserCallback = $callback;
     }
 }

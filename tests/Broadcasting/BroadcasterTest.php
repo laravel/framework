@@ -287,11 +287,11 @@ class BroadcasterTest extends TestCase
 
     public function testUserAuthenticationWithValidUser()
     {
-        $this->broadcaster->resolveUserAuthentication(function ($request) {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function ($request) {
             return ['id' => '12345', 'socket' => $request->socket_id];
         });
 
-        $user = $this->broadcaster->userAuthentication(new Request(['socket_id' => '1234.1234']));
+        $user = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
 
         $this->assertSame([
             'id' => '12345',
@@ -301,19 +301,18 @@ class BroadcasterTest extends TestCase
 
     public function testUserAuthenticationWithInvalidUser()
     {
-        $this->broadcaster->resolveUserAuthentication(function ($request) {
+        $this->broadcaster->resolveAuthenticatedUserUsing(function ($request) {
             return null;
         });
 
-        $user = $this->broadcaster->userAuthentication(new Request(['socket_id' => '1234.1234']));
+        $user = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
 
         $this->assertNull($user);
     }
 
     public function testUserAuthenticationWithoutResolve()
     {
-        $this->expectException(AccessDeniedHttpException::class);
-        $this->broadcaster->userAuthentication(new Request(['socket_id' => '1234.1234']));
+        $this->assertNull($this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234'])));
     }
 
     /**
