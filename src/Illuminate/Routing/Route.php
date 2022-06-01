@@ -536,7 +536,13 @@ class Route
     public function bindingFieldFor($parameter)
     {
         if (is_int($parameter)) {
-            $parameter = $this->parameterNames()[$parameter];
+            $parameters = $this->parameterNames();
+
+            if (! isset($parameters[$parameter])) {
+                return null;
+            }
+
+            $parameter = $parameters[$parameter];
         }
 
         return $this->bindingFields[$parameter] ?? null;
