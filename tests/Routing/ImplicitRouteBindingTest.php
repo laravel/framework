@@ -18,7 +18,7 @@ class ImplicitRouteBindingTest extends TestCase
     /**
      * @requires PHP >= 8.1
      */
-    public function test_it_can_resolve_the_implicit_backed_enum_route_bindings_for_the_given_route()
+    public function test_it_can_resolve_the_implicit_string_backed_enum_route_bindings_for_the_given_route()
     {
         $action = ['uses' => function (CategoryBackedEnum $category) {
             return $category->value;
@@ -61,7 +61,7 @@ class ImplicitRouteBindingTest extends TestCase
     /**
      * @requires PHP >= 8.1
      */
-    public function test_implicit_backed_enum_internal_exception()
+    public function test_implicit_string_backed_enum_internal_exception()
     {
         $action = ['uses' => function (CategoryBackedEnum $category) {
             return $category->value;
@@ -79,6 +79,53 @@ class ImplicitRouteBindingTest extends TestCase
             'Case [%s] not found on Backed Enum [%s].',
             'cars',
             CategoryBackedEnum::class,
+        ));
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function test_it_can_resolve_the_implicit_int_backed_enum_route_bindings_for_the_given_route()
+    {
+        $action = ['uses' => function (AnimalBackedEnum $animal) {
+            return $animal->value;
+        }];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['animal' => 0];
+
+        $route->prepareForSerialization();
+
+        $container = Container::getInstance();
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+
+        $this->assertSame(0, $route->parameter('animal')->value);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function test_implicit_backed_int_enum_internal_exception()
+    {
+        $action = ['uses' => function (AnimalBackedEnum $animal) {
+            return $animal->value;
+        }];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['animal' => 2];
+
+        $route->prepareForSerialization();
+
+        $container = Container::getInstance();
+
+        $this->expectException(BackedEnumCaseNotFoundException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Case [%s] not found on Backed Enum [%s].',
+            '2',
+            AnimalBackedEnum::class,
         ));
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
