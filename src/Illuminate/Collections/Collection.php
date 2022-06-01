@@ -369,7 +369,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function filter(callable $callback = null)
     {
         if ($callback) {
-            return new static(Arr::where($this->items, $callback));
+            return new static(Arr::filter($this->items, $callback));
         }
 
         return new static(array_filter($this->items));
