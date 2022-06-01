@@ -141,6 +141,10 @@ class AuthManager implements FactoryContract
             $guard->setRememberDuration($config['remember']);
         }
 
+        if (isset($config['remember_segments'])) {
+            $guard->setRememberSegments($config['remember_segments']);
+        }
+
         return $guard;
     }
 

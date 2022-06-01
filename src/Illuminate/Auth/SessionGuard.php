@@ -61,6 +61,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $rememberDuration = 2628000;
 
     /**
+     * Custom segments from login request that the "remember me" cookie should use for rebuild session.
+     *
+     * @var array
+     */
+    protected $rememberSegments = [];
+
+    /**
      * The session used by the guard.
      *
      * @var \Illuminate\Contracts\Session\Session
@@ -157,6 +164,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
             if ($this->user) {
                 $this->updateSession($this->user->getAuthIdentifier());
+                $this->updateRecallerSession($recaller->segments()[3] ?? null);
 
                 $this->fireLoginEvent($this->user, true);
             }
@@ -486,6 +494,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
             $this->ensureRememberTokenIsSet($user);
 
             $this->queueRecallerCookie($user);
+            $this->updateRecallerSession($this->createRememberSegments());
         }
 
         // If we have an event dispatcher instance set we will fire an event so that
@@ -510,6 +519,25 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Update the session with the recaller segments.
+     *
+     * @param  \Illuminate\Auth\Recaller  $recaller
+     * @return void
+     */
+    protected function updateRecallerSession($segments)
+    {
+        if (! $segments || ! $this->getRememberSegments()) {
+            return;
+        }
+
+        $params = json_decode(base64_decode(trim($segments, '|')), true);
+
+        if ($params) {
+            $this->session->put($params);
+        }
+    }
+
+    /**
      * Create a new "remember me" token for the user if one doesn't already exist.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
@@ -531,7 +559,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function queueRecallerCookie(AuthenticatableContract $user)
     {
         $this->getCookieJar()->queue($this->createRecaller(
-            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword()
+            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword().$this->createRememberSegments()
         ));
     }
 
@@ -544,6 +572,22 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function createRecaller($value)
     {
         return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
+    }
+
+    /**
+     * Create custom segments for the "remember me" cookie.
+     *
+     * @return string
+     */
+    protected function createRememberSegments()
+    {
+        if (! $this->getRememberSegments()) {
+            return '';
+        }
+
+        $params = collect($this->getRequest()->request->all())->only($this->getRememberSegments());
+
+        return '|'.base64_encode(json_encode($params));
     }
 
     /**
@@ -820,6 +864,29 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function setRememberDuration($minutes)
     {
         $this->rememberDuration = $minutes;
+
+        return $this;
+    }
+
+    /**
+     * Get the custom key names the remember me cookie should backup.
+     *
+     * @return array
+     */
+    protected function getRememberSegments()
+    {
+        return $this->rememberSegments;
+    }
+
+    /**
+     * Set the custom key names the remember me cookie should backup.
+     *
+     * @param  array  $segments
+     * @return $this
+     */
+    public function setRememberSegments($segments)
+    {
+        $this->rememberSegments = $segments;
 
         return $this;
     }

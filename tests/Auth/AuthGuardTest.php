@@ -460,6 +460,31 @@ class AuthGuardTest extends TestCase
         $guard->login($user, true);
     }
 
+    public function testLoginMethodQueuesCookieWhenRememberingAndAllowsCustomSession()
+    {
+        [$session, $provider, $request, $cookie] = $this->getMocks();
+        $customSegments = ['baz' => 'baz', 'qux' => 'qux'];
+        $request->request->add($customSegments);
+        $request->request->add(['fubar' => 'fubar']);
+        $guard = new SessionGuard('default', $provider, $session, $request);
+        $guard->setRememberSegments(array_keys($customSegments));
+        $guard->setCookieJar($cookie);
+        $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
+        $encodedSegments = base64_encode(json_encode($customSegments));
+        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar|'.$encodedSegments, 2628000)->andReturn($foreverCookie);
+        $cookie->shouldReceive('queue')->once()->with($foreverCookie);
+        $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
+        $guard->getSession()->shouldReceive('put')->once()->with($customSegments);
+        $session->shouldReceive('migrate')->once();
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+        $user->shouldReceive('getAuthPassword')->andReturn('bar');
+        $user->shouldReceive('getRememberToken')->andReturn('recaller');
+        $user->shouldReceive('setRememberToken')->never();
+        $provider->shouldReceive('updateRememberToken')->never();
+        $guard->login($user, true);
+    }
+
     public function testLoginMethodCreatesRememberTokenIfOneDoesntExist()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
