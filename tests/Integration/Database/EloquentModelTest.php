@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\TracksPreviousAttributes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
@@ -18,6 +19,12 @@ class EloquentModelTest extends DatabaseTestCase
         });
 
         Schema::create('test_model2', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('title');
+        });
+
+        Schema::create('test_model3', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('title');
@@ -67,7 +74,7 @@ class EloquentModelTest extends DatabaseTestCase
 
     public function testPreviousAttributes()
     {
-        $user = TestModel2::create([
+        $user = TestModel3::create([
             'name' => $oldName = Str::random(), 'title' => Str::random(),
         ]);
 
@@ -99,6 +106,15 @@ class TestModel1 extends Model
 class TestModel2 extends Model
 {
     public $table = 'test_model2';
+    public $timestamps = false;
+    protected $guarded = [];
+}
+
+class TestModel3 extends Model
+{
+    use TracksPreviousAttributes;
+
+    public $table = 'test_model3';
     public $timestamps = false;
     protected $guarded = [];
 }

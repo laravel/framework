@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\TracksPreviousAttributes;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
@@ -2301,7 +2302,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testGetPreviousCastsAttributes()
     {
-        $model = new EloquentModelCastingStub;
+        $model = new EloquentModelCastingStubWithPrevious();
         $model->intAttribute = '1';
         $model->floatAttribute = '0.1234';
         $model->stringAttribute = 432;
@@ -2775,6 +2776,11 @@ class EloquentModelCastingStub extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+}
+
+class EloquentModelCastingStubWithPrevious extends EloquentModelCastingStub
+{
+    use TracksPreviousAttributes;
 }
 
 class EloquentModelDynamicHiddenStub extends Model
