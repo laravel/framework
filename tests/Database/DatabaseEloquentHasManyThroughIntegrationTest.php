@@ -121,6 +121,18 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertCount(1, $country);
     }
 
+    public function testWithWhereHasOnARelationWithCustomIntermediateAndLocalKey()
+    {
+        $this->seedData();
+        $country = HasManyThroughIntermediateTestCountry::withWhereHas('posts', function ($query) {
+            $query->where('title', 'A title');
+        })->get();
+
+        $this->assertCount(1, $country);
+        $this->assertTrue($country->first()->relationLoaded('posts'));
+        $this->assertEquals($country->first()->posts->pluck('title')->unique()->toArray(), ['A title']);
+    }
+
     public function testFindMethod()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
