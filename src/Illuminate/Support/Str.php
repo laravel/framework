@@ -1113,15 +1113,11 @@ class Str
         static::$uuidFactory = $factory;
     }
 
-    public static function createUuidsUsingSequence(array $sequence)
+    public static function createUuidsUsingSequence(array $sequence, Closure $whenMissing = null)
     {
         $next = 0;
 
-        static::createUuidsUsing(function () use (&$next, $sequence) {
-            if (array_key_exists($next, $sequence)) {
-                return $sequence[$next++];
-            }
-
+        $whenMissing ??= function () use (&$next) {
             $factoryCache = static::$uuidFactory;
 
             static::$uuidFactory = null;
@@ -1133,6 +1129,14 @@ class Str
             $next++;
 
             return $uuid;
+        };
+
+        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing();
         });
     }
 

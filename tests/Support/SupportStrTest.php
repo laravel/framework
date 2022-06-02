@@ -961,6 +961,16 @@ class SupportStrTest extends TestCase
         $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
         $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
     }
+
+    public function testItCanSpecifyAFallbackForASequence()
+    {
+        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn () => throw new \Exception('Out of Uuids.'));
+        Str::uuid();
+        Str::uuid();
+
+        $this->expectExceptionMessage('Out of Uuids.');
+        Str::uuid();
+    }
 }
 
 class StringableObjectStub
