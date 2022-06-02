@@ -281,4 +281,17 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         return $this;
     }
+
+    /**
+     * Get a safe input element from the form request.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return ! $this->safeInputElements
+            ? parent::__get($key)
+            : Arr::get($this->safe(), $key, fn () => $this->route($key));
+    }
 }
