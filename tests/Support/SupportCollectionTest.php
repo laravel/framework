@@ -5093,6 +5093,14 @@ class SupportCollectionTest extends TestCase
             ],
         ], $data->all());
     }
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testChangeKeyCase($collection)
+    {
+        $c = new $collection(['FiRst' => 'Hello', 'Second' => 'hello']);
+        $this->assertEquals(['first' => 'Hello', 'second' => 'hello'], $c->changeKeyCase()->all());
+    }
 
     /**
      * Provides each collection class, respectively.

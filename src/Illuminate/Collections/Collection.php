@@ -1705,4 +1705,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * apply the same case to all the collection key
+     * @param int $case
+     *
+     * @return $this
+     */
+    public function changeKeyCase(int $case = CASE_LOWER): self
+    {
+        return new static(array_change_key_case($this->items,$case));
+    }
 }
