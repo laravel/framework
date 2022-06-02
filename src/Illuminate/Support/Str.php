@@ -40,7 +40,7 @@ class Str
     /**
      * The callback that should be used to generate UUIDs.
      *
-     * @var callable
+     * @var callable|null
      */
     protected static $uuidFactory;
 
@@ -1113,7 +1113,14 @@ class Str
         static::$uuidFactory = $factory;
     }
 
-    public static function createUuidsUsingSequence(array $sequence, Closure $whenMissing = null)
+    /**
+     * Set the sequence that will be used to generate UUIDs.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createUuidsUsingSequence(array $sequence, $whenMissing = null)
     {
         $next = 0;
 
@@ -1140,6 +1147,12 @@ class Str
         });
     }
 
+    /**
+     * Always return the same UUID when generating new UUIDs.
+     *
+     * @param  \Closure|null  $callback
+     * @return \Ramsey\Uuid\UuidInterface
+     */
     public static function freezeUuids(Closure $callback = null)
     {
         $uuid = Str::uuid();
@@ -1154,7 +1167,6 @@ class Str
 
         return $uuid;
     }
-
 
     /**
      * Indicate that UUIDs should be created normally and not using a custom factory.
