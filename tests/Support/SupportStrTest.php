@@ -929,6 +929,8 @@ class SupportStrTest extends TestCase
         $this->assertSame((string) $uuids[1], (string) $uuids[2]);
         $this->assertNotSame(Str::uuid(), Str::uuid());
         $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+
+        Str::createUuidsNormally();
     }
 
     public function testItCanSpecifyASquenceOfUuidsToUtilise()
@@ -960,6 +962,8 @@ class SupportStrTest extends TestCase
         $retrieved = Str::uuid();
         $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
         $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        Str::createUuidsNormally();
     }
 
     public function testItCanSpecifyAFallbackForASequence()
@@ -968,8 +972,13 @@ class SupportStrTest extends TestCase
         Str::uuid();
         Str::uuid();
 
-        $this->expectExceptionMessage('Out of Uuids.');
-        Str::uuid();
+        try {
+            $this->expectExceptionMessage('Out of Uuids.');
+            Str::uuid();
+            $this->fail();
+        } finally {
+            Str::createUuidsNormally();
+        }
     }
 }
 
