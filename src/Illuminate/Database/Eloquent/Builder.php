@@ -1573,6 +1573,19 @@ class Builder implements BuilderContract
 
         return $this;
     }
+    
+    /**
+     * Flush the given relationships being eagerly loaded.
+     *
+     * @param  array  $relations
+     * @return $this
+     */
+    public function withoutEagerLoad($relations)
+    {
+        $relations = array_diff(array_keys($this->model->getRelations()), $relations);
+
+        return $this->with($relations);
+    }
 
     /**
      * Flush the relationships being eagerly loaded.
