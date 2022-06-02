@@ -123,7 +123,8 @@ class DatabaseEloquentMorphTest extends TestCase
         $model->shouldReceive('setAttribute')->never();
         $model->shouldReceive('save')->never();
 
-        $this->assertInstanceOf(Model::class, $relation->firstOrTap(function (Model $model) {}));
+        $this->assertInstanceOf(Model::class, $relation->firstOrTap(function (Model $model) {
+        }));
     }
 
     public function testFirstOrTapMethodReturnsNewModelWithMorphKeysSet()
@@ -136,7 +137,8 @@ class DatabaseEloquentMorphTest extends TestCase
         $model->shouldReceive('setAttribute')->once()->with('morph_type', get_class($relation->getParent()));
         $model->shouldReceive('save')->never();
 
-        $this->assertInstanceOf(Model::class, $relation->firstOrTap(function (Model $model) {}, ['foo' => 'bar']));
+        $this->assertInstanceOf(Model::class, $relation->firstOrTap(function (Model $model) {
+        }, ['foo' => 'bar']));
     }
 
     public function testFirstOrNewMethodFindsFirstModel()

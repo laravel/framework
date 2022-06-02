@@ -506,7 +506,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $user->email = 'nuno@laravel.com';
             }
         );
-        
+
         $this->assertSame($user2->email, $user3->email);
     }
 

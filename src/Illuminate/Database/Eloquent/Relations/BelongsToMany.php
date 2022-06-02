@@ -594,8 +594,8 @@ class BelongsToMany extends Relation
     /**
      * Get the first matching related model record or tap a new instance.
      *
-     * @param Closure $callback
-     * @param array   $attributes
+     * @param  Closure  $callback
+     * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrTap(Closure $callback, array $attributes = [])
