@@ -1463,7 +1463,6 @@ trait ValidatesAttributes
      */
     public function validatePlainText($attribute, $value)
     {
-        dump(str_replace(["\n","\r","\t","\v","\0","\x00"], '', strip_tags($value)), $value);
         return str_replace(["\n","\r","\t","\v","\0","\x00"], '', strip_tags($value)) === $value;
     }
 
