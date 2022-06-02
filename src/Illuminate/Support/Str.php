@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Support\Traits\Macroable;
 use JsonException;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
@@ -1111,6 +1112,45 @@ class Str
     {
         static::$uuidFactory = $factory;
     }
+
+    public static function createUuidsUsingSequence(array $sequence)
+    {
+        $next = 0;
+
+        static::createUuidsUsing(function () use (&$next, $sequence) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            $factoryCache = static::$uuidFactory;
+
+            static::$uuidFactory = null;
+
+            $uuid = static::uuid();
+
+            static::$uuidFactory = $factoryCache;
+
+            $next++;
+
+            return $uuid;
+        });
+    }
+
+    public static function freezeUuids(Closure $callback = null)
+    {
+        $uuid = Str::uuid();
+
+        Str::createUuidsUsing(fn () => $uuid);
+
+        if ($callback !== null) {
+            $callback($uuid);
+
+            Str::createUuidsNormally();
+        }
+
+        return $uuid;
+    }
+
 
     /**
      * Indicate that UUIDs should be created normally and not using a custom factory.
