@@ -17,8 +17,10 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static mixed pushRaw(string $payload, string $queue = null, array $options = [])
  * @method static string getConnectionName()
  * @method static void assertNotPushed(string|\Closure $job, callable $callback = null)
+ * @method static void assertClosureNotPushed(callable $callback = null)
  * @method static void assertNothingPushed()
  * @method static void assertPushed(string|\Closure $job, callable|int $callback = null)
+ * @method static void assertClosurePushed(callable|int $callback = null)
  * @method static void assertPushedOn(string $queue, string|\Closure $job, callable $callback = null)
  * @method static void assertPushedWithChain(string $job, array $expectedChain = [], callable $callback = null)
  *

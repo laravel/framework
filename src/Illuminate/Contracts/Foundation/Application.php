@@ -46,6 +46,14 @@ interface Application extends Container
     public function databasePath($path = '');
 
     /**
+     * Get the path to the language files.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function langPath($path = '');
+
+    /**
      * Get the path to the resources directory.
      *
      * @param  string  $path
