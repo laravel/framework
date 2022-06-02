@@ -38,6 +38,18 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
 
+    public function testFormRequestReturnsSafeDataFromMagicMethods()
+    {
+        $payload = ['name' => 'specified', 'with' => 'extras'];
+
+        $request = $this->createRequest($payload, FoundationTestSafeFormRequestStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals('specified', $request->name);
+        $this->assertNull($request->with);
+    }
+
     public function testValidatedMethodReturnsTheValidatedDataNestedRules()
     {
         $payload = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
@@ -262,6 +274,16 @@ class FoundationTestFormRequestStub extends FormRequest
     public function authorize()
     {
         return true;
+    }
+}
+
+class FoundationTestSafeFormRequestStub extends FormRequest
+{
+    protected $safeInputElements = true;
+
+    public function rules()
+    {
+        return ['name' => 'required'];
     }
 }
 
