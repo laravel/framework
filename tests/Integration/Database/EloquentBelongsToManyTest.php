@@ -484,6 +484,36 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertSame('callback result', $result);
     }
 
+    public function testFirstOrTapMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach(Tag::all());
+
+        $this->assertEquals($tag->id, $post->tags()->firstOrTap(
+            function (Tag $model) {
+                $this->fail('Should not be reached.');
+            },
+            ['id' => $tag->id]
+        )->id);
+
+        $this->assertNull($post->tags()->firstOrTap(
+            function (Tag $model) {
+                $this->assertFalse($model->exists);
+            },
+            ['id' => 666]
+        )->id);
+
+        $this->assertInstanceOf(Tag::class, $post->tags()->firstOrTap(
+            function (Tag $model) {
+                $this->assertFalse($model->exists);
+            },
+            ['id' => 666]
+        ));
+    }
+
     public function testFirstOrNewMethod()
     {
         $post = Post::create(['title' => Str::random()]);

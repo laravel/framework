@@ -83,6 +83,29 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
     }
 
+    public function testFirstOrTapMethodFindsFirstExistingModel()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn($model = m::mock(Model::class));
+        $relation->getRelated()->shouldReceive('newInstance')->never();
+        $model->shouldReceive('setAttribute')->never();
+        $model->exists = true;
+
+        $this->assertInstanceOf(Model::class, $relation->firstOrTap(function (Model $model) {}, ['foo' => 'bar']));
+    }
+
+    public function testFirstOrTapMethodReturnsNewModelWithForeignKeySet()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
+        $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo' => 'bar'])->andReturn($model = m::mock(Model::class));
+        $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
+
+        $this->assertInstanceOf(Model::class, $relation->firstOrTap(function (Model $model) {}, ['foo' => 'bar']));
+    }
+
     public function testFirstOrNewMethodFindsFirstModel()
     {
         $relation = $this->getRelation();

@@ -284,6 +284,28 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(2, $users->first()->id);
     }
 
+    public function testFirstOrTap()
+    {
+        $this->createUsers();
+
+        $result = SoftDeletesTestUser::firstOrTap(
+            function (SoftDeletesTestUser $user) {
+                $this->assertFalse($user->exists);
+            },
+            ['email' => 'taylorotwell@gmail.com']
+        );
+
+        $this->assertNull($result->id);
+
+        $result = SoftDeletesTestUser::withTrashed()->firstOrTap(
+            function (SoftDeletesTestUser $user) {
+                $this->fail('Should not be reached.');
+            },
+            ['email' => 'taylorotwell@gmail.com']
+        );
+        $this->assertEquals(1, $result->id);
+    }
+
     public function testFirstOrNew()
     {
         $this->createUsers();
