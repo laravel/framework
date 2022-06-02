@@ -1470,16 +1470,18 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         return $this->passthru('undot', []);
     }
+
     /**
-     * apply the same case to all the collection key
-     * @param int $case
+     * apply the same case to all the collection key.
      *
+     * @param  int  $case
      * @return $this
      */
     public function changeKeyCase(int $case = CASE_LOWER): self
     {
         return $this->passthru('changeKeyCase', [$case]);
     }
+
     /**
      * Return only unique items from the collection array.
      *

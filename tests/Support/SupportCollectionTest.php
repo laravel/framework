@@ -5093,6 +5093,7 @@ class SupportCollectionTest extends TestCase
             ],
         ], $data->all());
     }
+
     /**
      * @dataProvider collectionClassProvider
      */
