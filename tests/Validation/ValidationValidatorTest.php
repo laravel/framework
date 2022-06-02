@@ -1059,6 +1059,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => "Joe\x00Doe"], ['x' => 'plain_text']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => '<?php echo "hello"; ?>'], ['x' => 'plain_text']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidatePresent()
