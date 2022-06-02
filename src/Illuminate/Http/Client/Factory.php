@@ -43,6 +43,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
  * @method \Illuminate\Http\Client\PendingRequest throwIf($condition)
+ * @method \Illuminate\Http\Client\PendingRequest throwUnless($condition)
  * @method array pool(callable $callback)
  * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
