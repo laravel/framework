@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -65,6 +66,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @var bool
      */
     protected $stopOnFirstFailure = false;
+
+    /**
+     * Indicates whether form request should return safe input elements from validator by default.
+     *
+     * @var bool
+     */
+    protected $safeInputElements = false;
 
     /**
      * The validator instance.
