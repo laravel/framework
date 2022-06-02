@@ -231,6 +231,20 @@ class PipelineTest extends TestCase
             });
     }
 
+    public function testExceptionIsHandledByOnFailureMethodInPipeline()
+    {
+        $result = (new Pipeline(new Container))
+            ->send('data')
+            ->through(PipelineWithException::class)
+            ->onFailure(function () {
+                return 'error';
+            })->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertEquals('error', $result);
+    }
+
     public function testPipelineThenReturnMethodRunsPipelineThenReturnsPassable()
     {
         $result = (new Pipeline(new Container))
@@ -277,5 +291,13 @@ class PipelineTestParameterPipe
         $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2];
 
         return $next($piped);
+    }
+}
+
+class PipelineWithException
+{
+    public function handle($piped, $next)
+    {
+        throw new \Exception('Foo');
     }
 }

@@ -25,6 +25,13 @@ class Pipeline implements PipelineContract
     protected $passable;
 
     /**
+     * The callback to be executed on failure pipeline.
+     *
+     * @var Closure
+     */
+    protected $onFailure;
+
+    /**
      * The array of class pipes.
      *
      * @var array
@@ -182,6 +189,10 @@ class Pipeline implements PipelineContract
 
                     return $this->handleCarry($carry);
                 } catch (Throwable $e) {
+                    if ($this->onFailure) {
+                        return call_user_func($this->onFailure, $pipe);
+                    }
+
                     return $this->handleException($passable, $e);
                 }
             };
@@ -240,6 +251,19 @@ class Pipeline implements PipelineContract
     public function setContainer(Container $container)
     {
         $this->container = $container;
+
+        return $this;
+    }
+
+    /**
+     * Set callback to be executed on failure pipeline.
+     *
+     * @param  Closure  $catch
+     * @return $this
+     */
+    public function onFailure(Closure $callback)
+    {
+        $this->onFailure = $callback;
 
         return $this;
     }
