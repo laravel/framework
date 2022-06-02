@@ -292,6 +292,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         return ! $this->safeInputElements
             ? parent::__get($key)
-            : Arr::get($this->safe(), $key, fn () => $this->route($key));
+            : Arr::get($this->validated(), $key, fn () => $this->route($key));
     }
 }
