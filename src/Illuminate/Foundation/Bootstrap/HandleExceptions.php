@@ -159,9 +159,9 @@ class HandleExceptions
      */
     public function handleException(Throwable $e)
     {
-        try {
-            self::$reservedMemory = null;
+        self::$reservedMemory = null;
 
+        try {
             $this->getExceptionHandler()->report($e);
         } catch (Exception $e) {
             //
@@ -217,6 +217,8 @@ class HandleExceptions
      */
     protected function fatalErrorFromPhpError(array $error, $traceOffset = null)
     {
+        self::$reservedMemory = null;
+
         return new FatalError($error['message'], 0, $error, $traceOffset);
     }
 
