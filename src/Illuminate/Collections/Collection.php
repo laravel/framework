@@ -1707,10 +1707,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * apply the same case to all the collection key
+     * apply the same case to all the collection key.
      *
-     * @param int $case
-     *
+     * @param  int  $case
      * @return $this
      */
     public function changeKeyCase(int $case = CASE_LOWER): self
