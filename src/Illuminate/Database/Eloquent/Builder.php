@@ -1573,7 +1573,7 @@ class Builder implements BuilderContract
 
         return $this;
     }
-    
+
     /**
      * Indicate that the given relationships should not be eagerly loaded.
      *
