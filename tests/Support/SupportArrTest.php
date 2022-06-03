@@ -1097,4 +1097,89 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testRenameKeys()
+    {
+        $before = [
+            'hello1' => '1',
+            'hello2' => '2',
+            'hello3' => '3',
+            'hello4' => '4',
+        ];
+
+        $after = Arr::renameKeys($before, [
+            'hello1' => 'bye1',
+            'hello3' => 'bye3',
+        ]);
+
+        $this->assertCount(4, $after);
+
+        // new keys exist
+        $this->assertArrayHasKey('bye1', $after);
+        $this->assertArrayHasKey('bye3', $after);
+
+        // old keys removed
+        $this->assertArrayNotHasKey('hello1', $after);
+        $this->assertArrayNotHasKey('hello3', $after);
+
+        // the order of values is the same:
+        $this->assertEquals(array_values($before), array_values($after));
+        $this->assertEquals('bye1', array_key_first($after));
+
+        $before = [
+            'address_' => 'nice',
+            'address_2' => 'nice',
+            'jack' => [
+                'address_2' => 'London',
+                'postal_code' => '1234',
+            ],
+            '**Taylor**' => [
+                'address_2' => 'Little Rock',
+                'postal_code' => ['**Taylor**' => '5678',]
+            ],
+        ];
+
+        $after = Arr::renameKeys($before, [
+            '**Taylor**' => '**Otwell**',
+            'address_2' => '__city__',
+        ]);
+
+        $expected = [
+            'address_' => 'nice',
+            '__city__' => 'nice',
+            'jack' => [
+                '__city__' => 'London',
+                'postal_code' => '1234',
+            ],
+            '**Otwell**' => [
+                '__city__' => 'Little Rock',
+                'postal_code' => ['**Otwell**' => '5678',],
+            ],
+        ];
+
+        $this->assertEquals($expected, $after);
+
+
+
+        $after = Arr::renameKeys($before, [
+            '**Taylor**' => '**Otwell**',
+            'address_2' => '__city__',
+        ], recursive: false);
+
+        // it only renames the first level keys on recursive: false.
+        $expected = [
+            'address_' => 'nice',
+            '__city__' => 'nice',
+            'jack' => [
+                'address_2' => 'London',
+                'postal_code' => '1234',
+            ],
+            '**Otwell**' => [
+                'address_2' => 'Little Rock',
+                'postal_code' => ['**Taylor**' => '5678',]
+            ],
+        ];
+
+        $this->assertEquals($expected, $after);
+    }
 }
