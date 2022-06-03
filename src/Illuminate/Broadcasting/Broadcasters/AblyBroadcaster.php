@@ -25,7 +25,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Ably\AblyRest  $ably
+     * @param \Ably\AblyRest $ably
      * @return void
      */
     public function __construct(AblyRest $ably)
@@ -36,171 +36,111 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Authenticate the incoming request for a given channel.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function auth($request)
     {
-        $channelName = $this->normalizeChannelName($request->channel_name);
+        $channelName = $request->channel_name;
+        $token = $request->token;
+        $normalizedChannelName = $this->normalizeChannelName($channelName);
+        $user = $this->retrieveUser($request, $normalizedChannelName);
 
-        if (empty($request->channel_name) ||
-            ($this->isGuardedChannel($request->channel_name) &&
-                ! $this->retrieveUser($request, $channelName))) {
-            throw new AccessDeniedHttpException;
+        if ($this->isGuardedChannel($channelName) && !$user) {
+            throw new AccessDeniedHttpException('User is not authenticated');
         }
-
-        return parent::verifyUserCanAccessChannel(
-            $request, $channelName
-        );
-    }
-
-    /**
-     * Return the valid authentication response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
-     */
-    public function validAuthenticationResponse($request, $result)
-    {
-        if (str_starts_with($request->channel_name, 'private')) {
-            $signature = $this->generateAblySignature(
-                $request->channel_name, $request->socket_id
-            );
-
-            return ['auth' => $this->getPublicToken().':'.$signature];
+        try {
+            $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
+        } catch (\Exception $_) {
+            throw new AccessDeniedHttpException("Access denied for a user " . $user);
         }
-
-        $channelName = $this->normalizeChannelName($request->channel_name);
-
-        $user = $this->retrieveUser($request, $channelName);
-
-        $broadcastIdentifier = method_exists($user, 'getAuthIdentifierForBroadcasting')
+        $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
             ? $user->getAuthIdentifierForBroadcasting()
             : $user->getAuthIdentifier();
 
-        $signature = $this->generateAblySignature(
-            $request->channel_name,
-            $request->socket_id,
-            $userData = array_filter([
-                'user_id' => (string) $broadcastIdentifier,
-                'user_info' => $result,
-            ])
-        );
-
-        return [
-            'auth' => $this->getPublicToken().':'.$signature,
-            'channel_data' => json_encode($userData),
-        ];
-    }
-
-    /**
-     * Generate the signature needed for Ably authentication headers.
-     *
-     * @param  string  $channelName
-     * @param  string  $socketId
-     * @param  array|null  $userData
-     * @return string
-     */
-    public function generateAblySignature($channelName, $socketId, $userData = null)
-    {
-        return hash_hmac(
-            'sha256',
-            sprintf('%s:%s%s', $socketId, $channelName, $userData ? ':'.json_encode($userData) : ''),
-            $this->getPrivateToken(),
-        );
-    }
-
-    /**
-     * Broadcast the given event.
-     *
-     * @param  array  $channels
-     * @param  string  $event
-     * @param  array  $payload
-     * @return void
-     *
-     * @throws \Illuminate\Broadcasting\BroadcastException
-     */
-    public function broadcast(array $channels, $event, array $payload = [])
-    {
-        try {
-            foreach ($this->formatChannels($channels) as $channel) {
-                $this->ably->channels->get($channel)->publish(
-                    $this->buildAblyMessage($event, $payload)
-                );
-            }
-        } catch (AblyException $e) {
-            throw new BroadcastException(
-                sprintf('Ably error: %s', $e->getMessage())
-            );
+        $signedToken = $this->getSignedToken($channelName, $token, $userId);
+        $response = array('token' => $signedToken);
+        if (is_array($userData)) {
+            $response['info'] = $userData;
         }
-    }
-
-    /**
-     * Build an Ably message object for broadcasting.
-     *
-     * @param  string  $event
-     * @param  array  $payload
-     * @return \Ably\Models\Message
-     */
-    protected function buildAblyMessage($event, array $payload = [])
-    {
-        return tap(new AblyMessage, function ($message) use ($event, $payload) {
-            $message->name = $event;
-            $message->data = $payload;
-            $message->connectionKey = data_get($payload, 'socket');
-        });
-    }
-
-    /**
-     * Return true if the channel is protected by authentication.
-     *
-     * @param  string  $channel
-     * @return bool
-     */
-    public function isGuardedChannel($channel)
-    {
-        return Str::startsWith($channel, ['private-', 'presence-']);
+        return $response;
     }
 
     /**
      * Remove prefix from channel name.
      *
-     * @param  string  $channel
+     * @param string $channel
      * @return string
      */
     public function normalizeChannelName($channel)
     {
-        if ($this->isGuardedChannel($channel)) {
-            return str_starts_with($channel, 'private-')
-                ? Str::replaceFirst('private-', '', $channel)
-                : Str::replaceFirst('presence-', '', $channel);
+        if ($channel) {
+            if ($this->isPrivateChannel($channel)) {
+                return Str::replaceFirst('private:', '', $channel);
+            }
+            if ($this->isPresenceChannel($channel)) {
+                return Str::replaceFirst('presence:', '', $channel);
+            }
+            return Str::replaceFirst('public:', '', $channel);
         }
-
         return $channel;
     }
 
-    /**
-     * Format the channel array into an array of strings.
-     *
-     * @param  array  $channels
-     * @return array
-     */
-    protected function formatChannels(array $channels)
+    public function isPrivateChannel($channel)
     {
-        return array_map(function ($channel) {
-            $channel = (string) $channel;
+        return Str::startsWith($channel, 'private:');
+    }
 
-            if (Str::startsWith($channel, ['private-', 'presence-'])) {
-                return str_starts_with($channel, 'private-')
-                    ? Str::replaceFirst('private-', 'private:', $channel)
-                    : Str::replaceFirst('presence-', 'presence:', $channel);
-            }
+    public function isPresenceChannel($channel)
+    {
+        return Str::startsWith($channel, 'presence:');
+    }
 
-            return 'public:'.$channel;
-        }, $channels);
+    /**
+     * Return true if the channel is protected by authentication.
+     *
+     * @param string $channel
+     * @return bool
+     */
+    public function isGuardedChannel($channel)
+    {
+        return $this->isPrivateChannel($channel) || $this->isPresenceChannel($channel);
+    }
+
+    public function getSignedToken($channelName, $token, $clientId)
+    {
+        $header = array(
+            "typ" => "JWT",
+            "alg" => "HS256",
+            "kid" => $this->getPublicToken()
+        );
+        // Set capabilities for public channel as per https://ably.com/docs/core-features/authentication#capability-operations
+        $channelClaims = array(
+            'public:*' => ["subscribe", "history", "channel-metadata"]
+        );
+        $serverTime = $this->ably->time();
+        if ($token && self::isJwtValid($token, $serverTime, $this->getPrivateToken())) {
+            $parsedJwt = self::parseJwt($token)->payload;
+            $iat = $parsedJwt->iat;
+            $exp = $parsedJwt->exp;
+            $channelClaims = $parsedJwt['x-ably-capability'];
+        } else {
+            $iat = round($serverTime / 1000);
+            $exp = $iat + 3600;
+        }
+        if ($channelName) {
+            $channelClaims[$channelName] = ["*"];
+        }
+        $claims = array(
+            "iat" => $iat,
+            "exp" => $exp,
+            "x-ably-clientId" => $clientId,
+            "x-ably-capability" => $channelClaims
+        );
+
+        return self::generateJwt($header, $claims, $this->getPrivateToken());
     }
 
     /**
@@ -211,37 +151,6 @@ class AblyBroadcaster extends Broadcaster
     protected function getPublicToken()
     {
         return Str::before($this->ably->options->key, ':');
-    }
-
-    /**
-     * Get the private token value from the Ably key.
-     *
-     * @return mixed
-     */
-    protected function getPrivateToken()
-    {
-        return Str::after($this->ably->options->key, ':');
-    }
-
-    /**
-     * Get the underlying Ably SDK instance.
-     *
-     * @return \Ably\AblyRest
-     */
-    public function getAbly()
-    {
-        return $this->ably;
-    }
-
-    static function generateJwt($headers, $payload, $secret = 'secret')
-    {
-        $encodedHeaders = self::base64urlEncode(json_encode($headers));
-        $encodedPayload = self::base64urlEncode(json_encode($payload));
-
-        $signature = hash_hmac('SHA256', "$encodedHeaders.$encodedPayload", $secret, true);
-        $encodedSignature = self::base64urlEncode($signature);
-
-        return "$encodedHeaders.$encodedPayload.$encodedSignature";
     }
 
     static function isJwtValid($jwt, $timeFn, $secret = 'secret')
@@ -263,6 +172,25 @@ class AblyBroadcaster extends Broadcaster
         return $isSignatureValid && !$isTokenExpired;
     }
 
+    static function base64urlEncode($str)
+    {
+        return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
+    }
+
+    /**
+     * Get the private token value from the Ably key.
+     *
+     * @return mixed
+     */
+    protected function getPrivateToken()
+    {
+        return Str::after($this->ably->options->key, ':');
+    }
+
+    /**
+     * @param $jwt string
+     * @return array
+     */
     static function parseJwt($jwt)
     {
         $tokenParts = explode('.', $jwt);
@@ -271,8 +199,115 @@ class AblyBroadcaster extends Broadcaster
         return array('header' => $header, 'payload' => $payload);
     }
 
-    static function base64urlEncode($str)
+    static function generateJwt($headers, $payload, $secret = 'secret')
     {
-        return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
+        $encodedHeaders = self::base64urlEncode(json_encode($headers));
+        $encodedPayload = self::base64urlEncode(json_encode($payload));
+
+        $signature = hash_hmac('SHA256', "$encodedHeaders.$encodedPayload", $secret, true);
+        $encodedSignature = self::base64urlEncode($signature);
+
+        return "$encodedHeaders.$encodedPayload.$encodedSignature";
+    }
+
+    /**
+     * Return the valid authentication response.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param mixed $result
+     * @return mixed
+     */
+    public function validAuthenticationResponse($request, $result)
+    {
+        return $result;
+    }
+
+    /**
+     * Generate the signature needed for Ably authentication headers.
+     *
+     * @param string $channelName
+     * @param string $socketId
+     * @param array|null $userData
+     * @return string
+     */
+    public function generateAblySignature($channelName, $socketId, $userData = null)
+    {
+        return hash_hmac(
+            'sha256',
+            sprintf('%s:%s%s', $socketId, $channelName, $userData ? ':' . json_encode($userData) : ''),
+            $this->getPrivateToken(),
+        );
+    }
+
+    /**
+     * Broadcast the given event.
+     *
+     * @param array $channels
+     * @param string $event
+     * @param array $payload
+     * @return void
+     *
+     * @throws \Illuminate\Broadcasting\BroadcastException
+     */
+    public function broadcast(array $channels, $event, array $payload = [])
+    {
+        try {
+            foreach ($this->formatChannels($channels) as $channel) {
+                $this->ably->channels->get($channel)->publish(
+                    $this->buildAblyMessage($event, $payload)
+                );
+            }
+        } catch (AblyException $e) {
+            throw new BroadcastException(
+                sprintf('Ably error: %s', $e->getMessage())
+            );
+        }
+    }
+
+    /**
+     * Format the channel array into an array of strings.
+     *
+     * @param array $channels
+     * @return array
+     */
+    protected function formatChannels(array $channels)
+    {
+        return array_map(function ($channel) {
+            $channel = (string)$channel;
+
+            if (Str::startsWith($channel, ['private-', 'presence-'])) {
+                return Str::startsWith($channel, 'private-')
+                    ? Str::replaceFirst('private-', 'private:', $channel)
+                    : Str::replaceFirst('presence-', 'presence:', $channel);
+            }
+
+            return 'public:' . $channel;
+        }, $channels);
+    }
+
+    /**
+     * Build an Ably message object for broadcasting.
+     *
+     * @param string $event
+     * @param array $payload
+     * @return \Ably\Models\Message
+     */
+    protected function buildAblyMessage($event, array $payload = [])
+    {
+        return tap(new AblyMessage, function ($message) use ($event, $payload) {
+            $message->name = $event;
+            $message->data = $payload;
+            $message->connectionKey = data_get($payload, 'socket');
+        });
+    }
+
+    /**
+     * Get the underlying Ably SDK instance.
+     *
+     * @return \Ably\AblyRest
+     */
+    public function getAbly()
+    {
+        return $this->ably;
     }
 }
