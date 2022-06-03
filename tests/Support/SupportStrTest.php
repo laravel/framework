@@ -980,6 +980,33 @@ class SupportStrTest extends TestCase
             Str::createUuidsNormally();
         }
     }
+
+    public function testJoin()
+    {
+        $this->assertSame('foo/bar', Str::join('foo', '/', 'bar'));
+        $this->assertSame('foo/bar', Str::join('foo/', '/', 'bar'));
+        $this->assertSame('foo/bar', Str::join('foo', '/', '/bar'));
+        $this->assertSame('foo/bar', Str::join('foo/', '/', '/bar'));
+        $this->assertSame('foobazbar', Str::join('foo', 'baz', 'bar'));
+        $this->assertSame('foobazbar', Str::join('foobaz', 'baz', 'bar'));
+        $this->assertSame('foobazbar', Str::join('foo', 'baz', 'bazbar'));
+        $this->assertSame('foobazbar', Str::join('foobaz', 'baz', 'bazbar'));
+    }
+
+    public function testJoinArray()
+    {
+        $this->assertSame('foo/bar', Str::joinArray(['foo', 'bar'], '/'));
+        $this->assertSame('foo/bar', Str::joinArray(['foo/', 'bar'], '/'));
+        $this->assertSame('foo/bar', Str::joinArray(['foo', '/bar'], '/'));
+        $this->assertSame('foo/bar', Str::joinArray(['foo/', '/bar'], '/'));
+        $this->assertSame('foo/bar/baz', Str::joinArray(['foo', 'bar', 'baz'], '/'));
+        $this->assertSame('foo/bar/baz', Str::joinArray(['foo/', 'bar', 'baz'], '/'));
+        $this->assertSame('foo/bar/baz', Str::joinArray(['foo', '/bar', 'baz'], '/'));
+        $this->assertSame('foo/bar/baz', Str::joinArray(['foo/', '/bar', 'baz'], '/'));
+        $this->assertSame('foo/bar/baz', Str::joinArray(['foo/', '/bar/', '/baz'], '/'));
+        $this->assertSame('foo', Str::joinArray(['foo'], '/'));
+        $this->assertSame('', Str::joinArray([], '/'));
+    }
 }
 
 class StringableObjectStub

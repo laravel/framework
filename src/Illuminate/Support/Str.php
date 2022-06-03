@@ -409,6 +409,37 @@ class Str
     }
 
     /**
+     * Join two strings while ensuring the cap is not repeated
+     *
+     * @param  string $start
+     * @param  string $glue
+     * @param  string $end
+     * @return string
+     */
+    public static function join(string $start, string $glue, string $end): string
+    {
+        return match (true) {
+            str_ends_with($start, $glue) && str_starts_with($end, $glue) => self::replaceLast($glue, '', $start).$end,
+            str_ends_with($start, $glue) || str_starts_with($end, $glue) => $start.$end,
+            default => $start.$glue.$end,
+        };
+    }
+
+    /**
+     * Implode array while ensuring the cap is not repeated
+     *
+     * @param  array<string> $items
+     * @param  string $glue
+     * @return string
+     */
+    public static function joinArray(array $items, string $glue): string
+    {
+        return collect($items)
+            ->values()
+            ->reduce(fn ($carry, $item, $key) => $key ? self::join($carry, $glue, $item) : $item, '');
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
