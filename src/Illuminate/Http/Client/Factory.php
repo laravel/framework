@@ -119,7 +119,7 @@ class Factory
     /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string  $body
+     * @param  array|string|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
