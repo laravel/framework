@@ -338,7 +338,7 @@ class Stringable implements JsonSerializable
     }
 
     /**
-     * Join multiple other strings with this string
+     * Join multiple other strings with this string.
      *
      * @param  array  $strings
      * @return static

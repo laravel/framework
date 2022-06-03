@@ -409,7 +409,7 @@ class Str
     }
 
     /**
-     * Join two strings while ensuring the glue is not repeated
+     * Join two strings while ensuring the glue is not repeated.
      *
      * @param  string  $start
      * @param  string  $glue
@@ -426,7 +426,7 @@ class Str
     }
 
     /**
-     * Implode array while ensuring the glue is not repeated
+     * Implode array while ensuring the glue is not repeated.
      *
      * @param  array<string>  $items
      * @param  string  $glue
