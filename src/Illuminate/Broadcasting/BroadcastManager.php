@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting;
 use Ably\AblyRest;
 use Closure;
 use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Broadcasting\Broadcasters\AblyBroadcasterDeprecated;
 use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
@@ -250,6 +251,9 @@ class BroadcastManager implements FactoryContract
      */
     protected function createAblyDriver(array $config)
     {
+        if ($config->pusherAdapter) {
+            return new AblyBroadcasterDeprecated($this->ably($config));
+        }
         return new AblyBroadcaster($this->ably($config));
     }
 
