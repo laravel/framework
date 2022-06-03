@@ -27,4 +27,3 @@ class CookieSessionHandlerTest extends TestCase
         $app['config']->set('session.expire_on_close', true);
     }
 }
-
