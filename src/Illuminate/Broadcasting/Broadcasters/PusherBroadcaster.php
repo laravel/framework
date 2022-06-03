@@ -46,6 +46,10 @@ class PusherBroadcaster extends Broadcaster
             return;
         }
 
+        if (method_exists($this->pusher, 'authenticateUser')) {
+            return $this->pusher->authenticateUser($request->socket_id, $user);
+        }
+
         $settings = $this->pusher->getSettings();
         $encodedUser = json_encode($user);
         $decodedString = "{$request->socket_id}::user::{$encodedUser}";
@@ -94,7 +98,10 @@ class PusherBroadcaster extends Broadcaster
     {
         if (str_starts_with($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
-                $request, $this->pusher->socket_auth($request->channel_name, $request->socket_id)
+                $request,
+                method_exists($this->pusher, 'authorizeChannel')
+                    ? $this->pusher->authorizeChannel($request->channel_name, $request->socket_id)
+                    : $this->pusher->socket_auth($request->channel_name, $request->socket_id)
             );
         }
 
@@ -108,10 +115,9 @@ class PusherBroadcaster extends Broadcaster
 
         return $this->decodePusherResponse(
             $request,
-            $this->pusher->presence_auth(
-                $request->channel_name, $request->socket_id,
-                $broadcastIdentifier, $result
-            )
+            method_exists($this->pusher, 'authorizePresenceChannel')
+                ? $this->pusher->authorizePresenceChannel($request->channel_name, $request->socket_id, $broadcastIdentifier, $result)
+                : $this->pusher->presence_auth($request->channel_name, $request->socket_id, $broadcastIdentifier, $result)
         );
     }
 
