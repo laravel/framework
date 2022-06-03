@@ -4023,7 +4023,8 @@ SQL;
         ]), $result);
     }
 
-    public function testCursorPaginateWithUnionWheres() {
+    public function testCursorPaginateWithUnionWheres()
+    {
         $ts = now()->toDateTimeString();
 
         $perPage = 16;
@@ -4043,7 +4044,7 @@ SQL;
 
         $results = collect([
             ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news']
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -4068,7 +4069,8 @@ SQL;
         ]), $result);
     }
 
-    public function testCursorPaginateWithUnionWheresWithRawOrderExpression() {
+    public function testCursorPaginateWithUnionWheresWithRawOrderExpression()
+    {
         $ts = now()->toDateTimeString();
 
         $perPage = 16;
@@ -4088,7 +4090,7 @@ SQL;
 
         $results = collect([
             ['id' => 1, 'created_at' => now(), 'type' => 'video', 'is_published' => true],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news', 'is_published' => true]
+            ['id' => 2, 'created_at' => now(), 'type' => 'news', 'is_published' => true],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -4113,7 +4115,8 @@ SQL;
         ]), $result);
     }
 
-    public function testCursorPaginateWithUnionWheresReverseOrder() {
+    public function testCursorPaginateWithUnionWheresReverseOrder()
+    {
         $ts = now()->toDateTimeString();
 
         $perPage = 16;
@@ -4133,7 +4136,7 @@ SQL;
 
         $results = collect([
             ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news']
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -4158,7 +4161,8 @@ SQL;
         ]), $result);
     }
 
-     public function testCursorPaginateWithUnionWheresMultipleOrders() {
+     public function testCursorPaginateWithUnionWheresMultipleOrders()
+     {
         $ts = now()->toDateTimeString();
 
         $perPage = 16;
@@ -4178,7 +4182,7 @@ SQL;
 
         $results = collect([
             ['id' => 1, 'created_at' => now(), 'type' => 'video'],
-            ['id' => 2, 'created_at' => now(), 'type' => 'news']
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
         ]);
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
@@ -4202,8 +4206,6 @@ SQL;
             'parameters' => ['created_at', 'id'],
         ]), $result);
     }
-
-
 
     public function testWhereRowValues()
     {

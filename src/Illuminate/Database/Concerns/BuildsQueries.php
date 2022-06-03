@@ -348,7 +348,7 @@ trait BuildsQueries
                         $cursor->parameter($previousColumn)
                     );
 
-                    $unionBuilders->each(function($unionBuilder) use($previousColumn, $cursor) {
+                    $unionBuilders->each(function ($unionBuilder) use($previousColumn, $cursor) {
                         $unionBuilder->where(
                             $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
                             '=',
@@ -374,9 +374,8 @@ trait BuildsQueries
                         });
                     }
 
-                    $unionBuilders->each(function($unionBuilder) use($column, $direction, $cursor, $i, $orders, $addCursorConditions){
-
-                        $unionBuilder->where(function($unionBuilder) use($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                    $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions){
+                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
                             $unionBuilder->where(
                                 $this->getOriginalColumnNameForCursorPagination($this, $column),
                                 $direction === 'asc' ? '>' : '<',
@@ -391,7 +390,6 @@ trait BuildsQueries
 
                             $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
                         });
-
                     });
                 });
             };

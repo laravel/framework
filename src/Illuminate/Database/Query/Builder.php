@@ -2492,13 +2492,13 @@ class Builder
         })
             ->when(
             $shouldReverse,
-            function(Collection $orders) {
+            function (Collection $orders) {
                 return $orders->map(function ($order) {
                     $order['direction'] = $order['direction'] === 'asc' ? 'desc' : 'asc';
 
                     return $order;
                 });
-        })->values();
+            })->values();
     }
 
     /**
