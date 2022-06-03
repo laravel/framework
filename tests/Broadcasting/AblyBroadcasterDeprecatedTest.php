@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Illuminate\Broadcasting\Broadcasters\AblyBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\AblyBroadcasterDeprecated;
 use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class AblyBroadcasterTest extends TestCase
+class AblyBroadcasterDeprecatedTest extends TestCase
 {
     /**
-     * @var \Illuminate\Broadcasting\Broadcasters\AblyBroadcaster
+     * @var \Illuminate\Broadcasting\Broadcasters\AblyBroadcasterDeprecated
      */
     public $broadcaster;
 
@@ -24,7 +24,7 @@ class AblyBroadcasterTest extends TestCase
         $this->ably = m::mock('Ably\AblyRest');
         $this->ably->options = (object) ['key' => 'abcd:efgh'];
 
-        $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
+        $this->broadcaster = m::mock(AblyBroadcasterDeprecated::class, [$this->ably])->makePartial();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
