@@ -5,7 +5,6 @@ namespace Illuminate\Mail;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 
 class Attachment

@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Notifications;
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
 class NotificationMailMessageTest extends TestCase
