@@ -36,7 +36,12 @@ class HandleExceptions
      */
     public function bootstrap(Application $app)
     {
-        self::$reservedMemory = str_repeat('x', 10240);
+        // The amount of times to repeat needs to be determined experimentally:
+        // - save the result of memory_get_peak_usage()
+        // - trigger error handling through trigger_error()
+        // - subtract the previous from the current memory_get_peak_usage()
+        // - divide the result by 1.2 and add some leeway
+        self::$reservedMemory = str_repeat('x', 32768);
 
         $this->app = $app;
 
