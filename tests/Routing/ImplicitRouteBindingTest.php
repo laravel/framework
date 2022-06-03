@@ -136,8 +136,7 @@ class ImplicitRouteBindingTest extends TestCase
 
         ImplicitRouteBinding::resolveForRoute($container, $route);
     }
-
-
+    
     public function test_it_can_resolve_the_implicit_int_backed_enum_route_when_parameter_is_a_valid_int_string()
     {
         $action = ['uses' => function (AnimalBackedEnum $animal) {
