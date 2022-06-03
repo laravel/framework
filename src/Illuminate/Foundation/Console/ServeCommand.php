@@ -69,6 +69,11 @@ class ServeCommand extends Command
      */
     public function handle()
     {
+        
+        if ($this->option('migration')) {
+            $this->runMigration();
+        }
+
         $this->line("<info>Starting Laravel development server:</info> http://{$this->host()}:{$this->port()}");
 
         $environmentFile = $this->option('env')
@@ -213,6 +218,16 @@ class ServeCommand extends Command
     }
 
     /**
+     * Run migrations.
+     *
+     * @return void
+     */
+    protected function runMigration()
+    {
+        $this->call('migrate');
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -224,6 +239,7 @@ class ServeCommand extends Command
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
+            ['migration', 'm', InputOption::VALUE_NONE, 'Run migrations'],
         ];
     }
 }
