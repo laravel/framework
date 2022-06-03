@@ -121,7 +121,7 @@ class ImplicitRouteBindingTest extends TestCase
         }];
 
         $route = new Route('GET', '/test', $action);
-        $route->parameters = ['animal' => " 00001."];
+        $route->parameters = ['animal' => ' 00001.'];
 
         $route->prepareForSerialization();
 
@@ -145,7 +145,7 @@ class ImplicitRouteBindingTest extends TestCase
         }];
 
         $route = new Route('GET', '/test', $action);
-        $route->parameters = ['animal' => "0"];
+        $route->parameters = ['animal' => '0'];
 
         $route->prepareForSerialization();
 
