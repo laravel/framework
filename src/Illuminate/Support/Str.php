@@ -409,11 +409,11 @@ class Str
     }
 
     /**
-     * Join two strings while ensuring the cap is not repeated
+     * Join two strings while ensuring the glue is not repeated
      *
-     * @param  string $start
-     * @param  string $glue
-     * @param  string $end
+     * @param  string  $start
+     * @param  string  $glue
+     * @param  string  $end
      * @return string
      */
     public static function join(string $start, string $glue, string $end): string
@@ -426,10 +426,10 @@ class Str
     }
 
     /**
-     * Implode array while ensuring the cap is not repeated
+     * Implode array while ensuring the glue is not repeated
      *
-     * @param  array<string> $items
-     * @param  string $glue
+     * @param  array<string>  $items
+     * @param  string  $glue
      * @return string
      */
     public static function joinArray(array $items, string $glue): string

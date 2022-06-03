@@ -338,6 +338,21 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Join multiple other strings with this string
+     *
+     * @param  array  $strings
+     * @return static
+     */
+    public function join(...$strings)
+    {
+        if (count($strings) === 1 && isset($strings[0]) && is_array($strings[0])) {
+            $strings = $strings[0];
+        }
+
+        return new static(Str::joinArray($strings, $this->value));
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @return static

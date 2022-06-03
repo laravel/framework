@@ -1037,4 +1037,15 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('[]')->exactly([]));
         $this->assertFalse($this->stringable('0')->exactly(0));
     }
+
+    public function testJoin()
+    {
+        $this->assertSame('foo/bar', $this->stringable('/')->join('foo', 'bar')->value());
+        $this->assertSame('foo/bar', $this->stringable('/')->join(['foo', 'bar'])->value());
+        $this->assertSame('foo/bar/baz', $this->stringable('/')->join('foo', 'bar/', '/baz')->value());
+        $this->assertSame('foo/bar/baz', $this->stringable('/')->join(['foo', 'bar/', '/baz'])->value());
+        $this->assertSame('foo', $this->stringable('/')->join('foo')->value());
+        $this->assertSame('', $this->stringable('/')->join()->value());
+        $this->assertSame('', $this->stringable('/')->join([])->value());
+    }
 }
