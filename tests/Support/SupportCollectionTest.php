@@ -5106,6 +5106,129 @@ class SupportCollectionTest extends TestCase
             [LazyCollection::class],
         ];
     }
+
+    public function testRenameKeys()
+    {
+        $before = [
+            'hello1' => '1',
+            'hello2' => '2',
+            'hello3' => '3',
+            'hello4' => '4',
+        ];
+
+        $after = Collection::make($before)->renameKeys([
+            'hello1' => 'world1',
+            '_skull_' => '_bone_',
+            'hello3' => 'world3',
+            'hello4' => '',
+        ])->all();
+
+        $this->assertCount(4, $after);
+
+        // new keys exist
+        $this->assertArrayHasKey('world1', $after);
+        $this->assertArrayHasKey('world3', $after);
+        $this->assertArrayHasKey('', $after);
+
+        // old keys removed
+        $this->assertArrayNotHasKey('hello1', $after);
+        $this->assertArrayNotHasKey('hello3', $after);
+
+        // the order of values is the same:
+        $this->assertEquals(array_values($before), array_values($after));
+        $this->assertEquals('world1', array_key_first($after));
+
+        $after = Collection::make($before)->renameKeys([
+            'hello1' => 'world1',
+            'hello3' => 'world1',
+        ])->all();
+
+        $this->assertCount(3, $after);
+
+        // new keys exist
+        $this->assertArrayHasKey('world1', $after);
+        $this->assertEquals('3', $after['world1']);
+
+        // old keys removed
+        $this->assertArrayNotHasKey('hello1', $after);
+        $this->assertArrayNotHasKey('hello3', $after);
+
+        $before = [
+            'address_' => 'nice',
+            'address_2' => 'nice',
+            'jack' => [
+                'address_2' => 'London',
+                'postal_code' => '1234',
+            ],
+            '**Taylor**' => [
+                'address_2' => 'Little Rock',
+                'postal_code' => ['**Taylor**' => '5678'],
+            ],
+        ];
+
+        $after = Collection::make($before)->renameKeys([
+            '**Taylor**' => '**Otwell**',
+            'address_2' => '__city__',
+        ])->all();
+
+        $expected = [
+            'address_' => 'nice',
+            '__city__' => 'nice',
+            'jack' => [
+                '__city__' => 'London',
+                'postal_code' => '1234',
+            ],
+            '**Otwell**' => [
+                '__city__' => 'Little Rock',
+                'postal_code' => ['**Otwell**' => '5678'],
+            ],
+        ];
+
+        $this->assertEquals($expected, $after);
+
+        $after = Collection::make($before)->renameKeys([
+            '**Taylor**' => '**Otwell**',
+            'address_2' => '__city__',
+        ], recursive: false)->all();
+
+        // it only renames the first level keys on recursive: false.
+        $expected = [
+            'address_' => 'nice',
+            '__city__' => 'nice',
+            'jack' => [
+                'address_2' => 'London',
+                'postal_code' => '1234',
+            ],
+            '**Otwell**' => [
+                'address_2' => 'Little Rock',
+                'postal_code' => ['**Taylor**' => '5678'],
+            ],
+        ];
+
+        $this->assertEquals($expected, $after);
+
+        // it can work with sequential arrays:
+        $before = ['1', '2', '3', '4'];
+
+        $after = Collection::make($before)->renameKeys([
+            'hello1' => 'world1',
+        ])->all();
+
+        $this->assertEquals($before, $after);
+
+        $before = ['1', '2', '3', '4'];
+
+        $after = Collection::make($before)->renameKeys([
+            1 => 10,
+        ])->all();
+
+        $this->assertEquals([
+            0 => '1',
+            2 => '3',
+            3 => '4',
+            10 => '2',
+        ], $after);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem

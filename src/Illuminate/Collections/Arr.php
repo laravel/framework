@@ -817,4 +817,16 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Renames the given array keys.
+     *
+     * @param  array<string, mixed>  $array
+     * @param  array<string, string>  $replace
+     * @return array
+     */
+    public static function renameKeys(array $array, array $replace, $recursive = true)
+    {
+        return Collection::make($array)->renameKeys($replace, $recursive)->all();
+    }
 }

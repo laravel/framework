@@ -1635,6 +1635,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Renames the given array keys.
+     *
+     * @param  array<string, string>  $replace
+     * @return static
+     */
+    public function renameKeys(array $replace, $recursive = true)
+    {
+        return (new static($this->items))->mapWithKeys(
+            fn ($item, $key) => [($replace[$key] ?? $key) => $recursive && is_array($item) ? static::make($item)->renameKeys($replace)->all() : $item]
+        );
+    }
+
+    /**
      * Add an item to the collection.
      *
      * @param  TValue  $item
