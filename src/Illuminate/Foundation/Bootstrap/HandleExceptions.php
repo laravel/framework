@@ -208,6 +208,8 @@ class HandleExceptions
      */
     public function handleShutdown()
     {
+        self::$reservedMemory = null;
+
         if (! is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
             $this->handleException($this->fatalErrorFromPhpError($error, 0));
         }
@@ -222,8 +224,6 @@ class HandleExceptions
      */
     protected function fatalErrorFromPhpError(array $error, $traceOffset = null)
     {
-        self::$reservedMemory = null;
-
         return new FatalError($error['message'], 0, $error, $traceOffset);
     }
 
