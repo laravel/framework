@@ -69,7 +69,6 @@ class ServeCommand extends Command
      */
     public function handle()
     {
-        
         if ($this->option('migration')) {
             $this->runMigration();
         }
