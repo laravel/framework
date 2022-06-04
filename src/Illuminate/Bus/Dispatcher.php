@@ -4,6 +4,7 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -51,11 +52,6 @@ class Dispatcher implements QueueingDispatcher
      * @var \Closure|null
      */
     protected $queueResolver;
-
-    /**
-     * @var array
-     */
-    private array $dispatchingJobsAfterResponse = [];
 
     /**
      * Create a new command dispatcher instance.
@@ -276,17 +272,14 @@ class Dispatcher implements QueueingDispatcher
             return;
         }
 
-        $uniqueId = method_exists($command, 'uniqueId')
-            ? $command->uniqueId()
-            : ($command->uniqueId ?? '');
-        $uniqueId = get_class($command).$uniqueId;
+        $lock = new UniqueLock($this->container->make(Cache::class));
 
-        if (! in_array($uniqueId, $this->dispatchingJobsAfterResponse)) {
-            $this->container->terminating(function () use ($command, $handler) {
+        if ($lock->acquire($command)) {
+            $this->container->terminating(function () use ($command, $handler, $lock) {
                 $this->dispatchNow($command, $handler);
-            });
 
-            $this->dispatchingJobsAfterResponse[] = $uniqueId;
+                $lock->release($command);
+            });
         }
     }
 

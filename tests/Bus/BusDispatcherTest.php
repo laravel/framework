@@ -12,7 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
 class BusDispatcherTest extends TestCase
@@ -75,7 +75,7 @@ class BusDispatcherTest extends TestCase
 
     public function testUniqueJobIsDispatchedAfterResponseOnce()
     {
-        $container = new \Illuminate\Foundation\Application;
+        $container = $this->app;
         $mock = m::mock(Dispatcher::class.'[dispatchNow]', [$container]);
         $mock->shouldReceive('dispatchNow')->once();
 
@@ -193,4 +193,3 @@ class UniqueJob implements ShouldBeUnique
         //
     }
 }
-
