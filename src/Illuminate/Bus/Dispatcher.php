@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
@@ -50,6 +51,11 @@ class Dispatcher implements QueueingDispatcher
      * @var \Closure|null
      */
     protected $queueResolver;
+
+    /**
+     * @var array
+     */
+    private array $dispatchingJobsAfterResponse = [];
 
     /**
      * Create a new command dispatcher instance.
@@ -262,9 +268,26 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchAfterResponse($command, $handler = null)
     {
-        $this->container->terminating(function () use ($command, $handler) {
-            $this->dispatchNow($command, $handler);
-        });
+        if (! $command instanceof ShouldBeUnique) {
+            $this->container->terminating(function () use ($command, $handler) {
+                $this->dispatchNow($command, $handler);
+            });
+
+            return;
+        }
+
+        $uniqueId = method_exists($command, 'uniqueId')
+            ? $command->uniqueId()
+            : ($command->uniqueId ?? '');
+        $uniqueId = get_class($command).$uniqueId;
+
+        if (! in_array($uniqueId, $this->dispatchingJobsAfterResponse)) {
+            $this->container->terminating(function () use ($command, $handler) {
+                $this->dispatchNow($command, $handler);
+            });
+
+            $this->dispatchingJobsAfterResponse[] = $uniqueId;
+        }
     }
 
     /**
