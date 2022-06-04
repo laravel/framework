@@ -1155,10 +1155,8 @@ class Builder implements BuilderContract
      */
     protected function mergeForeignKeys($attributes)
     {
-        if (count($this->for)) {
-            foreach ($this->for as $model) {
-                $attributes[$model['foreignKey']] = $model['model']->getKey();
-            }
+        foreach ($this->for as $model) {
+            $attributes[$model['foreignKey']] = $model['model']->getKey();
         }
 
         return $attributes;
