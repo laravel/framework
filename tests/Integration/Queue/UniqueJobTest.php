@@ -148,6 +148,19 @@ class UniqueJobTest extends TestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testUniqueJobIsDispatchedAfterResponseOnce()
+    {
+        UniqueTestJob::$handled = false;
+        UniqueTestJob::$handles = 0;
+
+        UniqueTestJob::dispatchAfterResponse();
+        UniqueTestJob::dispatchAfterResponse();
+
+        $this->app->terminate();
+
+        $this->assertEquals(1, UniqueTestJob::$handles);
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job));
@@ -158,11 +171,14 @@ class UniqueTestJob implements ShouldQueue, ShouldBeUnique
 {
     use InteractsWithQueue, Queueable, Dispatchable;
 
-    public static $handled = false;
+    public static bool $handled = false;
+
+    public static int $handles = 0;
 
     public function handle()
     {
         static::$handled = true;
+        static::$handles ++;
     }
 }
 

@@ -7,12 +7,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Mockery as m;
-use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class BusDispatcherTest extends TestCase
@@ -20,8 +18,6 @@ class BusDispatcherTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-
-        parent::tearDown();
     }
 
     public function testCommandsThatShouldQueueIsQueued()
@@ -73,18 +69,6 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherBasicCommand);
-    }
-
-    public function testUniqueJobIsDispatchedAfterResponseOnce()
-    {
-        $container = $this->app;
-        $mock = m::mock(Dispatcher::class.'[dispatchNow]', [$container]);
-        $mock->shouldReceive('dispatchNow')->once();
-
-        $mock->dispatchAfterResponse(new UniqueJob);
-        $mock->dispatchAfterResponse(new UniqueJob);
-
-        $container->terminate();
     }
 
     public function testDispatcherCanDispatchStandAloneHandler()
@@ -183,15 +167,5 @@ class ShouldNotBeDispatched implements ShouldQueue
     public function handle()
     {
         throw new RuntimeException('This should not be run');
-    }
-}
-
-class UniqueJob implements ShouldBeUnique
-{
-    use Dispatchable;
-
-    public function handle()
-    {
-        //
     }
 }
