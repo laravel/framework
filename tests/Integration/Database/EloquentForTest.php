@@ -303,6 +303,221 @@ class EloquentForTest extends DatabaseTestCase
         $this->assertSame($user->id, $anotherComment->user_id);
         $this->assertSame($post->id, $anotherComment->post_id);
     }
+
+    public function testForCanBeUsedOnRelationshipCreate()
+    {
+        /** @var User $user */
+        $user = User::create(['name' => 'My name']);
+        $post = Post::create(['title' => 'My title']);
+
+        $comment = $user->comments()
+            ->for($post, 'blogPost')
+            ->create([
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame('hello', $comment->content);
+
+        $this->assertSame($user->id, $comment->user_id);
+        $this->assertInstanceOf(User::class, $comment->user);
+
+        $this->assertSame($post->id, $comment->post_id);
+        $this->assertInstanceOf(Post::class, $comment->blogPost);
+    }
+
+    public function testForCanBeUsedOnRelationshipMake()
+    {
+        /** @var User $user */
+        $user = User::create(['name' => 'My name']);
+        $post = Post::create(['title' => 'My title']);
+
+        $comment = $user->comments()
+            ->for($post, 'blogPost')
+            ->make([
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame('hello', $comment->content);
+
+        $this->assertSame($user->id, $comment->user_id);
+        $this->assertInstanceOf(User::class, $comment->user);
+
+        $this->assertSame($post->id, $comment->post_id);
+        $this->assertInstanceOf(Post::class, $comment->blogPost);
+    }
+
+    public function testForCanBeUsedOnRelationshipMakeMany()
+    {
+        /** @var User $user */
+        $user = User::create(['name' => 'My name']);
+        $post = Post::create(['title' => 'My title']);
+
+        $comments = $user->comments()
+            ->for($post, 'blogPost')
+            ->makeMany([
+                ['content' => 'hello'],
+                ['content' => 'second'],
+            ]);
+
+        $this->assertSame('hello', $comments[0]->content);
+
+        $this->assertSame($user->id, $comments[0]->user_id);
+        $this->assertInstanceOf(User::class, $comments[0]->user);
+
+        $this->assertSame($post->id, $comments[0]->post_id);
+        $this->assertInstanceOf(Post::class, $comments[0]->blogPost);
+
+        $this->assertSame('second', $comments[1]->content);
+
+        $this->assertSame($user->id, $comments[1]->user_id);
+        $this->assertInstanceOf(User::class, $comments[1]->user);
+
+        $this->assertSame($post->id, $comments[1]->post_id);
+        $this->assertInstanceOf(Post::class, $comments[1]->blogPost);
+    }
+
+    public function testForCanBeUsedOnRelationshipFirstOrNewIfTheModelExists()
+    {
+        $user = User::create(['name' => 'My name']);
+        $anotherUser = User::create(['name' => 'Another name']);
+        $post = Post::create(['title' => 'My title']);
+
+        Comment::create([
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+            'content' => 'Hello',
+        ]);
+
+        $comment = $post->comments()
+            ->for($anotherUser)
+            ->firstOrNew([
+                'user_id' => $user->id,
+            ], [
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame($user->id, $comment->user_id);
+    }
+
+    public function testForCanBeUsedOnRelationshipsFirstOrNewIfTheModelDoesNotExist()
+    {
+        $user = User::create(['name' => 'My name']);
+        $anotherUser = User::create(['name' => 'Another name']);
+        $post = Post::create(['title' => 'My title']);
+
+        Comment::create([
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+            'content' => 'Hello',
+        ]);
+
+        $comment = $post->comments()
+            ->for($anotherUser)
+            ->firstOrNew([
+                'user_id' => 123,
+            ], [
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame($anotherUser->id, $comment->user_id);
+    }
+
+    public function testForCanBeUsedOnRelationshipFirstOrCreateIfTheModelExists()
+    {
+        $user = User::create(['name' => 'My name']);
+        $anotherUser = User::create(['name' => 'Another name']);
+        $post = Post::create(['title' => 'My title']);
+
+        Comment::create([
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+            'content' => 'Hello',
+        ]);
+
+        $comment = $post->comments()
+            ->for($anotherUser)
+            ->firstOrCreate([
+                'user_id' => $user->id,
+            ], [
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame($user->id, $comment->user_id);
+    }
+
+    public function testForCanBeUsedOnRelationshipFirstOrCreateIfTheModelDoesNotExist()
+    {
+        $user = User::create(['name' => 'My name']);
+        $anotherUser = User::create(['name' => 'Another name']);
+        $post = Post::create(['title' => 'My title']);
+
+        Comment::create([
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+            'content' => 'Hello',
+        ]);
+
+        $comment = $post->comments()
+            ->for($anotherUser)
+            ->firstOrCreate([
+                'user_id' => 123,
+            ], [
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame($anotherUser->id, $comment->user_id);
+    }
+
+    public function testForCanBeUsedOnRelationshipForceCreate()
+    {
+        /** @var User $user */
+        $user = User::create(['name' => 'My name']);
+        $post = Post::create(['title' => 'My title']);
+
+        $comment = $user->comments()
+            ->for($post, 'blogPost')
+            ->forceCreate([
+                'content' => 'hello',
+            ]);
+
+        $this->assertSame('hello', $comment->content);
+
+        $this->assertSame($user->id, $comment->user_id);
+        $this->assertInstanceOf(User::class, $comment->user);
+
+        $this->assertSame($post->id, $comment->post_id);
+        $this->assertInstanceOf(Post::class, $comment->blogPost);
+    }
+
+    public function testForCanBeUsedOnRelationshipCreateMany()
+    {
+        /** @var User $user */
+        $user = User::create(['name' => 'My name']);
+        $post = Post::create(['title' => 'My title']);
+
+        $comments = $user->comments()
+            ->for($post, 'blogPost')
+            ->createMany([
+                ['content' => 'hello'],
+                ['content' => 'second'],
+            ]);
+
+        $this->assertSame('hello', $comments[0]->content);
+
+        $this->assertSame($user->id, $comments[0]->user_id);
+        $this->assertInstanceOf(User::class, $comments[0]->user);
+
+        $this->assertSame($post->id, $comments[0]->post_id);
+        $this->assertInstanceOf(Post::class, $comments[0]->blogPost);
+
+        $this->assertSame('second', $comments[1]->content);
+
+        $this->assertSame($user->id, $comments[1]->user_id);
+        $this->assertInstanceOf(User::class, $comments[1]->user);
+
+        $this->assertSame($post->id, $comments[1]->post_id);
+        $this->assertInstanceOf(Post::class, $comments[1]->blogPost);
+    }
 }
 
 class User extends Model
@@ -313,6 +528,11 @@ class User extends Model
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }
 

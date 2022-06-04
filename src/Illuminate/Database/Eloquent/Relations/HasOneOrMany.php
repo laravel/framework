@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Support\Str;
 
 abstract class HasOneOrMany extends Relation
 {
@@ -24,6 +25,13 @@ abstract class HasOneOrMany extends Relation
      * @var string
      */
     protected $localKey;
+
+    /**
+     * The models that the queried models will be related to via a foreign key.
+     *
+     * @var array
+     */
+    protected $for = [];
 
     /**
      * Create a new has one or many relationship instance.
@@ -50,7 +58,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function make(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
+        return tap($this->related->newInstance($this->mergeForeignKeys($attributes)), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
         });
     }
@@ -187,6 +195,23 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Merge the attributes that will be used in the query with the specific foreign keys.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function mergeForeignKeys($attributes)
+    {
+        if (count($this->for)) {
+            foreach ($this->for as $model) {
+                $attributes[$model['foreignKey']] = $model['model']->getKey();
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * Find a model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
@@ -214,7 +239,7 @@ abstract class HasOneOrMany extends Relation
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance(array_merge($attributes, $values));
+            $instance = $this->related->newInstance($this->mergeForeignKeys(array_merge($attributes, $values)));
 
             $this->setForeignAttributesForCreate($instance);
         }
@@ -296,6 +321,27 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Set the foreign key for a relationship to another model.
+     *
+     * @param Model $model
+     * @param string $relationship
+     * @return $this
+     */
+    public function for($model, $relationship = null)
+    {
+        $relationship ??= Str::camel(class_basename($model));
+
+        $foreignKey = $this->getModel()->{$relationship}()->getForeignKeyName();
+
+        $this->for[] = [
+            'model' => $model,
+            'foreignKey' => $foreignKey,
+        ];
+
+        return $this;
+    }
+
+    /**
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
@@ -303,7 +349,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function create(array $attributes = [])
     {
-        return tap($this->related->newInstance($attributes), function ($instance) {
+        return tap($this->related->newInstance($this->mergeForeignKeys($attributes)), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
 
             $instance->save();
@@ -320,7 +366,7 @@ abstract class HasOneOrMany extends Relation
     {
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
-        return $this->related->forceCreate($attributes);
+        return $this->related->forceCreate($this->mergeForeignKeys($attributes));
     }
 
     /**
