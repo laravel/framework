@@ -43,29 +43,43 @@ class AblyBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        $channelName = $request->channelName;
+        $channelName = $request->channel_name;
         $token = $request->token;
+        $connectionId = $request->socket_id;
         $normalizedChannelName = $this->normalizeChannelName($channelName);
-        $user = $this->retrieveUser($request, $normalizedChannelName);
 
+        $user = $this->retrieveUser($request, $normalizedChannelName);
         if ($this->isGuardedChannel($channelName) && !$user) {
-            throw new AccessDeniedHttpException('User is not authenticated');
+            throw new AccessDeniedHttpException("User not authenticated, ". $this->stringify($channelName, $connectionId));
         }
-        try {
-            $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
-        } catch (\Exception $_) {
-            throw new AccessDeniedHttpException("Access denied for a user " . $user);
-        }
+
         $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
             ? $user->getAuthIdentifierForBroadcasting()
             : $user->getAuthIdentifier();
+        try {
+            $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
+        } catch (\Exception $e) {
+            throw new AccessDeniedHttpException("Access denied, ". $this->stringify($channelName, $connectionId, $userId), $e);
+        }
 
-        $signedToken = $this->getSignedToken($channelName, $token, $userId);
+        try {
+            $signedToken = $this->getSignedToken($channelName, $token, $userId);
+        } catch (\Exception $_) { // excluding exception to avoid exposing private key
+            throw new AccessDeniedHttpException("malformed token, ".$this->stringify($channelName, $connectionId, $userId));
+        }
+
         $response = array('token' => $signedToken);
         if (is_array($userData)) {
             $response['info'] = $userData;
         }
         return $response;
+    }
+
+    public function stringify($channelName, $connectionId, $userId = null) {
+        $message = "channel-name:".$channelName." ably-connection-id:". $connectionId;
+        if ($userId) {
+            return "user-id:".$userId." ".$message;
+        }
     }
 
     /**
@@ -122,10 +136,10 @@ class AblyBroadcaster extends Broadcaster
         );
         $serverTime = $this->ably->time(); // TODO - Update with server offset
         if ($token && self::isJwtValid($token, $serverTime, $this->getPrivateToken())) {
-            $parsedJwt = self::parseJwt($token)->payload;
-            $iat = $parsedJwt->iat;
-            $exp = $parsedJwt->exp;
-            $channelClaims = $parsedJwt['x-ably-capability'];
+            $payload = self::parseJwt($token)['payload'];
+            $iat = $payload['iat'];
+            $exp = $payload['exp'];
+            $channelClaims = $payload['x-ably-capability'];
         } else {
             $iat = round($serverTime / 1000);
             $exp = $iat + 3600;
@@ -194,10 +208,9 @@ class AblyBroadcaster extends Broadcaster
     static function parseJwt($jwt)
     {
         $tokenParts = explode('.', $jwt);
-        $result = array();
-        $result['header'] = json_decode(base64_decode($tokenParts[0]), true);
-        $result['payload'] = json_decode(base64_decode($tokenParts[1]), true);;
-        return $result;
+        $header = json_decode(base64_decode($tokenParts[0]), true);
+        $payload = json_decode(base64_decode($tokenParts[1]), true);;
+        return array('header'=> $header, 'payload' => $payload);
     }
 
     static function generateJwt($headers, $payload, $secret = 'secret')
