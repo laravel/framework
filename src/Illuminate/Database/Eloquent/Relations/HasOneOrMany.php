@@ -197,7 +197,7 @@ abstract class HasOneOrMany extends Relation
     /**
      * Merge the attributes that will be used in the query with the specific foreign keys.
      *
-     * @param array $attributes
+     * @param  array  $attributes
      * @return array
      */
     protected function mergeForeignKeys($attributes)
@@ -323,8 +323,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Set the foreign key for a relationship to another model.
      *
-     * @param Model $model
-     * @param string $relationship
+     * @param  Model  $model
+     * @param  string  $relationship
      * @return $this
      */
     public function for($model, $relationship = null)

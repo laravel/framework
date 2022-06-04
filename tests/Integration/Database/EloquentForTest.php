@@ -523,7 +523,13 @@ class EloquentForTest extends DatabaseTestCase
 class User extends Model
 {
     public $table = 'users';
+
     protected $guarded = [];
+
+    protected $casts = [
+        'post_id' => 'integer',
+        'comment_id' => 'integer',
+    ];
 
     public function posts()
     {
@@ -539,6 +545,7 @@ class User extends Model
 class Post extends Model
 {
     public $table = 'posts';
+
     protected $guarded = [];
 
     public function comments()
@@ -552,6 +559,11 @@ class Comment extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'post_id' => 'integer',
+        'user_id' => 'integer',
+    ];
 
     public function blogPost(): BelongsTo
     {

@@ -456,8 +456,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Set the foreign key for a relationship to another model.
      *
-     * @param Model $model
-     * @param string|null $relationship
+     * @param  Model  $model
+     * @param  string|null  $relationship
      * @return $this
      */
     public function forModel($model, $relationship = null)
