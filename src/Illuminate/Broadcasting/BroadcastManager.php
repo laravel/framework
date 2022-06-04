@@ -58,32 +58,56 @@ class BroadcastManager implements FactoryContract
     /**
      * Register the routes for handling broadcast authentication and sockets.
      *
-     * @param  array|null  $channelAuthorizationAttributes
-     * @param  array|null  $userAuthorizationAttributes
+     * @param  array|null  $attributes
      * @return void
      */
-    public function routes(array $channelAuthorizationAttributes = null, array $userAuthorizationAttributes = null)
+    public function routes(array $attributes = null)
     {
         if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return;
         }
 
-        $channelAuthorizationAttributes = $channelAuthorizationAttributes ?: ['middleware' => ['web']];
-        $userAuthorizationAttributes = $channelAuthorizationAttributes ?: ['middleware' => ['web']];
+        $attributes = $attributes ?: ['middleware' => ['web']];
 
-        $this->app['router']->group($channelAuthorizationAttributes, function ($router) {
+        $this->app['router']->group($attributes, function ($router) {
             $router->match(
                 ['get', 'post'], '/broadcasting/auth',
                 '\\'.BroadcastController::class.'@authenticate'
             )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
         });
+    }
 
-        $this->app['router']->group($userAuthorizationAttributes, function ($router) {
+    /**
+     * Register the routes for handling broadcast authentication.
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function userAuthenticationRoutes(array $attributes = null)
+    {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+            return;
+        }
+
+        $attributes = $attributes ?: ['middleware' => ['web']];
+
+        $this->app['router']->group($attributes, function ($router) {
             $router->match(
                 ['get', 'post'], '/broadcasting/user-auth',
                 '\\'.BroadcastController::class.'@authenticateUser'
             )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
         });
+    }
+
+    /**
+     * Alias for routes().
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function channelAuthorizationRoutes(array $attributes = null)
+    {
+        return $this->routes($attributes);
     }
 
     /**
