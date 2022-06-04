@@ -20,6 +20,8 @@ class BusDispatcherTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+
+        parent::tearDown();
     }
 
     public function testCommandsThatShouldQueueIsQueued()
