@@ -39,7 +39,7 @@ class AblyBroadcasterTest extends TestCase
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
             ->once();
 
-        $token = $this->broadcaster->auth(
+        $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private:test', null)
         );
     }
@@ -137,8 +137,9 @@ class AblyBroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel, $token)
     {
         $request = m::mock(Request::class);
-        $request->channelName = $channel;
+        $request->channel_name = $channel;
         $request->token = $token;
+        $request->socket_id = 'abcd.1234';
 
         $request->shouldReceive('input')
             ->with('callback', false)
@@ -163,8 +164,10 @@ class AblyBroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel, $token)
     {
         $request = m::mock(Request::class);
-        $request->channelName = $channel;
+        $request->channel_name = $channel;
         $request->token = $token;
+        $request->socket_id = 'abcd.1234';
+
 
         $request->shouldReceive('user')
             ->andReturn(null);
