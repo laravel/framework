@@ -1,6 +1,43 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.14.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.15.0...9.x)
+
+
+## [v9.15.0](https://github.com/laravel/framework/compare/v9.14.1...v9.15.0) - 2022-05-31
+
+### Added
+- Added --only-vendor option to route:list command ([#42549](https://github.com/laravel/framework/pull/42549))
+- Added `Illuminate/Http/Client/PendingRequest::throwUnless()` ([#42556](https://github.com/laravel/framework/pull/42556))
+- Added `Illuminate/Support/Str::isJson()` ([#42545](https://github.com/laravel/framework/pull/42545))
+- Added `Illuminate/Filesystem/Filesystem::isEmptyDirectory()` ([#42559](https://github.com/laravel/framework/pull/42559))
+- Added `Add counts to route:list command` ([#42551](https://github.com/laravel/framework/pull/42551))
+- Support kebab case for slot name shortcut ([#42574](https://github.com/laravel/framework/pull/42574))
+
+### Revered
+- Revert digits changes in validation ([c113768](https://github.com/laravel/framework/commit/c113768dbd47de7466d703108eaf8155916d5666), [#42562](https://github.com/laravel/framework/pull/42562))
+
+### Fixed
+- Fix getting '0' from route parameter in Authorize middleware ([#42582](https://github.com/laravel/framework/pull/42582))
+
+### Changed
+- Retain the original attribute value during validation of an array key with a dot for correct failure message ([#42395](https://github.com/laravel/framework/pull/42395))
+- Allow bootable test traits to teardown ([#42521](https://github.com/laravel/framework/pull/42521))
+- Pass thrown exception to $sleepMilliseconds closure in retry helper ([#42532](https://github.com/laravel/framework/pull/42532))
+- Make HasTimestamps::updateTimestamps chainable ([#42533](https://github.com/laravel/framework/pull/42533))
+- Remove meaningless parameter in `Illuminate/View/Concerns/ManagesEvents` ([#42546](https://github.com/laravel/framework/pull/42546))
+- Map integer parameter to parameter name when resolving binding field ([#42571](https://github.com/laravel/framework/pull/42571))
+- Conditionable should return HigherOrderWhenProxy only when the args number is exactly 1 ([#42555](https://github.com/laravel/framework/pull/42555))
+
+
+## [v9.14.1](https://github.com/laravel/framework/compare/v9.14.0...v9.14.1) - 2022-05-25
+
+### Added
+- Model::whereRelation add callback function ([#42491](https://github.com/laravel/framework/pull/42491))
+- Add Conditionable Trait to Illuminate\Support\Carbon ([#42500](https://github.com/laravel/framework/pull/42500))
+
+### Fixed
+- Fix afterCommit and DatabaseTransactions ([#42502](https://github.com/laravel/framework/pull/42502))
+- Fixed regression when only some route parameters are scoped ([#42517](https://github.com/laravel/framework/pull/42517))
 
 
 ## [v9.14.0](https://github.com/laravel/framework/compare/v9.13.0...v9.14.0) - 2022-05-24

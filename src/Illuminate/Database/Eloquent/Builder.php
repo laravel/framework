@@ -1620,6 +1620,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Indicate that the given relationships should not be eagerly loaded.
+     *
+     * @param  array  $relations
+     * @return $this
+     */
+    public function withoutEagerLoad(array $relations)
+    {
+        $relations = array_diff(array_keys($this->model->getRelations()), $relations);
+
+        return $this->with($relations);
+    }
+
+    /**
      * Flush the relationships being eagerly loaded.
      *
      * @return $this

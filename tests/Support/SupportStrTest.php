@@ -891,6 +891,95 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));
     }
+
+    public function testItCanFreezeUuids()
+    {
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+        $this->assertNotSame(Str::uuid(), Str::uuid());
+
+        $uuid = Str::freezeUuids();
+
+        $this->assertSame($uuid, Str::uuid());
+        $this->assertSame(Str::uuid(), Str::uuid());
+        $this->assertSame((string) $uuid, (string) Str::uuid());
+        $this->assertSame((string) Str::uuid(), (string) Str::uuid());
+
+        Str::createUuidsNormally();
+
+        $this->assertNotSame(Str::uuid(), Str::uuid());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+    }
+
+    public function testItCanFreezeUuidsInAClosure()
+    {
+        $uuids = [];
+
+        $uuid = Str::freezeUuids(function ($uuid) use (&$uuids) {
+            $uuids[] = $uuid;
+            $uuids[] = Str::uuid();
+            $uuids[] = Str::uuid();
+        });
+
+        $this->assertSame($uuid, $uuids[0]);
+        $this->assertSame((string) $uuid, (string) $uuids[0]);
+        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
+        $this->assertSame($uuids[0], $uuids[1]);
+        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
+        $this->assertSame($uuids[1], $uuids[2]);
+        $this->assertSame((string) $uuids[1], (string) $uuids[2]);
+        $this->assertNotSame(Str::uuid(), Str::uuid());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+
+        Str::createUuidsNormally();
+    }
+
+    public function testItCanSpecifyASquenceOfUuidsToUtilise()
+    {
+        Str::createUuidsUsingSequence([
+            0 => ($zeroth = Str::uuid()),
+            1 => ($first = Str::uuid()),
+            // just generate a random one here...
+            3 => ($third = Str::uuid()),
+            // continue to generate random uuids...
+        ]);
+
+        $retrieved = Str::uuid();
+        $this->assertSame($zeroth, $retrieved);
+        $this->assertSame((string) $zeroth, (string) $retrieved);
+
+        $retrieved = Str::uuid();
+        $this->assertSame($first, $retrieved);
+        $this->assertSame((string) $first, (string) $retrieved);
+
+        $retrieved = Str::uuid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        $retrieved = Str::uuid();
+        $this->assertSame($third, $retrieved);
+        $this->assertSame((string) $third, (string) $retrieved);
+
+        $retrieved = Str::uuid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        Str::createUuidsNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForASequence()
+    {
+        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn () => throw new \Exception('Out of Uuids.'));
+        Str::uuid();
+        Str::uuid();
+
+        try {
+            $this->expectExceptionMessage('Out of Uuids.');
+            Str::uuid();
+            $this->fail();
+        } finally {
+            Str::createUuidsNormally();
+        }
+    }
 }
 
 class StringableObjectStub

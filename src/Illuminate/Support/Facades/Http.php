@@ -38,6 +38,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method static \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest throwIf($condition)
+ * @method \Illuminate\Http\Client\PendingRequest throwUnless($condition)
  * @method static array pool(callable $callback)
  * @method static \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
