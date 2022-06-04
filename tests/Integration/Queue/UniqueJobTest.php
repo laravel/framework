@@ -178,7 +178,7 @@ class UniqueTestJob implements ShouldQueue, ShouldBeUnique
     public function handle()
     {
         static::$handled = true;
-        static::$handles ++;
+        static::$handles++;
     }
 }
 
