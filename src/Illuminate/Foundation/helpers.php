@@ -948,3 +948,16 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('test_path')) {
+    /**
+     * Get the path to the test folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function test_path($path = '')
+    {
+        return app()->testPath($path);
+    }
+}

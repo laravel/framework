@@ -319,6 +319,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance('path.database', $this->databasePath());
         $this->instance('path.resources', $this->resourcePath());
         $this->instance('path.bootstrap', $this->bootstrapPath());
+        $this->instance('path.test', $this->testPath());
 
         $this->useLangPath(value(function () {
             if (is_dir($directory = $this->resourcePath('lang'))) {
@@ -503,6 +504,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $basePath = $this['config']->get('view.paths')[0];
 
         return rtrim($basePath, DIRECTORY_SEPARATOR).($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+    }
+
+    /**
+     * Get the path to the tests directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function testPath($path = '')
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'tests'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
     }
 
     /**

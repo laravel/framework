@@ -62,6 +62,14 @@ interface Application extends Container
     public function storagePath($path = '');
 
     /**
+     * Get the path to the tests directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function testPath($path = '');
+
+    /**
      * Get or check the current application environment.
      *
      * @param  string|array  $environments
