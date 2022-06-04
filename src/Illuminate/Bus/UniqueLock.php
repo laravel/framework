@@ -59,7 +59,7 @@ class UniqueLock
     /**
      * Determine the lock duration for the given job.
      *
-     * @param  mixed $job
+     * @param  mixed  $job
      * @return int
      */
     protected function getJobUniqueFor(mixed $job): int
@@ -85,7 +85,7 @@ class UniqueLock
     }
 
     /**
-     * @param  mixed $job
+     * @param  mixed  $job
      * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function getJobUniqueVia(mixed $job): Cache
