@@ -194,9 +194,10 @@ class AblyBroadcaster extends Broadcaster
     static function parseJwt($jwt)
     {
         $tokenParts = explode('.', $jwt);
-        $header = json_decode(base64_decode($tokenParts[0]));
-        $payload = json_decode(base64_decode($tokenParts[1]));
-        return array('header' => $header, 'payload' => $payload);
+        $result = array();
+        $result['header'] = json_decode(base64_decode($tokenParts[0]), true);
+        $result['payload'] = json_decode(base64_decode($tokenParts[1]), true);;
+        return $result;
     }
 
     static function generateJwt($headers, $payload, $secret = 'secret')

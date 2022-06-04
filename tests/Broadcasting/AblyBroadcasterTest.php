@@ -39,7 +39,7 @@ class AblyBroadcasterTest extends TestCase
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
             ->once();
 
-        $this->broadcaster->auth(
+        $token = $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private:test', null)
         );
     }
@@ -109,6 +109,25 @@ class AblyBroadcasterTest extends TestCase
         $this->broadcaster->auth(
             $this->getMockRequestWithoutUserForChannel('private:test', null)
         );
+    }
+
+    public function testGenerateAndValidateToken() {
+        $headers = array('alg'=>'HS256','typ'=>'JWT');
+        $payload = array('sub'=>'1234567890','name'=>'John Doe', 'admin'=>true, 'exp'=>(time() + 60));
+        $jwtToken = AblyBroadcaster::generateJwt($headers, $payload);
+
+        $parsedJwt = AblyBroadcaster::parseJwt($jwtToken);
+        self::assertEquals("HS256", $parsedJwt['header']['alg']);
+        self::assertEquals("JWT", $parsedJwt['header']['typ']);
+
+        self::assertEquals("1234567890", $parsedJwt['payload']['sub']);
+        self::assertEquals("John Doe", $parsedJwt['payload']['name']);
+        self::assertEquals(true, $parsedJwt['payload']['admin']);
+
+
+        $timeFn = function () {return time(); };
+        $jwtIsValid = AblyBroadcaster::isJwtValid($jwtToken, $timeFn);
+        self::assertTrue($jwtIsValid);
     }
 
     /**
