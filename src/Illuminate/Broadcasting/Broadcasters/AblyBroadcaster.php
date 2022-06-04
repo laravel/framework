@@ -43,7 +43,7 @@ class AblyBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        $channelName = $request->channel_name;
+        $channelName = $request->channelName;
         $token = $request->token;
         $normalizedChannelName = $this->normalizeChannelName($channelName);
         $user = $this->retrieveUser($request, $normalizedChannelName);
@@ -120,7 +120,7 @@ class AblyBroadcaster extends Broadcaster
         $channelClaims = array(
             'public:*' => ["subscribe", "history", "channel-metadata"]
         );
-        $serverTime = $this->ably->time();
+        $serverTime = $this->ably->time(); // TODO - Update with server offset
         if ($token && self::isJwtValid($token, $serverTime, $this->getPrivateToken())) {
             $parsedJwt = self::parseJwt($token)->payload;
             $iat = $parsedJwt->iat;
@@ -220,23 +220,6 @@ class AblyBroadcaster extends Broadcaster
     public function validAuthenticationResponse($request, $result)
     {
         return $result;
-    }
-
-    /**
-     * Generate the signature needed for Ably authentication headers.
-     *
-     * @param string $channelName
-     * @param string $socketId
-     * @param array|null $userData
-     * @return string
-     */
-    public function generateAblySignature($channelName, $socketId, $userData = null)
-    {
-        return hash_hmac(
-            'sha256',
-            sprintf('%s:%s%s', $socketId, $channelName, $userData ? ':' . json_encode($userData) : ''),
-            $this->getPrivateToken(),
-        );
     }
 
     /**
