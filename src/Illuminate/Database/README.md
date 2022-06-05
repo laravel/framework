@@ -23,7 +23,7 @@ $capsule->addConnection([
 ]);
 
 // Set the event dispatcher used by Eloquent models... (optional)
-use Illuminate\Events\Dispatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Container\Container;
 $capsule->setEventDispatcher(new Dispatcher(new Container));
 
