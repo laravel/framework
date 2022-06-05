@@ -722,7 +722,6 @@ class Str
         });
     }
 
-
     /**
      * Indicate that random strings should be created normally and not using a custom factory.
      *
