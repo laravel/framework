@@ -13,6 +13,17 @@ trait CompilesHelpers
     {
         return '<?php echo csrf_field(); ?>';
     }
+    
+    /**
+     * Compile the "old" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileOld($arguments)
+    {
+        return "<?php echo old{$arguments}; ?>";
+    }
 
     /**
      * Compile the "dd" statements into valid PHP.
