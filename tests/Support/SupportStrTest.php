@@ -980,7 +980,7 @@ class SupportStrTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testItCanSpecifyASquenceOfUuidsToUtilise()
+    public function testItCanSpecifyASequenceOfUuidsToUtilise()
     {
         Str::createUuidsUsingSequence([
             0 => ($zeroth = Str::uuid()),
