@@ -1949,6 +1949,19 @@ trait ValidatesAttributes
     {
         return Str::startsWith($value, $parameters);
     }
+    
+    /**
+     * Validate the attribute not starts with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateNotStartsWith($attribute, $value, $parameters)
+    {
+        return ! Str::startsWith($value, $parameters);
+    }
 
     /**
      * Validate the attribute ends with a given substring.
