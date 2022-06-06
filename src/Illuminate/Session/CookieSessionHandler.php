@@ -44,9 +44,10 @@ class CookieSessionHandler implements SessionHandlerInterface
      *
      * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
      * @param  int  $minutes
+     * @param  bool  $expireOnClose
      * @return void
      */
-    public function __construct(CookieJar $cookie, $minutes, $expireOnClose)
+    public function __construct(CookieJar $cookie, $minutes, $expireOnClose = false)
     {
         $this->cookie = $cookie;
         $this->minutes = $minutes;
