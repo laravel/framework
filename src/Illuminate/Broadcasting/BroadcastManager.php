@@ -74,12 +74,40 @@ class BroadcastManager implements FactoryContract
                 ['get', 'post'], '/broadcasting/auth',
                 '\\'.BroadcastController::class.'@authenticate'
             )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+        });
+    }
 
+    /**
+     * Register the routes for handling broadcast authentication.
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function userAuthenticationRoutes(array $attributes = null)
+    {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+            return;
+        }
+
+        $attributes = $attributes ?: ['middleware' => ['web']];
+
+        $this->app['router']->group($attributes, function ($router) {
             $router->match(
                 ['get', 'post'], '/broadcasting/user-auth',
                 '\\'.BroadcastController::class.'@authenticateUser'
             )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
         });
+    }
+
+    /**
+     * Alias for routes().
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function channelAuthorizationRoutes(array $attributes = null)
+    {
+        return $this->routes($attributes);
     }
 
     /**
