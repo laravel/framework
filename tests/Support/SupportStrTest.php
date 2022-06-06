@@ -470,6 +470,53 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testRandomStringFactoryCanBeSet()
+    {
+        Str::createRandomStringsUsing(fn ($length) => 'length:'.$length);
+
+        $this->assertSame('length:7', Str::random(7));
+        $this->assertSame('length:7', Str::random(7));
+
+        Str::createRandomStringsNormally();
+
+        $this->assertNotSame('length:7', Str::random());
+    }
+
+    public function testItCanSpecifyASequenceOfRandomStringsToUtilise()
+    {
+        Str::createRandomStringsUsingSequence([
+            0 => 'x',
+            // 1 => just generate a random one here...
+            2 => 'y',
+            3 => 'z',
+            // ... => continue to generate random strings...
+        ]);
+
+        $this->assertSame('x', Str::random());
+        $this->assertSame(16, mb_strlen(Str::random()));
+        $this->assertSame('y', Str::random());
+        $this->assertSame('z', Str::random());
+        $this->assertSame(16, mb_strlen(Str::random()));
+        $this->assertSame(16, mb_strlen(Str::random()));
+
+        Str::createRandomStringsNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForARandomStringSequence()
+    {
+        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new \Exception('Out of random strings.'));
+        Str::random();
+        Str::random();
+
+        try {
+            $this->expectExceptionMessage('Out of random strings.');
+            Str::random();
+            $this->fail();
+        } finally {
+            Str::createRandomStringsNormally();
+        }
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
@@ -933,7 +980,7 @@ class SupportStrTest extends TestCase
         Str::createUuidsNormally();
     }
 
-    public function testItCanSpecifyASquenceOfUuidsToUtilise()
+    public function testItCanSpecifyASequenceOfUuidsToUtilise()
     {
         Str::createUuidsUsingSequence([
             0 => ($zeroth = Str::uuid()),

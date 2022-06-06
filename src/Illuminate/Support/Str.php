@@ -45,6 +45,13 @@ class Str
     protected static $uuidFactory;
 
     /**
+     * The callback that should be used to generate random strings.
+     *
+     * @var callable|null
+     */
+    protected static $randomStringFactory;
+
+    /**
      * Get a new stringable object from the given string.
      *
      * @param  string  $string
@@ -655,17 +662,74 @@ class Str
      */
     public static function random($length = 16)
     {
-        $string = '';
+        return (static::$randomStringFactory ?? function ($length) {
+            $string = '';
 
-        while (($len = strlen($string)) < $length) {
-            $size = $length - $len;
+            while (($len = strlen($string)) < $length) {
+                $size = $length - $len;
 
-            $bytes = random_bytes($size);
+                $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
-        }
+                $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            }
 
-        return $string;
+            return $string;
+        })($length);
+    }
+
+    /**
+     * Set the callable that will be used to generate random strings.
+     *
+     * @param  callable|null  $factory
+     * @return void
+     */
+    public static function createRandomStringsUsing(callable $factory = null)
+    {
+        static::$randomStringFactory = $factory;
+    }
+
+    /**
+     * Set the sequence that will be used to generate random strings.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createRandomStringsUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function ($length) use (&$next) {
+            $factoryCache = static::$randomStringFactory;
+
+            static::$randomStringFactory = null;
+
+            $randomString = static::random($length);
+
+            static::$randomStringFactory = $factoryCache;
+
+            $next++;
+
+            return $randomString;
+        };
+
+        static::createRandomStringsUsing(function ($length) use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing($length);
+        });
+    }
+
+    /**
+     * Indicate that random strings should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createRandomStringsNormally()
+    {
+        static::$randomStringFactory = null;
     }
 
     /**
