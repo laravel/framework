@@ -62,6 +62,31 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals(['seven'], $this->getRoute()->middleware());
     }
 
+    public function testCanMiddlewareFluentRegistration()
+    {
+        $this->router->can('see', 'a_class')->get('users', fn() => 'all-users');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['can:see,a_class'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareAndCanDoesNotOverrideEachOtherOnFluentRegistration()
+    {
+        $this->router->middleware('can:1')
+                     ->can('2')
+                     ->middleware('3')
+                     ->can('4')
+                     ->get('users', fn() => 'all-users');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals([
+            'can:1',
+            'can:2',
+            '3',
+            'can:4',
+        ], $this->getRoute()->middleware());
+    }
+
     public function testNullNamespaceIsRespected()
     {
         $this->router->middleware(['one'])->namespace(null)->get('users', function () {

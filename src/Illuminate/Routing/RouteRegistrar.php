@@ -17,6 +17,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\RouteRegistrar as(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar can(string $ability, array|null $models = [])
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
  * @method \Illuminate\Routing\RouteRegistrar domain(string $value)
  * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
@@ -115,7 +116,7 @@ class RouteRegistrar
 
         $attributeKey = Arr::get($this->aliases, $key, $key);
 
-        if ($key === 'withoutMiddleware') {
+        if (in_array($key, ['middleware', 'withoutMiddleware'])) {
             $value = array_merge(
                 (array) ($this->attributes[$attributeKey] ?? []), Arr::wrap($value)
             );
@@ -237,6 +238,12 @@ class RouteRegistrar
     {
         if (in_array($method, $this->passthru)) {
             return $this->registerRoute($method, ...$parameters);
+        }
+
+        if ($method === 'can') {
+            return $parameters[1] ?? false
+                ? $this->attribute('middleware', ['can:'.$parameters[0].','.implode(',', Arr::wrap($parameters[1]))])
+                : $this->attribute('middleware', ['can:'.$parameters[0]]);
         }
 
         if (in_array($method, $this->allowedAttributes)) {
