@@ -75,11 +75,12 @@ class AblyBroadcaster extends Broadcaster
         return $response;
     }
 
-    public function stringify($channelName, $connectionId, $userId = null) {
+    protected function stringify($channelName, $connectionId, $userId = null) {
         $message = "channel-name:".$channelName." ably-connection-id:". $connectionId;
         if ($userId) {
             return "user-id:".$userId." ".$message;
         }
+        return $message;
     }
 
     /**
@@ -123,7 +124,7 @@ class AblyBroadcaster extends Broadcaster
         return $this->isPrivateChannel($channel) || $this->isPresenceChannel($channel);
     }
 
-    public function getSignedToken($channelName, $token, $clientId)
+    function getSignedToken($channelName, $token, $clientId)
     {
         $header = array(
             "typ" => "JWT",
@@ -134,14 +135,14 @@ class AblyBroadcaster extends Broadcaster
         $channelClaims = array(
             'public:*' => ["subscribe", "history", "channel-metadata"]
         );
-        $serverTime = $this->ably->time(); // TODO - Update with server offset
-        if ($token && self::isJwtValid($token, $serverTime, $this->getPrivateToken())) {
+        $serverTimeFn = function () { return $this->ably->time() / 1000; }; // TODO - Update with server offset
+        if ($token && self::isJwtValid($token, $serverTimeFn)) {
             $payload = self::parseJwt($token)['payload'];
             $iat = $payload['iat'];
             $exp = $payload['exp'];
             $channelClaims = $payload['x-ably-capability'];
         } else {
-            $iat = round($serverTime / 1000);
+            $iat = round($serverTimeFn());
             $exp = $iat + 3600;
         }
         if ($channelName) {
@@ -154,7 +155,7 @@ class AblyBroadcaster extends Broadcaster
             "x-ably-capability" => $channelClaims
         );
 
-        return self::generateJwt($header, $claims, $this->getPrivateToken());
+        return self::generateJwt($header, $claims);
     }
 
     /**
@@ -167,7 +168,7 @@ class AblyBroadcaster extends Broadcaster
         return Str::before($this->ably->options->key, ':');
     }
 
-    static function isJwtValid($jwt, $timeFn, $secret = 'secret')
+    function isJwtValid($jwt, $timeFn)
     {
         // split the jwt
         $tokenParts = explode('.', $jwt);
@@ -180,7 +181,7 @@ class AblyBroadcaster extends Broadcaster
         $isTokenExpired = $expiration <= $timeFn();
 
         // build a signature based on the header and payload using the secret
-        $signature = hash_hmac('SHA256', $header . "." . $payload, $secret, true);
+        $signature = hash_hmac('SHA256', $header . "." . $payload, $this->getPrivateToken(), true);
         $isSignatureValid = self::base64urlEncode($signature) === $tokenSignature;
 
         return $isSignatureValid && !$isTokenExpired;
@@ -213,12 +214,12 @@ class AblyBroadcaster extends Broadcaster
         return array('header'=> $header, 'payload' => $payload);
     }
 
-    static function generateJwt($headers, $payload, $secret = 'secret')
+    function generateJwt($headers, $payload)
     {
         $encodedHeaders = self::base64urlEncode(json_encode($headers));
         $encodedPayload = self::base64urlEncode(json_encode($payload));
 
-        $signature = hash_hmac('SHA256', "$encodedHeaders.$encodedPayload", $secret, true);
+        $signature = hash_hmac('SHA256', "$encodedHeaders.$encodedPayload", $this->getPrivateToken(), true);
         $encodedSignature = self::base64urlEncode($signature);
 
         return "$encodedHeaders.$encodedPayload.$encodedSignature";
