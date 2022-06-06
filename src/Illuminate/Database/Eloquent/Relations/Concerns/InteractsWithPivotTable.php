@@ -473,7 +473,10 @@ trait InteractsWithPivotTable
     {
         $results = 0;
 
-        $pivots = $this->using::where($this->foreignPivotKey, $this->parent->{$this->parentKey})->whereIn($this->relatedPivotKey, $this->parseIds($ids))->get();
+        $pivots = $this->using::withoutGlobalScopes()
+            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
+            ->whereIn($this->relatedPivotKey, $this->parseIds($ids))
+            ->get();
 
         foreach ($pivots as $pivot) {
             $results += $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey)->delete();
