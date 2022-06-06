@@ -44,12 +44,12 @@ class ResponseSequence
     /**
      * Push a response to the sequence.
      *
-     * @param  string|array  $body
+     * @param  string|array|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return $this
      */
-    public function push($body = '', int $status = 200, array $headers = [])
+    public function push($body = null, int $status = 200, array $headers = [])
     {
         $body = is_array($body) ? json_encode($body) : $body;
 
