@@ -629,7 +629,7 @@ trait ReplacesAttributes
     }
     
     /**
-     * Replace all place-holders for the not_starts_with rule.
+     * Replace all place-holders for the doesnt_start_with rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -637,7 +637,7 @@ trait ReplacesAttributes
      * @param  array<int,string>  $parameters
      * @return string
      */
-    protected function replaceNotStartsWith($message, $attribute, $rule, $parameters)
+    protected function replaceDoesntStartWith($message, $attribute, $rule, $parameters)
     {
         foreach ($parameters as &$parameter) {
             $parameter = $this->getDisplayableValue($attribute, $parameter);
