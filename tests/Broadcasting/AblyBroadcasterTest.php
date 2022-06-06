@@ -25,7 +25,7 @@ class AblyBroadcasterTest extends TestCase
 
         $this->ably->shouldReceive('time')
             ->zeroOrMoreTimes()
-            ->andReturn(time()); // TODO - make this call at runtime
+            ->andReturn(time() * 1000); // TODO - make this call at runtime
 
         $this->ably->options = (object) ['key' => 'abcd:efgh'];
 
@@ -228,6 +228,7 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals("string", gettype($prevResponse["token"]));
         $expectedToken = $this->broadcaster->getSignedToken("private:test1", null, 42);
         self::assertEquals($expectedToken, $prevResponse["token"]);
+        self::assertTrue($this->broadcaster->isJwtValid($expectedToken, function () {return time();}));
 
         $response = $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence:test2', $prevResponse["token"])
@@ -236,6 +237,7 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals("string", gettype($response["token"]));
         $expectedToken = $this->broadcaster->getSignedToken("presence:test2", $prevResponse["token"], 42);
         self::assertEquals($expectedToken, $response["token"]);
+        self::assertTrue($this->broadcaster->isJwtValid($expectedToken, function () {return time();}));
 
         self::assertEquals("array", gettype($response["info"]));
         self::assertEquals(array("userid" => "user1234", "info" => "Hello there"), $response["info"]);
