@@ -632,6 +632,29 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testNth()
+    {
+        $array = [100, 200, 300];
+
+        $this->assertEquals(100, Arr::nth($array, 0));
+
+        $this->assertEquals(300, Arr::nth($array, 2));
+
+        $this->assertEquals(200, Arr::nth($array, -2));
+
+        $this->assertEquals('default', Arr::nth($array, 3, 'default'));
+
+        $array = ['a' => 100, 'b' => 200, 'c' => 300];
+
+        $this->assertEquals(100, Arr::nth($array, 0));
+
+        $this->assertEquals(300, Arr::nth($array, 2));
+
+        $this->assertEquals(200, Arr::nth($array, -2));
+
+        $this->assertEquals('default', Arr::nth($array, 3, 'default'));
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');

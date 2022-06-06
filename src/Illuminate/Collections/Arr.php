@@ -561,6 +561,21 @@ class Arr
     }
 
     /**
+     * Return the nth element in an array starting from zero.
+     *
+     * @param  array  $array
+     * @param  int  $position
+     * @param  mixed  $default
+     * @return array
+     */
+    public static function nth(array $array, int $position, mixed $default = null): mixed
+    {
+        $array = array_slice($array, $position, 1);
+
+        return current($array ?: [$default]);
+    }
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
