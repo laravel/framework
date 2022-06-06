@@ -22,8 +22,10 @@ class AblyBroadcasterTest extends TestCase
         parent::setUp();
 
         $this->ably = m::mock('Ably\AblyRest');
+
         $this->ably->shouldReceive('time')
-            ->andReturn(time());
+            ->zeroOrMoreTimes()
+            ->andReturn(time()); // TODO - make this call at runtime
 
         $this->ably->options = (object) ['key' => 'abcd:efgh'];
 
@@ -114,7 +116,7 @@ class AblyBroadcasterTest extends TestCase
     public function testGenerateAndValidateToken() {
         $headers = array('alg'=>'HS256','typ'=>'JWT');
         $payload = array('sub'=>'1234567890','name'=>'John Doe', 'admin'=>true, 'exp'=>(time() + 60));
-        $jwtToken = AblyBroadcaster::generateJwt($headers, $payload);
+        $jwtToken = $this->broadcaster->generateJwt($headers, $payload);
 
         $parsedJwt = AblyBroadcaster::parseJwt($jwtToken);
         self::assertEquals("HS256", $parsedJwt['header']['alg']);
@@ -126,8 +128,99 @@ class AblyBroadcasterTest extends TestCase
 
 
         $timeFn = function () {return time(); };
-        $jwtIsValid = AblyBroadcaster::isJwtValid($jwtToken, $timeFn);
+        $jwtIsValid = $this->broadcaster->isJwtValid($jwtToken, $timeFn);
         self::assertTrue($jwtIsValid);
+    }
+
+    public function testShouldGetSignedToken() {
+        $token = $this->broadcaster->getSignedToken(null, null, 'user123');
+        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $header = $parsedToken["header"];
+        $payload = $parsedToken["payload"];
+
+        self::assertEquals("JWT", $header["typ"]);
+        self::assertEquals("HS256", $header["alg"]);
+        self::assertEquals("abcd", $header["kid"]);
+
+        self::assertEquals(array('public:*' => ["subscribe", "history", "channel-metadata"]), $payload["x-ably-capability"]);
+        self::assertEquals("user123", $payload["x-ably-clientId"]);
+
+        self::assertEquals("integer", gettype($payload["iat"]));
+        self::assertEquals("integer", gettype($payload["exp"]));
+    }
+
+    public function testShouldGetSignedTokenForGivenChannel() {
+        $token = $this->broadcaster->getSignedToken("private:channel", null, 'user123');
+        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $header = $parsedToken["header"];
+        $payload = $parsedToken["payload"];
+
+        self::assertEquals("JWT", $header["typ"]);
+        self::assertEquals("HS256", $header["alg"]);
+        self::assertEquals("abcd", $header["kid"]);
+
+        $expectedCapability = array(
+            'public:*' => ["subscribe", "history", "channel-metadata"],
+            'private:channel' => ["*"]
+        );
+        self::assertEquals( $expectedCapability, $payload["x-ably-capability"]);
+        self::assertEquals("user123", $payload["x-ably-clientId"]);
+
+        self::assertEquals("integer", gettype($payload["iat"]));
+        self::assertEquals("integer", gettype($payload["exp"]));
+    }
+
+    public function testShouldHaveUpgradedCapabilitiesForValidToken() {
+        $token = $this->broadcaster->getSignedToken("private:channel", null, 'user123');
+
+        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $payload = $parsedToken["payload"];
+        self::assertEquals("integer", gettype($payload["iat"]));
+        self::assertEquals("integer", gettype($payload["exp"]));
+        $iat = $payload["iat"];
+        $exp = $payload["exp"];
+
+        $token = $this->broadcaster->getSignedToken("private:channel2", $token, 'user123');
+        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $payload = $parsedToken["payload"];
+        $expectedCapability = array(
+            'public:*' => ["subscribe", "history", "channel-metadata"],
+            'private:channel' => ["*"],
+            'private:channel2' => ["*"]
+        );
+        self::assertEquals("user123", $payload["x-ably-clientId"]);
+        self::assertEquals( $expectedCapability, $payload["x-ably-capability"]);
+        self::assertEquals($iat, $payload["iat"]);
+        self::assertEquals($exp, $payload["exp"]);
+
+        $token = $this->broadcaster->getSignedToken("private:channel3", $token, 'user98');
+        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $payload = $parsedToken["payload"];
+        $expectedCapability = array(
+            'public:*' => ["subscribe", "history", "channel-metadata"],
+            'private:channel' => ["*"],
+            'private:channel2' => ["*"],
+            'private:channel3' => ["*"],
+        );
+        self::assertEquals("user98", $payload["x-ably-clientId"]);
+        self::assertEquals( $expectedCapability, $payload["x-ably-capability"]);
+        self::assertEquals($iat, $payload["iat"]);
+        self::assertEquals($exp, $payload["exp"]);
+    }
+
+    public function testAuthSignedToken() {
+
+    }
+
+    public function testShouldFormatChannels() {
+        $result = $this->broadcaster->formatChannels(['private-hello']);
+        self::assertEquals("private:hello", $result[0]);
+
+        $result = $this->broadcaster->formatChannels(['presence-hello']);
+        self::assertEquals("presence:hello", $result[0]);
+
+        $result = $this->broadcaster->formatChannels(['hello']);
+        self::assertEquals("public:hello", $result[0]);
     }
 
     /**
