@@ -764,6 +764,30 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
     }
 
+    public function testCanSetCanMiddlewareOnRegisteredResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->can('create', Router::class);
+
+        $this->seeMiddleware('can:create,Illuminate\Routing\Router');
+    }
+
+    public function testMiddlewareAndCanDoesNotOverrideEachOtherOnRegisteredResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->middleware('can:1')
+                     ->can('2')
+                     ->middleware('3')
+                     ->can('4');
+
+        $this->assertEquals([
+            'can:1',
+            'can:2',
+            '3',
+            'can:4',
+        ], $this->getRoute()->middleware());
+    }
+
     public function testResourceWithoutMiddlewareRegistration()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)

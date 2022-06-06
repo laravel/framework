@@ -149,15 +149,33 @@ class PendingResourceRegistration
      */
     public function middleware($middleware)
     {
-        $middleware = Arr::wrap($middleware);
+        if (! is_array($middleware)) {
+            $middleware = func_get_args();
+        }
 
         foreach ($middleware as $key => $value) {
             $middleware[$key] = (string) $value;
         }
 
-        $this->options['middleware'] = $middleware;
+        $this->options['middleware'] = array_merge(
+            (array) ($this->options['middleware'] ?? []), $middleware
+        );
 
         return $this;
+    }
+
+    /**
+     * Specify that the "Authorize" / "can" middleware should be applied to the route with the given options.
+     *
+     * @param  string  $ability
+     * @param  array|string  $models
+     * @return $this
+     */
+    public function can($ability, $models = [])
+    {
+        return empty($models)
+                    ? $this->middleware(['can:'.$ability])
+                    : $this->middleware(['can:'.$ability.','.implode(',', Arr::wrap($models))]);
     }
 
     /**
