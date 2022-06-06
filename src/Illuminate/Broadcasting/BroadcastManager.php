@@ -56,7 +56,7 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Register the routes for handling broadcast authentication and sockets.
+     * Register the routes for handling broadcast channel authentication and sockets.
      *
      * @param  array|null  $attributes
      * @return void
@@ -78,7 +78,7 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Register the routes for handling broadcast authentication.
+     * Register the routes for handling broadcast user authentication.
      *
      * @param  array|null  $attributes
      * @return void
@@ -100,7 +100,9 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Alias for routes().
+     * Register the routes for handling broadcast authentication and sockets.
+     *
+     * Alias of "routes" method.
      *
      * @param  array|null  $attributes
      * @return void
