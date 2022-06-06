@@ -201,6 +201,43 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if all items exist in the collection their values.
+     *
+     * @param  array $values
+     * @return bool
+     */
+    public function containsAll($values)
+    {
+        $values = new static(array_unique($values));
+
+        return $this->intersect($values)->count() == $values->count();
+    }
+
+    /**
+     * Determine if any of the items exist in the collection their values.
+     *
+     * @param  array $values
+     * @return bool
+     */
+    public function containsAny($values)
+    {
+        $values = new static(array_unique($values));
+
+        return $this->intersect($values)->count() > 0;
+    }
+
+    /**
+     * Determine if none of the items exist in the collection their values.
+     *
+     * @param  array $values
+     * @return bool
+     */
+    public function containsNone($values)
+    {
+        return ! $this->containsAny($values);
+    }
+
+    /**
      * Cross join with the given lists, returning all possible permutations.
      *
      * @template TCrossJoinKey

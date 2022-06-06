@@ -250,6 +250,39 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if all items exist in the collection their values.
+     *
+     * @param  array $values
+     * @return bool
+     */
+    public function containsAll($values)
+    {
+        return $this->collect()->containsAll($values);
+    }
+
+    /**
+     * Determine if any of the items exist in the collection their values.
+     *
+     * @param  array $values
+     * @return bool
+     */
+    public function containsAny($values)
+    {
+        return $this->collect()->containsAny($values);
+    }
+
+    /**
+     * Determine if none of the items exist in the collection their values.
+     *
+     * @param  array $values
+     * @return bool
+     */
+    public function containsNone($values)
+    {
+        return ! $this->containsAny($values);
+    }
+
+    /**
      * Cross join the given iterables, returning all possible permutations.
      *
      * @template TCrossJoinKey
