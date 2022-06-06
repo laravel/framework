@@ -252,7 +252,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if all items exist in the collection their values.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return bool
      */
     public function containsAll($values)
@@ -263,7 +263,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if any of the items exist in the collection their values.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return bool
      */
     public function containsAny($values)
@@ -274,7 +274,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if none of the items exist in the collection their values.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return bool
      */
     public function containsNone($values)

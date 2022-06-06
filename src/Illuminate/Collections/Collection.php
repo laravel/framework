@@ -203,7 +203,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if all items exist in the collection their values.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return bool
      */
     public function containsAll($values)
@@ -216,7 +216,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if any of the items exist in the collection their values.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return bool
      */
     public function containsAny($values)
@@ -229,7 +229,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Determine if none of the items exist in the collection their values.
      *
-     * @param  array $values
+     * @param  array  $values
      * @return bool
      */
     public function containsNone($values)

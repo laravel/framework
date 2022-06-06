@@ -3368,7 +3368,7 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
-    public function testContainsAll($collection) 
+    public function testContainsAll($collection)
     {
         $c = new $collection([1, 3, 5]);
 
@@ -3386,7 +3386,7 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([1, 3, 5]);
 
         $this->assertTrue($c->containsAny([1, 2]));
-        $this->assertFalse($c->containsAny([2,4]));
+        $this->assertFalse($c->containsAny([2, 4]));
     }
 
     /**
