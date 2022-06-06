@@ -73,17 +73,18 @@ class RouteRegistrarTest extends TestCase
     public function testMiddlewareAndCanDoesNotOverrideEachOtherOnFluentRegistration()
     {
         $this->router->middleware('can:1')
-                     ->can('2')
-                     ->middleware('3')
-                     ->can('4')
+                     ->can('2', 'a')
+                     ->middleware('3', '4')
+                     ->can('5')
                      ->get('users', fn() => 'all-users');
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals([
             'can:1',
-            'can:2',
+            'can:2,a',
             '3',
-            'can:4',
+            '4',
+            'can:5',
         ], $this->getRoute()->middleware());
     }
 
@@ -797,19 +798,31 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('can:create,Illuminate\Routing\Router');
     }
 
+    public function testCanSetMultipleMiddlewareOnRegisteredResource()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+                     ->middleware('3', '4');
+
+        $this->assertEquals([
+            '3',
+            '4',
+        ], $this->getRoute()->middleware());
+    }
+
     public function testMiddlewareAndCanDoesNotOverrideEachOtherOnRegisteredResource()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)
                      ->middleware('can:1')
                      ->can('2')
-                     ->middleware('3')
-                     ->can('4');
+                     ->middleware('3', '4')
+                     ->can('5');
 
         $this->assertEquals([
             'can:1',
             'can:2',
             '3',
-            'can:4',
+            '4',
+            'can:5',
         ], $this->getRoute()->middleware());
     }
 
