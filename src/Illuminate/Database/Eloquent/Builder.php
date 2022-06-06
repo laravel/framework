@@ -418,7 +418,7 @@ class Builder implements BuilderContract
      * Find a model by its primary key.
      *
      * @param  mixed  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
     public function find($id, $columns = ['*'])
@@ -434,7 +434,7 @@ class Builder implements BuilderContract
      * Find multiple models by their primary keys.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findMany($ids, $columns = ['*'])
@@ -452,7 +452,7 @@ class Builder implements BuilderContract
      * Find a model by its primary key or throw an exception.
      *
      * @param  mixed  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
@@ -486,7 +486,7 @@ class Builder implements BuilderContract
      * Find a model by its primary key or return fresh model instance.
      *
      * @param  mixed  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function findOrNew($id, $columns = ['*'])
@@ -502,7 +502,7 @@ class Builder implements BuilderContract
      * Find a model by its primary key or call a callback.
      *
      * @param  mixed  $id
-     * @param  \Closure|array  $columns
+     * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed
      */
@@ -572,7 +572,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
@@ -589,7 +589,7 @@ class Builder implements BuilderContract
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @param  \Closure|array  $columns
+     * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
@@ -865,7 +865,7 @@ class Builder implements BuilderContract
      * Paginate the given query.
      *
      * @param  int|null|\Closure  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -897,7 +897,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a simple paginator.
      *
      * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -923,7 +923,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a cursor paginator.
      *
      * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
