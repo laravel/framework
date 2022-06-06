@@ -136,7 +136,7 @@ class AblyBroadcaster extends Broadcaster
             'public:*' => ["subscribe", "history", "channel-metadata"]
         );
         $serverTimeFn = function () { return $this->ably->time() / 1000; }; // TODO - Update with server offset
-        if ($token && self::isJwtValid($token, $serverTimeFn)) {
+        if ($token && $this->isJwtValid($token, $serverTimeFn)) {
             $payload = self::parseJwt($token)['payload'];
             $iat = $payload['iat'];
             $exp = $payload['exp'];
@@ -155,7 +155,7 @@ class AblyBroadcaster extends Broadcaster
             "x-ably-capability" => $channelClaims
         );
 
-        return self::generateJwt($header, $claims);
+        return $this->generateJwt($header, $claims);
     }
 
     /**
