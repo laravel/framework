@@ -928,6 +928,17 @@ class SupportArrTest extends TestCase
         $this->assertSame('font-bold mt-4 ml-2', $classes);
     }
 
+    public function testTrim()
+    {
+        $trimmed = Arr::trim(['a', ' b', "c \t\v", ["\r\n d "]]);
+
+        $this->assertEquals(['a', 'b', 'c', ['d']], $trimmed);
+
+        $trimmed = Arr::trim(['a*', '*b', '*c*', ['*d*']], '*');
+
+        $this->assertEquals(['a', 'b', 'c', ['d']], $trimmed);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];

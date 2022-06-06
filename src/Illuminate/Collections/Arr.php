@@ -794,6 +794,22 @@ class Arr
     }
 
     /**
+     * Recursively trim the values in the array using the given characters.
+     *
+     * @param  array  $array
+     * @param  string  $characters
+     * @return array
+     */
+    public static function trim(array $array, string $characters = " \n\r\t\v\x00"): array
+    {
+        foreach ($array as & $value) {
+            $value = is_array($value) ? static::trim($value, $characters) : trim($value, $characters);
+        }
+
+        return $array;
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
