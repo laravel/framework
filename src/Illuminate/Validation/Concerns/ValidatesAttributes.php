@@ -1949,7 +1949,7 @@ trait ValidatesAttributes
     {
         return Str::startsWith($value, $parameters);
     }
-    
+
     /**
      * Validate the attribute does not start with a given substring.
      *
