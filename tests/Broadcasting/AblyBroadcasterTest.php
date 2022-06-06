@@ -142,7 +142,10 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals("HS256", $header["alg"]);
         self::assertEquals("abcd", $header["kid"]);
 
-        self::assertEquals(array('public:*' => ["subscribe", "history", "channel-metadata"]), $payload["x-ably-capability"]);
+        $expectedCapability = array(
+            'public:*' => ["subscribe", "history", "channel-metadata"]
+        );
+        self::assertEquals($expectedCapability, $payload["x-ably-capability"]);
         self::assertEquals("user123", $payload["x-ably-clientId"]);
 
         self::assertEquals("integer", gettype($payload["iat"]));
@@ -209,7 +212,33 @@ class AblyBroadcasterTest extends TestCase
     }
 
     public function testAuthSignedToken() {
+        $this->broadcaster->channel('test1', function () {
+            return true;
+        });
+        $this->broadcaster->channel('test2', function () {
+            return true;
+        });
+        $this->broadcaster->shouldReceive('validAuthenticationResponse')
+            ->times(2)
+            ->andReturn(true, array("userid" => "user1234", "info" => "Hello there"));
 
+        $prevResponse = $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('private:test1', null)
+        );
+        self::assertEquals("string", gettype($prevResponse["token"]));
+        $expectedToken = $this->broadcaster->getSignedToken("private:test1", null, 42);
+        self::assertEquals($expectedToken, $prevResponse["token"]);
+
+        $response = $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('presence:test2', $prevResponse["token"])
+        );
+
+        self::assertEquals("string", gettype($response["token"]));
+        $expectedToken = $this->broadcaster->getSignedToken("presence:test2", $prevResponse["token"], 42);
+        self::assertEquals($expectedToken, $response["token"]);
+
+        self::assertEquals("array", gettype($response["info"]));
+        self::assertEquals(array("userid" => "user1234", "info" => "Hello there"), $response["info"]);
     }
 
     public function testShouldFormatChannels() {
