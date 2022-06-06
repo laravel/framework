@@ -802,7 +802,7 @@ class Arr
      */
     public static function trim(array $array, string $characters = " \n\r\t\v\x00"): array
     {
-        foreach ($array as & $value) {
+        foreach ($array as &$value) {
             $value = is_array($value) ? static::trim($value, $characters) : trim($value, $characters);
         }
 
