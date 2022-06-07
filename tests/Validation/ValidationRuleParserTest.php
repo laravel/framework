@@ -40,6 +40,37 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testInvertedConditionalRulesAreProperlyExpandedAndFiltered()
+    {
+        $rules = ValidationRuleParser::filterConditionalRules([
+            'name' => Rule::unless(false, ['required', 'min:2']),
+            'email' => Rule::unless(true, ['required', 'min:2']),
+            'password' => Rule::unless(false, 'required|min:2'),
+            'username' => ['required', Rule::unless(false, ['min:2'])],
+            'address' => ['required', Rule::unless(true, ['min:2'])],
+            'city' => ['required', Rule::unless(function (Fluent $input) {
+                return false;
+            }, ['min:2'])],
+            'state' => ['required', Rule::unless(false, function (Fluent $input) {
+                return 'min:2';
+            })],
+            'zip' => ['required', Rule::unless(true, [], function (Fluent $input) {
+                return ['min:2'];
+            })],
+        ]);
+
+        $this->assertEquals([
+            'name' => ['required', 'min:2'],
+            'email' => [],
+            'password' => ['required', 'min:2'],
+            'username' => ['required', 'min:2'],
+            'address' => ['required'],
+            'city' => ['required', 'min:2'],
+            'state' => ['required', 'min:2'],
+            'zip' => ['required', 'min:2'],
+        ], $rules);
+    }
+
     public function testEmptyRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
@@ -81,12 +112,31 @@ class ValidationRuleParserTest extends TestCase
         ], $rules);
     }
 
+    public function testInvertedConditionalRulesWithDefault()
+    {
+        $rules = ValidationRuleParser::filterConditionalRules([
+            'name' => Rule::unless(false, ['required', 'min:2'], ['string', 'max:10']),
+            'email' => Rule::unless(true, ['required', 'min:2'], ['string', 'max:10']),
+            'password' => Rule::unless(true, 'required|min:2', 'string|max:10'),
+            'username' => ['required', Rule::unless(false, ['min:2'], ['string', 'max:10'])],
+            'address' => ['required', Rule::unless(true, ['min:2'], ['string', 'max:10'])],
+        ]);
+
+        $this->assertEquals([
+            'name' => ['required', 'min:2'],
+            'email' => ['string', 'max:10'],
+            'password' => ['string', 'max:10'],
+            'username' => ['required', 'min:2'],
+            'address' => ['required', 'string', 'max:10'],
+        ], $rules);
+    }
+
     public function testEmptyConditionalRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
-            'name' => Rule::when(true, '', ['string', 'max:10']),
-            'email' => Rule::when(false, ['required', 'min:2'], []),
-            'password' => Rule::when(false, 'required|min:2', 'string|max:10'),
+            'name' => Rule::unless(false, '', ['string', 'max:10']),
+            'email' => Rule::unless(true, ['required', 'min:2'], []),
+            'password' => Rule::unless(true, 'required|min:2', 'string|max:10'),
         ]);
 
         $this->assertEquals([
