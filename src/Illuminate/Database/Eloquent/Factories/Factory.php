@@ -19,6 +19,7 @@ use Throwable;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
  * @method $this trashed()
  */
 abstract class Factory
