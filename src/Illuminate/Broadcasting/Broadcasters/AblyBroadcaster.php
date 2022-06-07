@@ -180,7 +180,7 @@ class AblyBroadcaster extends Broadcaster
             $payload = self::parseJwt($token)['payload'];
             $iat = $payload['iat'];
             $exp = $payload['exp'];
-            $channelClaims = $payload['x-ably-capability'];
+            $channelClaims = json_decode($payload['x-ably-capability'], true);
         } else {
             $iat = $serverTimeFn();
             $exp = $iat + 3600;
@@ -192,7 +192,7 @@ class AblyBroadcaster extends Broadcaster
             "iat" => $iat,
             "exp" => $exp,
             "x-ably-clientId" => $clientId,
-            "x-ably-capability" => $channelClaims
+            "x-ably-capability" => json_encode($channelClaims)
         );
 
         return $this->generateJwt($header, $claims);
