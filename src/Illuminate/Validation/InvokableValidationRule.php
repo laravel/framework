@@ -54,7 +54,8 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     public static function make($invokable)
     {
         if ($invokable->implicit ?? false) {
-            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {
+            return new class($invokable) extends InvokableValidationRule implements ImplicitRule
+            {
                 //
             };
         }
@@ -145,11 +146,8 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      */
     protected function pendingPotentiallyTranslatedString($message)
     {
-        return new class (
-            $message,
-            $this->validator->getTranslator(),
-            fn ($message) => $this->messages[] = $message
-        ) extends PotentiallyTranslatedString {
+        return new class($message, $this->validator->getTranslator(), fn ($message) => $this->messages[] = $message) extends PotentiallyTranslatedString
+        {
             /**
              * The callback to call when the object destructs.
              *

@@ -32,7 +32,7 @@ class PotentiallyTranslatedString implements Stringable
      * Create a new potentially translated string.
      *
      * @param  string  $string
-     * @param \Illuminate\Contracts\Translation\Translator  $translator
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      */
     public function __construct($string, $translator)
     {
