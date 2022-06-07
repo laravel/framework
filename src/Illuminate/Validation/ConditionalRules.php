@@ -28,18 +28,27 @@ class ConditionalRules
     protected $defaultRules;
 
     /**
+     * Whether the condition should pass for a falsey value.
+     *
+     * @var bool
+     */
+    protected $isInverted;
+
+    /**
      * Create a new conditional rules instance.
      *
      * @param  callable|bool  $condition
      * @param  array|string|\Closure  $rules
      * @param  array|string|\Closure  $defaultRules
+     * @param  bool $isInverted
      * @return void
      */
-    public function __construct($condition, $rules, $defaultRules = [])
+    public function __construct($condition, $rules, $defaultRules = [], $isInverted = false)
     {
         $this->condition = $condition;
         $this->rules = $rules;
         $this->defaultRules = $defaultRules;
+        $this->isInverted = $isInverted;
     }
 
     /**
@@ -50,9 +59,10 @@ class ConditionalRules
      */
     public function passes(array $data = [])
     {
-        return is_callable($this->condition)
+        $result = is_callable($this->condition)
                     ? call_user_func($this->condition, new Fluent($data))
                     : $this->condition;
+        return $this->isInverted ? ! $result : $result;
     }
 
     /**
