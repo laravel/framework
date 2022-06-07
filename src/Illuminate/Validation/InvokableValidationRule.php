@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
+use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
@@ -46,6 +47,17 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     protected $data = [];
 
     /**
+     * Create a new explicit Invokable validation rule.
+     *
+     * @param  \Illuminate\Contracts\Validation\InvokableRule  $invokable
+     * @return void
+     */
+    protected function __construct(InvokableRule $invokable)
+    {
+        $this->invokable = $invokable;
+    }
+
+    /**
      * Create a new implicit or explicit Invokable validation rule.
      *
      * @param  \Illuminate\Contracts\Validation\InvokableRule  $invokable
@@ -61,17 +73,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
         }
 
         return new InvokableValidationRule($invokable);
-    }
-
-    /**
-     * Create a new explicit Invokable validation rule.
-     *
-     * @param  \Illuminate\Contracts\Validation\InvokableRule  $invokable
-     * @return void
-     */
-    protected function __construct($invokable)
-    {
-        $this->invokable = $invokable;
     }
 
     /**
