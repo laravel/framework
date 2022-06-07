@@ -40,7 +40,7 @@ class ConditionalRules
      * @param  callable|bool  $condition
      * @param  array|string|\Closure  $rules
      * @param  array|string|\Closure  $defaultRules
-     * @param  bool $isInverted
+     * @param  bool  $isInverted
      * @return void
      */
     public function __construct($condition, $rules, $defaultRules = [], $isInverted = false)
