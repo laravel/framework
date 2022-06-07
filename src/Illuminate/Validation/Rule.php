@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\ExcludeIf;
@@ -137,5 +138,24 @@ class Rule
     public static function unique($table, $column = 'NULL')
     {
         return new Unique($table, $column);
+    }
+
+    /**
+     * Get default Validation Rules defined for the Model
+     *
+     * @param  Model|string  $model
+     * @return mixed|void
+     */
+    public static function model(Model|string $model)
+    {
+        if($model instanceof Model) {
+            return $model->getRules();
+        }
+
+        if(class_exists($model) && in_array(Model::class, class_parents(new $model))) {
+            return (new $model)->getRules();
+        }
+
+        throw ValidationException::withMessages(["$model not found for Validation"]);
     }
 }

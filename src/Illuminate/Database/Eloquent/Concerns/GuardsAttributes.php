@@ -12,6 +12,13 @@ trait GuardsAttributes
     protected $fillable = [];
 
     /**
+     * The attributes default Validation Rules
+     *
+     * @var array<string>
+     */
+    protected $rules = [];
+
+    /**
      * The attributes that aren't mass assignable.
      *
      * @var array<string>|bool
@@ -251,5 +258,10 @@ trait GuardsAttributes
         }
 
         return $attributes;
+    }
+
+    public function getRules()
+    {
+        return $this->rules;
     }
 }
