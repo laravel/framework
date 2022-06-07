@@ -62,6 +62,7 @@ class ConditionalRules
         $result = is_callable($this->condition)
                     ? call_user_func($this->condition, new Fluent($data))
                     : $this->condition;
+
         return $this->isInverted ? ! $result : $result;
     }
 
