@@ -505,6 +505,35 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, or execute the given Closure and store the result until dependency is false.
+     *
+     * @param $key
+     * @param $value
+     * @param $dependency
+     * @return mixed
+     */
+    public function rememberUntil($key, $value, $dependency)
+    {
+        $dependency = $dependency instanceof Closure ? $dependency() : $dependency;
+
+        if ($dependency == false) {
+            $this->store->forget($this->itemKey($key));
+        }
+
+        $cache = $this->store->get($key);
+
+        if (! is_null($cache)) {
+            return $cache;
+        }
+
+        $result = $value instanceof Closure ? $value() : $value;
+
+        $this->forever($key, $result);
+
+        return $result;
+    }
+
+    /**
      * Format the key for a cache item.
      *
      * @param  string  $key
