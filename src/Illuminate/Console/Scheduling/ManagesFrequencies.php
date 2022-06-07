@@ -470,6 +470,8 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run quarterly on a given day and time.
      *
+     * @param  int  $dayOfQuarter
+     * @param  int  $time
      * @return $this
      */
     public function quarterlyOn($dayOfQuarter = 1, $time = '0:0')
