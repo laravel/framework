@@ -321,8 +321,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Set the foreign key for a relationship to another model.
      *
-     * @param  Model  $model
-     * @param  string  $relationship
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string|null  $relationship
      * @return $this
      */
     public function for($model, $relationship = null)
