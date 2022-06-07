@@ -627,7 +627,7 @@ trait ReplacesAttributes
 
         return str_replace(':values', implode(', ', $parameters), $message);
     }
-    
+
     /**
      * Replace all place-holders for the doesnt_start_with rule.
      *
