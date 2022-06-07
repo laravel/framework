@@ -2158,6 +2158,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The url must start with one of the following values http, https', $v->messages()->first('url'));
     }
 
+    public function testValidateDoesntStartWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'world hello'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateString()
     {
         $trans = $this->getIlluminateArrayTranslator();
