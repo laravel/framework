@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class AblyBroadcaster extends Broadcaster
 {
+    private static $serverTimeDiff = null;
     /**
      * The AblyRest SDK instance.
      *
@@ -31,6 +32,18 @@ class AblyBroadcaster extends Broadcaster
     public function __construct(AblyRest $ably)
     {
         $this->ably = $ably;
+        if (self::$serverTimeDiff == null) {
+            self::setServerTime(round($this->ably->time() / 1000));
+        }
+    }
+
+    /**
+     * @param $time int
+     * @return void
+     */
+    private static function setServerTime($time)
+    {
+        self::$serverTimeDiff = time() - $time;
     }
 
     /**
@@ -50,7 +63,7 @@ class AblyBroadcaster extends Broadcaster
 
         $user = $this->retrieveUser($request, $normalizedChannelName);
         if ($this->isGuardedChannel($channelName) && !$user) {
-            throw new AccessDeniedHttpException("User not authenticated, ". $this->stringify($channelName, $connectionId));
+            throw new AccessDeniedHttpException("User not authenticated, " . $this->stringify($channelName, $connectionId));
         }
 
         $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
@@ -59,13 +72,13 @@ class AblyBroadcaster extends Broadcaster
         try {
             $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
         } catch (\Exception $e) {
-            throw new AccessDeniedHttpException("Access denied, ". $this->stringify($channelName, $connectionId, $userId), $e);
+            throw new AccessDeniedHttpException("Access denied, " . $this->stringify($channelName, $connectionId, $userId), $e);
         }
 
         try {
             $signedToken = $this->getSignedToken($channelName, $token, $userId);
         } catch (\Exception $_) { // excluding exception to avoid exposing private key
-            throw new AccessDeniedHttpException("malformed token, ".$this->stringify($channelName, $connectionId, $userId));
+            throw new AccessDeniedHttpException("malformed token, " . $this->stringify($channelName, $connectionId, $userId));
         }
 
         $response = array('token' => $signedToken);
@@ -73,14 +86,6 @@ class AblyBroadcaster extends Broadcaster
             $response['info'] = $userData;
         }
         return $response;
-    }
-
-    protected function stringify($channelName, $connectionId, $userId = null) {
-        $message = "channel-name:".$channelName." ably-connection-id:". $connectionId;
-        if ($userId) {
-            return "user-id:".$userId." ".$message;
-        }
-        return $message;
     }
 
     /**
@@ -124,6 +129,15 @@ class AblyBroadcaster extends Broadcaster
         return $this->isPrivateChannel($channel) || $this->isPresenceChannel($channel);
     }
 
+    protected function stringify($channelName, $connectionId, $userId = null)
+    {
+        $message = "channel-name:" . $channelName . " ably-connection-id:" . $connectionId;
+        if ($userId) {
+            return "user-id:" . $userId . " " . $message;
+        }
+        return $message;
+    }
+
     function getSignedToken($channelName, $token, $clientId)
     {
         $header = array(
@@ -135,14 +149,16 @@ class AblyBroadcaster extends Broadcaster
         $channelClaims = array(
             'public:*' => ["subscribe", "history", "channel-metadata"]
         );
-        $serverTimeFn = function () { return $this->ably->time() / 1000; }; // TODO - Update with server offset
+        $serverTimeFn = function () {
+            return self::getServerTime();
+        };
         if ($token && $this->isJwtValid($token, $serverTimeFn)) {
             $payload = self::parseJwt($token)['payload'];
             $iat = $payload['iat'];
             $exp = $payload['exp'];
             $channelClaims = $payload['x-ably-capability'];
         } else {
-            $iat = round($serverTimeFn());
+            $iat = $serverTimeFn();
             $exp = $iat + 3600;
         }
         if ($channelName) {
@@ -168,6 +184,17 @@ class AblyBroadcaster extends Broadcaster
         return Str::before($this->ably->options->key, ':');
     }
 
+    /**
+     * @return int
+     */
+    private static function getServerTime()
+    {
+        if (self::$serverTimeDiff != null) {
+            return time() - self::$serverTimeDiff;
+        }
+        return time();
+    }
+
     function isJwtValid($jwt, $timeFn)
     {
         // split the jwt
@@ -187,11 +214,6 @@ class AblyBroadcaster extends Broadcaster
         return $isSignatureValid && !$isTokenExpired;
     }
 
-    static function base64urlEncode($str)
-    {
-        return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
-    }
-
     /**
      * Get the private token value from the Ably key.
      *
@@ -200,6 +222,11 @@ class AblyBroadcaster extends Broadcaster
     protected function getPrivateToken()
     {
         return Str::after($this->ably->options->key, ':');
+    }
+
+    static function base64urlEncode($str)
+    {
+        return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
     }
 
     /**
@@ -211,7 +238,7 @@ class AblyBroadcaster extends Broadcaster
         $tokenParts = explode('.', $jwt);
         $header = json_decode(base64_decode($tokenParts[0]), true);
         $payload = json_decode(base64_decode($tokenParts[1]), true);;
-        return array('header'=> $header, 'payload' => $payload);
+        return array('header' => $header, 'payload' => $payload);
     }
 
     function generateJwt($headers, $payload)
