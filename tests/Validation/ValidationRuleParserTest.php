@@ -134,6 +134,21 @@ class ValidationRuleParserTest extends TestCase
     public function testEmptyConditionalRulesArePreserved()
     {
         $rules = ValidationRuleParser::filterConditionalRules([
+            'name' => Rule::when(true, '', ['string', 'max:10']),
+            'email' => Rule::when(false, ['required', 'min:2'], []),
+            'password' => Rule::when(false, 'required|min:2', 'string|max:10'),
+        ]);
+
+        $this->assertEquals([
+            'name' => [],
+            'email' => [],
+            'password' => ['string', 'max:10'],
+        ], $rules);
+    }
+
+    public function testEmptyInvertedConditionalRulesArePreserved()
+    {
+        $rules = ValidationRuleParser::filterConditionalRules([
             'name' => Rule::unless(false, '', ['string', 'max:10']),
             'email' => Rule::unless(true, ['required', 'min:2'], []),
             'password' => Rule::unless(true, 'required|min:2', 'string|max:10'),
