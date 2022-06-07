@@ -31,6 +31,19 @@ class Rule
     }
 
     /**
+     * Create a new inverted conditional rule set.
+     *
+     * @param  callable|bool  $condition
+     * @param  array|string|\Closure  $rules
+     * @param  array|string|\Closure  $defaultRules
+     * @return \Illuminate\Validation\ConditionalRules
+     */
+    public static function unless($condition, $rules, $defaultRules = [])
+    {
+        return new ConditionalRules(! $condition, $rules, $defaultRules);
+    }
+
+    /**
      * Get a dimensions constraint builder instance.
      *
      * @param  array  $constraints
