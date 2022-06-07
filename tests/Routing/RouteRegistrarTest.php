@@ -64,7 +64,7 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanMiddlewareFluentRegistration()
     {
-        $this->router->can('see', 'a_class')->get('users', fn() => 'all-users');
+        $this->router->can('see', 'a_class')->get('users', fn () => 'all-users');
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals(['can:see,a_class'], $this->getRoute()->middleware());
@@ -76,7 +76,7 @@ class RouteRegistrarTest extends TestCase
                      ->can('2', 'a')
                      ->middleware('3', '4')
                      ->can('5')
-                     ->get('users', fn() => 'all-users');
+                     ->get('users', fn () => 'all-users');
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertEquals([
