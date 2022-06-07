@@ -2169,6 +2169,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateContainsWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'some bad word f***'], ['x' => 'contains_with:f***,s***']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'some word'], ['x' => 'contains_with:f***,s***']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateDoesntContainsWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'some word'], ['x' => 'doesnt_contains_with:other words']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'some word'], ['x' => 'doesnt_contains_with:word']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateString()
     {
         $trans = $this->getIlluminateArrayTranslator();
