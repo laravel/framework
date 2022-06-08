@@ -1490,7 +1490,7 @@ class Builder implements BuilderContract
                 [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
             }
 
-            $preparedRelationships[$prefix.$key] = $this->combineContraints([
+            $preparedRelationships[$prefix.$key] = $this->combineConstraints([
                 $value,
                 $preparedRelationships[$prefix.$key] ?? static function () {
                     //
@@ -1504,10 +1504,10 @@ class Builder implements BuilderContract
     /**
      * Combine an array of constraints into a single constraint.
      *
-     * @param  array  $constriants
+     * @param  array  $constraints
      * @return \Closure
      */
-    protected function combineContraints(array $constraints)
+    protected function combineConstraints(array $constraints)
     {
         return function ($builder) use ($constraints) {
             foreach ($constraints as $constraint) {
