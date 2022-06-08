@@ -81,7 +81,8 @@ class DatabaseEloquentJsonTest extends TestCase
         $this->assertEmpty($newModel->getChanges());
     }
 
-    public function testMySQLJsonUpdateOnNonChangedJsonData() {
+    public function testMySQLJsonUpdateOnNonChangedJsonData()
+    {
         $this->mysqlConnection();
 
         $this->createSchema();
@@ -101,8 +102,9 @@ class DatabaseEloquentJsonTest extends TestCase
         $this->assertEmpty($newModel->getChanges());
     }
 
-    public function testPostgresSqlJsonUpdateOnNonChangedJsonData() {
-        $this->postgreSqlConnection();
+    public function testPostgresSqlJsonUpdateOnNonChangedJsonData()
+    {
+        $this->postgresSqlConnection();
 
         $this->createSchema();
 
