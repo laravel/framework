@@ -9,7 +9,7 @@ use Orchestra\Testbench\TestCase;
 
 class DatabaseEloquentJsonTest extends TestCase
 {
-    protected function setUp(): void
+    protected function sqliteConnection(): void
     {
         $db = new DB;
 
@@ -20,8 +20,37 @@ class DatabaseEloquentJsonTest extends TestCase
 
         $db->bootEloquent();
         $db->setAsGlobal();
+    }
 
-        $this->createSchema();
+    protected function mysqlConnection(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'mysql',
+            'host' => 'localhost',
+            'database' => 'test',
+            'username' => 'root'
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+    }
+
+    protected function postgreSqlConnection(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'pgsql',
+            'host' => 'localhost',
+            'database' => 'test',
+            'username' => 'postgres',
+            'password' => 'password'
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
     }
 
     protected function tearDown(): void
@@ -42,8 +71,52 @@ class DatabaseEloquentJsonTest extends TestCase
         });
     }
 
-    public function testJsonUpdateOnNonChangedJsonData()
+    public function testSQLiteJsonUpdateOnNonChangedJsonData()
     {
+        $this->sqliteConnection();
+
+        $this->createSchema();
+
+        $sample_data = [
+            'aa' => 1,
+            'b' => 2,
+        ];
+
+        $model = new JsonTest();
+        $model->sample_data = $sample_data;
+        $model->save();
+
+        $newModel = JsonTest::find(1);
+        $newModel->sample_data = $sample_data;
+        $newModel->save();
+        $this->assertEmpty($newModel->getChanges());
+    }
+
+    public function testMySQLJsonUpdateOnNonChangedJsonData() {
+        $this->mysqlConnection();
+
+        $this->createSchema();
+
+        $sample_data = [
+            'aa' => 1,
+            'b' => 2,
+        ];
+
+        $model = new JsonTest();
+        $model->sample_data = $sample_data;
+        $model->save();
+
+        $newModel = JsonTest::find(1);
+        $newModel->sample_data = $sample_data;
+        $newModel->save();
+        $this->assertEmpty($newModel->getChanges());
+    }
+
+    public function testPostgresSqlJsonUpdateOnNonChangedJsonData() {
+        $this->postgreSqlConnection();
+
+        $this->createSchema();
+
         $sample_data = [
             'aa' => 1,
             'b' => 2,
