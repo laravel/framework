@@ -1,6 +1,13 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.15...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.16...8.x)
+
+
+## [v8.83.16 (2022-06-07)](https://github.com/laravel/framework/compare/v8.83.15...v8.83.16)
+
+### Fixed
+- Free reserved memory before handling fatal errors ([#42630](https://github.com/laravel/framework/pull/42630), [#42646](https://github.com/laravel/framework/pull/42646))
+- Prevent $mailer being reset when testing mailables that implement ShouldQueue ([#42695](https://github.com/laravel/framework/pull/42695))
 
 
 ## [v8.83.15 (2022-05-31)](https://github.com/laravel/framework/compare/v8.83.14...v8.83.15)
