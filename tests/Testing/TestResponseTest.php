@@ -1853,7 +1853,7 @@ class TestResponseTest extends TestCase
         ]));
 
         $store->save(); // Required to serialize error bag to JSON
- 
+
         $response = TestResponse::fromBaseResponse(new Response());
 
         $response->assertSessionHasErrors(['foo']);

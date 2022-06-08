@@ -1444,7 +1444,7 @@ EOF;
         if (! $session->isStarted()) {
             $session->start();
         }
-        
+
         return $session;
     }
 
