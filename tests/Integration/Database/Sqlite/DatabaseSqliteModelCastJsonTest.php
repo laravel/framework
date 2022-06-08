@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonArray;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonObject;
@@ -50,7 +51,7 @@ class DatabaseSqliteModelCastJsonTest extends SqlServerTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges().' is not the expected '.json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), Arr::first($newModel->getChanges()).' is not the expected '.json_encode($sampleData));
     }
 
     public function testModelJsonArrayCastUpdateWithSameArrayDoesNotAffectChanges()
@@ -68,6 +69,6 @@ class DatabaseSqliteModelCastJsonTest extends SqlServerTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges().' is not the expected '.json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), Arr::first($newModel->getChanges()).' is not the expected '.json_encode($sampleData));
     }
 }
