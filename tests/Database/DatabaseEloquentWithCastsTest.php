@@ -23,9 +23,9 @@ class DatabaseEloquentWithCastsTest extends TestCase
 
         $db->addConnection([
             'driver' => 'mysql',
-            'host' => 'localhost',
+            'host' => '127.0.0.1',
             'database' => 'forge',
-            'username' => 'forge',
+            'username' => 'root',
         ], 'mysql');
 
         $db->addConnection([
