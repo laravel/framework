@@ -798,6 +798,12 @@ class Builder implements BuilderContract
         return $this->whereNested(function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
+                    if (count($value) === 3) {
+                        if ($value[1] === 'in') {
+                            $query->whereIn($value[0], $value[2]);
+                            continue;
+                        }
+                    }
                     $query->{$method}(...array_values($value));
                 } else {
                     $query->$method($key, '=', $value, $boolean);
