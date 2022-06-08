@@ -11,4 +11,5 @@ class JsonArray extends Model
     protected $casts = [
         'sample_data' => 'array',
     ];
+
 }

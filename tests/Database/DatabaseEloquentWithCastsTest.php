@@ -3,9 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithCastsTest extends TestCase

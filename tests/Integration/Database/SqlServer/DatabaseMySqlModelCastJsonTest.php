@@ -2,15 +2,16 @@
 
 namespace Illuminate\Tests\Integration\Database\SqlServer;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonArray;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonObject;
 
 class DatabaseMySqlModelCastJsonTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed() {
+    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    {
         Schema::create('json_arrays', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
@@ -22,17 +23,20 @@ class DatabaseMySqlModelCastJsonTest extends DatabaseTestCase
         });
     }
 
-    protected function destroyDatabaseMigrations() {
+    protected function destroyDatabaseMigrations()
+    {
         Schema::drop('json_arrays');
 
         Schema::drop('json_objects');
     }
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
     }
 
-    public function testModelJsonObjectCastUpdateWithSameArrayDoesNotAffectChanges() {
+    public function testModelJsonObjectCastUpdateWithSameArrayDoesNotAffectChanges()
+    {
         $sampleData = [
             'aa' => 1,
             'b' => 2,
@@ -49,7 +53,8 @@ class DatabaseMySqlModelCastJsonTest extends DatabaseTestCase
         $this->assertEmpty($newModel->getChanges());
     }
 
-    public function testModelJsonArrayCastUpdateWithSameArrayDoesNotAffectChanges() {
+    public function testModelJsonArrayCastUpdateWithSameArrayDoesNotAffectChanges()
+    {
         $sampleData = [
             'aa' => 1,
             'b' => 2,
@@ -65,4 +70,5 @@ class DatabaseMySqlModelCastJsonTest extends DatabaseTestCase
 
         $this->assertEmpty($newModel->getChanges());
     }
+
 }
