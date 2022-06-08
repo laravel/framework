@@ -2151,14 +2151,18 @@ class Builder implements BuilderContract
      * Add a "having between " clause to the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
      */
-    public function havingBetween($column, array $values, $boolean = 'and', $not = false)
+    public function havingBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
+
+        if ($values instanceof CarbonPeriod) {
+            $values = $values->toArray();
+        }
 
         $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
 
