@@ -11,5 +11,4 @@ class JsonObject extends Model
     protected $casts = [
         'sample_data' => 'object',
     ];
-
 }

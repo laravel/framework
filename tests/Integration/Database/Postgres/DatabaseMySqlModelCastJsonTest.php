@@ -22,13 +22,15 @@ class DatabaseMySqlModelCastJsonTest extends PostgresTestCase
         });
     }
 
-    protected function destroyDatabaseMigrations() {
+    protected function destroyDatabaseMigrations()
+    {
         Schema::drop('json_arrays');
 
         Schema::drop('json_objects');
     }
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
     }
 
@@ -67,5 +69,4 @@ class DatabaseMySqlModelCastJsonTest extends PostgresTestCase
 
         $this->assertEmpty($newModel->getChanges());
     }
-
 }

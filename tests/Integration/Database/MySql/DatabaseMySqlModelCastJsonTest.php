@@ -29,7 +29,8 @@ class DatabaseMySqlModelCastJsonTest extends MySqlTestCase
         Schema::drop('json_objects');
     }
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
     }
 
@@ -68,5 +69,4 @@ class DatabaseMySqlModelCastJsonTest extends MySqlTestCase
 
         $this->assertEmpty($newModel->getChanges());
     }
-
 }

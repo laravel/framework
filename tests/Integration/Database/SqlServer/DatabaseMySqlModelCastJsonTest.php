@@ -70,5 +70,4 @@ class DatabaseMySqlModelCastJsonTest extends DatabaseTestCase
 
         $this->assertEmpty($newModel->getChanges());
     }
-
 }
