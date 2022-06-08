@@ -2159,7 +2159,7 @@ class Builder implements BuilderContract
     public function havingBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
-        
+
         if ($values instanceof CarbonPeriod) {
             $values = $values->toArray();
         }
