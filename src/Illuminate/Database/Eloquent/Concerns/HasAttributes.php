@@ -1942,7 +1942,7 @@ trait HasAttributes
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
-        } elseif ($this->hasCast($key, ['object', 'collection'])) {
+        } elseif ($this->hasCast($key, ['object', 'collection', 'array'])) {
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
