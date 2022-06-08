@@ -1945,7 +1945,7 @@ trait HasAttributes
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
-        } elseif ($this->hasCast($key, ['array'])) {
+        } elseif ($this->hasCast($key, ['array']) && is_string($attribute) && is_string($original)) {
                 return $attribute === $original;
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
