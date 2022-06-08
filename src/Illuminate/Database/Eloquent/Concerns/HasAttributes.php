@@ -1185,8 +1185,8 @@ trait HasAttributes
     {
         $decoded = json_decode($value, ! $asObject);
 
-        if (!$asObject && is_object($decoded)) {
-            $decoded = (array)$decoded;
+        if (! $asObject && is_object($decoded)) {
+            $decoded = (array) $decoded;
         }
 
         if (is_array($decoded)) {
