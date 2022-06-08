@@ -1183,7 +1183,13 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value, ! $asObject);
+        $decoded = json_decode($value, ! $asObject);
+
+        if(is_array($decoded)) {
+            ksort($decoded);
+        }
+
+        return $decoded;
     }
 
     /**
@@ -1942,11 +1948,9 @@ trait HasAttributes
         } elseif ($this->isDateAttribute($key) || $this->isDateCastableWithCustomFormat($key)) {
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
-        } elseif ($this->hasCast($key, ['object', 'collection'])) {
+        } elseif ($this->hasCast($key, ['object', 'collection', 'array'])) {
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
-        } elseif ($this->hasCast($key, ['array']) && is_string($attribute) && is_string($original)) {
-            return $attribute === $original;
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
                 return false;
