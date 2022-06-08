@@ -1946,7 +1946,7 @@ trait HasAttributes
             return $this->fromJson($attribute) ===
                 $this->fromJson($original);
         } elseif ($this->hasCast($key, ['array']) && is_string($attribute) && is_string($original)) {
-                return $attribute === $original;
+            return $attribute === $original;
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
                 return false;

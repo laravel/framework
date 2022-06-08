@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonArray;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonObject;
 
-class DatabaseMySqlModelCastJsonTest extends PostgresTestCase
+class DatabasePostgresModelCastJsonTest extends PostgresTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
@@ -49,7 +49,7 @@ class DatabaseMySqlModelCastJsonTest extends PostgresTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges() . ' is not the expected ' . json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges().' is not the expected '.json_encode($sampleData));
     }
 
     public function testModelJsonArrayCastUpdateWithSameArrayDoesNotAffectChanges()
@@ -67,6 +67,6 @@ class DatabaseMySqlModelCastJsonTest extends PostgresTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges() . ' is not the expected ' . json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges().' is not the expected '.json_encode($sampleData));
     }
 }

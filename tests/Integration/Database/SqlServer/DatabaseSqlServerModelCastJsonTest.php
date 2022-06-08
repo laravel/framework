@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\Sqlite;
+namespace Illuminate\Tests\Integration\Database\SqlServer;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonArray;
 use Illuminate\Tests\Integration\Database\Fixtures\JsonObject;
-use Illuminate\Tests\Integration\Database\SqlServer\SqlServerTestCase;
 
-class DatabaseMySqlModelCastJsonTest extends SqlServerTestCase
+class DatabaseSqlServerModelCastJsonTest extends DatabaseTestCase
 {
     protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
     {
@@ -50,7 +50,7 @@ class DatabaseMySqlModelCastJsonTest extends SqlServerTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges() . ' is not the expected ' . json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges().' is not the expected '.json_encode($sampleData));
     }
 
     public function testModelJsonArrayCastUpdateWithSameArrayDoesNotAffectChanges()
@@ -68,6 +68,6 @@ class DatabaseMySqlModelCastJsonTest extends SqlServerTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges() . ' is not the expected ' . json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges().' is not the expected '.json_encode($sampleData));
     }
 }
