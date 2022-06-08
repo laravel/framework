@@ -26,28 +26,17 @@ class DatabaseEloquentJsonTest extends TestCase
     {
         $db = new DB;
 
-        $db->addConnection([
-            'driver' => 'mysql',
-            'host' => 'localhost',
-            'database' => 'test',
-            'username' => 'root'
-        ]);
+        $db->addConnection(['host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8', 'isolation_level' => 'REPEATABLE READ']);
 
         $db->bootEloquent();
         $db->setAsGlobal();
     }
 
-    protected function postgreSqlConnection(): void
+    protected function postgresSqlConnection(): void
     {
         $db = new DB;
 
-        $db->addConnection([
-            'driver' => 'pgsql',
-            'host' => 'localhost',
-            'database' => 'test',
-            'username' => 'postgres',
-            'password' => 'password'
-        ]);
+        $db->addConnection(['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8']);
 
         $db->bootEloquent();
         $db->setAsGlobal();
