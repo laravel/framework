@@ -26,7 +26,7 @@ class DatabaseEloquentJsonTest extends TestCase
     {
         $db = new DB;
 
-        $db->addConnection(['host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8', 'isolation_level' => 'REPEATABLE READ']);
+        $db->addConnection(['driver' => 'mysql', 'host' => 'foo', 'database' => 'bar', 'collation' => 'utf8_unicode_ci', 'charset' => 'utf8', 'isolation_level' => 'REPEATABLE READ']);
 
         $db->bootEloquent();
         $db->setAsGlobal();
@@ -36,7 +36,7 @@ class DatabaseEloquentJsonTest extends TestCase
     {
         $db = new DB;
 
-        $db->addConnection(['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8']);
+        $db->addConnection(['driver' => 'pgsql', 'host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8']);
 
         $db->bootEloquent();
         $db->setAsGlobal();
