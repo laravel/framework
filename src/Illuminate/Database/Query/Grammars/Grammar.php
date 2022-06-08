@@ -859,8 +859,29 @@ class Grammar extends BaseGrammar
     protected function compileOrdersToArray(Builder $query, $orders)
     {
         return array_map(function ($order) {
-            return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
+            if(isset($order['sql'])) {
+                return $order['sql'];
+            } elseif(isset($order['field'])) {
+                return $this->compileOrderByField($order);
+            } else {
+                return $this->wrap($order['column']).' '.$order['direction'];
+            }
         }, $orders);
+    }
+
+    /**
+     * Compile the "order by field()" portion of the query.
+     *
+     * @param array $order
+     * @return string
+     */
+    protected function compileOrderByField($order)
+    {
+        $column = $order['column'];
+
+        return 'case '.implode(' ', array_map(function($field, $value) use($column) {
+            return 'when '. $this->wrap($column).'='.$this->wrapValue($field).' then '.($value + 1);
+        }, $order['field'], array_keys($order['field']))).' else '.count($order['field'])+1;
     }
 
     /**

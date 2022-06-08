@@ -2243,6 +2243,33 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "order by field()" clause to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
+     * @param  array  $field
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function orderByField($column, $field)
+    {
+        if ($this->isQueryable($column)) {
+            [$query, $bindings] = $this->createSub($column);
+
+            $column = new Expression('('.$query.')');
+
+            $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
+        }
+
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'column' => $column,
+            'field' => $field,
+        ];
+
+        return $this;
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column

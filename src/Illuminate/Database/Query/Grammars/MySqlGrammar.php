@@ -270,6 +270,19 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the "order by field()" portion of the query.
+     *
+     * @param array $order
+     * @return string
+     */
+    protected function compileOrderByField($order)
+    {
+        return 'field('.$this->wrap($order['column']).', '.implode(', ', array_map(function($field) {
+            return '"'.$field.'"';
+        }, $order['field'])).')';
+    }
+
+    /**
      * Prepare the bindings for an update statement.
      *
      * Booleans, integers, and doubles are inserted into JSON updates as raw values.

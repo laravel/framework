@@ -1284,6 +1284,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testOrderByFields()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderByField('age', [5, 7, 9]);
+        $this->assertSame('select * from "users" order by "email" asc, case when "age"="5" then 1 when "age"="7" then 2 when "age"="9" then 3 else 4', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderByField('age', [5, 7, 9]);
+        $this->assertSame('select * from `users` order by `email` asc, field(`age`, "5", "7", "9")', $builder->toSql());
+    }
+
     public function testOrderBysSqlServer()
     {
         $builder = $this->getSqlServerBuilder();
