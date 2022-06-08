@@ -87,4 +87,5 @@ class JsonTest extends Model
     protected $casts = [
         'sample_data' => 'array',
     ];
+
 }
