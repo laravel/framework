@@ -1185,7 +1185,7 @@ trait HasAttributes
     {
         $decoded = json_decode($value, ! $asObject);
 
-        if(is_array($decoded)) {
+        if (is_array($decoded)) {
             ksort($decoded);
         }
 
