@@ -67,6 +67,6 @@ class DatabaseMySqlModelCastJsonTest extends PostgresTestCase
         $newModel->sample_data = $sampleData;
         $newModel->save();
 
-        $this->assertEmpty($newModel->getChanges(), json_encode($newModel->getChanges()['sample_data']) . ' is not the expected ' . json_encode($sampleData));
+        $this->assertEmpty($newModel->getChanges(), $newModel->getChanges()['sample_data'] . ' is not the expected ' . json_encode($sampleData));
     }
 }
