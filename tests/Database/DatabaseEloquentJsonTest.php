@@ -30,7 +30,7 @@ class DatabaseEloquentJsonTest extends TestCase
             'driver' => 'mysql',
             'host' => 'localhost',
             'database' => 'test',
-            'username' => 'root'
+            'username' => 'root',
         ]);
 
         $db->bootEloquent();
@@ -46,7 +46,7 @@ class DatabaseEloquentJsonTest extends TestCase
             'host' => 'localhost',
             'database' => 'test',
             'username' => 'postgres',
-            'password' => 'password'
+            'password' => 'password',
         ]);
 
         $db->bootEloquent();
@@ -162,5 +162,6 @@ class JsonTest extends Model
     protected $casts = [
         'sample_data' => 'array',
     ];
+
 
 }
