@@ -24,7 +24,8 @@ class DatabaseEloquentJsonTest extends TestCase
         $this->createSchema();
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         $this->schema()->drop('json_tests');
     }
 
@@ -41,10 +42,11 @@ class DatabaseEloquentJsonTest extends TestCase
         });
     }
 
-    public function testJsonUpdateOnNonChangedJsonData() {
+    public function testJsonUpdateOnNonChangedJsonData()
+    {
         $sample_data = [
             'aa' => 1,
-            'b' => 2
+            'b' => 2,
         ];
 
         $model = new JsonTest();
@@ -83,6 +85,6 @@ class JsonTest extends Model
     public $timestamps = false;
 
     protected $casts = [
-        'sample_data' => 'array'
+        'sample_data' => 'array',
     ];
 }
