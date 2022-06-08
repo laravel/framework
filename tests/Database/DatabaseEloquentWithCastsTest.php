@@ -25,14 +25,14 @@ class DatabaseEloquentWithCastsTest extends TestCase
             'driver' => 'mysql',
             'host' => 'localhost',
             'database' => 'forge',
-            'username' => 'forge'
+            'username' => 'forge',
         ], 'mysql');
 
         $db->addConnection([
             'driver' => 'pgsql',
             'host' => 'localhost',
             'database' => 'forge',
-            'username' => 'forge'
+            'username' => 'forge',
         ], 'pgsql');
 
         $db->bootEloquent();
@@ -49,38 +49,39 @@ class DatabaseEloquentWithCastsTest extends TestCase
             $table->timestamps();
         });
 
-        $this->schema()->create('json_arrays', function(Blueprint $table) {
+        $this->schema()->create('json_arrays', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
         });
 
-        $this->schema()->create('json_objects', function(Blueprint $table) {
+        $this->schema()->create('json_objects', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
         });
 
-        $this->schema('mysql')->create('json_arrays', function(Blueprint $table) {
+        $this->schema('mysql')->create('json_arrays', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
         });
 
-        $this->schema('mysql')->create('json_objects', function(Blueprint $table) {
+        $this->schema('mysql')->create('json_objects', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
         });
 
-        $this->schema('pgsql')->create('json_arrays', function(Blueprint $table) {
+        $this->schema('pgsql')->create('json_arrays', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
         });
 
-        $this->schema('pgsql')->create('json_objects', function(Blueprint $table) {
+        $this->schema('pgsql')->create('json_objects', function (Blueprint $table) {
             $table->increments('id');
             $table->json('sample_data');
         });
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         parent::tearDown();
 
         $this->schema('mysql')->drop('json_arrays');
@@ -121,7 +122,7 @@ class DatabaseEloquentWithCastsTest extends TestCase
     {
         $sample_data = [
             'aa' => 1,
-            'b' => 2
+            'b' => 2,
         ];
 
         $model = new JsonArray();
@@ -164,7 +165,7 @@ class DatabaseEloquentWithCastsTest extends TestCase
     {
         $sample_data = [
             'aa' => 1,
-            'b' => 2
+            'b' => 2,
         ];
 
         $model = new JsonObject();
@@ -237,7 +238,7 @@ class JsonObject extends Model
     public $timestamps = false;
 
     protected $casts = [
-        'sample_data' => 'object'
+        'sample_data' => 'object',
     ];
 }
 
