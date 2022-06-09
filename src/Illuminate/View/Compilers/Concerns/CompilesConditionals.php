@@ -337,4 +337,15 @@ trait CompilesConditionals
     {
         return "<?php if{$condition}: echo 'disabled'; endif; ?>";
     }
+
+    /**
+     * Compile a readonly block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileReadonly($condition)
+    {
+        return "<?php if{$condition}: echo 'readonly'; endif; ?>";
+    }
 }
