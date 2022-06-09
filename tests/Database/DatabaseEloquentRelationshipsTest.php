@@ -180,10 +180,10 @@ class CustomPost extends Post
     }
 
     protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
-        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
+        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false, $morphType = null)
     {
         return new CustomMorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
-            $relationName, $inverse);
+            $relationName, $inverse, $morphType);
     }
 
     protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
