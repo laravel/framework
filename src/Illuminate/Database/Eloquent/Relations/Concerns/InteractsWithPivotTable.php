@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 
 trait InteractsWithPivotTable
@@ -134,7 +135,7 @@ trait InteractsWithPivotTable
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
     {
-        return $this->sync(collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($values) {
+        return $this->sync(Arr::mapWithKeys($this->parseIds($ids), function ($id) use ($values) {
             return [$id => $values];
         }), $detaching);
     }
@@ -147,13 +148,13 @@ trait InteractsWithPivotTable
      */
     protected function formatRecordsList(array $records)
     {
-        return collect($records)->mapWithKeys(function ($attributes, $id) {
+        return Arr::mapWithKeys($records, function ($attributes, $id) {
             if (! is_array($attributes)) {
                 [$id, $attributes] = [$attributes, []];
             }
 
             return [$id => $attributes];
-        })->all();
+        });
     }
 
     /**
