@@ -475,9 +475,9 @@ class Arr
      */
     public static function prependKeysWith($array, $prependWith)
     {
-        return Collection::make($array)->mapWithKeys(function ($item, $key) use ($prependWith) {
+        return Arr::mapWithKeys($array, function ($item, $key) use ($prependWith) {
             return [$prependWith.$key => $item];
-        })->all();
+        });
     }
 
     /**
@@ -558,6 +558,30 @@ class Arr
         $items = array_map($callback, $array, $keys);
 
         return array_combine($keys, $items);
+    }
+
+    /**
+     * Run an associative map over each of the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function mapWithKeys(array $array, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -632,6 +632,79 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapWithKeys()
+    {
+        $data = [
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ];
+
+        $mapped = Arr::mapWithKeys($data, function ($pokemon) {
+            return [$pokemon['name'] => $pokemon['type']];
+        });
+
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $mapped,
+        );
+    }
+        
+    public function testMapWithKeysIntegerKeys()
+    {
+        $data = [
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 3, 'name' => 'B'],
+            ['id' => 2, 'name' => 'C'],
+        ];
+
+        $mapped = Arr::mapWithKeys($data, function ($item) {
+            return [$item['id'] => $item];
+        });
+
+        $this->assertSame([1, 3, 2], array_keys($mapped));
+    }
+
+    public function testMapWithKeysMultipleRows()
+    {
+        $data = [
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 3, 'name' => 'C'],
+        ];
+
+        $mapped = Arr::mapWithKeys($data, function ($item) {
+            return [$item['id'] => $item['name'], $item['name'] => $item['id']];
+        });
+
+        $this->assertSame(
+            [
+                1 => 'A',
+                'A' => 1,
+                2 => 'B',
+                'B' => 2,
+                3 => 'C',
+                'C' => 3,
+            ],
+            $mapped,
+        );
+    }
+
+    public function testMapWithKeysCallbackKey()
+    {
+        $data = [
+            3 => ['id' => 1, 'name' => 'A'],
+            5 => ['id' => 3, 'name' => 'B'],
+            4 => ['id' => 2, 'name' => 'C'],
+        ];
+
+        $mapped = Arr::mapWithKeys($data, function ($item, $key) {
+            return [$key => $item['id']];
+        });
+
+        $this->assertSame([3, 5, 4], array_keys($mapped));
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
