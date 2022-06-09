@@ -82,7 +82,7 @@ class EloquentForTest extends DatabaseTestCase
         $anotherUser = User::create(['name' => 'Another name']);
         $post = Post::create(['title' => 'My title']);
 
-        Comment::create([
+        $existingComment = Comment::create([
             'user_id' => $user->id,
             'post_id' => $post->id,
             'content' => 'Hello',
@@ -96,6 +96,7 @@ class EloquentForTest extends DatabaseTestCase
                 'value' => 'Goodbye',
             ]);
 
+        $this->assertSame($comment->id, $existingComment->id);
         $this->assertSame($user->id, $comment->user_id);
     }
 
@@ -105,7 +106,7 @@ class EloquentForTest extends DatabaseTestCase
         $anotherUser = User::create(['name' => 'Another name']);
         $post = Post::create(['title' => 'My title']);
 
-        Comment::create([
+        $existingComment = Comment::create([
             'user_id' => $user->id,
             'post_id' => $post->id,
             'content' => 'Hello',
@@ -119,6 +120,7 @@ class EloquentForTest extends DatabaseTestCase
                 'value' => 'Goodbye',
             ]);
 
+        $this->assertNotSame($comment->id, $existingComment->id);
         $this->assertSame($anotherUser->id, $comment->user_id);
     }
 
