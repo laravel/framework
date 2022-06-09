@@ -264,40 +264,6 @@ class EloquentForTest extends DatabaseTestCase
         $this->assertInstanceOf(Post::class, $comment->blogPost);
     }
 
-    public function testForCanBeUsedOnBuilderGet()
-    {
-        $user = User::create(['name' => 'My name']);
-        $anotherUser = User::create(['name' => 'Another user']);
-        $post = Post::create(['title' => 'My title']);
-
-        $existingCommentOne = Comment::create([
-            'user_id' => $user->id,
-            'post_id' => $post->id,
-            'content' => 'Hello',
-        ]);
-
-        $existingCommentTwo = Comment::create([
-            'user_id' => $user->id,
-            'post_id' => $post->id,
-            'content' => 'Hello',
-        ]);
-
-        // This belongs to a different user and shouldn't be included.
-        $anotherComment = Comment::create([
-            'user_id' => $anotherUser->id,
-            'post_id' => $post->id,
-            'content' => 'Hello',
-        ]);
-
-        $comments = Comment::for($user)
-            ->for($post, 'blogPost')
-            ->get();
-
-        $this->assertCount(2, $comments);
-        $this->assertSame($existingCommentOne->id, $comments[0]->id);
-        $this->assertSame($existingCommentTwo->id, $comments[1]->id);
-    }
-
     public function testForCanBeUsedOnModelUpdate()
     {
         $user = User::create(['name' => 'My name']);
@@ -553,40 +519,6 @@ class EloquentForTest extends DatabaseTestCase
 
         $this->assertSame($post->id, $comments[1]->post_id);
         $this->assertInstanceOf(Post::class, $comments[1]->blogPost);
-    }
-
-    public function testForCanBeUsedOnRelationshipGet()
-    {
-        $user = User::create(['name' => 'My name']);
-        $anotherUser = User::create(['name' => 'Another user']);
-        $post = Post::create(['title' => 'My title']);
-
-        $existingCommentOne = Comment::create([
-            'user_id' => $user->id,
-            'post_id' => $post->id,
-            'content' => 'Hello',
-        ]);
-
-        $existingCommentTwo = Comment::create([
-            'user_id' => $user->id,
-            'post_id' => $post->id,
-            'content' => 'Hello',
-        ]);
-
-        // This belongs to a different user and shouldn't be included.
-        $anotherComment = Comment::create([
-            'user_id' => $anotherUser->id,
-            'post_id' => $post->id,
-            'content' => 'Hello',
-        ]);
-
-        $comments = $post->comments()
-            ->for($user)
-            ->get();
-
-        $this->assertCount(2, $comments);
-        $this->assertSame($existingCommentOne->id, $comments[0]->id);
-        $this->assertSame($existingCommentTwo->id, $comments[1]->id);
     }
 }
 
