@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Generator;
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Illuminate\Foundation\Support\Providers\WithEvents;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'event:generate')]
@@ -41,9 +43,7 @@ class EventGenerateCommand extends Command
      */
     public function handle()
     {
-        $providers = $this->laravel->getProviders(EventServiceProvider::class);
-
-        foreach ($providers as $provider) {
+        foreach ($this->getProvidersUsingWithEvents() as $provider) {
             foreach ($provider->listens() as $event => $listeners) {
                 $this->makeEventAndListeners($event, $listeners);
             }
@@ -85,6 +85,17 @@ class EventGenerateCommand extends Command
             $this->callSilent('make:listener', array_filter(
                 ['name' => $listener, '--event' => $event]
             ));
+        }
+    }
+
+    protected function getProvidersUsingWithEvents(): Generator
+    {
+        $providers = $this->laravel->getProviders(ServiceProvider::class);
+
+        foreach ($providers as $provider) {
+            if (in_array(WithEvents::class, class_uses_recursive($provider))) {
+                yield $provider;
+            }
         }
     }
 }

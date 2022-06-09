@@ -2,8 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Generator;
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Illuminate\Foundation\Support\Providers\WithEvents;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'event:cache')]
@@ -60,12 +62,23 @@ class EventCacheCommand extends Command
     {
         $events = [];
 
-        foreach ($this->laravel->getProviders(EventServiceProvider::class) as $provider) {
+        foreach ($this->getProvidersUsingWithEvents() as $provider) {
             $providerEvents = array_merge_recursive($provider->shouldDiscoverEvents() ? $provider->discoverEvents() : [], $provider->listens());
 
             $events[get_class($provider)] = $providerEvents;
         }
 
         return $events;
+    }
+
+    protected function getProvidersUsingWithEvents(): Generator
+    {
+        $providers = $this->laravel->getProviders(ServiceProvider::class);
+
+        foreach ($providers as $provider) {
+            if (in_array(WithEvents::class, class_uses_recursive($provider))) {
+                yield $provider;
+            }
+        }
     }
 }
