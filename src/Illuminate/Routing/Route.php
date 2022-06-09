@@ -8,10 +8,10 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Matching\HostValidator;
+use Illuminate\Routing\Matching\IsLockInProductionValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Routing\Matching\UriValidator;
-use Illuminate\Routing\Matching\IsLockInProductionValidator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -915,14 +915,14 @@ class Route
 
     /**
      * Lock the route when the application is in production mode.
-     * 
+     *
      * @param  mixed  $environments
      * @return $this
      */
     public function lockInProduction()
     {
         $this->action['is_production'] = app()->isProduction();
-        
+
         return $this;
     }
 

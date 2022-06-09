@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
-use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Routing\Registrar;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteLockInProductionTest extends TestCase
