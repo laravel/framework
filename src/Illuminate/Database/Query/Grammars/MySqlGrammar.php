@@ -272,14 +272,15 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the "order by field()" portion of the query.
      *
-     * @param array $order
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $order
      * @return string
      */
-    protected function compileOrderByField($order)
+    protected function compileOrderByField(Builder $query, $order)
     {
-        return 'field('.$this->wrap($order['column']).', '.implode(', ', array_map(function($field) {
-            return '"'.$field.'"';
-        }, $order['field'])).')';
+        return 'field('.$this->wrap($order['sql']).', '.implode(', ', array_map(function($field) {
+            return $this->parameter($field);
+        }, $order['bindings'])).')';
     }
 
     /**

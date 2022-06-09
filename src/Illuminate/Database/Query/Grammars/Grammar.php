@@ -858,11 +858,11 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrdersToArray(Builder $query, $orders)
     {
-        return array_map(function ($order) {
-            if(isset($order['sql'])) {
+        return array_map(function ($order) use($query) {
+            if(isset($order['type']) && $order['type'] === 'Field') {
+                return $this->compileOrderByField($query, $order);
+            } elseif(isset($order['sql'])) {
                 return $order['sql'];
-            } elseif(isset($order['field'])) {
-                return $this->compileOrderByField($order);
             } else {
                 return $this->wrap($order['column']).' '.$order['direction'];
             }
@@ -872,16 +872,17 @@ class Grammar extends BaseGrammar
     /**
      * Compile the "order by field()" portion of the query.
      *
-     * @param array $order
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $order
      * @return string
      */
-    protected function compileOrderByField($order)
+    protected function compileOrderByField(Builder $query, $order)
     {
-        $column = $order['column'];
+        $column = $order['sql'];
 
         return 'case '.implode(' ', array_map(function($field, $value) use($column) {
-            return 'when '. $this->wrap($column).'='.$this->wrapValue($field).' then '.($value + 1);
-        }, $order['field'], array_keys($order['field']))).' else '.count($order['field'])+1;
+            return 'when '. $this->wrap($column).'='.$this->parameter($field).' then '.($value + 1);
+        }, $order['bindings'], array_keys($order['bindings']))).' else 0';
     }
 
     /**

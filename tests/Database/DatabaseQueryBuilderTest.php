@@ -1288,11 +1288,18 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->orderBy('email')->orderByField('age', [5, 7, 9]);
-        $this->assertSame('select * from "users" order by "email" asc, case when "age"="5" then 1 when "age"="7" then 2 when "age"="9" then 3 else 4', $builder->toSql());
+        $this->assertSame('select * from "users" order by "email" asc, case when "age"=? then 1 when "age"=? then 2 when "age"=? then 3 else 0', $builder->toSql());
+        $this->assertEquals([5, 7, 9], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->orderBy('email')->orderByField('age', [5, 7, 9]);
+        $this->assertSame('select * from [users] order by [email] asc, case when [age]=? then 1 when [age]=? then 2 when [age]=? then 3 else 0', $builder->toSql());
+        $this->assertEquals([5, 7, 9], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->orderBy('email')->orderByField('age', [5, 7, 9]);
-        $this->assertSame('select * from `users` order by `email` asc, field(`age`, "5", "7", "9")', $builder->toSql());
+        $this->assertSame('select * from `users` order by `email` asc, field(`age`, ?, ?, ?)', $builder->toSql());
+        $this->assertEquals([5, 7, 9], $builder->getBindings());
     }
 
     public function testOrderBysSqlServer()
