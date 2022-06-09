@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Illuminate\Testing\TestResponse;
@@ -9,7 +10,6 @@ use Illuminate\Testing\LoggedExceptionCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Cookie\CookieValuePrefix;
-use Illuminate\Contracts\Http\Kernel as HttpKernel;
 
 trait MakesHttpRequests
 {
