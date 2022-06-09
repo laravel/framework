@@ -685,6 +685,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $provider->register();
 
+        $provider->registerTraits();
+
         // If there are bindings / singletons set as properties on the provider we
         // will spin through them and register them with the application, which
         // serves as a convenience layer while registering a lot of bindings.

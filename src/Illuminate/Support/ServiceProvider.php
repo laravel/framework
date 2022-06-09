@@ -434,4 +434,20 @@ abstract class ServiceProvider
     {
         return $this instanceof DeferrableProvider;
     }
+
+    /**
+     * Register used traits in the provider.
+     *
+     * @return void
+     */
+    public function registerTraits()
+    {
+        foreach (class_uses_recursive($this) as $trait) {
+            $method = sprintf('register%s', last(explode('\\', $trait)));
+
+            if (method_exists($this, $method)) {
+                $this->{$method}();
+            }
+        }
+    }
 }
