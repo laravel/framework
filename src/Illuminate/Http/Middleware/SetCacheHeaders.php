@@ -3,8 +3,8 @@
 namespace Illuminate\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 class SetCacheHeaders
 {
