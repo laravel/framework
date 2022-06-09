@@ -11,6 +11,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Routing\Matching\UriValidator;
+use Illuminate\Routing\Matching\IsLockInProductionValidator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -903,6 +904,29 @@ class Route
     }
 
     /**
+     * Get the lock route production of the route instance.
+     *
+     * @return bool
+     */
+    public function getLockInProduction()
+    {
+        return (bool) ($this->action['is_production'] ?? false);
+    }
+
+    /**
+     * Lock the route when the application is in production mode.
+     * 
+     * @param  mixed  $environments
+     * @return $this
+     */
+    public function lockInProduction()
+    {
+        $this->action['is_production'] = app()->isProduction();
+        
+        return $this;
+    }
+
+    /**
      * Set the handler for the route.
      *
      * @param  \Closure|array|string  $action
@@ -1213,6 +1237,7 @@ class Route
         return static::$validators = [
             new UriValidator, new MethodValidator,
             new SchemeValidator, new HostValidator,
+            new IsLockInProductionValidator,
         ];
     }
 
