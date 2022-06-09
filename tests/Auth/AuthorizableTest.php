@@ -5,19 +5,25 @@ namespace Illuminate\Tests\Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Foundation\Testing\TestCase;
-use Orchestra\Testbench\Concerns\CreatesApplication;
+use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class AuthorizableTest extends TestCase
 {
-    use CreatesApplication;
+    public function setUp(): void
+    {
+        $container = Container::setInstance(new Container());
+
+        $gate = new Gate($container, fn() => null);
+        $gate->policy(AuthorizableTestDummy::class, AuthorizableTestPolicy::class);
+        
+        $container->singleton(GateContract::class, fn() => $gate);
+    }
 
     public function testAuthorizeMethodThrowsAuthorizationExceptionWithPolicyDenial()
     {
-        \Illuminate\Support\Facades\Gate::policy(AuthorizableTestDummy::class, AuthorizableTestPolicy::class);
-
         $user = new User();
 
         try {
@@ -30,8 +36,6 @@ class AuthorizableTest extends TestCase
 
     public function testAuthorizeMethodReturnsAllowedResponseWithPolicySuccess()
     {
-        \Illuminate\Support\Facades\Gate::policy(AuthorizableTestDummy::class, AuthorizableTestPolicy::class);
-
         $user = new User();
 
         $response = $user->authorize('willSucceed', AuthorizableTestDummy::class);
@@ -42,7 +46,6 @@ class AuthorizableTest extends TestCase
 
 class AuthorizableTestDummy
 {
-
 }
 
 class AuthorizableTestPolicy
