@@ -89,14 +89,14 @@ class EloquentForTest extends DatabaseTestCase
         ]);
 
         $comment = Comment::query()
-            ->for($anotherUser)
+            ->for($user)
             ->firstOrNew([
-                'user_id' => $user->id,
+                'user_id' => $anotherUser->id, // This will be overridden by the $user in for()
             ], [
                 'value' => 'Goodbye',
             ]);
 
-        $this->assertSame($comment->id, $existingComment->id);
+        $this->assertSame($existingComment->id, $comment->id);
         $this->assertSame($user->id, $comment->user_id);
     }
 
@@ -120,7 +120,7 @@ class EloquentForTest extends DatabaseTestCase
                 'value' => 'Goodbye',
             ]);
 
-        $this->assertNotSame($comment->id, $existingComment->id);
+        $this->assertNull($comment->id);
         $this->assertSame($anotherUser->id, $comment->user_id);
     }
 
@@ -138,10 +138,10 @@ class EloquentForTest extends DatabaseTestCase
         ]);
 
         $comment = Comment::query()
-            ->for($anotherUser)
-            ->for($anotherPost, 'blogPost')
+            ->for($user)
+            ->for($post, 'blogPost')
             ->firstOrCreate([
-                'user_id' => $user->id,
+                'user_id' => $anotherUser->id, // This will be overridden by the $anotherUser in the for()
             ], [
                 'content' => 'Goodbye',
             ]);
@@ -167,7 +167,7 @@ class EloquentForTest extends DatabaseTestCase
             ->for($anotherUser)
             ->for($anotherPost, 'blogPost')
             ->firstOrCreate([
-                'user_id' => 123,
+                'user_id' => 123, // This will be overridden by the $anotherUser in the for()
             ], [
                 'content' => 'Goodbye',
             ]);
@@ -262,6 +262,11 @@ class EloquentForTest extends DatabaseTestCase
 
         $this->assertSame($post->id, $comment->post_id);
         $this->assertInstanceOf(Post::class, $comment->blogPost);
+    }
+
+    public function testForCanBeUsedWithBuilderGet()
+    {
+
     }
 
     public function testForCanBeUsedOnModelUpdate()

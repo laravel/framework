@@ -537,7 +537,7 @@ class Builder implements BuilderContract
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = $this->where($this->mergeForeignKeys($attributes))->first())) {
             return $instance;
         }
 
@@ -553,7 +553,7 @@ class Builder implements BuilderContract
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (! is_null($instance = $this->where($this->mergeForeignKeys($attributes))->first())) {
             return $instance;
         }
 
