@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Carbon\CarbonInterval;
 use Closure;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection as DoctrineConnection;
@@ -156,6 +157,20 @@ class Connection implements ConnectionInterface
      * @var bool
      */
     protected $loggingQueries = false;
+
+    /**
+     * The duration of all run queries in milliseconds.
+     *
+     * @var float
+     */
+    protected $totalQueryDuration = 0.0;
+
+    /**
+     * Query duration handlers.
+     *
+     * @var array
+     */
+    protected $queryDurationHandlers = [];
 
     /**
      * Indicates if the connection is in a "dry run".
@@ -755,6 +770,8 @@ class Connection implements ConnectionInterface
      */
     public function logQuery($query, $bindings, $time = null)
     {
+        $this->totalQueryDuration += $time ?? 0.0;
+
         $this->event(new QueryExecuted($query, $bindings, $time, $this));
 
         if ($this->loggingQueries) {
@@ -771,6 +788,62 @@ class Connection implements ConnectionInterface
     protected function getElapsedTime($start)
     {
         return round((microtime(true) - $start) * 1000, 2);
+    }
+
+    /**
+     * Handle exceeding query duration threshold.
+     *
+     * @param  \Carbon\CarbonInterval|float|int  $threshold
+     * @param  callable  $handler
+     * @return void
+     */
+    public function handleExceedingQueryDuration($threshold, $handler)
+    {
+        $threshold = $threshold instanceof CarbonInterval
+            ? $threshold->totalMilliseconds
+            : $threshold;
+
+        $this->queryDurationHandlers[] = [
+            'not_yet_run' => true,
+            'handler' => $handler,
+        ];
+
+        $key = count($this->queryDurationHandlers) - 1;
+
+        $this->listen(function ($event) use ($threshold, $handler, $key) {
+            if ($this->queryDurationHandlers[$key]['not_yet_run'] && $this->totalQueryDuration() > $threshold) {
+                $handler($this);
+
+                $this->queryDurationHandlers[$key]['not_yet_run'] = false;
+            }
+        });
+    }
+
+    public function restoreAlreadyRunQueryDurationHandlers()
+    {
+        foreach ($this->queryDurationHandlers as $key => $queryDurationHandler) {
+            $this->queryDurationHandlers[$key]['not_yet_run'] = true;
+        }
+    }
+
+    /**
+     * Get the duration of all run queries in milliseconds.
+     *
+     * @return float
+     */
+    public function totalQueryDuration()
+    {
+        return $this->totalQueryDuration;
+    }
+
+    /**
+     * Reset the duration of all run queries.
+     *
+     * @return void
+     */
+    public function resetTotalQueryDuration()
+    {
+        $this->totalQueryDuration = 0.0;
     }
 
     /**
