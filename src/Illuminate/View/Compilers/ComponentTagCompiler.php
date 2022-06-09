@@ -2,17 +2,17 @@
 
 namespace Illuminate\View\Compilers;
 
-use ReflectionClass;
-use InvalidArgumentException;
-use Illuminate\View\ViewFinderInterface;
-use Illuminate\View\DynamicComponent;
-use Illuminate\View\AnonymousComponent;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\View\AnonymousComponent;
+use Illuminate\View\DynamicComponent;
+use Illuminate\View\ViewFinderInterface;
+use InvalidArgumentException;
+use ReflectionClass;
 
 /**
  * @author Spatie bvba <info@spatie.be>
