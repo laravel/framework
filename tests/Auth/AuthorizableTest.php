@@ -38,15 +38,6 @@ class AuthorizableTest extends TestCase
 
         $this->assertTrue($response->allowed());
     }
-
-    protected function getBasicGate($isAdmin = false)
-    {
-        return new Gate(new Container, function () use ($isAdmin) {
-            return (object)['id' => 1, 'isAdmin' => $isAdmin];
-        });
-
-    }
-
 }
 
 class AuthorizableTestDummy
