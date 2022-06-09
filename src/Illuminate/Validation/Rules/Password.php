@@ -133,6 +133,17 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Make a password that adheres to the default validation rules.
+     *
+     * @param  int  $length
+     * @return string
+     */
+    public static function make(int $length = 8): string
+    {
+        return static::default()->create($length);
+    }
+
+    /**
      * Get the default configuration of the password rule.
      *
      * @return static
@@ -277,6 +288,50 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         $this->customRules = Arr::wrap($rules);
 
         return $this;
+    }
+
+    /**
+     * Create a password that adheres to the current validation rules.
+     *
+     * @param  int  $length
+     * @return string
+     */
+    public function create(int $length = 8): string
+    {
+        $length = ($length >= $this->min) ? $length : random_int($this->min, $this->min + 10);
+
+        $password = [];
+
+        $upper = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z'];
+        $lower = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z'];
+        $numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        $symbols = ['~', '`', '!', '@', '#', '$', '%', '^', '&', '8', '(', ')', '_', '-', '+', '=', '{', '[', '}', ']', '|', '\\', ':', ';', '"', '\'', '<', ',', '>', '.', '?', '/'];
+        $characters = array_merge($upper, $lower);
+
+        if ($this->mixedCase) {
+            $password[] = $upper[random_int(0, count($upper) - 1)];
+            $password[] = $lower[random_int(0, count($lower) - 1)];
+        }
+
+        if ($this->letters && ! $this->mixedCase) {
+            $password[] = $characters[random_int(0, count($characters) - 1)];
+        }
+
+        if ($this->numbers) {
+            $password[] = $numbers[random_int(0, count($numbers) - 1)];
+            $characters = array_merge($characters, $numbers);
+        }
+
+        if ($this->symbols) {
+            $password[] = $symbols[random_int(0, count($symbols) - 1)];
+            $characters = array_merge($characters, $symbols);
+        }
+
+        while (count($password) < $length) {
+            $password[] = $characters[random_int(0, count($characters) - 1)];
+        }
+
+        return Arr::join(Arr::shuffle($password), '');
     }
 
     /**

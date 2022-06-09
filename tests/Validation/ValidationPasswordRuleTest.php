@@ -216,6 +216,71 @@ class ValidationPasswordRuleTest extends TestCase
         $this->assertInstanceOf(Password::class, Password::default());
     }
 
+    public function testItCanMakePasswordAccordingToRules()
+    {
+        Password::defaults(
+            fn () => Password::min(20)
+                ->mixedCase()
+                ->letters()
+                ->symbols()
+                ->numbers()
+        );
+
+        $min = Password::min(16);
+        $mixed = Password::min(8)->mixedCase();
+        $letters = Password::min(8)->letters();
+        $numbers = Password::min(8)->numbers();
+        $symbols = Password::min(8)->symbols();
+
+        $this->passes($min, [
+            $min->create(),
+            $min->create(),
+            $min->create(),
+            $min->create(),
+            $min->create(),
+        ]);
+
+        $this->passes($mixed, [
+            $mixed->create(),
+            $mixed->create(),
+            $mixed->create(),
+            $mixed->create(),
+            $mixed->create(),
+        ]);
+
+        $this->passes($letters, [
+            $letters->create(),
+            $letters->create(),
+            $letters->create(),
+            $letters->create(),
+            $letters->create(),
+        ]);
+
+        $this->passes($numbers, [
+            $numbers->create(),
+            $numbers->create(),
+            $numbers->create(),
+            $numbers->create(),
+            $numbers->create(),
+        ]);
+
+        $this->passes($symbols, [
+            $symbols->create(),
+            $symbols->create(),
+            $symbols->create(),
+            $symbols->create(),
+            $symbols->create(),
+        ]);
+
+        $this->passes(Password::default(), [
+            Password::make(),
+            Password::make(),
+            Password::make(),
+            Password::make(),
+            Password::make(),
+        ]);
+    }
+
     public function testItCanSetDefaultUsing()
     {
         $this->assertInstanceOf(Password::class, Password::default());
