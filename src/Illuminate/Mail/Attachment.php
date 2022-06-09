@@ -51,7 +51,7 @@ class Attachment
      */
     public static function fromPath($path)
     {
-        return new static(fn ($attachment, $pathStragegy) => $pathStragegy($path, $attachment));
+        return new static(fn ($attachment, $pathStrategy) => $pathStrategy($path, $attachment));
     }
 
     /**
