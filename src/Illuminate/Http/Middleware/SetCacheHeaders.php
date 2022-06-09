@@ -2,8 +2,9 @@
 
 namespace Illuminate\Http\Middleware;
 
-use Closure;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Arr;
+use Closure;
 
 class SetCacheHeaders
 {
@@ -55,10 +56,10 @@ class SetCacheHeaders
      */
     protected function parseOptions($options)
     {
-        return collect(explode(';', rtrim($options, ';')))->mapWithKeys(function ($option) {
+        return Arr::mapWithKeys(explode(';', rtrim($options, ';')), function ($option) {
             $data = explode('=', $option, 2);
 
             return [$data[0] => $data[1] ?? true];
-        })->all();
+        });
     }
 }
