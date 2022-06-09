@@ -649,7 +649,7 @@ class SupportArrTest extends TestCase
             $mapped,
         );
     }
-        
+
     public function testMapWithKeysIntegerKeys()
     {
         $data = [
