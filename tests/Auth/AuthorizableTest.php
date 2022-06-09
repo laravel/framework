@@ -16,10 +16,10 @@ class AuthorizableTest extends TestCase
     {
         $container = Container::setInstance(new Container());
 
-        $gate = new Gate($container, fn() => null);
+        $gate = new Gate($container, fn () => null);
         $gate->policy(AuthorizableTestDummy::class, AuthorizableTestPolicy::class);
-        
-        $container->singleton(GateContract::class, fn() => $gate);
+
+        $container->singleton(GateContract::class, fn () => $gate);
     }
 
     public function testAuthorizeMethodThrowsAuthorizationExceptionWithPolicyDenial()
