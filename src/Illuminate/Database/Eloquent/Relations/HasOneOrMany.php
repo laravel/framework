@@ -210,6 +210,17 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function get($columns = ['*'])
+    {
+        return $this->query->where($this->mergeForeignKeys([]))->get($columns);
+    }
+
+    /**
      * Find a model by its primary key or return a new instance of the related model.
      *
      * @param  mixed  $id
