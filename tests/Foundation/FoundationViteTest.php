@@ -46,7 +46,7 @@ class FoundationViteTest extends TestCase
         $this->assertSame('<script type="module" src="https://example.com/build/assets/app-without-css.versioned.js"></script>', $result->toHtml());
     }
 
-    public function testViteWithCss()
+    public function testViteWithCssImport()
     {
         $this->makeViteManifest();
 
@@ -59,7 +59,7 @@ class FoundationViteTest extends TestCase
         );
     }
 
-    public function testViteWithSharedCss()
+    public function testViteWithSharedCssImport()
     {
         $this->makeViteManifest();
 
@@ -72,15 +72,42 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testViteWithCssEntrypoint()
+    {
+        $this->makeViteManifest();
+
+        $result = (new Vite)(['resources/js/app.js', 'resources/css/app.css']);
+
+        $this->assertSame(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $result->toHtml()
+        );
+    }
+
     public function testViteHotModuleReplacement()
     {
         $this->makeViteHotFile();
 
-        $result = (new Vite)(['resources/js/app-with-css.js']);
+        $result = (new Vite)(['resources/js/app.js']);
 
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'
-            .'<script type="module" src="http://localhost:3000/resources/js/app-with-css.js"></script>',
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $result->toHtml()
+        );
+    }
+
+    public function testViteHotModuleReplacementWithCssEntrypoint()
+    {
+        $this->makeViteHotFile();
+
+        $result = (new Vite)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
             $result->toHtml()
         );
     }
@@ -111,6 +138,9 @@ class FoundationViteTest extends TestCase
                 'imports' => [
                     '_someFile.js',
                 ],
+            ],
+            'resources/css/app.css' => [
+                'file' => 'assets/app.versioned.css',
             ],
             '_someFile.js' => [
                 'css' => [

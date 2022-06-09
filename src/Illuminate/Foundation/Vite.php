@@ -29,7 +29,7 @@ class Vite
 
             return new HtmlString(
                 $entrypoints
-                    ->map(fn ($entrypoint) => $this->makeScriptTag("{$url}/{$entrypoint}"))
+                    ->map(fn ($entrypoint) => $this->makeTag("{$url}/{$entrypoint}"))
                     ->prepend($this->makeScriptTag("{$url}/@vite/client"))
                     ->join('')
             );
@@ -47,23 +47,18 @@ class Vite
 
         $manifest = $manifests[$manifestPath];
 
-        $scripts = collect();
-        $stylesheets = collect();
+        $tags = collect();
 
         foreach ($entrypoints as $entrypoint) {
             if (! isset($manifest[$entrypoint])) {
                 throw new Exception("Unable to locate file in Vite manifest: {$entrypoint}.");
             }
 
-            $scripts->push(
-                $this->makeScriptTag(asset("{$buildDirectory}/{$manifest[$entrypoint]['file']}"))
-            );
+            $tags->push($this->makeTag(asset("{$buildDirectory}/{$manifest[$entrypoint]['file']}")));
 
             if (isset($manifest[$entrypoint]['css'])) {
                 foreach ($manifest[$entrypoint]['css'] as $css) {
-                    $stylesheets->push(
-                        $this->makeStylesheetTag(asset("{$buildDirectory}/{$css}"))
-                    );
+                    $tags->push($this->makeStylesheetTag(asset("{$buildDirectory}/{$css}")));
                 }
             }
 
@@ -71,14 +66,14 @@ class Vite
                 foreach ($manifest[$entrypoint]['imports'] as $import) {
                     if (isset($manifest[$import]['css'])) {
                         foreach ($manifest[$import]['css'] as $css) {
-                            $stylesheets->push(
-                                $this->makeStylesheetTag(asset("{$buildDirectory}/{$css}"))
-                            );
+                            $tags->push($this->makeStylesheetTag(asset("{$buildDirectory}/{$css}")));
                         }
                     }
                 }
             }
         }
+
+        [$stylesheets, $scripts] = $tags->partition(fn ($tag) => str_starts_with($tag, '<link'));
 
         return new HtmlString($stylesheets->join('').$scripts->join(''));
     }
@@ -113,6 +108,21 @@ class Vite
     }
 
     /**
+     * Generate an appropriate tag for the given URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function makeTag($url)
+    {
+        if ($this->isCssPath($url)) {
+            return $this->makeStylesheetTag($url);
+        }
+
+        return $this->makeScriptTag($url);
+    }
+
+    /**
      * Generate a script tag for the given URL.
      *
      * @param  string  $url
@@ -132,5 +142,15 @@ class Vite
     protected function makeStylesheetTag($url)
     {
         return sprintf('<link rel="stylesheet" href="%s" />', $url);
+    }
+
+    /**
+     * Determine whether the given path is a CSS file
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    protected function isCssPath($path) {
+        return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)$/', $path) === 1;
     }
 }
