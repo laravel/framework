@@ -2,13 +2,14 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Contracts\Http\Kernel as HttpKernel;
-use Illuminate\Cookie\CookieValuePrefix;
-use Illuminate\Http\Request;
-use Illuminate\Testing\LoggedExceptionCollection;
-use Illuminate\Testing\TestResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Illuminate\Testing\TestResponse;
+use Illuminate\Testing\LoggedExceptionCollection;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 
 trait MakesHttpRequests
 {
@@ -558,11 +559,11 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
+        return Arr::mapWithKeys(array_merge($this->defaultHeaders, $headers), function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];
-        })->all();
+        });
     }
 
     /**
