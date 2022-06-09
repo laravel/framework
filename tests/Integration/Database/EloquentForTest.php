@@ -141,7 +141,7 @@ class EloquentForTest extends DatabaseTestCase
             ->for($user)
             ->for($post, 'blogPost')
             ->firstOrCreate([
-                'user_id' => $anotherUser->id, // This will be overridden by the $anotherUser in the for()
+                'user_id' => $anotherUser->id, // This will be overridden by the $user in the for()
             ], [
                 'content' => 'Goodbye',
             ]);
@@ -262,11 +262,6 @@ class EloquentForTest extends DatabaseTestCase
 
         $this->assertSame($post->id, $comment->post_id);
         $this->assertInstanceOf(Post::class, $comment->blogPost);
-    }
-
-    public function testForCanBeUsedWithBuilderGet()
-    {
-
     }
 
     public function testForCanBeUsedOnModelUpdate()
@@ -398,12 +393,12 @@ class EloquentForTest extends DatabaseTestCase
         $comment = $post->comments()
             ->for($anotherUser)
             ->firstOrNew([
-                'user_id' => $user->id,
+                'user_id' => $user->id, // This will be overridden by the $anotherUser in the for()
             ], [
                 'content' => 'hello',
             ]);
 
-        $this->assertSame($user->id, $comment->user_id);
+        $this->assertSame($anotherUser->id, $comment->user_id);
     }
 
     public function testForCanBeUsedOnRelationshipsFirstOrNewIfTheModelDoesNotExist()
@@ -442,9 +437,9 @@ class EloquentForTest extends DatabaseTestCase
         ]);
 
         $comment = $post->comments()
-            ->for($anotherUser)
+            ->for($user)
             ->firstOrCreate([
-                'user_id' => $user->id,
+                'user_id' => $anotherUser->id, // This will be overridden by the $user in the for()
             ], [
                 'content' => 'hello',
             ]);
@@ -467,7 +462,7 @@ class EloquentForTest extends DatabaseTestCase
         $comment = $post->comments()
             ->for($anotherUser)
             ->firstOrCreate([
-                'user_id' => 123,
+                'user_id' => $user->id, // This will be overridden by the $anotherUser in the for()
             ], [
                 'content' => 'hello',
             ]);
