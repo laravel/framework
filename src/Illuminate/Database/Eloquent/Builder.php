@@ -1465,7 +1465,7 @@ class Builder implements BuilderContract
 
         // If any of the relationships are formatted with the [$attribute => array()]
         // syntax, we shall loop over the nested relations and prepend each key of
-        // the array while flattening into the traditional dot notation format.
+        // this array while flattening into the traditional dot notation format.
         foreach ($relations as $key => $value) {
             if (! is_string($key) || ! is_array($value)) {
                 continue;
@@ -1482,9 +1482,9 @@ class Builder implements BuilderContract
             unset($relations[$key]);
         }
 
-        // We now know that the remaining relationships are in a dot notation format.
-        // The values maybe a string or a Closure. We'll loop over them and ensure
-        // existing Closures are merged and strings are made into a constraint.
+        // We now know that the remaining relationships are in a dot notation format
+        // and may be a string or Closure. We'll loop over them and ensure all of
+        // the present Closures are merged + strings are made into constraints.
         foreach ($relations as $key => $value) {
             if (is_numeric($key) && is_string($value)) {
                 [$key, $value] = $this->parseNameAndAttributeSelectionConstraint($value);
