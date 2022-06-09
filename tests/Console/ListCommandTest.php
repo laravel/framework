@@ -23,46 +23,51 @@ class ListCommandTest extends TestCase
 
     public function testShowsAllCommandsByDefault()
     {
-        $app = new Application(
-            $app = m::mock(ApplicationContract::class, ['version' => '6.0']),
-            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
-            'testing'
-        );
-
-        $output = new BufferedOutput();
-        $app->call('list', [], $output);
+        $output = $this->listConsole('', []);
 
         // Should see default Symfony "completion" command
-        $this->assertMatchesRegularExpression("/Available commands:\n\s+completion/s", $output->fetch());
+        $this->assertMatchesRegularExpression("/Available commands:\n\s+completion/s", $output);
     }
 
     public function testDoesNotShowDefaultCommandsWithExceptVendor()
     {
-        $console = new Application(
-            $app = m::mock(ApplicationContract::class, ['version' => '6.0']),
-            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
-            'testing'
-        );
-        $console->add(new ExampleCommand);
-        $console->add(new ClosureCommand('example-closure', function () {}));
-
-        $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $app->shouldReceive('basePath')->with('vendor')->andReturn('/xyz');
-        $app->shouldReceive('make')->with(Dispatcher::class)->andReturn($events);
-
-        $output = new BufferedOutput();
-        $console->call('list', ['--except-vendor' => true], $output);
-
-        $outputStr = $output->fetch();
+        $output = $this->listConsole('xyz', ['--except-vendor' => true]);
 
         // Should not see default Symfony "completion" command
-        $this->assertDoesNotMatchRegularExpression("/Available commands:\n\s+completion/s", $outputStr);
+        $this->assertDoesNotMatchRegularExpression("/Available commands:\n\s+completion/s", $output);
 
         // Should see App namespace and ClosureCommands
-        $this->assertMatchesRegularExpression("/Available commands:\n\s+example.*?\n\s+example-closure/s", $outputStr);
+        $this->assertMatchesRegularExpression("/Available commands:\n\s+example.*?\n\s+example-closure/s", $output);
     }
 
     public function testDoesNotShowClosureCommandsInsideVendorWithExceptVendor()
+    {
+        $output = $this->listConsole(__DIR__, ['--except-vendor' => true]);
+
+        // Should not see example-closure command
+        $this->assertDoesNotMatchRegularExpression("/Available commands:\n\s+example-closure/s", $output);
+    }
+
+    public function testDoesNotShowCustomCommandsWithOnlyVendor()
+    {
+        $output = $this->listConsole('xyz', ['--only-vendor' => true]);
+
+        // Should see default Symfony "completion" command
+        $this->assertMatchesRegularExpression("/Available commands:\n\s+completion/s", $output);
+
+        // Should not see App namespace and ClosureCommands
+        $this->assertDoesNotMatchRegularExpression("/Available commands:\n\s+example.*?\n\s+example-closure/s", $output);
+    }
+
+    public function testDoesShowClosureCommandsInsideVendorWithOnlyVendor()
+    {
+        $output = $this->listConsole(__DIR__, ['--only-vendor' => true]);
+
+        // Should see example-closure command
+        $this->assertMatchesRegularExpression("/Available commands:.*?\n\s+example-closure/s", $output);
+    }
+
+    private function listConsole(string $vendorDir, array $options)
     {
         $console = new Application(
             $app = m::mock(ApplicationContract::class, ['version' => '6.0']),
@@ -73,16 +78,18 @@ class ListCommandTest extends TestCase
         $console->add(new ClosureCommand('example-closure', function () {}));
 
         $app->shouldReceive('getNamespace')->andReturn('App\\');
-        $app->shouldReceive('basePath')->with('vendor')->andReturn(__DIR__);
+        /*
+         * Returning __DIR__ as the $vendorDir here will make the application think
+         * that the ConsoleCommand defined defined above is from the "vendor"
+         * directory.
+         */
+        $app->shouldReceive('basePath')->with('vendor')->andReturn($vendorDir);
         $app->shouldReceive('make')->with(Dispatcher::class)->andReturn($events);
 
-        $output = new BufferedOutput();
-        $console->call('list', ['--except-vendor' => true], $output);
+        $output = new BufferedOutput;
+        $console->call('list', $options, $output);
 
-        $outputStr = $output->fetch();
-
-        // Should not see example-closure command
-        $this->assertDoesNotMatchRegularExpression("/Available commands:\n\s+example-closure/s", $outputStr);
+        return $output->fetch();
     }
 }
 

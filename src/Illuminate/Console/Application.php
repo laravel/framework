@@ -72,6 +72,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected $shouldExcludeVendor = false;
 
     /**
+     * Whether non-vendor commands should be excluded from the command listing.
+     *
+     * @var bool
+     */
+    protected $shouldExcludeNonVendor = false;
+
+    /**
      * Create a new Artisan console application.
      *
      * @param  \Illuminate\Contracts\Container\Container  $laravel
@@ -382,26 +389,46 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
+     * Set whether non-vendor commands should be excluded from the command listing.
+     *
+     * @param bool $shouldExcludeNonVendor
+     * @return $this
+     */
+    public function setShouldExcludeNonVendor(bool $shouldExcludeNonVendor)
+    {
+        $this->shouldExcludeNonVendor = $shouldExcludeNonVendor;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function all(string $namespace = null)
     {
         $commands = parent::all($namespace);
 
-        if (! $this->shouldExcludeVendor) {
+        if (! $this->shouldExcludeVendor && ! $this->shouldExcludeNonVendor) {
             return $commands;
         }
 
-        return array_filter($commands, function (SymfonyCommand $command) {
+        if ($this->shouldExcludeVendor) {
+            $excludeVendor = true;
+        }
+        if ($this->shouldExcludeNonVendor) {
+            $excludeVendor = false;
+        }
+
+        return array_filter($commands, function (SymfonyCommand $command) use ($excludeVendor) {
             if (str_starts_with(get_class($command), $this->getLaravel()->getNamespace())) {
-                return true;
+                return $excludeVendor;
             }
 
             if ($command instanceof ClosureCommand && ! $this->isVendorClosure($command)) {
-                return true;
+                return $excludeVendor;
             }   
 
-            return false;
+            return ! $excludeVendor;
         });
     }
 

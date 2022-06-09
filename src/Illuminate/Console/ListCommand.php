@@ -20,7 +20,10 @@ class ListCommand extends SymfonyListCommand
         
         $definition = $this->getDefinition();
         $definition->addOption(
-            new InputOption('except-vendor', null, InputOption::VALUE_NONE, 'Do not include commands defined by vendor packages (except ClosureCommands)'),
+            new InputOption('except-vendor', null, InputOption::VALUE_NONE, 'Do not include commands defined by vendor packages')
+        );
+        $definition->addOption(
+            new InputOption('only-vendor', null, InputOption::VALUE_NONE, 'Only include commands defined by vendor packages')
         );
 
         $this->setDefinition($definition);
@@ -29,17 +32,20 @@ class ListCommand extends SymfonyListCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exceptVendor = $input->getOption('except-vendor');
+        $onlyVendor = $input->getOption('only-vendor');
 
         if ($exceptVendor) {
-            $this->getApplication()->setShouldExcludeVendor(true);
+            $this->getApplication()
+                ->setShouldExcludeVendor(true)
+                ->setShouldExcludeNonVendor(false);
         }
 
-        $returnCode = parent::execute($input, $output);
-
-        if ($exceptVendor) {
-            $this->getApplication()->setShouldExcludeVendor(true);
+        if ($onlyVendor) {
+            $this->getApplication()
+                ->setShouldExcludeVendor(false)
+                ->setShouldExcludeNonVendor(true);
         }
 
-        return $returnCode;
+        return parent::execute($input, $output);
     }
 }
