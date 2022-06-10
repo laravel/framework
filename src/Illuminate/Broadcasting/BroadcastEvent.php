@@ -36,7 +36,7 @@ class BroadcastEvent implements ShouldQueue
     public $timeout;
 
     /**
-     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
+     * The number of seconds to wait before retrying the job when encountering an uncaught exception.
      *
      * @var int
      */
