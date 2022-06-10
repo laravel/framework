@@ -25,36 +25,37 @@ class FoundationViteTest extends TestCase
         m::close();
     }
 
-    public function testViteWithDefaultEntrypoint()
+    public function testViteWithJsOnly()
     {
         $this->makeViteManifest();
 
-        $result = (new Vite)();
+        $result = (new Vite)('resources/js/app.js');
 
-        $this->assertSame(
-            '<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
-            $result->toHtml()
-        );
+        $this->assertSame('<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>', $result->toHtml());
     }
 
-    public function testViteWithoutCss()
+    public function testViteWithCssAndJs()
     {
         $this->makeViteManifest();
 
-        $result = (new Vite)(['resources/js/app-without-css.js']);
+        $result = (new Vite)(['resources/css/app.css', 'resources/js/app.js']);
 
-        $this->assertSame('<script type="module" src="https://example.com/build/assets/app-without-css.versioned.js"></script>', $result->toHtml());
+        $this->assertSame(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $result->toHtml()
+        );
     }
 
     public function testViteWithCssImport()
     {
         $this->makeViteManifest();
 
-        $result = (new Vite)(['resources/js/app-with-css.js']);
+        $result = (new Vite)('resources/js/app-with-css-import.js');
 
         $this->assertSame(
-            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
-            .'<script type="module" src="https://example.com/build/assets/app-with-css.versioned.js"></script>',
+            '<link rel="stylesheet" href="https://example.com/build/assets/imported-css.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app-with-css-import.versioned.js"></script>',
             $result->toHtml()
         );
     }
@@ -66,30 +67,17 @@ class FoundationViteTest extends TestCase
         $result = (new Vite)(['resources/js/app-with-shared-css.js']);
 
         $this->assertSame(
-            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            '<link rel="stylesheet" href="https://example.com/build/assets/shared-css.versioned.css" />'
             .'<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
             $result->toHtml()
         );
     }
 
-    public function testViteWithCssEntrypoint()
-    {
-        $this->makeViteManifest();
-
-        $result = (new Vite)(['resources/js/app.js', 'resources/css/app.css']);
-
-        $this->assertSame(
-            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
-            .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
-            $result->toHtml()
-        );
-    }
-
-    public function testViteHotModuleReplacement()
+    public function testViteHotModuleReplacementWithJsOnly()
     {
         $this->makeViteHotFile();
 
-        $result = (new Vite)(['resources/js/app.js']);
+        $result = (new Vite)('resources/js/app.js');
 
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'
@@ -98,7 +86,7 @@ class FoundationViteTest extends TestCase
         );
     }
 
-    public function testViteHotModuleReplacementWithCssEntrypoint()
+    public function testViteHotModuleReplacementWithJsAndCss()
     {
         $this->makeViteHotFile();
 
@@ -124,13 +112,10 @@ class FoundationViteTest extends TestCase
             'resources/js/app.js' => [
                 'file' => 'assets/app.versioned.js',
             ],
-            'resources/js/app-without-css.js' => [
-                'file' => 'assets/app-without-css.versioned.js',
-            ],
-            'resources/js/app-with-css.js' => [
-                'file' => 'assets/app-with-css.versioned.js',
+            'resources/js/app-with-css-import.js' => [
+                'file' => 'assets/app-with-css-import.versioned.js',
                 'css' => [
-                    'assets/app.versioned.css',
+                    'assets/imported-css.versioned.css',
                 ],
             ],
             'resources/js/app-with-shared-css.js' => [
@@ -144,7 +129,7 @@ class FoundationViteTest extends TestCase
             ],
             '_someFile.js' => [
                 'css' => [
-                    'assets/app.versioned.css',
+                    'assets/shared-css.versioned.css',
                 ],
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

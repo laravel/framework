@@ -17,7 +17,7 @@ class Vite
      *
      * @throws \Exception
      */
-    public function __invoke($entrypoints = 'resources/js/app.js', $buildDirectory = 'build')
+    public function __invoke($entrypoints, $buildDirectory = 'build')
     {
         static $manifests = [];
 
@@ -145,12 +145,13 @@ class Vite
     }
 
     /**
-     * Determine whether the given path is a CSS file
+     * Determine whether the given path is a CSS file.
      *
      * @param  string  $path
      * @return bool
      */
-    protected function isCssPath($path) {
+    protected function isCssPath($path)
+    {
         return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)$/', $path) === 1;
     }
 }
