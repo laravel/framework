@@ -6,6 +6,9 @@ enum CategoryEnum
 {
     case People;
     case Fruits;
+    
+    case People1;
+    case Fruits2;
 }
 
 enum CategoryBackedEnum: string
