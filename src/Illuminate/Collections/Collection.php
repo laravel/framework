@@ -1321,7 +1321,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TKey): mixed)>|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
      * @param  bool  $descending
      * @return static
@@ -1359,7 +1359,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection using multiple comparisons.
      *
-     * @param  array<array-key, (callable(TValue, TKey): mixed)>|array<array-key, string>  $comparisons
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|string|array{string, string}>  $comparisons
      * @return static
      */
     protected function sortByMany(array $comparisons = [])
@@ -1401,7 +1401,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Sort the collection in descending order using the given callback.
      *
-     * @param  array<array-key, (callable(TValue, TKey): mixed)>|array<array-key, string>|(callable(TValue, TKey): mixed)|string  $callback
+     * @param  array<array-key, (callable(TValue, TKey): mixed)|string|array{string, string}>|(callable(TValue, TKey): mixed)|string  $callback
      * @param  int  $options
      * @return static
      */
