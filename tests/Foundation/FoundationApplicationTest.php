@@ -37,6 +37,7 @@ class FoundationApplicationTest extends TestCase
         $provider = m::mock(ApplicationBasicServiceProviderStub::class);
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
+        $provider->shouldReceive('registerTraits')->once();
         $app = new Application;
         $app->register($provider);
 
@@ -84,6 +85,7 @@ class FoundationApplicationTest extends TestCase
         $provider = m::mock(ServiceProvider::class);
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
+        $provider->shouldReceive('registerTraits')->once();
         $app = new Application;
         $app->register($provider);
 
@@ -95,6 +97,7 @@ class FoundationApplicationTest extends TestCase
         $provider = m::mock(ServiceProvider::class);
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
+        $provider->shouldReceive('registerTraits')->once();
         $app = new Application;
         $app->register($provider);
 
