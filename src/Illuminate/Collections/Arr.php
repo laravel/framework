@@ -458,7 +458,7 @@ class Arr
      * Key an associative array by a field or using a callback.
      *
      * @param  array  $array
-     * @param  callable|array|string
+     * @param  callable|array|string  $keyBy
      * @return array
      */
     public static function keyBy($array, $keyBy)
