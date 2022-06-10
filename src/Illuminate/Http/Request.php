@@ -670,7 +670,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function offsetExists($offset)
     {
         return Arr::has(
-            $this->all() + $this->route()->parameters(),
+            $this->all() + with($this->route(), function ($route) {
+                return $route ? $route->parameters() : [];
+            }),
             $offset
         );
     }
