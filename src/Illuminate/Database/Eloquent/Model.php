@@ -561,7 +561,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get all of the models from the database.
      *
-     * @param  array|mixed  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Database\Eloquent\Collection<int, static>
      */
     public static function all($columns = ['*'])

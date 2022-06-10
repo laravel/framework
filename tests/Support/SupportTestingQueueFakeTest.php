@@ -52,6 +52,20 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class);
     }
 
+    public function testItCanAssertAgainstDataWithPush()
+    {
+        $data = null;
+        $this->fake->push(JobStub::class, ['foo' => 'bar'], 'redis');
+
+        $this->fake->assertPushed(JobStub::class, function ($job, $queue, $jobData) use (&$data) {
+            $data = $jobData;
+
+            return true;
+        });
+
+        $this->assertSame(['foo' => 'bar'], $data);
+    }
+
     public function testAssertPushedWithIgnore()
     {
         $job = new JobStub;

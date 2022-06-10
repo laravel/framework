@@ -267,6 +267,27 @@ class DatabaseEloquentHasOneOfManyTest extends TestCase
         $this->assertFalse($found);
     }
 
+    public function testWithHasNested()
+    {
+        $user = HasOneOfManyTestUser::create();
+        $previousLogin = $user->logins()->create();
+        $latestLogin = $user->logins()->create();
+
+        $found = HasOneOfManyTestUser::withWhereHas('latest_login', function ($query) use ($latestLogin) {
+            $query->where('logins.id', $latestLogin->id);
+        })->first();
+
+        $this->assertTrue((bool) $found);
+        $this->assertTrue($found->relationLoaded('latest_login'));
+        $this->assertEquals($found->latest_login->id, $latestLogin->id);
+
+        $found = HasOneOfManyTestUser::withWhereHas('latest_login', function ($query) use ($previousLogin) {
+            $query->where('logins.id', $previousLogin->id);
+        })->exists();
+
+        $this->assertFalse($found);
+    }
+
     public function testHasCount()
     {
         $user = HasOneOfManyTestUser::create();

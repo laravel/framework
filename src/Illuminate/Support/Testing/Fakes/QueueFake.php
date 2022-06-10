@@ -276,7 +276,7 @@ class QueueFake extends QueueManager implements Queue
         $callback = $callback ?: fn () => true;
 
         return collect($this->jobs[$job])->filter(
-            fn ($data) => $callback($data['job'], $data['queue'])
+            fn ($data) => $callback($data['job'], $data['queue'], $data['data'])
         )->pluck('job');
     }
 
@@ -333,6 +333,7 @@ class QueueFake extends QueueManager implements Queue
             $this->jobs[is_object($job) ? get_class($job) : $job][] = [
                 'job' => $job,
                 'queue' => $queue,
+                'data' => $data,
             ];
         } else {
             is_object($job) && isset($job->connection)

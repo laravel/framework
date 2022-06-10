@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Notifications\Messages\MailMessage;
 use PHPUnit\Framework\TestCase;
 
@@ -269,5 +271,47 @@ class NotificationMailMessageTest extends TestCase
         $message = new MailMessage;
         $message->unless('truthy', $callback, $default);
         $this->assertSame([['truthy@example.com', null]], $message->cc);
+    }
+
+    public function testItAttachesFilesViaAttachableContractFromPath()
+    {
+        $message = new MailMessage;
+
+        $message->attach(new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromPath('/foo.jpg')->as('bar')->withMime('image/png');
+            }
+        });
+
+        $this->assertSame([
+            'file' => '/foo.jpg',
+            'options' => [
+                'as' => 'bar',
+                'mime' => 'image/png',
+            ],
+        ], $message->attachments[0]);
+    }
+
+    public function testItAttachesFilesViaAttachableContractFromData()
+    {
+        $mailMessage = new MailMessage();
+
+        $mailMessage->attach(new class() implements Attachable
+        {
+            public function toMailAttachment()
+            {
+                return Attachment::fromData(fn () => 'bar', 'foo.jpg')->withMime('image/png');
+            }
+        });
+
+        $this->assertSame([
+            'data' => 'bar',
+            'name' => 'foo.jpg',
+            'options' => [
+                'mime' => 'image/png',
+            ],
+        ], $mailMessage->rawAttachments[0]);
     }
 }
