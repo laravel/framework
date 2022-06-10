@@ -2,9 +2,9 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Contracts\Validation\{{ ruleType }};
+use Illuminate\Contracts\Validation\InvokableRule;
 
-class {{ class }} implements {{ ruleType }}
+class {{ class }} implements InvokableRule
 {
     /**
      * Run the validation rule.

@@ -51,17 +51,9 @@ class RuleMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $replace = 'Rule';
-
-        if ($this->option('invokable')) {
-            $replace = 'InvokableRule';
-        } elseif ($this->option('implicit')) {
-            $replace = 'ImplicitRule';
-        }
-
         return str_replace(
             '{{ ruleType }}',
-            $replace,
+            $this->option('implicit') ? 'ImplicitRule' : 'Rule',
             parent::buildClass($name)
         );
     }
