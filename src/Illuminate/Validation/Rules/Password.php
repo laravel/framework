@@ -330,9 +330,9 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
         });
 
         if ($this->uncompromised && ! Container::getInstance()->make(UncompromisedVerifier::class)->verify([
-                'value' => $value,
-                'threshold' => $this->compromisedThreshold,
-            ])) {
+            'value' => $value,
+            'threshold' => $this->compromisedThreshold,
+        ])) {
             $validator->errors()->add(
                 $attribute,
                 $this->getErrorMessage('validation.password.uncompromised')
