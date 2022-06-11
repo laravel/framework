@@ -14,6 +14,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -143,6 +144,13 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->get('file.txt'));
+    }
+
+    public function testMimeTypeNotDetected()
+    {
+        $this->filesystem->write('unknown.mime-type', '');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertFalse($filesystemAdapter->mimeType('unknown.mime-type'));
     }
 
     public function testPut()
@@ -442,6 +450,23 @@ class FilesystemAdapterTest extends TestCase
             return;
         } finally {
             chmod(__DIR__.'/tmp/foo.txt', 0600);
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    public function testThrowExceptionsForMimeType()
+    {
+        $this->filesystem->write('unknown.mime-type', '');
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
+
+        try {
+            $adapter->mimeType('unknown.mime-type');
+        } catch (UnableToRetrieveMetadata $e) {
+            $this->assertTrue(true);
+
+            return;
         }
 
         $this->fail('Exception was not thrown.');
