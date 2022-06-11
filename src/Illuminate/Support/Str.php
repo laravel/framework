@@ -438,6 +438,10 @@ class Str
         if ($encoding) {
             return mb_strlen($value, $encoding);
         }
+        
+        if (is_null($value)) {
+            return 0;
+        }
 
         return mb_strlen($value);
     }
