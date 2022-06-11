@@ -433,14 +433,10 @@ class Str
      * @param  string|null  $encoding
      * @return int
      */
-    public static function length($value, $encoding = null)
+    public static function length(string $value, $encoding = null)
     {
         if ($encoding) {
             return mb_strlen($value, $encoding);
-        }
-        
-        if (is_null($value)) {
-            return 0;
         }
 
         return mb_strlen($value);
