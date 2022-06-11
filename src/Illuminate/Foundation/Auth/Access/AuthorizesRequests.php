@@ -77,10 +77,9 @@ trait AuthorizesRequests
      * @param  string|array  $model
      * @param  string|array|null  $parameter
      * @param  array  $options
-     * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
-    public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
+    public function authorizeResource($model, $parameter = null, array $options = [])
     {
         $model = is_array($model) ? implode(',', $model) : $model;
 
