@@ -347,7 +347,7 @@ trait FormatsMessages
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $placeholder
-     * @param  \Closure  $modifier
+     * @param  \Closure|null  $modifier
      * @return string
      */
     protected function replaceIndexOrPositionPlaceholder($message, $attribute, $placeholder, Closure $modifier = null)
