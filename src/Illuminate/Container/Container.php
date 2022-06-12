@@ -820,7 +820,7 @@ class Container implements ArrayAccess, ContainerContract
         // given abstract type. So, we will need to check if any aliases exist with this
         // type and then spin through them and check for contextual bindings on these.
         if (empty($this->abstractAliases[$abstract])) {
-            return;
+            return null;
         }
 
         foreach ($this->abstractAliases[$abstract] as $alias) {
