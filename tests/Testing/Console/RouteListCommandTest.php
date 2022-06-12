@@ -67,6 +67,8 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [6] routes')
             ->expectsOutput('');
     }
 
@@ -92,6 +94,8 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\Console\\FooController@show')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
             ->expectsOutput('             ⇂ web')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [4] routes')
             ->expectsOutput('');
     }
 
@@ -110,6 +114,8 @@ class RouteListCommandTest extends TestCase
             ->assertSuccessful()
             ->expectsOutput('')
             ->expectsOutput('  GET|HEAD       foo ...................................... foo.show')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [1] routes')
             ->expectsOutput('');
     }
 
@@ -125,6 +131,8 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
             ->expectsOutput('  ANY            redirect .... Illuminate\Routing\RedirectController')
             ->expectsOutput('  GET|HEAD       view .............................................. ')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
     }
 

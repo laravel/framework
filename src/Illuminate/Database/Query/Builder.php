@@ -678,7 +678,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $wheres
      * @param  array  $bindings
-     * @return void
+     * @return $this
      */
     public function mergeWheres($wheres, $bindings)
     {
@@ -2003,8 +2003,8 @@ class Builder implements BuilderContract
      * Add a "having" clause to the query.
      *
      * @param  \Closure|string  $column
-     * @param  string|null  $operator
-     * @param  string|null  $value
+     * @param  string|int|float|null  $operator
+     * @param  string|int|float|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2047,8 +2047,8 @@ class Builder implements BuilderContract
      * Add an "or having" clause to the query.
      *
      * @param  \Closure|string  $column
-     * @param  string|null  $operator
-     * @param  string|null  $value
+     * @param  string|int|float|null  $operator
+     * @param  string|int|float|null  $value
      * @return $this
      */
     public function orHaving($column, $operator = null, $value = null)
@@ -2546,7 +2546,7 @@ class Builder implements BuilderContract
      * Execute a query for a single record by ID.
      *
      * @param  int|string  $id
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return mixed|static
      */
     public function find($id, $columns = ['*'])
@@ -2558,7 +2558,7 @@ class Builder implements BuilderContract
      * Execute a query for a single record by ID or call a callback.
      *
      * @param  mixed  $id
-     * @param  \Closure|array  $columns
+     * @param  \Closure|array|string  $columns
      * @param  \Closure|null  $callback
      * @return mixed|static
      */
@@ -2635,7 +2635,7 @@ class Builder implements BuilderContract
      * Paginate the given query into a simple paginator.
      *
      * @param  int|\Closure  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -2662,7 +2662,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
      * @return \Illuminate\Contracts\Pagination\Paginator
@@ -2685,7 +2685,7 @@ class Builder implements BuilderContract
      * This is more efficient on larger data-sets, etc.
      *
      * @param  int|null  $perPage
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @param  string  $cursorName
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator

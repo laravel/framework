@@ -8,11 +8,17 @@ use PHPUnit\Framework\TestCase;
 
 trait TestTrait
 {
-    public $booted = false;
+    public $setUp = false;
+    public $tearDown = false;
 
     public function setUpTestTrait()
     {
-        $this->booted = true;
+        $this->setUp = true;
+    }
+
+    public function tearDownTestTrait()
+    {
+        $this->tearDown = true;
     }
 }
 
@@ -24,13 +30,18 @@ class TestCaseWithTrait extends FoundationTestCase
 
 class BootTraitsTest extends TestCase
 {
-    public function testSetUpTraitsWithBootMethod()
+    public function testSetUpAndTearDownTraits()
     {
         $testCase = new TestCaseWithTrait;
 
-        $method = new \ReflectionMethod(get_class($testCase), 'setUpTraits');
+        $method = new \ReflectionMethod($testCase, 'setUpTraits');
         tap($method)->setAccessible(true)->invoke($testCase);
 
-        $this->assertTrue($testCase->booted);
+        $this->assertTrue($testCase->setUp);
+
+        $method = new \ReflectionMethod($testCase, 'callBeforeApplicationDestroyedCallbacks');
+        tap($method)->setAccessible(true)->invoke($testCase);
+
+        $this->assertTrue($testCase->tearDown);
     }
 }

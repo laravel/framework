@@ -1840,6 +1840,25 @@ class TestResponseTest extends TestCase
         $response->assertSessionHasErrors(['foo']);
     }
 
+    public function testAssertJsonSerializedSessionHasErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1), null, 'json'));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $store->save(); // Required to serialize error bag to JSON
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasErrors(['foo']);
+    }
+
     public function testAssertSessionDoesntHaveErrors()
     {
         $this->expectException(AssertionFailedError::class);

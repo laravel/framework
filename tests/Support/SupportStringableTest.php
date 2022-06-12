@@ -38,6 +38,23 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
     }
 
+    public function testIsJson()
+    {
+        $this->assertTrue($this->stringable('1')->isJson());
+        $this->assertTrue($this->stringable('[1,2,3]')->isJson());
+        $this->assertTrue($this->stringable('[1,   2,   3]')->isJson());
+        $this->assertTrue($this->stringable('{"first": "John", "last": "Doe"}')->isJson());
+        $this->assertTrue($this->stringable('[{"first": "John", "last": "Doe"}, {"first": "Jane", "last": "Doe"}]')->isJson());
+
+        $this->assertFalse($this->stringable('1,')->isJson());
+        $this->assertFalse($this->stringable('[1,2,3')->isJson());
+        $this->assertFalse($this->stringable('[1,   2   3]')->isJson());
+        $this->assertFalse($this->stringable('{first: "John"}')->isJson());
+        $this->assertFalse($this->stringable('[{first: "John"}, {first: "Jane"}]')->isJson());
+        $this->assertFalse($this->stringable('')->isJson());
+        $this->assertFalse($this->stringable(null)->isJson());
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());

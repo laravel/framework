@@ -266,7 +266,8 @@ class RouteListCommand extends Command
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
             ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
             ($this->option('domain') && ! Str::contains((string) $route['domain'], $this->option('domain'))) ||
-            ($this->option('except-vendor') && $route['vendor'])) {
+            ($this->option('except-vendor') && $route['vendor']) ||
+            ($this->option('only-vendor') && ! $route['vendor'])) {
             return;
         }
 
@@ -360,6 +361,8 @@ class RouteListCommand extends Command
 
         $terminalWidth = $this->getTerminalWidth();
 
+        $routeCount = $this->determineRouteCountOutput($routes, $terminalWidth);
+
         return $routes->map(function ($route) use ($maxMethod, $terminalWidth) {
             [
                 'action' => $action,
@@ -397,9 +400,14 @@ class RouteListCommand extends Command
                 $spaces,
                 preg_replace('#({[^}]+})#', '<fg=yellow>$1</>', $uri),
                 $dots,
-                str_replace('   ', ' › ', $action),
+                str_replace('   ', ' › ', $action ?? ''),
             ), $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null];
-        })->flatten()->filter()->prepend('')->push('')->toArray();
+        })
+            ->flatten()
+            ->filter()
+            ->prepend('')
+            ->push('')->push($routeCount)->push('')
+            ->toArray();
     }
 
     /**
@@ -434,6 +442,24 @@ class RouteListCommand extends Command
         }
 
         return $name.$action;
+    }
+
+    /**
+     * Determine and return the output for displaying the number of routes in the CLI output.
+     *
+     * @param  \Illuminate\Support\Collection  $routes
+     * @param  int  $terminalWidth
+     * @return string
+     */
+    protected function determineRouteCountOutput($routes, $terminalWidth)
+    {
+        $routeCountText = 'Showing ['.$routes->count().'] routes';
+
+        $offset = $terminalWidth - mb_strlen($routeCountText) - 2;
+
+        $spaces = str_repeat(' ', $offset);
+
+        return $spaces.'<fg=blue;options=bold>Showing ['.$routes->count().'] routes</>';
     }
 
     /**
@@ -476,6 +502,7 @@ class RouteListCommand extends Command
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
+            ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
         ];
     }
 }

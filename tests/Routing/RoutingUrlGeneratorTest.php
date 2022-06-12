@@ -373,6 +373,24 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
     }
 
+    public function testRoutableInterfaceRoutingAsQueryString()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo', ['as' => 'query-string']);
+        $routes->add($route);
+
+        $model = new RoutableInterfaceStub;
+        $model->key = 'routable';
+
+        $this->assertSame('/foo?routable', $url->route('query-string', $model, false));
+        $this->assertSame('/foo?routable', $url->route('query-string', [$model], false));
+        $this->assertSame('/foo?foo=routable', $url->route('query-string', ['foo' => $model], false));
+    }
+
     public function testRoutableInterfaceRoutingWithSeparateBindingFieldOnlyForSecondParameter()
     {
         $url = new UrlGenerator(
