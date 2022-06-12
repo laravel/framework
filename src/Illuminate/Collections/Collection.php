@@ -286,6 +286,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @param  string  $prepend
+     * @return static
+     */
+    public function dot($prepend = '')
+    {
+        return new static(Arr::dot($this->all(), $prepend));
+    }
+
+    /**
      * Retrieve duplicate items from the collection.
      *
      * @param  (callable(TValue): bool)|string|null  $callback
