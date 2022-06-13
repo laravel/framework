@@ -814,7 +814,7 @@ EOF;
     /**
      * Assert that the response does not contain the given path.
      *
-     * @param  array  $data
+     * @param  string  $path
      * @return $this
      */
     public function assertJsonMissingPath(string $path)

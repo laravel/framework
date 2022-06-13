@@ -243,7 +243,7 @@ class MailMessage extends SimpleMessage implements Renderable
     /**
      * Attach a file to the message.
      *
-     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Contracts\Mail\Attachable  $file
+     * @param  string|\Illuminate\Contracts\Mail\Attachable  $file
      * @param  array  $options
      * @return $this
      */
