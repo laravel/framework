@@ -92,11 +92,11 @@ class DatabaseSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')
             ->andReturn('');
 
-        $blueprint = m::mock(Blueprint::class . '[createDefaultIndexName]', ['users']);
+        $blueprint = m::mock(Blueprint::class.'[createDefaultIndexName]', ['users']);
         $blueprint->shouldReceive('createDefaultIndexName')
             ->with(['users', ['country_id']])->andReturn('users_country_id_foreign');
 
-        $builder = m::mock(Builder::class . '[getIndexListing]', [$connection])
+        $builder = m::mock(Builder::class.'[getIndexListing]', [$connection])
             ->shouldAllowMockingProtectedMethods();
 
         $builder->shouldReceive('getIndexListing')->with('users')->times(3)
@@ -119,11 +119,11 @@ class DatabaseSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')
             ->andReturn('');
 
-        $blueprint = m::mock(Blueprint::class . '[createDefaultIndexName]', ['users']);
+        $blueprint = m::mock(Blueprint::class.'[createDefaultIndexName]', ['users']);
         $blueprint->shouldReceive('createDefaultIndexName')
             ->with(['users', ['country_id']])->andReturn('users_country_id_foreign');
 
-        $builder = m::mock(Builder::class . '[getIndexListing]', [$connection])
+        $builder = m::mock(Builder::class.'[getIndexListing]', [$connection])
             ->shouldAllowMockingProtectedMethods();
 
         $builder->shouldReceive('getIndexListing')->with('users')->times(3)

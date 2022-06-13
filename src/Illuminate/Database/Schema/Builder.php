@@ -239,7 +239,7 @@ class Builder
     {
         $schemaManager = $this->connection->getDoctrineSchemaManager();
 
-        $indexes = $schemaManager->listTableIndexes($this->connection->getTablePrefix() . $table);
+        $indexes = $schemaManager->listTableIndexes($this->connection->getTablePrefix().$table);
 
         return array_keys($indexes);
     }
@@ -248,12 +248,13 @@ class Builder
      * Determine if the given table has a given index.
      * The type param must be given in case the index param is array,
      * to create the default index name. Which must be one of these values:
-     * 'primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'
+     * 'primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'.
      *
-     * @param  string        $table
+     * @param  string  $table
      * @param  string|array  $index
-     * @param  string        $type
+     * @param  string  $type
      * @return bool
+     *
      * @throws \LogicException
      */
     public function hasIndex(string $table, string|array $index, string $type = ''): bool
@@ -274,12 +275,13 @@ class Builder
      * Determine if the given table has given indexes.
      * The type param must be given in case the index param's item is array,
      * to create the default index name. Which must be one of these values:
-     * 'primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'
+     * 'primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'.
      *
      * @param  string  $table
-     * @param  array   $indexes
+     * @param  array  $indexes
      * @param  string  $type
      * @return bool
+     *
      * @throws \LogicException
      */
     public function hasIndexes(string $table, array $indexes, string $type = ''): bool
@@ -293,7 +295,7 @@ class Builder
                 $index = $this->createBlueprint($table)->createDefaultIndexName($type, $index);
             }
 
-            if (!in_array(strtolower($index), $tableIndexes)) {
+            if (! in_array(strtolower($index), $tableIndexes)) {
                 return false;
             }
         }
@@ -305,10 +307,10 @@ class Builder
      * Execute a table builder callback if the given table has a given index.
      * Index type param can be empty string in case the index param is string.
      *
-     * @param  string        $table
+     * @param  string  $table
      * @param  string|array  $index
-     * @param  string        $type
-     * @param  \Closure      $callback
+     * @param  string  $type
+     * @param  \Closure  $callback
      * @return void
      */
     public function whenTableHasIndex(string $table, string|array $index, string $type, Closure $callback): void
@@ -322,10 +324,10 @@ class Builder
      * Execute a table builder callback if the given table doesn't have a given index.
      * Index type param can be empty string in case the index param is string.
      *
-     * @param  string        $table
+     * @param  string  $table
      * @param  string|array  $index
-     * @param  string        $type
-     * @param  \Closure      $callback
+     * @param  string  $type
+     * @param  \Closure  $callback
      * @return void
      */
     public function whenTableDoesntHaveIndex(string $table, string|array $index, string $type, Closure $callback): void
