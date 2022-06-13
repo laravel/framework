@@ -261,7 +261,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertSame('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional'));
-        $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional', ['baz' => null]));
+        $this->assertSame('http://www.foo.com/foo/bar?baz=', $url->route('optional', ['baz' => null]));
         $this->assertSame('http://www.foo.com/foo/bar', $url->route('optional', ['baz' => '']));
         $this->assertSame('http://www.foo.com/foo/bar/0', $url->route('optional', ['baz' => 0]));
         $this->assertSame('http://www.foo.com/foo/bar/taylor', $url->route('optional', 'taylor'));

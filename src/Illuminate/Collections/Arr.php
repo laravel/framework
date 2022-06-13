@@ -531,6 +531,12 @@ class Arr
      */
     public static function query($array)
     {
+        array_walk_recursive($array, function (&$value) {
+            if ($value === null) {
+                $value = '';
+            }
+        });
+
         return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
     }
 
