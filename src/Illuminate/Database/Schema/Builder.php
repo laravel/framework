@@ -328,7 +328,7 @@ class Builder
      * @param  \Closure      $callback
      * @return void
      */
-    public function whenTableDoesntHaveindex(string $table, string|array $index, string $type, Closure $callback): void
+    public function whenTableDoesntHaveIndex(string $table, string|array $index, string $type, Closure $callback): void
     {
         if (! $this->hasIndex($table, $index, $type)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
