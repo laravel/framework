@@ -672,6 +672,15 @@ class SupportStrTest extends TestCase
         $this->assertSame('***************', Str::mask('maria@email.com', '*', 0));
     }
 
+    public function testMaskEachPartition()
+    {
+        $this->assertSame('Y**** O*** S***', Str::maskEachPartition('Yusuf Onur SARI'));
+        $this->assertSame('Y**************', Str::maskEachPartition('Yusuf Onur SARI', ''));
+        $this->assertSame('F**,B**,B**', Str::maskEachPartition('Foo,Bar,Baz', ','));
+        $this->assertSame('tay***@email.com', Str::maskEachPartition('taylor@email.com', '', '*', -13, 3));
+        $this->assertSame('Yus** On** SA**', Str::maskEachPartition('Yusuf Onur SARI', ' ', '*', -2, 2));
+    }
+
     public function testMatch()
     {
         $this->assertSame('bar', Str::match('/bar/', 'foo bar'));

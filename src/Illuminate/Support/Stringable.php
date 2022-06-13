@@ -406,6 +406,21 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Masks each part of the string separated by a separator.
+     *
+     * @param string $separator
+     * @param string $character
+     * @param int $index
+     * @param int|null $length
+     * @param string $encoding
+     * @return string
+     */
+    public function maskEachPartition(string $separator = ' ', string $character = '*', int $index = 1, ?int $length = null, $encoding = 'UTF-8'): string
+    {
+        return new static(Str::maskEachPartition($this->value, $separator, $character, $index, $length, $encoding));
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern

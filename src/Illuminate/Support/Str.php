@@ -540,6 +540,31 @@ class Str
     }
 
     /**
+     * Masks each part of the string separated by a separator.
+     *
+     * @param string $string
+     * @param string $separator
+     * @param string $character
+     * @param int $index
+     * @param int|null $length
+     * @param string $encoding
+     * @return string
+     */
+    public static function maskEachPartition(string $string, string $separator = ' ', string $character = '*', int $index = 1, ?int $length = null, $encoding = 'UTF-8'): string
+    {
+        if (!self::length($separator)) {
+            return self::mask($string, $character, $index, $length, $encoding);
+        }
+
+        $items = explode($separator, $string);
+        $items = array_map(function ($value) use ($character, $index, $length, $encoding) {
+            return self::mask($value, $character, $index, $length, $encoding);
+        }, $items);
+
+        return implode($separator, $items);
+    }
+
+    /**
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
