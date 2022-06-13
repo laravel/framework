@@ -24,6 +24,11 @@ namespace Illuminate\Support\Facades;
  * @method static void morphUsingUuids()
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
+ * @method static array getIndexListing(string $table)
+ * @method static bool hasIndex(string $table, string|array $index, string $type = '')
+ * @method static bool hasIndexes(string $table, array $indexes, string $type = '')
+ * @method static void whenTableHasIndex(string $table, string|array $index, string $type, Closure $callback)
+ * @method static void whenTableDoesntHaveIndex(string $table, string|array $index, string $type, Closure $callback)
  *
  * @see \Illuminate\Database\Schema\Builder
  */
