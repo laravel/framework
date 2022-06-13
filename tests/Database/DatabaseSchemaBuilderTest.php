@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use LogicException;
 use Mockery as m;
@@ -81,5 +82,59 @@ class DatabaseSchemaBuilderTest extends TestCase
         $type->shouldReceive('getName')->once()->andReturn('integer');
 
         $this->assertSame('integer', $builder->getColumnType('users', 'id'));
+    }
+
+    public function testTableHasIndex()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = m::mock(stdClass::class);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getConfig')
+            ->andReturn('');
+
+        $blueprint = m::mock(Blueprint::class . '[createDefaultIndexName]', ['users']);
+        $blueprint->shouldReceive('createDefaultIndexName')
+            ->with(['users', ['country_id']])->andReturn('users_country_id_foreign');
+
+        $builder = m::mock(Builder::class . '[getIndexListing]', [$connection])
+            ->shouldAllowMockingProtectedMethods();
+
+        $builder->shouldReceive('getIndexListing')->with('users')->times(3)
+            ->andReturn(['primary', 'users_country_id_foreign']);
+
+        $builder->shouldReceive('createBlueprint')->with('users')
+            ->andReturn($blueprint);
+
+        $this->assertTrue($builder->hasIndex('users', 'primary'));
+        $this->assertTrue($builder->hasIndex('users', ['country_id'], 'foreign'));
+
+        $this->assertFalse($builder->hasIndex('users', 'not_exists'));
+    }
+
+    public function testTableHasIndexes()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = m::mock(stdClass::class);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getConfig')
+            ->andReturn('');
+
+        $blueprint = m::mock(Blueprint::class . '[createDefaultIndexName]', ['users']);
+        $blueprint->shouldReceive('createDefaultIndexName')
+            ->with(['users', ['country_id']])->andReturn('users_country_id_foreign');
+
+        $builder = m::mock(Builder::class . '[getIndexListing]', [$connection])
+            ->shouldAllowMockingProtectedMethods();
+
+        $builder->shouldReceive('getIndexListing')->with('users')->times(3)
+            ->andReturn(['primary', 'users_country_id_foreign']);
+
+        $builder->shouldReceive('createBlueprint')->with('users')
+            ->andReturn($blueprint);
+
+        $this->assertTrue($builder->hasIndexes('users', ['primary', 'users_country_id_foreign']));
+        $this->assertTrue($builder->hasIndexes('users', [['country_id']], 'foreign'));
+
+        $this->assertFalse($builder->hasIndexes('users', ['not_exists']));
     }
 }

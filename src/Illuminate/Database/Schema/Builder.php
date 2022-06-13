@@ -230,6 +230,112 @@ class Builder
     }
 
     /**
+     * Get the index listing for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexListing(string $table): array
+    {
+        $schemaManager = $this->connection->getDoctrineSchemaManager();
+
+        $indexes = $schemaManager->listTableIndexes($this->connection->getTablePrefix() . $table);
+
+        return array_keys($indexes);
+    }
+
+    /**
+     * Determine if the given table has a given index.
+     * The type param must be given in case the index param is array,
+     * to create the default index name. Which must be one of these values:
+     * 'primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'
+     *
+     * @param  string        $table
+     * @param  string|array  $index
+     * @param  string        $type
+     * @return bool
+     * @throws \LogicException
+     */
+    public function hasIndex(string $table, string|array $index, string $type = ''): bool
+    {
+        if (is_array($index) && $type === '') {
+            throw new LogicException('The index type must be given in case the index param is array.');
+        } elseif (is_array($index)) {
+            $index = $this->createBlueprint($table)->createDefaultIndexName($type, $index);
+        }
+
+        return in_array(
+            strtolower($index),
+            array_map('strtolower', $this->getIndexListing($table))
+        );
+    }
+
+    /**
+     * Determine if the given table has given indexes.
+     * The type param must be given in case the index param's item is array,
+     * to create the default index name. Which must be one of these values:
+     * 'primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'
+     *
+     * @param  string  $table
+     * @param  array   $indexes
+     * @param  string  $type
+     * @return bool
+     * @throws \LogicException
+     */
+    public function hasIndexes(string $table, array $indexes, string $type = ''): bool
+    {
+        $tableIndexes = array_map('strtolower', $this->getIndexListing($table));
+
+        foreach ($indexes as $index) {
+            if (is_array($index) && $type === '') {
+                throw new LogicException('The index type must be given in case the index param is array.');
+            } elseif (is_array($index)) {
+                $index = $this->createBlueprint($table)->createDefaultIndexName($type, $index);
+            }
+
+            if (!in_array(strtolower($index), $tableIndexes)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Execute a table builder callback if the given table has a given index.
+     * Index type param can be empty string in case the index param is string.
+     *
+     * @param  string        $table
+     * @param  string|array  $index
+     * @param  string        $type
+     * @param  \Closure      $callback
+     * @return void
+     */
+    public function whenTableHasIndex(string $table, string|array $index, string $type, Closure $callback): void
+    {
+        if ($this->hasIndex($table, $index, $type)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
+     * Execute a table builder callback if the given table doesn't have a given index.
+     * Index type param can be empty string in case the index param is string.
+     *
+     * @param  string        $table
+     * @param  string|array  $index
+     * @param  string        $type
+     * @param  \Closure      $callback
+     * @return void
+     */
+    public function whenTableDoesntHaveindex(string $table, string|array $index, string $type, Closure $callback): void
+    {
+        if (! $this->hasIndex($table, $index, $type)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
      * Modify a table on the schema.
      *
      * @param  string  $table

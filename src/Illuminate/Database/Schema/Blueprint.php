@@ -1578,6 +1578,18 @@ class Blueprint
     }
 
     /**
+     * Create a default index name for the table.
+     *
+     * @param  string  $type
+     * @param  array  $columns
+     * @return string
+     */
+    public function createDefaultIndexName(string $type, array $columns): string
+    {
+        return $this->createIndexName($type, $columns);
+    }
+
+    /**
      * Add a new column to the blueprint.
      *
      * @param  string  $type
