@@ -32,6 +32,39 @@ class PusherBroadcaster extends Broadcaster
     }
 
     /**
+     * Resolve the authenticated user payload for an incoming connection request.
+     *
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#response
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|null
+     */
+    public function resolveAuthenticatedUser($request)
+    {
+        if (! $user = parent::resolveAuthenticatedUser($request)) {
+            return;
+        }
+
+        if (method_exists($this->pusher, 'authenticateUser')) {
+            return $this->pusher->authenticateUser($request->socket_id, $user);
+        }
+
+        $settings = $this->pusher->getSettings();
+        $encodedUser = json_encode($user);
+        $decodedString = "{$request->socket_id}::user::{$encodedUser}";
+
+        $auth = $settings['auth_key'].':'.hash_hmac(
+            'sha256', $decodedString, $settings['secret']
+        );
+
+        return [
+            'auth' => $auth,
+            'user_data' => $encodedUser,
+        ];
+    }
+
+    /**
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -65,7 +98,10 @@ class PusherBroadcaster extends Broadcaster
     {
         if (str_starts_with($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
-                $request, $this->pusher->socket_auth($request->channel_name, $request->socket_id)
+                $request,
+                method_exists($this->pusher, 'authorizeChannel')
+                    ? $this->pusher->authorizeChannel($request->channel_name, $request->socket_id)
+                    : $this->pusher->socket_auth($request->channel_name, $request->socket_id)
             );
         }
 
@@ -79,10 +115,9 @@ class PusherBroadcaster extends Broadcaster
 
         return $this->decodePusherResponse(
             $request,
-            $this->pusher->presence_auth(
-                $request->channel_name, $request->socket_id,
-                $broadcastIdentifier, $result
-            )
+            method_exists($this->pusher, 'authorizePresenceChannel')
+                ? $this->pusher->authorizePresenceChannel($request->channel_name, $request->socket_id, $broadcastIdentifier, $result)
+                : $this->pusher->presence_auth($request->channel_name, $request->socket_id, $broadcastIdentifier, $result)
         );
     }
 

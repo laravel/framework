@@ -2158,6 +2158,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The url must start with one of the following values http, https', $v->messages()->first('url'));
     }
 
+    public function testValidateDoesntStartWith()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'world hello'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'hello world'], ['x' => 'doesnt_start_with:hello']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateString()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2325,30 +2336,6 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '2e7'], ['foo' => 'Digits:3']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'digits:3']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'digits:5']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'digits:4']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '123.456.789'], ['foo' => 'digits:10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '...'], ['foo' => 'digits:3']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.'], ['foo' => 'digits:1']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.2'], ['foo' => 'digits:2']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '2.'], ['foo' => 'digits:2']);
-        $this->assertTrue($v->passes());
-
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'digits_between:1,6']);
         $this->assertTrue($v->passes());
@@ -2361,30 +2348,6 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_between:1,6']);
         $this->assertFalse($v->passes());
-
-        $v = new Validator($trans, ['foo' => '1.2'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '0.9876'], ['foo' => 'digits_between:1,5']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '1..2'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '123.456.789'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '...'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->fails());
-
-        $v = new Validator($trans, ['foo' => '.2'], ['foo' => 'digits_between:0,10']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => '2.'], ['foo' => 'digits_between:1,10']);
-        $this->assertTrue($v->passes());
     }
 
     public function testValidateSize()
@@ -2435,6 +2398,24 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Between:50,100']);
+        $this->assertFalse($v->passes());
+
+        // inclusive on min
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Between:123,200']);
+        $this->assertTrue($v->passes());
+
+        // inclusive on max
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Between:0,123']);
+        $this->assertTrue($v->passes());
+
+        // can work with float
+        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Between:0.01,0.02']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Between:0.01,0.03']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.001'], ['foo' => 'Numeric|Between:0.01,0.03']);
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Between:1,5']);
@@ -7233,6 +7214,28 @@ class ValidationValidatorTest extends TestCase
             'The baz field must contain entries for foo, fee, boo, bar',
             $validator->messages()->first('baz')
         );
+    }
+
+    public function testArrayKeysWithDotIntegerMin()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $data = [
+            'foo.bar' => -1,
+        ];
+
+        $rules = [
+            'foo\.bar' => 'integer|min:1',
+        ];
+
+        $expectedResult = [
+            'foo.bar' => [
+                'validation.min.numeric',
+            ],
+        ];
+
+        $validator = new Validator($trans, $data, $rules, [], []);
+        $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
     }
 
     protected function getTranslator()

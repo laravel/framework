@@ -1,6 +1,143 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.12.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.17.0...9.x)
+
+
+## [v9.17.0](https://github.com/laravel/framework/compare/v9.16.0...v9.17.0) - 2022-06-07
+
+### Added
+- Added Illuminate/Database/Eloquent/Builder::withoutEagerLoad() ([#42641](https://github.com/laravel/framework/pull/42641))
+- Allow random string generation to be controlled ([#42669](https://github.com/laravel/framework/pull/42669))
+- Adds doesnt_start_with validation ([#42683](https://github.com/laravel/framework/pull/42683), [de35bf2](https://github.com/laravel/framework/commit/de35bf2a8ab40013d997c62b5a80cdb907c73b99))
+- Added quarterlyOn cron schedule frequency command ([#42692](https://github.com/laravel/framework/pull/42692))
+
+### Fixed
+- Free reserved memory before handling fatal errors ([#42630](https://github.com/laravel/framework/pull/42630), [#42646](https://github.com/laravel/framework/pull/42646))
+- Prevent $mailer being reset when testing mailables that implement ShouldQueue ([#42695](https://github.com/laravel/framework/pull/42695))
+- Added checks for Pusher 7.1 preps ([#42632](https://github.com/laravel/framework/pull/42632))
+- Fixed grouping for user authorization ([#42664](https://github.com/laravel/framework/pull/42664))
+
+### Changed
+-  Allow assertions against pushed string based pushed jobs ([#42676](https://github.com/laravel/framework/pull/42676))
+
+
+## [v9.16.0](https://github.com/laravel/framework/compare/v9.15.0...v9.16.0) - 2022-06-02
+
+### Added
+- Added Eloquent withWhereHas method ([#42597](https://github.com/laravel/framework/pull/42597))
+- User authentication for Pusher ([#42531](https://github.com/laravel/framework/pull/42531))
+- Added additional uuid testing helpers ([#42619](https://github.com/laravel/framework/pull/42619))
+
+### Fixed
+- Fix queueable notification's ID overwritten ([#42581](https://github.com/laravel/framework/pull/42581))
+- Handle undefined array key error in route ([#42606](https://github.com/laravel/framework/pull/42606))
+
+### Deprecated
+- Illuminate/Routing/Redirector::home() ([#42600](https://github.com/laravel/framework/pull/42600))
+
+
+## [v9.15.0](https://github.com/laravel/framework/compare/v9.14.1...v9.15.0) - 2022-05-31
+
+### Added
+- Added --only-vendor option to route:list command ([#42549](https://github.com/laravel/framework/pull/42549))
+- Added `Illuminate/Http/Client/PendingRequest::throwUnless()` ([#42556](https://github.com/laravel/framework/pull/42556))
+- Added `Illuminate/Support/Str::isJson()` ([#42545](https://github.com/laravel/framework/pull/42545))
+- Added `Illuminate/Filesystem/Filesystem::isEmptyDirectory()` ([#42559](https://github.com/laravel/framework/pull/42559))
+- Added `Add counts to route:list command` ([#42551](https://github.com/laravel/framework/pull/42551))
+- Support kebab case for slot name shortcut ([#42574](https://github.com/laravel/framework/pull/42574))
+
+### Revered
+- Revert digits changes in validation ([c113768](https://github.com/laravel/framework/commit/c113768dbd47de7466d703108eaf8155916d5666), [#42562](https://github.com/laravel/framework/pull/42562))
+
+### Fixed
+- Fix getting '0' from route parameter in Authorize middleware ([#42582](https://github.com/laravel/framework/pull/42582))
+
+### Changed
+- Retain the original attribute value during validation of an array key with a dot for correct failure message ([#42395](https://github.com/laravel/framework/pull/42395))
+- Allow bootable test traits to teardown ([#42521](https://github.com/laravel/framework/pull/42521))
+- Pass thrown exception to $sleepMilliseconds closure in retry helper ([#42532](https://github.com/laravel/framework/pull/42532))
+- Make HasTimestamps::updateTimestamps chainable ([#42533](https://github.com/laravel/framework/pull/42533))
+- Remove meaningless parameter in `Illuminate/View/Concerns/ManagesEvents` ([#42546](https://github.com/laravel/framework/pull/42546))
+- Map integer parameter to parameter name when resolving binding field ([#42571](https://github.com/laravel/framework/pull/42571))
+- Conditionable should return HigherOrderWhenProxy only when the args number is exactly 1 ([#42555](https://github.com/laravel/framework/pull/42555))
+
+
+## [v9.14.1](https://github.com/laravel/framework/compare/v9.14.0...v9.14.1) - 2022-05-25
+
+### Added
+- Model::whereRelation add callback function ([#42491](https://github.com/laravel/framework/pull/42491))
+- Add Conditionable Trait to Illuminate\Support\Carbon ([#42500](https://github.com/laravel/framework/pull/42500))
+
+### Fixed
+- Fix afterCommit and DatabaseTransactions ([#42502](https://github.com/laravel/framework/pull/42502))
+- Fixed regression when only some route parameters are scoped ([#42517](https://github.com/laravel/framework/pull/42517))
+
+
+## [v9.14.0](https://github.com/laravel/framework/compare/v9.13.0...v9.14.0) - 2022-05-24
+
+### Added
+- Added ability to add table comments for MySQL and Postgres ([#42401](https://github.com/laravel/framework/pull/42401))
+- Added dynamic trashed factory state ([#42414](https://github.com/laravel/framework/pull/42414))
+- Added Illuminate/Collections/Arr::prependKeysWith() ([#42448](https://github.com/laravel/framework/pull/42448))
+- Added bootable traits to TestCase ([#42394](https://github.com/laravel/framework/pull/42394))
+
+### Fixed
+- Fix clone issue on updateOrCreate and firstOrCreate ([#42434](https://github.com/laravel/framework/pull/42434))
+- Prevent double sanitized key in RateLimiter@tooManyAttempts ([#42462](https://github.com/laravel/framework/pull/42462))
+- Add flush handler to output buffer for streamed test response (bugfix) ([#42481](https://github.com/laravel/framework/pull/42481))
+
+### Changed
+- Adds attaches a concise error message to SES exceptions ([#42426](https://github.com/laravel/framework/pull/42426))
+- Use duplicate instead of createFromBase to clone request when routes are cached ([#42420](https://github.com/laravel/framework/pull/42420))
+- Use model route key when route parameter does not specifiy custom binding field but a different parameter does ([#42425](https://github.com/laravel/framework/pull/42425))
+- Adds ability to have paginate() $perPage parameter as callable with access to $total ([#42429](https://github.com/laravel/framework/pull/42429))
+- Extract ServeCommand env list to static property ([#42444](https://github.com/laravel/framework/pull/42444))
+- Use route parameters in view ([#42461](https://github.com/laravel/framework/pull/42461))
+
+
+## [v9.13.0](https://github.com/laravel/framework/compare/v9.12.2...v9.13.0) - 2022-05-17
+
+### Added
+- Added Illuminate/Collections/Traits/EnumeratesValues::value() ([#42257](https://github.com/laravel/framework/pull/42257))
+- Added new TestResponse helper: assertJsonMissingPath ([#42361](https://github.com/laravel/framework/pull/42361))
+- Added Illuminate/Support/Testing/Fakes/NotificationFake::assertCount() ([#42366](https://github.com/laravel/framework/pull/42366))
+- Added new DetectLostConnections ([#42377](https://github.com/laravel/framework/pull/42377), [#42382](https://github.com/laravel/framework/pull/42382))
+- Added Illuminate/Testing/TestResponse::collect() ([#42384](https://github.com/laravel/framework/pull/42384))
+- Added full callable support to schedule:list ([#42400](https://github.com/laravel/framework/pull/42400))
+- Added `Illuminate/Collections/Arr::map()` ([#42398](https://github.com/laravel/framework/pull/42398))
+
+### Fixed
+- Fixed PruneCommand finding its usage within other traits ([#42350](https://github.com/laravel/framework/pull/42350))
+- Fix assert that exception is thrown without message ([#42360](https://github.com/laravel/framework/pull/42360))
+
+### Changed
+- Skip parameter parsing for raw post body in HTTP Client ([#42364](https://github.com/laravel/framework/pull/42364))
+- Consistency between digits and digits_between validation rules ([#42358](https://github.com/laravel/framework/pull/42358))
+- Corrects the use of "failed_jobs" instead of "job_batches" in BatchedTableCommand ([#42389](https://github.com/laravel/framework/pull/42389))
+- Update email.blade.php ([#42388](https://github.com/laravel/framework/pull/42388))
+- Remove old monolog 1.x compat code ([#42392](https://github.com/laravel/framework/pull/42392))
+- SesTransport: use correct Tags argument ([#42390](https://github.com/laravel/framework/pull/42390))
+- Implement robust handling of forwarding of exception codes ([#42393](https://github.com/laravel/framework/pull/42393))
+
+
+## [v9.12.2](https://github.com/laravel/framework/compare/v9.12.1...v9.12.2) - 2022-05-11
+
+### Fixed
+- Factory fails to eval models and factories when returned from closure ([#42344](https://github.com/laravel/framework/pull/42344))
+
+### Changed
+- Added is_string check to QueriesRelationships@requalifyWhereTables ([#42341](https://github.com/laravel/framework/pull/42341))
+
+
+## [v9.12.1](https://github.com/laravel/framework/compare/v9.12.0...v9.12.1) - 2022-05-10
+
+### Fixed
+- Fix TypeError in DeadlockException ([#42337](https://github.com/laravel/framework/pull/42337))
+- Fixed type mismatch on Pusher::validate_channels() ([#42340](https://github.com/laravel/framework/pull/42340))
+
+### Changed
+- Add custom segments on "remember me" for session rebuild ([#42316](https://github.com/laravel/framework/pull/42316))
+
 
 ## [v9.12.0](https://github.com/laravel/framework/compare/v9.11.0...v9.12.0) - 2022-05-10
 

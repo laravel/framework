@@ -153,6 +153,23 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a relationship count / exists condition to the query with where clauses.
+     *
+     * Also load the relationship with same condition.
+     *
+     * @param  string  $relation
+     * @param  \Closure|null  $callback
+     * @param  string  $operator
+     * @param  int  $count
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function withWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    {
+        return $this->whereHas($relation, $callback, $operator, $count)
+            ->with($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+    }
+
+    /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string  $relation
@@ -365,7 +382,11 @@ trait QueriesRelationships
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
         });
     }
 
@@ -381,7 +402,11 @@ trait QueriesRelationships
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
         return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
         });
     }
 

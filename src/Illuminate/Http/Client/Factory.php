@@ -26,7 +26,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method \Illuminate\Http\Client\PendingRequest dd()
  * @method \Illuminate\Http\Client\PendingRequest dump()
- * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
+ * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleepMilliseconds = 0, ?callable $when = null, bool $throw = true)
  * @method \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
  * @method \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
@@ -43,6 +43,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
  * @method \Illuminate\Http\Client\PendingRequest throw(callable $callback = null)
  * @method \Illuminate\Http\Client\PendingRequest throwIf($condition)
+ * @method \Illuminate\Http\Client\PendingRequest throwUnless($condition)
  * @method array pool(callable $callback)
  * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
  * @method \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
@@ -118,7 +119,7 @@ class Factory
     /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string  $body
+     * @param  array|string|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
