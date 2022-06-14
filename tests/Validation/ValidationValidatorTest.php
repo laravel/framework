@@ -7238,6 +7238,39 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals($expectedResult, $validator->getMessageBag()->getMessages());
     }
 
+    public function testItCanTranslateMessagesForClosureBasedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'Translated error message.'], 'en');
+        $rule = function ($attribute, $value, $fail) {
+            $fail('validation.translated-error')->translate();
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo' => [
+                'Translated error message.',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItThrowsIfTranslationIsNotFoundForClosureBasedRules()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = function ($attribute, $value, $fail) {
+            $fail('validation.key')->translate();
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to find translation [validation.key] for locale [en].');
+
+        $validator->passes();
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
