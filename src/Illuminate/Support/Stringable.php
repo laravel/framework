@@ -415,9 +415,9 @@ class Stringable implements JsonSerializable
      * @param string $encoding
      * @return string
      */
-    public function maskEachPartition(string $separator = ' ', string $character = '*', int $index = 1, ?int $length = null, $encoding = 'UTF-8'): string
+    public function maskWords(string $separator = ' ', string $character = '*', int $index = 1, ?int $length = null, string $encoding = 'UTF-8'): string
     {
-        return new static(Str::maskEachPartition($this->value, $separator, $character, $index, $length, $encoding));
+        return new static(Str::maskWords($this->value, $separator, $character, $index, $length, $encoding));
     }
 
     /**

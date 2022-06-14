@@ -672,13 +672,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('***************', Str::mask('maria@email.com', '*', 0));
     }
 
-    public function testMaskEachPartition()
+    public function testMaskWords()
     {
-        $this->assertSame('Y**** O*** S***', Str::maskEachPartition('Yusuf Onur SARI'));
-        $this->assertSame('Y**************', Str::maskEachPartition('Yusuf Onur SARI', ''));
-        $this->assertSame('F**,B**,B**', Str::maskEachPartition('Foo,Bar,Baz', ','));
-        $this->assertSame('tay***@email.com', Str::maskEachPartition('taylor@email.com', '', '*', -13, 3));
-        $this->assertSame('Yus** On** SA**', Str::maskEachPartition('Yusuf Onur SARI', ' ', '*', -2, 2));
+        $this->assertSame('Y**** O*** S***', Str::maskWords('Yusuf Onur SARI'));
+        $this->assertSame('Y**************', Str::maskWords('Yusuf Onur SARI', ''));
+        $this->assertSame('F**,B**,B**', Str::maskWords('Foo,Bar,Baz', ','));
+        $this->assertSame('tay***@email.com', Str::maskWords('taylor@email.com', '', '*', -13, 3));
+        $this->assertSame('Yus** On** SA**', Str::maskWords('Yusuf Onur SARI', ' ', '*', -2, 2));
     }
 
     public function testMatch()

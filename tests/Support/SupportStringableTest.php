@@ -980,13 +980,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame('**一段中文', (string) $this->stringable('这是一段中文')->mask('*', 0, 2));
     }
 
-    public function testMaskEachPartition()
+    public function testMaskWords()
     {
-        $this->assertSame('Y**** O*** S***', $this->stringable('Yusuf Onur SARI')->maskEachPartition());
-        $this->assertSame('Y**************', $this->stringable('Yusuf Onur SARI')->maskEachPartition(''));
-        $this->assertSame('F**,B**,B**', $this->stringable('Foo,Bar,Baz')->maskEachPartition(','));
-        $this->assertSame('tay***@email.com', $this->stringable('taylor@email.com')->maskEachPartition('', '*', -13, 3));
-        $this->assertSame('Yus** On** SA**', $this->stringable('Yusuf Onur SARI')->maskEachPartition(' ', '*', -2, 2));
+        $this->assertSame('Y**** O*** S***', $this->stringable('Yusuf Onur SARI')->maskWords());
+        $this->assertSame('Y**************', $this->stringable('Yusuf Onur SARI')->maskWords(''));
+        $this->assertSame('F**,B**,B**', $this->stringable('Foo,Bar,Baz')->maskWords(','));
+        $this->assertSame('tay***@email.com', $this->stringable('taylor@email.com')->maskWords('', '*', -13, 3));
+        $this->assertSame('Yus** On** SA**', $this->stringable('Yusuf Onur SARI')->maskWords(' ', '*', -2, 2));
     }
 
     public function testRepeat()
