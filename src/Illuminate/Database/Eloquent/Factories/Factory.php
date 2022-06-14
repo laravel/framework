@@ -280,7 +280,7 @@ abstract class Factory
     /**
      * Create a collection of models and persist them to the database without dispatching any model events.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model|TModel>|\Illuminate\Database\Eloquent\Model|TModel
      */
