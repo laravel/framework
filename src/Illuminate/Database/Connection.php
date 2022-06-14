@@ -819,6 +819,11 @@ class Connection implements ConnectionInterface
         });
     }
 
+    /**
+     * Restore all the query duration handlers that have already run.
+     *
+     * @return void
+     */
     public function restoreAlreadyRunQueryDurationHandlers()
     {
         foreach ($this->queryDurationHandlers as $key => $queryDurationHandler) {
