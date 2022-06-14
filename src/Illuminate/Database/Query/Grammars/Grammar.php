@@ -858,10 +858,10 @@ class Grammar extends BaseGrammar
      */
     protected function compileOrdersToArray(Builder $query, $orders)
     {
-        return array_map(function ($order) use($query) {
-            if(isset($order['type']) && $order['type'] === 'Field') {
+        return array_map(function ($order) use ($query) {
+            if (isset($order['type']) && $order['type'] === 'Field') {
                 return $this->compileOrderByField($query, $order);
-            } elseif(isset($order['sql'])) {
+            } elseif (isset($order['sql'])) {
                 return $order['sql'];
             } else {
                 return $this->wrap($order['column']).' '.$order['direction'];
@@ -880,8 +880,8 @@ class Grammar extends BaseGrammar
     {
         $column = $order['sql'];
 
-        return 'case '.implode(' ', array_map(function($field, $value) use($column) {
-            return 'when '. $this->wrap($column).'='.$this->parameter($field).' then '.($value + 1);
+        return 'case '.implode(' ', array_map(function ($field, $value) use ($column) {
+            return 'when '.$this->wrap($column).'='.$this->parameter($field).' then '.($value + 1);
         }, $order['bindings'], array_keys($order['bindings']))).' else 0';
     }
 

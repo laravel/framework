@@ -278,7 +278,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileOrderByField(Builder $query, $order)
     {
-        return 'field('.$this->wrap($order['sql']).', '.implode(', ', array_map(function($field) {
+        return 'field('.$this->wrap($order['sql']).', '.implode(', ', array_map(function ($field) {
             return $this->parameter($field);
         }, $order['bindings'])).')';
     }
