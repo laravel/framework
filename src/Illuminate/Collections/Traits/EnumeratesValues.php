@@ -943,6 +943,7 @@ trait EnumeratesValues
      *
      * @param  class-string<TResourceClass>  $resourceClass
      * @return AnonymousResourceCollection<TKey, TResourceClass<TValue>>
+     *
      * @throws Exception
      */
     public function toAnonymousResourceCollection(string $resourceClass)

@@ -3951,7 +3951,6 @@ class SupportCollectionTest extends TestCase
         }
         $this->assertSame($values, $c->pluck('field')->toArray());
 
-
         $mappedIntoNamedCollection = $c->toResourceCollection(TestCollectionResourceCollection::class);
         $this->assertInstanceOf(TestCollectionResourceCollection::class, $mappedIntoNamedCollection);
         $this->assertEquals(2, $mappedIntoNamedCollection->count());
