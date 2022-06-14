@@ -310,6 +310,36 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the host name.
+     *
+     * @return string
+     */
+    public function host()
+    {
+        return $this->getHost();
+    }
+
+    /**
+     * Get the HTTP host being requested.
+     *
+     * @return string
+     */
+    public function httpHost()
+    {
+        return $this->getHttpHost();
+    }
+
+    /**
+     * Get the scheme and HTTP host.
+     *
+     * @return string
+     */
+    public function schemeAndHttpHost()
+    {
+        return $this->getSchemeAndHttpHost();
+    }
+
+    /**
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
