@@ -9,6 +9,9 @@ use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -3931,6 +3934,38 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testToResourceCollection($collection)
+    {
+        $c = new $collection([
+            ['field' => 'foo'],
+            ['field' => 'bar']
+        ]);
+
+        $mappedIntoAnonymous = $c->toAnonymousResourceCollection(TestCollectionResource::class);
+        $this->assertInstanceOf(AnonymousResourceCollection::class, $mappedIntoAnonymous);
+        $this->assertEquals(2, $mappedIntoAnonymous->count());
+        $values = [];
+        foreach($mappedIntoAnonymous as $resource){
+            $this->assertInstanceOf(TestCollectionResource::class, $resource);
+            $values[] = $resource['field'];
+        }
+        $this->assertSame($values, $c->pluck('field')->toArray());
+
+
+        $mappedIntoNamedCollection = $c->toResourceCollection(TestCollectionResourceCollection::class);
+        $this->assertInstanceOf(TestCollectionResourceCollection::class, $mappedIntoNamedCollection);
+        $this->assertEquals(2, $mappedIntoNamedCollection->count());
+        $namedValues = [];
+        foreach($mappedIntoNamedCollection as $resource){
+            $this->assertInstanceOf(TestCollectionResource::class, $resource);
+            $namedValues[] = $resource['field'];
+        }
+        $this->assertSame($namedValues, $c->pluck('field')->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testCombineWithArray($collection)
     {
         $expected = [
@@ -5242,6 +5277,11 @@ class TestCollectionMapIntoObject
     {
         $this->value = $value;
     }
+}
+
+class TestCollectionResource extends JsonResource {}
+class TestCollectionResourceCollection extends ResourceCollection {
+    public $collects = TestCollectionResource::class;
 }
 
 class TestCollectionSubclass extends Collection

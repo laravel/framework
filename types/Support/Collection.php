@@ -1014,3 +1014,24 @@ foreach ($collection as $int => $user) {
     assertType('int', $int);
     assertType('User', $user);
 }
+
+/**
+ * @template TResource
+ */
+class CustomResourceClass extends \Illuminate\Http\Resources\Json\JsonResource {
+    /** @var TResource */
+    public $resource;
+}
+/**
+ * @template TResourceClass
+ */
+class CustomResourceCollectionClass extends \Illuminate\Http\Resources\Json\ResourceCollection {
+    /** @var class-string<TResourceClass> */
+    public $collects = CustomResourceClass::class;
+}
+assertType('Illuminate\Http\Resources\Json\AnonymousResourceCollection&iterable<int, Illuminate\Http\Resources\Json\JsonResource<User>>',
+    $collection->toAnonymousResourceCollection(CustomResourceClass::class)
+);
+assertType('CustomResourceCollectionClass&iterable<int, User>',
+    $collection->toResourceCollection(CustomResourceCollectionClass::class)
+);
