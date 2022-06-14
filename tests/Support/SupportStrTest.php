@@ -771,7 +771,7 @@ class SupportStrTest extends TestCase
 
         $this->assertSame(['Żółta', 'Łódka'], Str::ucsplit('ŻółtaŁódka', false));
         $this->assertSame(['sind', 'Öde', 'Und', 'So'], Str::ucsplit('sindÖdeUndSo', false));
-        $this->assertSame(['Öffentliche','ÖÖÖ', 'Überraschungen'], Str::ucsplit('ÖffentlicheÖÖÖÜberraschungen', false));
+        $this->assertSame(['Öffentliche', 'ÖÖÖ', 'Überraschungen'], Str::ucsplit('ÖffentlicheÖÖÖÜberraschungen', false));
     }
 
     public function testUuid()

@@ -1115,7 +1115,7 @@ class Str
      */
     public static function ucsplit($string, $consecutive = true)
     {
-        if($consecutive) {
+        if ($consecutive) {
             return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
         } else {
             return preg_split('/(?=\p{Lu})(?<!\p{Lu})|(?=\p{Lu}\p{Ll})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
