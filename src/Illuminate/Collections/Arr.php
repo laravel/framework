@@ -252,6 +252,7 @@ class Arr
         return $result;
     }
 
+
     /**
      * Remove one or many array items from a given array using "dot" notation.
      *
@@ -816,5 +817,63 @@ class Arr
         }
 
         return is_array($value) ? $value : [$value];
+    }
+
+
+    /**
+     * Flatten a multi-dimensional array keys into a single level.
+     *
+     * @param  iterable  $array
+     * @return array
+     */
+    public static function flattenKeys($array)
+    {
+        $keys = [];
+
+        foreach ($array as $key => $value) {
+            $keys[] = $key;
+
+            if (is_array($value)) {
+                $keys = array_merge($keys, static::flattenKeys($value));
+            }
+        }
+
+        return $keys;
+    }
+    /**
+     * Flatten a multi-dimensional array keys into a single level.
+     *
+     * @param  iterable  $array
+     * @return array
+     */
+    public static function flattenKeysWithValues($array)
+    {
+        $keys = [];
+
+        foreach ($array as $key => $value) {
+            $keys[$key] = $value;
+
+            if (is_array($value)) {
+                $keys = array_merge($keys, static::flattenKeysWithValues($value));
+            }
+        }
+
+
+        $arr_filter = array_filter($keys, function ($value) {
+            if (is_array($value)) {
+                $filtered = array_filter(array_keys($value), 'is_string');
+                if (empty($filtered)) {
+
+                    return $value;
+                }
+            }
+            return !is_array($value);
+        });
+
+        return array_filter(
+            $arr_filter,
+            fn($key) => !is_numeric($key),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

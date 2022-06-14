@@ -5022,6 +5022,8 @@ class SupportCollectionTest extends TestCase
         $this->assertSame($originalData, $data->whereNotNull()->all());
     }
 
+
+
     /**
      * @dataProvider collectionClassProvider
      */

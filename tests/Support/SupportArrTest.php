@@ -1097,4 +1097,66 @@ class SupportArrTest extends TestCase
             ],
         ], Arr::prependKeysWith($array, 'test.'));
     }
+
+    public function testFlattenKeys()
+    {
+        $array = [
+            'name' => 'taylor',
+            'languages' => [
+                'web' => [
+                    'backend' => 'php',
+                    'frontend' => 'vue'
+                ],
+                'mobile' => [
+                    'android' => 'java',
+                    'ios' => 'swift'
+                ]
+            ],
+           'favorite' => 'laravel'
+
+        ];
+
+        $this->assertEquals([
+            0 => "name",
+            1 => "languages",
+            2 => "web",
+            3 => "backend",
+            4 => "frontend",
+            5 => "mobile",
+            6 => "android",
+            7 => "ios",
+            8 => "favorite"
+        ], Arr::flattenKeys($array));
+    }
+
+    public function testFlattenKeysWithValues()
+    {
+        $array = [
+            'name' => 'taylor',
+            'languages' => [
+                'web' => [
+                    'backend' => 'php',
+                    'frontend' => 'vue'
+                ],
+                'mobile' => [
+                    'android' => 'java',
+                    'ios' => 'swift'
+                ]
+            ],
+            'favorites' => ['laravel', 'lambo']
+
+        ];
+
+        $this->assertEquals([
+            "name" => "taylor",
+            "backend" => "php",
+            "frontend" => "vue",
+            "android" => "java",
+            "ios" => "swift",
+            "favorites" => [
+                0 => "laravel",
+                1 => "lambo"
+            ],
+        ], Arr::flattenKeysWithValues($array));
+    }
 }
