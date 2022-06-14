@@ -3938,14 +3938,14 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([
             ['field' => 'foo'],
-            ['field' => 'bar']
+            ['field' => 'bar'],
         ]);
 
         $mappedIntoAnonymous = $c->toAnonymousResourceCollection(TestCollectionResource::class);
         $this->assertInstanceOf(AnonymousResourceCollection::class, $mappedIntoAnonymous);
         $this->assertEquals(2, $mappedIntoAnonymous->count());
         $values = [];
-        foreach($mappedIntoAnonymous as $resource){
+        foreach($mappedIntoAnonymous as $resource) {
             $this->assertInstanceOf(TestCollectionResource::class, $resource);
             $values[] = $resource['field'];
         }
@@ -3956,7 +3956,7 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf(TestCollectionResourceCollection::class, $mappedIntoNamedCollection);
         $this->assertEquals(2, $mappedIntoNamedCollection->count());
         $namedValues = [];
-        foreach($mappedIntoNamedCollection as $resource){
+        foreach($mappedIntoNamedCollection as $resource) {
             $this->assertInstanceOf(TestCollectionResource::class, $resource);
             $namedValues[] = $resource['field'];
         }
@@ -5279,8 +5279,11 @@ class TestCollectionMapIntoObject
     }
 }
 
-class TestCollectionResource extends JsonResource {}
-class TestCollectionResourceCollection extends ResourceCollection {
+class TestCollectionResource extends JsonResource
+{
+}
+class TestCollectionResourceCollection extends ResourceCollection
+{
     public $collects = TestCollectionResource::class;
 }
 

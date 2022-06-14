@@ -924,10 +924,10 @@ trait EnumeratesValues
     }
 
     /**
-     * Get the collection of items as a resource collection
+     * Get the collection of items as a resource collection.
      * @template TResourceCollectionClass of \Illuminate\Http\Resources\Json\ResourceCollection
      *
-     * @param class-string<TResourceCollectionClass> $resourceCollectionClass
+     * @param  class-string<TResourceCollectionClass>  $resourceCollectionClass
      * @return TResourceCollectionClass<TKey, TValue>
      */
     public function toResourceCollection(string $resourceCollectionClass)
@@ -936,14 +936,15 @@ trait EnumeratesValues
     }
 
     /**
-     * Get the collection of items as an anonymous resource collection
+     * Get the collection of items as an anonymous resource collection.
      * @template TResourceClass of \Illuminate\Http\Resources\Json\JsonResource
      *
-     * @param class-string<TResourceClass> $resourceClass
+     * @param  class-string<TResourceClass>  $resourceClass
      * @return AnonymousResourceCollection<TKey, TResourceClass<TValue>>
      * @throws Exception
      */
-    public function toAnonymousResourceCollection(string $resourceClass){
+    public function toAnonymousResourceCollection(string $resourceClass)
+    {
         if(is_subclass_of($resourceClass, JsonResource::class, true)){
             return $resourceClass::collection($this);
         }

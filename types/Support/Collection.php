@@ -1018,14 +1018,16 @@ foreach ($collection as $int => $user) {
 /**
  * @template TResource
  */
-class CustomResourceClass extends \Illuminate\Http\Resources\Json\JsonResource {
+class CustomResourceClass extends \Illuminate\Http\Resources\Json\JsonResource
+{
     /** @var TResource */
     public $resource;
 }
 /**
  * @template TResourceClass
  */
-class CustomResourceCollectionClass extends \Illuminate\Http\Resources\Json\ResourceCollection {
+class CustomResourceCollectionClass extends \Illuminate\Http\Resources\Json\ResourceCollection
+{
     /** @var class-string<TResourceClass> */
     public $collects = CustomResourceClass::class;
 }
