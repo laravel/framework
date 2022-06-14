@@ -841,7 +841,7 @@ class Arr
         return $keys;
     }
     /**
-     * Flatten a multi-dimensional array keys into a single level.
+     * Flatten a multi-dimensional array keys with values into a single level.
      *
      * @param  iterable  $array
      * @return array
