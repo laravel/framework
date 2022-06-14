@@ -1110,11 +1110,16 @@ class Str
      * Split a string into pieces by uppercase characters.
      *
      * @param  string  $string
+     * @param  bool  $consecutive
      * @return array
      */
-    public static function ucsplit($string)
+    public static function ucsplit($string, $consecutive = true)
     {
-        return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
+        if($consecutive) {
+            return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
+        } else {
+            return preg_split('/(?=\p{Lu})(?<!\p{Lu})|(?=\p{Lu}\p{Ll})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
+        }
     }
 
     /**

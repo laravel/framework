@@ -762,6 +762,18 @@ class SupportStrTest extends TestCase
         $this->assertSame(['Öffentliche', 'Überraschungen'], Str::ucsplit('ÖffentlicheÜberraschungen'));
     }
 
+    public function testUcsplitNonConsecutive()
+    {
+        $this->assertSame(['Laravel_p_h_p_framework'], Str::ucsplit('Laravel_p_h_p_framework', false));
+        $this->assertSame(['Laravel_', 'P_h_p_framework'], Str::ucsplit('Laravel_P_h_p_framework', false));
+        $this->assertSame(['laravel', 'PHP', 'Framework'], Str::ucsplit('laravelPHPFramework', false));
+        $this->assertSame(['Laravel-ph', 'P-framework'], Str::ucsplit('Laravel-phP-framework', false));
+
+        $this->assertSame(['Żółta', 'Łódka'], Str::ucsplit('ŻółtaŁódka', false));
+        $this->assertSame(['sind', 'Öde', 'Und', 'So'], Str::ucsplit('sindÖdeUndSo', false));
+        $this->assertSame(['Öffentliche','ÖÖÖ', 'Überraschungen'], Str::ucsplit('ÖffentlicheÖÖÖÜberraschungen', false));
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
