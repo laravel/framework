@@ -797,7 +797,7 @@ class Connection implements ConnectionInterface
      * @param  callable  $handler
      * @return void
      */
-    public function handleExceedingQueryDuration($threshold, $handler)
+    public function handleExceedingCumulativeQueryDuration($threshold, $handler)
     {
         $threshold = $threshold instanceof CarbonInterval
             ? $threshold->totalMilliseconds

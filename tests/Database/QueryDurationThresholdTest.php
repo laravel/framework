@@ -15,7 +15,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = 0;
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1.1), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1.1), function () use (&$called) {
             $called++;
         });
 
@@ -32,7 +32,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = 0;
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called++;
         });
 
@@ -48,10 +48,10 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = [];
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called['a'] = true;
         });
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called['b'] = true;
         });
 
@@ -69,10 +69,10 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = [];
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called['a'] = true;
         });
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(2), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(2), function () use (&$called) {
             $called['b'] = true;
         });
 
@@ -94,7 +94,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'), '', '', ['name' => 'expected-name']);
         $connection->setEventDispatcher(new Dispatcher());
         $name = null;
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1), function ($connection) use (&$name) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1), function ($connection) use (&$name) {
             $name = $connection->getName();
         });
 
@@ -109,7 +109,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = false;
-        $connection->handleExceedingQueryDuration(1.1, function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(1.1, function () use (&$called) {
             $called = true;
         });
 
@@ -125,7 +125,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = false;
-        $connection->handleExceedingQueryDuration(2, function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(2, function () use (&$called) {
             $called = true;
         });
 
@@ -155,7 +155,7 @@ class QueryDurationThresholdTest extends TestCase
         $connection = new Connection(new PDO('sqlite::memory:'));
         $connection->setEventDispatcher(new Dispatcher());
         $called = 0;
-        $connection->handleExceedingQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(1), function () use (&$called) {
             $called++;
         });
 
