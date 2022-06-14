@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Connection;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -175,5 +176,27 @@ class QueryDurationThresholdTest extends TestCase
         $connection->logQuery('xxxx', [], 1);
         $connection->logQuery('xxxx', [], 1);
         $this->assertSame(3, $called);
+    }
+
+    public function testItCanAccessAllQueriesWhenQueryLoggingIsActive()
+    {
+        $connection = new Connection(new PDO('sqlite::memory:'));
+        $connection->setEventDispatcher(new Dispatcher());
+        $connection->enableQueryLog();
+        $queries = [];
+        $connection->handleExceedingCumulativeQueryDuration(CarbonInterval::milliseconds(2), function ($connection, $event) use (&$queries) {
+            $queries = Arr::pluck($connection->getQueryLog(), 'query');
+            $queries[] = $event->sql;
+        });
+
+        $connection->logQuery('foo', [], 1);
+        $connection->logQuery('bar', [], 1);
+        $connection->logQuery('baz', [], 1);
+
+        $this->assertSame([
+            'foo',
+            'bar',
+            'baz',
+        ], $queries);
     }
 }

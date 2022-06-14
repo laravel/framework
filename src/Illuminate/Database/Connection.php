@@ -812,7 +812,7 @@ class Connection implements ConnectionInterface
 
         $this->listen(function ($event) use ($threshold, $handler, $key) {
             if ($this->queryDurationHandlers[$key]['not_yet_run'] && $this->totalQueryDuration() > $threshold) {
-                $handler($this);
+                $handler($this, $event);
 
                 $this->queryDurationHandlers[$key]['not_yet_run'] = false;
             }
