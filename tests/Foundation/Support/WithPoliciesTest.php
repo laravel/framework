@@ -6,8 +6,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\WithPolicies;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class WithPoliciesTest extends TestCase
 {

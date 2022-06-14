@@ -70,7 +70,7 @@ trait WithRoutes
      */
     protected function setRootControllerNamespace()
     {
-        if (!is_null($this->getNamespace())) {
+        if (! is_null($this->getNamespace())) {
             $this->app[UrlGenerator::class]->setRootControllerNamespace($this->getNamespace());
         }
     }
@@ -104,7 +104,7 @@ trait WithRoutes
      */
     protected function loadRoutes()
     {
-        if (!is_null($this->loadRoutesUsing ?? null)) {
+        if (! is_null($this->loadRoutesUsing ?? null)) {
             $this->app->call($this->loadRoutesUsing);
         } elseif (method_exists($this, 'map')) {
             $this->app->call([$this, 'map']);
