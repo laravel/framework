@@ -332,9 +332,9 @@ EOF;
         );
 
         if (! is_null($name)) {
-            $expectedUri = rtrim($request->fullUrlWithQuery([
-                'signature' => null,
-                'expires' => null,
+            $expectedUri = rtrim($request->fullUrlWithoutQuery([
+                'signature',
+                'expires',
             ]), '?');
 
             PHPUnit::assertEquals(
