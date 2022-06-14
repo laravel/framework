@@ -3945,7 +3945,7 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf(AnonymousResourceCollection::class, $mappedIntoAnonymous);
         $this->assertEquals(2, $mappedIntoAnonymous->count());
         $values = [];
-        foreach($mappedIntoAnonymous as $resource) {
+        foreach ($mappedIntoAnonymous as $resource) {
             $this->assertInstanceOf(TestCollectionResource::class, $resource);
             $values[] = $resource['field'];
         }
@@ -3956,7 +3956,7 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf(TestCollectionResourceCollection::class, $mappedIntoNamedCollection);
         $this->assertEquals(2, $mappedIntoNamedCollection->count());
         $namedValues = [];
-        foreach($mappedIntoNamedCollection as $resource) {
+        foreach ($mappedIntoNamedCollection as $resource) {
             $this->assertInstanceOf(TestCollectionResource::class, $resource);
             $namedValues[] = $resource['field'];
         }
