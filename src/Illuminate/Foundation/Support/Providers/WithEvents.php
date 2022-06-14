@@ -31,11 +31,11 @@ trait WithEvents
                 }
             }
 
-            foreach ($this->subscribe as $subscriber) {
+            foreach ($this->subscribes() as $subscriber) {
                 Event::subscribe($subscriber);
             }
 
-            foreach ($this->observers as $model => $observers) {
+            foreach ($this->observers() as $model => $observers) {
                 $model::observe($observers);
             }
         });
@@ -52,13 +52,23 @@ trait WithEvents
     }
 
     /**
-     * Get the events and handlers.
+     * Get the subscribes.
      *
      * @return array
      */
     public function subscribes()
     {
         return $this->subscribe ?? [];
+    }
+
+    /**
+     * Get the observers.
+     *
+     * @return array
+     */
+    public function observers()
+    {
+        return $this->observers ?? [];
     }
 
     /**

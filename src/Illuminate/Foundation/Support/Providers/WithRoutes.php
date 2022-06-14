@@ -48,7 +48,7 @@ trait WithRoutes
      */
     protected function routes(\Closure $routesCallback)
     {
-        $this->loadRoutesUseing = $routesCallback;
+        $this->loadRoutesUsing = $routesCallback;
 
         return $this;
     }
