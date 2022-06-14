@@ -103,7 +103,7 @@ abstract class Seeder
     {
         $classes = Arr::wrap($class);
 
-        foreach($classes as $class) {
+        foreach ($classes as $class) {
             if (in_array($class, static::$called)) {
                 continue;
             }
