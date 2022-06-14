@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @mixin ServiceProvider
+ *
  * @property string|null $namespace - The controller namespace for the application.
  * @property \Closure|null $loadRoutesUsing - The callback that should be used to load the application's routes.
  */

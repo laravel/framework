@@ -3,7 +3,13 @@
 namespace Illuminate\Foundation\Support\Providers;
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
+/**
+ * @mixin ServiceProvider
+ *
+ * @property array<class-string, class-string> $policies - Get the policies defined on the provider.
+ */
 trait WithPolicies
 {
     /**

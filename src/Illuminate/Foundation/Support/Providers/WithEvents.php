@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 
 /**
  * @mixin ServiceProvider
+ *
  * @property string[] $listen - The event handler mappings for the application.
  * @property string[] $subscribe - The subscribers to register.
  * @property string[] $observers - The observers to register.
@@ -110,7 +111,7 @@ trait WithEvents
     {
         return collect($this->discoverEventsWithin())
                     ->reject(function ($directory) {
-                        return !is_dir($directory);
+                        return ! is_dir($directory);
                     })
                     ->reduce(function ($discovered, $directory) {
                         return array_merge_recursive(
