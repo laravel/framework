@@ -542,17 +542,17 @@ class Str
     /**
      * Masks each part of the string separated by a separator.
      *
-     * @param string $string
-     * @param string $separator
-     * @param string $character
-     * @param int $index
-     * @param int|null $length
-     * @param string $encoding
+     * @param  string  $string
+     * @param  string  $separator
+     * @param  string  $character
+     * @param  int  $index
+     * @param  int|null  $length
+     * @param  string  $encoding
      * @return string
      */
     public static function maskWords(string $string, string $separator = ' ', string $character = '*', int $index = 1, ?int $length = null, string $encoding = 'UTF-8'): string
     {
-        if (!self::length($separator)) {
+        if (! self::length($separator)) {
             return self::mask($string, $character, $index, $length, $encoding);
         }
 

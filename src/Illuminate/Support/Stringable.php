@@ -408,11 +408,11 @@ class Stringable implements JsonSerializable
     /**
      * Masks each part of the string separated by a separator.
      *
-     * @param string $separator
-     * @param string $character
-     * @param int $index
-     * @param int|null $length
-     * @param string $encoding
+     * @param  string  $separator
+     * @param  string  $character
+     * @param  int  $index
+     * @param  int|null  $length
+     * @param  string  $encoding
      * @return string
      */
     public function maskWords(string $separator = ' ', string $character = '*', int $index = 1, ?int $length = null, string $encoding = 'UTF-8'): string
