@@ -71,6 +71,10 @@ class RuleMakeCommand extends GeneratorCommand
             $stub = '/stubs/rule.invokable.stub';
         }
 
+        if ($this->option('implicit') && $this->option('invokable')) {
+            $stub = str_replace('.stub', '.implicit.stub', $stub);
+        }
+
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
             : __DIR__.$stub;
