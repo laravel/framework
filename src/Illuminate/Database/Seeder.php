@@ -105,7 +105,7 @@ abstract class Seeder
 
         foreach($classes as $class) {
             if (in_array($class, static::$called)) {
-                return;
+                continue;
             }
 
             $this->call($class, $silent, $parameters);
