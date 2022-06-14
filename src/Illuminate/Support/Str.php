@@ -97,6 +97,19 @@ class Str
     }
 
     /**
+     * Perform a regular expression search and replace to the given string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @param  string  $subject
+     * @return string
+     */
+    public static function preg($search, $replace, $subject)
+    {
+        return preg_replace($search, $replace, $subject);
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
      * @param  string  $value

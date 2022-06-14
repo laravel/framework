@@ -54,6 +54,18 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Perform a regular expression search and replace to the given string.
+     *
+     * @param  string  $search
+     * @param  string  $replace
+     * @return static
+     */
+    public function preg($search, $replace)
+    {
+        return new static(Str::preg($search, $replace, $this->value));
+    }
+
+    /**
      * Append the given values to the string.
      *
      * @param  array  $values

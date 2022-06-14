@@ -1027,6 +1027,12 @@ class SupportStrTest extends TestCase
             Str::createUuidsNormally();
         }
     }
+
+    public function testStrPreg()
+    {
+        $this->assertSame('Somerandomstring', Str::preg('/[^A-Za-z0-9\-]/', '', 'Some (random) string'));
+        $this->assertSame('Camila Cabello is a Hollywood singer.', Str::preg('/\s+/', ' ', 'Camila    Cabello   is    a   Hollywood    singer.'));
+    }
 }
 
 class StringableObjectStub
