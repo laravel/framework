@@ -281,6 +281,45 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Laravel', $request->userAgent());
     }
 
+    public function testHostMethod()
+    {
+        $request = Request::create('http://example.com');
+        $this->assertSame('example.com', $request->host());
+
+        $request = Request::create('https://example.com');
+        $this->assertSame('example.com', $request->host());
+    }
+
+    public function testHttpHostMethod()
+    {
+        $request = Request::create('http://example.com');
+        $this->assertSame('example.com', $request->httpHost());
+
+        $request = Request::create('https://example.com');
+        $this->assertSame('example.com', $request->httpHost());
+
+        $request = Request::create('http://example.com:8080');
+        $this->assertSame('example.com:8080', $request->httpHost());
+
+        $request = Request::create('https://example.com:8080');
+        $this->assertSame('example.com:8080', $request->httpHost());
+    }
+
+    public function testSchemeAndHttpHostMethod()
+    {
+        $request = Request::create('http://example.com');
+        $this->assertSame('http://example.com', $request->schemeAndHttpHost());
+
+        $request = Request::create('https://example.com');
+        $this->assertSame('https://example.com', $request->schemeAndHttpHost());
+
+        $request = Request::create('http://example.com:8080');
+        $this->assertSame('http://example.com:8080', $request->schemeAndHttpHost());
+
+        $request = Request::create('https://example.com:8080');
+        $this->assertSame('https://example.com:8080', $request->schemeAndHttpHost());
+    }
+
     public function testHasMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
