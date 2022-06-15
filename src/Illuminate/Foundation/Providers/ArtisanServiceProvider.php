@@ -58,6 +58,7 @@ use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Foundation\Console\StubPublishCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\TraitMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Foundation\Console\ViewCacheCommand;
@@ -176,6 +177,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Serve' => ServeCommand::class,
         'StubPublish' => StubPublishCommand::class,
         'TestMake' => TestMakeCommand::class,
+        'TraitMake' => TraitMakeCommand::class,
         'VendorPublish' => VendorPublishCommand::class,
     ];
 
@@ -1031,6 +1033,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(TestMakeCommand::class, function ($app) {
             return new TestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerTraitMakeCommand()
+    {
+        $this->app->singleton(TraitMakeCommand::class, function ($app) {
+            return new TraitMakeCommand($app['files']);
         });
     }
 
