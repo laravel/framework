@@ -61,7 +61,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      * Create a new implicit or explicit Invokable validation rule.
      *
      * @param  \Illuminate\Contracts\Validation\InvokableRule  $invokable
-     * @return \Illuminate\Contracts\Validation\ImplicitRule
+     * @return \Illuminate\Contracts\Validation\Rule
      */
     public static function make($invokable)
     {
@@ -94,10 +94,10 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
             $this->invokable->setValidator($this->validator);
         }
 
-        $this->invokable->__invoke($attribute, $value, function ($message) {
+        $this->invokable->__invoke($attribute, $value, function ($attribute, $message = null) {
             $this->failed = true;
 
-            return $this->pendingPotentiallyTranslatedString($message);
+            return $this->pendingPotentiallyTranslatedString($attribute, $message);
         });
 
         return ! $this->failed;
@@ -142,12 +142,17 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     /**
      * Create a pending potentially translated string.
      *
-     * @param  string  $message
+     * @param  string  $attribute
+     * @param  ?string  $message
      * @return \Illuminate\Translation\PotentiallyTranslatedString
      */
-    protected function pendingPotentiallyTranslatedString($message)
+    protected function pendingPotentiallyTranslatedString($attribute, $message)
     {
-        return new class($message, $this->validator->getTranslator(), fn ($message) => $this->messages[] = $message) extends PotentiallyTranslatedString
+        $destructor = $message === null
+            ? fn ($message) => $this->messages[] = $message
+            : fn ($message) => $this->messages[$attribute] = $message;
+
+        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor) extends PotentiallyTranslatedString
         {
             /**
              * The callback to call when the object destructs.
@@ -159,7 +164,7 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
             /**
              * Create a new pending potentially translated string.
              *
-             * @param  string  $string
+             * @param  string  $message
              * @param  \Illuminate\Contracts\Translation\Translator  $translator
              * @param  \Closure  $destructor
              */
