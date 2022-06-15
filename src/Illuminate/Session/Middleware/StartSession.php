@@ -219,15 +219,9 @@ class StartSession
     {
         if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
-                $session->getName(),
-                $session->getId(),
-                $this->getCookieExpirationDate(),
-                $config['path'],
-                $config['domain'],
-                $config['secure'] ?? false,
-                $config['http_only'] ?? true,
-                false,
-                $config['same_site'] ?? null
+                $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
+                $config['path'], $config['domain'], $config['secure'] ?? false,
+                $config['http_only'] ?? true, false, $config['same_site'] ?? null
             ));
         }
     }
