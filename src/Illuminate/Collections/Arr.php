@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArgumentCountError;
 use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -555,7 +556,13 @@ class Arr
     {
         $keys = array_keys($array);
 
-        $items = array_map($callback, $array, $keys);
+        try {
+            $items = array_map($callback, $array, $keys);
+        } catch (ArgumentCountError) {
+            // When the callback isn't accepting the key argument, we'll simply omit it.
+            // This allows to map-by-reference for fixed methods such as 'strrev'.
+            $items = array_map($callback, $array);
+        }
 
         return array_combine($keys, $items);
     }
