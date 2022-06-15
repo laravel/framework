@@ -23,8 +23,7 @@ $message = "";
 $__i = 0;
 while ($message === "") {
      $message = $__bag->first($__errorArgs[0][$__i++]);
-}
-?>';
+} ?>';
     }
 
     /**
