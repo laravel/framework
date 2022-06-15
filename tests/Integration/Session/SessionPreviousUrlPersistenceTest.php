@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
-class SessionPreviouslUrlPersistenceTest extends TestCase
+class SessionPreviousUrlPersistenceTest extends TestCase
 {
     protected function setUp(): void
     {
