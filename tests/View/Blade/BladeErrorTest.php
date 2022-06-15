@@ -51,7 +51,7 @@ while ($message === "") {
 <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>';
+unset($__errorArgs, $__bag, $__i); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
