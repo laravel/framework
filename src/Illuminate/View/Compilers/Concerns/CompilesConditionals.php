@@ -367,7 +367,7 @@ trait CompilesConditionals
      *
      * @return string
      */
-    protected function compileEndpushIf()
+    protected function compileEndPushIf()
     {
         return '<?php $__env->stopPush(); endif; ?>';
     }
