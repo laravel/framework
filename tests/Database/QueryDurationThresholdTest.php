@@ -165,13 +165,13 @@ class QueryDurationThresholdTest extends TestCase
         $connection->logQuery('xxxx', [], 1);
         $this->assertSame(1, $called);
 
-        $connection->restoreAlreadyRunQueryDurationHandlers();
+        $connection->allowQueryDurationHandlersToRunAgain();
         $connection->logQuery('xxxx', [], 1);
         $connection->logQuery('xxxx', [], 1);
         $connection->logQuery('xxxx', [], 1);
         $this->assertSame(2, $called);
 
-        $connection->restoreAlreadyRunQueryDurationHandlers();
+        $connection->allowQueryDurationHandlersToRunAgain();
         $connection->logQuery('xxxx', [], 1);
         $connection->logQuery('xxxx', [], 1);
         $connection->logQuery('xxxx', [], 1);

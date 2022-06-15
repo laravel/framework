@@ -203,7 +203,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 if (method_exists($app['db'], 'getConnections')) {
                     foreach ($app['db']->getConnections() as $connection) {
                         $connection->resetTotalQueryDuration();
-                        $connection->restoreAlreadyRunQueryDurationHandlers();
+                        $connection->allowQueryDurationHandlersToRunAgain();
                     }
                 }
 

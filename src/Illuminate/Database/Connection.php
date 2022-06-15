@@ -159,14 +159,14 @@ class Connection implements ConnectionInterface
     protected $loggingQueries = false;
 
     /**
-     * The duration of all run queries in milliseconds.
+     * The duration of all executed queries in milliseconds.
      *
      * @var float
      */
     protected $totalQueryDuration = 0.0;
 
     /**
-     * Query duration handlers.
+     * All of the registered query duration handlers.
      *
      * @var array
      */
@@ -804,30 +804,30 @@ class Connection implements ConnectionInterface
             : $threshold;
 
         $this->queryDurationHandlers[] = [
-            'not_yet_run' => true,
+            'has_run' => false,
             'handler' => $handler,
         ];
 
         $key = count($this->queryDurationHandlers) - 1;
 
         $this->listen(function ($event) use ($threshold, $handler, $key) {
-            if ($this->queryDurationHandlers[$key]['not_yet_run'] && $this->totalQueryDuration() > $threshold) {
+            if (! $this->queryDurationHandlers[$key]['has_run'] && $this->totalQueryDuration() > $threshold) {
                 $handler($this, $event);
 
-                $this->queryDurationHandlers[$key]['not_yet_run'] = false;
+                $this->queryDurationHandlers[$key]['has_run'] = true;
             }
         });
     }
 
     /**
-     * Restore all the query duration handlers that have already run.
+     * Allow all the query duration handlers to run again, even if they have already run.
      *
      * @return void
      */
-    public function restoreAlreadyRunQueryDurationHandlers()
+    public function allowQueryDurationHandlersToRunAgain()
     {
         foreach ($this->queryDurationHandlers as $key => $queryDurationHandler) {
-            $this->queryDurationHandlers[$key]['not_yet_run'] = true;
+            $this->queryDurationHandlers[$key]['has_run'] = false;
         }
     }
 
