@@ -658,7 +658,9 @@ trait HasAttributes
      */
     protected function mutateAttributeForArray($key, $value)
     {
-        if ($this->isClassCastable($key)) {
+        if ($this->isEnumCastable($key)) {
+            $value = $this->getEnumCastableAttributeValue($key, $value);
+        } elseif ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
         } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
                   static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
