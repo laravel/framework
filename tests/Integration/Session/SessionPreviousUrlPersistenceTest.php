@@ -14,8 +14,10 @@ use Orchestra\Testbench\TestCase;
 
 class SessionPreviouslUrlPersistenceTest extends TestCase
 {
-    public function testRemembersPreviouslyVisitedUrl()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         Route::middleware('web')->get('_test/session-url/home', function () {
             return url()->previous();
         });
@@ -23,7 +25,10 @@ class SessionPreviouslUrlPersistenceTest extends TestCase
         Route::middleware('web')->get('_test/session-url/my-page', function () {
             return 'my-page-content';
         });
+    }
 
+    public function testRemembersPreviouslyVisitedUrl()
+    {
         $this->get('_test/session-url/my-page')
             ->assertOk()
             ->assertSee('my-page-content');
@@ -35,14 +40,6 @@ class SessionPreviouslUrlPersistenceTest extends TestCase
 
     public function testIgnoresTurboFrameVisitsFromPreviousUrl()
     {
-        Route::middleware('web')->get('_test/session-url/home', function () {
-            return url()->previous();
-        });
-
-        Route::middleware('web')->get('_test/session-url/my-page', function () {
-            return 'my-page-content';
-        });
-
         $this->withHeaders(['Turbo-Frame' => 'testing-frame'])
             ->get('_test/session-url/my-page')
             ->assertOk()
