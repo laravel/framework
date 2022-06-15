@@ -16,9 +16,9 @@ $__bag = $errors->getBag($__errorArgs[1] ?? \'default\');
 $__errorArgs[0] = is_array($__errorArgs[0]) ? $__errorArgs[0] : [$__errorArgs[0]];
 if ($__bag->hasAny($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = false;
+$message = "";
 $__i = 0;
-while (empty($message)) {
+while ($message === "") {
      $message = $__bag->first($__errorArgs[0][$__i++]);
 } ?>
     <span><?php echo e($message); ?></span>
@@ -42,9 +42,9 @@ $__bag = $errors->getBag($__errorArgs[1] ?? \'default\');
 $__errorArgs[0] = is_array($__errorArgs[0]) ? $__errorArgs[0] : [$__errorArgs[0]];
 if ($__bag->hasAny($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = false;
+$message = "";
 $__i = 0;
-while (empty($message)) {
+while ($message === "") {
      $message = $__bag->first($__errorArgs[0][$__i++]);
 } ?>
     <span><?php echo e($message); ?></span>
@@ -67,9 +67,9 @@ $__bag = $errors->getBag($__errorArgs[1] ?? \'default\');
 $__errorArgs[0] = is_array($__errorArgs[0]) ? $__errorArgs[0] : [$__errorArgs[0]];
 if ($__bag->hasAny($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = false;
+$message = "";
 $__i = 0;
-while (empty($message)) {
+while ($message === "") {
      $message = $__bag->first($__errorArgs[0][$__i++]);
 } ?>
     <span><?php echo e($message); ?></span>
@@ -93,9 +93,9 @@ $__bag = $errors->getBag($__errorArgs[1] ?? \'default\');
 $__errorArgs[0] = is_array($__errorArgs[0]) ? $__errorArgs[0] : [$__errorArgs[0]];
 if ($__bag->hasAny($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = false;
+$message = "";
 $__i = 0;
-while (empty($message)) {
+while ($message === "") {
      $message = $__bag->first($__errorArgs[0][$__i++]);
 } ?>
     <span><?php echo e($message); ?></span>
