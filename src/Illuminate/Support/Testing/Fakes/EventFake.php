@@ -53,7 +53,7 @@ class EventFake implements Dispatcher
      * Assert if an event has a listener attached to it.
      *
      * @param  string  $expectedEvent
-     * @param  string  $expectedListener
+     * @param  string|array  $expectedListener
      * @return void
      */
     public function assertListening($expectedEvent, $expectedListener)
