@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use ArgumentCountError;
 use ArrayAccess;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -555,7 +556,11 @@ class Arr
     {
         $keys = array_keys($array);
 
-        $items = array_map($callback, $array, $keys);
+        try {
+            $items = array_map($callback, $array, $keys);
+        } catch (ArgumentCountError) {
+            $items = array_map($callback, $array);
+        }
 
         return array_combine($keys, $items);
     }

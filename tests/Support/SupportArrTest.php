@@ -632,6 +632,15 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
     }
 
+    public function testMapByReference()
+    {
+        $data = ['first' => 'taylor', 'last' => 'otwell'];
+        $mapped = Arr::map($data, 'strrev');
+
+        $this->assertEquals(['first' => 'rolyat', 'last' => 'llewto'], $mapped);
+        $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
