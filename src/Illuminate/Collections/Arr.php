@@ -559,8 +559,6 @@ class Arr
         try {
             $items = array_map($callback, $array, $keys);
         } catch (ArgumentCountError) {
-            // When the callback isn't accepting the key argument, we'll simply omit it.
-            // This allows to map-by-reference for fixed methods such as 'strrev'.
             $items = array_map($callback, $array);
         }
 
