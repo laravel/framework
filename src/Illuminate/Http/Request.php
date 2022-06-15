@@ -239,6 +239,36 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the host name.
+     *
+     * @return string
+     */
+    public function host()
+    {
+        return $this->getHost();
+    }
+
+    /**
+     * Get the HTTP host being requested.
+     *
+     * @return string
+     */
+    public function httpHost()
+    {
+        return $this->getHttpHost();
+    }
+
+    /**
+     * Get the scheme and HTTP host.
+     *
+     * @return string
+     */
+    public function schemeAndHttpHost()
+    {
+        return $this->getSchemeAndHttpHost();
+    }
+
+    /**
      * Determine if the request is the result of an AJAX call.
      *
      * @return bool
@@ -307,36 +337,6 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function userAgent()
     {
         return $this->headers->get('User-Agent');
-    }
-
-    /**
-     * Get the host name.
-     *
-     * @return string
-     */
-    public function host()
-    {
-        return $this->getHost();
-    }
-
-    /**
-     * Get the HTTP host being requested.
-     *
-     * @return string
-     */
-    public function httpHost()
-    {
-        return $this->getHttpHost();
-    }
-
-    /**
-     * Get the scheme and HTTP host.
-     *
-     * @return string
-     */
-    public function schemeAndHttpHost()
-    {
-        return $this->getSchemeAndHttpHost();
     }
 
     /**
