@@ -356,7 +356,7 @@ class Builder implements BuilderContract
      */
     public function whereWhen($condition, $column, $operator = null, $value = null)
     {
-        return $this->when($condition, fn ($query) => $query->where($column, $operator, $value));
+        return $this->when($condition, fn ($query, $whenValue) => $query->where($column, $operator, $value ?: $whenValue));
     }
 
     /**
@@ -370,7 +370,7 @@ class Builder implements BuilderContract
      */
     public function whereUnless($condition, $column, $operator = null, $value = null)
     {
-        return $this->unless($condition, fn ($query) => $query->where($column, $operator, $value));
+        return $this->unless($condition, fn ($query, $unlessValue) => $query->where($column, $operator, $value ?: $unlessValue));
     }
 
     /**
