@@ -931,7 +931,7 @@ class Builder implements BuilderContract
     /**
      * Add an "where unless" clause to the query.
      *
-     * @param  (\Closure($this): TWhenParameter)|TWhenParameter  $condition
+     * @param  (\Closure($this): TUnlessParameter)|TUnlessParameter  $condition
      * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
      * @param  mixed  $operator
      * @param  mixed  $value
