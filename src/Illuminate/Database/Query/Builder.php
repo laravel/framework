@@ -911,6 +911,42 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "where when" clause to the query.
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereWhen($condition, $column, $operator = null, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->when($condition, fn ($query, $whenValue) => $query->where($column, $operator, $value ?? $whenValue));
+    }
+
+    /**
+     * Add an "where unless" clause to the query.
+     *
+     * @param  (\Closure($this): TUnlessParameter)|TUnlessParameter  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereUnless($condition, $column, $operator = null, $value = null)
+    {
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->unless($condition, fn ($query, $unlessValue) => $query->where($column, $operator, $value ?? $unlessValue));
+    }
+
+    /**
      * Add a "where" clause comparing two columns to the query.
      *
      * @param  string|array  $first
