@@ -9,7 +9,7 @@ class {{ class }} implements InvokableRule
     /**
      * Indicates whether the rule should be implicit.
      *
-     * @var bool|null
+     * @var bool
      */
     public $implicit = true;
 
