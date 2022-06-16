@@ -991,6 +991,8 @@ trait EnumeratesValues
             return (array) $items->jsonSerialize();
         } elseif ($items instanceof Traversable) {
             return iterator_to_array($items);
+        } elseif ($items instanceof \UnitEnum) {
+            return [$items];
         }
 
         return (array) $items;
