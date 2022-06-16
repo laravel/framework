@@ -909,7 +909,7 @@ class Builder implements BuilderContract
     {
         return $this->whereNot($column, $operator, $value, 'or');
     }
-    
+
     /**
      * Add an "where when" clause to the query.
      *
@@ -945,6 +945,7 @@ class Builder implements BuilderContract
 
         return $this->unless($condition, fn ($query, $unlessValue) => $query->where($column, $operator, $value ?? $unlessValue));
     }
+
     /**
      * Add a "where" clause comparing two columns to the query.
      *
