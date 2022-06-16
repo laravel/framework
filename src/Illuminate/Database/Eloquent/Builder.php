@@ -346,6 +346,34 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "where when" clause to the query.
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereWhen($condition, $column, $operator = null, $value = null)
+    {
+        return $this->when($condition, fn ($query) => $query->where($column, $operator, $value));
+    }
+
+    /**
+     * Add an "where unless" clause to the query.
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereUnless($condition, $column, $operator = null, $value = null)
+    {
+        return $this->unless($condition, fn ($query) => $query->where($column, $operator, $value));
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
