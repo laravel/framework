@@ -358,7 +358,7 @@ class Builder implements BuilderContract
      */
     public function whereWhen($condition, $column, $operator = null, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->query->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -376,7 +376,7 @@ class Builder implements BuilderContract
      */
     public function whereUnless($condition, $column, $operator = null, $value = null)
     {
-        [$value, $operator] = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->query->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
