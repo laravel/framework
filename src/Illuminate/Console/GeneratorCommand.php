@@ -107,7 +107,7 @@ abstract class GeneratorCommand extends Command
         '__LINE__',
         '__METHOD__',
         '__NAMESPACE__',
-        '__TRAIT__'
+        '__TRAIT__',
     ];
 
     /**
