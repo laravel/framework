@@ -2661,7 +2661,7 @@ class Builder implements BuilderContract
      *
      * This is more efficient on larger data-sets, etc.
      *
-     * @param  int  $perPage
+     * @param  int|callable  $perPage
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
@@ -2671,9 +2671,13 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $this->offset(($page - 1) * $perPage)->limit($perPage + 1);
+        $total = $this->getCountForPagination();
 
-        return $this->simplePaginator($this->get($columns), $perPage, $page, [
+        $perPage = $perPage instanceof Closure ? $perPage($total) : $perPage;
+
+        $results = $total ? $this->offset(($page - 1) * $perPage)->limit($perPage + 1)->get($columns) : collect();
+
+        return $this->simplePaginator($results, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);

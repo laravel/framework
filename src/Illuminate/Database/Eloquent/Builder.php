@@ -896,7 +896,7 @@ class Builder implements BuilderContract
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int|null  $perPage
+     * @param  int|null|\Closure  $perPage
      * @param  array|string  $columns
      * @param  string  $pageName
      * @param  int|null  $page
@@ -906,14 +906,21 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ?: $this->model->getPerPage();
+        $total = $this->toBase()->getCountForPagination();
+
+        $perPage = ($perPage instanceof Closure
+            ? $perPage($total)
+            : $perPage
+        ) ?: $this->model->getPerPage();
 
         // Next we will set the limit and offset for this query so that when we get the
         // results we get the proper section of results. Then, we'll create the full
         // paginator instances for these results with the given page and per page.
-        $this->skip(($page - 1) * $perPage)->take($perPage + 1);
+        $results = $total
+            ? $this->skip(($page - 1) * $perPage)->take($perPage + 1)->get($columns)
+            : $this->model->newCollection();
 
-        return $this->simplePaginator($this->get($columns), $perPage, $page, [
+        return $this->simplePaginator($results, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
