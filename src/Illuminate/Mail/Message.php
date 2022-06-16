@@ -265,7 +265,7 @@ class Message
     /**
      * Embed in-memory data in the message and get the CID.
      *
-     * @param  string  $data
+     * @param  string|\Swift_OutputByteStream  $data
      * @param  string  $name
      * @param  string|null  $contentType
      * @return string
