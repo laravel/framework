@@ -24,6 +24,8 @@ use ReflectionMethod;
  * @property-read HigherOrderBuilderProxy $orWhere
  * @property-read HigherOrderBuilderProxy $whereNot
  * @property-read HigherOrderBuilderProxy $orWhereNot
+ * @property-read HigherOrderBuilderProxy $whereWhen
+ * @property-read HigherOrderBuilderProxy $whereUnless
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
@@ -356,7 +358,11 @@ class Builder implements BuilderContract
      */
     public function whereWhen($condition, $column, $operator = null, $value = null)
     {
-        return $this->when($condition, fn ($query, $whenValue) => $query->where($column, $operator, $value ?: $whenValue));
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->when($condition, fn ($query, $whenValue) => $query->where($column, $operator, $value ?? $whenValue));
     }
 
     /**
@@ -370,7 +376,11 @@ class Builder implements BuilderContract
      */
     public function whereUnless($condition, $column, $operator = null, $value = null)
     {
-        return $this->unless($condition, fn ($query, $unlessValue) => $query->where($column, $operator, $value ?: $unlessValue));
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->unless($condition, fn ($query, $unlessValue) => $query->where($column, $operator, $value ?? $unlessValue));
     }
 
     /**
@@ -1812,7 +1822,7 @@ class Builder implements BuilderContract
      */
     public function __get($key)
     {
-        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
+        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot', 'whereWhen', 'whereUnless'])) {
             return new HigherOrderBuilderProxy($this, $key);
         }
 
