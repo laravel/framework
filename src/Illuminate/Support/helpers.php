@@ -269,7 +269,9 @@ if (! function_exists('silent')) {
     {
         try {
             return $callback(...$arguments);
-        } catch (Exception) {
+        } catch (Exception $e) {
+            report($e);
+
             return false;
         }
     }
