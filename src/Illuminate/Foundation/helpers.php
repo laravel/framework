@@ -458,7 +458,8 @@ if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
      * @param  ?string  $locale
      * @return \Faker\Generator
      */
-    function fake($locale = null) {
+    function fake($locale = null)
+    {
         $locale ??= app('config')->get('app.faker_locale') ?? 'en_US';
 
         $abstract = \Faker\Generator::class.':'.$locale;
