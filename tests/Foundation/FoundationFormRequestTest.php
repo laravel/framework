@@ -149,6 +149,24 @@ class FoundationFormRequestTest extends TestCase
         $this->assertSame('bar', $request->validated('nested.foo'));
     }
 
+    public function testPopulateToProperties()
+    {
+        $request = $this->createRequest(['name' => 'Adam'], FoundationTestFormRequestWithProperties::class);
+
+        $request->refresh();
+
+        $this->assertSame('Adam', $request->name);
+    }
+
+    public function testPopulateToPropertiesWontTouchParentProperties()
+    {
+        $request = $this->createRequest(['request' => 'fake'], FoundationTestFormRequestWithProperties::class);
+
+        $request->refresh();
+
+        $this->assertIsNotScalar($request->request);
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -377,3 +395,14 @@ class FoundationTestFormRequestPassesWithResponseStub extends FormRequest
         return Response::allow('baz');
     }
 }
+
+class FoundationTestFormRequestWithProperties extends FormRequest
+{
+    public string $name;
+
+    public function rules()
+    {
+        return [];
+    }
+}
+
