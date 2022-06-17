@@ -346,6 +346,7 @@ class Builder implements BuilderContract
     {
         return $this->whereNot($column, $operator, $value, 'or');
     }
+
     /**
      * Add an "where when" clause to the query.
      *
