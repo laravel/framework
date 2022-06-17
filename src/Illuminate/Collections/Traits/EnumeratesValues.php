@@ -900,9 +900,13 @@ trait EnumeratesValues
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof Jsonable) {
+            }
+
+            if ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof Arrayable) {
+            }
+
+            if ($value instanceof Arrayable) {
                 return $value->toArray();
             }
 
@@ -995,15 +999,25 @@ trait EnumeratesValues
     {
         if (is_array($items)) {
             return $items;
-        } elseif ($items instanceof Enumerable) {
+        }
+
+        if ($items instanceof Enumerable) {
             return $items->all();
-        } elseif ($items instanceof Arrayable) {
+        }
+
+        if ($items instanceof Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof Jsonable) {
+        }
+
+        if ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
-        } elseif ($items instanceof JsonSerializable) {
+        }
+
+        if ($items instanceof JsonSerializable) {
             return (array) $items->jsonSerialize();
-        } elseif ($items instanceof Traversable) {
+        }
+
+        if ($items instanceof Traversable) {
             return iterator_to_array($items);
         }
 
@@ -1047,19 +1061,16 @@ trait EnumeratesValues
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '!=':
-                case '<>':  return $retrieved != $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '===': return $retrieved === $value;
-                case '!==': return $retrieved !== $value;
-            }
+            return match ($operator) {
+                '!=', '<>' => $retrieved != $value,
+                '<' => $retrieved < $value,
+                '>' => $retrieved > $value,
+                '<=' => $retrieved <= $value,
+                '>=' => $retrieved >= $value,
+                '===' => $retrieved === $value,
+                '!==' => $retrieved !== $value,
+                default => $retrieved == $value
+            };
         };
     }
 
