@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Closure;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\CurrentDeviceLogout;
@@ -25,7 +26,6 @@ use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Closure;
 
 class SessionGuard implements StatefulGuard, SupportsBasicAuth
 {
