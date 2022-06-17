@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Error;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -22,6 +24,7 @@ class SupportHelpersTest extends TestCase
 {
     protected function tearDown(): void
     {
+        Container::setInstance();
         m::close();
     }
 
@@ -665,6 +668,12 @@ class SupportHelpersTest extends TestCase
 
     public function testSilent()
     {
+        $m = m::mock(ExceptionHandler::class);
+        $m->expects('report')->with(m::type(LogicException::class));
+
+        $container = Container::setInstance(new Container());
+        $container->instance(ExceptionHandler::class, $m);
+
         $callback = function ($foo, $fail) {
             $this->assertSame('foo', $foo);
 
@@ -672,6 +681,7 @@ class SupportHelpersTest extends TestCase
         };
 
         $this->assertSame('foobar', silent($callback, 'foo', 0));
+
         $this->assertFalse(silent($callback, 'foo', 1));
     }
 
