@@ -2158,6 +2158,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('The url must start with one of the following values http, https', $v->messages()->first('url'));
     }
 
+    public function testValidateContains()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['key' => 'Foo Bar'], ['key' => 'contains:Foo']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['key' => 'Foo Bar'], ['key' => 'contains:Biz']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['key' => 'Foo Bar Biz'], ['key' => 'contains:Foo,Biz']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateDoesntStartWith()
     {
         $trans = $this->getIlluminateArrayTranslator();
