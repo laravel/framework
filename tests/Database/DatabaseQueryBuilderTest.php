@@ -182,6 +182,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
     }
 
+    public function testWhereWhenCallback()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereWhen(true, 'id', '=', 1)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereWhen(false, 'id', '=', 1)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $id = 1;
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereWhen($id, 'id')->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $id = '';
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereWhen($id, 'id')->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
     public function testWhenCallbackWithReturn()
     {
         $callback = function ($query, $condition) {
@@ -239,6 +260,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->unless(true, $callback)->where('email', 'foo');
         $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+    }
+
+    public function testWhereUnlessCallback()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereUnless(false, 'id', '=', 1)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereUnless(true, 'id', '=', 1)->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $id = 1;
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereUnless($id, 'id')->where('email', 'foo');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $id = '';
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereUnless($id, 'id')->where('email', 'foo');
+        $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
     }
 
     public function testUnlessCallbackWithReturn()

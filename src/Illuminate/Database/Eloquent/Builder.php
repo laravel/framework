@@ -24,6 +24,8 @@ use ReflectionMethod;
  * @property-read HigherOrderBuilderProxy $orWhere
  * @property-read HigherOrderBuilderProxy $whereNot
  * @property-read HigherOrderBuilderProxy $orWhereNot
+ * @property-read HigherOrderBuilderProxy $whereWhen
+ * @property-read HigherOrderBuilderProxy $whereUnless
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
@@ -343,6 +345,46 @@ class Builder implements BuilderContract
     public function orWhereNot($column, $operator = null, $value = null)
     {
         return $this->whereNot($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "where when" clause to the query.
+     *
+     * @param  (\Closure($this): TWhenParameter)|TWhenParameter  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereWhen($condition, $column, $operator = null, $value = null)
+    {
+        [$value, $operator] = $this->query->prepareValueAndOperator(
+            $value,
+            $operator,
+            func_num_args() === 2
+        );
+
+        return $this->when($condition, fn ($query, $whenValue) => $query->where($column, $operator, $value ?? $whenValue));
+    }
+
+    /**
+     * Add an "where unless" clause to the query.
+     *
+     * @param  (\Closure($this): TUnlessParameter)|TUnlessParameter  $condition
+     * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function whereUnless($condition, $column, $operator = null, $value = null)
+    {
+        [$value, $operator] = $this->query->prepareValueAndOperator(
+            $value,
+            $operator,
+            func_num_args() === 2
+        );
+
+        return $this->unless($condition, fn ($query, $unlessValue) => $query->where($column, $operator, $value ?? $unlessValue));
     }
 
     /**
@@ -1784,7 +1826,7 @@ class Builder implements BuilderContract
      */
     public function __get($key)
     {
-        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot'])) {
+        if (in_array($key, ['orWhere', 'whereNot', 'orWhereNot', 'whereWhen', 'whereUnless'])) {
             return new HigherOrderBuilderProxy($this, $key);
         }
 
