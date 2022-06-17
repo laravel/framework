@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionFunction;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class Broadcaster implements BroadcasterContract
 {
@@ -345,12 +346,14 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $channel
      * @return array
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function retrieveChannelOptions($channel)
     {
         foreach ($this->channelOptions as $pattern => $options) {
             if (! $this->channelNameMatchesPattern($channel, $pattern)) {
-                continue;
+                throw new NotFoundHttpException;
             }
 
             return $options;
