@@ -11,7 +11,9 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'queue:work')]
 class WorkCommand extends Command
 {
     /**
@@ -36,15 +38,6 @@ class WorkCommand extends Command
                             {--rest=0 : Number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=1 : Number of times to attempt a job before logging it failed}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'queue:work';
 
     /**
      * The console command description.

@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'env')]
 class EnvironmentCommand extends Command
 {
     /**
@@ -12,15 +14,6 @@ class EnvironmentCommand extends Command
      * @var string
      */
     protected $name = 'env';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'env';
 
     /**
      * The console command description.

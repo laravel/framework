@@ -468,6 +468,21 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run quarterly on a given day and time.
+     *
+     * @param  int  $dayOfQuarter
+     * @param  int  $time
+     * @return $this
+     */
+    public function quarterlyOn($dayOfQuarter = 1, $time = '0:0')
+    {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $dayOfQuarter)
+                    ->spliceIntoPosition(4, '1-12/3');
+    }
+
+    /**
      * Schedule the event to run yearly.
      *
      * @return $this

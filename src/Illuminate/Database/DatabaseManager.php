@@ -7,6 +7,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
@@ -16,6 +17,10 @@ use RuntimeException;
  */
 class DatabaseManager implements ConnectionResolverInterface
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
      * The application instance.
      *
@@ -33,14 +38,14 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * The active connection instances.
      *
-     * @var array
+     * @var array<string, \Illuminate\Database\Connection>
      */
     protected $connections = [];
 
     /**
      * The custom connection resolvers.
      *
-     * @var array
+     * @var array<string, callable>
      */
     protected $extensions = [];
 
@@ -54,7 +59,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * The custom Doctrine column types.
      *
-     * @var array
+     * @var array<string, array>
      */
     protected $doctrineTypes = [];
 
@@ -364,7 +369,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the support drivers.
      *
-     * @return array
+     * @return string[]
      */
     public function supportedDrivers()
     {
@@ -374,7 +379,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get all of the drivers that are actually available.
      *
-     * @return array
+     * @return string[]
      */
     public function availableDrivers()
     {
@@ -397,9 +402,20 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Remove an extension connection resolver.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function forgetExtension($name)
+    {
+        unset($this->extensions[$name]);
+    }
+
+    /**
      * Return all of the created connections.
      *
-     * @return array
+     * @return array<string, \Illuminate\Database\Connection>
      */
     public function getConnections()
     {
@@ -439,6 +455,10 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->connection()->$method(...$parameters);
     }
 }

@@ -39,6 +39,21 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
+    public function testIsExpiredReturnsFalseWhenUseCacheIsTrueAndNoFileModification()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(true);
+        $files->shouldReceive('lastModified')->once()->with('foo')->andReturn(0);
+        $files->shouldReceive('lastModified')->once()->with(__DIR__.'/'.sha1('v2foo').'.php')->andReturn(100);
+        $this->assertFalse($compiler->isExpired('foo'));
+    }
+
+    public function testIsExpiredReturnsTrueWhenUseCacheIsFalse()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__, $basePath = '', $useCache = false);
+        $this->assertTrue($compiler->isExpired('foo'));
+    }
+
     public function testCompilePathIsProperlyCreated()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
@@ -216,6 +231,36 @@ class ViewBladeCompilerTest extends TestCase
 
         $compiler->component('App\View\Components\Forms\Input', null, 'prefix');
         $this->assertEquals(['prefix-forms:input' => 'App\View\Components\Forms\Input'], $compiler->getClassComponentAliases());
+    }
+
+    public function testAnonymousComponentNamespacesCanBeStored()
+    {
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace(' public/frontend ', 'frontend');
+        $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('public/frontend/', 'frontend');
+        $this->assertEquals(['frontend' => 'public.frontend'], $compiler->getAnonymousComponentNamespaces());
+
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('/admin/components', 'admin');
+        $this->assertEquals(['admin' => 'admin.components'], $compiler->getAnonymousComponentNamespaces());
+
+        // Test directory is automatically inferred from the prefix if not given.
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('frontend');
+        $this->assertEquals(['frontend' => 'frontend'], $compiler->getAnonymousComponentNamespaces());
+
+        // Test that the prefix can also contain dots.
+        $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
+
+        $compiler->anonymousComponentNamespace('frontend/auth', 'frontend.auth');
+        $this->assertEquals(['frontend.auth' => 'frontend.auth'], $compiler->getAnonymousComponentNamespaces());
     }
 
     protected function getFiles()

@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'stub:publish')]
 class StubPublishCommand extends Command
 {
     /**
@@ -13,15 +15,6 @@ class StubPublishCommand extends Command
      * @var string
      */
     protected $signature = 'stub:publish {--force : Overwrite any existing files}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'stub:publish';
 
     /**
      * The console command description.
@@ -42,6 +35,7 @@ class StubPublishCommand extends Command
         }
 
         $files = [
+            __DIR__.'/stubs/cast.inbound.stub' => $stubsPath.'/cast.inbound.stub',
             __DIR__.'/stubs/cast.stub' => $stubsPath.'/cast.stub',
             __DIR__.'/stubs/console.stub' => $stubsPath.'/console.stub',
             __DIR__.'/stubs/event.stub' => $stubsPath.'/event.stub',
@@ -59,8 +53,8 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/policy.stub' => $stubsPath.'/policy.stub',
             __DIR__.'/stubs/provider.stub' => $stubsPath.'/provider.stub',
             __DIR__.'/stubs/request.stub' => $stubsPath.'/request.stub',
-            __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
             __DIR__.'/stubs/resource.stub' => $stubsPath.'/resource.stub',
+            __DIR__.'/stubs/resource-collection.stub' => $stubsPath.'/resource-collection.stub',
             __DIR__.'/stubs/rule.stub' => $stubsPath.'/rule.stub',
             __DIR__.'/stubs/scope.stub' => $stubsPath.'/scope.stub',
             __DIR__.'/stubs/test.stub' => $stubsPath.'/test.stub',

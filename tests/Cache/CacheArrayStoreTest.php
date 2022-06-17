@@ -44,6 +44,8 @@ class CacheArrayStoreTest extends TestCase
 
     public function testItemsCanExpire()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
 
         $store->put('foo', 'bar', 10);
@@ -70,6 +72,33 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->increment('foo');
         $this->assertEquals(2, $result);
         $this->assertEquals(2, $store->get('foo'));
+
+        $result = $store->increment('foo', 2);
+        $this->assertEquals(4, $result);
+        $this->assertEquals(4, $store->get('foo'));
+    }
+
+    public function testValuesGetCastedByIncrementOrDecrement()
+    {
+        $store = new ArrayStore;
+        $store->put('foo', '1', 10);
+        $result = $store->increment('foo');
+        $this->assertEquals(2, $result);
+        $this->assertEquals(2, $store->get('foo'));
+
+        $store->put('bar', '1', 10);
+        $result = $store->decrement('bar');
+        $this->assertEquals(0, $result);
+        $this->assertEquals(0, $store->get('bar'));
+    }
+
+    public function testIncrementNonNumericValues()
+    {
+        $store = new ArrayStore;
+        $store->put('foo', 'I am string', 10);
+        $result = $store->increment('foo');
+        $this->assertEquals(1, $result);
+        $this->assertEquals(1, $store->get('foo'));
     }
 
     public function testNonExistingKeysCanBeIncremented()
@@ -78,10 +107,16 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);
         $this->assertEquals(1, $store->get('foo'));
+
+        // Will be there forever
+        Carbon::setTestNow(Carbon::now()->addYears(10));
+        $this->assertEquals(1, $store->get('foo'));
     }
 
     public function testExpiredKeysAreIncrementedLikeNonExistingKeys()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
 
         $store->put('foo', 999, 10);
@@ -98,6 +133,10 @@ class CacheArrayStoreTest extends TestCase
         $result = $store->decrement('foo');
         $this->assertEquals(0, $result);
         $this->assertEquals(0, $store->get('foo'));
+
+        $result = $store->decrement('foo', 2);
+        $this->assertEquals(-2, $result);
+        $this->assertEquals(-2, $store->get('foo'));
     }
 
     public function testItemsCanBeRemoved()
@@ -137,6 +176,8 @@ class CacheArrayStoreTest extends TestCase
 
     public function testCanAcquireLockAgainAfterExpiry()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $store = new ArrayStore;
         $lock = $store->lock('foo', 10);
         $lock->acquire();

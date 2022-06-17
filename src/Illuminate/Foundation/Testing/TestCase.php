@@ -27,8 +27,7 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
-        Concerns\InteractsWithViews,
-        Concerns\MocksApplicationServices;
+        Concerns\InteractsWithViews;
 
     /**
      * The Illuminate application instance.
@@ -141,6 +140,16 @@ abstract class TestCase extends BaseTestCase
 
         if (isset($uses[WithFaker::class])) {
             $this->setUpFaker();
+        }
+
+        foreach ($uses as $trait) {
+            if (method_exists($this, $method = 'setUp'.class_basename($trait))) {
+                $this->{$method}();
+            }
+
+            if (method_exists($this, $method = 'tearDown'.class_basename($trait))) {
+                $this->beforeApplicationDestroyed(fn () => $this->{$method}());
+            }
         }
 
         return $uses;

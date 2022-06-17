@@ -105,7 +105,7 @@ class CacheRateLimiterTest extends TestCase
 
         $rateLimiter = new RateLimiter($cache);
 
-        $this->assertEquals('foo', $rateLimiter->attempt('key', 1, function () {
+        $this->assertSame('foo', $rateLimiter->attempt('key', 1, function () {
             return 'foo';
         }, 1));
     }
@@ -135,5 +135,20 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter = new RateLimiter($cache);
 
         $this->assertTrue($rateLimiter->tooManyAttempts('jôhn', 1));
+    }
+
+    public function testKeyIsSanitizedOnlyOnce()
+    {
+        $cache = m::mock(Cache::class);
+        $rateLimiter = new RateLimiter($cache);
+
+        $key = "john'doe";
+        $cleanedKey = $rateLimiter->cleanRateLimiterKey($key);
+
+        $cache->shouldReceive('get')->once()->with($cleanedKey, 0)->andReturn(1);
+        $cache->shouldReceive('has')->once()->with("$cleanedKey:timer")->andReturn(true);
+        $cache->shouldReceive('add')->never();
+
+        $this->assertTrue($rateLimiter->tooManyAttempts($key, 1));
     }
 }

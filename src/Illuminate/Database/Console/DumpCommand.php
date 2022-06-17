@@ -9,7 +9,9 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'schema:dump')]
 class DumpCommand extends Command
 {
     /**
@@ -21,15 +23,6 @@ class DumpCommand extends Command
                 {--database= : The database connection to use}
                 {--path= : The path where the schema dump file should be stored}
                 {--prune : Delete all existing migration files}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'schema:dump';
 
     /**
      * The console command description.

@@ -40,7 +40,7 @@ class NestedRules
             Arr::undot(Arr::wrap($data))
         );
 
-        if (is_array($rules) && Arr::isAssoc($rules)) {
+        if (is_array($rules) && ! array_is_list($rules)) {
             $nested = [];
 
             foreach ($rules as $key => $rule) {

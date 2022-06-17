@@ -28,6 +28,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptions;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptionsAndTypeHints;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
@@ -38,7 +39,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use LogicException;
-use Mockery;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
@@ -159,6 +160,28 @@ class ResourceTest extends TestCase
                 'third' => 'value',
                 'fourth' => 'default',
                 'fifth' => 'default',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalSelectedAttributes()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalAttributes(new Post([
+                'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'no title',
             ],
         ]);
     }
@@ -799,6 +822,8 @@ class ResourceTest extends TestCase
             'meta' => [
                 'path' => '/',
                 'per_page' => 1,
+                'next_cursor' => (new Cursor(['id' => 5]))->encode(),
+                'prev_cursor' => null,
             ],
         ]);
     }
@@ -1154,7 +1179,7 @@ class ResourceTest extends TestCase
     {
         $this->expectException(PostTooLargeException::class);
 
-        $request = Mockery::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
+        $request = m::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
         $post = new ValidatePostSize;
         $post->handle($request, function () {
         });

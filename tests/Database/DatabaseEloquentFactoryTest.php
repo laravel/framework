@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
@@ -12,8 +13,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentFactoryTest extends TestCase
@@ -24,7 +26,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $container->singleton(Generator::class, function ($app, $parameters) {
             return \Faker\Factory::create('en_US');
         });
-        $container->instance(Application::class, $app = Mockery::mock(Application::class));
+        $container->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('App\\');
 
         $db = new DB;
@@ -58,6 +60,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->increments('id');
             $table->foreignId('user_id');
             $table->string('title');
+            $table->softDeletes();
             $table->timestamps();
         });
 
@@ -66,6 +69,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             $table->foreignId('commentable_id');
             $table->string('commentable_type');
             $table->string('body');
+            $table->softDeletes();
             $table->timestamps();
         });
 
@@ -89,7 +93,7 @@ class DatabaseEloquentFactoryTest extends TestCase
      */
     protected function tearDown(): void
     {
-        Mockery::close();
+        m::close();
 
         $this->schema()->drop('users');
 
@@ -105,6 +109,10 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, $user);
 
         $user = FactoryTestUserFactory::new()->create(['name' => 'Taylor Otwell']);
+        $this->assertInstanceOf(Eloquent::class, $user);
+        $this->assertSame('Taylor Otwell', $user->name);
+
+        $user = FactoryTestUserFactory::new()->set('name', 'Taylor Otwell')->create();
         $this->assertInstanceOf(Eloquent::class, $user);
         $this->assertSame('Taylor Otwell', $user->name);
 
@@ -131,6 +139,18 @@ class DatabaseEloquentFactoryTest extends TestCase
         ]);
 
         $this->assertSame('taylor-options', $user->options);
+    }
+
+    public function test_expanded_closure_attribute_returning_a_factory_is_resolved()
+    {
+        $post = FactoryTestPostFactory::new()->create([
+            'title' => 'post',
+            'user_id' => fn ($attributes) => FactoryTestUserFactory::new([
+                'options' => $attributes['title'].'-options',
+            ]),
+        ]);
+
+        $this->assertEquals('post-options', $post->user->options);
     }
 
     public function test_make_creates_unpersisted_model_instance()
@@ -415,6 +435,22 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame('index: 1', $users[1]->name);
     }
 
+    public function test_counted_sequence()
+    {
+        $factory = FactoryTestUserFactory::new()->forEachSequence(
+            ['name' => 'Taylor Otwell'],
+            ['name' => 'Abigail Otwell'],
+            ['name' => 'Dayle Rees']
+        );
+
+        $class = new \ReflectionClass($factory);
+        $prop = $class->getProperty('count');
+        $prop->setAccessible(true);
+        $value = $prop->getValue($factory);
+
+        $this->assertSame(3, $value);
+    }
+
     public function test_cross_join_sequences()
     {
         $assert = function ($users) {
@@ -472,7 +508,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_nested_model_name_from_factory()
     {
-        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('Illuminate\\Tests\\Database\\Fixtures\\');
 
         Factory::useNamespace('Illuminate\\Tests\\Database\\Fixtures\\Factories\\');
@@ -484,7 +520,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_resolve_non_app_nested_model_factories()
     {
-        Container::getInstance()->instance(Application::class, $app = Mockery::mock(Application::class));
+        Container::getInstance()->instance(Application::class, $app = m::mock(Application::class));
         $app->shouldReceive('getNamespace')->andReturn('Foo\\');
 
         Factory::useNamespace('Factories\\');
@@ -555,6 +591,39 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->unless(true, function () {
                 $this->fail('Unreachable code that has somehow been reached.');
             });
+    }
+
+    public function test_dynamic_trashed_state_for_softdeletes_models()
+    {
+        $now = Carbon::create(2020, 6, 7, 8, 9);
+        Carbon::setTestNow($now);
+        $post = FactoryTestPostFactory::new()->trashed()->create();
+
+        $this->assertTrue($post->deleted_at->equalTo($now->subDay()));
+
+        $deleted_at = Carbon::create(2020, 1, 2, 3, 4, 5);
+        $post = FactoryTestPostFactory::new()->trashed($deleted_at)->create();
+
+        $this->assertTrue($deleted_at->equalTo($post->deleted_at));
+
+        Carbon::setTestNow();
+    }
+
+    public function test_dynamic_trashed_state_respects_existing_state()
+    {
+        $now = Carbon::create(2020, 6, 7, 8, 9);
+        Carbon::setTestNow($now);
+        $comment = FactoryTestCommentFactory::new()->trashed()->create();
+
+        $this->assertTrue($comment->deleted_at->equalTo($now->subWeek()));
+
+        Carbon::setTestNow();
+    }
+
+    public function test_dynamic_trashed_state_throws_exception_when_not_a_softdeletes_model()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        FactoryTestUserFactory::new()->trashed()->create();
     }
 
     /**
@@ -628,6 +697,8 @@ class FactoryTestPostFactory extends Factory
 
 class FactoryTestPost extends Eloquent
 {
+    use SoftDeletes;
+
     protected $table = 'posts';
 
     public function user()
@@ -663,10 +734,19 @@ class FactoryTestCommentFactory extends Factory
             'body' => $this->faker->name,
         ];
     }
+
+    public function trashed()
+    {
+        return $this->state([
+            'deleted_at' => Carbon::now()->subWeek(),
+        ]);
+    }
 }
 
 class FactoryTestComment extends Eloquent
 {
+    use SoftDeletes;
+
     protected $table = 'comments';
 
     public function commentable()

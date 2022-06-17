@@ -106,6 +106,32 @@ class SupportTestingNotificationFakeTest extends TestCase
         }
     }
 
+    public function testAssertNothingSent()
+    {
+        $this->fake->assertNothingSent();
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertNothingSent();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Notifications were sent unexpectedly.'));
+        }
+    }
+
+    public function testAssertNothingSentTo()
+    {
+        $this->fake->assertNothingSentTo($this->user);
+        $this->fake->send($this->user, new NotificationStub);
+
+        try {
+            $this->fake->assertNothingSentTo($this->user);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Notifications were sent unexpectedly.'));
+        }
+    }
+
     public function testAssertSentToFailsForEmptyArray()
     {
         $this->expectException(Exception::class);
@@ -138,9 +164,9 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->assertNotSame($id, $this->notification->id);
     }
 
-    public function testAssertTimesSent()
+    public function testAssertSentTimes()
     {
-        $this->fake->assertTimesSent(0, NotificationStub::class);
+        $this->fake->assertSentTimes(NotificationStub::class, 0);
 
         $this->fake->send($this->user, new NotificationStub);
 
@@ -148,7 +174,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
         $this->fake->send(new UserStub, new NotificationStub);
 
-        $this->fake->assertTimesSent(3, NotificationStub::class);
+        $this->fake->assertSentTimes(NotificationStub::class, 3);
     }
 
     public function testAssertSentToTimes()

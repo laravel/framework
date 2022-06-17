@@ -142,6 +142,35 @@ PHP);
         $response->assertNotFound();
     }
 
+    public function testEnforceScopingImplicitRouteBindingsWithTrashedAndChildWithNoSoftDeleteTrait()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        $post = $user->posts()->create();
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+        Route::scopeBindings()->group(function () {
+            Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
+                return [$user, $post];
+            })->middleware(['web'])->withTrashed();
+        });
+
+        $response = $this->getJson("/user/{$user->id}/post/{$post->id}");
+        $response->assertOk();
+        $response->assertJson([
+            [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            [
+                'id' => 1,
+                'user_id' => 1,
+            ],
+        ]);
+    }
+
     public function testEnforceScopingImplicitRouteBindingsWithRouteCachingEnabled()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);

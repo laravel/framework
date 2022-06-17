@@ -4,10 +4,12 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
+#[AsCommand(name: 'serve')]
 class ServeCommand extends Command
 {
     /**
@@ -16,15 +18,6 @@ class ServeCommand extends Command
      * @var string
      */
     protected $name = 'serve';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'serve';
 
     /**
      * The console command description.
@@ -39,6 +32,22 @@ class ServeCommand extends Command
      * @var int
      */
     protected $portOffset = 0;
+
+    /**
+     * The environment variables that should be passed from host machine to the PHP server process.
+     *
+     * @var string[]
+     */
+    public static $passthroughVariables = [
+        'APP_ENV',
+        'LARAVEL_SAIL',
+        'PHP_CLI_SERVER_WORKERS',
+        'PHP_IDE_CONFIG',
+        'SYSTEMROOT',
+        'XDEBUG_CONFIG',
+        'XDEBUG_MODE',
+        'XDEBUG_SESSION',
+    ];
 
     /**
      * Execute the console command.
@@ -107,16 +116,7 @@ class ServeCommand extends Command
                 return [$key => $value];
             }
 
-            return in_array($key, [
-                'APP_ENV',
-                'LARAVEL_SAIL',
-                'PHP_CLI_SERVER_WORKERS',
-                'PHP_IDE_CONFIG',
-                'SYSTEMROOT',
-                'XDEBUG_CONFIG',
-                'XDEBUG_MODE',
-                'XDEBUG_SESSION',
-            ]) ? [$key => $value] : [$key => false];
+            return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
         $process->start(function ($type, $buffer) {
@@ -191,7 +191,7 @@ class ServeCommand extends Command
     }
 
     /**
-     * Check if the command has reached its max amount of port tries.
+     * Check if the command has reached its maximum number of port tries.
      *
      * @return bool
      */
@@ -209,7 +209,7 @@ class ServeCommand extends Command
     protected function getOptions()
     {
         return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', '127.0.0.1'],
+            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', Env::get('SERVER_HOST', '127.0.0.1')],
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],

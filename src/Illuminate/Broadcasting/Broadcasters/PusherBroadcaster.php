@@ -4,6 +4,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Pusher\ApiErrorException;
 use Pusher\Pusher;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -28,6 +29,39 @@ class PusherBroadcaster extends Broadcaster
     public function __construct(Pusher $pusher)
     {
         $this->pusher = $pusher;
+    }
+
+    /**
+     * Resolve the authenticated user payload for an incoming connection request.
+     *
+     * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+     * See: https://pusher.com/docs/channels/server_api/authenticating-users/#response
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|null
+     */
+    public function resolveAuthenticatedUser($request)
+    {
+        if (! $user = parent::resolveAuthenticatedUser($request)) {
+            return;
+        }
+
+        if (method_exists($this->pusher, 'authenticateUser')) {
+            return $this->pusher->authenticateUser($request->socket_id, $user);
+        }
+
+        $settings = $this->pusher->getSettings();
+        $encodedUser = json_encode($user);
+        $decodedString = "{$request->socket_id}::user::{$encodedUser}";
+
+        $auth = $settings['auth_key'].':'.hash_hmac(
+            'sha256', $decodedString, $settings['secret']
+        );
+
+        return [
+            'auth' => $auth,
+            'user_data' => $encodedUser,
+        ];
     }
 
     /**
@@ -64,7 +98,10 @@ class PusherBroadcaster extends Broadcaster
     {
         if (str_starts_with($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
-                $request, $this->pusher->socket_auth($request->channel_name, $request->socket_id)
+                $request,
+                method_exists($this->pusher, 'authorizeChannel')
+                    ? $this->pusher->authorizeChannel($request->channel_name, $request->socket_id)
+                    : $this->pusher->socket_auth($request->channel_name, $request->socket_id)
             );
         }
 
@@ -78,10 +115,9 @@ class PusherBroadcaster extends Broadcaster
 
         return $this->decodePusherResponse(
             $request,
-            $this->pusher->presence_auth(
-                $request->channel_name, $request->socket_id,
-                $broadcastIdentifier, $result
-            )
+            method_exists($this->pusher, 'authorizePresenceChannel')
+                ? $this->pusher->authorizePresenceChannel($request->channel_name, $request->socket_id, $broadcastIdentifier, $result)
+                : $this->pusher->presence_auth($request->channel_name, $request->socket_id, $broadcastIdentifier, $result)
         );
     }
 
@@ -118,10 +154,12 @@ class PusherBroadcaster extends Broadcaster
 
         $parameters = $socket !== null ? ['socket_id' => $socket] : [];
 
+        $channels = Collection::make($this->formatChannels($channels));
+
         try {
-            $this->pusher->trigger(
-                $this->formatChannels($channels), $event, $payload, $parameters
-            );
+            $channels->chunk(100)->each(function ($channels) use ($event, $payload, $parameters) {
+                $this->pusher->trigger($channels->toArray(), $event, $payload, $parameters);
+            });
         } catch (ApiErrorException $e) {
             throw new BroadcastException(
                 sprintf('Pusher error: %s.', $e->getMessage())

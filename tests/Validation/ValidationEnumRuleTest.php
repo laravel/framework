@@ -12,13 +12,8 @@ use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
-if (PHP_VERSION_ID >= 80100) {
-    include 'Enums.php';
-}
+include 'Enums.php';
 
-/**
- * @requires PHP >= 8.1
- */
 class ValidationEnumRuleTest extends TestCase
 {
     public function testvalidationPassesWhenPassingCorrectEnum()
