@@ -965,9 +965,15 @@ class Str
         }
 
         if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
+            $value = explode(' ', $value);
 
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
+            foreach ($value as $key => $word) {
+                $value[$key] = mb_ucfirst($word);
+            }
+            
+            $value = preg_replace('/\s+/u', '', implode(' ', $value));
+
+            $value = static::lower(preg_replace('/(.)(?=\p{Lu})/u', '$1'.$delimiter, $value));
         }
 
         return static::$snakeCache[$key][$delimiter] = $value;
