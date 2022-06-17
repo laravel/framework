@@ -26,7 +26,6 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('Basic foobar', $this->defaultHeaders['Authorization']);
     }
 
-
     public function testWithoutTokenRemovesAuthorizationHeader()
     {
         $this->withToken('foobar');

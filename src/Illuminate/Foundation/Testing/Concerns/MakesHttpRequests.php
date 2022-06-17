@@ -110,7 +110,7 @@ trait MakesHttpRequests
     public function withoutToken()
     {
         unset($this->defaultHeaders['Authorization']);
-        
+
         return $this;
     }
 
