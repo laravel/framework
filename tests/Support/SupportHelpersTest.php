@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Error;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
@@ -672,6 +673,15 @@ class SupportHelpersTest extends TestCase
 
         $this->assertSame('foobar', silent($callback, 'foo', 0));
         $this->assertFalse(silent($callback, 'foo', 1));
+    }
+
+    public function testSilentThrowsError()
+    {
+        $this->expectException(Error::class);
+
+        silent(function () {
+            throw new Error();
+        });
     }
 
     public function testTransform()
