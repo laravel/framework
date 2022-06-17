@@ -257,6 +257,24 @@ if (! function_exists('retry')) {
     }
 }
 
+if (! function_exists('silent')) {
+    /**
+     * Returns a callback result, or false if it throws an exception.
+     *
+     * @param  callable  $callback
+     * @param  mixed  ...$arguments
+     * @return mixed|false
+     */
+    function silent(callable $callback, ...$arguments)
+    {
+        try {
+            return $callback(...$arguments);
+        } catch (Exception) {
+            return false;
+        }
+    }
+}
+
 if (! function_exists('str')) {
     /**
      * Get a new stringable object from the given string.

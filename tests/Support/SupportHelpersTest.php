@@ -662,6 +662,18 @@ class SupportHelpersTest extends TestCase
         $this->assertEqualsWithDelta(0.05 + 0.1 + 0.2, microtime(true) - $startTime, 0.02);
     }
 
+    public function testSilent()
+    {
+        $callback = function ($foo, $fail) {
+            $this->assertSame('foo', $foo);
+
+            return $fail ? throw new LogicException() : $foo . 'bar';
+        };
+
+        $this->assertSame('foobar', silent($callback, 'foo', 0));
+        $this->assertFalse(silent($callback, 'foo', 1));
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
