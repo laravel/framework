@@ -169,6 +169,21 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create a resource file for the model.
+     *
+     * @return void
+     */
+    protected function createResource()
+    {
+        $resource = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:resource', [
+            'name'         => "{$resource}Resource",
+            '--collection' => $this->option('collection'),
+        ]);
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
