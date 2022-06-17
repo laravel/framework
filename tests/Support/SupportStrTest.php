@@ -601,6 +601,26 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo-_bar', Str::snake('Foo-Bar'));
         $this->assertSame('foo__bar', Str::snake('Foo_Bar'));
         $this->assertSame('żółtałódka', Str::snake('ŻółtaŁódka'));
+        
+        // Cyrillic
+        $this->assertSame('ларавел_п_х_п_фреймворк', Str::snake('ЛаравелПХПФреймворк'));
+        $this->assertSame('ларавел_пхп_фреймворк', Str::snake('ЛаравелПхпФреймворк'));
+        $this->assertSame('ларавел пхп фреймворк', Str::snake('ЛаравелПхпФреймворк', ' '));
+        $this->assertSame('ларавел_пхп_фреймворк', Str::snake('Ларавел Пхп Фреймворк'));
+        $this->assertSame('ларавел_пхп_фреймворк', Str::snake('Ларавел    Пхп      Фреймворк   '));
+        $this->assertSame('ларавел_пхп_фреймворк', Str::snake('ларавел пхп Фреймворк'));
+        $this->assertSame('ларавел_пхп_фрейм_ворк', Str::snake('ларавел пхп ФреймВорк'));
+        $this->assertSame('ларавел__пхп__фреймворк', Str::snake('ЛаравелПхпФреймворк', '__'));
+
+        // Greek
+        $this->assertSame('ελληνικό_αλφάβητο', Str::snake('Ελληνικό αλφάβητο'));
+        $this->assertSame('ελληνικό_αλφάβητο', Str::snake('Ελληνικό Αλφάβητο'));
+        $this->assertSame('ελληνικό-αλφάβητο', Str::snake('ελληνικόΑλφάβητο', '-'));
+        $this->assertSame('ελληνικό__αλφάβητο_', Str::snake('ελληνικόΑλφάβητο_', '__'));
+
+        $this->assertSame('żółta_łódka', Str::snake('ŻółtaŁódka'));
+        $this->assertSame('❤_multi_byte', Str::snake('❤MultiByte'));
+        $this->assertSame('multi_byte❤', Str::snake('multiByte❤'));
     }
 
     public function testSquish()
