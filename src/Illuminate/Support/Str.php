@@ -968,7 +968,7 @@ class Str
             $value = explode(' ', $value);
 
             foreach ($value as $key => $word) {
-                $value[$key] = mb_ucfirst($word);
+                $value[$key] = mb_strtoupper(mb_substr($word, 0, 1)) . mb_substr($word, 1);
             }
             
             $value = preg_replace('/\s+/u', '', implode(' ', $value));
