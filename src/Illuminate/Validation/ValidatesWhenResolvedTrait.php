@@ -2,6 +2,9 @@
 
 namespace Illuminate\Validation;
 
+use ReflectionClass;
+use ReflectionProperty;
+
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
@@ -25,6 +28,8 @@ trait ValidatesWhenResolvedTrait
         if ($instance->fails()) {
             $this->failedValidation($instance);
         }
+
+        $this->refresh();
 
         $this->passedValidation();
     }
@@ -96,5 +101,21 @@ trait ValidatesWhenResolvedTrait
     protected function failedAuthorization()
     {
         throw new UnauthorizedException;
+    }
+
+    /**
+     * Populate the request data to properties.
+     *
+     * @return $this
+     */
+    public function refresh()
+    {
+        foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            if ($this->has(($property->name)) && $property->getDeclaringClass()->getName() === $this::class) {
+                $this->{$property->name} = $this->input($property->name);
+            }
+        }
+
+        return $this;
     }
 }
