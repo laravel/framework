@@ -955,6 +955,54 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder, $result);
     }
 
+    public function testWhereWhen()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereWhen(true, 'foo', '=', 'bar');
+        $this->assertSame('select * from "table" where "foo" = ? and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals(['bar'], $query->getBindings());
+
+        $query = $model->newQuery()->whereWhen(false, 'foo', '=', 'bar');
+        $this->assertSame('select * from "table" where "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+
+        $foo = 'bar';
+        $query = $model->newQuery()->whereWhen($foo, 'foo');
+        $this->assertSame('select * from "table" where "foo" = ? and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals(['bar'], $query->getBindings());
+
+        $foo = '';
+        $query = $model->newQuery()->whereWhen($foo, 'foo');
+        $this->assertSame('select * from "table" where "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+    }
+
+    public function testWhereUnless()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $query = $model->newQuery()->whereUnless(true, 'foo', '=', 'bar');
+        $this->assertSame('select * from "table" where "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+
+        $query = $model->newQuery()->whereUnless(false, 'foo', '=', 'bar');
+        $this->assertSame('select * from "table" where "foo" = ? and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals(['bar'], $query->getBindings());
+
+        $foo = 'bar';
+        $query = $model->newQuery()->whereUnless($foo, 'foo');
+        $this->assertSame('select * from "table" where "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals([], $query->getBindings());
+
+        $foo = '';
+        $query = $model->newQuery()->whereUnless($foo, 'foo');
+        $this->assertSame('select * from "table" where "foo" = ? and "table"."deleted_at" is null', $query->toSql());
+        $this->assertEquals([''], $query->getBindings());
+    }
+
     public function testRealNestedWhereWithScopes()
     {
         $model = new EloquentBuilderTestNestedStub;
