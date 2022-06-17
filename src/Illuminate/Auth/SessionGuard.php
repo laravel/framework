@@ -2,6 +2,7 @@
 
 namespace Illuminate\Auth;
 
+use Closure;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\CurrentDeviceLogout;
@@ -639,24 +640,31 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
+     * @param  \Closure|null  $rehashUserPassword
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function logoutOtherDevices($password, $attribute = 'password')
+    public function logoutOtherDevices($password, $attribute = 'password', $rehashUserPassword = null)
     {
-        if (! $this->user()) {
+        if (! $user = $this->user()) {
             return;
         }
 
-        $result = $this->rehashUserPassword($password, $attribute);
+        if (! Hash::check($password, $user->{$attribute})) {
+            throw new InvalidArgumentException('The given password does not match the current password.');
+        }
+
+        $result = $rehashUserPassword instanceof Closure ?
+            $rehashUserPassword($user, $password, $attribute) :
+            $this->rehashUserPassword($user, $password, $attribute);
 
         if ($this->recaller() ||
             $this->getCookieJar()->hasQueued($this->getRecallerName())) {
-            $this->queueRecallerCookie($this->user());
+            $this->queueRecallerCookie($user);
         }
 
-        $this->fireOtherDeviceLogoutEvent($this->user());
+        $this->fireOtherDeviceLogoutEvent($user);
 
         return $result;
     }
@@ -664,19 +672,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Rehash the current user's password.
      *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $password
      * @param  string  $attribute
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
-     *
-     * @throws \InvalidArgumentException
      */
-    protected function rehashUserPassword($password, $attribute)
+    protected function rehashUserPassword($user, $password, $attribute)
     {
-        if (! Hash::check($password, $this->user()->{$attribute})) {
-            throw new InvalidArgumentException('The given password does not match the current password.');
-        }
-
-        return tap($this->user()->forceFill([
+        return tap($user->forceFill([
             $attribute => Hash::make($password),
         ]))->save();
     }
