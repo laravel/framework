@@ -85,7 +85,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->createPolicy();
         }
 
-        if ($this->option('all') && $this->option("api")) {
+        if ($this->option('all') && $this->option('api')) {
             $this->createResource();
         }
     }
