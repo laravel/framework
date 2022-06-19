@@ -230,6 +230,31 @@ class ValidationInvokableRuleTest extends TestCase
         $validator->passes();
     }
 
+    public function testItCanSpecifyTheValidationErrorKeyForTheErrorMessage()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('bar.baz', 'Another attribute error.');
+                $fail('This attribute error.');
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'xxxx'], ['foo' => $rule]);
+
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'bar.baz' => [
+                'Another attribute error.',
+            ],
+            'foo' => [
+                'This attribute error.',
+            ],
+        ], $validator->messages()->messages());
+    }
+
     private function getIlluminateArrayTranslator()
     {
         return new Translator(

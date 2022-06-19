@@ -24,6 +24,7 @@ use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
 use League\Flysystem\Visibility;
@@ -268,17 +269,25 @@ class FilesystemAdapter implements CloudFilesystemContract
     {
         $response = new StreamedResponse;
 
-        $filename = $name ?? basename($path);
+        if (! array_key_exists('Content-Type', $headers)) {
+            $headers['Content-Type'] = $this->mimeType($path);
+        }
 
-        $disposition = $response->headers->makeDisposition(
-            $disposition, $filename, $this->fallbackName($filename)
-        );
+        if (! array_key_exists('Content-Length', $headers)) {
+            $headers['Content-Length'] = $this->size($path);
+        }
 
-        $response->headers->replace($headers + [
-            'Content-Type' => $this->mimeType($path),
-            'Content-Length' => $this->size($path),
-            'Content-Disposition' => $disposition,
-        ]);
+        if (! array_key_exists('Content-Disposition', $headers)) {
+            $filename = $name ?? basename($path);
+
+            $disposition = $response->headers->makeDisposition(
+                $disposition, $filename, $this->fallbackName($filename)
+            );
+
+            $headers['Content-Disposition'] = $disposition;
+        }
+
+        $response->headers->replace($headers);
 
         $response->setCallback(function () use ($path) {
             $stream = $this->readStream($path);
@@ -548,7 +557,13 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function mimeType($path)
     {
-        return $this->driver->mimeType($path);
+        try {
+            return $this->driver->mimeType($path);
+        } catch (UnableToRetrieveMetadata $e) {
+            throw_if($this->throwsExceptions(), $e);
+        }
+
+        return false;
     }
 
     /**

@@ -26,6 +26,15 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertSame('Basic foobar', $this->defaultHeaders['Authorization']);
     }
 
+    public function testWithoutTokenRemovesAuthorizationHeader()
+    {
+        $this->withToken('foobar');
+        $this->assertSame('Bearer foobar', $this->defaultHeaders['Authorization']);
+
+        $this->withoutToken();
+        $this->assertArrayNotHasKey('Authorization', $this->defaultHeaders);
+    }
+
     public function testWithoutAndWithMiddleware()
     {
         $this->assertFalse($this->app->has('middleware.disable'));

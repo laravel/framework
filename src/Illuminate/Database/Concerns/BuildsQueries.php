@@ -343,6 +343,8 @@ trait BuildsQueries
 
         if (! is_null($cursor)) {
             $addCursorConditions = function (self $builder, $previousColumn, $i) use (&$addCursorConditions, $cursor, $orders) {
+                $unionBuilders = isset($builder->unions) ? collect($builder->unions)->pluck('query') : collect();
+
                 if (! is_null($previousColumn)) {
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $previousColumn);
 
@@ -351,9 +353,19 @@ trait BuildsQueries
                         '=',
                         $cursor->parameter($previousColumn)
                     );
+
+                    $unionBuilders->each(function ($unionBuilder) use ($previousColumn, $cursor) {
+                        $unionBuilder->where(
+                            $this->getOriginalColumnNameForCursorPagination($this, $previousColumn),
+                            '=',
+                            $cursor->parameter($previousColumn)
+                        );
+
+                        $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
+                    });
                 }
 
-                $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i) {
+                $builder->where(function (self $builder) use ($addCursorConditions, $cursor, $orders, $i, $unionBuilders) {
                     ['column' => $column, 'direction' => $direction] = $orders[$i];
 
                     $originalColumn = $this->getOriginalColumnNameForCursorPagination($this, $column);
@@ -369,6 +381,24 @@ trait BuildsQueries
                             $addCursorConditions($builder, $column, $i + 1);
                         });
                     }
+
+                    $unionBuilders->each(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                        $unionBuilder->where(function ($unionBuilder) use ($column, $direction, $cursor, $i, $orders, $addCursorConditions) {
+                            $unionBuilder->where(
+                                $this->getOriginalColumnNameForCursorPagination($this, $column),
+                                $direction === 'asc' ? '>' : '<',
+                                $cursor->parameter($column)
+                            );
+
+                            if ($i < $orders->count() - 1) {
+                                $unionBuilder->orWhere(function (self $builder) use ($addCursorConditions, $column, $i) {
+                                    $addCursorConditions($builder, $column, $i + 1);
+                                });
+                            }
+
+                            $this->addBinding($unionBuilder->getRawBindings()['where'], 'union');
+                        });
+                    });
                 });
             };
 

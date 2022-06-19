@@ -348,4 +348,27 @@ trait CompilesConditionals
     {
         return "<?php if{$condition}: echo 'readonly'; endif; ?>";
     }
+
+    /**
+     * Compile the push statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compilePushIf($expression)
+    {
+        $parts = explode(',', $this->stripParentheses($expression), 2);
+
+        return "<?php if({$parts[0]}): \$__env->startPush({$parts[1]}); ?>";
+    }
+
+    /**
+     * Compile the end-push statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndPushIf()
+    {
+        return '<?php $__env->stopPush(); endif; ?>';
+    }
 }

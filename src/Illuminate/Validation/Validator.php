@@ -816,9 +816,11 @@ class Validator implements ValidatorContract
 
             $messages = $messages ? (array) $messages : [get_class($rule)];
 
-            foreach ($messages as $message) {
-                $this->messages->add($attribute, $this->makeReplacements(
-                    $message, $attribute, get_class($rule), []
+            foreach ($messages as $key => $message) {
+                $key = is_string($key) ? $key : $attribute;
+
+                $this->messages->add($key, $this->makeReplacements(
+                    $message, $key, get_class($rule), []
                 ));
             }
         }

@@ -102,6 +102,11 @@ assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Elo
 assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->createQuietly([
     'string' => 'string',
 ]));
+assertType('Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model', $factory->createQuietly(function ($attributes) {
+    assertType('array<string, mixed>', $attributes);
+
+    return ['string' => 'string'];
+}));
 
 // assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, User>|User', $factory->lazy());
 // assertType('Closure(): Illuminate\Database\Eloquent\Collection<int, User>|User', $factory->lazy([
