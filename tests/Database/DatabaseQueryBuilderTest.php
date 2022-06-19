@@ -4370,6 +4370,7 @@ SQL;
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
+
             return $results;
         });
 
@@ -4416,6 +4417,7 @@ SQL;
                 $builder->toSql());
             $this->assertEquals([true, $ts], $builder->bindings['where']);
             $this->assertEquals([true, $ts], $builder->bindings['union']);
+
             return $results;
         });
 
@@ -4462,6 +4464,7 @@ SQL;
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
+
             return $results;
         });
 
@@ -4478,8 +4481,8 @@ SQL;
         ]), $result);
     }
 
-     public function testCursorPaginateWithUnionWheresMultipleOrders()
-     {
+    public function testCursorPaginateWithUnionWheresMultipleOrders()
+    {
         $ts = now()->toDateTimeString();
 
         $perPage = 16;
@@ -4508,6 +4511,7 @@ SQL;
                 $builder->toSql());
             $this->assertEquals([$ts, $ts, 1], $builder->bindings['where']);
             $this->assertEquals([$ts, $ts, 1], $builder->bindings['union']);
+
             return $results;
         });
 
