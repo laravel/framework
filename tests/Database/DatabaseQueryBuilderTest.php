@@ -4340,6 +4340,190 @@ SQL;
         ]), $result);
     }
 
+    public function testCursorPaginateWithUnionWheres()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" > ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts], $builder->bindings['where']);
+            $this->assertEquals([$ts], $builder->bindings['union']);
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheresWithRawOrderExpression()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'is_published', 'start_time as created_at')->selectRaw("'video' as type")->where('is_published', true)->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'is_published', 'created_at')->selectRaw("'news' as type")->where('is_published', true)->from('news'));
+        $builder->orderByRaw('case when (id = 3 and type="news" then 0 else 1 end)')->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video', 'is_published' => true],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news', 'is_published' => true],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("start_time" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([true, $ts], $builder->bindings['where']);
+            $this->assertEquals([true, $ts], $builder->bindings['union']);
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheresReverseOrder()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts], false);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts], $builder->bindings['where']);
+            $this->assertEquals([$ts], $builder->bindings['union']);
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+     public function testCursorPaginateWithUnionWheresMultipleOrders()
+     {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts, 'id' => 1]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->orderByDesc('created_at')->orderBy('id');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts, $ts, 1], $builder->bindings['where']);
+            $this->assertEquals([$ts, $ts, 1], $builder->bindings['union']);
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at', 'id'],
+        ]), $result);
+    }
+
     public function testWhereRowValues()
     {
         $builder = $this->getBuilder();

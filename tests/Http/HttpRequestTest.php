@@ -655,6 +655,17 @@ class HttpRequestTest extends TestCase
         $this->assertSame('foo', $request['id']);
     }
 
+    public function testArrayAccessWithoutRouteResolver()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+
+        $this->assertFalse(isset($request['non-existent']));
+        $this->assertNull($request['non-existent']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertSame('Taylor', $request['name']);
+    }
+
     public function testAllMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
