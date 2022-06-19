@@ -237,7 +237,7 @@ class ModelMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['all', 'a', InputOption::VALUE_NONE, 'Generate a migration, seeder, factory, policy, and resource controller for the model'],
+            ['all', 'a', InputOption::VALUE_NONE, 'Generate a migration, seeder, factory, policy, and resource controller for the model, generate a resource file with --api option'],
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model'],
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists'],
@@ -247,7 +247,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['seed', 's', InputOption::VALUE_NONE, 'Create a new seeder for the model'],
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
-            ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
+            ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller, generate a resource file with -a/--all option'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
             ['collection', null, InputOption::VALUE_NONE, 'Create a resource collection, must be with resource option'],
 
