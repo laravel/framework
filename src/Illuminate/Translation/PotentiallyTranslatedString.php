@@ -2,7 +2,6 @@
 
 namespace Illuminate\Translation;
 
-use RuntimeException;
 use Stringable;
 
 class PotentiallyTranslatedString implements Stringable
@@ -44,15 +43,28 @@ class PotentiallyTranslatedString implements Stringable
     /**
      * Translate the string.
      *
+     * @param  array  $replace
+     * @param  string|null  $locale
      * @return $this
      */
-    public function translate()
+    public function translate($replace = [], $locale = null)
     {
-        if (! $this->translator->has($this->string)) {
-            throw new RuntimeException("Unable to find translation [{$this->string}] for locale [{$this->translator->getLocale()}].");
-        }
+        $this->translation = $this->translator->get($this->string, $replace, $locale);
 
-        $this->translation = $this->translator->get($this->string);
+        return $this;
+    }
+
+    /**
+     * Translates the string based on a count.
+     *
+     * @param  \Countable|int|array  $number
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return $this
+     */
+    public function translateChoice($number, array $replace = [], $locale = null)
+    {
+        $this->translation = $this->translator->choice($this->string, $number, $replace, $locale);
 
         return $this;
     }
