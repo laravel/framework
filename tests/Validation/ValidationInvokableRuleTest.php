@@ -9,7 +9,6 @@ use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class ValidationInvokableRuleTest extends TestCase
 {
@@ -172,26 +171,6 @@ class ValidationInvokableRuleTest extends TestCase
         ], $validator->messages()->messages());
     }
 
-    public function testItThrowsInsteadOfFallingBackWithTranslation()
-    {
-        $trans = $this->getIlluminateArrayTranslator();
-        $trans->addLines(['validation.key' => 'English'], 'en');
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
-            {
-                $fail('validation.key')->translate([], 'fr');
-            }
-        };
-
-        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to find translation [validation.key] for locale [fr].');
-
-        $validator->fails();
-    }
-
     public function testItCanAccessDataDuringValidation()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -307,25 +286,6 @@ class ValidationInvokableRuleTest extends TestCase
         $this->assertSame([], $validator->messages()->messages());
     }
 
-    public function testItThrowsIfTranslationIsNotFound()
-    {
-        $trans = $this->getIlluminateArrayTranslator();
-        $rule = new class() implements InvokableRule
-        {
-            public function __invoke($attribute, $value, $fail)
-            {
-                $fail('validation.key')->translate();
-            }
-        };
-
-        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to find translation [validation.key] for locale [en].');
-
-        $validator->passes();
-    }
-
     public function testItCanSpecifyTheValidationErrorKeyForTheErrorMessage()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -347,6 +307,28 @@ class ValidationInvokableRuleTest extends TestCase
             ],
             'foo' => [
                 'This attribute error.',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItCanTranslateWithChoices()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'There is one error.|There are many errors.'], 'en');
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('validation.translated-error')->translateChoice(2);
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo' => [
+                'There are many errors.',
             ],
         ], $validator->messages()->messages());
     }
