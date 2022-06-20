@@ -124,4 +124,11 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $this->assertSame($this->options, $this->p->getOptions());
     }
+
+    public function testLengthAwarePaginatorShouldAllowForZeroPerPage()
+    {
+        $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 0, 2, $this->options);
+
+        $this->assertSame(0, $p->toArray()['per_Page']);
+    }
 }
