@@ -249,7 +249,7 @@ trait Queueable
     {
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
-                $next->chained = $this->chained;
+                $next->chained = array_merge($next->chained, $this->chained);
 
                 $next->onConnection($next->connection ?: $this->chainConnection);
                 $next->onQueue($next->queue ?: $this->chainQueue);
