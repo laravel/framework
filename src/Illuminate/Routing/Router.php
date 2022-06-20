@@ -489,6 +489,7 @@ class Router implements BindingRegistrar, RegistrarContract
         }
 
         $this->addWhereClausesToRoute($route);
+        $this->invokeAfterRegisterCallbackForRoute($route);
 
         return $route;
     }
@@ -614,6 +615,19 @@ class Router implements BindingRegistrar, RegistrarContract
         ));
 
         return $route;
+    }
+
+    /**
+     * Invoke the after registration callback of the route, if configured.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function invokeAfterRegisterCallbackForRoute($route)
+    {
+        if (isset($route->action['afterRegisterCallback'])) {
+            $route->action['afterRegisterCallback']($route);
+        }
     }
 
     /**

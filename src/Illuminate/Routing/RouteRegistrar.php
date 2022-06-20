@@ -16,6 +16,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
  * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\RouteRegistrar afterRegisterCallback(\Closure $action)
  * @method \Illuminate\Routing\RouteRegistrar as(string $value)
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
  * @method \Illuminate\Routing\RouteRegistrar domain(string $value)
@@ -58,6 +59,7 @@ class RouteRegistrar
      * @var string[]
      */
     protected $allowedAttributes = [
+        'afterRegisterCallback',
         'as',
         'controller',
         'domain',

@@ -7,6 +7,7 @@ use FooController;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -418,6 +419,40 @@ class RouteRegistrarTest extends TestCase
             FooController::class.'@index',
             $this->getRoute()->getAction()['uses']
         );
+    }
+
+    public function testCanRegisterGroupWithAfterRegisterCallback()
+    {
+        $this->router->afterRegisterCallback(function (Route $route) {
+            $route->block(5, 7);
+        })->group(function (Router $router) {
+            $router->get('users', RouteRegistrarControllerStub::class.'@index');
+        });
+
+        $this->assertSame(5, $this->getRoute()->locksFor());
+        $this->assertSame(7, $this->getRoute()->waitsFor());
+    }
+
+    public function testCanRegisterGroupWithAfterRegisterCallbackAsAttribute()
+    {
+        $this->router->group(['afterRegisterCallback' => function (Route $route) {
+            $route->block(5, 7);
+        }], function (Router $router) {
+            $router->get('users', RouteRegistrarControllerStub::class.'@index');
+        });
+
+        $this->assertSame(5, $this->getRoute()->locksFor());
+        $this->assertSame(7, $this->getRoute()->waitsFor());
+    }
+
+    public function testCanRegisterGroupWithAfterRegisterCallbackSetToNullAsAttribute()
+    {
+        $this->router->group(['afterRegisterCallback' => null], function (Router $router) {
+            $router->get('users', RouteRegistrarControllerStub::class.'@index');
+        });
+
+        $this->assertNull($this->getRoute()->locksFor());
+        $this->assertNull($this->getRoute()->waitsFor());
     }
 
     public function testRouteGroupingWithoutPrefix()
