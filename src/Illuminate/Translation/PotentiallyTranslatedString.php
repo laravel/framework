@@ -44,15 +44,19 @@ class PotentiallyTranslatedString implements Stringable
     /**
      * Translate the string.
      *
+     * @param  array  $replacements
+     * @param  ?string  $locale
      * @return $this
      */
-    public function translate()
+    public function translate($replacements = [], $locale = null)
     {
-        if (! $this->translator->has($this->string)) {
-            throw new RuntimeException("Unable to find translation [{$this->string}] for locale [{$this->translator->getLocale()}].");
+        $locale ??= $this->translator->getLocale();
+
+        if (! $this->translator->has($this->string, $locale)) {
+            throw new RuntimeException("Unable to find translation [{$this->string}] for locale [{$locale}].");
         }
 
-        $this->translation = $this->translator->get($this->string);
+        $this->translation = $this->translator->get($this->string, $replacements, $locale);
 
         return $this;
     }

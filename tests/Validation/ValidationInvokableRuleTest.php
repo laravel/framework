@@ -96,6 +96,102 @@ class ValidationInvokableRuleTest extends TestCase
         ], $validator->messages()->messages());
     }
 
+    public function testItPerformsReplacementsWhenTranslating()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'attribute: :attribute input: :input position: :position index: :index baz: :baz'], 'en');
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                if ($value !== null) {
+                    $fail('validation.translated-error')->translate([
+                        'baz' => 'xxxx',
+                    ]);
+                }
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => [null, 'bar']], ['foo.*' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo.1' => [
+                'attribute: foo.1 input: bar position: 2 index: 1 baz: xxxx',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItLooksForLanguageFileCustomisations()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'attribute: :attribute'], 'en');
+        $trans->addLines(['validation.attributes.foo' => 'email address'], 'en');
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                if ($value !== null) {
+                    $fail('validation.translated-error')->translate();
+                }
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo' => [
+                'attribute: email address',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItCanSpecifyLocaleWhenTranslating()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.translated-error' => 'English'], 'en');
+        $trans->addLines(['validation.translated-error' => 'French'], 'fr');
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('validation.translated-error')->translate([], 'en');
+                $fail('validation.translated-error')->translate([], 'fr');
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame([
+            'foo' => [
+                'English',
+                'French',
+            ],
+        ], $validator->messages()->messages());
+    }
+
+    public function testItThrowsInsteadOfFallingBackWithTranslation()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.key' => 'English'], 'en');
+        $rule = new class() implements InvokableRule
+        {
+            public function __invoke($attribute, $value, $fail)
+            {
+                $fail('validation.key')->translate([], 'fr');
+            }
+        };
+
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to find translation [validation.key] for locale [fr].');
+
+        $validator->fails();
+    }
+
     public function testItCanAccessDataDuringValidation()
     {
         $trans = $this->getIlluminateArrayTranslator();
