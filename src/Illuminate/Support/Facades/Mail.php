@@ -18,7 +18,6 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static \Illuminate\Mail\SentMessage|null plain(string $view, array $data, $callback)
  * @method static \Illuminate\Mail\SentMessage|null html(string $html, $callback)
  * @method static \Illuminate\Mail\SentMessage|null send(\Illuminate\Contracts\Mail\Mailable|string|array $view, array $data = [], \Closure|string $callback = null)
- * @method static array failures()
  * @method static bool hasQueued(string $mailable)
  * @method static bool hasSent(string $mailable)
  * @method static mixed later(\DateTimeInterface|\DateInterval|int $delay, \Illuminate\Contracts\Mail\Mailable|string|array $view, string $queue = null)
