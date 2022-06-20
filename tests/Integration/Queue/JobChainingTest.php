@@ -244,6 +244,21 @@ class JobChainingTest extends TestCase
 
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
     }
+
+    public function testChainNestedJob()
+    {
+        JobChainingTestFirstJob::dispatch()->allOnQueue('some_queue')->allOnConnection('sync1')->chain([
+            new JobChainingTestSecondJob,
+            (new JobChainingTestThirdJob)->chain([
+                new JobChainingTestFourthJob(),
+            ]),
+        ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+        $this->assertTrue(JobChainingTestThirdJob::$ran);
+        $this->assertTrue(JobChainingTestFourthJob::$ran);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -279,6 +294,22 @@ class JobChainingTestSecondJob implements ShouldQueue
 }
 
 class JobChainingTestThirdJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
+
+    public function handle()
+    {
+        static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
+    }
+}
+
+class JobChainingTestFourthJob implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
