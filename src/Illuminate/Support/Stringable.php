@@ -184,7 +184,7 @@ class Stringable implements JsonSerializable
      */
     public function containsAll(array $needles, $ignoreCase = false)
     {
-        return Str::containsAll($this->value, $needles, $ignoreCase );
+        return Str::containsAll($this->value, $needles, $ignoreCase);
     }
 
     /**
