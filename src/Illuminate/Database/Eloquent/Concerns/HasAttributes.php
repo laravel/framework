@@ -1962,7 +1962,7 @@ trait HasAttributes
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
-        }  elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+        } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
             return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
         }
 
