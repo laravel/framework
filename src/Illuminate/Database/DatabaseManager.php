@@ -162,7 +162,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
+        if (is_null($config = Arr::get($connections, $name) ?? $this->getOtherfileConfiguration($name))) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 
@@ -461,4 +461,17 @@ class DatabaseManager implements ConnectionResolverInterface
 
         return $this->connection()->$method(...$parameters);
     }
+
+    /**
+     * Get other file configuration connection.
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getOtherfileConfiguration($name)
+    {
+        // name is the full path configuration for the database connection from the new configuration file.
+        return isset($this->app['config'][$name]) ? $this->app['config'][$name] : null;
+    }
+
 }
