@@ -451,6 +451,27 @@ if (! function_exists('event')) {
     }
 }
 
+if (! function_exists('fake') && class_exists(\Faker\Factory::class)) {
+    /**
+     * Get a faker instance.
+     *
+     * @param  ?string  $locale
+     * @return \Faker\Generator
+     */
+    function fake($locale = null)
+    {
+        $locale ??= app('config')->get('app.faker_locale') ?? 'en_US';
+
+        $abstract = \Faker\Generator::class.':'.$locale;
+
+        if (! app()->bound($abstract)) {
+            app()->singleton($abstract, fn () => \Faker\Factory::create($locale));
+        }
+
+        return app()->make($abstract);
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
