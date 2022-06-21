@@ -54,11 +54,19 @@ class RuleMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $relativePath = '/stubs/rule.stub';
+        $stub = '/stubs/rule.stub';
 
-        return file_exists($customPath = $this->laravel->basePath(trim($relativePath, '/')))
+        if ($this->option('invokable')) {
+            $stub = '/stubs/rule.invokable.stub';
+        }
+
+        if ($this->option('implicit') && $this->option('invokable')) {
+            $stub = str_replace('.stub', '.implicit.stub', $stub);
+        }
+
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.$relativePath;
+            : __DIR__.$stub;
     }
 
     /**
@@ -81,6 +89,7 @@ class RuleMakeCommand extends GeneratorCommand
     {
         return [
             ['implicit', 'i', InputOption::VALUE_NONE, 'Generate an implicit rule.'],
+            ['invokable', null, InputOption::VALUE_NONE, 'Generate a single method, invokable rule class.'],
         ];
     }
 }
