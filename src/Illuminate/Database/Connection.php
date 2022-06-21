@@ -20,6 +20,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use PDO;
 use PDOStatement;
@@ -30,6 +31,7 @@ class Connection implements ConnectionInterface
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
         Concerns\ManagesTransactions,
+        InteractsWithTime,
         Macroable;
 
     /**
@@ -791,14 +793,18 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Handle exceeding query duration threshold.
+     * Register a callback to be invoked when the connection queries for longer than a given amount of time.
      *
-     * @param  \Carbon\CarbonInterval|float|int  $threshold
+     * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
      * @param  callable  $handler
      * @return void
      */
-    public function handleExceedingCumulativeQueryDuration($threshold, $handler)
+    public function whenQueryingForLongerThan($threshold, $handler)
     {
+        $threshold = $threshold instanceof DateTimeInterface
+            ? $this->secondsUntil($threshold) * 1000
+            : $threshold;
+
         $threshold = $threshold instanceof CarbonInterval
             ? $threshold->totalMilliseconds
             : $threshold;
