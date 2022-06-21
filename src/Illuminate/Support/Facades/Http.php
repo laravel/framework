@@ -8,6 +8,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \GuzzleHttp\Promise\PromiseInterface response($body = null, $status = 200, $headers = [])
  * @method static \Illuminate\Http\Client\PendingRequest accept(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest acceptJson()
+ * @method static \Illuminate\Http\Client\PendingRequest allowMaxRedirects(int $max)
  * @method static \Illuminate\Http\Client\PendingRequest asForm()
  * @method static \Illuminate\Http\Client\PendingRequest asJson()
  * @method static \Illuminate\Http\Client\PendingRequest asMultipart()

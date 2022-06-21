@@ -14,6 +14,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 /**
  * @method \Illuminate\Http\Client\PendingRequest accept(string $contentType)
  * @method \Illuminate\Http\Client\PendingRequest acceptJson()
+ * @method \Illuminate\Http\Client\PendingRequest allowMaxRedirects(int $max)
  * @method \Illuminate\Http\Client\PendingRequest asForm()
  * @method \Illuminate\Http\Client\PendingRequest asJson()
  * @method \Illuminate\Http\Client\PendingRequest asMultipart()
