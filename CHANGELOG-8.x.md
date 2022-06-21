@@ -1,6 +1,17 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.16...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.17...8.x)
+
+
+## [v8.83.17 (2022-06-21)](https://github.com/laravel/framework/compare/v8.83.16...v8.83.17)
+
+### Added
+- Apply where's from union query builder in cursor pagination ([#42651](https://github.com/laravel/framework/pull/42651))
+- Handle collection creation around a single enum ([#42839](https://github.com/laravel/framework/pull/42839))
+
+### Fixed
+- Fixed Request offsetExists without routeResolver ([#42754](https://github.com/laravel/framework/pull/42754))
+- Fixed: Loose comparison causes the value not to be saved ([#42793](https://github.com/laravel/framework/pull/42793))
 
 
 ## [v8.83.16 (2022-06-07)](https://github.com/laravel/framework/compare/v8.83.15...v8.83.16)
