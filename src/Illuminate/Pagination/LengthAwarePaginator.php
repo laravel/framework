@@ -46,7 +46,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         }
 
         $this->total = $total;
-        $this->perPage = $perPage;
+        $this->perPage = (int) $perPage;
         $perPage = $perPage > 0 ? $perPage : 1;
         $this->lastPage = max((int) ceil($this->total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
