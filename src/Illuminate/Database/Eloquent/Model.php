@@ -1139,10 +1139,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @throws \LogicException
      */
     protected function setKeysForSaveQuery($query)
     {
-        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+        if (is_null($keyValue = $this->getKeyForSaveQuery())) {
+            throw new LogicException(sprintf(
+                'Select %s column because needed to execute this query',
+                $this->getKeyName()
+            ));
+        }
+
+        $query->where($this->getKeyName(), '=', $keyValue);
 
         return $query;
     }
