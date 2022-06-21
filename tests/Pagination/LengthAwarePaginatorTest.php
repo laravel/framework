@@ -129,6 +129,6 @@ class LengthAwarePaginatorTest extends TestCase
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 0, 2, $this->options);
 
-        $this->assertSame(0, $p->toArray()['per_Page']);
+        $this->assertSame(0, $p->perPage());
     }
 }
