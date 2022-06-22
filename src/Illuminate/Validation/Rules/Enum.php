@@ -38,7 +38,7 @@ class Enum implements Rule
             return false;
         }
 
-        if($value instanceof $this->type) {
+        if ($value instanceof $this->type) {
             return true;
         }
 
