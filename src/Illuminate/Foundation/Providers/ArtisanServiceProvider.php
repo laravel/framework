@@ -55,6 +55,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\ShowModelCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Foundation\Console\StubPublishCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
@@ -132,6 +133,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleClearCache' => ScheduleClearCacheCommand::class,
         'ScheduleTest' => ScheduleTestCommand::class,
         'ScheduleWork' => ScheduleWorkCommand::class,
+        'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'Up' => UpCommand::class,
         'ViewCache' => ViewCacheCommand::class,
@@ -1000,6 +1002,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerScheduleWorkCommand()
     {
         $this->app->singleton(ScheduleWorkCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerShowModelCommand()
+    {
+        $this->app->singleton(ShowModelCommand::class);
     }
 
     /**
