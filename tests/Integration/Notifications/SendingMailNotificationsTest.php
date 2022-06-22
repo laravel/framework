@@ -236,6 +236,17 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
+    public function testMailIsSentUsingMailableWithoutTo()
+    {
+        $notification = new TestMailNotificationWithMailableThatHasNoTo;
+
+        $user = NotifiableUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user->notify($notification);
+    }
+
     public function testMailIsSentUsingMailMessageWithHtmlAndPlain()
     {
         $notification = new TestMailNotificationWithHtmlAndPlain;
@@ -409,7 +420,26 @@ class TestMailNotificationWithMailable extends Notification
     {
         $mailable = m::mock(Mailable::class);
 
+        $mailable->to = 'taylor@laravel.com';
+
         $mailable->shouldReceive('send')->once();
+
+        return $mailable;
+    }
+}
+
+class TestMailNotificationWithMailableThatHasNoTo extends TestMailNotificationWithMailable
+{
+    public function toMail($notifiable)
+    {
+        $mailable = m::mock(Mailable::class);
+        $mailable->to = null;
+
+        $mailable->shouldReceive('to')
+            ->andReturn(m::self())
+            ->once()
+            ->shouldReceive('send')
+            ->once();
 
         return $mailable;
     }

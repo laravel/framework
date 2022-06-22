@@ -58,6 +58,10 @@ class MailChannel
         }
 
         if ($message instanceof Mailable) {
+            if (! $message->to) {
+                $message->to($notifiable);
+            }
+
             return $message->send($this->mailer);
         }
 
