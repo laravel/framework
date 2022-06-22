@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation;
+namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Routing\UrlGenerator;
 use Mockery as m;
