@@ -32,6 +32,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     protected $items = [];
 
     /**
+     * The items contained in the collection before applied where clause.
+     *
+     * @var array<TKey, TValue>
+     */
+    protected $itemsBeforeWhere = [];
+
+    /**
      * Create a new collection.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
@@ -1645,6 +1652,35 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $this->items[] = $item;
 
         return $this;
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param  callable|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return static
+     */
+    public function where($key, $operator = null, $value = null)
+    {
+        $collection = $this->filter($this->operatorForWhere(...func_get_args()));
+        $collection->itemsBeforeWhere = $this->all();
+
+        return $collection;
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param  callable|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return static
+     */
+    public function orWhere($key, $operator = null, $value = null)
+    {
+        return $this->merge((new static($this->itemsBeforeWhere))->filter($this->operatorForWhere(...func_get_args())));
     }
 
     /**
