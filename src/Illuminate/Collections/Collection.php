@@ -1253,6 +1253,18 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the first item in the collection but create an item if no matching items exist.
+     * @param callable $callback
+     * @param mixed $item
+     * @return mixed
+     */
+    public function firstOrPush(callable $callback = null, $item = [])
+    {
+        return $this->first($callback) ?: $this->push($item)->last();
+
+    }
+
+    /**
      * Chunk the collection into chunks of the given size.
      *
      * @param  int  $size
