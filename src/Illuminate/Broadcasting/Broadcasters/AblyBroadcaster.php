@@ -100,20 +100,23 @@ class AblyBroadcaster extends Broadcaster
         $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
             ? $user->getAuthIdentifierForBroadcasting()
             : $user->getAuthIdentifier();
-        try {
-            $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
-        } catch (\Exception $e) {
-            throw new AccessDeniedHttpException("Access denied, " . $this->stringify($channelName, $connectionId, $userId), $e);
+
+        if ($channelName) {
+            try {
+                $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
+            } catch (\Exception $e) {
+                throw new AccessDeniedHttpException("Access denied, " . $this->stringify($channelName, $connectionId, $userId), $e);
+            }
         }
 
         try {
-            $signedToken = $this->getSignedToken($channelName, $token, $userId);
+            $signedToken = $this->getSignedToken($channelName, $token, strval($userId));
         } catch (\Exception $_) { // excluding exception to avoid exposing private key
             throw new AccessDeniedHttpException("malformed token, " . $this->stringify($channelName, $connectionId, $userId));
         }
 
         $response = array('token' => $signedToken);
-        if (is_array($userData)) {
+        if (isset($userData) && is_array($userData)) {
             $response['info'] = $userData;
         }
         return $response;
