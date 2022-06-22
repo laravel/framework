@@ -20,6 +20,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
  * @method static \Illuminate\Http\Client\PendingRequest dd()
  * @method static \Illuminate\Http\Client\PendingRequest dump()
+ * @method static \Illuminate\Http\Client\PendingRequest maxRedirects(int $max)
  * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleepMilliseconds = 0, ?callable $when = null, bool $throw = true)
  * @method static \Illuminate\Http\Client\ResponseSequence sequence(array $responses = [])
  * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
