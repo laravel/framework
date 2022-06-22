@@ -266,6 +266,29 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testFirstOrPushWithCallbackNull()
+    {
+        $data = new Collection(['Boston', 'Berlin', 'Oslo', 'Paris']);
+        $firstItem = $data->firstOrPush(null, 'Rasht');
+        $this->assertEquals('Boston', $firstItem);
+    }
+
+    public function testFirstOrPushWithEmptyCallback()
+    {
+        $data = new Collection(['Boston', 'Berlin', 'Oslo', 'Paris']);
+        $firstItem = $data->firstOrPush(function (){}, 'Rasht');
+        $this->assertEquals('Rasht', $firstItem);
+    }
+
+    public function testFirstOrPushWithCallback()
+    {
+        $data = new Collection(['Boston', 'Berlin', 'Oslo', 'Paris']);
+        $firstItem = $data->firstOrPush(function ($item){
+            return strlen($item) >= 6;
+        }, 'Rasht');
+        $this->assertEquals('Boston', $firstItem);
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
