@@ -440,10 +440,12 @@ class PendingRequest
     }
 
     /**
+     * Specify the maximum number of redirects to allow.
+     *
      * @param  int  $max
      * @return $this
      */
-    public function allowMaxRedirects(int $max)
+    public function maxRedirects(int $max)
     {
         return tap($this, function () use ($max) {
             $this->options['allow_redirects']['max'] = $max;

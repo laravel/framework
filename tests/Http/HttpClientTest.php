@@ -1624,7 +1624,7 @@ class HttpClientTest extends TestCase
 
         $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 5]], $request->getOptions());
 
-        $request = $request->allowMaxRedirects(10);
+        $request = $request->maxRedirects(10);
 
         $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
     }
