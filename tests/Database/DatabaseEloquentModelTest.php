@@ -2396,6 +2396,19 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNull($user->name);
     }
+
+    public function testSetCustomEloquentBuilder()
+    {
+        $model = new EloquentModelStub;
+        $this->addMockConnection($model);
+
+        $this->assertInstanceOf(Builder::class, $model->newModelQuery());
+
+        $model = new EloquentModelWithCustomEloquentBuilder();
+        $this->addMockConnection($model);
+
+        $this->assertInstanceOf(CustomBuilder::class, $model->newModelQuery());
+    }
 }
 
 class EloquentTestObserverStub
@@ -2869,4 +2882,14 @@ class Uppercase implements CastsInboundAttributes
     {
         return is_string($value) ? strtoupper($value) : $value;
     }
+}
+
+class EloquentModelWithCustomEloquentBuilder extends Model
+{
+    protected $eloquentBuilder = CustomBuilder::class;
+}
+
+class CustomBuilder extends Builder
+{
+    //
 }

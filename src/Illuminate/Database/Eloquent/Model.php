@@ -35,6 +35,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ForwardsCalls;
 
     /**
+     * The Eloquent builder to use for the model.
+     *
+     * @var string|null
+     */
+    protected $eloquentBuilder;
+
+    /**
      * The connection name for the model.
      *
      * @var string|null
@@ -1444,7 +1451,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function newEloquentBuilder($query)
     {
-        return new Builder($query);
+        $builder = $this->eloquentBuilder ?: Builder::class;
+
+        return new $builder($query);
     }
 
     /**
