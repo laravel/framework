@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Foundation\Vite;
 use Illuminate\Routing\UrlGenerator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
