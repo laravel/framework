@@ -928,6 +928,34 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testOrWhere($collection)
+    {
+        $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => 4]]);
+
+        $results = $c->where('v', '<', 2)->orWhere('v', '>', 3)
+            ->values()->all();
+
+        $this->assertEquals([['v' => 1], ['v' => 4]], $results);
+
+        // it has no effect without a where clause.
+        $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => 4]]);
+        $results = $c->orWhere('v', '>', 2)->values()->all();
+        $this->assertEquals([['v' => 1], ['v' => 2], ['v' => 3], ['v' => 4]], $results);
+
+        // it only pairs with the immediate previous where.
+        $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => 4]]);
+        $results = $c
+            ->where('v', '>', 2)
+            ->where('v', '===', 3)
+            ->orWhere('v', '===', 1)
+            ->values()->all();
+
+        $this->assertEquals([['v' => 3]], $results);
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testWhere($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);

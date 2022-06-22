@@ -62,6 +62,13 @@ trait EnumeratesValues
     protected $escapeWhenCastingToString = false;
 
     /**
+     * The items contained in the collection before applied where clause.
+     *
+     * @var array<TKey, TValue>
+     */
+    protected $itemsBeforeWhere = [];
+
+    /**
      * The methods that can be proxied.
      *
      * @var array<int, string>
@@ -572,7 +579,15 @@ trait EnumeratesValues
      */
     public function where($key, $operator = null, $value = null)
     {
-        return $this->filter($this->operatorForWhere(...func_get_args()));
+        $collection = $this->filter($this->operatorForWhere(...func_get_args()));
+        $collection->itemsBeforeWhere = $this->all();
+
+        return $collection;
+    }
+
+    public function orWhere($key, $operator = null, $value = null)
+    {
+        return $this->merge((new static($this->itemsBeforeWhere))->filter($this->operatorForWhere(...func_get_args())));
     }
 
     /**
