@@ -38,6 +38,21 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertFalse($v->fails());
     }
 
+    public function testvalidationPassesWhenPassingInstanceOfEnum()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => StringStatus::done,
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertFalse($v->fails());
+    }
+
     public function testValidationFailsWhenProvidingNoExistingCases()
     {
         $v = new Validator(
