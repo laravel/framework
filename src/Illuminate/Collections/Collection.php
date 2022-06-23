@@ -1262,7 +1262,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function firstOrPush(callable $callback = null, $item = [])
     {
         return $this->first($callback) ?: $this->push($item)->last();
-
     }
 
     /**
