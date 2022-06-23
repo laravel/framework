@@ -9,6 +9,7 @@ namespace Illuminate\Support\Facades;
  * @method static void prepend($key, $value)
  * @method static void push($key, $value)
  * @method static void set($key, $value = null)
+ * @method static Illuminate\Support\Collection collect($key)
  *
  * @see \Illuminate\Config\Repository
  */

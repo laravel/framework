@@ -133,6 +133,17 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified configuration value(s) as a collection.
+     *
+     * @param  array|string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function collect($key)
+    {
+        return collect($this->get($key));
+    }
+
+    /**
      * Determine if the given configuration option exists.
      *
      * @param  string  $key
