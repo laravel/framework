@@ -57,8 +57,8 @@ class LotteryTest extends TestCase
     {
         // Exmaple...
         // DB::whenQueryingForLongerThan(Interval::seconds(5), Lottery::odds(1, 5)->winner(function ($connection) {
-            // Alert the team
-        // }))2;
+        //     Alert the team
+        // }));
         $result = (function (callable $callable) {
             return $callable('winner-chicken', '-dinner');
         })(Lottery::odds(1, 1)->winner(fn ($first, $second) => 'winner-'.$first.$second));
