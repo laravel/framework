@@ -276,14 +276,15 @@ class SupportCollectionTest extends TestCase
     public function testFirstOrPushWithEmptyCallback()
     {
         $data = new Collection(['Boston', 'Berlin', 'Oslo', 'Paris']);
-        $data = $data->firstOrPush(function (){}, 'Rasht');
+        $data = $data->firstOrPush(function () {
+        }, 'Rasht');
         $this->assertEquals('Rasht', $data);
     }
 
     public function testFirstOrPushWithCallback()
     {
         $data = new Collection(['Boston', 'Berlin', 'Oslo', 'Paris']);
-        $data = $data->firstOrPush(function ($item){
+        $data = $data->firstOrPush(function ($item) {
             return strlen($item) >= 6;
         }, 'Rasht');
         $this->assertEquals('Boston', $data);

@@ -1254,8 +1254,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
     /**
      * Get the first item in the collection but create an item if no matching items exist.
-     * @param callable $callback
-     * @param mixed $item
+     *
+     * @param  callable  $callback
+     * @param  mixed  $item
      * @return mixed
      */
     public function firstOrPush(callable $callback = null, $item = [])
