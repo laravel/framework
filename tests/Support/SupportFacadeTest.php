@@ -80,6 +80,15 @@ class SupportFacadeTest extends TestCase
         $this->assertInstanceOf(MockInterface::class, $mock = FacadeStub::expects('foo')->with('bar')->andReturn('baz')->getMock());
         $this->assertSame('baz', $app['foo']->foo('bar'));
     }
+
+    public function testFinalClassFacade()
+    {
+        $app = new ApplicationStub;
+        $app->setAttributes([FinalClass::class => new FinalClass()]);
+        FinalClassFacade::setFacadeApplication($app);
+        FinalClassFacade::shouldReceive('foo')->once()->andReturn('bar');
+        $this->assertSame('bar', FinalClassFacade::foo());
+    }
 }
 
 class FacadeStub extends Facade
@@ -87,6 +96,18 @@ class FacadeStub extends Facade
     protected static function getFacadeAccessor()
     {
         return 'foo';
+    }
+}
+
+final class FinalClass
+{
+}
+
+class FinalClassFacade extends Facade
+{
+    protected static function getFacadeAccessor()
+    {
+        return FinalClass::class;
     }
 }
 

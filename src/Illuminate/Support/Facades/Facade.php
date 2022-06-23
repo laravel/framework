@@ -9,6 +9,7 @@ use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use Mockery;
 use Mockery\LegacyMockInterface;
+use ReflectionClass;
 use RuntimeException;
 
 abstract class Facade
@@ -164,7 +165,12 @@ abstract class Facade
     protected static function getMockableClass()
     {
         if ($root = static::getFacadeRoot()) {
-            return get_class($root);
+            $class = get_class($root);
+            $reflection = new ReflectionClass($class);
+
+            if (! $reflection->isFinal()) {
+                return $class;
+            }
         }
     }
 
