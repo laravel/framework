@@ -75,7 +75,7 @@ class Vite
 
         [$stylesheets, $scripts] = $tags->partition(fn ($tag) => str_starts_with($tag, '<link'));
 
-        return new HtmlString($stylesheets->join('').$scripts->join(''));
+        return new HtmlString($stylesheets->unique()->join('').$scripts->join(''));
     }
 
     /**

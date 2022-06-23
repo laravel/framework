@@ -74,6 +74,19 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testViteWithDuplicateCssImport()
+    {
+        $this->makeViteManifest();
+
+        $result = (new Vite)(['resources/js/app-with-duplicate-css.js']);
+
+        $this->assertSame(
+            '<link rel="stylesheet" href="https://example.com/build/assets/common.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app-with-duplicate-css.versioned.js"></script>',
+            $result->toHtml()
+        );
+    }
+
     public function testViteHotModuleReplacementWithJsOnly()
     {
         $this->makeViteHotFile();
@@ -125,12 +138,29 @@ class FoundationViteTest extends TestCase
                     '_someFile.js',
                 ],
             ],
+            'resources/js/app-with-duplicate-css.js' => [
+                'file' => 'assets/app-with-duplicate-css.versioned.js',
+                'imports' => [
+                    '_firstFile.js',
+                    '_secondFile.js',
+                ],
+            ],
             'resources/css/app.css' => [
                 'file' => 'assets/app.versioned.css',
             ],
             '_someFile.js' => [
                 'css' => [
                     'assets/shared-css.versioned.css',
+                ],
+            ],
+            '_firstFile.js' => [
+                'css' => [
+                    'assets/common.versioned.css',
+                ],
+            ],
+            '_secondFile.js' => [
+                'css' => [
+                    'assets/common.versioned.css',
                 ],
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
