@@ -880,7 +880,7 @@ if (! function_exists('__')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
-     * @return string|array|null
+     * @return string|null
      */
     function __($key = null, $replace = [], $locale = null)
     {
@@ -888,7 +888,9 @@ if (! function_exists('__')) {
             return $key;
         }
 
-        return trans($key, $replace, $locale);
+        return transform(trans($key, $replace, $locale), function ($translation) use ($key) {
+            return is_string($translation) ? $translation : $key;
+        });
     }
 }
 

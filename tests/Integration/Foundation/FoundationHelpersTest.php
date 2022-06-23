@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\TestCase;
@@ -132,6 +133,25 @@ class FoundationHelpersTest extends TestCase
         file_put_contents($path, $content);
 
         return $path;
+    }
+
+    public function testUnderscoreUnderscoreCanTranslate()
+    {
+        $this->assertSame('Auth', __('Auth'));
+        $this->assertSame('auth', __('auth'));
+        $this->assertSame('Pagination', __('Pagination'));
+        $this->assertSame('pagination', __('pagination'));
+        $this->assertSame('Passwords', __('Passwords'));
+        $this->assertSame('passwords', __('passwords'));
+        $this->assertSame('Validation', __('Validation'));
+        $this->assertSame('validation', __('validation'));
+
+        $this->assertSame('Laravel Framework', __('Laravel Framework'));
+
+        $this->assertSame('Laravel Framework '.Application::VERSION, __('Laravel Framework :version', ['version' => Application::VERSION]));
+
+        $this->assertSame('validation.size', __('validation.size'));
+        $this->assertSame('The Name field is required.', __('validation.required', ['attribute' => 'Name']));
     }
 }
 
