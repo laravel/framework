@@ -5,26 +5,36 @@ namespace Illuminate\Support;
 class Lottery
 {
     /**
+     * The number of expected wins.
+     *
      * @var int
      */
     protected $chances;
 
     /**
+     * The number of potential opportunities to win.
+     *
      * @var int
      */
     protected $outOf;
 
     /**
+     * The winning callback.
+     *
      * @var null|callable
      */
-    protected $winnerCallback;
+    protected $winner;
 
     /**
+     * The losing callback.
+     *
      * @var null|callable
      */
-    protected $loserCallback;
+    protected $loser;
 
     /**
+     * Create a new Lottery instance.
+     *
      * @param  int  $chances
      * @param  int  $outOf
      */
@@ -36,6 +46,8 @@ class Lottery
     }
 
     /**
+     * Create a new Lottery instance.
+     *
      * @param  int  $chances
      * @param  int  $outOf
      * @return static
@@ -46,68 +58,79 @@ class Lottery
     }
 
     /**
+     * Set the winner callback.
+     *
      * @param  callable  $callback
      * @return $this
      */
     public function winner($callback)
     {
-        $this->winnerCallback = $callback;
+        $this->winner = $callback;
 
         return $this;
     }
 
     /**
+     * Set the loser callback.
+     *
      * @param  callable  $callback
      * @return $this
      */
     public function loser($callback)
     {
-        $this->loserCallback = $callback;
+        $this->loser = $callback;
 
         return $this;
     }
 
     /**
+     * Run the lottery.
+     *
      * @param  mixed  ...$args
      * @return mixed
      */
     public function __invoke(...$args)
     {
-        return ($this->pickCallback())(...$args);
+        return $this->runCallback(...$args);
     }
 
     /**
+     * Run the lottery.
+     *
      * @param  null|int  $times
      * @return mixed
      */
     public function choose($times = null)
     {
         if ($times === null) {
-            return ($this->pickCallback())();
+            return $this->runCallback();
         }
 
         $results = [];
 
         for ($i = 0; $i < $times; $i++) {
-            $results[] = ($this->pickCallback())();
+            $results[] = $this->runCallback();
         }
 
         return $results;
     }
 
     /**
+     * Run the winner or loser callback, randomly.
+     *
+     * @param  mixed  ...$args
      * @return callable
      */
-    protected function pickCallback()
+    protected function runCallback(...$args)
     {
-        $callback = $this->wins()
-            ? ($this->winnerCallback ?? fn () => true)
-            : ($this->loserCallback ?? fn () => false);
-
-        return $callback;
+        return $this->wins()
+            ? ($this->winner ?? fn () => true)(...$args)
+            : ($this->loser ?? fn () => false)(...$args);
     }
 
     /**
+     * Determine if the lottery "wins" or "loses".
+     *
      * @return bool
      */
     protected function wins()
