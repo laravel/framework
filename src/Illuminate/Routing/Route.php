@@ -94,11 +94,11 @@ class Route
     protected $originalParameters;
 
     /**
-     * The named parameter defaults.
+     * The parameters to exlude when determining the route's parameter names.
      *
      * @var array
      */
-    public $defaultParameters = [];
+    public $excludedParameters = [];
 
     /**
      * Indicates "trashed" models can be retrieved when resolving implicit model bindings for this route.
@@ -517,7 +517,7 @@ class Route
         return array_values(array_filter(array_map(function ($m) {
             return trim($m, '?');
         }, $matches[1]), function ($parameterName) {
-            return ! array_key_exists($parameterName, $this->defaultParameters);
+            return ! array_key_exists($parameterName, $this->excludedParameters);
         }));
     }
 
