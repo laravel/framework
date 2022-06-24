@@ -64,6 +64,8 @@ class Vite
 
             if (isset($manifest[$entrypoint]['imports'])) {
                 foreach ($manifest[$entrypoint]['imports'] as $import) {
+                    $tags->push($this->makeModulePreloadTag(asset("{$buildDirectory}/{$manifest[$import]['file']}")));
+
                     if (isset($manifest[$import]['css'])) {
                         foreach ($manifest[$import]['css'] as $css) {
                             $tags->push($this->makeStylesheetTag(asset("{$buildDirectory}/{$css}")));
@@ -131,6 +133,17 @@ class Vite
     protected function makeScriptTag($url)
     {
         return sprintf('<script type="module" src="%s"></script>', $url);
+    }
+
+    /**
+     * Generate a modulepreload tag for the given URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function makeModulePreloadTag($url)
+    {
+        return sprintf('<link rel="modulepreload" href="%s" />', $url);
     }
 
     /**

@@ -35,6 +35,19 @@ class FoundationViteTest extends TestCase
         $this->assertSame('<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>', $result->toHtml());
     }
 
+    public function testViteWithNestedJs()
+    {
+        $this->makeViteManifest();
+
+        $result = (new Vite)('resources/js/parent.js');
+
+        $this->assertSame(
+            '<link rel="modulepreload" href="https://example.com/build/assets/child.versioned.js" />'
+            .'<script type="module" src="https://example.com/build/assets/parent.versioned.js"></script>',
+            $result->toHtml()
+        );
+    }
+
     public function testViteWithCssAndJs()
     {
         $this->makeViteManifest();
@@ -68,7 +81,8 @@ class FoundationViteTest extends TestCase
         $result = (new Vite)(['resources/js/app-with-shared-css.js']);
 
         $this->assertSame(
-            '<link rel="stylesheet" href="https://example.com/build/assets/shared-css.versioned.css" />'
+            '<link rel="modulepreload" href="https://example.com/build/assets/someFile.versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/build/assets/shared-css.versioned.css" />'
             .'<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
             $result->toHtml()
         );
@@ -113,6 +127,12 @@ class FoundationViteTest extends TestCase
             'resources/js/app.js' => [
                 'file' => 'assets/app.versioned.js',
             ],
+            'resources/js/parent.js' => [
+                'file' => 'assets/parent.versioned.js',
+                'imports' => [
+                    '_child.js',
+                ],
+            ],
             'resources/js/app-with-css-import.js' => [
                 'file' => 'assets/app-with-css-import.versioned.js',
                 'css' => [
@@ -128,7 +148,11 @@ class FoundationViteTest extends TestCase
             'resources/css/app.css' => [
                 'file' => 'assets/app.versioned.css',
             ],
+            '_child.js' => [
+                'file' => 'assets/child.versioned.js',
+            ],
             '_someFile.js' => [
+                'file' => 'assets/someFile.versioned.js',
                 'css' => [
                     'assets/shared-css.versioned.css',
                 ],
