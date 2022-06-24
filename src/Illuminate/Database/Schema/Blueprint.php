@@ -561,6 +561,20 @@ class Blueprint
     }
 
     /**
+     * Specify a unique index for the table, ignoring
+     * soft deleted rows.
+     *
+     * @param  string|array  $columns
+     * @param  string|null  $name
+     * @param  string|null  $algorithm
+     * @return \Illuminate\Database\Schema\IndexDefinition
+     */
+    public function uniqueNotTrashed($columns, $name = null, $algorithm = null)
+    {
+        return $this->indexCommand('unique', $columns, $name, $algorithm);
+    }
+
+    /**
      * Specify an index for the table.
      *
      * @param  string|array  $columns
