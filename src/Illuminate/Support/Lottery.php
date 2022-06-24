@@ -33,6 +33,13 @@ class Lottery
     protected $loser;
 
     /**
+     * The factory that should be used to generate results.
+     *
+     * @var callable|null
+     */
+    protected static $resultFactory;
+
+    /**
      * Create a new Lottery instance.
      *
      * @param  int  $chances
@@ -135,6 +142,109 @@ class Lottery
      */
     protected function wins()
     {
-        return random_int(1, $this->outOf) <= $this->chances;
+        return static::resultFactory()($this->chances, $this->outOf);
+    }
+
+    /**
+     * The factory that determines the lottery result.
+     *
+     * @return callable
+     */
+    protected static function resultFactory()
+    {
+        return static::$resultFactory ?? fn ($chances, $outOf) => random_int(1, $outOf) <= $chances;
+    }
+
+    /**
+     * Force the lottery to always result in a win.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function alwaysWin($callback = null)
+    {
+        self::setResultFactory(fn () => true);
+
+        if ($callback === null) {
+            return;
+        }
+
+        $callback();
+
+        static::determineResultNormally();
+    }
+
+    /**
+     * Force the lottery to always result in a lose.
+     *
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public static function alwaysLose($callback = null)
+    {
+        self::setResultFactory(fn () => false);
+
+        if ($callback === null) {
+            return;
+        }
+
+        $callback();
+
+        static::determineResultNormally();
+    }
+
+    /**
+     * Set the sequence that will be used to determine lottery results.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function forceResultWithSequence($sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function ($chances, $outOf) use (&$next) {
+            $factoryCache = static::$resultFactory;
+
+            static::$resultFactory = null;
+
+            $result = static::resultFactory()($chances, $outOf);
+
+            static::$resultFactory = $factoryCache;
+
+            $next++;
+
+            return $result;
+        };
+
+        static::setResultFactory(function ($chances, $outOf) use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing($chances, $outOf);
+        });
+    }
+
+    /**
+     * Indicate that the lottery results should be determined normally.
+     *
+     * @return void
+     */
+    public static function determineResultNormally()
+    {
+        static::$resultFactory = null;
+    }
+
+    /**
+     * Set the factory that should be used to deterine the lottery results.
+     *
+     * @param  callable  $factory
+     * @return void
+     */
+    public static function setResultFactory($factory)
+    {
+        self::$resultFactory = $factory;
     }
 }
