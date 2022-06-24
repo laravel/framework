@@ -566,4 +566,36 @@ trait InteractsWithInput
 
         return $this;
     }
+
+    /**
+     * Determine if the request contains a given input item key,
+     * then fill provided <i>match</i> with it's value.
+     *
+     * @param  string|null  $key
+     * @param  mixed|null  $match
+     * @param  mixed|null  $default
+     * @return bool
+     */
+    public function grep(string $key = null, mixed &$match = null, mixed $default = null): bool
+    {
+        $match = $this->input($key, $default);
+
+        return $this->has($key);
+    }
+
+    /**
+     * Determine if the request contains a non-empty value for an input item key,
+     * then fill provided <i>match</i> with it's value.
+     *
+     * @param  string|null  $key
+     * @param  mixed|null  $match
+     * @param  mixed|null  $default
+     * @return bool
+     */
+    public function grepFilled(string $key = null, mixed &$match = null, mixed $default = null): bool
+    {
+        $match = $this->input($key, $default);
+
+        return $this->filled($key);
+    }
 }
