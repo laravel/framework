@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Lottery;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class LotteryTest extends TestCase
 {
@@ -73,5 +74,68 @@ class LotteryTest extends TestCase
 
         $lose = Lottery::odds(0, 1)->choose();
         $this->assertFalse($lose);
+    }
+
+    public function testItCanForceWinningResultInTests()
+    {
+        $result = null;
+        Lottery::alwaysWin(function () use (&$result) {
+            $result = Lottery::odds(1, 2)->winner(fn () => 'winner')->choose(10);
+        });
+
+        $this->assertSame([
+            'winner', 'winner', 'winner', 'winner', 'winner',
+            'winner', 'winner', 'winner', 'winner', 'winner',
+        ], $result);
+    }
+
+    public function testItCanForceLosingResultInTests()
+    {
+        $result = null;
+        Lottery::alwaysLose(function () use (&$result) {
+            $result = Lottery::odds(1, 2)->loser(fn () => 'loser')->choose(10);
+        });
+
+        $this->assertSame([
+            'loser', 'loser', 'loser', 'loser', 'loser',
+            'loser', 'loser', 'loser', 'loser', 'loser',
+        ], $result);
+    }
+
+    public function testItCanForceTheResultViaSequence()
+    {
+        $result = null;
+        Lottery::forceResultWithSequence([
+            true, false, true, false, true,
+            false, true, false, true, false,
+        ]);
+
+        $result = Lottery::odds(1, 100)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose(10);
+
+        $this->assertSame([
+            'winner', 'loser', 'winner', 'loser', 'winner',
+            'loser', 'winner', 'loser', 'winner', 'loser',
+        ], $result);
+    }
+
+    public function testItCanHandleMissingSequenceItems()
+    {
+        $result = null;
+        Lottery::forceResultWithSequence([
+            0 => true,
+            1 => true,
+            // 2 => ...
+            3 => true,
+        ], fn () => throw new RuntimeException('Missing key in sequence.'));
+
+        $result = Lottery::odds(1, 10000)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose();
+        $this->assertSame('winner', $result);
+
+        $result = Lottery::odds(1, 10000)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose();
+        $this->assertSame('winner', $result);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectErrorMessage('Missing key in sequence.');
+        Lottery::odds(1, 10000)->winner(fn () => 'winner')->loser(fn () => 'loser')->choose();
     }
 }
