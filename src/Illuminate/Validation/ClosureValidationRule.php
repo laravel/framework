@@ -58,10 +58,10 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
     {
         $this->failed = false;
 
-        $this->callback->__invoke($attribute, $value, function ($message) {
+        $this->callback->__invoke($attribute, $value, function ($attribute, $message = null) {
             $this->failed = true;
 
-            return $this->pendingPotentiallyTranslatedString($message);
+            return $this->pendingPotentiallyTranslatedString($attribute, $message);
         });
 
         return ! $this->failed;
@@ -93,12 +93,17 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
     /**
      * Create a pending potentially translated string.
      *
-     * @param  string  $message
+     * @param  string  $attribute
+     * @param  ?string  $message
      * @return \Illuminate\Translation\PotentiallyTranslatedString
      */
-    protected function pendingPotentiallyTranslatedString($message)
+    protected function pendingPotentiallyTranslatedString($attribute, $message)
     {
-        return new class($message, $this->validator->getTranslator(), fn ($message) => $this->messages[] = $message) extends PotentiallyTranslatedString
+        $destructor = $message === null
+            ? fn ($message) => $this->messages[] = $message
+            : fn ($message) => $this->messages[$attribute] = $message;
+
+        return new class($message ?? $attribute, $this->validator->getTranslator(), $destructor) extends PotentiallyTranslatedString
         {
             /**
              * The callback to call when the object destructs.
@@ -110,7 +115,7 @@ class ClosureValidationRule implements RuleContract, ValidatorAwareRule
             /**
              * Create a new pending potentially translated string.
              *
-             * @param  string  $string
+             * @param  string  $message
              * @param  \Illuminate\Contracts\Translation\Translator  $translator
              * @param  \Closure  $destructor
              */
