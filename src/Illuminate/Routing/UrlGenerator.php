@@ -478,6 +478,8 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function toRoute($route, $parameters, $absolute)
     {
+        $route->excludedParameters = $this->getDefaultParameters();
+
         $parameters = collect(Arr::wrap($parameters))->map(function ($value, $key) use ($route) {
             return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
                     ? $value->{$route->bindingFieldFor($key)}
