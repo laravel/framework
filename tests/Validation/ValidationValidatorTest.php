@@ -7244,6 +7244,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.translated-error' => 'Translated error message.'], 'en');
         $rule = function ($attribute, $value, $fail) {
             $fail('validation.translated-error')->translate();
+            $fail('validation.not-translated-message')->translate();
         };
 
         $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
@@ -7252,23 +7253,30 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame([
             'foo' => [
                 'Translated error message.',
+                'validation.not-translated-message',
             ],
         ], $validator->messages()->messages());
     }
 
-    public function testItThrowsIfTranslationIsNotFoundForClosureBasedRules()
+    public function testItCanSpecifyTheValidationErrorKeyForTheErrorMessageForClosureBasedRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $rule = function ($attribute, $value, $fail) {
-            $fail('validation.key')->translate();
+            $fail('bar.baz', 'Another attribute error.');
+            $fail('This attribute error.');
         };
 
-        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => $rule]);
+        $validator = new Validator($trans, ['foo' => 'xxxx'], ['foo' => $rule]);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to find translation [validation.key] for locale [en].');
-
-        $validator->passes();
+        $this->assertFalse($validator->passes());
+        $this->assertSame([
+            'bar.baz' => [
+                'Another attribute error.',
+            ],
+            'foo' => [
+                'This attribute error.',
+            ],
+        ], $validator->messages()->messages());
     }
 
     protected function getTranslator()
