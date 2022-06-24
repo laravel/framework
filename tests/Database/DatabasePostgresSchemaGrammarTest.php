@@ -243,6 +243,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "bar" unique ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueIgnoreTrashedKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uniqueIgnoreTrashed('foo', 'deleted_at', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" ON "users" ("foo", ("deleted_at" IS NULL)) WHERE "deleted_at" IS NULL', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint('users');

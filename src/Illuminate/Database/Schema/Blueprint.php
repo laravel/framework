@@ -561,15 +561,15 @@ class Blueprint
     }
 
     /**
-     * Specify a unique index for the table, ignoring
-     * soft deleted rows.
+     * Specify a unique index for the table. Ignore soft
+     * deleted models during the unique check.
      *
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
-    public function uniqueNotTrashed($columns, $name = null, $algorithm = null)
+    public function uniqueIgnoreTrashed($columns, $deletedAtColumn = 'deleted_at', $name = null, $algorithm = null)
     {
         return $this->indexCommand('unique', $columns, $name, $algorithm);
     }
