@@ -356,7 +356,6 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/routable', $url->route('routable', [$model], false));
     }
 
-    /** @group Foo */
     public function testRoutableInterfaceRoutingWithCustomBindingField()
     {
         $url = new UrlGenerator(
@@ -375,7 +374,6 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
     }
 
-    /** @group Foo */
     public function testRoutableInterfaceRoutingWithUrlDefaults()
     {
         $url = new UrlGenerator(
