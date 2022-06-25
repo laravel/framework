@@ -2,9 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Fluent;
 
 class PostgresGrammar extends Grammar
