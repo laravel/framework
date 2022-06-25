@@ -250,7 +250,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertSame('create unique index "bar" ON "users" ("foo", ("deleted_at" IS NULL)) WHERE "deleted_at" IS NULL', $statements[0]);
+        $this->assertSame('create unique index "bar" on "users" ("foo") where "deleted_at" is null', $statements[0]);
     }
 
     public function testAddingIndex()

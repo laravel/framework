@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Fluent;
 
 class PostgresGrammar extends Grammar
@@ -156,6 +158,25 @@ class PostgresGrammar extends Grammar
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
             $this->columnize($command->columns)
+        );
+    }
+
+    /**
+     * Compile a spartial index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileUniqueIgnoreNull(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('create unique index %s on %s%s (%s) where %s is null',
+            $this->wrap($command->index),
+            $this->wrapTable($blueprint),
+            $command->algorithm ? ' using '.$command->algorithm : '',
+            $this->columnize($command->columns),
+            $this->wrap($command->nullColumn),
         );
     }
 

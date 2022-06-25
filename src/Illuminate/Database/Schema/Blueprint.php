@@ -5,9 +5,11 @@ namespace Illuminate\Database\Schema;
 use BadMethodCallException;
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
@@ -571,7 +573,7 @@ class Blueprint
      */
     public function uniqueIgnoreTrashed($columns, $deletedAtColumn = 'deleted_at', $name = null, $algorithm = null)
     {
-        return $this->indexCommand('unique', $columns, $name, $algorithm);
+        return $this->indexIgnoreNullCommand('unique', $columns, $deletedAtColumn, $name, $algorithm);
     }
 
     /**
@@ -1552,6 +1554,29 @@ class Blueprint
 
         return $this->addCommand(
             $type, compact('index', 'columns', 'algorithm')
+        );
+    }
+
+    /**
+     * Add a new index command to the blueprint.
+     *
+     * @param  string  $type
+     * @param  string|array  $columns
+     * @param  string  $index
+     * @param  string|null  $algorithm
+     * @return \Illuminate\Support\Fluent
+     */
+    protected function indexIgnoreNullCommand($type, $columns, $nullColumn, $index, $algorithm = null)
+    {
+        $columns = (array) $columns;
+
+        // If no name was specified for this index, we will create one using a basic
+        // convention of the table name, followed by the columns, followed by an
+        // index type, such as primary or index, which makes the index unique.
+        $index = $index ?: $this->createIndexName($type, $columns);
+
+        return $this->addCommand(
+            $type . 'IgnoreNull', compact('index', 'columns', 'nullColumn', 'algorithm')
         );
     }
 
