@@ -6,12 +6,12 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use function is_iterable;
+use function is_object;
 use IteratorAggregate;
 use JsonSerializable;
 use Stringable;
 use Traversable;
-use function is_iterable;
-use function is_object;
 
 class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggregate, Arrayable, Jsonable
 {
