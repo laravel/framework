@@ -73,12 +73,19 @@ class SupportStringableTest extends TestCase
     public function testOrdinal()
     {
         $this->assertSame('1st', (string) $this->stringable(1)->ordinal());
+        $this->assertSame('1<sup>st</sup>', (string) $this->stringable(1)->ordinal(true));
         $this->assertSame('2nd', (string) $this->stringable(2)->ordinal());
+        $this->assertSame('2<sup>nd</sup>', (string) $this->stringable(2)->ordinal(true));
         $this->assertSame('3rd', (string) $this->stringable(3)->ordinal());
+        $this->assertSame('3<sup>rd</sup>', (string) $this->stringable(3)->ordinal(true));
         $this->assertSame('4th', (string) $this->stringable(4)->ordinal());
+        $this->assertSame('4<sup>th</sup>', (string) $this->stringable(4)->ordinal(true));
         $this->assertSame('5th', (string) $this->stringable(5)->ordinal());
+        $this->assertSame('5<sup>th</sup>', (string) $this->stringable(5)->ordinal(true));
         $this->assertSame('101st', (string) $this->stringable(101)->ordinal());
+        $this->assertSame('101<sup>st</sup>', (string) $this->stringable(101)->ordinal(true));
         $this->assertSame('512th', (string) $this->stringable(512)->ordinal());
+        $this->assertSame('512<sup>th</sup>', (string) $this->stringable(512)->ordinal(true));
     }
 
     public function testMatch()

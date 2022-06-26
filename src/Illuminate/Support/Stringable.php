@@ -510,11 +510,12 @@ class Stringable implements JsonSerializable
     /**
      * Generate an ordinal suffix for the given value.
      *
-     * @return string
+     * @param  bool $superscript
+     * @return static
      */
-    public function ordinal()
+    public function ordinal($superscript = false)
     {
-        return new static(Str::ordinal($this->value));
+        return new static(Str::ordinal($this->value, $superscript));
     }
 
     /**

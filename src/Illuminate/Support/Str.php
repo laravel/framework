@@ -642,9 +642,10 @@ class Str
      * Generate an ordinal suffix for the given value.
      *
      * @param  int  $value
+     * @param  bool  $superscript
      * @return string
      */
-    public static function ordinal($value)
+    public static function ordinal($value, $superscript = false)
     {
         if (! is_numeric($value)) {
             return '';
@@ -654,10 +655,10 @@ class Str
 
         $indicators = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
 
-        $suffix = $indicators[$value % 10];
+        $suffix = $superscript ? '<sup>' . $indicators[$value % 10] . '</sup>' : $indicators[$value % 10];
 
         if ($value % 100 >= 11 && $value % 100 <= 13) {
-            $suffix = 'th';
+            $suffix = $superscript ? '<sup>th</sup>' : 'th';
         }
 
         return number_format($value).$suffix;
