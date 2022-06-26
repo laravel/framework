@@ -28,7 +28,7 @@ class SupportJsonTest extends TestCase
         });
     }
 
-    public function testGet(): void
+    public function testGet()
     {
         $this->assertSame(['foo' => 'bar'], $this->json->get('foo'));
         $this->assertSame('qux', $this->json->get('bar.baz.quz'));
@@ -37,7 +37,7 @@ class SupportJsonTest extends TestCase
         $this->assertNull($this->json->get('baz'));
     }
 
-    public function testSet(): void
+    public function testSet()
     {
         $this->json->set('quz', 'qux');
 
@@ -59,7 +59,7 @@ class SupportJsonTest extends TestCase
         $this->assertSame('qux', (new Json("\x66\x6f\x6f"))->set('quz', 'qux')->get('quz'));
     }
 
-    public function testFill(): void
+    public function testFill()
     {
         $this->json->fill('quz', 'qux');
 
@@ -70,7 +70,7 @@ class SupportJsonTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->json->get('foo'));
     }
 
-    public function testHas(): void
+    public function testHas()
     {
         $this->json->set('quz', ['bar' => null]);
 
@@ -80,7 +80,7 @@ class SupportJsonTest extends TestCase
         $this->assertFalse($this->json->has('quz.baz'));
     }
 
-    public function testMissing(): void
+    public function testMissing()
     {
         $this->json->set('quz', ['bar' => null]);
 
@@ -90,7 +90,7 @@ class SupportJsonTest extends TestCase
         $this->assertTrue($this->json->missing('quz.baz'));
     }
 
-    public function testForget(): void
+    public function testForget()
     {
         $this->json->forget('foo');
         $this->assertTrue($this->json->missing('foo'));
@@ -109,7 +109,27 @@ class SupportJsonTest extends TestCase
         $this->assertTrue($this->json->missing('bar.baz'));
     }
 
-    public function testCollect(): void
+    public function testSegment()
+    {
+        $json = new Json([
+            'foo' => 'bar',
+            'baz' => [
+                'quz' => [
+                    'qux',
+                    'quuz'
+                ],
+                'quux' => 'cougar',
+                'cougar' => 'foo',
+            ]
+        ]);
+
+        $this->assertSame(
+            '{"baz":{"quz":["qux","quuz"],"quux":"cougar"}}',
+            $json->segment(['baz.quz', 'baz.quux'])->toJson()
+        );
+    }
+
+    public function testCollect()
     {
         $collection = $this->json->collect();
 
@@ -121,7 +141,7 @@ class SupportJsonTest extends TestCase
         $this->assertTrue($collection->has('baz'));
     }
 
-    public function testDynamicAccess(): void
+    public function testDynamicAccess()
     {
         $this->assertSame(['foo' => 'bar'], $this->json->foo);
 
@@ -136,7 +156,7 @@ class SupportJsonTest extends TestCase
         $this->assertTrue($this->json->missing('foo'));
     }
 
-    public function testArrayAccess(): void
+    public function testArrayAccess()
     {
         $this->assertSame(['foo' => 'bar'], $this->json['foo']);
 
@@ -151,17 +171,17 @@ class SupportJsonTest extends TestCase
         $this->assertTrue($this->json->missing('foo'));
     }
 
-    public function testToStringAsJson(): void
+    public function testToStringAsJson()
     {
         $this->assertSame('{"foo":{"foo":"bar"},"bar":{"baz":{"quz":"qux"}}}', (string) $this->json);
     }
 
-    public function testToJson(): void
+    public function testToJson()
     {
         $this->assertSame('{"foo":{"foo":"bar"},"bar":{"baz":{"quz":"qux"}}}', $this->json->toJson());
     }
 
-    public function testToArray(): void
+    public function testToArray()
     {
         $this->json->set('baz', new Collection(['foo', 'bar', 'baz']));
 
@@ -174,7 +194,7 @@ class SupportJsonTest extends TestCase
         );
     }
 
-    public function testToArrayWithSingleValues(): void
+    public function testToArrayWithSingleValues()
     {
         $this->assertSame([], (new Json(null))->toArray());
         $this->assertSame(['foo'], (new Json('foo'))->toArray());
@@ -185,7 +205,7 @@ class SupportJsonTest extends TestCase
         $this->assertSame(["\x66\x6f\x6f"], (new Json("\x66\x6f\x6f"))->toArray());
     }
 
-    public function testIterator(): void
+    public function testIterator()
     {
         $this->assertEquals(
             ['foo' => ['foo' => 'bar'], 'bar' => (object) ['baz' => (object) ['quz' => 'qux']]],
@@ -219,7 +239,7 @@ class SupportJsonTest extends TestCase
         $this->assertSame(['foo' => ['bar', 'quz']], iterator_to_array($json));
     }
 
-    public function testMake(): void
+    public function testMake()
     {
         $json = Json::make(['foo' => 'bar']);
         $this->assertSame(['foo' => 'bar'], $json->data());
@@ -228,13 +248,13 @@ class SupportJsonTest extends TestCase
         $this->assertSame($object, $json->data());
     }
 
-    public function testFromString(): void
+    public function testFromString()
     {
         $json = Json::fromString('{"foo":{"foo":"bar"}}');
         $this->assertEquals((object) ['foo' => (object) ['foo' => 'bar']], $json->data());
     }
 
-    public function testWrap(): void
+    public function testWrap()
     {
         $json = Json::fromString('{"foo":{"foo":"bar"}}');
 

@@ -138,6 +138,23 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
     }
 
     /**
+     * Retrieves a segment of the JSON into one Json instance.
+     *
+     * @param  array  $segment
+     * @return static
+     */
+    public function segment(array $segment)
+    {
+        $json = new static();
+
+        foreach ($segment as $key) {
+            $json->set($key, $this->get($key));
+        }
+
+        return $json;
+    }
+
+    /**
      * Returns a Json instance as a Collection.
      *
      * @param  string|null  $key
