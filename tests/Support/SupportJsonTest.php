@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Support;
 
 use ArrayIterator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Json;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Json;
 use RecursiveArrayIterator;
 use Traversable;
 
@@ -18,7 +18,8 @@ class SupportJsonTest extends TestCase
     {
         parent::setUp();
 
-        $this->json = new Json(new class {
+        $this->json = new Json(new class
+        {
             public function __construct($foo = ['foo' => 'bar'])
             {
                 $this->foo = $foo;
@@ -32,7 +33,7 @@ class SupportJsonTest extends TestCase
         static::assertSame(['foo' => 'bar'], $this->json->get('foo'));
         static::assertSame('qux', $this->json->get('bar.baz.quz'));
         static::assertSame('cougar', $this->json->get('baz', 'cougar'));
-        static::assertSame('cougar', $this->json->get('baz', fn() => 'cougar'));
+        static::assertSame('cougar', $this->json->get('baz', fn () => 'cougar'));
         static::assertNull($this->json->get('baz'));
     }
 
@@ -174,7 +175,8 @@ class SupportJsonTest extends TestCase
         static::assertInstanceOf(ArrayIterator::class, $json->getIterator());
         static::assertSame(['foo', 'bar', 'baz'], iterator_to_array($json));
 
-        $json = new Json(new class {
+        $json = new Json(new class
+        {
             public function __construct(public $foo = 'bar', public $baz = 'quz', public $qux = 'cougar')
             {
             }
@@ -183,7 +185,8 @@ class SupportJsonTest extends TestCase
         static::assertInstanceOf(ArrayIterator::class, $json->getIterator());
         static::assertSame(['foo' => 'bar', 'baz' => 'quz', 'qux' => 'cougar'], iterator_to_array($json));
 
-        $json = new Json(new class implements IteratorAggregate {
+        $json = new Json(new class implements IteratorAggregate
+        {
             public function getIterator(): Traversable
             {
                 return new RecursiveArrayIterator(['foo' => ['bar', 'quz']]);
@@ -199,7 +202,7 @@ class SupportJsonTest extends TestCase
         $json = Json::make(['foo' => 'bar']);
         static::assertSame(['foo' => 'bar'], $json->data());
 
-        $json = Json::make($object = (object)['foo' => 'bar']);
+        $json = Json::make($object = (object) ['foo' => 'bar']);
         static::assertSame($object, $json->data());
     }
 

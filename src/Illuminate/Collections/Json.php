@@ -24,7 +24,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
     protected $data;
 
     /**
-     * Create a new JSON instance
+     * Create a new JSON instance.
      *
      * @param  mixed  $data
      */
@@ -101,7 +101,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
      */
     public function missing($key)
     {
-        return !$this->has($key);
+        return ! $this->has($key);
     }
 
     /**
@@ -259,7 +259,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
     }
 
     /**
-     * Retrieve an external iterator
+     * Retrieve an external iterator.
      *
      * @return \ArrayIterator
      */
