@@ -84,7 +84,7 @@ class CursorPaginatorTest extends TestCase
         $p = new CursorPaginator(Collection::make(), 25, $cursor, [
             'path' => 'http://website.com/test',
             'cursorName' => 'cursor',
-            'parameters' => ['id']
+            'parameters' => ['id'],
         ]);
 
         $this->assertInstanceOf(CursorPaginator::class, $p);
