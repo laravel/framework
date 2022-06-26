@@ -510,7 +510,7 @@ class Stringable implements JsonSerializable
     /**
      * Generate an ordinal suffix for the given value.
      *
-     * @param  bool $superscript
+     * @param  bool  $superscript
      * @return static
      */
     public function ordinal($superscript = false)

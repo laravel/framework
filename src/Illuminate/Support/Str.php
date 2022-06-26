@@ -655,7 +655,7 @@ class Str
 
         $indicators = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
 
-        $suffix = $superscript ? '<sup>' . $indicators[$value % 10] . '</sup>' : $indicators[$value % 10];
+        $suffix = $superscript ? '<sup>'.$indicators[$value % 10].'</sup>' : $indicators[$value % 10];
 
         if ($value % 100 >= 11 && $value % 100 <= 13) {
             $suffix = $superscript ? '<sup>th</sup>' : 'th';
