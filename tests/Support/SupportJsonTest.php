@@ -48,13 +48,15 @@ class SupportJsonTest extends TestCase
         $this->assertSame('bar', $this->json->get('foo'));
     }
 
-    public function testSetOnNonArrayOrObject()
+    public function testSetOnSingleValues()
     {
-        $json = (new Json(null));
-
-        $json->set('quz', 'qux');
-
-        $this->assertSame('qux', $json->get('quz'));
+        $this->assertSame('qux', (new Json(null))->set('quz', 'qux')->get('quz'));
+        $this->assertSame('qux', (new Json('foo'))->set('quz', 'qux')->get('quz'));
+        $this->assertSame('qux', (new Json(true))->set('quz', 'qux')->get('quz'));
+        $this->assertSame('qux', (new Json(false))->set('quz', 'qux')->get('quz'));
+        $this->assertSame('qux', (new Json(10))->set('quz', 'qux')->get('quz'));
+        $this->assertSame('qux', (new Json(10.1))->set('quz', 'qux')->get('quz'));
+        $this->assertSame('qux', (new Json("\x66\x6f\x6f"))->set('quz', 'qux')->get('quz'));
     }
 
     public function testFill(): void
@@ -172,6 +174,17 @@ class SupportJsonTest extends TestCase
         );
     }
 
+    public function testToArrayWithSingleValues(): void
+    {
+        $this->assertSame([], (new Json(null))->toArray());
+        $this->assertSame(['foo'], (new Json('foo'))->toArray());
+        $this->assertSame([true], (new Json(true))->toArray());
+        $this->assertSame([false], (new Json(false))->toArray());
+        $this->assertSame([10], (new Json(10))->toArray());
+        $this->assertSame([10.1], (new Json(10.1))->toArray());
+        $this->assertSame(["\x66\x6f\x6f"], (new Json("\x66\x6f\x6f"))->toArray());
+    }
+
     public function testIterator(): void
     {
         $this->assertEquals(
@@ -234,7 +247,7 @@ class SupportJsonTest extends TestCase
         $this->assertEmpty(Json::wrap(null)->data());
     }
 
-    public function testInstanceWithNonObjectsOrArray()
+    public function testInstanceWithSingleValues()
     {
         $this->assertSame('null', (new Json(null))->toJson());
         $this->assertSame('"foo"', (new Json('foo'))->toJson());
@@ -243,5 +256,6 @@ class SupportJsonTest extends TestCase
         $this->assertSame('10', (new Json(10))->toJson());
         $this->assertSame('10.1', (new Json(10.1))->toJson());
         $this->assertSame('"foo"', (new Json("\x66\x6f\x6f"))->toJson());
+        $this->assertSame('"{\"foo\":\"bar\"}"', (new Json('{"foo":"bar"}'))->toJson());
     }
 }
