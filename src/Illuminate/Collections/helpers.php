@@ -68,7 +68,7 @@ if (! function_exists('data_get')) {
                 $result = [];
 
                 foreach ($target as $item) {
-                    $result[] = data_get($item, $key);
+                    $result[] = data_get($item, $key, $default);
                 }
 
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
