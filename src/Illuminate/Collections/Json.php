@@ -10,6 +10,8 @@ use IteratorAggregate;
 use JsonSerializable;
 use Stringable;
 use Traversable;
+use function is_iterable;
+use function is_object;
 
 class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggregate, Arrayable, Jsonable
 {
@@ -251,11 +253,18 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
     /**
      * Specify data which should be serialized to JSON.
      *
-     * @return array
+     * @return mixed
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize(): mixed
     {
-        return $this->toArray();
+        // If the current JSON is not an object or array, we will return it verbatim.
+        // Otherwise, we will try to convert the data into an array so the developer
+        // is able to control how this data is serialized when it hits the encoder.
+        if (is_iterable($this->data) || is_object($this->data)) {
+            return $this->toArray();
+        }
+
+        return $this->data;
     }
 
     /**
@@ -281,7 +290,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
-        }, match (true) {
+        }, (array) match (true) {
             $this->data instanceof Traversable, => iterator_to_array($this->data),
             is_object($this->data) => get_object_vars($this->data),
             default => $this->data,

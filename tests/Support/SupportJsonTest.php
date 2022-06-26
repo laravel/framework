@@ -48,6 +48,15 @@ class SupportJsonTest extends TestCase
         static::assertSame('bar', $this->json->get('foo'));
     }
 
+    public function testSetOnNonArrayOrObject()
+    {
+        $json = (new Json(null));
+
+        $json->set('quz', 'qux');
+
+        static::assertSame('qux', $json->get('quz'));
+    }
+
     public function testFill(): void
     {
         $this->json->fill('quz', 'qux');
@@ -223,5 +232,16 @@ class SupportJsonTest extends TestCase
         static::assertSame($object, Json::wrap($object)->data());
 
         static::assertEmpty(Json::wrap(null)->data());
+    }
+
+    public function testInstanceWithNonObjectsOrArray()
+    {
+        static::assertSame('null', (new Json(null))->toJson());
+        static::assertSame('"foo"', (new Json('foo'))->toJson());
+        static::assertSame('true', (new Json(true))->toJson());
+        static::assertSame('false', (new Json(false))->toJson());
+        static::assertSame('10', (new Json(10))->toJson());
+        static::assertSame('10.1', (new Json(10.1))->toJson());
+        static::assertSame('"foo"', (new Json("\x66\x6f\x6f"))->toJson());
     }
 }
