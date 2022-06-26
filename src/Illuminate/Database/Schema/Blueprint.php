@@ -280,6 +280,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the table needs to be created from an existing table.
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function createLike($fromTable)
+    {
+        return $this->addCommand('createLike', compact('fromTable'));
+    }
+
+    /**
      * Indicate that the table needs to be temporary.
      *
      * @return void

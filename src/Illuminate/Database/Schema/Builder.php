@@ -258,6 +258,21 @@ class Builder
     }
 
     /**
+     * Create a new table on the schema after an existing table.
+     *
+     * @param  string  $table
+     * @param  string  $fromTable
+     * @return void
+     */
+    public function createLike($table, $fromTable)
+    {
+        $this->build(tap(
+            $this->createBlueprint($table),
+            fn ($blueprint) => $blueprint->createLike($fromTable))
+        );
+    }
+
+    /**
      * Drop a table from the schema.
      *
      * @param  string  $table
