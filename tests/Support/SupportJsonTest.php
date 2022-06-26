@@ -2,184 +2,223 @@
 
 namespace Illuminate\Tests\Support;
 
+use ArrayIterator;
 use Illuminate\Support\Collection;
+use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Json;
+use RecursiveArrayIterator;
+use Traversable;
 
 class SupportJsonTest extends TestCase
 {
-    /**
-     * @param  array  $array
-     * @return \Illuminate\Support\Json
-     */
-    protected function json($array = [])
+    protected $json;
+
+    protected function setUp(): void
     {
-        return new Json($array);
+        parent::setUp();
+
+        $this->json = new Json(new class {
+            public function __construct($foo = ['foo' => 'bar'])
+            {
+                $this->foo = $foo;
+                $this->bar = (object) ['baz' => (object) ['quz' => 'qux']];
+            }
+        });
     }
 
-    public function testAll()
+    public function testGet(): void
     {
-        $this->assertSame(['foo' => 'bar'], $this->json(['foo' => 'bar'])->all());
+        static::assertSame(['foo' => 'bar'], $this->json->get('foo'));
+        static::assertSame('qux', $this->json->get('bar.baz.quz'));
+        static::assertSame('cougar', $this->json->get('baz', 'cougar'));
+        static::assertSame('cougar', $this->json->get('baz', fn() => 'cougar'));
+        static::assertNull($this->json->get('baz'));
     }
 
-    public function testGet()
+    public function testSet(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        $this->json->set('quz', 'qux');
 
-        $this->assertSame('baz', $json->get('foo.bar'));
+        static::assertSame('qux', $this->json->get('quz'));
 
-        $this->assertNull($json->get('foo.baz'));
+        $this->json->set('foo', 'bar');
 
-        $this->assertSame('qux', $json->get('foo.baz', 'qux'));
+        static::assertSame('bar', $this->json->get('foo'));
     }
 
-    public function testHas()
+    public function testFill(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        $this->json->fill('quz', 'qux');
 
-        $this->assertTrue($json->has('foo.bar'));
-        $this->assertFalse($json->has('foo.baz'));
+        static::assertSame('qux', $this->json->get('quz'));
 
-        $this->assertTrue($json->has('foo', 'foo.bar'));
-        $this->assertFalse($json->has('foo', 'foo.baz'));
+        $this->json->fill('foo', 'bar');
+
+        static::assertSame(['foo' => 'bar'], $this->json->get('foo'));
     }
 
-    public function testHasAny()
+    public function testHas(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        $this->json->set('quz', ['bar' => null]);
 
-        $this->assertTrue($json->hasAny('foo.bar'));
-        $this->assertFalse($json->hasAny('foo.baz'));
-
-        $this->assertTrue($json->hasAny('foo', 'foo.bar'));
-        $this->assertTrue($json->hasAny('foo', 'foo.baz'));
+        static::assertTrue($this->json->has('foo'));
+        static::assertTrue($this->json->has('bar.baz.quz'));
+        static::assertFalse($this->json->has('quz.bar'));
+        static::assertFalse($this->json->has('quz.baz'));
     }
 
-    public function testMissing()
+    public function testMissing(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        $this->json->set('quz', ['bar' => null]);
 
-        $this->assertFalse($json->missing('foo.bar'));
-        $this->assertTrue($json->missing('foo.baz'));
-
-        $this->assertFalse($json->missing('foo.bar'));
-        $this->assertTrue($json->missing('foo.baz'));
+        static::assertFalse($this->json->missing('foo'));
+        static::assertFalse($this->json->missing('bar.baz.quz'));
+        static::assertTrue($this->json->missing('quz.bar'));
+        static::assertTrue($this->json->missing('quz.baz'));
     }
 
-    public function testSet()
+    public function testUnset(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        $this->json->unset('foo');
+        static::assertTrue($this->json->missing('foo'));
 
-        $json->set('foo.quz', 'qux');
+        $this->json->unset('bar.baz.quz');
+        static::assertFalse($this->json->missing('bar'));
+        static::assertFalse($this->json->missing('bar.baz'));
+        static::asserttrue($this->json->missing('bar.baz.quz'));
 
-        $this->assertSame('qux', $json->get('foo.quz'));
+        $this->json->unset('bar.baz');
+        static::assertFalse($this->json->missing('bar'));
+        static::assertTrue($this->json->missing('bar.baz'));
 
-        $json->set(null, []);
-
-        $this->assertSame([], $json->all());
+        $this->json->unset('bar.baz');
+        static::assertFalse($this->json->missing('bar'));
+        static::assertTrue($this->json->missing('bar.baz'));
     }
 
-    public function testForget()
+    public function testCollect(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz', 'quz' => 'qux']]);
+        $collection = $this->json->collect();
 
-        $json->forget('foo.quz');
+        static::assertTrue($collection->has('foo'));
+        static::assertTrue($collection->has('bar'));
 
-        $this->assertSame(['foo' => ['bar' => 'baz']], $json->all());
+        $collection = $this->json->collect('bar');
+
+        static::assertTrue($collection->has('baz'));
     }
 
-    public function testCollection()
+    public function testDynamicAccess(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz', 'quz' => 'qux']]);
+        static::assertSame(['foo' => 'bar'], $this->json->foo);
 
-        $this->assertSame(['foo' => ['bar' => 'baz', 'quz' => 'qux']], $json->collect()->all());
+        $this->json->foo = 'bar';
+        static::assertSame('bar', $this->json->foo);
 
-        $this->assertSame(['bar' => 'baz', 'quz' => 'qux'], $json->collect('foo')->all());
+        static::assertTrue(isset($this->json->bar));
+        static::assertFalse(isset($this->json->baz));
+
+        unset($this->json->foo);
+
+        static::assertTrue($this->json->missing('foo'));
     }
 
-    public function testDynamicAccess()
+    public function testArrayAccess(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        static::assertSame(['foo' => 'bar'], $this->json['foo']);
 
-        $this->assertSame(['bar' => 'baz'], $json->foo);
+        $this->json['foo'] = 'bar';
+        static::assertSame('bar', $this->json['foo']);
 
-        $json->foo = ['quz'];
+        static::assertTrue(isset($this->json['bar']));
+        static::assertFalse(isset($this->json['baz']));
 
-        $this->assertSame(['quz'], $json->foo);
+        unset($this->json['foo']);
 
-        $this->assertTrue(isset($json->foo));
-
-        unset($json->foo);
-
-        $this->assertNull($json->foo);
+        static::assertTrue($this->json->missing('foo'));
     }
 
-    public function testArrayAccess()
+    public function testToStringAsJson(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
-
-        $this->assertSame(['bar' => 'baz'], $json['foo']);
-
-        $json['foo'] = ['quz'];
-
-        $this->assertSame(['quz'], $json['foo']);
-
-        $this->assertTrue(isset($json['foo']));
-
-        unset($json['foo']);
-
-        $this->assertNull($json['foo']);
+        static::assertSame('{"foo":{"foo":"bar"},"bar":{"baz":{"quz":"qux"}}}', (string) $this->json);
     }
 
-    public function testToString()
+    public function testToJson(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
-
-        $this->assertSame('{"foo":{"bar":"baz"}}', $json->__toString());
-        $this->assertSame('{"foo":{"bar":"baz"}}', (string) $json);
+        static::assertSame('{"foo":{"foo":"bar"},"bar":{"baz":{"quz":"qux"}}}', $this->json->toJson());
     }
 
-    public function testIterator()
+    public function testToArray(): void
     {
-        $json = $this->json($array = ['foo', 'bar', 'baz', 'quz']);
+        $this->json->set('baz', new Collection(['foo', 'bar', 'baz']));
 
-        foreach ($json as $key => $value) {
-            $this->assertSame($array[$key], $value);
-        }
+        static::assertEquals([
+            'foo' => ['foo' => 'bar'],
+            'bar' => (object) ['baz' => (object) ['quz' => 'qux']],
+            'baz' => ['foo', 'bar', 'baz'],
+        ],
+            $this->json->toArray()
+        );
     }
 
-    public function testToArray()
+    public function testIterator(): void
     {
-        $json = $this->json(['foo', 'bar', 'baz', new Collection(['quz', 'qux'])]);
+        static::assertEquals(
+            ['foo' => ['foo' => 'bar'], 'bar' => (object) ['baz' => (object) ['quz' => 'qux']]],
+            iterator_to_array($this->json)
+        );
 
-        $this->assertSame(['foo', 'bar', 'baz', ['quz', 'qux']], $json->toArray());
+        $json = new Json(['foo', 'bar', 'baz']);
+
+        static::assertInstanceOf(ArrayIterator::class, $json->getIterator());
+        static::assertSame(['foo', 'bar', 'baz'], iterator_to_array($json));
+
+        $json = new Json(new class {
+            public function __construct(public $foo = 'bar', public $baz = 'quz', public $qux = 'cougar')
+            {
+            }
+        });
+
+        static::assertInstanceOf(ArrayIterator::class, $json->getIterator());
+        static::assertSame(['foo' => 'bar', 'baz' => 'quz', 'qux' => 'cougar'], iterator_to_array($json));
+
+        $json = new Json(new class implements IteratorAggregate {
+            public function getIterator(): Traversable
+            {
+                return new RecursiveArrayIterator(['foo' => ['bar', 'quz']]);
+            }
+        });
+
+        static::assertInstanceOf(RecursiveArrayIterator::class, $json->getIterator());
+        static::assertSame(['foo' => ['bar', 'quz']], iterator_to_array($json));
     }
 
-    public function testToJson()
+    public function testMake(): void
     {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        $json = Json::make(['foo' => 'bar']);
+        static::assertSame(['foo' => 'bar'], $json->data());
 
-        $this->assertSame('{"foo":{"bar":"baz"}}', $json->toJson());
+        $json = Json::make($object = (object)['foo' => 'bar']);
+        static::assertSame($object, $json->data());
     }
 
-    public function testMake()
+    public function testFromString(): void
     {
-        $array = ['foo' => ['bar' => 'baz']];
-
-        $this->assertSame($array, Json::make($array)->all());
+        $json = Json::fromString('{"foo":{"foo":"bar"}}');
+        static::assertEquals((object) ['foo' => (object) ['foo' => 'bar']], $json->data());
     }
 
-    public function testFromJson()
+    public function testWrap(): void
     {
-        $this->assertSame(['foo' => ['bar' => 'baz']], Json::fromJson('{"foo":{"bar":"baz"}}')->all());
-    }
+        $json = Json::fromString('{"foo":{"foo":"bar"}}');
 
-    public function testWrap()
-    {
-        $json = $this->json(['foo' => ['bar' => 'baz']]);
+        static::assertSame($json, Json::wrap($json));
 
-        $this->assertSame($json, Json::wrap($json));
+        $object = (object) ['foo' => (object) ['foo' => 'bar']];
 
-        $this->assertSame(['foo' => ['bar' => 'baz']], Json::wrap(['foo' => ['bar' => 'baz']])->all());
+        static::assertSame($object, Json::wrap($object)->data());
+
+        static::assertEmpty(Json::wrap(null)->data());
     }
 }

@@ -6,114 +6,137 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use IteratorAggregate;
 use JsonSerializable;
 use Stringable;
+use Traversable;
 
-class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggregate, Arrayable, Jsonable
+class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggregate, Arrayable, Jsonable
 {
     use Traits\Conditionable;
     use Traits\Tappable;
 
     /**
-     * The JSON array.
+     * The underlying JSON data.
      *
-     * @var array
+     * @var mixed
      */
-    protected array $json = [];
+    protected $data;
 
     /**
-     * Create a new Json instance.
+     * Create a new JSON instance
      *
-     * @param  array  $json
+     * @param  mixed  $data
      */
-    public function __construct(array $json = [])
+    public function __construct($data = null)
     {
-        $this->json = $json;
+        $this->data = $data;
     }
 
     /**
-     * Returns the underlying JSON array.
+     * Returns the underlying JSON object or array.
      *
-     * @return array
+     * @return mixed
      */
-    public function all()
+    public function data()
     {
-        return $this->json;
+        return $this->get(null);
     }
 
     /**
-     * Get an item from JSON using "dot" notation.
+     * Returns a JSON value from a key in "dot" notation.
      *
-     * @param  string|int  $key
+     * @param  string|int|null  $key
      * @param  mixed|null  $default
      * @return mixed
      */
     public function get($key, $default = null)
     {
-        return Arr::get($this->json, $key, $default);
+        return data_get($this->data, $key, $default);
     }
 
     /**
-     * Check if an item or items exist in JSON using "dot" notation.
+     * Sets a value into the JSON data using a key in "dot" notation.
      *
-     * @param  string|int  ...$keys
-     * @return bool
+     * @param  string|int  $key
+     * @param  mixed  $value
+     * @param  bool  $overwrite
+     * @return $this
      */
-    public function has(...$keys)
+    public function set($key, $value, $overwrite = true)
     {
-        return Arr::has($this->json, $keys);
+        data_set($this->data, $key, $value, $overwrite);
+
+        return $this;
     }
 
     /**
-     * Determine if any of the keys exist in JSON using "dot" notation.
+     * Sets a value into the JSON data using a key in "dot" notation if the key is missing.
      *
-     * @param  string|int  ...$keys
+     * @param  string|int  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function fill($key, $value)
+    {
+        return $this->set($key, $value, false);
+    }
+
+    /**
+     * Check if a given key is set and not null using dot notation.
+     *
+     * @param  string  $key
      * @return bool
      */
-    public function hasAny(...$keys)
+    public function has($key)
     {
-        return Arr::hasAny($this->json, $keys);
+        return $this->get($key) !== null;
     }
 
     /**
      * Check if the given key is missing using dot notation.
      *
-     * @param  string|int  $key
+     * @param  string  $key
      * @return bool
      */
     public function missing($key)
     {
-        return ! $this->has($key);
+        return !$this->has($key);
     }
 
     /**
-     * Set a JSON item to a given value using "dot" notation.
+     * Removes a JSON key.
      *
-     * If no key is given to the method, the entire JSON will be replaced.
-     *
-     * @param  string|int|null  $key
-     * @param  mixed  $value
-     * @return $this
+     * @param  string|int  $key
+     * @return void
      */
-    public function set($key, $value)
+    public function unset($key)
     {
-        Arr::set($this->json, $key, $value);
+        $segment = $this->data;
 
-        return $this;
-    }
+        $keys = explode('.', $key) ?: [$key];
 
-    /**
-     * Remove one or many items from JSON using "dot" notation.
-     *
-     * @param  string|int  ...$keys
-     * @return $this
-     */
-    public function forget(...$keys)
-    {
-        Arr::forget($this->json, $keys);
+        foreach ($keys as $index => $name) {
+            if (count($keys) === 1) {
+                break;
+            }
 
-        return $this;
+            unset($keys[$index]);
+
+            if (is_array($segment) && array_key_exists($name, $segment)) {
+                $segment = &$segment[$name];
+            } elseif (property_exists($segment, $name)) {
+                $segment = &$segment->{$name};
+            }
+        }
+
+        if (is_array($segment)) {
+            unset($segment[array_shift($keys)]);
+        } else {
+            unset($segment->{array_shift($keys)});
+        }
     }
 
     /**
@@ -133,7 +156,7 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      * @param  string  $name
      * @return mixed
      */
-    public function __get($name)
+    public function __get($name): mixed
     {
         return $this->get($name);
     }
@@ -145,7 +168,7 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      * @param  mixed  $value
      * @return void
      */
-    public function __set($name, $value)
+    public function __set($name, $value): void
     {
         $this->set($name, $value);
     }
@@ -156,7 +179,7 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      * @param  string  $name
      * @return bool
      */
-    public function __isset($name)
+    public function __isset($name): bool
     {
         return $this->has($name);
     }
@@ -167,9 +190,9 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      * @param  string  $name
      * @return void
      */
-    public function __unset($name)
+    public function __unset($name): void
     {
-        $this->forget($name);
+        $this->unset($name);
     }
 
     /**
@@ -214,17 +237,7 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      */
     public function offsetUnset($offset): void
     {
-        $this->forget($offset);
-    }
-
-    /**
-     * Get a string representation of the object.
-     *
-     * @return string
-     */
-    public function toString()
-    {
-        return $this->toJson();
+        $this->unset($offset);
     }
 
     /**
@@ -234,7 +247,7 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      */
     public function __toString(): string
     {
-        return $this->toString();
+        return $this->toJson();
     }
 
     /**
@@ -252,9 +265,13 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      *
      * @return \ArrayIterator
      */
-    public function getIterator(): ArrayIterator
+    public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->toArray());
+        return match (true) {
+            $this->data instanceof IteratorAggregate => $this->data->getIterator(),
+            is_array($this->data) => new ArrayIterator($this->data),
+            default => new ArrayIterator(get_object_vars($this->data)),
+        };
     }
 
     /**
@@ -264,7 +281,13 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      */
     public function toArray()
     {
-        return array_map(fn ($item) => $item instanceof Arrayable ? $item->toArray() : $item, $this->json);
+        return array_map(function ($value) {
+            return $value instanceof Arrayable ? $value->toArray() : $value;
+        }, match (true) {
+            $this->data instanceof Traversable, => iterator_to_array($this->data),
+            is_object($this->data) => get_object_vars($this->data),
+            default => $this->data,
+        });
     }
 
     /**
@@ -281,8 +304,8 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
     /**
      * Create a new Json instance.
      *
-     * @param  array  $json
-     * @return static
+     * @param  array|object|null  $json
+     * @return $this
      */
     public static function make($json)
     {
@@ -297,20 +320,19 @@ class Json implements ArrayAccess, Stringable, JsonSerializable, IteratorAggrega
      * @param  int  $options
      * @return static
      */
-    public static function fromJson($json, $depth = 512, $options = 0)
+    public static function fromString($json, $depth = 512, $options = 0)
     {
-        return new static(json_decode($json, true, $depth, $options));
+        return new static(json_decode($json, false, $depth, $options));
     }
 
     /**
      * Wraps an array into a Json instance.
      *
-     * @param  self|array|null  $json
+     * @param  object|array|null  $json
      * @return static
      */
     public static function wrap($json)
     {
-        return $json instanceof static ? $json : new static((array) $json);
+        return $json instanceof static ? $json : new static($json);
     }
 }
-
