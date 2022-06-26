@@ -70,6 +70,17 @@ class SupportStringableTest extends TestCase
         $this->assertSame('LaraCons', (string) $this->stringable('LaraCon')->pluralStudly(-2));
     }
 
+    public function testOrdinal()
+    {
+        $this->assertSame('1st', (string) $this->stringable(1)->ordinal());
+        $this->assertSame('2nd', (string) $this->stringable(2)->ordinal());
+        $this->assertSame('3rd', (string) $this->stringable(3)->ordinal());
+        $this->assertSame('4th', (string) $this->stringable(4)->ordinal());
+        $this->assertSame('5th', (string) $this->stringable(5)->ordinal());
+        $this->assertSame('101st', (string) $this->stringable(101)->ordinal());
+        $this->assertSame('512th', (string) $this->stringable(512)->ordinal());
+    }
+
     public function testMatch()
     {
         $stringable = $this->stringable('foo bar');

@@ -508,6 +508,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Generate an ordinal suffix for the given value.
+     *
+     * @return string
+     */
+    public function ordinal()
+    {
+        return new static(Str::ordinal($this->value));
+    }
+
+
+    /**
      * Pluralize the last word of an English, studly caps case string.
      *
      * @param  int  $count

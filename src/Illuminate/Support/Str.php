@@ -638,6 +638,32 @@ class Str
         return Pluralizer::plural($value, $count);
     }
 
+
+    /**
+     * Generate an ordinal suffix for the given value.
+     *
+     * @param  int  $value
+     * @return string
+     */
+    public static function ordinal($value)
+    {
+        if (! is_numeric($value)) {
+            return "";
+        }
+
+        $value = abs($value);
+
+        $indicators = ['th','st','nd','rd','th','th','th','th','th','th'];
+
+        $suffix = $indicators[$value % 10];
+
+        if ($value % 100 >= 11 && $value % 100 <= 13) {
+            $suffix = 'th';
+        }
+
+        return number_format($value) . $suffix;
+    }
+
     /**
      * Pluralize the last word of an English, studly caps case string.
      *
