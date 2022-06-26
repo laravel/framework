@@ -124,6 +124,23 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a create table like command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateLike(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        return trim(sprintf('%s table %s LIKE %s',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $this->wrapTable($blueprint),
+            $this->wrapTable($command->fromTable)
+        ));
+    }
+
+    /**
      * Append the character set specifications to a command.
      *
      * @param  string  $sql

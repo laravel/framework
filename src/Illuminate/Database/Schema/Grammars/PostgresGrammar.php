@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 
@@ -99,6 +100,22 @@ class PostgresGrammar extends Grammar
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))
         )], $this->compileAutoIncrementStartingValues($blueprint))));
+    }
+
+    /**
+     * Compile a create table like command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileCreateLike(Blueprint $blueprint, Fluent $command)
+    {
+        return trim(sprintf('%s table %s LIKE %s',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $this->wrapTable($blueprint),
+            $this->wrapTable($command->fromTable)
+        ));
     }
 
     /**
