@@ -6,8 +6,6 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\JsonResponse;
 use IteratorAggregate;
 use JsonSerializable;
 use Stringable;
