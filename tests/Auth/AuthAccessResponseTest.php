@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class AuthAccessResponseTest extends TestCase
 {
@@ -33,6 +34,36 @@ class AuthAccessResponseTest extends TestCase
         $response = Response::deny();
 
         $this->assertNull($response->message());
+    }
+
+    public function testItSetsEmptyStatusOnExceptionWhenAuthorizing()
+    {
+        try {
+            Response::deny()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertNull($e->status());
+            $this->assertFalse($e->hasStatus());
+        }
+    }
+
+    public function testItSetsStatusOnExceptionWhenAuthorizing()
+    {
+        try {
+            Response::deny()->withStatus(404)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+            $this->assertTrue($e->hasStatus());
+        }
+
+        try {
+            Response::denyWithStatus(404)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+            $this->assertTrue($e->hasStatus());
+        }
     }
 
     public function testAuthorizeMethodThrowsAuthorizationExceptionWhenResponseDenied()

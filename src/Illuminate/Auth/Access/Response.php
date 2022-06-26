@@ -28,6 +28,13 @@ class Response implements Arrayable
     protected $code;
 
     /**
+     * The HTTP response status code.
+     *
+     * @var int|null
+     */
+    protected $status;
+
+    /**
      * Create a new response.
      *
      * @param  bool  $allowed
@@ -64,6 +71,19 @@ class Response implements Arrayable
     public static function deny($message = null, $code = null)
     {
         return new static(false, $message, $code);
+    }
+
+    /**
+     * Create a new "deny" Response with a HTTP status code.
+     *
+     * @param  int  $status
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public static function denyWithStatus($status, $message = null, $code = null)
+    {
+        return static::deny($message, $code)->withStatus($status);
     }
 
     /**
@@ -117,10 +137,34 @@ class Response implements Arrayable
     {
         if ($this->denied()) {
             throw (new AuthorizationException($this->message(), $this->code()))
-                        ->setResponse($this);
+                ->setResponse($this)
+                ->withStatus($this->status);
         }
 
         return $this;
+    }
+
+    /**
+     * Set the HTTP response status code.
+     *
+     * @param  null|int  $status
+     * @return $this
+     */
+    public function withStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get the HTTP status code.
+     *
+     * @return int|null
+     */
+    public function status()
+    {
+        return $this->status;
     }
 
     /**
