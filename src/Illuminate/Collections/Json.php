@@ -286,13 +286,15 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
      */
     public function toArray()
     {
-        return array_map(function ($value) {
-            return $value instanceof Arrayable ? $value->toArray() : $value;
-        }, (array) match (true) {
+        $data = match (true) {
             $this->data instanceof Traversable, => iterator_to_array($this->data),
             is_object($this->data) => get_object_vars($this->data),
             default => $this->data,
-        });
+        };
+
+        return array_map(function ($value) {
+            return $value instanceof Arrayable ? $value->toArray() : $value;
+        }, Arr::wrap($data));
     }
 
     /**
