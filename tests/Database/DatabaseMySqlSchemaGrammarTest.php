@@ -47,6 +47,20 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
     }
 
+    public function testBasicCreateTableLike()
+    {
+        $blueprint = new Blueprint('users2');
+        $blueprint->createLike('users');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table `users2` LIKE `users`', $statements[0]);
+    }
+
     public function testAutoIncrementStartingValue()
     {
         $blueprint = new Blueprint('users');
@@ -165,6 +179,21 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create temporary table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+    }
+
+    public function testCreateTemporaryTableLike()
+    {
+        $blueprint = new Blueprint('temp_users');
+        $blueprint->createLike('users');
+        $blueprint->temporary();
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create temporary table `temp_users` LIKE `users`', $statements[0]);
     }
 
     public function testDropTable()

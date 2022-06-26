@@ -38,6 +38,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add column "id" serial primary key not null, add column "email" varchar(255) not null', $statements[0]);
     }
 
+    public function testBasicCreateTableLike()
+    {
+        $blueprint = new Blueprint('users2');
+        $blueprint->createLike('users');
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "users2" LIKE "users"', $statements[0]);
+    }
+
     public function testCreateTableWithAutoIncrementStartingValue()
     {
         $blueprint = new Blueprint('users');
@@ -76,6 +87,18 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create temporary table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
+    }
+
+    public function testCreateTemporaryTableLike()
+    {
+        $blueprint = new Blueprint('temp_users');
+        $blueprint->createLike('users');
+        $blueprint->temporary();
+
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create temporary table "temp_users" LIKE "users"', $statements[0]);
     }
 
     public function testDropTable()
