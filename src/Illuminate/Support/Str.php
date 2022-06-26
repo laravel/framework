@@ -638,7 +638,6 @@ class Str
         return Pluralizer::plural($value, $count);
     }
 
-
     /**
      * Generate an ordinal suffix for the given value.
      *
@@ -648,12 +647,12 @@ class Str
     public static function ordinal($value)
     {
         if (! is_numeric($value)) {
-            return "";
+            return '';
         }
 
         $value = abs($value);
 
-        $indicators = ['th','st','nd','rd','th','th','th','th','th','th'];
+        $indicators = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
 
         $suffix = $indicators[$value % 10];
 
@@ -661,7 +660,7 @@ class Str
             $suffix = 'th';
         }
 
-        return number_format($value) . $suffix;
+        return number_format($value).$suffix;
     }
 
     /**
