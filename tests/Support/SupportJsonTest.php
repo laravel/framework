@@ -78,21 +78,21 @@ class SupportJsonTest extends TestCase
         static::assertTrue($this->json->missing('quz.baz'));
     }
 
-    public function testUnset(): void
+    public function testForget(): void
     {
-        $this->json->unset('foo');
+        $this->json->forget('foo');
         static::assertTrue($this->json->missing('foo'));
 
-        $this->json->unset('bar.baz.quz');
+        $this->json->forget('bar.baz.quz');
         static::assertFalse($this->json->missing('bar'));
         static::assertFalse($this->json->missing('bar.baz'));
         static::asserttrue($this->json->missing('bar.baz.quz'));
 
-        $this->json->unset('bar.baz');
+        $this->json->forget('bar.baz');
         static::assertFalse($this->json->missing('bar'));
         static::assertTrue($this->json->missing('bar.baz'));
 
-        $this->json->unset('bar.baz');
+        $this->json->forget('bar.baz');
         static::assertFalse($this->json->missing('bar'));
         static::assertTrue($this->json->missing('bar.baz'));
     }

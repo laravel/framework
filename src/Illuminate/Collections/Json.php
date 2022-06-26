@@ -110,7 +110,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
      * @param  string|int  $key
      * @return void
      */
-    public function unset($key)
+    public function forget($key)
     {
         $segment = $this->data;
 
@@ -190,7 +190,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
      */
     public function __unset($name): void
     {
-        $this->unset($name);
+        $this->forget($name);
     }
 
     /**
@@ -235,7 +235,7 @@ class Json implements Stringable, ArrayAccess, JsonSerializable, IteratorAggrega
      */
     public function offsetUnset($offset): void
     {
-        $this->unset($offset);
+        $this->forget($offset);
     }
 
     /**
