@@ -423,7 +423,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $url = $absolute ? $request->url() : '/'.$request->path();
 
-        $queryString = collect(explode('&', $request->server->get('QUERY_STRING')))
+        $queryString = collect(explode('&', (string) $request->server->get('QUERY_STRING')))
             ->reject(fn ($parameter) => in_array(Str::before($parameter, '='), $ignoreQuery))
             ->join('&');
 
