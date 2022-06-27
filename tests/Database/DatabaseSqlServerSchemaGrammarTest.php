@@ -258,6 +258,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueIgnoreTrashedKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uniqueIgnoreTrashed('foo', 'deleted_at', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo", "deleted_at")', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint('users');

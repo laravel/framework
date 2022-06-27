@@ -140,6 +140,25 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a unique index ignoring a null column command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileUniqueIgnoreNull(Blueprint $blueprint, Fluent $command)
+    {
+        $columns = $command->columns;
+        $columns[] = $command->nullColumn;
+
+        return sprintf('create unique index %s on %s (%s)',
+            $this->wrap($command->index),
+            $this->wrapTable($blueprint),
+            $this->columnize($columns)
+        );
+    }
+
+    /**
      * Compile a plain index key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
