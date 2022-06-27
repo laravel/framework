@@ -202,7 +202,7 @@ trait HasEvents
             return null;
         }
 
-        $eventResponses = array_map(function($response) {
+        $eventResponses = array_map(function ($response) {
             return ! ($response === false);
         }, Arr::wrap($eventResponses));
 
