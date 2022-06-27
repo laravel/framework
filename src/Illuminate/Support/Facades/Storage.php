@@ -43,6 +43,18 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string|false putFileAs(string $path, \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string $file, string $name, mixed $options = [])
  * @method static void macro(string $name, object|callable $macro)
  * @method static void buildTemporaryUrlsUsing(\Closure $callback)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem createFtpDriver(array $config)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem createLocalDriver(array $config)
+ * @method static \Illuminate\Contracts\Filesystem\Cloud createS3Driver(array $config)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem createSftpDriver(array $config)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(string|null $name = null)
+ * @method static \Illuminate\Filesystem\FilesystemManager forgetDisk(array|string $disk)
+ * @method static string getDefaultCloudDriver()
+ * @method static string getDefaultDriver()
+ * @method static void purge(string|null $name = null)
+ * @method static \Illuminate\Filesystem\FilesystemManager set(string $name, mixed $disk)
+ * @method static \Illuminate\Filesystem\FilesystemManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
+ *
  *
  * @see \Illuminate\Filesystem\FilesystemManager
  */

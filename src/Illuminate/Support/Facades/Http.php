@@ -55,6 +55,14 @@ use Illuminate\Http\Client\Factory;
  * @method static void assertNothingSent()
  * @method static void assertSentCount(int $count)
  * @method static void assertSequencesAreEmpty()
+ * @method static void flushMacros()
+ * @method static \Illuminate\Contracts\Events\Dispatcher|null getDispatcher()
+ * @method static bool hasMacro(string $name)
+ * @method static void macro(string $name, object|callable $macro)
+ * @method static mixed macroCall(string $method, array $parameters)
+ * @method static void mixin(object $mixin, bool $replace = true)
+ * @method static void recordRequestResponsePair(\Illuminate\Http\Client\Request $request, \Illuminate\Http\Client\Response $response)
+ * @method static \Illuminate\Support\Collection recorded(callable $callback = null)
  *
  * @see \Illuminate\Http\Client\Factory
  */

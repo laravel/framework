@@ -21,6 +21,15 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static void assertTimesSent(int $expectedCount, string $notification)
  * @method static void send(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
  * @method static void sendNow(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
+ * @method static void deliverVia(string $channel)
+ * @method static string deliversVia()
+ * @method static mixed driver(string|null $driver = null)
+ * @method static \Illuminate\Notifications\ChannelManager extend(string $driver, \Closure $callback)
+ * @method static \Illuminate\Notifications\ChannelManager forgetDrivers()
+ * @method static \Illuminate\Contracts\Container\Container getContainer()
+ * @method static string getDefaultDriver()
+ * @method static array getDrivers()
+ * @method static \Illuminate\Notifications\ChannelManager setContainer(\Illuminate\Contracts\Container\Container $container)
  *
  * @see \Illuminate\Notifications\ChannelManager
  */
