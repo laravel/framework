@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ValidationProhibitedIfTest extends TestCase
 {
@@ -38,9 +39,14 @@ class ValidationProhibitedIfTest extends TestCase
 
         $rule = new ProhibitedIf(true);
 
-        $this->expectException(InvalidArgumentException::class);
-
-        $rule = new ProhibitedIf('phpinfo');
+        foreach ([1, 1.1, 'phpinfo', new stdClass] as $condition) {
+            try {
+                $rule = new ProhibitedIf($condition);
+                $this->fail('The ProhibitedIf constructor must not accept '.gettype($condition));
+            } catch (InvalidArgumentException $exception) {
+                $this->assertEquals('The provided condition must be a callable or boolean.', $exception->getMessage());
+            }
+        }
     }
 
     public function testItReturnedRuleIsNotSerializable()
