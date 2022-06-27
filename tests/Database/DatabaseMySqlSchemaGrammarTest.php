@@ -342,6 +342,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add unique `bar`(`foo`)', $statements[0]);
     }
 
+    public function testAddingUniqueIgnoreTrashedKey()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->uniqueIgnoreTrashed('foo', 'deleted_at', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        // v8.0.13+
+        $this->assertSame('create unique index `bar` on `users` (`foo`, (CASE WHEN `deleted_at` IS NULL THEN 0 ELSE `deleted_at` END))', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint('users');

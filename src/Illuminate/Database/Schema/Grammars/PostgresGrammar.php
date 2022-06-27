@@ -160,11 +160,10 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a spartial index key command.
+     * Compile a unique index ignoring a null column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
      * @return string
      */
     public function compileUniqueIgnoreNull(Blueprint $blueprint, Fluent $command)

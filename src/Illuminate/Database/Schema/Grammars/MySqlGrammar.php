@@ -229,6 +229,24 @@ class MySqlGrammar extends Grammar
         return $this->compileKey($blueprint, $command, 'unique');
     }
 
+/**
+     * Compile a unique index ignoring a null column command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileUniqueIgnoreNull(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('create unique index %s on %s%s (%s, %s)',
+            $this->wrap($command->index),
+            $this->wrapTable($blueprint),
+            $command->algorithm ? ' using '.$command->algorithm : '',
+            $this->columnize($command->columns),
+            "(CASE WHEN {$this->wrap($command->nullColumn)} IS NULL THEN 0 ELSE {$this->wrap($command->nullColumn)} END)",
+        );
+    }
+
     /**
      * Compile a plain index key command.
      *
