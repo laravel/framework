@@ -134,18 +134,4 @@ class CallableCommand extends Command
     {
         return $this->callableInstance->$method(...$parameters);
     }
-
-    /**
-     * Handle dynamic static method calls into the underlying callable.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public static function __callStatic($method, $parameters)
-    {
-        $className = get_class($this->callableInstance);
-
-        return $className::$method(...$parameters);
-    }
 }
