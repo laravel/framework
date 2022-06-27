@@ -190,6 +190,29 @@ trait HasEvents
         );
     }
 
+    protected function fireModelBeforeEvent($event)
+    {
+        $eventResponses = $this->fireModelEvent($event, false);
+
+        if ($eventResponses === false) {
+            return false;
+        }
+
+        if ($eventResponses === null) {
+            return null;
+        }
+
+        $eventResponses = array_map(function($response) {
+            return ! ($response === false);
+        }, Arr::wrap($eventResponses));
+
+        if (in_array(false, $eventResponses)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Fire a custom model event for the given event.
      *

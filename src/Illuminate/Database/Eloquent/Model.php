@@ -222,7 +222,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (! isset(static::$booted[static::class])) {
             static::$booted[static::class] = true;
 
-            $this->fireModelEvent('booting', false);
+            $this->fireModelBeforeEvent('booting');
 
             static::booting();
             static::boot();
@@ -858,7 +858,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->forceFill($extra);
 
-        if ($this->fireModelEvent('updating') === false) {
+        if ($this->fireModelBeforeEvent('updating') === false) {
             return false;
         }
 
@@ -1007,7 +1007,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
         // listeners to cancel save operations if validations fail or whatever.
-        if ($this->fireModelEvent('saving') === false) {
+        if ($this->fireModelBeforeEvent('saving') === false) {
             return false;
         }
 
@@ -1084,7 +1084,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         // If the updating event returns false, we will cancel the update operation so
         // developers can hook Validation systems into their models and cancel this
         // operation if the model does not pass validation. Otherwise, we update.
-        if ($this->fireModelEvent('updating') === false) {
+        if ($this->fireModelBeforeEvent('updating') === false) {
             return false;
         }
 
@@ -1165,7 +1165,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performInsert(Builder $query)
     {
-        if ($this->fireModelEvent('creating') === false) {
+        if ($this->fireModelBeforeEvent('creating') === false) {
             return false;
         }
 
@@ -1282,7 +1282,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return;
         }
 
-        if ($this->fireModelEvent('deleting') === false) {
+        if ($this->fireModelBeforeEvent('deleting') === false) {
             return false;
         }
 
@@ -1615,7 +1615,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $instance->setRelations($this->relations);
 
-            $instance->fireModelEvent('replicating', false);
+            $instance->fireModelBeforeEvent('replicating', false);
         });
     }
 

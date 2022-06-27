@@ -110,7 +110,7 @@ trait SoftDeletes
         // If the restoring event does not return false, we will proceed with this
         // restore operation. Otherwise, we bail out so the developer will stop
         // the restore totally. We will clear the deleted timestamp and save.
-        if ($this->fireModelEvent('restoring') === false) {
+        if ($this->fireModelBeforeEvent('restoring') === false) {
             return false;
         }
 

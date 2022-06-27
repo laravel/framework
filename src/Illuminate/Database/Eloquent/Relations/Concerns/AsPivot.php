@@ -126,7 +126,7 @@ trait AsPivot
             return (int) parent::delete();
         }
 
-        if ($this->fireModelEvent('deleting') === false) {
+        if ($this->fireModelBeforeEvent('deleting') === false) {
             return 0;
         }
 
