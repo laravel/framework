@@ -53,7 +53,7 @@ class MorphMany extends MorphOneOrMany
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function forceCreate(array $attributes = []) 
+    public function forceCreate(array $attributes = [])
     {
         $attributes[$this->getMorphType()] = $this->morphClass;
 
