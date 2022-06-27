@@ -38,7 +38,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
         $model->makePartial();
-        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
+        $model->shouldReceive('fireModelBeforeEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
         $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
 
@@ -51,7 +51,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);
         $model->makePartial();
-        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
+        $model->shouldReceive('fireModelBeforeEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
 
         $this->assertFalse($model->restore());

@@ -88,7 +88,7 @@ class EventsDispatcherTest extends TestCase
         $response = $d->dispatch('foo', ['bar']);
 
         $this->assertSame('bar', $_SERVER['__event.test']);
-        $this->assertEquals(['bar'], $response);
+        $this->assertEquals(['bar', null], $response);
     }
 
     public function testReturningFalsyValuesContinuesPropagation()

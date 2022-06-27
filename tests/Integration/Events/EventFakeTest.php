@@ -75,7 +75,7 @@ class EventFakeTest extends TestCase
             $this->fail('should not be called');
         });
 
-        $this->assertEquals([null], Event::dispatch('test'));
+        $this->assertEquals([null, false], Event::dispatch('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
@@ -155,7 +155,7 @@ class Post extends Model
 
     public function save(array $options = [])
     {
-        if ($this->fireModelEvent('saving') === false) {
+        if ($this->fireModelBeforeEvent('saving') === false) {
             return false;
         }
     }
