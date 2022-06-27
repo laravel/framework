@@ -1574,7 +1574,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type . 'IgnoreNull', compact('index', 'columns', 'nullColumn', 'algorithm')
+            $type.'IgnoreNull', compact('index', 'columns', 'nullColumn', 'algorithm')
         );
     }
 

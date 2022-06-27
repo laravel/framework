@@ -229,7 +229,7 @@ class MySqlGrammar extends Grammar
         return $this->compileKey($blueprint, $command, 'unique');
     }
 
-/**
+    /**
      * Compile a unique index ignoring a null column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
