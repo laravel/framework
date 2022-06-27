@@ -916,7 +916,9 @@ trait ValidatesAttributes
      */
     public function parseTable($table)
     {
-        [$connection, $table] = str_contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+        [$connection, $table] = str_contains($table, '.')
+            ? [substr($table, 0, strrpos($table, '.')), substr($table, strrpos($table, '.') + 1)]
+            : [null, $table];
 
         if (str_contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
             $model = new $table;

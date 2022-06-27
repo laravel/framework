@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/laravel/framework/compare/v9.18.0...9.x)
 
+### Fixed
+- allow dot symbol (.) in database connection when using Unique/Exists Rule (#xxxxx](---))
 
 ## [v9.18.0](https://github.com/laravel/framework/compare/v9.17.0...v9.18.0) - 2022-06-21
 
