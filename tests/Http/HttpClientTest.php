@@ -1615,4 +1615,17 @@ class HttpClientTest extends TestCase
                 $request->hasHeader('Authorization', 'Bearer GET /json HTTP/1.1');
         });
     }
+
+    public function testItCanSetAllowMaxRedirects(): void
+    {
+        $request = new PendingRequest($this->factory);
+
+        $request = $request->withOptions(['allow_redirects' => ['max' => 5]]);
+
+        $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 5]], $request->getOptions());
+
+        $request = $request->maxRedirects(10);
+
+        $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
+    }
 }

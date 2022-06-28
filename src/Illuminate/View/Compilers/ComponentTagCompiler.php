@@ -460,7 +460,7 @@ class ComponentTagCompiler
         $value = preg_replace_callback($pattern, function ($matches) {
             $name = $this->stripQuotes($matches['inlineName'] ?: $matches['name']);
 
-            if (Str::contains($name, '-')) {
+            if (Str::contains($name, '-') && ! empty($matches['inlineName'])) {
                 $name = Str::camel($name);
             }
 
