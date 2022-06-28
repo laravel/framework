@@ -75,7 +75,7 @@ class EventFakeTest extends TestCase
             $this->fail('should not be called');
         });
 
-        $this->assertEquals([null], Event::dispatch('test'));
+        $this->assertEquals([null, false], Event::dispatch('test'));
 
         Event::assertNotDispatched(NonImportantEvent::class);
     }
