@@ -50,7 +50,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Cache\Repository setDefaultCacheTime(int|null $seconds)
  * @method static void setDefaultDriver(string $name)
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
- * @method static bool setMultiple()
+ * @method static bool setMultiple($values, $ttl = null)
  * @method static bool supportsTags()
  *
  * @see \Illuminate\Cache\CacheManager
