@@ -222,7 +222,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (! isset(static::$booted[static::class])) {
             static::$booted[static::class] = true;
 
-            $this->fireModelBeforeEvent('booting', false);
+            $this->fireModelBeforeEvent('booting');
 
             static::booting();
             static::boot();
@@ -1615,7 +1615,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
             $instance->setRelations($this->relations);
 
-            $instance->fireModelBeforeEvent('replicating', false);
+            $instance->fireModelBeforeEvent('replicating');
         });
     }
 
