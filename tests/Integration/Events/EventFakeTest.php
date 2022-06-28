@@ -155,7 +155,7 @@ class Post extends Model
 
     public function save(array $options = [])
     {
-        if ($this->fireModelEvent('saving') === false) {
+        if ($this->fireModelBeforeEvent('saving') === false) {
             return false;
         }
     }
