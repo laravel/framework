@@ -1293,11 +1293,12 @@ class Blueprint
      * Create a new geometry column on the table.
      *
      * @param  string  $column
+     * @param  int|null  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function geometry($column)
+    public function geometry($column, $srid = null)
     {
-        return $this->addColumn('geometry', $column);
+        return $this->addColumn('geometry', $column, compact('srid'));
     }
 
     /**
@@ -1316,22 +1317,24 @@ class Blueprint
      * Create a new linestring column on the table.
      *
      * @param  string  $column
+     * @param  int|null  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function lineString($column)
+    public function lineString($column, $srid = null)
     {
-        return $this->addColumn('linestring', $column);
+        return $this->addColumn('linestring', $column, compact('srid'));
     }
 
     /**
      * Create a new polygon column on the table.
      *
      * @param  string  $column
+     * @param  int|null  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function polygon($column)
+    public function polygon($column, $srid = null)
     {
-        return $this->addColumn('polygon', $column);
+        return $this->addColumn('polygon', $column, compact('srid'));
     }
 
     /**
