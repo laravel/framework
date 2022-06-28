@@ -116,7 +116,7 @@ trait DatabaseRule
             return $this->whereNotIn($column, $value);
         }
 
-        return $this->where($column, '!'.$value);
+        return $this->where($column, '!='.$value);
     }
 
     /**
