@@ -11,7 +11,6 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
