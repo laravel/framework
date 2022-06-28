@@ -46,7 +46,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool putMany(array $values, \DateTimeInterface|\DateInterval|int|null $ttl = null)
  * @method static void refreshEventDispatcher()
  * @method static \Illuminate\Cache\Repository repository(\Illuminate\Contracts\Cache\Store $store)
- * @method static bool set()
+ * @method static bool set($key, $value, $ttl = null)
  * @method static \Illuminate\Cache\Repository setDefaultCacheTime(int|null $seconds)
  * @method static void setDefaultDriver(string $name)
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
