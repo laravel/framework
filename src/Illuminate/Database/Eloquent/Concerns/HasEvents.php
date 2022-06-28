@@ -191,6 +191,25 @@ trait HasEvents
     }
 
     /**
+     * Fire the given "before" event for the model.
+     *
+     * @param  string  $event
+     * @return bool
+     */
+    protected function fireModelBeforeEvent($event)
+    {
+        $eventResponses = $this->fireModelEvent($event, false);
+
+        foreach (Arr::wrap($eventResponses) as $response) {
+            if ($response === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Fire a custom model event for the given event.
      *
      * @param  string  $event
