@@ -74,7 +74,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new RuntimeException('Exception message'));
     }
@@ -83,7 +83,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::subset(['foo' => 'bar'])])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'bar'])])->once();
 
         $this->handler->report(new ContextProvidingException('Exception message'));
     }
@@ -92,7 +92,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new UnReportableException('Exception message'));
     }
@@ -101,16 +101,17 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::CRITICAL, 'Critical message', m::hasKey('exception')])->once();
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Error message', m::hasKey('exception')])->once();
-        $logger->shouldReceive('log')->withArgs([LogLevel::WARNING, 'Warning message', m::hasKey('exception')])->once();
+
+        $logger->shouldReceive('critical')->withArgs(['Critical message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('error')->withArgs(['Error message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('log')->withArgs(['custom', 'Custom message', m::hasKey('exception')])->once();
 
         $this->handler->level(InvalidArgumentException::class, LogLevel::CRITICAL);
-        $this->handler->level(OutOfRangeException::class, LogLevel::WARNING);
+        $this->handler->level(OutOfRangeException::class, 'custom');
 
         $this->handler->report(new InvalidArgumentException('Critical message'));
         $this->handler->report(new RuntimeException('Error message'));
-        $this->handler->report(new OutOfRangeException('Warning message'));
+        $this->handler->report(new OutOfRangeException('Custom message'));
     }
 
     public function testHandlerIgnoresNotReportableExceptions()
