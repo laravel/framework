@@ -194,20 +194,10 @@ trait HasEvents
     {
         $eventResponses = $this->fireModelEvent($event, false);
 
-        if ($eventResponses === false) {
-            return false;
-        }
-
-        if ($eventResponses === null) {
-            return null;
-        }
-
-        $eventResponses = array_map(function ($response) {
-            return ! ($response === false);
-        }, Arr::wrap($eventResponses));
-
-        if (in_array(false, $eventResponses)) {
-            return false;
+        foreach (Arr::wrap($eventResponses) as $response) {
+            if ($response === false) {
+                return false;
+            }
         }
 
         return true;
