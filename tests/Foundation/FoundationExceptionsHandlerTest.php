@@ -74,7 +74,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new RuntimeException('Exception message'));
     }
@@ -83,7 +83,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::subset(['foo' => 'bar'])])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::subset(['foo' => 'bar'])])->once();
 
         $this->handler->report(new ContextProvidingException('Exception message'));
     }
@@ -92,7 +92,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
-        $logger->shouldReceive('log')->withArgs([LogLevel::ERROR, 'Exception message', m::hasKey('exception')])->once();
+        $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
 
         $this->handler->report(new UnReportableException('Exception message'));
     }
