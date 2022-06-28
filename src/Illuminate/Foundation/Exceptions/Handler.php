@@ -265,15 +265,15 @@ class Handler implements ExceptionHandlerContract
             $this->levels, fn ($level, $type) => $e instanceof $type, LogLevel::ERROR
         );
 
-        $logger->log(
-            $level,
-            $e->getMessage(),
-            array_merge(
-                $this->exceptionContext($e),
-                $this->context(),
-                ['exception' => $e]
-            )
+        $context = array_merge(
+            $this->exceptionContext($e),
+            $this->context(),
+            ['exception' => $e]
         );
+
+        method_exists($logger, $level)
+            ? $logger->{$level}($e->getMessage(), $context)
+            : $logger->log($level, $e->getMessage(), $context);
     }
 
     /**
