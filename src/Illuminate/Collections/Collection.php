@@ -436,6 +436,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
+        if ($key && str_contains($key, '.')) {
+            return data_get($this->items, $key, $default);
+        }
+
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }

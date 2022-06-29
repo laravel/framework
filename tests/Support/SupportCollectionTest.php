@@ -2188,6 +2188,19 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
+    public function testGetWithDotNotation()
+    {
+        $data = new Collection([['foo' => 'bar'], 'baz' => ['quz' => 'qux']]);
+
+        $this->assertSame('bar', $data->get('0.foo'));
+        $this->assertSame('qux', $data->get('baz.quz'));
+        $this->assertSame('fred', $data->get('baz.fred', 'fred'));
+
+        $this->assertSame('bar', data_get($data, '0.foo'));
+        $this->assertSame('qux', data_get($data, 'baz.quz'));
+        $this->assertSame('fred', data_get($data, 'baz.fred', 'fred'));
+    }
+
     public function testGetOrPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
