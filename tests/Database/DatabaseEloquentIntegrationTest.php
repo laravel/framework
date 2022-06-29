@@ -827,6 +827,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
     }
 
+    public function testWithWhereHasOnSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+
+        $results = EloquentTestUser::withWhereHas('friends', function ($query) {
+            $query->where('email', 'abigailotwell@gmail.com');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+        $this->assertTrue($results->first()->relationLoaded('friends'));
+        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
+    }
+
     public function testHasOnNestedSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -851,6 +866,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+    }
+
+    public function testWithWhereHasOnNestedSelfReferencingBelongsToManyRelationship()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $friend->friends()->create(['email' => 'foo@gmail.com']);
+
+        $results = EloquentTestUser::withWhereHas('friends.friends', function ($query) {
+            $query->where('email', 'foo@gmail.com');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('taylorotwell@gmail.com', $results->first()->email);
+        $this->assertTrue($results->first()->relationLoaded('friends'));
+        $this->assertSame($results->first()->friends->pluck('email')->unique()->toArray(), ['abigailotwell@gmail.com']);
+        $this->assertSame($results->first()->friends->pluck('friends')->flatten()->pluck('email')->unique()->toArray(), ['foo@gmail.com']);
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationshipWithWherePivot()
@@ -909,6 +941,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Child Post', $results->first()->name);
     }
 
+    public function testWithWhereHasOnSelfReferencingBelongsToRelationship()
+    {
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+        $results = EloquentTestPost::withWhereHas('parentPost', function ($query) {
+            $query->where('name', 'Parent Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Child Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('parentPost'));
+        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+    }
+
     public function testHasOnNestedSelfReferencingBelongsToRelationship()
     {
         $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
@@ -935,6 +982,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame('Child Post', $results->first()->name);
     }
 
+    public function testWithWhereHasOnNestedSelfReferencingBelongsToRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::withWhereHas('parentPost.parentPost', function ($query) {
+            $query->where('name', 'Grandparent Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Child Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('parentPost'));
+        $this->assertSame($results->first()->parentPost->name, 'Parent Post');
+        $this->assertTrue($results->first()->parentPost->relationLoaded('parentPost'));
+        $this->assertSame($results->first()->parentPost->parentPost->name, 'Grandparent Post');
+    }
+
     public function testHasOnSelfReferencingHasManyRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
@@ -957,6 +1022,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('Parent Post', $results->first()->name);
+    }
+
+    public function testWithWhereHasOnSelfReferencingHasManyRelationship()
+    {
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+
+        $results = EloquentTestPost::withWhereHas('childPosts', function ($query) {
+            $query->where('name', 'Child Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Parent Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('childPosts'));
+        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Child Post']);
     }
 
     public function testHasOnNestedSelfReferencingHasManyRelationship()
@@ -983,6 +1063,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame('Grandparent Post', $results->first()->name);
+    }
+
+    public function testWithWhereHasOnNestedSelfReferencingHasManyRelationship()
+    {
+        $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
+        $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+
+        $results = EloquentTestPost::withWhereHas('childPosts.childPosts', function ($query) {
+            $query->where('name', 'Child Post');
+        })->get();
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Grandparent Post', $results->first()->name);
+        $this->assertTrue($results->first()->relationLoaded('childPosts'));
+        $this->assertSame($results->first()->childPosts->pluck('name')->unique()->toArray(), ['Parent Post']);
+        $this->assertSame($results->first()->childPosts->pluck('childPosts')->flatten()->pluck('name')->unique()->toArray(), ['Child Post']);
     }
 
     public function testHasWithNonWhereBindings()

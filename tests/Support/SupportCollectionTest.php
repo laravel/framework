@@ -24,6 +24,10 @@ use stdClass;
 use Symfony\Component\VarDumper\VarDumper;
 use UnexpectedValueException;
 
+if (PHP_VERSION_ID >= 80100) {
+    include_once 'Enums.php';
+}
+
 class SupportCollectionTest extends TestCase
 {
     /**
@@ -1048,6 +1052,17 @@ class SupportCollectionTest extends TestCase
             [['v' => 1], ['v' => 2]],
             $c->where('v')->values()->all()
         );
+
+        $c = new $collection([
+            ['v' => 1, 'g' => 3],
+            ['v' => 2, 'g' => 2],
+            ['v' => 2, 'g' => 3],
+            ['v' => 2, 'g' => null],
+        ]);
+        $this->assertEquals([['v' => 2, 'g' => 3]], $c->where('v', 2)->where('g', 3)->values()->all());
+        $this->assertEquals([['v' => 2, 'g' => 3]], $c->where('v', 2)->where('g', '>', 2)->values()->all());
+        $this->assertEquals([], $c->where('v', 2)->where('g', 4)->values()->all());
+        $this->assertEquals([['v' => 2, 'g' => null]], $c->where('v', 2)->whereNull('g')->values()->all());
     }
 
     /**
@@ -1081,6 +1096,8 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
         $this->assertEquals([['v' => 1], ['v' => 3], ['v' => '3']], $c->whereIn('v', [1, 3])->values()->all());
+        $this->assertEquals([], $c->whereIn('v', [2])->whereIn('v', [1, 3])->values()->all());
+        $this->assertEquals([['v' => 1]], $c->whereIn('v', [1])->whereIn('v', [1, 3])->values()->all());
     }
 
     /**
@@ -1099,6 +1116,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
         $this->assertEquals([['v' => 2], ['v' => 4]], $c->whereNotIn('v', [1, 3])->values()->all());
+        $this->assertEquals([['v' => 4]], $c->whereNotIn('v', [2])->whereNotIn('v', [1, 3])->values()->all());
     }
 
     /**
@@ -4344,6 +4362,26 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection(new ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     * @requires PHP >= 8.1
+     */
+    public function testCollectionFromEnum($collection)
+    {
+        $data = new $collection(TestEnum::A);
+        $this->assertEquals([TestEnum::A], $data->toArray());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     * @requires PHP >= 8.1
+     */
+    public function testCollectionFromBackedEnum($collection)
+    {
+        $data = new $collection(TestBackedEnum::A);
+        $this->assertEquals([TestBackedEnum::A], $data->toArray());
     }
 
     /**

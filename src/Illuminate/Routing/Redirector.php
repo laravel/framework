@@ -40,6 +40,8 @@ class Redirector
      *
      * @param  int  $status
      * @return \Illuminate\Http\RedirectResponse
+     *
+     * @deprecated Will be removed in a future Laravel version.
      */
     public function home($status = 302)
     {
@@ -98,7 +100,7 @@ class Redirector
     /**
      * Create a new redirect response to the previously intended location.
      *
-     * @param  string  $default
+     * @param  mixed  $default
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure

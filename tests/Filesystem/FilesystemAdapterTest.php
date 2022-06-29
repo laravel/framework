@@ -14,6 +14,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToWriteFile;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -57,6 +58,44 @@ class FilesystemAdapterTest extends TestCase
         $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertSame('Hello World', $content);
         $this->assertSame('inline; filename=file.txt', $response->headers->get('content-disposition'));
+    }
+
+    public function testMimeTypeIsNotCalledAlreadyProvidedToResponse()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $files->shouldReceive('mimeType')->never();
+
+        $files->response('file.txt', null, [
+            'Content-Type' => 'text/x-custom',
+        ]);
+    }
+
+    public function testSizeIsNotCalledAlreadyProvidedToResponse()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])->makePartial();
+        $files->shouldReceive('size')->never();
+
+        $files->response('file.txt', null, [
+            'Content-Length' => 11,
+        ]);
+    }
+
+    public function testFallbackNameCalledAlreadyProvidedToResponse()
+    {
+        $this->filesystem->write('file.txt', 'Hello World');
+
+        $files = m::mock(FilesystemAdapter::class, [$this->filesystem, $this->adapter])
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+        $files->shouldReceive('fallbackName')->never();
+
+        $files->response('file.txt', null, [
+            'Content-Disposition' => 'attachment',
+        ]);
     }
 
     public function testDownload()
@@ -143,6 +182,13 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->get('file.txt'));
+    }
+
+    public function testMimeTypeNotDetected()
+    {
+        $this->filesystem->write('unknown.mime-type', '');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $this->assertFalse($filesystemAdapter->mimeType('unknown.mime-type'));
     }
 
     public function testPut()
@@ -442,6 +488,23 @@ class FilesystemAdapterTest extends TestCase
             return;
         } finally {
             chmod(__DIR__.'/tmp/foo.txt', 0600);
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    public function testThrowExceptionsForMimeType()
+    {
+        $this->filesystem->write('unknown.mime-type', '');
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
+
+        try {
+            $adapter->mimeType('unknown.mime-type');
+        } catch (UnableToRetrieveMetadata $e) {
+            $this->assertTrue(true);
+
+            return;
         }
 
         $this->fail('Exception was not thrown.');

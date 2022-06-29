@@ -281,6 +281,45 @@ class HttpRequestTest extends TestCase
         $this->assertSame('Laravel', $request->userAgent());
     }
 
+    public function testHostMethod()
+    {
+        $request = Request::create('http://example.com');
+        $this->assertSame('example.com', $request->host());
+
+        $request = Request::create('https://example.com');
+        $this->assertSame('example.com', $request->host());
+    }
+
+    public function testHttpHostMethod()
+    {
+        $request = Request::create('http://example.com');
+        $this->assertSame('example.com', $request->httpHost());
+
+        $request = Request::create('https://example.com');
+        $this->assertSame('example.com', $request->httpHost());
+
+        $request = Request::create('http://example.com:8080');
+        $this->assertSame('example.com:8080', $request->httpHost());
+
+        $request = Request::create('https://example.com:8080');
+        $this->assertSame('example.com:8080', $request->httpHost());
+    }
+
+    public function testSchemeAndHttpHostMethod()
+    {
+        $request = Request::create('http://example.com');
+        $this->assertSame('http://example.com', $request->schemeAndHttpHost());
+
+        $request = Request::create('https://example.com');
+        $this->assertSame('https://example.com', $request->schemeAndHttpHost());
+
+        $request = Request::create('http://example.com:8080');
+        $this->assertSame('http://example.com:8080', $request->schemeAndHttpHost());
+
+        $request = Request::create('https://example.com:8080');
+        $this->assertSame('https://example.com:8080', $request->schemeAndHttpHost());
+    }
+
     public function testHasMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
@@ -614,6 +653,17 @@ class HttpRequestTest extends TestCase
 
         $this->assertTrue(isset($request['id']));
         $this->assertSame('foo', $request['id']);
+    }
+
+    public function testArrayAccessWithoutRouteResolver()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+
+        $this->assertFalse(isset($request['non-existent']));
+        $this->assertNull($request['non-existent']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertSame('Taylor', $request['name']);
     }
 
     public function testAllMethod()

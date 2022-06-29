@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Closure;
+use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -112,6 +113,10 @@ class ValidationRuleParser
     {
         if ($rule instanceof Closure) {
             $rule = new ClosureValidationRule($rule);
+        }
+
+        if ($rule instanceof InvokableRule) {
+            $rule = InvokableValidationRule::make($rule);
         }
 
         if (! is_object($rule) ||

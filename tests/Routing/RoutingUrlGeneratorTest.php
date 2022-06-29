@@ -369,8 +369,46 @@ class RoutingUrlGeneratorTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+        $this->assertSame('/foo/test-slug', $url->route('routable', $model, false));
         $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
+        $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+    }
+
+    public function testRoutableInterfaceRoutingWithUrlDefaults()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->defaults(['locale' => 'baz']);
+        $route = new Route(['GET'], '{locale}/foo/{bar:slug}', ['as' => 'routable']);
+        $routes->add($route);
+
+        $model = new RoutableInterfaceStub;
+        $model->key = 'routable';
+
+        $this->assertSame('/baz/foo/test-slug', $url->route('routable', $model, false));
+        $this->assertSame('/baz/foo/test-slug', $url->route('routable', [$model], false));
+        $this->assertSame('/baz/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+    }
+
+    public function testRoutableInterfaceRoutingAsQueryString()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $route = new Route(['GET'], 'foo', ['as' => 'query-string']);
+        $routes->add($route);
+
+        $model = new RoutableInterfaceStub;
+        $model->key = 'routable';
+
+        $this->assertSame('/foo?routable', $url->route('query-string', $model, false));
+        $this->assertSame('/foo?routable', $url->route('query-string', [$model], false));
+        $this->assertSame('/foo?foo=routable', $url->route('query-string', ['foo' => $model], false));
     }
 
     public function testRoutableInterfaceRoutingWithSeparateBindingFieldOnlyForSecondParameter()

@@ -3,11 +3,32 @@
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Mix;
+use Illuminate\Foundation\Vite;
 use Orchestra\Testbench\TestCase;
 use stdClass;
 
 class InteractsWithContainerTest extends TestCase
 {
+    public function testWithoutViteBindsEmptyHandlerAndReturnsInstance()
+    {
+        $instance = $this->withoutVite();
+
+        $this->assertSame('', app(Vite::class)(['resources/js/app.js']));
+        $this->assertSame($this, $instance);
+    }
+
+    public function testWithViteRestoresOriginalHandlerAndReturnsInstance()
+    {
+        $handler = new stdClass;
+        $this->app->instance(Vite::class, $handler);
+
+        $this->withoutVite();
+        $instance = $this->withVite();
+
+        $this->assertSame($handler, resolve(Vite::class));
+        $this->assertSame($this, $instance);
+    }
+
     public function testWithoutMixBindsEmptyHandlerAndReturnsInstance()
     {
         $instance = $this->withoutMix();

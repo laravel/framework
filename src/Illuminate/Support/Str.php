@@ -2,7 +2,9 @@
 
 namespace Illuminate\Support;
 
+use Closure;
 use Illuminate\Support\Traits\Macroable;
+use JsonException;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
@@ -38,9 +40,16 @@ class Str
     /**
      * The callback that should be used to generate UUIDs.
      *
-     * @var callable
+     * @var callable|null
      */
     protected static $uuidFactory;
+
+    /**
+     * The callback that should be used to generate random strings.
+     *
+     * @var callable|null
+     */
+    protected static $randomStringFactory;
 
     /**
      * Get a new stringable object from the given string.
@@ -371,6 +380,27 @@ class Str
     }
 
     /**
+     * Determine if a given string is valid JSON.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isJson($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        try {
+            json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if a given string is a valid UUID.
      *
      * @param  string  $value
@@ -632,17 +662,74 @@ class Str
      */
     public static function random($length = 16)
     {
-        $string = '';
+        return (static::$randomStringFactory ?? function ($length) {
+            $string = '';
 
-        while (($len = strlen($string)) < $length) {
-            $size = $length - $len;
+            while (($len = strlen($string)) < $length) {
+                $size = $length - $len;
 
-            $bytes = random_bytes($size);
+                $bytes = random_bytes($size);
 
-            $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
-        }
+                $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+            }
 
-        return $string;
+            return $string;
+        })($length);
+    }
+
+    /**
+     * Set the callable that will be used to generate random strings.
+     *
+     * @param  callable|null  $factory
+     * @return void
+     */
+    public static function createRandomStringsUsing(callable $factory = null)
+    {
+        static::$randomStringFactory = $factory;
+    }
+
+    /**
+     * Set the sequence that will be used to generate random strings.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createRandomStringsUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function ($length) use (&$next) {
+            $factoryCache = static::$randomStringFactory;
+
+            static::$randomStringFactory = null;
+
+            $randomString = static::random($length);
+
+            static::$randomStringFactory = $factoryCache;
+
+            $next++;
+
+            return $randomString;
+        };
+
+        static::createRandomStringsUsing(function ($length) use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing($length);
+        });
+    }
+
+    /**
+     * Indicate that random strings should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createRandomStringsNormally()
+    {
+        static::$randomStringFactory = null;
     }
 
     /**
@@ -1088,6 +1175,61 @@ class Str
     public static function createUuidsUsing(callable $factory = null)
     {
         static::$uuidFactory = $factory;
+    }
+
+    /**
+     * Set the sequence that will be used to generate UUIDs.
+     *
+     * @param  array  $sequence
+     * @param  callable|null  $whenMissing
+     * @return void
+     */
+    public static function createUuidsUsingSequence(array $sequence, $whenMissing = null)
+    {
+        $next = 0;
+
+        $whenMissing ??= function () use (&$next) {
+            $factoryCache = static::$uuidFactory;
+
+            static::$uuidFactory = null;
+
+            $uuid = static::uuid();
+
+            static::$uuidFactory = $factoryCache;
+
+            $next++;
+
+            return $uuid;
+        };
+
+        static::createUuidsUsing(function () use (&$next, $sequence, $whenMissing) {
+            if (array_key_exists($next, $sequence)) {
+                return $sequence[$next++];
+            }
+
+            return $whenMissing();
+        });
+    }
+
+    /**
+     * Always return the same UUID when generating new UUIDs.
+     *
+     * @param  \Closure|null  $callback
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function freezeUuids(Closure $callback = null)
+    {
+        $uuid = Str::uuid();
+
+        Str::createUuidsUsing(fn () => $uuid);
+
+        if ($callback !== null) {
+            $callback($uuid);
+
+            Str::createUuidsNormally();
+        }
+
+        return $uuid;
     }
 
     /**

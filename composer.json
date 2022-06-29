@@ -24,7 +24,7 @@
         "fruitcake/php-cors": "^1.2",
         "laravel/serializable-closure": "^1.0",
         "league/commonmark": "^2.2",
-        "league/flysystem": "^3.0",
+        "league/flysystem": "^3.0.16",
         "monolog/monolog": "^2.0",
         "nesbot/carbon": "^2.53.1",
         "psr/container": "^1.1.1|^2.0.1",
@@ -92,7 +92,7 @@
         "pda/pheanstalk": "^4.0",
         "phpstan/phpstan": "^1.4.7",
         "phpunit/phpunit": "^9.5.8",
-        "predis/predis": "^1.1.9",
+        "predis/predis": "^1.1.9|^2.0",
         "symfony/cache": "^6.0"
     },
     "provide": {
@@ -154,7 +154,7 @@
         "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
         "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8).",
-        "predis/predis": "Required to use the predis connector (^1.1.9).",
+        "predis/predis": "Required to use the predis connector (^1.1.9|^2.0).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
         "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0).",
         "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",

@@ -56,7 +56,7 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Register the routes for handling broadcast authentication and sockets.
+     * Register the routes for handling broadcast channel authentication and sockets.
      *
      * @param  array|null  $attributes
      * @return void
@@ -75,6 +75,41 @@ class BroadcastManager implements FactoryContract
                 '\\'.BroadcastController::class.'@authenticate'
             )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
         });
+    }
+
+    /**
+     * Register the routes for handling broadcast user authentication.
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function userRoutes(array $attributes = null)
+    {
+        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+            return;
+        }
+
+        $attributes = $attributes ?: ['middleware' => ['web']];
+
+        $this->app['router']->group($attributes, function ($router) {
+            $router->match(
+                ['get', 'post'], '/broadcasting/user-auth',
+                '\\'.BroadcastController::class.'@authenticateUser'
+            )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+        });
+    }
+
+    /**
+     * Register the routes for handling broadcast authentication and sockets.
+     *
+     * Alias of "routes" method.
+     *
+     * @param  array|null  $attributes
+     * @return void
+     */
+    public function channelRoutes(array $attributes = null)
+    {
+        return $this->routes($attributes);
     }
 
     /**

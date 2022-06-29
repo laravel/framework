@@ -11,6 +11,8 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -1061,6 +1063,10 @@ trait HasAttributes
             ? $this->castAttributeAsEncryptedString($key, $value)
             : $value;
 
+        if ($this->isClassCastable($key)) {
+            unset($this->classCastCache[$key]);
+        }
+
         return $this;
     }
 
@@ -1956,6 +1962,8 @@ trait HasAttributes
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
+        } elseif ($this->isClassCastable($key) && $original !== null && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
+            return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
         }
 
         return is_numeric($attribute) && is_numeric($original)
