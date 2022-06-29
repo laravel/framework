@@ -249,8 +249,9 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->uniqueIgnoreTrashed('foo', 'deleted_at', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('create unique index "bar" on "users" ("foo") where "deleted_at" is null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table "users" add column "deleted_at_index" boolean null generated always as (CASE WHEN deleted_at IS NULL THEN TRUE END) stored', $statements[0]);
+        $this->assertSame('alter table "users" add constraint "bar" unique ("foo", "deleted_at_index")', $statements[1]);
     }
 
     public function testAddingIndex()

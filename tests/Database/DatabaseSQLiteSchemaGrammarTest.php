@@ -216,11 +216,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingUniqueIgnoreTrashedKey()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->string('foo');
+        $blueprint->softDeletes();
         $blueprint->uniqueIgnoreTrashed('foo', 'deleted_at', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertSame('create unique index "bar" on "users" ("foo") where "deleted_at" is null', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame('create table "users" ("foo" varchar not null, "deleted_at" datetime, "deleted_at_index" tinyint(1) as (CASE WHEN deleted_at IS NULL THEN TRUE END) stored)', $statements[0]);
+        $this->assertSame('create unique index "bar" on "users" ("foo", "deleted_at_index")', $statements[1]);
     }
 
     public function testAddingIndex()

@@ -348,9 +348,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->uniqueIgnoreTrashed('foo', 'deleted_at', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        // v8.0.13+
-        $this->assertSame('create unique index `bar` on `users` (`foo`, (CASE WHEN `deleted_at` IS NULL THEN 0 ELSE `deleted_at` END))', $statements[0]);
+        $this->assertCount(2, $statements);
+        $this->assertSame('alter table `users` add `deleted_at_index` tinyint(1) as (CASE WHEN deleted_at IS NULL THEN TRUE END) stored', $statements[0]);
+        $this->assertSame('alter table `users` add unique `bar`(`foo`, `deleted_at_index`)', $statements[1]);
     }
 
     public function testAddingIndex()
@@ -663,6 +663,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
+        dump($statements);
         $this->assertSame('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
         $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
     }

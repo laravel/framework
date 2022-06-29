@@ -208,7 +208,7 @@ class Blueprint
     protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
-            foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
+            foreach (['primary', 'unique', 'uniqueIgnoreTrashed', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
                 // If the index has been specified on the given column, but is simply equal
                 // to "true" (boolean), no name has been specified for this index so the
                 // index method can be called without a name and it will generate one.
@@ -567,11 +567,18 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string|null  $name
      * @param  string|null  $algorithm
-     * @return \Illuminate\Database\Schema\IndexDefinition
+     * @return void
      */
     public function uniqueIgnoreTrashed($columns, $deletedAtColumn = 'deleted_at', $name = null, $algorithm = null)
     {
-        return $this->indexIgnoreNullCommand('unique', $columns, $deletedAtColumn, $name, $algorithm);
+        $this->boolean("{$deletedAtColumn}_index")
+            ->storedAs('CASE WHEN deleted_at IS NULL THEN TRUE END')
+            ->nullable();
+
+        $columns = (array) $columns;
+        $columns[] = "{$deletedAtColumn}_index";
+
+        $this->unique($columns, $name, $algorithm);
     }
 
     /**
