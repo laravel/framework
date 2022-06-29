@@ -1,6 +1,14 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.17...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.18...8.x)
+
+
+## [v8.83.18 (2022-06-28)](https://github.com/laravel/framework/compare/v8.83.17...v8.83.18)
+
+### Fixed
+- Fixed bug on forceCreate on a MorphMay relationship not including morph type ([#42929](https://github.com/laravel/framework/pull/42929))
+- Handle cursor paginator when no items are found ([#42963](https://github.com/laravel/framework/pull/42963))
+- Fixed Str::Mask() for repeating chars ([#42956](https://github.com/laravel/framework/pull/42956))
 
 
 ## [v8.83.17 (2022-06-21)](https://github.com/laravel/framework/compare/v8.83.16...v8.83.17)
