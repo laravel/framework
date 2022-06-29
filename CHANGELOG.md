@@ -14,7 +14,6 @@
 - Fixed bug on forceCreate on a MorphMay relationship not including morph type ([#42929](https://github.com/laravel/framework/pull/42929))
 - Fix default parameter bug in routes ([#42942](https://github.com/laravel/framework/pull/42942))
 - Handle cursor paginator when no items are found ([#42963](https://github.com/laravel/framework/pull/42963))
-- Fixed Str::Mask() for repeating chars ([#42956](https://github.com/laravel/framework/pull/42956))
 - Fix undefined constant error when use slot name as key of object ([#42943](https://github.com/laravel/framework/pull/42943))
 - Fix BC break for Log feature tests ([#42987](https://github.com/laravel/framework/pull/42987))
 
