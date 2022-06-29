@@ -92,8 +92,6 @@ class VendorPublishCommand extends Command
         foreach ($this->tags ?: [null] as $tag) {
             $this->publishTag($tag);
         }
-
-        $this->info('Publishing complete.');
     }
 
     /**
@@ -178,16 +176,23 @@ class VendorPublishCommand extends Command
 
         $pathsToPublish = $this->pathsToPublish($tag);
 
-        foreach ($pathsToPublish as $from => $to) {
-            $this->publishItem($from, $to);
-
-            $published = true;
+        if ($publishing = count($pathsToPublish) > 0) {
+            $this->info(sprintf(
+                'Publishing %sassets',
+                $tag ? "[$tag] " : '',
+            ));
         }
 
-        if ($published === false) {
-            $this->comment('No publishable resources for tag ['.$tag.'].');
+        foreach ($pathsToPublish as $from => $to) {
+            $this->publishItem($from, $to);
+        }
+
+        if ($publishing === false) {
+            $this->info('No publishable resources for tag ['.$tag.'].');
         } else {
             $this->laravel['events']->dispatch(new VendorTagPublished($tag, $pathsToPublish));
+
+            $this->newLine();
         }
     }
 
@@ -236,7 +241,12 @@ class VendorPublishCommand extends Command
 
             $this->files->copy($from, $to);
 
-            $this->status($from, $to, 'File');
+            $this->status($from, $to, 'file');
+        } else {
+            $this->task(sprintf(
+                'File [%s] already exist',
+                str_replace(base_path() . '/', '', realpath($to)),
+            ));
         }
     }
 
@@ -256,7 +266,7 @@ class VendorPublishCommand extends Command
             'to' => new Flysystem(new LocalAdapter($to, $visibility)),
         ]));
 
-        $this->status($from, $to, 'Directory');
+        $this->status($from, $to, 'directory');
     }
 
     /**
@@ -299,10 +309,15 @@ class VendorPublishCommand extends Command
      */
     protected function status($from, $to, $type)
     {
-        $from = str_replace(base_path(), '', realpath($from));
+        $from = str_replace(base_path(). '/', '', realpath($from));
 
-        $to = str_replace(base_path(), '', realpath($to));
+        $to = str_replace(base_path(). '/', '', realpath($to));
 
-        $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
+        $this->task(sprintf(
+            'Copying %s [%s] to [%s]',
+            $type,
+            $from,
+            $to,
+        ), fn () => true);
     }
 }

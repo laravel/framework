@@ -59,15 +59,17 @@ class DumpCommand extends Command
 
         $dispatcher->dispatch(new SchemaDumped($connection, $path));
 
-        $this->info('Database schema dumped successfully.');
+        $info = 'Database schema dumped';
 
         if ($this->option('prune')) {
             (new Filesystem)->deleteDirectory(
                 database_path('migrations'), $preserve = false
             );
 
-            $this->info('Migrations pruned successfully.');
+            $info .= ' and pruned';
         }
+
+        $this->info($info . ' successfully.');
     }
 
     /**

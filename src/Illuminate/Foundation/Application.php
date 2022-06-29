@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Illuminate\Console\ConsoleServiceProvider;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
@@ -218,6 +219,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function registerBaseServiceProviders()
     {
+        $this->register(new ConsoleServiceProvider($this));
         $this->register(new EventServiceProvider($this));
         $this->register(new LogServiceProvider($this));
         $this->register(new RoutingServiceProvider($this));

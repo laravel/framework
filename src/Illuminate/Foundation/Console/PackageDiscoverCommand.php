@@ -44,10 +44,9 @@ class PackageDiscoverCommand extends Command
     {
         $manifest->build();
 
-        foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("Discovered Package: <info>{$package}</info>");
-        }
+        $tasks = collect($manifest->manifest)
+            ->map(fn () => fn () => true);
 
-        $this->info('Package manifest generated successfully.');
+        $this->tasks('Discovering packages', $tasks);
     }
 }

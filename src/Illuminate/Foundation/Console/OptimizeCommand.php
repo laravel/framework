@@ -40,9 +40,9 @@ class OptimizeCommand extends Command
      */
     public function handle()
     {
-        $this->call('config:cache');
-        $this->call('route:cache');
-
-        $this->info('Files cached successfully.');
+        $this->tasks('Caching the framework bootstrap files', [
+            'config' => fn () => $this->callSilent('config:cache') == 0,
+            'routes' => fn () => $this->callSilent('route:cache') == 0,
+        ]);
     }
 }

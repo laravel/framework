@@ -40,13 +40,13 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
-        $this->call('event:clear');
-        $this->call('view:clear');
-        $this->call('cache:clear');
-        $this->call('route:clear');
-        $this->call('config:clear');
-        $this->call('clear-compiled');
-
-        $this->info('Caches cleared successfully.');
+        $this->tasks('Removing cached bootstrap files', [
+            'events' => fn () => $this->callSilent('event:clear'),
+            'views' => fn () => $this->callSilent('view:clear'),
+            'cache' => fn () => $this->callSilent('cache:clear'),
+            'route' => fn () => $this->callSilent('route:clear'),
+            'config' => fn () => $this->callSilent('config:clear'),
+            'compiled' => fn () => $this->callSilent('clear-compiled'),
+        ]);
     }
 }

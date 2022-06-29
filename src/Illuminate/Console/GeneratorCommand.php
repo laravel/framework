@@ -174,11 +174,15 @@ abstract class GeneratorCommand extends Command
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        $this->info($this->type.' created successfully.');
+        $info = $this->type;
 
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            $this->handleTestCreation($path);
+            if ($this->handleTestCreation($path)) {
+                $info .= ' and test';
+            }
         }
+
+        $this->info($info.' created successfully.');
     }
 
     /**

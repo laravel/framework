@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use function Termwind\{terminal, render, renderUsing};
 
 trait InteractsWithIO
 {
@@ -194,6 +195,61 @@ trait InteractsWithIO
     }
 
     /**
+     * Perform the given tasks.
+     *
+     * @param  string  $title
+     * @param  iterable<string, callable(): bool>  $tasks
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function tasks($title, $tasks, $verbosity = null)
+    {
+        $this->info($title, $verbosity);
+
+        collect($tasks)->each(
+            fn ($task, $description) => $this->task($description, $task, $verbosity),
+        );
+
+        $this->newLine();
+    }
+
+    /**
+     * Perform the given task.
+     *
+     * @param  string  $description
+     * @param  (callable(): bool)|null  $task
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function task($description, $task = null, $verbosity = null)
+    {
+        if (!$this->output->isDecorated()) {
+            $this->output->write($description);
+
+            if ($task) {
+                $this->output->writeln(': ' . ($task() ? 'DONE' : 'FAIL'));
+            }
+
+            return;
+        }
+
+        $descriptionWidth = mb_strlen($description);
+        $description = $this->highlightDynamicContent($description);
+        $this->output->write("  $description ", false, $this->parseVerbosity($verbosity));
+        $dots = max(terminal()->width() - $descriptionWidth - 10, 0);
+        $this->output->write(str_repeat('<fg=gray>.</>', $dots), false, $this->parseVerbosity($verbosity));
+
+        if ($task) {
+            $this->output->writeln(
+                $task() !== false ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>',
+                $this->parseVerbosity($verbosity),
+            );
+        } else {
+            $this->output->writeln(str_repeat('<fg=gray>.</>', 5));
+        }
+    }
+
+    /**
      * Give the user a single choice from an array of answers.
      *
      * @param  string  $question
@@ -292,9 +348,15 @@ trait InteractsWithIO
      */
     public function line($string, $style = null, $verbosity = null)
     {
-        $styled = $style ? "<$style>$string</$style>" : $string;
+        if ($this->output->isDecorated() == false || is_null($style)) {
+            return $this->output->writeln($string, $this->parseVerbosity($verbosity));
+        }
 
-        $this->output->writeln($styled, $this->parseVerbosity($verbosity));
+        renderUsing($this->output);
+
+        render(view('illuminate.console::lines.'. $style, [
+            'content' => $this->highlightDynamicContent($string),
+        ]), $this->parseVerbosity($verbosity));
     }
 
     /**
@@ -306,7 +368,12 @@ trait InteractsWithIO
      */
     public function comment($string, $verbosity = null)
     {
-        $this->line($string, 'comment', $verbosity);
+        $string = $this->highlightDynamicContent($string);
+
+        $this->output->writeln(
+            "<comment>$string</comment>",
+            $this->parseVerbosity($verbosity)
+        );
     }
 
     /**
@@ -342,12 +409,6 @@ trait InteractsWithIO
      */
     public function warn($string, $verbosity = null)
     {
-        if (! $this->output->getFormatter()->hasStyle('warning')) {
-            $style = new OutputFormatterStyle('yellow');
-
-            $this->output->getFormatter()->setStyle('warning', $style);
-        }
-
         $this->line($string, 'warning', $verbosity);
     }
 
@@ -359,13 +420,9 @@ trait InteractsWithIO
      */
     public function alert($string)
     {
-        $length = Str::length(strip_tags($string)) + 12;
-
-        $this->comment(str_repeat('*', $length));
-        $this->comment('*     '.$string.'     *');
-        $this->comment(str_repeat('*', $length));
-
-        $this->newLine();
+        render(view('illuminate.console::alert', [
+            'content' => $string,
+        ]));
     }
 
     /**
@@ -429,6 +486,17 @@ trait InteractsWithIO
         }
 
         return $level;
+    }
+
+    /**
+     * Highligths dynamic content within the given string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    protected function highlightDynamicContent($string)
+    {
+        return preg_replace('/\[([^\]]+)\]/', "<options=bold>[$1]</>", $string);
     }
 
     /**

@@ -53,6 +53,6 @@ class PruneFailedJobsCommand extends Command
             return 1;
         }
 
-        $this->info("{$count} entries deleted!");
+        $this->info("{$count} entries deleted.");
     }
 }
