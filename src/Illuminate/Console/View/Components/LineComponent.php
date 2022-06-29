@@ -3,7 +3,6 @@
 namespace Illuminate\Console\View\Components;
 
 use Illuminate\View\Component;
-use function Termwind\{render, renderUsing};
 
 class LineComponent extends Component
 {

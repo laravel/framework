@@ -245,7 +245,7 @@ class VendorPublishCommand extends Command
         } else {
             $this->task(sprintf(
                 'File [%s] already exist',
-                str_replace(base_path() . '/', '', realpath($to)),
+                str_replace(base_path().'/', '', realpath($to)),
             ));
         }
     }
@@ -309,9 +309,9 @@ class VendorPublishCommand extends Command
      */
     protected function status($from, $to, $type)
     {
-        $from = str_replace(base_path(). '/', '', realpath($from));
+        $from = str_replace(base_path().'/', '', realpath($from));
 
-        $to = str_replace(base_path(). '/', '', realpath($to));
+        $to = str_replace(base_path().'/', '', realpath($to));
 
         $this->task(sprintf(
             'Copying %s [%s] to [%s]',

@@ -5,14 +5,14 @@ namespace Illuminate\Console\Concerns;
 use Closure;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Str;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
-use function Termwind\{terminal, render, renderUsing};
+use function Termwind\render;
+use function Termwind\renderUsing;
+use function Termwind\terminal;
 
 trait InteractsWithIO
 {
@@ -223,11 +223,11 @@ trait InteractsWithIO
      */
     public function task($description, $task = null, $verbosity = null)
     {
-        if (!$this->output->isDecorated()) {
+        if (! $this->output->isDecorated()) {
             $this->output->write($description);
 
             if ($task) {
-                $this->output->writeln(': ' . ($task() ? 'DONE' : 'FAIL'));
+                $this->output->writeln(': '.($task() ? 'DONE' : 'FAIL'));
             }
 
             return;
@@ -354,7 +354,7 @@ trait InteractsWithIO
 
         renderUsing($this->output);
 
-        render(view('illuminate.console::lines.'. $style, [
+        render(view('illuminate.console::lines.'.$style, [
             'content' => $this->highlightDynamicContent($string),
         ]), $this->parseVerbosity($verbosity));
     }
@@ -496,7 +496,7 @@ trait InteractsWithIO
      */
     protected function highlightDynamicContent($string)
     {
-        return preg_replace('/\[([^\]]+)\]/', "<options=bold>[$1]</>", $string);
+        return preg_replace('/\[([^\]]+)\]/', '<options=bold>[$1]</>', $string);
     }
 
     /**

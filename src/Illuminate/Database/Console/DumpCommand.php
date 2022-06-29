@@ -69,7 +69,7 @@ class DumpCommand extends Command
             $info .= ' and pruned';
         }
 
-        $this->info($info . ' successfully.');
+        $this->info($info.' successfully.');
     }
 
     /**
