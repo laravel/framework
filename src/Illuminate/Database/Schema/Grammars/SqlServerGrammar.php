@@ -148,13 +148,12 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUniqueIgnoreNull(Blueprint $blueprint, Fluent $command)
     {
-        $columns = $command->columns;
-        $columns[] = $command->nullColumn;
-
-        return sprintf('create unique index %s on %s (%s)',
+        return sprintf('create unique index %s on %s%s (%s) where %s is null',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
-            $this->columnize($columns)
+            $command->algorithm ? ' using '.$command->algorithm : '',
+            $this->columnize($command->columns),
+            $this->wrap($command->nullColumn),
         );
     }
 
