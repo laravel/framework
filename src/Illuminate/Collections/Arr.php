@@ -822,4 +822,42 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * it reverses items in a given array
+     *
+     * @param array $array
+     * @param integer $offset
+     * @param integer $limit
+     * @return array
+     */
+    public static function reverseEach(array $array, int $offset = 0, int $limit = 1): array
+    {
+        $num = func_num_args();
+
+        if ($num === 1) {
+            return array_map(function ($item) {
+                return is_numeric($item) ? (float) strrev($item) : strrev($item);
+            }, $array);
+        }
+
+        $count = count($array);
+        if ($num === 2) {
+            for ($offset; $offset < $count; $offset++) {
+                $array[$offset] =  is_numeric($array[$offset]) ? (float) strrev($array[$offset]) :  strrev($array[$offset]);
+            }
+        }
+
+        if ($num === 3) {
+            if ($offset + $limit > $count) {
+                $limit = $count;
+            } else $limit += $offset;
+
+            for ($offset; $offset < $limit; $offset++) {
+                $array[$offset] = is_numeric($array[$offset]) ? (float) strrev($array[$offset]) :   strrev($array[$offset]);
+            }
+        }
+
+        return $array;
+    }
 }
