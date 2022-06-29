@@ -244,6 +244,33 @@ class JobChainingTest extends TestCase
 
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
     }
+
+    public function testChainJobsCanBeAppendedOnlyWhenConditionIsTrue()
+    {
+        JobChainingTestFirstJob::dispatch()->chainWhen(false, [
+            new JobChainingTestSecondJob
+        ])
+        ->chainWhen(true, [
+            new JobChainingTestThirdJob
+        ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertFalse(JobChainingTestSecondJob::$ran);
+        $this->assertTrue(JobChainingTestThirdJob::$ran);
+    }
+
+    public function testChainDefaultJobsCanBeAppendedOnlyWhenConditionIsFalse()
+    {
+        JobChainingTestFirstJob::dispatch()->chainWhen(false, [
+            new JobChainingTestSecondJob
+        ], [
+            new JobChainingTestThirdJob
+        ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertFalse(JobChainingTestSecondJob::$ran);
+        $this->assertTrue(JobChainingTestThirdJob::$ran);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue

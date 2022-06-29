@@ -138,6 +138,25 @@ class PendingDispatch
     }
 
     /**
+     * Set the jobs that should run if this job is successful and the condition is true.
+     *
+     * @param  bool  $condition
+     * @param  array  $chain
+     * @param  array|null  $defaultChain
+     * @return $this
+     */
+    public function chainWhen($condition, $chain, $defaultChain = null)
+    {
+        if($condition) {
+            $this->job->chain($chain);
+        } elseif ($defaultChain) {
+            $this->job->chain($defaultChain);
+        }
+
+        return $this;
+    }
+
+    /**
      * Indicate that the job should be dispatched after the response is sent to the browser.
      *
      * @return $this
