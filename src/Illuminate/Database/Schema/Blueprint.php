@@ -561,8 +561,7 @@ class Blueprint
     }
 
     /**
-     * Specify a unique index for the table. Ignore soft
-     * deleted models during the unique check.
+     * Specify a unique index for the table. Ignore $deletedAtColumn.
      *
      * @param  string|array  $columns
      * @param  string|null  $name
