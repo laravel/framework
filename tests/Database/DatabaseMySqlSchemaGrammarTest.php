@@ -663,7 +663,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
-        dump($statements);
         $this->assertSame('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
         $this->assertSame('alter table `users` auto_increment = 1000', $statements[1]);
     }
