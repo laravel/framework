@@ -161,24 +161,6 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Compile a unique index ignoring a null column command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return string
-     */
-    public function compileUniqueIgnoreNull(Blueprint $blueprint, Fluent $command)
-    {
-        return sprintf('create unique index %s on %s%s (%s) where %s is null',
-            $this->wrap($command->index),
-            $this->wrapTable($blueprint),
-            $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns),
-            $this->wrap($command->nullColumn),
-        );
-    }
-
-    /**
      * Compile a plain index key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
