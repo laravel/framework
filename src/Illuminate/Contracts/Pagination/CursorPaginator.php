@@ -30,6 +30,13 @@ interface CursorPaginator
     public function fragment($fragment = null);
 
     /**
+     * Add all current query string values to the paginator.
+     *
+     * @return $this
+     */
+    public function withQueryString();
+
+    /**
      * Get the URL for the previous page, or null.
      *
      * @return string|null
