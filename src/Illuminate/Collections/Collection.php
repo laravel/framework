@@ -1286,7 +1286,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         );
     }
 
-
     /**
      * Chunk the collection into chunks of the given size without preserve keys.
      *
