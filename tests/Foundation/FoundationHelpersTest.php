@@ -3,12 +3,13 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Auth\AuthServiceProvider;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
+use Illuminate\Session\SessionServiceProvider;
 use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -279,10 +280,14 @@ class FoundationHelpersTest extends TestCase
 
     public function testGate()
     {
+        config()->set('session.driver', 'array');
+        config()->set('auth.providers.users.model', User::class);
+        config()->set('auth.providers.users.driver', 'eloquent');
+        config()->set('auth.guards.web.driver', 'session');
+        config()->set('auth.defaults.guard', 'web');
+        app()->register(SessionServiceProvider::class);
+        app()->register(AuthServiceProvider::class);
+
         $this->assertInstanceOf(Gate::class, gate());
-
-        $this->assertIsBool(gate('foo'));
-
-        $this->assertInstanceOf(Response::class, gate('foo', true));
     }
 }
