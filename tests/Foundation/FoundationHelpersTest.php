@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
@@ -273,5 +275,14 @@ class FoundationHelpersTest extends TestCase
 
         // Should fallback to en_US
         $this->assertSame('Australian Capital Territory', fake()->state());
+    }
+
+    public function testGate()
+    {
+        $this->assertInstanceOf(Gate::class, gate());
+
+        $this->assertIsBool(gate('foo'));
+
+        $this->assertInstanceOf(Response::class, gate('foo', true));
     }
 }

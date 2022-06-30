@@ -953,3 +953,27 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('gate')) {
+    /**
+     * Get the gate and inspect the ability if any.
+     *
+     * @param  string|null  $ability
+     * @param bool|null $shouldReturnResponse
+     * @return \Illuminate\Contracts\Auth\Access\Gate|\Illuminate\Auth\Access\Response|bool
+     */
+    function gate($ability = null, $shouldReturnResponse = false)
+    {
+        if (is_null($ability)) {
+            return app(Gate::class);
+        }
+
+        $response = app(Gate::class)->inspect($ability);
+
+        if ($shouldReturnResponse) {
+            return $response;
+        }
+
+        return $response->allowed();
+    }
+}
