@@ -3,14 +3,12 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\View\Components\Detail;
-use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use function Termwind\renderUsing;
-use function Termwind\render;
 
 class QuestionHelper extends SymfonyQuestionHelper
 {

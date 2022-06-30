@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console\View\Components;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use function Termwind\render;
 use function Termwind\renderUsing;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class Detail
 {
