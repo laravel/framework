@@ -147,7 +147,7 @@ class PendingDispatch
      */
     public function chainWhen($condition, $chain, $defaultChain = null)
     {
-        if($condition) {
+        if ($condition) {
             $this->job->chain($chain);
         } elseif ($defaultChain) {
             $this->job->chain($defaultChain);

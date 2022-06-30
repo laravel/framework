@@ -248,10 +248,10 @@ class JobChainingTest extends TestCase
     public function testChainJobsCanBeAppendedOnlyWhenConditionIsTrue()
     {
         JobChainingTestFirstJob::dispatch()->chainWhen(false, [
-            new JobChainingTestSecondJob
+            new JobChainingTestSecondJob,
         ])
         ->chainWhen(true, [
-            new JobChainingTestThirdJob
+            new JobChainingTestThirdJob,
         ]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
@@ -262,9 +262,9 @@ class JobChainingTest extends TestCase
     public function testChainDefaultJobsCanBeAppendedOnlyWhenConditionIsFalse()
     {
         JobChainingTestFirstJob::dispatch()->chainWhen(false, [
-            new JobChainingTestSecondJob
+            new JobChainingTestSecondJob,
         ], [
-            new JobChainingTestThirdJob
+            new JobChainingTestThirdJob,
         ]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
