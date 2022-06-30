@@ -175,7 +175,7 @@ trait HasAttributes
     /**
      * Indicates whether models should be loaded without appended attributes.
      */
-    public static $withoutAppends = false;
+    public $withoutAppends = false;
 
     /**
      * Convert the model's attributes to an array.
