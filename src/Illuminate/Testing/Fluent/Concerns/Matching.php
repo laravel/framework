@@ -14,9 +14,10 @@ trait Matching
      *
      * @param  string  $key
      * @param  mixed|\Closure  $expected
+     * @param  bool  $strict
      * @return $this
      */
-    public function where(string $key, $expected): self
+    public function where(string $key, $expected, $strict = true): self
     {
         $this->has($key);
 
@@ -38,7 +39,9 @@ trait Matching
         $this->ensureSorted($expected);
         $this->ensureSorted($actual);
 
-        PHPUnit::assertSame(
+        $assertFn = $strict ? 'assertSame' : 'assertEquals';
+
+        PHPUnit::{$assertFn}(
             $expected,
             $actual,
             sprintf('Property [%s] does not match the expected value.', $this->dotPath($key))

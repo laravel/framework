@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Testing\Fluent;
 
 use Illuminate\Support\Collection;
+use Illuminate\Testing\AssertableJsonString;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Tests\Testing\Stubs\ArrayableStubObject;
 use PHPUnit\Framework\AssertionFailedError;
@@ -269,6 +270,38 @@ class AssertTest extends TestCase
         ]);
 
         $assert->where('bar', 'value');
+    }
+
+    public function testAssertWhereFailsWithFloatInStrictMode()
+    {
+        $doubleValue = (float) 1234.0;
+
+        $stringifiedData = json_encode([
+            'bar' => $doubleValue,
+        ]);
+
+        $assertableJsonString = new AssertableJsonString($stringifiedData);
+        $assert = AssertableJson::fromAssertableJsonString($assertableJsonString);
+
+        // Expect failure as 1234.0 will turn into an integer during JSON deserialization
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] does not match the expected value.');
+
+        $assert->where('bar', $doubleValue);
+    }
+
+    public function testAssertWhereMatchesWithFloatInNonStrictMode()
+    {
+        $doubleValue = (float) 1234.0;
+
+        $stringifiedData = json_encode([
+            'bar' => $doubleValue,
+        ]);
+
+        $assertableJsonString = new AssertableJsonString($stringifiedData);
+        $assert = AssertableJson::fromAssertableJsonString($assertableJsonString);
+
+        $assert->where('bar', $doubleValue, false);
     }
 
     public function testAssertWhereFailsWhenDoesNotMatchValue()
