@@ -173,6 +173,11 @@ trait HasAttributes
     public static $encrypter;
 
     /**
+     * Indicates whether models should be loaded without appended attributes. 
+     */
+    public static $withoutAppends = false;
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -328,6 +333,10 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
+        if (self::$withoutAppends) {
+            return [];
+        }
+
         if (! count($this->appends)) {
             return [];
         }
@@ -2043,6 +2052,19 @@ trait HasAttributes
     public function hasAppended($attribute)
     {
         return in_array($attribute, $this->appends);
+    }
+
+    /**
+     * Scope a query to load models without appended attributes.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithoutAppends($query)
+    {
+        self::$withoutAppends = true;
+
+        return $query;
     }
 
     /**
