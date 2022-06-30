@@ -23,10 +23,6 @@ class MySqlConnector extends Connector implements ConnectorInterface
         // connection's behavior, and some might be specified by the developers.
         $connection = $this->createConnection($dsn, $config, $options);
 
-        if (! empty($config['database'])) {
-            $connection->exec("use `{$config['database']}`;");
-        }
-
         $this->configureIsolationLevel($connection, $config);
 
         $this->configureEncoding($connection, $config);
@@ -72,9 +68,11 @@ class MySqlConnector extends Connector implements ConnectorInterface
             return $connection;
         }
 
-        $connection->prepare(
-            "set names '{$config['charset']}'".$this->getCollation($config)
-        )->execute();
+        $collation = $this->getCollation($config);
+
+        if ($collation) {
+            $connection->exec("set names '{$config['charset']}'" . $collation);
+        }
     }
 
     /**
@@ -112,9 +110,15 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function getDsn(array $config)
     {
-        return $this->hasSocket($config)
+        $dsn = $this->hasSocket($config)
                             ? $this->getSocketDsn($config)
                             : $this->getHostDsn($config);
+
+        if (isset($config['charset'])) {
+            $dsn .= ';charset=' . $config['charset'];
+        }
+
+        return $dsn;
     }
 
     /**
