@@ -29,7 +29,7 @@ trait ConfirmableTrait
             $confirmed = $this->confirm('Do you really wish to run this command?');
 
             if (! $confirmed) {
-                $this->warn('Command Canceled!');
+                $this->warn('Command canceled.');
 
                 return false;
             }
