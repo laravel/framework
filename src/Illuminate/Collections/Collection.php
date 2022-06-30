@@ -1290,7 +1290,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Chunk the collection into chunks of the given size without preserve keys.
      *
-     * @param int $size
+     * @param  int  $size
      * @return static<int, static>
      */
     public function chunkWithOutPreserveKeys($size)
@@ -1308,7 +1308,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         return new static($chunks);
     }
 
-    
     /**
      * Sort through each item with a callback.
      *
