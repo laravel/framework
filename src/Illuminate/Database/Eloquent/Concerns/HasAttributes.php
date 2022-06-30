@@ -333,7 +333,7 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
-        if (self::$withoutAppends) {
+        if ($this->withoutAppends) {
             return [];
         }
 
@@ -2062,7 +2062,7 @@ trait HasAttributes
      */
     public function scopeWithoutAppends($query)
     {
-        self::$withoutAppends = true;
+        $this->withoutAppends = true;
 
         return $query;
     }
