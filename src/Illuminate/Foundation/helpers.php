@@ -959,7 +959,7 @@ if (! function_exists('gate')) {
      * Get the gate and inspect the ability if any.
      *
      * @param  string|null  $ability
-     * @param bool|null $shouldReturnResponse
+     * @param  bool|null  $shouldReturnResponse
      * @return \Illuminate\Contracts\Auth\Access\Gate|\Illuminate\Auth\Access\Response|bool
      */
     function gate($ability = null, $shouldReturnResponse = false)
