@@ -2,12 +2,21 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Contracts\NewLineAware;
+use ReflectionClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class OutputStyle extends SymfonyStyle
+class OutputStyle extends SymfonyStyle implements NewLineAware
 {
+    /**
+     * If the last output wrote a new line.
+     *
+     * @var bool
+     */
+    protected $newLineWritten = false;
+
     /**
      * The output instance.
      *
@@ -27,6 +36,11 @@ class OutputStyle extends SymfonyStyle
         $this->output = $output;
 
         parent::__construct($input, $output);
+
+        with(new ReflectionClass($this))
+            ->getParentClass()
+            ->getProperty('questionHelper')
+            ->setValue($this, new QuestionHelper());
     }
 
     /**
@@ -77,5 +91,33 @@ class OutputStyle extends SymfonyStyle
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write(string|iterable $messages, bool $newline = false, int $options = 0)
+    {
+        $this->newLineWritten = $newline;
+
+        parent::write($messages, $newline, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function newLine(int $count = 1)
+    {
+        $this->newLineWritten = $count > 0;
+
+        parent::newLine($count);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function newLineWritten()
+    {
+        return $this->newLineWritten;
     }
 }

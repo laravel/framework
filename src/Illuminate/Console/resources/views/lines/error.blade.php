@@ -1,3 +1,3 @@
-<x-line :bgColor="'red'" :fgColor="'white'" :title="'error'">
+<x-line :newLine="$newLine" :bgColor="'red'" :fgColor="'white'" :title="'error'">
     {{ $content }}
 </x-line>

@@ -16,7 +16,7 @@ class ConsoleServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
-            Blade::component('line', Components\LineComponent::class);
+            Blade::component('line', Components\Line::class);
         }
     }
 

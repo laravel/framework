@@ -4,6 +4,7 @@ namespace Illuminate\Console\Concerns;
 
 use Closure;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -207,7 +208,9 @@ trait InteractsWithIO
         $this->info($title, $verbosity);
 
         collect($tasks)->each(
-            fn ($task, $description) => $this->task($description, $task, $verbosity),
+            fn ($task, $description) => Components\Task::renderUsing(
+                $this->output, $description, $task, $this->parseVerbosity($verbosity),
+            ),
         );
 
         $this->newLine();
@@ -223,30 +226,9 @@ trait InteractsWithIO
      */
     public function task($description, $task = null, $verbosity = null)
     {
-        if (! $this->output->isDecorated()) {
-            $this->output->write($description);
-
-            if ($task) {
-                $this->output->writeln(': '.($task() ? 'DONE' : 'FAIL'));
-            }
-
-            return;
-        }
-
-        $descriptionWidth = mb_strlen($description);
-        $description = $this->highlightDynamicContent($description);
-        $this->output->write("  $description ", false, $this->parseVerbosity($verbosity));
-        $dots = max(terminal()->width() - $descriptionWidth - 10, 0);
-        $this->output->write(str_repeat('<fg=gray>.</>', $dots), false, $this->parseVerbosity($verbosity));
-
-        if ($task) {
-            $this->output->writeln(
-                $task() !== false ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>',
-                $this->parseVerbosity($verbosity),
-            );
-        } else {
-            $this->output->writeln(str_repeat('<fg=gray>.</>', 5));
-        }
+        Components\Task::renderUsing(
+            $this->output, $description, $task, $this->parseVerbosity($verbosity),
+        );
     }
 
     /**
@@ -348,15 +330,7 @@ trait InteractsWithIO
      */
     public function line($string, $style = null, $verbosity = null)
     {
-        if ($this->output->isDecorated() == false || is_null($style)) {
-            return $this->output->writeln($string, $this->parseVerbosity($verbosity));
-        }
-
-        renderUsing($this->output);
-
-        render(view('illuminate.console::lines.'.$style, [
-            'content' => $this->highlightDynamicContent($string),
-        ]), $this->parseVerbosity($verbosity));
+        Components\Line::renderUsing($this->output, $string, $style, $this->parseVerbosity($verbosity));
     }
 
     /**
@@ -368,8 +342,6 @@ trait InteractsWithIO
      */
     public function comment($string, $verbosity = null)
     {
-        $string = $this->highlightDynamicContent($string);
-
         $this->output->writeln(
             "<comment>$string</comment>",
             $this->parseVerbosity($verbosity)
@@ -486,17 +458,6 @@ trait InteractsWithIO
         }
 
         return $level;
-    }
-
-    /**
-     * Highligths dynamic content within the given string.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    protected function highlightDynamicContent($string)
-    {
-        return preg_replace('/\[([^\]]+)\]/', '<options=bold>[$1]</>', $string);
     }
 
     /**
