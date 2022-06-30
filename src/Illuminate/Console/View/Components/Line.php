@@ -68,8 +68,9 @@ class Line extends Component
     public static function renderUsing($output, $string, $style, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         // if ($output->isDecorated() == false || is_null($style)) {
-        //     return $output->writeln($string, $verbosity);
-        // }
+        if (is_null($style)) {
+            return $output->writeln($string, $verbosity);
+        }
 
         renderUsing($output);
 
