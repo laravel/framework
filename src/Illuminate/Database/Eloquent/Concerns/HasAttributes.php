@@ -173,7 +173,7 @@ trait HasAttributes
     public static $encrypter;
 
     /**
-     * Indicates whether models should be loaded without appended attributes. 
+     * Indicates whether models should be loaded without appended attributes.
      */
     public static $withoutAppends = false;
 
@@ -2057,7 +2057,7 @@ trait HasAttributes
     /**
      * Scope a query to load models without appended attributes.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutAppends($query)
