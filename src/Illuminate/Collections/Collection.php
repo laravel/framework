@@ -1286,6 +1286,29 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         );
     }
 
+
+    /**
+     * Chunk the collection into chunks of the given size without preserve keys.
+     *
+     * @param int $size
+     * @return static<int, static>
+     */
+    public function chunkWithOutPreserveKeys($size)
+    {
+        if ($size <= 0) {
+            return new static;
+        }
+
+        $chunks = [];
+
+        foreach (array_chunk($this->items, $size, false) as $chunk) {
+            $chunks[] = new static($chunk);
+        }
+
+        return new static($chunks);
+    }
+
+    
     /**
      * Sort through each item with a callback.
      *
