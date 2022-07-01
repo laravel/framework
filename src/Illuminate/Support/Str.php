@@ -926,7 +926,8 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function isSingular(string $value){
+    public static function isSingular(string $value)
+    {
         return static::singular($value) === $value;
     }
 
@@ -936,7 +937,8 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function isPlural(string $value){
+    public static function isPlural(string $value)
+    {
         return !static::isSingular($value) || $value === static::plural($value);
     }
 
