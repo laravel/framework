@@ -1834,7 +1834,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or any of the given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) have been modified since last save.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1858,7 +1858,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or any of the given attribute(s) have been modified.
+     * Determine if the model or any of the given attribute(s) were changed on save.
      *
      * @param  array|string|null  $attributes
      * @return bool
