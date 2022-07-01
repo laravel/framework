@@ -939,7 +939,7 @@ class Str
      */
     public static function isPlural(string $value)
     {
-        return !static::isSingular($value) || $value === static::plural($value);
+        return ! static::isSingular($value) || $value === static::plural($value);
     }
 
     /**
