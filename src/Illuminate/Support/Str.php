@@ -921,6 +921,26 @@ class Str
     }
 
     /**
+     * check if the given value is in a singular form.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isSingular(string $value){
+        return static::singular($value) === $value;
+    }
+
+    /**
+     * check if the given value is in a plural form.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isPlural(string $value){
+        return !static::isSingular($value) || $value === static::plural($value);
+    }
+
+    /**
      * Generate a URL friendly "slug" from a given string.
      *
      * @param  string  $title

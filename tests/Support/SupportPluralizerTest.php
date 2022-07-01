@@ -113,6 +113,44 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
     }
 
+    public function testIsSingular()
+    {
+        $this->assertTrue(Str::isSingular('User'));
+        $this->assertTrue(Str::isSingular('Child'));
+        $this->assertTrue(Str::isSingular('Story'));
+        $this->assertTrue(Str::isSingular('cod'));
+        $this->assertTrue(Str::isSingular('The word'));
+        $this->assertTrue(Str::isSingular('Bouqueté'));
+    }
+
+    public function testIsSingularReturnsFalse()
+    {
+        $this->assertFalse(Str::isSingular('Users'));
+        $this->assertFalse(Str::isSingular('Stories'));
+        $this->assertFalse(Str::isSingular('Children'));
+        $this->assertFalse(Str::isSingular('The words'));
+        $this->assertFalse(Str::isSingular('Bouquetés'));
+    }
+
+    public function testIsPlural()
+    {
+        $this->assertTrue(Str::isPlural('Users'));
+        $this->assertTrue(Str::isPlural('Stories'));
+        $this->assertTrue(Str::isPlural('Children'));
+        $this->assertTrue(Str::isPlural('cod'));
+        $this->assertTrue(Str::isPlural('The words'));
+        $this->assertTrue(Str::isPlural('Bouquetés'));
+    }
+
+    public function testIsPluralReturnsFalse()
+    {
+        $this->assertFalse(Str::isPlural('User'));
+        $this->assertFalse(Str::isPlural('Story'));
+        $this->assertFalse(Str::isPlural('Child'));
+        $this->assertFalse(Str::isPlural('The word'));
+        $this->assertFalse(Str::isPlural('Bouqueté'));
+    }
+
     private function assertPluralStudly($expected, $value, $count = 2)
     {
         $this->assertSame($expected, Str::pluralStudly($value, $count));
