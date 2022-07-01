@@ -978,7 +978,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get one or a specified number of items randomly from the collection.
      *
-     * @param  int|null  $number
+     * @param  (callable(TValue): int)|int|null  $number
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
@@ -987,6 +987,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         if (is_null($number)) {
             return Arr::random($this->items);
+        }
+
+        if (is_callable($number)) {
+            return new static(Arr::random($this->items, $number($this)));
         }
 
         return new static(Arr::random($this->items, $number));
