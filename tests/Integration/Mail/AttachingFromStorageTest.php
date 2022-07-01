@@ -53,4 +53,16 @@ class AttachingFromStorageTest extends TestCase
 
         Storage::disk('local')->delete('/dir/foo.png');
     }
+
+    public function testItCanChainAttachWithMailMessage()
+    {
+        Storage::disk('local')->put('/dir/foo.png', 'expected body contents');
+        $message = new MailMessage();
+
+        $result = $message->attach(
+            Attachment::fromStorageDisk('local', '/dir/foo.png')
+        );
+
+        $this->assertSame($message, $result);
+    }
 }
