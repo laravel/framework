@@ -129,8 +129,8 @@ trait ValidatesAttributes
     /**
      * Overwritable dns check method. Can be mocked in tests to avoid actual calls.
      *
-     * @param string $hostname
-     * @param int $type
+     * @param  string  $hostname
+     * @param  int  $type
      * @return array|false
      */
     protected function dnsRecords($hostname, $type)
