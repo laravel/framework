@@ -290,7 +290,6 @@ class Str
         $radius = $options['radius'] ?? 100;
         $omission = $options['omission'] ?? '...';
 
-        preg_match('/^(.*?)('.preg_quote((string) $phrase).')(.*)$/iu', (string) $text, $matches);
 
         if (empty($matches)) {
             return null;
@@ -414,12 +413,12 @@ class Str
         }
 
         try {
-            unserialize($value);
+            $unserialized = @unserialize($value);
         } catch (Exception) {
             return false;
         }
 
-        return true;
+        return serialize($unserialized) === $value;
     }
 
     /**
