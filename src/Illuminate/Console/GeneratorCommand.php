@@ -289,7 +289,9 @@ abstract class GeneratorCommand extends Command
     {
         $stub = $this->files->get($this->getStub());
 
-        return $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        return $this->replaceNamespace($stub, $name)
+                     ->replaceTable($stub, $name)
+                     ->replaceClass($stub, $name);
     }
 
     /**
@@ -327,6 +329,22 @@ abstract class GeneratorCommand extends Command
     protected function getNamespace($name)
     {
         return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
+    }
+
+    /**
+     * Replace the table name for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return $this
+     */
+    protected function replaceTable(&$stub, $name)
+    {
+        $table = Str::snake(Str::pluralStudly(Str::studly(Str::replace('\\', '_', $this->getNameInput()))));
+
+        $stub = str_replace(['DummyTable', '{{ table }}', '{{table}}'], $table, $stub);
+
+        return $this;
     }
 
     /**
