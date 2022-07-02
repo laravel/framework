@@ -117,13 +117,25 @@ trait ValidatesAttributes
 
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
-                return count(dns_get_record($url.'.', DNS_A | DNS_AAAA)) > 0;
+                return count($this->dnsRecords($url.'.', DNS_A | DNS_AAAA)) > 0;
             } catch (Exception $e) {
                 return false;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Overwritable dns check method. Can be mocked in tests to avoid actual calls.
+     *
+     * @param string $hostname
+     * @param int $type
+     * @return array|false
+     */
+    protected function dnsRecords($hostname, $type)
+    {
+        return dns_get_record($hostname, $type);
     }
 
     /**
