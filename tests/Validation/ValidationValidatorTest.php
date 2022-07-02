@@ -3557,7 +3557,7 @@ class ValidationValidatorTest extends TestCase
                 ['x' => 'http://www.google.com'],
                 true,
             ],
-            'Google About With Subdomain' => [
+            'Google With Subdomain About Page' => [
                 ['x' => 'http://www.google.com/about'],
                 true,
             ],
