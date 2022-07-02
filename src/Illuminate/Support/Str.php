@@ -414,12 +414,12 @@ class Str
         }
 
         try {
-            unserialize($value);
+            $unserialized = @unserialize($value);
         } catch (Exception) {
             return false;
         }
 
-        return true;
+        return serialize($unserialized) === $value;
     }
 
     /**
