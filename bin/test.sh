@@ -29,16 +29,24 @@ echo "Ensuring services are running"
 
 docker-compose up -d
 
-if docker run -it --rm "registry.gitlab.com/grahamcampbell/php:$php-base" -r "\$tries = 0; while (true) { try { \$tries++; if (\$tries > 30) { throw new RuntimeException('MySQL never became available'); } sleep(1); new PDO('mysql:host=docker.for.mac.localhost;dbname=forge', 'root', '', [PDO::ATTR_TIMEOUT => 3]); break; } catch (PDOException \$e) {} }"; then
+if docker run --add-host=host.docker.internal:host-gateway -it --rm "registry.gitlab.com/grahamcampbell/php:$php-base" -r "\$tries = 0; while (true) { try { \$tries++; if (\$tries > 30) { throw new RuntimeException('MySQL never became available'); } sleep(1); new PDO('mysql:host=host.docker.internal;dbname=forge', 'root', '', [PDO::ATTR_TIMEOUT => 3]); break; } catch (PDOException \$e) {} }"; then
     echo "Running tests"
 
-    if docker run -it -w /data -v ${PWD}:/data:delegated \
-       --user "www-data" --entrypoint vendor/bin/phpunit \
-       --env CI=1 --env DB_HOST=docker.for.mac.localhost --env DB_USERNAME=root \
-       --env DB_HOST=docker.for.mac.localhost --env DB_PORT=3306 \
-       --env DYNAMODB_ENDPOINT=docker.for.mac.localhost:8000 --env DYNAMODB_CACHE_TABLE=cache --env AWS_ACCESS_KEY_ID=dummy --env AWS_SECRET_ACCESS_KEY=dummy \
-       --env REDIS_HOST=docker.for.mac.localhost --env REDIS_PORT=6379 \
-       --env MEMCACHED_HOST=docker.for.mac.localhost --env MEMCACHED_PORT=11211 \
+    if docker run -it -w /data -v ${PWD}:/data:delegated -u $(id -u ${USER}):$(id -g ${USER}) \
+       --entrypoint vendor/bin/phpunit \
+       --add-host=host.docker.internal:host-gateway \
+       --env CI=1 \
+       --env DB_HOST=host.docker.internal \
+       --env DB_PORT=3306 \
+       --env DB_USERNAME=root \
+       --env DYNAMODB_ENDPOINT=host.docker.internal:8000 \
+       --env DYNAMODB_CACHE_TABLE=cache \
+       --env AWS_ACCESS_KEY_ID=dummy \
+       --env AWS_SECRET_ACCESS_KEY=dummy \
+       --env REDIS_HOST=host.docker.internal \
+       --env REDIS_PORT=6379 \
+       --env MEMCACHED_HOST=host.docker.internal \
+       --env MEMCACHED_PORT=11211 \
        --rm "registry.gitlab.com/grahamcampbell/php:$php-base" "$@"; then
         exit 0
     else
