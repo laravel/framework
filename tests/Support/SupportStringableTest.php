@@ -61,6 +61,7 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('d:24.04;')->isSerialized());
         $this->assertTrue($this->stringable('s:1:"0";')->isSerialized());
         $this->assertTrue($this->stringable('a:0:{}')->isSerialized());
+        $this->assertTrue($this->stringable('b:0;')->isSerialized());
         $this->assertTrue($this->stringable('N;')->isSerialized());
         $this->assertTrue($this->stringable('O:8:"stdClass":0:{}')->isSerialized());
         $this->assertTrue($this->stringable('a:1:{s:3:"foo";s:3:"bar";}')->isSerialized());

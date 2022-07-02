@@ -430,6 +430,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isSerialized('d:24.04;'));
         $this->assertTrue(Str::isSerialized('s:1:"0";'));
         $this->assertTrue(Str::isSerialized('a:0:{}'));
+        $this->assertTrue(Str::isSerialized('b:0;'));
         $this->assertTrue(Str::isSerialized('N;'));
         $this->assertTrue(Str::isSerialized('O:8:"stdClass":0:{}'));
         $this->assertTrue(Str::isSerialized('a:1:{s:3:"foo";s:3:"bar";}'));
