@@ -55,6 +55,24 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable(null)->isJson());
     }
 
+    public function testIsSerialized()
+    {
+        $this->assertTrue($this->stringable('i:0;')->isSerialized());
+        $this->assertTrue($this->stringable('d:24.04;')->isSerialized());
+        $this->assertTrue($this->stringable('s:1:"0";')->isSerialized());
+        $this->assertTrue($this->stringable('a:0:{}')->isSerialized());
+        $this->assertTrue($this->stringable('N;')->isSerialized());
+        $this->assertTrue($this->stringable('O:8:"stdClass":0:{}')->isSerialized());
+        $this->assertTrue($this->stringable('a:1:{s:3:"foo";s:3:"bar";}')->isSerialized());
+
+        $this->assertFalse($this->stringable('')->isSerialized());
+        $this->assertFalse($this->stringable('error')->isSerialized());
+        $this->assertFalse($this->stringable('a:1')->isSerialized());
+        $this->assertFalse($this->stringable('a:1:{42}')->isSerialized());
+        $this->assertFalse($this->stringable('a:2:{s:3:"foo";s:3:"bar";}')->isSerialized());
+        $this->assertFalse($this->stringable(null)->isSerialized());
+    }
+
     public function testIsEmpty()
     {
         $this->assertTrue($this->stringable('')->isEmpty());

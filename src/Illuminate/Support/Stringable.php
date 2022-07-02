@@ -308,6 +308,16 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Determine if a given value is a valid serialized string.
+     *
+     * @return bool
+     */
+    public function isSerialized()
+    {
+        return Str::isSerialized($this->value);
+    }
+
+    /**
      * Determine if a given string is a valid UUID.
      *
      * @return bool

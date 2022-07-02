@@ -424,6 +424,24 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isJson([]));
     }
 
+    public function testIsSerialized()
+    {
+        $this->assertTrue(Str::isSerialized('i:0;'));
+        $this->assertTrue(Str::isSerialized('d:24.04;'));
+        $this->assertTrue(Str::isSerialized('s:1:"0";'));
+        $this->assertTrue(Str::isSerialized('a:0:{}'));
+        $this->assertTrue(Str::isSerialized('N;'));
+        $this->assertTrue(Str::isSerialized('O:8:"stdClass":0:{}'));
+        $this->assertTrue(Str::isSerialized('a:1:{s:3:"foo";s:3:"bar";}'));
+
+        $this->assertFalse(Str::isSerialized(''));
+        $this->assertFalse(Str::isSerialized('error'));
+        $this->assertFalse(Str::isSerialized('a:1'));
+        $this->assertFalse(Str::isSerialized('a:1:{42}'));
+        $this->assertFalse(Str::isSerialized('a:2:{s:3:"foo";s:3:"bar";}'));
+        $this->assertFalse(Str::isSerialized(null));
+    }
+
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));

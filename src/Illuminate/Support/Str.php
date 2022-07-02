@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use Exception;
 use JsonException;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
@@ -394,6 +395,27 @@ class Str
         try {
             json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if a given value is a valid serialized string.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isSerialized($value)
+    {
+        if (! is_string($value) || ! $value) {
+            return false;
+        }
+
+        try {
+            unserialize($value);
+        } catch (Exception) {
             return false;
         }
 
