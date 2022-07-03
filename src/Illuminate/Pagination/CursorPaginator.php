@@ -14,6 +14,13 @@ use JsonSerializable;
 class CursorPaginator extends AbstractCursorPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
 {
     /**
+     * The total number of items before slicing.
+     *
+     * @var int
+     */
+    protected $total;
+
+    /**
      * Indicates whether there are more items in the data source.
      *
      * @return bool
@@ -24,12 +31,13 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
      * Create a new paginator instance.
      *
      * @param  mixed  $items
+     * @param  int  $total
      * @param  int  $perPage
      * @param  \Illuminate\Pagination\Cursor|null  $cursor
      * @param  array  $options  (path, query, fragment, pageName)
      * @return void
      */
-    public function __construct($items, $perPage, $cursor = null, array $options = [])
+    public function __construct($items, $total, $perPage, $cursor = null, array $options = [])
     {
         $this->options = $options;
 
@@ -37,6 +45,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
             $this->{$key} = $value;
         }
 
+        $this->total = (int) $total;
         $this->perPage = (int) $perPage;
         $this->cursor = $cursor;
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
@@ -87,6 +96,16 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
         return static::viewFactory()->make($view ?: Paginator::$defaultSimpleView, array_merge($data, [
             'paginator' => $this,
         ]));
+    }
+
+    /**
+     * Get the total number of items being paginated.
+     *
+     * @return int
+     */
+    public function total()
+    {
+        return $this->total;
     }
 
     /**

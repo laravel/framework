@@ -930,9 +930,11 @@ class Builder implements BuilderContract
      */
     public function cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
+        $total = $this->toBase()->getCountForPagination();
+
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        return $this->paginateUsingCursor($perPage, $columns, $cursorName, $cursor);
+        return $this->paginateUsingCursor($total, $perPage, $columns, $cursorName, $cursor);
     }
 
     /**

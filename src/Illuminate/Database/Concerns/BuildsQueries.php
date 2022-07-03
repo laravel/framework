@@ -331,7 +331,7 @@ trait BuildsQueries
      * @param  \Illuminate\Pagination\Cursor|string|null  $cursor
      * @return \Illuminate\Contracts\Pagination\CursorPaginator
      */
-    protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    protected function paginateUsingCursor($total, $perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
     {
         if (! $cursor instanceof Cursor) {
             $cursor = is_string($cursor)
@@ -407,7 +407,7 @@ trait BuildsQueries
 
         $this->limit($perPage + 1);
 
-        return $this->cursorPaginator($this->get($columns), $perPage, $cursor, [
+        return $this->cursorPaginator($this->get($columns), $total, $perPage, $cursor, [
             'path' => Paginator::resolveCurrentPath(),
             'cursorName' => $cursorName,
             'parameters' => $orders->pluck('column')->toArray(),
@@ -484,10 +484,10 @@ trait BuildsQueries
      * @param  array  $options
      * @return \Illuminate\Pagination\CursorPaginator
      */
-    protected function cursorPaginator($items, $perPage, $cursor, $options)
+    protected function cursorPaginator($items, $total, $perPage, $cursor, $options)
     {
         return Container::getInstance()->makeWith(CursorPaginator::class, compact(
-            'items', 'perPage', 'cursor', 'options'
+            'items', 'total', 'perPage', 'cursor', 'options'
         ));
     }
 

@@ -793,7 +793,8 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $paginator = new CursorPaginator(
-                collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]),
+                $items = collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]),
+                $items->count(),
                 1, null, ['parameters' => ['id']]
             );
 
@@ -833,7 +834,7 @@ class ResourceTest extends TestCase
         Route::get('/', function () {
             $collection = collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]);
             $paginator = new CursorPaginator(
-                $collection, 1, null, ['parameters' => ['id']]
+                $collection, $collection->count(), 1, null, ['parameters' => ['id']]
             );
 
             return PostCollectionResource::make($paginator)->preserveQuery();
@@ -870,7 +871,7 @@ class ResourceTest extends TestCase
         Route::get('/', function () {
             $collection = collect([new Post(['id' => 5, 'title' => 'Test Title']), new Post(['id' => 6, 'title' => 'Hello'])]);
             $paginator = new CursorPaginator(
-                $collection, 1, null, ['parameters' => ['id']]
+                $collection, $collection->count(), 1, null, ['parameters' => ['id']]
             );
 
             return PostCollectionResource::make($paginator)->withQuery(['author' => 'Taylor']);

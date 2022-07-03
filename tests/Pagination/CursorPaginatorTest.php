@@ -11,7 +11,7 @@ class CursorPaginatorTest extends TestCase
 {
     public function testReturnsRelevantContextInformation()
     {
-        $p = new CursorPaginator($array = [['id' => 1], ['id' => 2], ['id' => 3]], 2, null, [
+        $p = new CursorPaginator($array = [['id' => 1], ['id' => 2], ['id' => 3]], count($array), 2, null, [
             'parameters' => ['id'],
         ]);
 
@@ -34,7 +34,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testPaginatorRemovesTrailingSlashes()
     {
-        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], count($array), 2, null,
             ['path' => 'http://website.com/test/', 'parameters' => ['id']]);
 
         $this->assertSame('http://website.com/test?cursor='.$this->getCursor(['id' => 5]), $p->nextPageUrl());
@@ -42,7 +42,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
     {
-        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], count($array), 2, null,
             ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $this->assertSame('http://website.com/test?cursor='.$this->getCursor(['id' => 5]), $p->nextPageUrl());
@@ -50,7 +50,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testItRetrievesThePaginatorOptions()
     {
-        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], count($array), 2, null,
             $options = ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $this->assertSame($p->getOptions(), $options);
@@ -58,7 +58,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testPaginatorReturnsPath()
     {
-        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], count($array), 2, null,
             $options = ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $this->assertSame($p->path(), 'http://website.com/test');
@@ -66,7 +66,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testCanTransformPaginatorItems()
     {
-        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], 2, null,
+        $p = new CursorPaginator($array = [['id' => 4], ['id' => 5], ['id' => 6]], count($array), 2, null,
             $options = ['path' => 'http://website.com/test', 'parameters' => ['id']]);
 
         $p->through(function ($item) {
@@ -81,7 +81,7 @@ class CursorPaginatorTest extends TestCase
 
     public function testLengthAwarePaginatorisOnFirstAndLastPage()
     {
-        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null, [
+        $paginator = new CursorPaginator($array = [['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], count($array), 2, null, [
             'parameters' => ['id'],
         ]);
 
@@ -89,7 +89,7 @@ class CursorPaginatorTest extends TestCase
         $this->assertFalse($paginator->onLastPage());
 
         $cursor = new Cursor(['id' => 3]);
-        $paginator = new CursorPaginator([['id' => 3], ['id' => 4]], 2, $cursor, [
+        $paginator = new CursorPaginator($array = [['id' => 3], ['id' => 4]], count($array), 2, $cursor, [
             'parameters' => ['id'],
         ]);
 
@@ -101,7 +101,7 @@ class CursorPaginatorTest extends TestCase
     {
         $cursor = new Cursor(['id' => 25], true);
 
-        $p = new CursorPaginator(Collection::make(), 25, $cursor, [
+        $p = new CursorPaginator(Collection::make(), 0, 25, $cursor, [
             'path' => 'http://website.com/test',
             'cursorName' => 'cursor',
             'parameters' => ['id'],

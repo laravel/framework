@@ -4051,6 +4051,7 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select * from "foobar" where ("test" > ?) order by "test" asc limit 17',
@@ -4066,7 +4067,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['test'],
@@ -4089,6 +4090,7 @@ SQL;
 
         $results = collect([['test' => 'foo', 'another' => 1], ['test' => 'bar', 'another' => 2]]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select * from "foobar" where ("test" > ? or ("test" = ? and ("another" > ?))) order by "test" asc, "another" asc limit 17',
@@ -4105,7 +4107,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['test', 'another'],
@@ -4127,6 +4129,7 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select * from "foobar" where ("test" > ?) order by "test" asc limit 16',
@@ -4146,7 +4149,7 @@ SQL;
 
         $result = $builder->cursorPaginate();
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['test'],
@@ -4162,6 +4165,7 @@ SQL;
 
         $results = [];
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn(0);
         $builder->shouldReceive('get')->once()->andReturn($results);
 
         CursorPaginator::currentCursorResolver(function () {
@@ -4174,7 +4178,7 @@ SQL;
 
         $result = $builder->cursorPaginate();
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, null, [
+        $this->assertEquals(new CursorPaginator($results, count($results), $perPage, null, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['test'],
@@ -4197,6 +4201,7 @@ SQL;
 
         $results = collect([['id' => 3, 'name' => 'Taylor'], ['id' => 5, 'name' => 'Mohamed']]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select * from "foobar" where ("id" > ?) order by "id" asc limit 17',
@@ -4212,7 +4217,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['id'],
@@ -4235,6 +4240,7 @@ SQL;
 
         $results = collect([['foo' => 1, 'bar' => 2, 'baz' => 4], ['foo' => 1, 'bar' => 1, 'baz' => 1]]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select * from "foobar" where ("foo" > ? or ("foo" = ? and ("bar" < ? or ("bar" = ? and ("baz" > ?))))) order by "foo" asc, "bar" desc, "baz" asc limit 17',
@@ -4251,7 +4257,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['foo', 'bar', 'baz'],
@@ -4273,6 +4279,7 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select *, (CONCAT(firstname, \' \', lastname)) as test from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
@@ -4292,7 +4299,7 @@ SQL;
 
         $result = $builder->cursorPaginate();
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['test'],
@@ -4314,6 +4321,7 @@ SQL;
 
         $results = collect([['test' => 'foo'], ['test' => 'bar']]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results) {
             $this->assertEquals(
                 'select *, (CONCAT(firstname, \' \', lastname)) as "test" from "foobar" where ((CONCAT(firstname, \' \', lastname)) > ?) order by "test" asc limit 16',
@@ -4333,7 +4341,7 @@ SQL;
 
         $result = $builder->cursorPaginate();
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['test'],
@@ -4364,6 +4372,7 @@ SQL;
             ['id' => 2, 'created_at' => now(), 'type' => 'news'],
         ]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" > ?)) order by "created_at" asc limit 17',
@@ -4380,7 +4389,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['created_at'],
@@ -4411,6 +4420,7 @@ SQL;
             ['id' => 2, 'created_at' => now(), 'type' => 'news', 'is_published' => true],
         ]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
                 '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("start_time" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
@@ -4427,7 +4437,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['created_at'],
@@ -4458,6 +4468,7 @@ SQL;
             ['id' => 2, 'created_at' => now(), 'type' => 'news'],
         ]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" asc limit 17',
@@ -4474,7 +4485,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['created_at'],
@@ -4505,6 +4516,7 @@ SQL;
             ['id' => 2, 'created_at' => now(), 'type' => 'news'],
         ]);
 
+        $builder->shouldReceive('getCountForPagination')->once()->andReturn($results->count());
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
                 '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
@@ -4521,7 +4533,7 @@ SQL;
 
         $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
 
-        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+        $this->assertEquals(new CursorPaginator($results, $results->count(), $perPage, $cursor, [
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['created_at', 'id'],
