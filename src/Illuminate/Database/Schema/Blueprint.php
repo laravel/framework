@@ -1251,9 +1251,9 @@ class Blueprint
     public function userstamp($column)
     {
         $stamp = $this->foreignId($column);
-        $this->foreign($column)->references('id')->on('users')
+        $this->foreign($column)->references('id')->on('users');
 
-        return $stamp
+        return $stamp;
     }
 
     /**
