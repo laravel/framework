@@ -458,6 +458,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the userstamp columns should be dropped.
+     *
+     * @return void
+     */
+    public function dropUserstamps()
+    {
+        $this->dropColumn('created_by', 'updated_by');
+    }
+
+    /**
      * Indicate that the timestamp columns should be dropped.
      *
      * @return void
@@ -1229,6 +1239,31 @@ class Blueprint
     public function year($column)
     {
         return $this->addColumn('year', $column);
+    }
+
+    /**
+     * Create a new userstamp column on the table.
+     *
+     * @param  string  $column
+     * @param  int|null  $precision
+     * @return \Illuminate\Database\Schema\ColumnDefinition
+     */
+    public function userstamp($column)
+    {
+        return $this->string($column, 255);
+    }
+
+    /**
+     * Add nullable creation and update userstamps to the table.
+     *
+     * @param  int|null  $precision
+     * @return void
+     */
+    public function userstamps()
+    {
+        $this->string('created_by', 255)->nullable();
+
+        $this->string('updated_by', 255)->nullable();
     }
 
     /**

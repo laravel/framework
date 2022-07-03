@@ -30,6 +30,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,
         Concerns\HasTimestamps,
+        Concerns\HasUserstamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes,
         ForwardsCalls;
@@ -358,6 +359,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $class = $class ?: static::class;
 
         if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
+            return true;
+        }
+
+        if (! get_class_vars($class)['userstamps'] || ! $class::UPDATED_BY) {
             return true;
         }
 
@@ -1089,10 +1094,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         // First we need to create a fresh query instance and touch the creation and
-        // update timestamp on the model which are maintained by us for developer
+        // update timestamp / userstamp on the model which are maintained by us for developer
         // convenience. Then we will just continue saving the model instances.
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();
+        }
+        if ($this->usesUserstamps()) {
+            $this->updateUserstamps();
         }
 
         // Once we have run the update operation, we will fire the "updated" event for
@@ -1170,10 +1178,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         // First we'll need to create a fresh query instance and touch the creation and
-        // update timestamps on this model, which are maintained by us for developer
+        // update timestamps / userstamps on this model, which are maintained by us for developer
         // convenience. After, we will just continue saving these model instances.
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();
+        }
+        if ($this->usesUserstamps()) {
+            $this->updateUserstamps();
         }
 
         // If the model has an incrementing key, we can use the "insertGetId" method on
