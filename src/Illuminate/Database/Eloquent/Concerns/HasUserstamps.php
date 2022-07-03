@@ -11,7 +11,7 @@ trait HasUserstamps
      *
      * @var bool
      */
-    public $userstamps = true;
+    public $userstamps = false;
 
     /**
      * Update the creation and update userstamps.
