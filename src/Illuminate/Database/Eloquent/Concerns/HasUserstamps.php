@@ -7,37 +7,14 @@ use Illuminate\Support\Facades\Auth;
 trait HasUserstamps
 {
     /**
-     * Indicates if the model should be timestamped.
+     * Indicates if the model should be userstamped.
      *
      * @var bool
      */
     public $userstamps = true;
 
     /**
-     * Update the model's update timestamp.
-     *
-     * @param  string|null  $attribute
-     * @return bool
-     */
-    public function touch($attribute = null)
-    {
-        if ($attribute) {
-            $this->$attribute = $this->freshUserstamp();
-
-            return $this->save();
-        }
-
-        if (! $this->usesUserstamps()) {
-            return false;
-        }
-
-        $this->updateUserstamps();
-
-        return $this->save();
-    }
-
-    /**
-     * Update the creation and update timestamps.
+     * Update the creation and update userstamps.
      *
      * @return $this
      */
@@ -93,7 +70,7 @@ trait HasUserstamps
      */
     public function freshUserstamp()
     {
-        return Auth::user() ? Auth::id() : null;
+        return Auth::check() ? Auth::id() : null;
     }
 
     /**

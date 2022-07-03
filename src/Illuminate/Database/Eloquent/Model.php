@@ -197,6 +197,20 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     const UPDATED_AT = 'updated_at';
 
     /**
+     * The name of the "created by" column.
+     *
+     * @var string|null
+     */
+    const CREATED_BY = 'created_by';
+
+    /**
+     * The name of the "updated by" column.
+     *
+     * @var string|null
+     */
+    const UPDATED_BY = 'updated_by';
+
+    /**
      * Create a new Eloquent model instance.
      *
      * @param  array  $attributes
@@ -358,11 +372,10 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $class = $class ?: static::class;
 
-        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
-            return true;
-        }
-
-        if (! get_class_vars($class)['userstamps'] || ! $class::UPDATED_BY) {
+        if (
+            ! get_class_vars($class)['timestamps'] && ! $class::UPDATED_AT &&
+            ! get_class_vars($class)['userstamps'] && ! $class::UPDATED_BY
+        ) {
             return true;
         }
 
@@ -373,6 +386,35 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return false;
+    }
+
+    /**
+     * Update the model's update timestamp.
+     *
+     * @param  string|null  $attribute
+     * @return bool
+     */
+    public function touch($attribute = null)
+    {
+        if ($attribute) {
+            $this->$attribute = $this->freshTimestamp();
+
+            return $this->save();
+        }
+
+        if (! $this->usesTimestamps() && ! $this->usesUserstamps()) {
+            return false;
+        }
+
+        if ($this->usesTimestamps()) {
+            $this->updateTimestamps();
+        }
+
+        if ($this->usesUserstamps()) {
+            $this->updateUserstamps();
+        }
+
+        return $this->save();
     }
 
     /**

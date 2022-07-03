@@ -1250,7 +1250,10 @@ class Blueprint
      */
     public function userstamp($column)
     {
-        return $this->string($column, 255);
+        $stamp = $this->foreignId($column);
+        $this->foreign($column)->references('id')->on('users')
+
+        return $stamp
     }
 
     /**
@@ -1261,9 +1264,11 @@ class Blueprint
      */
     public function userstamps()
     {
-        $this->string('created_by', 255)->nullable();
+        $this->foreignId('created_by')->nullable();
+        $this->foreign('created_by')->references('id')->on('users')
 
-        $this->string('updated_by', 255)->nullable();
+        $this->foreignId('updated_by')->nullable();
+        $this->foreign('updated_by')->references('id')->on('users')
     }
 
     /**
