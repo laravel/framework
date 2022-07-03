@@ -373,8 +373,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $class = $class ?: static::class;
 
         if (
-            ! get_class_vars($class)['timestamps'] && ! $class::UPDATED_AT &&
-            ! get_class_vars($class)['userstamps'] && ! $class::UPDATED_BY
+            (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) &&
+            (! get_class_vars($class)['userstamps'] || ! $class::UPDATED_BY)
         ) {
             return true;
         }
