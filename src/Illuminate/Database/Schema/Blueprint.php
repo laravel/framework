@@ -1265,10 +1265,10 @@ class Blueprint
     public function userstamps()
     {
         $this->foreignId('created_by')->nullable();
-        $this->foreign('created_by')->references('id')->on('users')
+        $this->foreign('created_by')->references('id')->on('users');
 
         $this->foreignId('updated_by')->nullable();
-        $this->foreign('updated_by')->references('id')->on('users')
+        $this->foreign('updated_by')->references('id')->on('users');
     }
 
     /**
