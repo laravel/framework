@@ -93,7 +93,7 @@ trait HasUserstamps
      */
     public function freshUserstamp()
     {
-        return Auth::user() ? Auth::id() : Null;
+        return Auth::user() ? Auth::id() : null;
     }
 
     /**
