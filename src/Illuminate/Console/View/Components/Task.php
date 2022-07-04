@@ -25,9 +25,10 @@ class Task
     {
         $description = self::ensureRelativePaths($description);
         $description = self::ensureNoPunctuation($description);
-
-        $descriptionWidth = mb_strlen($description);
         $description = static::highlightDynamicContent($description);
+
+        $descriptionWidth = mb_strlen(preg_replace("/\<[\w=#\/\;,:.&,%?]+\>|\\e\[\d+m/", '$1', $description) ?? '');
+
         $output->write("  $description ", false, $verbosity);
 
         if (is_null($task)) {
