@@ -43,6 +43,11 @@ class EloquentUniqueIgnoreTrashedTest extends DatabaseTestCase
         $user2 = new $class();
         $user2->username = 'morrislaptop';
         $user2->save();
+        $user2->delete();
+
+        $user3 = new $class();
+        $user3->username = 'morrislaptop';
+        $user3->save();
 
         $this->assertCount(1, $class::all());
     }
