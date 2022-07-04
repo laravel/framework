@@ -109,7 +109,7 @@ class MonitorCommand extends Command
                 'connection' => $connection,
                 'queue' => $queue,
                 'size' => $size = $this->manager->connection($connection)->size($queue),
-                'status' => $size >= $this->option('max') ? '<fg=red>ALERT</>' : 'OK',
+                'status' => $size >= $this->option('max') ? '<fg=yellow>ALERT</>' : '<fg=green>OK</>',
             ];
         });
     }
@@ -122,7 +122,17 @@ class MonitorCommand extends Command
      */
     protected function displaySizes(Collection $queues)
     {
-        $this->table($this->headers, $queues);
+        $this->newLine();
+
+        $this->detail('<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
+
+        $queues->each(function ($queue) {
+            $status = '['.$queue['size'].'] ' . $queue['status'];
+
+            $this->detail($queue['queue'], $status);
+        });
+
+        $this->newLine();
     }
 
     /**
