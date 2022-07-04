@@ -61,7 +61,8 @@ class StatusCommand extends BaseCommand
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
             if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
-                $this->info('Migration status:');
+                $this->newLine();
+                $this->detail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
                 $migrations->each(
                     fn ($migration) => $this->detail($migration[0], $migration[1])
                 );
