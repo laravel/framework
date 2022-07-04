@@ -127,7 +127,7 @@ class MonitorCommand extends Command
         $this->detail('<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
 
         $queues->each(function ($queue) {
-            $status = '['.$queue['size'].'] ' . $queue['status'];
+            $status = '['.$queue['size'].'] '.$queue['status'];
 
             $this->detail($queue['queue'], $status);
         });
