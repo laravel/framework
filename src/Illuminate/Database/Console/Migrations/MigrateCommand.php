@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\View\Components\Line;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -108,9 +110,13 @@ class MigrateCommand extends BaseCommand
     protected function prepareDatabase()
     {
         if (! $this->migrator->repositoryExists()) {
-            $this->call('migrate:install', array_filter([
-                '--database' => $this->option('database'),
-            ]));
+            $this->info('Preparing database.');
+
+            Task::renderUsing($this->output, 'Creating migration table', function () {
+                return $this->callSilent('migrate:install', array_filter([
+                    '--database' => $this->option('database'),
+                ])) == 0;
+            });
         }
 
         if (! $this->migrator->hasRunAnyMigrations() && ! $this->option('pretend')) {
@@ -135,20 +141,18 @@ class MigrateCommand extends BaseCommand
             return;
         }
 
-        $this->line('<info>Loading stored database schema:</info> '.$path);
+        $this->info('Preparing database.');
 
-        $startTime = microtime(true);
+        Task::renderUsing($this->output, "Loading stored database schema [$path].", function () use ($connection, $path) {
+            // Since the schema file will create the "migrations" table and reload it to its
+            // proper state, we need to delete it here so we don't get an error that this
+            // table already exists when the stored database schema file gets executed.
+            $this->migrator->deleteRepository();
 
-        // Since the schema file will create the "migrations" table and reload it to its
-        // proper state, we need to delete it here so we don't get an error that this
-        // table already exists when the stored database schema file gets executed.
-        $this->migrator->deleteRepository();
-
-        $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
-            $this->output->write($buffer);
-        })->load($path);
-
-        $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+            $connection->getSchemaState()->handleOutputUsing(function ($type, $buffer) {
+                $this->output->write($buffer);
+            })->load($path);
+        });
 
         // Finally, we will fire an event that this schema has been loaded so developers
         // can perform any post schema load tasks that are necessary in listeners for
@@ -156,8 +160,6 @@ class MigrateCommand extends BaseCommand
         $this->dispatcher->dispatch(
             new SchemaLoaded($connection, $path)
         );
-
-        $this->line('<info>Loaded stored database schema.</info> ('.$runTime.'ms)');
     }
 
     /**
