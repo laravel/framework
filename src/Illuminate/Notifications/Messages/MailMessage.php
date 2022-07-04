@@ -261,6 +261,23 @@ class MailMessage extends SimpleMessage implements Renderable
 
         return $this;
     }
+    
+    /**
+     * Attach an array of files to the message.
+     *
+     * @param  array  $files
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachFiles($files, array $options = [])
+    {
+        foreach($files as $file)
+        {
+            $this->attachments[] = compact('file', 'options');
+        }
+
+        return $this;
+    }
 
     /**
      * Attach in-memory data as an attachment.
