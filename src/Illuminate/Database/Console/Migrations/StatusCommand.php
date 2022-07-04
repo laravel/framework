@@ -90,7 +90,7 @@ class StatusCommand extends BaseCommand
                             : '<fg=yellow>Pending</>';
 
                         if (in_array($migrationName, $ran)) {
-                            $status .= ' ['.$batches[$migrationName].']';
+                            $status = '['.$batches[$migrationName].'] ' . $status;
                         }
 
                         return [$migrationName, $status];
