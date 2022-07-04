@@ -59,12 +59,14 @@ class EventListCommand extends Command
             return;
         }
 
-        $this->line(
-            $events->map(fn ($listeners, $event) => [
-                sprintf('  <fg=white>%s</>', $this->appendEventInterfaces($event)),
-                collect($listeners)->map(fn ($listener) => sprintf('    <fg=#6C7280>⇂ %s</>', $listener)),
-            ])->flatten()->filter()->prepend('')->push('')->toArray()
-        );
+        $this->newLine();
+
+        $events->each(function ($listeners, $event) {
+            $this->detail($this->appendEventInterfaces($event));
+            $this->bulletList($listeners);
+        });
+
+        $this->newLine();
     }
 
     /**
