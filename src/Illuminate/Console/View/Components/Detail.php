@@ -8,7 +8,9 @@ use function Termwind\renderUsing;
 
 class Detail
 {
-    use Concerns\Highlightable;
+    use Concerns\EnsureNoPunctuation,
+        Concerns\EnsureRelativePaths,
+        Concerns\Highlightable;
 
     /**
      * Renders the component using the given arguments.
@@ -19,20 +21,21 @@ class Detail
      * @param  int  $verbosity
      * @return void
      */
-    public static function renderUsing($output, $left, $right, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public static function renderUsing($output, $left, $right = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        // if ($output->isDecorated() == false || is_null($style)) {
-        //    return $output->writeln($string, $verbosity);
-        // }
-
         renderUsing($output);
 
-        $left = static::highlightDynamicContent($left);
-        $right = static::highlightDynamicContent($right);
+        $left = self::highlightDynamicContent($left);
+        $left = self::ensureNoPunctuation($left);
+        $left = self::ensureRelativePaths($left);
+
+        $right = self::highlightDynamicContent($right);
+        $right = self::ensureNoPunctuation($right);
+        $right = self::ensureRelativePaths($right);
 
         render(view('illuminate.console::detail', [
-            'left' => static::highlightDynamicContent($left),
-            'right' => static::highlightDynamicContent($right),
+            'left' => $left,
+            'right' => $right,
         ]), $verbosity);
     }
 }

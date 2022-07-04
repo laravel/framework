@@ -4,12 +4,15 @@ namespace Illuminate\Console\View\Components;
 
 use Illuminate\Console\Contracts\NewLineAware;
 use Illuminate\View\Component;
+use Symfony\Component\Console\Output\OutputInterface;
 use function Termwind\render;
 use function Termwind\renderUsing;
 
 class Line extends Component
 {
-    use Concerns\Highlightable;
+    use Concerns\EnsurePunctuation,
+        Concerns\EnsureRelativePaths,
+        Concerns\Highlightable;
 
     /**
      * The margin top that should be applied.
@@ -35,7 +38,7 @@ class Line extends Component
     /**
      * The line title.
      *
-     * @var string
+     * @var string|null
      */
     public $title;
 
@@ -45,10 +48,10 @@ class Line extends Component
      * @param  bool  $newLine
      * @param  string  $bgColor
      * @param  string  $fgColor
-     * @param  string  $title
+     * @param  string|null  $title
      * @return void
      */
-    public function __construct($newLine, $bgColor, $fgColor, $title)
+    public function __construct($newLine, $bgColor, $fgColor, $title = null)
     {
         $this->marginTop = $newLine ? 1 : 0;
         $this->bgColor = $bgColor;
@@ -67,15 +70,16 @@ class Line extends Component
      */
     public static function renderUsing($output, $string, $style, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        // if ($output->isDecorated() == false || is_null($style)) {
-        if (is_null($style)) {
-            return $output->writeln($string, $verbosity);
-        }
+        $style = $style ?: 'raw';
 
         renderUsing($output);
 
+        $string = self::highlightDynamicContent($string);
+        $string = self::ensurePunctuation($string);
+        $string = self::ensureRelativePaths($string);
+
         render(view('illuminate.console::lines.'.$style, [
-            'content' => static::highlightDynamicContent($string),
+            'content' => $string,
             'newLine' => $output instanceof NewLineAware
                 ? $output->newLineWritten() == false
                 : true,
@@ -91,8 +95,10 @@ class Line extends Component
     {
         return <<<'blade'
             <div class="mx-2 mb-1 mt-{{ $marginTop }}">
-                <span class="px-1 bg-{{ $bgColor }} text-{{ $fgColor }} uppercase">{{ $title }}</span>
-                <span class="ml-1">
+                @if ($title)
+                    <span class="px-1 bg-{{ $bgColor }} text-{{ $fgColor }} uppercase">{{ $title }}</span>
+                @endif
+                <span class="@if ($title) ml-1 @endif">
                     {{ $slot }}
                 </span>
             </div>
