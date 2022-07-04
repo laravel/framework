@@ -572,7 +572,7 @@ class Blueprint
     public function uniqueIgnoreTrashed($columns, $deletedAtColumn = 'deleted_at', $name = null, $algorithm = null)
     {
         $this->boolean("{$deletedAtColumn}_index")
-             ->storedAs('CASE WHEN deleted_at IS NULL THEN TRUE END')
+             ->storedAs("CASE WHEN {$deletedAtColumn} IS NULL THEN TRUE END")
              ->nullable();
 
         $columns = (array) $columns;
