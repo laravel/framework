@@ -319,6 +319,31 @@ trait InteractsWithIO
     }
 
     /**
+     * Write a list of strings as bullet list output.
+     *
+     * @param  array<int, string>  $strings
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function bulletList($strings, $verbosity = null)
+    {
+        Components\BulletList::renderUsing($this->output, $strings, $this->parseVerbosity($verbosity));
+    }
+
+    /**
+     * Write a string as detail output.
+     *
+     * @param  string  $left
+     * @param  string|null  $right
+     * @param  int|string|null  $verbosity
+     * @return void
+     */
+    public function detail($left, $right = null, $verbosity = null)
+    {
+        Components\Detail::renderUsing($this->output, $left, $right, $this->parseVerbosity($verbosity));
+    }
+
+    /**
      * Write a string as standard output.
      *
      * @param  string  $string
@@ -390,9 +415,7 @@ trait InteractsWithIO
      */
     public function alert($string)
     {
-        render(view('illuminate.console::alert', [
-            'content' => $string,
-        ]));
+        Components\Alert::renderUsing($this->output, $string);
     }
 
     /**
