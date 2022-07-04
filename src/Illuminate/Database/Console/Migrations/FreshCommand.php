@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\DatabaseRefreshed;
@@ -39,12 +40,14 @@ class FreshCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        $this->call('db:wipe', array_filter([
+        $this->newLine();
+
+        $this->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
             '--database' => $database,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
             '--force' => true,
-        ]));
+        ])) == 0);
 
         $this->call('migrate', array_filter([
             '--database' => $database,
