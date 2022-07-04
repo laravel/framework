@@ -12,7 +12,7 @@ trait EnsureRelativePaths
      */
     protected static function ensureRelativePaths($string)
     {
-        $string = str_replace(base_path() . '/', '', $string);
+        $string = str_replace(base_path().'/', '', $string);
 
         return $string;
     }

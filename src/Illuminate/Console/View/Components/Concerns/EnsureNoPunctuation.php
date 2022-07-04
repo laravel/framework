@@ -13,7 +13,7 @@ trait EnsureNoPunctuation
     protected static function ensureNoPunctuation($string)
     {
         if (str($string)->endsWith(['.', '?', '!', ':'])) {
-            return substr_replace($string ,"", -1);
+            return substr_replace($string, '', -1);
         }
 
         return $string;

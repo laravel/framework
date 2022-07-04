@@ -2,9 +2,8 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\View\Components\Line;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Database\Migrations\Migrator;

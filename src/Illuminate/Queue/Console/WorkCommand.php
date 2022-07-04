@@ -197,12 +197,13 @@ class WorkCommand extends Command
         if ($status == 'starting') {
             $this->latestStartedAt = microtime(true);
             $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
+
             return $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
-        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2) . 'ms';
+        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - mb_strlen($runTime) - 32, 0);
-        $this->output->write(' ' . str_repeat('<fg=gray>.</>', $dots));
+        $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
         $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
     }

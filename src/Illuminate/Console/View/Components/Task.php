@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console\View\Components;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use function Termwind\terminal;
 use Throwable;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class Task
 {
@@ -32,6 +32,7 @@ class Task
 
         if (is_null($task)) {
             $dots = max(terminal()->width() - $descriptionWidth - 5, 0);
+
             return $output->write(str_repeat('<fg=gray>.</>', $dots), false, $verbosity);
         }
 
@@ -45,7 +46,7 @@ class Task
             throw $e;
         } finally {
             $runTime = (microtime(true) - $startTime) > 0.05
-                ? (' ' . number_format((microtime(true) - $startTime) * 1000, 2) . 'ms')
+                ? (' '.number_format((microtime(true) - $startTime) * 1000, 2).'ms')
                 : '';
 
             $runTimeWidth = mb_strlen($runTime);
