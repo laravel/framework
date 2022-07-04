@@ -32,7 +32,7 @@ class EloquentUniqueIgnoreTrashedTest extends DatabaseTestCase
     /**
      * @group SkipMSSQL
      * @dataProvider classes
-    */
+     */
     public function testUniqueAllowsDuplicatesIfDeleted($class)
     {
         $user = new $class();
@@ -50,7 +50,7 @@ class EloquentUniqueIgnoreTrashedTest extends DatabaseTestCase
     /**
      * @group SkipMSSQL
      * @dataProvider classes
-    */
+     */
     public function testUniqueRejectsDuplicates($class)
     {
         $user = new $class();
@@ -66,7 +66,7 @@ class EloquentUniqueIgnoreTrashedTest extends DatabaseTestCase
     /**
      * @group SkipMSSQL
      * @dataProvider classes
-    */
+     */
     public function testUniqueRejectsDuplicatesWithDeleted($class)
     {
         $user = new $class();
