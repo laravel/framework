@@ -202,7 +202,7 @@ class WorkCommand extends Command
         }
 
         $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
-        $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - mb_strlen($runTime) - 32, 0);
+        $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - mb_strlen($runTime) - 31, 0);
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
         $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
