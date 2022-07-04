@@ -9,6 +9,7 @@ use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -102,6 +103,8 @@ class ScheduleRunCommand extends Command
         $this->dispatcher = $dispatcher;
         $this->handler = $handler;
 
+        $this->newLine();
+
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
@@ -120,6 +123,8 @@ class ScheduleRunCommand extends Command
 
         if (! $this->eventsRan) {
             $this->info('No scheduled commands are ready to run.');
+        } else {
+            $this->newLine();
         }
     }
 
@@ -146,25 +151,31 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
-        $this->line('<info>['.date('c').'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $description = sprintf(
+            '<fg=gray>%s</> Running [%s]',
+            Carbon::now()->format('Y-m-d H:i:s'),
+            $event->getSummaryForDisplay()
+        );
 
-        $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
+        $this->task($description, function () use ($event) {
+            $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
-        $start = microtime(true);
+            $start = microtime(true);
 
-        try {
-            $event->run($this->laravel);
+            try {
+                $event->run($this->laravel);
 
-            $this->dispatcher->dispatch(new ScheduledTaskFinished(
-                $event,
-                round(microtime(true) - $start, 2)
-            ));
+                $this->dispatcher->dispatch(new ScheduledTaskFinished(
+                    $event,
+                    round(microtime(true) - $start, 2)
+                ));
 
-            $this->eventsRan = true;
-        } catch (Throwable $e) {
-            $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
+                $this->eventsRan = true;
+            } catch (Throwable $e) {
+                $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
 
-            $this->handler->report($e);
-        }
+                $this->handler->report($e);
+            }
+        });
     }
 }
