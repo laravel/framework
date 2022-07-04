@@ -52,7 +52,7 @@ class ScheduleTestCommand extends Command
         }
 
         if (empty($commandNames)) {
-            return $this->comment('No scheduled commands have been defined.');
+            return $this->info('No scheduled commands have been defined.');
         }
 
         if (! empty($name = $this->option('name'))) {
@@ -73,8 +73,10 @@ class ScheduleTestCommand extends Command
 
         $event = $commands[$index];
 
-        $this->line('<info>['.Carbon::now()->format('c').'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $this->task(sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
+            $event->run($this->laravel);
+        });
 
-        $event->run($this->laravel);
+        $this->newLine();
     }
 }
