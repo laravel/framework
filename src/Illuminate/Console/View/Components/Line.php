@@ -93,15 +93,11 @@ class Line extends Component
      */
     public function render()
     {
-        return <<<'blade'
-            <div class="mx-2 mb-1 mt-{{ $marginTop }}">
-                @if ($title)
-                    <span class="px-1 bg-{{ $bgColor }} text-{{ $fgColor }} uppercase">{{ $title }}</span>
-                @endif
-                <span class="@if ($title) ml-1 @endif">
-                    {{ $slot }}
-                </span>
-            </div>
-        blade;
+        return view('illuminate.console::lines.line', [
+            'marginTop' => $this->marginTop,
+            'title' => $this->title,
+            'bgColor' => $this->bgColor,
+            'fgColor' => $this->fgColor,
+        ]);
     }
 }
