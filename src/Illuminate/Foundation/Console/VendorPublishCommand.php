@@ -14,6 +14,7 @@ use League\Flysystem\MountManager;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'vendor:publish')]
 class VendorPublishCommand extends Command
@@ -243,7 +244,7 @@ class VendorPublishCommand extends Command
 
             $this->status($from, $to, 'file');
         } else {
-            $this->task(sprintf(
+            Task::renderUsing($this->output, sprintf(
                 'File [%s] already exist',
                 str_replace(base_path().'/', '', realpath($to)),
             ));
@@ -313,7 +314,7 @@ class VendorPublishCommand extends Command
 
         $to = str_replace(base_path().'/', '', realpath($to));
 
-        $this->task(sprintf(
+        Task::renderUsing($this->output, sprintf(
             'Copying %s [%s] to [%s]',
             $type,
             $from,

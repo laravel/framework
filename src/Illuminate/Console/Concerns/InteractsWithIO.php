@@ -193,42 +193,6 @@ trait InteractsWithIO
     }
 
     /**
-     * Perform the given tasks.
-     *
-     * @param  string  $title
-     * @param  iterable<string, callable(): bool>  $tasks
-     * @param  int|string|null  $verbosity
-     * @return void
-     */
-    public function tasks($title, $tasks, $verbosity = null)
-    {
-        $this->info($title, $verbosity);
-
-        collect($tasks)->each(
-            fn ($task, $description) => Components\Task::renderUsing(
-                $this->output, $description, $task, $this->parseVerbosity($verbosity),
-            ),
-        );
-
-        $this->newLine();
-    }
-
-    /**
-     * Perform the given task.
-     *
-     * @param  string  $description
-     * @param  (callable(): bool)|null  $task
-     * @param  int|string|null  $verbosity
-     * @return void
-     */
-    public function task($description, $task = null, $verbosity = null)
-    {
-        Components\Task::renderUsing(
-            $this->output, $description, $task, $this->parseVerbosity($verbosity),
-        );
-    }
-
-    /**
      * Give the user a single choice from an array of answers.
      *
      * @param  string  $question

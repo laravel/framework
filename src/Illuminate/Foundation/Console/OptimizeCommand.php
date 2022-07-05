@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'optimize')]
 class OptimizeCommand extends Command
@@ -40,9 +41,15 @@ class OptimizeCommand extends Command
      */
     public function handle()
     {
-        $this->tasks('Caching the framework bootstrap files', [
+        $this->info('Caching the framework bootstrap files');
+
+        collect([
             'config' => fn () => $this->callSilent('config:cache') == 0,
             'routes' => fn () => $this->callSilent('route:cache') == 0,
-        ]);
+        ])->each(fn ($task, $description) => Task::renderUsing(
+            $this->output, $description, $task,
+        ));
+
+        $this->newLine();
     }
 }

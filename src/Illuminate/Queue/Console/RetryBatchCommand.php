@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'queue:retry-batch')]
 class RetryBatchCommand extends Command
@@ -56,7 +57,7 @@ class RetryBatchCommand extends Command
         $this->info("Retrying the failed jobs for a batch [$id].");
 
         foreach ($batch->failedJobIds as $failedJobId) {
-            $this->task($failedJobId, fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0);
+            Task::renderUsing($this->output, $failedJobId, fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0);
         }
 
         $this->newLine();

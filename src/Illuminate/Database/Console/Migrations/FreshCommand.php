@@ -7,6 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\DatabaseRefreshed;
 use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Console\View\Components\Task;
 
 class FreshCommand extends Command
 {
@@ -41,7 +42,7 @@ class FreshCommand extends Command
 
         $this->newLine();
 
-        $this->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
+        Task::renderUsing($this->output, 'Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
             '--database' => $database,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),

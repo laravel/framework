@@ -9,6 +9,7 @@ use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'queue:retry')]
 class RetryCommand extends Command
@@ -62,7 +63,7 @@ class RetryCommand extends Command
             } else {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
-                $this->task($id, fn () => $this->retryJob($job));
+                Task::renderUsing($this->output, $id, fn () => $this->retryJob($job));
 
                 $this->laravel['queue.failer']->forget($id);
             }

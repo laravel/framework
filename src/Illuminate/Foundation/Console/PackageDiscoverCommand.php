@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\PackageManifest;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'package:discover')]
 class PackageDiscoverCommand extends Command
@@ -42,11 +43,16 @@ class PackageDiscoverCommand extends Command
      */
     public function handle(PackageManifest $manifest)
     {
+        $this->info('Discovering packages');
+
         $manifest->build();
 
-        $tasks = collect($manifest->manifest)
-            ->map(fn () => fn () => true);
+        collect($manifest->manifest)
+            ->map(fn () => fn () => true)
+            ->each(fn ($task, $description) => Task::renderUsing(
+                $this->output, $description, $task,
+            ));
 
-        $this->tasks('Discovering packages', $tasks);
+        $this->newLine();
     }
 }

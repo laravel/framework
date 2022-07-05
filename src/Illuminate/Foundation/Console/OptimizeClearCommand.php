@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'optimize:clear')]
 class OptimizeClearCommand extends Command
@@ -40,13 +41,19 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
-        $this->tasks('Removing cached bootstrap files', [
-            'events' => fn () => $this->callSilent('event:clear'),
-            'views' => fn () => $this->callSilent('view:clear'),
-            'cache' => fn () => $this->callSilent('cache:clear'),
-            'route' => fn () => $this->callSilent('route:clear'),
-            'config' => fn () => $this->callSilent('config:clear'),
-            'compiled' => fn () => $this->callSilent('clear-compiled'),
-        ]);
+        $this->info('Removing cached bootstrap files');
+
+        collect([
+            'events' => fn () => $this->callSilent('event:clear') == 0,
+            'views' => fn () => $this->callSilent('view:clear') == 0,
+            'cache' => fn () => $this->callSilent('cache:clear') == 0,
+            'route' => fn () => $this->callSilent('route:clear') == 0,
+            'config' => fn () => $this->callSilent('config:clear') == 0,
+            'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
+        ])->each(fn ($task, $description) => Task::renderUsing(
+            $this->output, $description, $task,
+        ));
+
+        $this->newLine();
     }
 }

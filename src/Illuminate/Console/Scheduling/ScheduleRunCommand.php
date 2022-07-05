@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskSkipped;
@@ -159,7 +160,7 @@ class ScheduleRunCommand extends Command
             $event->getSummaryForDisplay()
         );
 
-        $this->task($description, function () use ($event) {
+        Task::renderUsing($this->output, $description, function () use ($event) {
             $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
             $start = microtime(true);

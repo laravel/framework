@@ -17,7 +17,7 @@ class Task extends Component
      * @param  int  $verbosity
      * @return void
      */
-    public static function renderUsing($output, $description, $task, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public static function renderUsing($output, $description, $task = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         $component = static::fromOutput($output);
 

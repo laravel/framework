@@ -5,6 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'schedule:test')]
 class ScheduleTestCommand extends Command
@@ -72,7 +73,7 @@ class ScheduleTestCommand extends Command
 
         $event = $commands[$index];
 
-        $this->task(sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
+        Task::renderUsing($this->output, sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
             $event->run($this->laravel);
         });
 
