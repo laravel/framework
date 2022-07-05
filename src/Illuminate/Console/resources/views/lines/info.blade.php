@@ -1,3 +1,3 @@
-<x-line :newLine="$newLine" :bgColor="'blue'" :fgColor="'white'" :title="'info'">
+<x-illuminate-console-line :newLine="$newLine" :bgColor="'blue'" :fgColor="'white'" :title="'info'">
     {{ $content }}
-</x-line>
+</x-illuminate-console-line>

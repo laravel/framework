@@ -72,12 +72,11 @@ class Line extends Component
     {
         $style = $style ?: 'raw';
 
-        renderUsing($output);
-
         $string = self::highlightDynamicContent($string);
         $string = self::ensurePunctuation($string);
         $string = self::ensureRelativePaths($string);
 
+        renderUsing($output);
         render(view('illuminate.console::lines.'.$style, [
             'content' => $string,
             'newLine' => $output instanceof NewLineAware
