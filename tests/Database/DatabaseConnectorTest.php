@@ -70,6 +70,37 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testMySqlConnectCallsCreateConnectionWithMinimalInteractionsAndDefaultCollation()
+    {
+        $dsn = 'mysql:host=foo;port=3306;dbname=bar;charset=utf8mb4';
+        $config = ['host' => 'foo', 'port' => 3306, 'database' => 'bar', 'charset' => 'utf8mb4'];
+
+        $connector = $this->getMockBuilder(MySqlConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $connection->shouldNotReceive(['exec', 'prepare']);
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
+    public function testMySqlConnectCallsCreateConnectionWithMinimalInteractionsAndCustomCollation()
+    {
+        $dsn = 'mysql:host=foo;port=3306;dbname=bar;charset=utf8mb4';
+        $config = ['host' => 'foo', 'port' => 3306, 'database' => 'bar', 'charset' => 'utf8mb4', 'collation' => 'utf8mb4_general_ci'];
+
+        $connector = $this->getMockBuilder(MySqlConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock(PDO::class);
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->willReturn($connection);
+        $connection->shouldReceive('exec')->once()->with('set names \'utf8mb4\' collate \'utf8mb4_general_ci\'');
+        $connection->shouldNotReceive('prepare');
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     public function testPostgresConnectCallsCreateConnectionWithProperArguments()
     {
         $dsn = 'pgsql:host=foo;dbname=\'bar\';port=111';

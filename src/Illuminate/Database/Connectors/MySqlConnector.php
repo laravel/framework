@@ -71,7 +71,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         $collation = $this->getCollation($config);
 
         if ($collation) {
-            $connection->exec("set names '{$config['charset']}'" . $collation);
+            $connection->exec("set names '{$config['charset']}'".$collation);
         }
     }
 
@@ -115,7 +115,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
                             : $this->getHostDsn($config);
 
         if (isset($config['charset'])) {
-            $dsn .= ';charset=' . $config['charset'];
+            $dsn .= ';charset='.$config['charset'];
         }
 
         return $dsn;
