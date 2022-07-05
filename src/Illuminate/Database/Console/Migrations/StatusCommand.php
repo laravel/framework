@@ -87,8 +87,8 @@ class StatusCommand extends BaseCommand
                         $migrationName = $this->migrator->getMigrationName($migration);
 
                         $status = in_array($migrationName, $ran)
-                            ? '<fg=green>Ran</>'
-                            : '<fg=yellow>Pending</>';
+                            ? '<fg=green;options=bold>Ran</>'
+                            : '<fg=yellow;options=bold>Pending</>';
 
                         if (in_array($migrationName, $ran)) {
                             $status = '['.$batches[$migrationName].'] '.$status;

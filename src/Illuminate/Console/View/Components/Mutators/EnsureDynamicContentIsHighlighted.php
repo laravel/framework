@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Console\View\Components\Concerns;
+namespace Illuminate\Console\View\Components\Mutators;
 
-trait Highlightable
+class EnsureDynamicContentIsHighlighted
 {
     /**
      * Highligths dynamic content within the given string.
@@ -10,7 +10,7 @@ trait Highlightable
      * @param  string  $string
      * @return string
      */
-    protected static function highlightDynamicContent($string)
+    public function __invoke($string)
     {
         return preg_replace('/\[([^\]]+)\]/', '<options=bold>[$1]</>', $string);
     }

@@ -3,10 +3,8 @@
 namespace Illuminate\Console\View\Components;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use function Termwind\render;
-use function Termwind\renderUsing;
 
-class Alert
+class Alert extends Component
 {
     /**
      * Renders the component using the given arguments.
@@ -18,10 +16,16 @@ class Alert
      */
     public static function renderUsing($output, $string, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        renderUsing($output);
+        $component = static::fromOutput($output);
 
-        render(view('illuminate.console::alert', [
+        $string = $component->mutate($string, [
+            Mutators\EnsureDynamicContentIsHighlighted::class,
+            Mutators\EnsurePunctuation::class,
+            Mutators\EnsureRelativePaths::class,
+        ]);
+
+        $component->render('alert', [
             'content' => $string,
-        ]), $verbosity);
+        ], $verbosity);
     }
 }

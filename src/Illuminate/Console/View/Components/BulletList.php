@@ -3,15 +3,9 @@
 namespace Illuminate\Console\View\Components;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use function Termwind\render;
-use function Termwind\renderUsing;
 
-class BulletList
+class BulletList extends Component
 {
-    use Concerns\EnsureNoPunctuation,
-        Concerns\EnsureRelativePaths,
-        Concerns\Highlightable;
-
     /**
      * Renders the component using the given arguments.
      *
@@ -22,16 +16,16 @@ class BulletList
      */
     public static function renderUsing($output, $elements, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        renderUsing($output);
+        $component = static::fromOutput($output);
 
-        render(view('illuminate.console::bullet-list', [
-            'elements' => collect($elements)->map(function ($string) {
-                $string = self::highlightDynamicContent($string);
-                $string = self::ensureNoPunctuation($string);
-                $string = self::ensureRelativePaths($string);
+        $elements = $component->mutate($elements, [
+            Mutators\EnsureDynamicContentIsHighlighted::class,
+            Mutators\EnsureNoPunctuation::class,
+            Mutators\EnsureRelativePaths::class,
+        ]);
 
-                return $string;
-            }),
-        ]), $verbosity);
+        $component->render('bullet-list', [
+            'elements' => $elements,
+        ], $verbosity);
     }
 }

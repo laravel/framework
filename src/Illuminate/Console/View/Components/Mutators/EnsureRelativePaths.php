@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Console\View\Components\Concerns;
+namespace Illuminate\Console\View\Components\Mutators;
 
-trait EnsureRelativePaths
+class EnsureRelativePaths
 {
     /**
      * Ensures the given string only contains relative paths.
@@ -10,7 +10,7 @@ trait EnsureRelativePaths
      * @param  string  $string
      * @return string
      */
-    protected static function ensureRelativePaths($string)
+    public function __invoke($string)
     {
         $string = str_replace(base_path().'/', '', $string);
 

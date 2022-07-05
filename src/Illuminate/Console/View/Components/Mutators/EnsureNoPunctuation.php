@@ -1,8 +1,8 @@
 <?php
 
-namespace Illuminate\Console\View\Components\Concerns;
+namespace Illuminate\Console\View\Components\Mutators;
 
-trait EnsureNoPunctuation
+class EnsureNoPunctuation
 {
     /**
      * Ensures the given string does not end with a dot.
@@ -10,7 +10,7 @@ trait EnsureNoPunctuation
      * @param  string  $string
      * @return string
      */
-    protected static function ensureNoPunctuation($string)
+    public function __invoke($string)
     {
         if (str($string)->endsWith(['.', '?', '!', ':'])) {
             return substr_replace($string, '', -1);

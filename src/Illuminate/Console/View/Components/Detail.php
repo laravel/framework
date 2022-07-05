@@ -3,15 +3,9 @@
 namespace Illuminate\Console\View\Components;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use function Termwind\render;
-use function Termwind\renderUsing;
 
-class Detail
+class Detail extends Component
 {
-    use Concerns\EnsureNoPunctuation,
-        Concerns\EnsureRelativePaths,
-        Concerns\Highlightable;
-
     /**
      * Renders the component using the given arguments.
      *
@@ -23,19 +17,23 @@ class Detail
      */
     public static function renderUsing($output, $left, $right = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        renderUsing($output);
+        $component = static::fromOutput($output);
 
-        $left = self::highlightDynamicContent($left);
-        $left = self::ensureNoPunctuation($left);
-        $left = self::ensureRelativePaths($left);
+        $left = $component->mutate($left, [
+            Mutators\EnsureDynamicContentIsHighlighted::class,
+            Mutators\EnsureNoPunctuation::class,
+            Mutators\EnsureRelativePaths::class,
+        ]);
 
-        $right = self::highlightDynamicContent($right);
-        $right = self::ensureNoPunctuation($right);
-        $right = self::ensureRelativePaths($right);
+        $right = $component->mutate($right, [
+            Mutators\EnsureDynamicContentIsHighlighted::class,
+            Mutators\EnsureNoPunctuation::class,
+            Mutators\EnsureRelativePaths::class,
+        ]);
 
-        render(view('illuminate.console::detail', [
+        $component->render('detail', [
             'left' => $left,
             'right' => $right,
-        ]), $verbosity);
+        ], $verbosity);
     }
 }

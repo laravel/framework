@@ -3,6 +3,6 @@
         <span class="px-1 bg-{{ $bgColor }} text-{{ $fgColor }} uppercase">{{ $title }}</span>
     @endif
     <span class="@if ($title) ml-1 @endif">
-        {{ $slot }}
+        {{ $content }}
     </span>
 </div>

@@ -6,12 +6,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function Termwind\terminal;
 use Throwable;
 
-class Task
+class Task extends Component
 {
-    use Concerns\EnsureNoPunctuation,
-        Concerns\EnsureRelativePaths,
-        Concerns\Highlightable;
-
     /**
      * Renders the component using the given arguments.
      *
@@ -23,9 +19,13 @@ class Task
      */
     public static function renderUsing($output, $description, $task, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        $description = self::ensureRelativePaths($description);
-        $description = self::ensureNoPunctuation($description);
-        $description = static::highlightDynamicContent($description);
+        $component = static::fromOutput($output);
+
+        $description = $component->mutate($description, [
+            Mutators\EnsureDynamicContentIsHighlighted::class,
+            Mutators\EnsureNoPunctuation::class,
+            Mutators\EnsureRelativePaths::class,
+        ]);
 
         $descriptionWidth = mb_strlen(preg_replace("/\<[\w=#\/\;,:.&,%?]+\>|\\e\[\d+m/", '$1', $description) ?? '');
 

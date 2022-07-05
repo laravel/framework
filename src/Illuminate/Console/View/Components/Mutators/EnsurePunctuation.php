@@ -1,20 +1,19 @@
 <?php
 
-namespace Illuminate\Console\View\Components\Concerns;
+namespace Illuminate\Console\View\Components\Mutators;
 
-trait EnsurePunctuation
+class EnsurePunctuation
 {
     /**
      * Ensures the given string ends with a punctuation.
      *
      * @param  string  $string
-     * @param  string  $default
      * @return string
      */
-    protected static function ensurePunctuation($string, $default = '.')
+    public function __invoke($string)
     {
         if (! str($string)->endsWith(['.', '?', '!', ':'])) {
-            return "$string$default";
+            return "$string.";
         }
 
         return $string;
