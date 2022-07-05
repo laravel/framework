@@ -56,9 +56,7 @@ class Line extends Component
         ]);
 
         $component->render('line', array_merge(static::$styles[$style], [
-            'marginTop' => $output instanceof NewLineAware
-                ? $output->newLineWritten() == false
-                : true,
+            'marginTop' => ($output instanceof NewLineAware && $output->newLineWritten()) ? 0 : 1,
             'content' => $string,
         ]), $verbosity);
     }
