@@ -17,6 +17,14 @@ class InteractsWithContainerTest extends TestCase
         $this->assertSame($this, $instance);
     }
 
+    public function testWithoutViteHandlesReactRefresh()
+    {
+        $instance = $this->withoutVite();
+
+        $this->assertSame('', app(Vite::class)->reactRefresh());
+        $this->assertSame($this, $instance);
+    }
+
     public function testWithViteRestoresOriginalHandlerAndReturnsInstance()
     {
         $handler = new stdClass;
