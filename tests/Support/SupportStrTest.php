@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Exception;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -504,7 +505,7 @@ class SupportStrTest extends TestCase
 
     public function testItCanSpecifyAFallbackForARandomStringSequence()
     {
-        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new \Exception('Out of random strings.'));
+        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new Exception('Out of random strings.'));
         Str::random();
         Str::random();
 
@@ -1015,7 +1016,7 @@ class SupportStrTest extends TestCase
 
     public function testItCanSpecifyAFallbackForASequence()
     {
-        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn () => throw new \Exception('Out of Uuids.'));
+        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn () => throw new Exception('Out of Uuids.'));
         Str::uuid();
         Str::uuid();
 
