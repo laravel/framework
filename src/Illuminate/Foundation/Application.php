@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation;
 
 use Closure;
-use Illuminate\Console\ConsoleServiceProvider;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
