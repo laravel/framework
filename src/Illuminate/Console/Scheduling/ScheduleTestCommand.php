@@ -4,8 +4,8 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Illuminate\Console\View\Components\Task;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'schedule:test')]
 class ScheduleTestCommand extends Command

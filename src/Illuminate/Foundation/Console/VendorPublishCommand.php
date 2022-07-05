@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
@@ -14,7 +15,6 @@ use League\Flysystem\MountManager;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'vendor:publish')]
 class VendorPublishCommand extends Command

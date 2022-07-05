@@ -4,8 +4,8 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Illuminate\Console\View\Components\Task;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:retry-batch')]
 class RetryBatchCommand extends Command

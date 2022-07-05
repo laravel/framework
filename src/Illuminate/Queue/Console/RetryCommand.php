@@ -4,12 +4,12 @@ namespace Illuminate\Queue\Console;
 
 use DateTimeInterface;
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Illuminate\Console\View\Components\Task;
 
 #[AsCommand(name: 'queue:retry')]
 class RetryCommand extends Command

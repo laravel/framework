@@ -3,11 +3,11 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
