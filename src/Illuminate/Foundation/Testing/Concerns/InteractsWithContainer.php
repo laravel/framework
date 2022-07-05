@@ -111,6 +111,11 @@ trait InteractsWithContainer
 
         $this->swap(Vite::class, new class
         {
+            public function __invoke()
+            {
+                return '';
+            }
+
             public function __call($name, $arguments)
             {
                 return '';
