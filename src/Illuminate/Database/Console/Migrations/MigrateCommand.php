@@ -116,6 +116,8 @@ class MigrateCommand extends BaseCommand
                     '--database' => $this->option('database'),
                 ])) == 0;
             });
+
+            $this->newLine();
         }
 
         if (! $this->migrator->hasRunAnyMigrations() && ! $this->option('pretend')) {
