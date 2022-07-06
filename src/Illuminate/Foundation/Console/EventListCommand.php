@@ -4,6 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Console\View\Components\Detail;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use ReflectionFunction;
@@ -62,8 +64,8 @@ class EventListCommand extends Command
         $this->newLine();
 
         $events->each(function ($listeners, $event) {
-            $this->detail($this->appendEventInterfaces($event));
-            $this->bulletList($listeners);
+            Detail::renderUsing($this->output, $this->appendEventInterfaces($event));
+            BulletList::renderUsing($this->output, $listeners);
         });
 
         $this->newLine();

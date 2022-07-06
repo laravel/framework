@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\View\Components\Detail;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\InputOption;
@@ -62,9 +63,11 @@ class StatusCommand extends BaseCommand
 
             if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
                 $this->newLine();
-                $this->detail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
+
+                Detail::renderUsing($this->output, '<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
+
                 $migrations->each(
-                    fn ($migration) => $this->detail($migration[0], $migration[1])
+                    fn ($migration) => Detail::renderUsing($this->output, $migration[0], $migration[1])
                 );
                 $this->newLine();
             } else {

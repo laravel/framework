@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Detail;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Queue\Events\QueueBusy;
@@ -124,12 +125,12 @@ class MonitorCommand extends Command
     {
         $this->newLine();
 
-        $this->detail('<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
+        Detail::renderUsing($this->output, '<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
 
         $queues->each(function ($queue) {
             $status = '['.$queue['size'].'] '.$queue['status'];
 
-            $this->detail($queue['queue'], $status);
+            Detail::renderUsing($this->output, $queue['queue'], $status);
         });
 
         $this->newLine();
