@@ -958,7 +958,7 @@ class Str
     public static function space(mixed ...$words): string
     {
         return join(' ', array_filter(
-            $words, fn ($value) => ! is_null($value)
+            $words, fn ($value) => ! is_null($value) && trim($value) !== ''
         ));
     }
 

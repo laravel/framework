@@ -589,6 +589,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('John Jacob Jingleheimer Schmidt', Str::space('John', 'Jacob', 'Jingleheimer', 'Schmidt'));
         $this->assertSame('John Schmidt', Str::space('John', null, null, 'Schmidt'));
+        $this->assertSame('John Schmidt', Str::space('John', '', 'Schmidt'));
     }
 
     public function testSnake()
