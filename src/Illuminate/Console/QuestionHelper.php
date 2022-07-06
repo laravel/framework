@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Console\View\Components\Detail;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -68,7 +68,7 @@ class QuestionHelper extends SymfonyQuestionHelper
 
         if ($question instanceof ChoiceQuestion) {
             foreach ($question->getChoices() as $key => $value) {
-                Detail::renderUsing($output, $key, $value);
+                TwoColumnDetail::renderUsing($output, $key, $value);
             }
         }
 

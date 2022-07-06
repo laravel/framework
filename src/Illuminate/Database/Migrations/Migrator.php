@@ -4,7 +4,7 @@ namespace Illuminate\Database\Migrations;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Detail;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Console\View\Components\Line;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -274,7 +274,7 @@ class Migrator
             $migration = (object) $migration;
 
             if (! $file = Arr::get($files, $migration->migration)) {
-                $this->write(Detail::class, $migration->migration, '<fg=yellow;options=bold>Migration not found</>');
+                $this->write(TwoColumnDetail::class, $migration->migration, '<fg=yellow;options=bold>Migration not found</>');
 
                 continue;
             }
@@ -413,7 +413,7 @@ class Migrator
                 $name = $this->getMigrationName($reflectionClass->getFileName());
             }
 
-            $this->write(Detail::class, $name);
+            $this->write(TwoColumnDetail::class, $name);
             $this->write(BulletList::class, $name, collect($this->getQueries($migration, $method))->map(function ($query) {
                 return $query['query'];
             }));

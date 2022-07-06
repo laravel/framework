@@ -4,7 +4,7 @@ namespace Illuminate\Console\View\Components;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Detail extends Component
+class TwoColumnDetail extends Component
 {
     /**
      * Renders the component using the given arguments.
