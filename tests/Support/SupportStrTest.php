@@ -585,6 +585,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('❤MultiByte☆', Str::reverse('☆etyBitluM❤'));
     }
 
+    public function testSpace()
+    {
+        $this->assertSame('John Jacob Jingleheimer Schmidt', Str::space('John', 'Jacob', 'Jingleheimer', 'Schmidt'));
+        $this->assertSame('John Schmidt', Str::space('John', null, null, 'Schmidt'));
+    }
+
     public function testSnake()
     {
         $this->assertSame('laravel_p_h_p_framework', Str::snake('LaravelPHPFramework'));

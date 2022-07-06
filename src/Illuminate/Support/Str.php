@@ -950,6 +950,19 @@ class Str
     }
 
     /**
+     * Join strings with a single space, ignoring nullable values.
+     *
+     * @param  mixed  ...$words
+     * @return string
+     */
+    public static function space(mixed ...$words): string
+    {
+        return join(' ', array_filter(
+            $words, fn ($value) => ! is_null($value)
+        ));
+    }
+
+    /**
      * Convert a string to snake case.
      *
      * @param  string  $value
