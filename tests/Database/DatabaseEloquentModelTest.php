@@ -11,8 +11,8 @@ use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -1959,6 +1959,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
         $model->collectionAttribute = new BaseCollection;
+        $model->serializedAttribute = ['foo' => 'bar'];
 
         $this->assertIsInt($model->intAttribute);
         $this->assertIsFloat($model->floatAttribute);
@@ -1980,6 +1981,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertSame('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertSame(['foo' => 'bar'], $model->serializedAttribute);
+        $this->assertSame('a:1:{s:3:"foo";s:3:"bar";}', $model->serializedAttributeValue());
 
         $arr = $model->toArray();
 
@@ -2000,6 +2003,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
+        $this->assertSame(['foo' => 'bar'], $arr['serializedAttribute']);
     }
 
     public function testModelDateAttributeCastingResetsTime()
@@ -2777,6 +2781,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'serializedAttribute' => 'serialized',
         'asarrayobjectAttribute' => AsArrayObject::class,
         'ascollectionAttribute' => AsCollection::class,
         'asStringableAttribute' => AsStringable::class,
@@ -2787,6 +2792,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function serializedAttributeValue()
+    {
+        return $this->attributes['serializedAttribute'];
     }
 
     protected function serializeDate(DateTimeInterface $date)

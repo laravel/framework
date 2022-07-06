@@ -103,6 +103,7 @@ trait HasAttributes
         'json',
         'object',
         'real',
+        'serialized',
         'string',
         'timestamp',
     ];
@@ -747,6 +748,8 @@ trait HasAttributes
                 return $this->asDateTime($value)->toImmutable();
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'serialized':
+                return $this->fromSerialized($value);
         }
 
         if ($this->isEnumCastable($key)) {
@@ -947,6 +950,10 @@ trait HasAttributes
 
         if (! is_null($value) && $this->isEncryptedCastable($key)) {
             $value = $this->castAttributeAsEncryptedString($key, $value);
+        }
+
+        if (! is_null($value) && $this->hasCast($key, 'serialized')) {
+            $value = $this->asSerialized($value);
         }
 
         $this->attributes[$key] = $value;
@@ -1190,6 +1197,29 @@ trait HasAttributes
     public function fromJson($value, $asObject = false)
     {
         return json_decode($value, ! $asObject);
+    }
+
+    /**
+     * Serialize the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function asSerialized($value)
+    {
+        return serialize($value);
+    }
+
+    /**
+     * Unserialize the given serialized value.
+     *
+     * @param  string  $value
+     * @param  array  $options
+     * @return mixed
+     */
+    public function fromSerialized($value, array $options = [])
+    {
+        return unserialize($value, $options);
     }
 
     /**
