@@ -106,6 +106,16 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     /**
      * {@inheritdoc}
      */
+    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
+    {
+        $this->newLineWritten = true;
+
+        parent::writeln($messages, $type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function newLine(int $count = 1)
     {
         $this->newLineWritten = $count > 0;
