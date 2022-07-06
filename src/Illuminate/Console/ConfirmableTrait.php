@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\View\Components\Alert;
+
 trait ConfirmableTrait
 {
     /**
@@ -24,7 +26,7 @@ trait ConfirmableTrait
                 return true;
             }
 
-            $this->alert($warning);
+            Alert::renderUsing($this->output, $warning);
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 

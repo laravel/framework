@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -353,7 +354,13 @@ trait InteractsWithIO
      */
     public function alert($string)
     {
-        Components\Alert::renderUsing($this->output, $string);
+        $length = Str::length(strip_tags($string)) + 12;
+
+        $this->comment(str_repeat('*', $length));
+        $this->comment('*     '.$string.'     *');
+        $this->comment(str_repeat('*', $length));
+
+        $this->newLine();
     }
 
     /**
