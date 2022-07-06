@@ -70,6 +70,14 @@ abstract class Grammar
             return $this->wrapJsonSelector($value);
         }
 
+        // If the given value is functional (wrapped in parentheses), we cannot make any
+        // assumptions, and should just return the value as is.  For example, as of MySQL
+        // 8.0.13, indexes can include functional key parts wrapped in parens, like
+        // (COALESCE(`scan_code`, "")), as well as simple column names.
+        if ($this->isFunctional($value)) {
+            return $value;
+        }
+
         return $this->wrapSegments(explode('.', $value));
     }
 
@@ -146,6 +154,17 @@ abstract class Grammar
     protected function isJsonSelector($value)
     {
         return str_contains($value, '->');
+    }
+
+    /**
+     * Determine if the given string is functional (wrapped in parentheses).
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isFunctional($value)
+    {
+        return $value[0] === '(' && $value[-1] === ')';
     }
 
     /**
