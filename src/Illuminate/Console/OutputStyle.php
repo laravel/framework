@@ -37,7 +37,7 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
 
         parent::__construct($input, $output);
 
-        with(new ReflectionClass($this))
+        with(new ReflectionClass(self::class))
             ->getParentClass()
             ->getProperty('questionHelper')
             ->setValue($this, new QuestionHelper());
