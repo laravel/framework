@@ -27,15 +27,11 @@ class Task extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
+        $task = $task ?: fn () => true;
+
         $descriptionWidth = mb_strlen(preg_replace("/\<[\w=#\/\;,:.&,%?]+\>|\\e\[\d+m/", '$1', $description) ?? '');
 
         $output->write("  $description ", false, $verbosity);
-
-        if (is_null($task)) {
-            $dots = max(terminal()->width() - $descriptionWidth - 5, 0);
-
-            return $output->write(str_repeat('<fg=gray>.</>', $dots), false, $verbosity);
-        }
 
         $startTime = microtime(true);
 

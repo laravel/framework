@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\View\Components\Task;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Events\VendorTagPublished;
 use Illuminate\Support\Arr;
@@ -244,7 +245,7 @@ class VendorPublishCommand extends Command
 
             $this->status($from, $to, 'file');
         } else {
-            Task::renderUsing($this->output, sprintf(
+            TwoColumnDetail::renderUsing($this->output, sprintf(
                 'File [%s] already exist',
                 str_replace(base_path().'/', '', realpath($to)),
             ));
@@ -319,6 +320,6 @@ class VendorPublishCommand extends Command
             $type,
             $from,
             $to,
-        ), fn () => true);
+        ));
     }
 }
