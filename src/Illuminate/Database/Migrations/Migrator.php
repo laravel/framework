@@ -4,9 +4,9 @@ namespace Illuminate\Database\Migrations;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Console\View\Components\Line;
 use Illuminate\Console\View\Components\Task;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Events\MigrationEnded;
