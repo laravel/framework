@@ -31,7 +31,7 @@ class TwoColumnDetail extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->render('detail', [
+        $component->render('two-column-detail', [
             'left' => $left,
             'right' => $right,
         ], $verbosity);
