@@ -64,7 +64,7 @@ abstract class Component
 
         ob_start();
 
-        include(__DIR__."/../../resources/views/components/$view.php");
+        include __DIR__."/../../resources/views/components/$view.php";
 
         return tap(ob_get_contents(), function () {
             ob_end_clean();
