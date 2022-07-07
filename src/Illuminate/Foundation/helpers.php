@@ -980,7 +980,8 @@ if (! function_exists('jsonResponse')) {
      * @param int $options
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
      */
-    function jsonResponse($data = [], $status = 200, array $headers = [], $options = 0) {
+    function jsonResponse($data = [], $status = 200, array $headers = [], $options = 0)
+    {
         return response()->json($data, $status, $headers, $options);
     }
 }
