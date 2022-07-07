@@ -58,7 +58,7 @@ abstract class Component
 
         renderUsing($this->output);
 
-        render(view('illuminate.console::'.$view, $data), $verbosity);
+        render(view('illuminate.console::components.'.$view, $data), $verbosity);
     }
 
     /**
