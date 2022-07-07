@@ -1914,4 +1914,12 @@ class Builder implements BuilderContract
     {
         $this->query = clone $this->query;
     }
+
+    /**
+     * Check boolean column
+     */
+    public function whereBoolean($column, $value = true)
+    {
+        return $this->where($column, $value);
+    }
 }
