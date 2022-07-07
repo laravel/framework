@@ -42,33 +42,18 @@ class QuestionHelper extends SymfonyQuestionHelper
 
                 break;
 
-            case $question instanceof ChoiceQuestion && $question->isMultiselect():
-                $choices = $question->getChoices();
-                $default = explode(',', $default);
-
-                foreach ($default as $key => $value) {
-                    $default[$key] = $choices[trim($value)];
-                }
-
-                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape(implode(', ', $default)));
-
-                break;
-
             case $question instanceof ChoiceQuestion:
                 $choices = $question->getChoices();
                 $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($choices[$default] ?? $default));
 
                 break;
-
-            default:
-                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($default));
         }
 
         $output->writeln($text);
 
         if ($question instanceof ChoiceQuestion) {
             foreach ($question->getChoices() as $key => $value) {
-                TwoColumnDetail::render($output, $key, $value);
+                with(new TwoColumnDetail($output))->render($key, $value);
             }
         }
 

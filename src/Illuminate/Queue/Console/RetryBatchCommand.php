@@ -45,19 +45,19 @@ class RetryBatchCommand extends Command
         $batch = $this->laravel[BatchRepository::class]->find($id = $this->argument('id'));
 
         if (! $batch) {
-            $this->error("Unable to find a batch with ID [{$id}].");
+            $this->components->error("Unable to find a batch with ID [{$id}].");
 
             return 1;
         } elseif (empty($batch->failedJobIds)) {
-            $this->error('The given batch does not contain any failed jobs.');
+            $this->components->error('The given batch does not contain any failed jobs.');
 
             return 1;
         }
 
-        $this->info("Retrying the failed jobs for a batch [$id].");
+        $this->components->info("Retrying the failed jobs for a batch [$id].");
 
         foreach ($batch->failedJobIds as $failedJobId) {
-            Task::render($this->output, $failedJobId, fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0);
+            $this->components->task($failedJobId, fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0);
         }
 
         $this->newLine();

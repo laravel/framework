@@ -4,9 +4,9 @@ namespace Illuminate\Console\Concerns;
 
 use Closure;
 use Illuminate\Console\OutputStyle;
-use Illuminate\Console\View\Components;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +15,15 @@ use Symfony\Component\Console\Question\Question;
 
 trait InteractsWithIO
 {
+    /**
+     * The console components factory.
+     *
+     * @var \Illuminate\Console\View\Components\Factory
+     *
+     * @internal This property is not meant to be used or overwritten outside the framework.
+     */
+    protected $components;
+
     /**
      * The input interface implementation.
      *
@@ -292,7 +301,9 @@ trait InteractsWithIO
      */
     public function line($string, $style = null, $verbosity = null)
     {
-        Components\Line::render($this->output, $string, $style, $this->parseVerbosity($verbosity));
+        $styled = $style ? "<$style>$string</$style>" : $string;
+
+        $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }
 
     /**
@@ -304,10 +315,7 @@ trait InteractsWithIO
      */
     public function comment($string, $verbosity = null)
     {
-        $this->output->writeln(
-            "<comment>$string</comment>",
-            $this->parseVerbosity($verbosity)
-        );
+        $this->line($string, 'comment', $verbosity);
     }
 
     /**
@@ -343,6 +351,12 @@ trait InteractsWithIO
      */
     public function warn($string, $verbosity = null)
     {
+        if (! $this->output->getFormatter()->hasStyle('warning')) {
+            $style = new OutputFormatterStyle('yellow');
+
+            $this->output->getFormatter()->setStyle('warning', $style);
+        }
+
         $this->line($string, 'warning', $verbosity);
     }
 

@@ -42,7 +42,7 @@ class FreshCommand extends Command
 
         $this->newLine();
 
-        Task::render($this->output, 'Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
+        $this->components->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
             '--database' => $database,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),

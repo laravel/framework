@@ -52,7 +52,7 @@ class DownCommand extends Command
     {
         try {
             if ($this->laravel->maintenanceMode()->active()) {
-                $this->info('Application is already down.');
+                $this->components->info('Application is already down.');
 
                 return 0;
             }
@@ -66,9 +66,9 @@ class DownCommand extends Command
 
             $this->laravel->get('events')->dispatch(MaintenanceModeEnabled::class);
 
-            $this->info('Application is now in maintenance mode.');
+            $this->components->info('Application is now in maintenance mode.');
         } catch (Exception $e) {
-            $this->error(sprintf(
+            $this->components->error(sprintf(
                 'Failed to enter maintenance mode: %s.',
                 $e->getMessage(),
             ));

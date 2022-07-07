@@ -123,7 +123,7 @@ class VendorPublishCommand extends Command
      */
     protected function promptForProviderOrTag()
     {
-        $choice = $this->choice(
+        $choice = $this->components->choice(
             "Which provider or tag's files would you like to publish?",
             $choices = $this->publishableChoices()
         );
@@ -179,7 +179,7 @@ class VendorPublishCommand extends Command
         $pathsToPublish = $this->pathsToPublish($tag);
 
         if ($publishing = count($pathsToPublish) > 0) {
-            $this->info(sprintf(
+            $this->components->info(sprintf(
                 'Publishing %sassets',
                 $tag ? "[$tag] " : '',
             ));
@@ -190,7 +190,7 @@ class VendorPublishCommand extends Command
         }
 
         if ($publishing === false) {
-            $this->info('No publishable resources for tag ['.$tag.'].');
+            $this->components->info('No publishable resources for tag ['.$tag.'].');
         } else {
             $this->laravel['events']->dispatch(new VendorTagPublished($tag, $pathsToPublish));
 
@@ -226,7 +226,7 @@ class VendorPublishCommand extends Command
             return $this->publishDirectory($from, $to);
         }
 
-        $this->error("Can't locate path: <{$from}>");
+        $this->components->error("Can't locate path: <{$from}>");
     }
 
     /**
@@ -245,7 +245,7 @@ class VendorPublishCommand extends Command
 
             $this->status($from, $to, 'file');
         } else {
-            TwoColumnDetail::render($this->output, sprintf(
+            $this->components->twoColumnDetail(sprintf(
                 'File [%s] already exist',
                 str_replace(base_path().'/', '', realpath($to)),
             ));
@@ -315,7 +315,7 @@ class VendorPublishCommand extends Command
 
         $to = str_replace(base_path().'/', '', realpath($to));
 
-        Task::render($this->output, sprintf(
+        $this->components->task(sprintf(
             'Copying %s [%s] to [%s]',
             $type,
             $from,

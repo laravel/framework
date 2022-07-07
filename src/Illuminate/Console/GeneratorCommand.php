@@ -147,7 +147,7 @@ abstract class GeneratorCommand extends Command
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
         if ($this->isReservedName($this->getNameInput())) {
-            $this->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
+            $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
 
             return false;
         }
@@ -162,7 +162,7 @@ abstract class GeneratorCommand extends Command
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
-            $this->error($this->type.' already exists.');
+            $this->components->error($this->type.' already exists.');
 
             return false;
         }
@@ -182,7 +182,7 @@ abstract class GeneratorCommand extends Command
             }
         }
 
-        $this->info($info.' created successfully.');
+        $this->components->info($info.' created successfully.');
     }
 
     /**

@@ -41,7 +41,7 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
-        $this->info('Removing cached bootstrap files');
+        $this->components->info('Removing cached bootstrap files');
 
         collect([
             'events' => fn () => $this->callSilent('event:clear') == 0,
@@ -50,9 +50,7 @@ class OptimizeClearCommand extends Command
             'route' => fn () => $this->callSilent('route:clear') == 0,
             'config' => fn () => $this->callSilent('config:clear') == 0,
             'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
-        ])->each(fn ($task, $description) => Task::render(
-            $this->output, $description, $task,
-        ));
+        ])->each(fn ($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
     }

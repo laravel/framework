@@ -9,22 +9,19 @@ class BulletList extends Component
     /**
      * Renders the component using the given arguments.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  array<int, string>  $elements
      * @param  int  $verbosity
      * @return void
      */
-    public static function render($output, $elements, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public function render($elements, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        $component = static::fromOutput($output);
-
-        $elements = $component->mutate($elements, [
+        $elements = $this->mutate($elements, [
             Mutators\EnsureDynamicContentIsHighlighted::class,
             Mutators\EnsureNoPunctuation::class,
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->renderView('bullet-list', [
+        $this->renderView('bullet-list', [
             'elements' => $elements,
         ], $verbosity);
     }

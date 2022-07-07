@@ -42,7 +42,7 @@ class ScheduleWorkCommand extends Command
      */
     public function handle()
     {
-        $this->info('Running schedule tasks every minute.');
+        $this->components->info('Running schedule tasks every minute.');
 
         [$lastExecutionStartedAt, $keyOfLastExecutionWithOutput, $executions] = [null, null, []];
 

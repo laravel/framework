@@ -11,17 +11,14 @@ class Task extends Component
     /**
      * Renders the component using the given arguments.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  string  $description
      * @param  (callable(): bool)|null  $task
      * @param  int  $verbosity
      * @return void
      */
-    public static function render($output, $description, $task = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public function render($description, $task = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        $component = static::fromOutput($output);
-
-        $description = $component->mutate($description, [
+        $description = $this->mutate($description, [
             Mutators\EnsureDynamicContentIsHighlighted::class,
             Mutators\EnsureNoPunctuation::class,
             Mutators\EnsureRelativePaths::class,
@@ -31,7 +28,7 @@ class Task extends Component
 
         $descriptionWidth = mb_strlen(preg_replace("/\<[\w=#\/\;,:.&,%?]+\>|\\e\[\d+m/", '$1', $description) ?? '');
 
-        $output->write("  $description ", false, $verbosity);
+        $this->output->write("  $description ", false, $verbosity);
 
         $startTime = microtime(true);
 
@@ -48,10 +45,10 @@ class Task extends Component
 
             $runTimeWidth = mb_strlen($runTime);
             $dots = max(terminal()->width() - $descriptionWidth - $runTimeWidth - 10, 0);
-            $output->write(str_repeat('<fg=gray>.</>', $dots), false, $verbosity);
-            $output->write("<fg=gray>$runTime</>", false, $verbosity);
+            $this->output->write(str_repeat('<fg=gray>.</>', $dots), false, $verbosity);
+            $this->output->write("<fg=gray>$runTime</>", false, $verbosity);
 
-            $output->writeln(
+            $this->output->writeln(
                 $result !== false ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>',
                 $verbosity,
             );

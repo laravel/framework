@@ -4,7 +4,8 @@ namespace Illuminate\Database\Migrations;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Line;
+use Illuminate\Console\View\Components\Info;
+use Illuminate\Console\View\Components\Error;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -20,6 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\ArrayInput;
 
 class Migrator
 {
@@ -148,7 +150,7 @@ class Migrator
         if (count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('up'));
 
-            $this->write(Line::class, 'Nothing to migrate', 'info');
+            $this->write(Info::class, 'Nothing to migrate');
 
             return;
         }
@@ -164,7 +166,7 @@ class Migrator
 
         $this->fireMigrationEvent(new MigrationsStarted('up'));
 
-        $this->write(Line::class, 'Running migrations.', 'info');
+        $this->write(Info::class, 'Running migrations.');
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
@@ -226,7 +228,7 @@ class Migrator
         if (count($migrations) === 0) {
             $this->fireMigrationEvent(new NoPendingMigrations('down'));
 
-            $this->write(Line::class, 'Nothing to rollback.', 'info');
+            $this->write(Info::class, 'Nothing to rollback.');
 
             return [];
         }
@@ -265,7 +267,7 @@ class Migrator
 
         $this->fireMigrationEvent(new MigrationsStarted('down'));
 
-        $this->write(Line::class, 'Rollbacking migrations.', 'info');
+        $this->write(Info::class, 'Rollbacking migrations.');
 
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order. This getLast method on the
@@ -307,7 +309,7 @@ class Migrator
         $migrations = array_reverse($this->repository->getRan());
 
         if (count($migrations) === 0) {
-            $this->write(Line::class, 'Nothing to rollback.', 'info');
+            $this->write(Info::class, 'Nothing to rollback.');
 
             return [];
         }
@@ -420,10 +422,10 @@ class Migrator
         } catch (SchemaException $e) {
             $name = get_class($migration);
 
-            $this->write(Line::class, sprintf(
+            $this->write(Error::class, sprintf(
                 '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',
                 $name,
-            ), 'error');
+            ));
         }
     }
 
@@ -722,7 +724,7 @@ class Migrator
     protected function write($component, ...$arguments)
     {
         if ($this->output) {
-            $component::render($this->output, ...$arguments);
+            with(new $component($this->output))->render(...$arguments);
         }
     }
 

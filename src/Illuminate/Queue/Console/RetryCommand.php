@@ -52,24 +52,24 @@ class RetryCommand extends Command
         $jobsFound = count($ids = $this->getJobIds()) > 0;
 
         if ($jobsFound) {
-            $this->info('Retrying failed queue jobs.');
+            $this->components->info('Retrying failed queue jobs.');
         }
 
         foreach ($ids as $id) {
             $job = $this->laravel['queue.failer']->find($id);
 
             if (is_null($job)) {
-                $this->error("Unable to find failed job with ID [{$id}].");
+                $this->components->error("Unable to find failed job with ID [{$id}].");
             } else {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
-                Task::render($this->output, $id, fn () => $this->retryJob($job));
+                $this->components->task($id, fn () => $this->retryJob($job));
 
                 $this->laravel['queue.failer']->forget($id);
             }
         }
 
-        $jobsFound ? $this->newLine() : $this->info('No retryable jobs found.');
+        $jobsFound ? $this->newLine() : $this->components->info('No retryable jobs found.');
     }
 
     /**
@@ -110,7 +110,7 @@ class RetryCommand extends Command
                         ->toArray();
 
         if (count($ids) === 0) {
-            $this->error("Unable to find failed jobs for queue [{$queue}].");
+            $this->components->error("Unable to find failed jobs for queue [{$queue}].");
         }
 
         return $ids;

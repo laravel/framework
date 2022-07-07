@@ -64,9 +64,9 @@ class ClearCommand extends Command
         if ($queue instanceof ClearableQueue) {
             $count = $queue->clear($queueName);
 
-            $this->info('Cleared '.$count.' jobs from the ['.$queueName.'] queue');
+            $this->components->info('Cleared '.$count.' jobs from the ['.$queueName.'] queue');
         } else {
-            $this->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
+            $this->components->error('Clearing queues is not supported on ['.(new ReflectionClass($queue))->getShortName().']');
         }
 
         return 0;

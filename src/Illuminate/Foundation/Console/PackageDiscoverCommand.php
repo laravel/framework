@@ -43,15 +43,13 @@ class PackageDiscoverCommand extends Command
      */
     public function handle(PackageManifest $manifest)
     {
-        $this->info('Discovering packages');
+        $this->components->info('Discovering packages');
 
         $manifest->build();
 
         collect($manifest->manifest)
             ->map(fn () => fn () => true)
-            ->each(fn ($task, $description) => Task::render(
-                $this->output, $description, $task,
-            ));
+            ->each(fn ($task, $description) => $this->components->task($description, $task));
 
         $this->newLine();
     }

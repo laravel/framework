@@ -3,7 +3,6 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Contracts\NewLineAware;
-use ReflectionClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -36,11 +35,6 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
         $this->output = $output;
 
         parent::__construct($input, $output);
-
-        with(new ReflectionClass(self::class))
-            ->getParentClass()
-            ->getProperty('questionHelper')
-            ->setValue($this, new QuestionHelper());
     }
 
     /**

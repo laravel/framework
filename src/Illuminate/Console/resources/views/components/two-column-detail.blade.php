@@ -1,11 +1,11 @@
 <div class="flex mx-2">
     <span>
-        {{ $left }}
+        {{ $first }}
     </span>
     <span class="flex-1 content-repeat-[.] text-gray ml-1"></span>
-    @if ($right !== '')
+    @if ($second !== '')
         <span class="ml-1">
-            {{ $right }}
+            {{ $second }}
         </span>
     @endif
 </div>

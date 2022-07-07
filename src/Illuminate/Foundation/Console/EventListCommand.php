@@ -56,7 +56,7 @@ class EventListCommand extends Command
         $events = $this->getEvents()->sortKeys();
 
         if ($events->isEmpty()) {
-            $this->comment("Your application doesn't have any events matching the given criteria.");
+            $this->components->info("Your application doesn't have any events matching the given criteria.");
 
             return;
         }
@@ -64,8 +64,8 @@ class EventListCommand extends Command
         $this->newLine();
 
         $events->each(function ($listeners, $event) {
-            TwoColumnDetail::render($this->output, $this->appendEventInterfaces($event));
-            BulletList::render($this->output, $listeners);
+            $this->components->twoColumnDetail($this->appendEventInterfaces($event));
+            $this->components->bulletList($listeners);
         });
 
         $this->newLine();

@@ -9,31 +9,28 @@ class TwoColumnDetail extends Component
     /**
      * Renders the component using the given arguments.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  string  $left
-     * @param  string|null  $right
+     * @param  string  $first
+     * @param  string|null  $second
      * @param  int  $verbosity
      * @return void
      */
-    public static function render($output, $left, $right = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public function render($first, $second = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        $component = static::fromOutput($output);
-
-        $left = $component->mutate($left, [
+        $first = $this->mutate($first, [
             Mutators\EnsureDynamicContentIsHighlighted::class,
             Mutators\EnsureNoPunctuation::class,
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $right = $component->mutate($right, [
+        $second = $this->mutate($second, [
             Mutators\EnsureDynamicContentIsHighlighted::class,
             Mutators\EnsureNoPunctuation::class,
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->renderView('two-column-detail', [
-            'left' => $left,
-            'right' => $right,
+        $this->renderView('two-column-detail', [
+            'first' => $first,
+            'second' => $second,
         ], $verbosity);
     }
 }

@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\Task;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'schedule:test')]
@@ -52,7 +51,7 @@ class ScheduleTestCommand extends Command
         }
 
         if (empty($commandNames)) {
-            return $this->info('No scheduled commands have been defined.');
+            return $this->components->info('No scheduled commands have been defined.');
         }
 
         if (! empty($name = $this->option('name'))) {
@@ -63,17 +62,19 @@ class ScheduleTestCommand extends Command
             });
 
             if (count($matches) !== 1) {
-                return $this->error('No matching scheduled command found.');
+                $this->components->info('No matching scheduled command found.');
+
+                return;
             }
 
             $index = key($matches);
         } else {
-            $index = array_search($this->choice('Which command would you like to run?', $commandNames), $commandNames);
+            $index = array_search($this->components->choice('Which command would you like to run?', $commandNames), $commandNames);
         }
 
         $event = $commands[$index];
 
-        Task::render($this->output, sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
+        $this->components->task(sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
             $event->run($this->laravel);
         });
 

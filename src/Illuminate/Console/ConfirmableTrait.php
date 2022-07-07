@@ -2,8 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Console\View\Components\Alert;
-
 trait ConfirmableTrait
 {
     /**
@@ -26,12 +24,12 @@ trait ConfirmableTrait
                 return true;
             }
 
-            Alert::render($this->output, $warning);
+            $this->components->alert($warning);
 
-            $confirmed = $this->confirm('Do you really wish to run this command?');
+            $confirmed = $this->components->confirm('Do you really wish to run this command?');
 
             if (! $confirmed) {
-                $this->warn('Command canceled.');
+                $this->components->warn('Command canceled.');
 
                 return false;
             }

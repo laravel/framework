@@ -7,7 +7,6 @@ use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Carbon;
@@ -123,7 +122,7 @@ class ScheduleRunCommand extends Command
         }
 
         if (! $this->eventsRan) {
-            $this->info('No scheduled commands are ready to run.');
+            $this->components->info('No scheduled commands are ready to run.');
         } else {
             $this->newLine();
         }
@@ -140,7 +139,7 @@ class ScheduleRunCommand extends Command
         if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
-            $this->info(sprintf(
+            $this->components->info(sprintf(
                 'Skipping [%s], as command already run on another server.', $event->getSummaryForDisplay()
             ));
         }
@@ -160,7 +159,7 @@ class ScheduleRunCommand extends Command
             $event->getSummaryForDisplay()
         );
 
-        Task::render($this->output, $description, function () use ($event) {
+        $this->components->task($description, function () use ($event) {
             $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
             $start = microtime(true);

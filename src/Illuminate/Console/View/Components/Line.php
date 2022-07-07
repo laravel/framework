@@ -18,7 +18,7 @@ class Line extends Component
             'fgColor' => 'white',
             'title' => 'info',
         ],
-        'warning' => [
+        'warn' => [
             'bgColor' => 'yellow',
             'fgColor' => 'black',
             'title' => 'warn',
@@ -28,35 +28,26 @@ class Line extends Component
             'fgColor' => 'white',
             'title' => 'error',
         ],
-        'raw' => [
-            'bgColor' => 'default',
-            'fgColor' => 'default',
-        ],
     ];
 
     /**
      * Renders the component using the given arguments.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  string  $style
      * @param  string  $string
-     * @param  string|null  $style
      * @param  int  $verbosity
      * @return void
      */
-    public static function render($output, $string, $style, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public function render($style, $string, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        $component = static::fromOutput($output);
-
-        $style = $style ?: 'raw';
-
-        $string = $component->mutate($string, [
+        $string = $this->mutate($string, [
             Mutators\EnsureDynamicContentIsHighlighted::class,
             Mutators\EnsurePunctuation::class,
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->renderView('line', array_merge(static::$styles[$style], [
-            'marginTop' => ($output instanceof NewLineAware && $output->newLineWritten()) ? 0 : 1,
+        $this->renderView('line', array_merge(static::$styles[$style], [
+            'marginTop' => ($this->output instanceof NewLineAware && $this->output->newLineWritten()) ? 0 : 1,
             'content' => $string,
         ]), $verbosity);
     }

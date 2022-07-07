@@ -2,16 +2,20 @@
 
 namespace Illuminate\Console\View\Components;
 
-use Illuminate\Support\Facades\View;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Console\QuestionHelper;
+use Illuminate\Support\Facades\Blade;
+use ReflectionClass;
+use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use function Termwind\render;
 use function Termwind\renderUsing;
 
 abstract class Component
 {
     /**
-     * The output instance.
+     * The output style implementation.
      *
-     * @var \Symfony\Component\Console\Output\OutputInterface
+     * @var \Illuminate\Console\OutputStyle
      */
     protected $output;
 
@@ -25,23 +29,12 @@ abstract class Component
     /**
      * Creates a new component instance.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param  \Illuminate\Console\OutputStyle  $output
      * @return void
      */
-    protected function __construct($output)
+    public function __construct($output)
     {
         $this->output = $output;
-    }
-
-    /**
-     * Creates a new component instance from the given output.
-     *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return static
-     */
-    public static function fromOutput($output)
-    {
-        return new static($output);
     }
 
     /**
@@ -52,23 +45,14 @@ abstract class Component
      * @param  int  $verbosity
      * @return void
      */
-    public function renderView($view, $data, $verbosity)
+    protected function renderView($view, $data, $verbosity)
     {
-        $this->ensureViewRequirements();
+        $view = file_get_contents(
+            __DIR__."/../../resources/views/components/$view.blade.php"
+        );
 
         renderUsing($this->output);
-
-        render(view('illuminate.console::components.'.$view, $data), $verbosity);
-    }
-
-    /**
-     * Ensure with view requirements, such as the namespace, are loaded.
-     *
-     * @return void
-     */
-    protected function ensureViewRequirements()
-    {
-        View::replaceNamespace('illuminate.console', __DIR__.'/../../resources/views');
+        render((string) Blade::render($view, $data), $verbosity);
     }
 
     /**
@@ -78,7 +62,7 @@ abstract class Component
      * @param  array<int, callable(string): string>  $mutators
      * @return array<int, string>|string
      */
-    public function mutate($data, $mutators)
+    protected function mutate($data, $mutators)
     {
         foreach ($mutators as $mutator) {
             if (is_iterable($data)) {
@@ -91,5 +75,30 @@ abstract class Component
         }
 
         return $data;
+    }
+
+    /**
+     * Eventually performs a question using the component's question helper.
+     *
+     * @param  callable  $callable
+     * @return mixed
+     */
+    protected function usingQuestionHelper($callable)
+    {
+        $property = with(new ReflectionClass(OutputStyle::class))
+            ->getParentClass()
+            ->getProperty('questionHelper');
+
+        $currentHelper = $property->isInitialized($this->output)
+            ? $property->getValue($this->output)
+            : new SymfonyQuestionHelper();
+
+        $property->setValue($this->output, new QuestionHelper);
+
+        try {
+            return $callable();
+        } finally {
+            $property->setValue($this->output, $currentHelper);
+        }
     }
 }
