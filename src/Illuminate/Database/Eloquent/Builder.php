@@ -1916,7 +1916,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Check boolean column
+     * Check boolean column.
      */
     public function whereBoolean($column, $value = true)
     {
