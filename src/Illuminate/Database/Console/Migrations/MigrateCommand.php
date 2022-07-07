@@ -111,7 +111,7 @@ class MigrateCommand extends BaseCommand
         if (! $this->migrator->repositoryExists()) {
             $this->info('Preparing database.');
 
-            Task::renderUsing($this->output, 'Creating migration table', function () {
+            Task::render($this->output, 'Creating migration table', function () {
                 return $this->callSilent('migrate:install', array_filter([
                     '--database' => $this->option('database'),
                 ])) == 0;
@@ -144,7 +144,7 @@ class MigrateCommand extends BaseCommand
 
         $this->info('Preparing database.');
 
-        Task::renderUsing($this->output, "Loading stored database schema [$path].", function () use ($connection, $path) {
+        Task::render($this->output, "Loading stored database schema [$path].", function () use ($connection, $path) {
             // Since the schema file will create the "migrations" table and reload it to its
             // proper state, we need to delete it here so we don't get an error that this
             // table already exists when the stored database schema file gets executed.

@@ -73,7 +73,7 @@ class ScheduleTestCommand extends Command
 
         $event = $commands[$index];
 
-        Task::renderUsing($this->output, sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
+        Task::render($this->output, sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
             $event->run($this->laravel);
         });
 

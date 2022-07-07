@@ -50,7 +50,7 @@ class OptimizeClearCommand extends Command
             'route' => fn () => $this->callSilent('route:clear') == 0,
             'config' => fn () => $this->callSilent('config:clear') == 0,
             'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
-        ])->each(fn ($task, $description) => Task::renderUsing(
+        ])->each(fn ($task, $description) => Task::render(
             $this->output, $description, $task,
         ));
 

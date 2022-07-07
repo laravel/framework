@@ -245,7 +245,7 @@ class VendorPublishCommand extends Command
 
             $this->status($from, $to, 'file');
         } else {
-            TwoColumnDetail::renderUsing($this->output, sprintf(
+            TwoColumnDetail::render($this->output, sprintf(
                 'File [%s] already exist',
                 str_replace(base_path().'/', '', realpath($to)),
             ));
@@ -315,7 +315,7 @@ class VendorPublishCommand extends Command
 
         $to = str_replace(base_path().'/', '', realpath($to));
 
-        Task::renderUsing($this->output, sprintf(
+        Task::render($this->output, sprintf(
             'Copying %s [%s] to [%s]',
             $type,
             $from,

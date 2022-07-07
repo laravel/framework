@@ -64,10 +64,10 @@ class StatusCommand extends BaseCommand
             if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
                 $this->newLine();
 
-                TwoColumnDetail::renderUsing($this->output, '<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
+                TwoColumnDetail::render($this->output, '<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
 
                 $migrations->each(
-                    fn ($migration) => TwoColumnDetail::renderUsing($this->output, $migration[0], $migration[1])
+                    fn ($migration) => TwoColumnDetail::render($this->output, $migration[0], $migration[1])
                 );
                 $this->newLine();
             } else {

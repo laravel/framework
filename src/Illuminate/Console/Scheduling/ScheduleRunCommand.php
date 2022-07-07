@@ -160,7 +160,7 @@ class ScheduleRunCommand extends Command
             $event->getSummaryForDisplay()
         );
 
-        Task::renderUsing($this->output, $description, function () use ($event) {
+        Task::render($this->output, $description, function () use ($event) {
             $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
             $start = microtime(true);

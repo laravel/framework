@@ -14,7 +14,7 @@ class BulletList extends Component
      * @param  int  $verbosity
      * @return void
      */
-    public static function renderUsing($output, $elements, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public static function render($output, $elements, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         $component = static::fromOutput($output);
 
@@ -24,7 +24,7 @@ class BulletList extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->render('bullet-list', [
+        $component->renderView('bullet-list', [
             'elements' => $elements,
         ], $verbosity);
     }

@@ -14,7 +14,7 @@ class Alert extends Component
      * @param  int  $verbosity
      * @return void
      */
-    public static function renderUsing($output, $string, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public static function render($output, $string, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         $component = static::fromOutput($output);
 
@@ -24,7 +24,7 @@ class Alert extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->render('alert', [
+        $component->renderView('alert', [
             'content' => $string,
         ], $verbosity);
     }

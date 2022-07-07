@@ -26,7 +26,7 @@ trait ConfirmableTrait
                 return true;
             }
 
-            Alert::renderUsing($this->output, $warning);
+            Alert::render($this->output, $warning);
 
             $confirmed = $this->confirm('Do you really wish to run this command?');
 

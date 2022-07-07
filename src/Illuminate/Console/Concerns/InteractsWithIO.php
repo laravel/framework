@@ -292,7 +292,7 @@ trait InteractsWithIO
      */
     public function line($string, $style = null, $verbosity = null)
     {
-        Components\Line::renderUsing($this->output, $string, $style, $this->parseVerbosity($verbosity));
+        Components\Line::render($this->output, $string, $style, $this->parseVerbosity($verbosity));
     }
 
     /**

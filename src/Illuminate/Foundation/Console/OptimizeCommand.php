@@ -46,7 +46,7 @@ class OptimizeCommand extends Command
         collect([
             'config' => fn () => $this->callSilent('config:cache') == 0,
             'routes' => fn () => $this->callSilent('route:cache') == 0,
-        ])->each(fn ($task, $description) => Task::renderUsing(
+        ])->each(fn ($task, $description) => Task::render(
             $this->output, $description, $task,
         ));
 

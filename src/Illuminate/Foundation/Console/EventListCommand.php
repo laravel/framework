@@ -64,8 +64,8 @@ class EventListCommand extends Command
         $this->newLine();
 
         $events->each(function ($listeners, $event) {
-            TwoColumnDetail::renderUsing($this->output, $this->appendEventInterfaces($event));
-            BulletList::renderUsing($this->output, $listeners);
+            TwoColumnDetail::render($this->output, $this->appendEventInterfaces($event));
+            BulletList::render($this->output, $listeners);
         });
 
         $this->newLine();

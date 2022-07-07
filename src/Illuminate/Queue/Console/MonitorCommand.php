@@ -125,12 +125,12 @@ class MonitorCommand extends Command
     {
         $this->newLine();
 
-        TwoColumnDetail::renderUsing($this->output, '<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
+        TwoColumnDetail::render($this->output, '<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
 
         $queues->each(function ($queue) {
             $status = '['.$queue['size'].'] '.$queue['status'];
 
-            TwoColumnDetail::renderUsing($this->output, $queue['queue'], $status);
+            TwoColumnDetail::render($this->output, $queue['queue'], $status);
         });
 
         $this->newLine();

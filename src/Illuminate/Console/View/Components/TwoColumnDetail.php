@@ -15,7 +15,7 @@ class TwoColumnDetail extends Component
      * @param  int  $verbosity
      * @return void
      */
-    public static function renderUsing($output, $left, $right = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public static function render($output, $left, $right = null, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         $component = static::fromOutput($output);
 
@@ -31,7 +31,7 @@ class TwoColumnDetail extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->render('two-column-detail', [
+        $component->renderView('two-column-detail', [
             'left' => $left,
             'right' => $right,
         ], $verbosity);

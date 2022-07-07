@@ -43,7 +43,7 @@ class Line extends Component
      * @param  int  $verbosity
      * @return void
      */
-    public static function renderUsing($output, $string, $style, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public static function render($output, $string, $style, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         $component = static::fromOutput($output);
 
@@ -55,7 +55,7 @@ class Line extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $component->render('line', array_merge(static::$styles[$style], [
+        $component->renderView('line', array_merge(static::$styles[$style], [
             'marginTop' => ($output instanceof NewLineAware && $output->newLineWritten()) ? 0 : 1,
             'content' => $string,
         ]), $verbosity);

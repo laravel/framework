@@ -63,7 +63,7 @@ class RetryCommand extends Command
             } else {
                 $this->laravel['events']->dispatch(new JobRetryRequested($job));
 
-                Task::renderUsing($this->output, $id, fn () => $this->retryJob($job));
+                Task::render($this->output, $id, fn () => $this->retryJob($job));
 
                 $this->laravel['queue.failer']->forget($id);
             }

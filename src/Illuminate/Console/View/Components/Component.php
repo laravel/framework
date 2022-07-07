@@ -52,7 +52,7 @@ abstract class Component
      * @param  int  $verbosity
      * @return void
      */
-    public function render($view, $data, $verbosity)
+    public function renderView($view, $data, $verbosity)
     {
         $this->ensureViewRequirements();
 

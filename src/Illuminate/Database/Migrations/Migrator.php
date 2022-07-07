@@ -722,7 +722,7 @@ class Migrator
     protected function write($component, ...$arguments)
     {
         if ($this->output) {
-            $component::renderUsing($this->output, ...$arguments);
+            $component::render($this->output, ...$arguments);
         }
     }
 

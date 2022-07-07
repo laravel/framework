@@ -49,7 +49,7 @@ class PackageDiscoverCommand extends Command
 
         collect($manifest->manifest)
             ->map(fn () => fn () => true)
-            ->each(fn ($task, $description) => Task::renderUsing(
+            ->each(fn ($task, $description) => Task::render(
                 $this->output, $description, $task,
             ));
 
