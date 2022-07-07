@@ -4,8 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use ReflectionFunction;

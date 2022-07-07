@@ -4,7 +4,6 @@ namespace Illuminate\Queue\Console;
 
 use DateTimeInterface;
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Queue\Events\JobRetryRequested;
 use Illuminate\Support\Arr;

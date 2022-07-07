@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Foundation\PackageManifest;
 use Symfony\Component\Console\Attribute\AsCommand;
 

@@ -4,8 +4,8 @@ namespace Illuminate\Database\Migrations;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Error;
+use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -21,7 +21,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\ArrayInput;
 
 class Migrator
 {
