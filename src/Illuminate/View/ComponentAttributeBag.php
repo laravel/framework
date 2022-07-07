@@ -126,9 +126,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function whereStartsWith($needles)
     {
-        return $this->filter(function ($value, $key) use ($needles) {
-            return Str::startsWith($key, $needles);
-        });
+        return $this->filter(fn ($value, $key) => Str::startsWith($key, $needles));
     }
 
     /**
@@ -139,9 +137,7 @@ class ComponentAttributeBag implements ArrayAccess, Htmlable, IteratorAggregate
      */
     public function whereDoesntStartWith($needles)
     {
-        return $this->filter(function ($value, $key) use ($needles) {
-            return ! Str::startsWith($key, $needles);
-        });
+        return $this->filter(fn ($value, $key) => !Str::startsWith($key, $needles));
     }
 
     /**

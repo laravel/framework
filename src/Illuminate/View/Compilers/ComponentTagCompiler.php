@@ -212,9 +212,7 @@ class ComponentTagCompiler
 
         [$data, $attributes] = $this->partitionDataAndAttributes($class, $attributes);
 
-        $data = $data->mapWithKeys(function ($value, $key) {
-            return [Str::camel($key) => $value];
-        });
+        $data = $data->mapWithKeys(fn ($value, $key) => [Str::camel($key) => $value]);
 
         // If the component doesn't exist as a class, we'll assume it's a class-less
         // component and pass the component as a view parameter to the data so it
@@ -272,9 +270,7 @@ class ComponentTagCompiler
         }
 
         $guess = collect($this->blade->getAnonymousComponentNamespaces())
-            ->filter(function ($directory, $prefix) use ($component) {
-                return Str::startsWith($component, $prefix.'::');
-            })
+            ->filter(fn ($directory, $prefix) => Str::startsWith($component, $prefix.'::'))
             ->prepend('components', $component)
             ->reduce(function ($carry, $directory, $prefix) use ($component, $viewFactory) {
                 if (! is_null($carry)) {

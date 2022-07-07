@@ -366,9 +366,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storeVerbatimBlocks($value)
     {
-        return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            return $this->storeRawBlock($matches[1]);
-        }, $value);
+        return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s',
+            fn ($matches) => $this->storeRawBlock($matches[1]), $value);
     }
 
     /**
@@ -379,9 +378,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storePhpBlocks($value)
     {
-        return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
-            return $this->storeRawBlock("<?php{$matches[1]}?>");
-        }, $value);
+        return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s',
+            fn ($matches) => $this->storeRawBlock("<?php{$matches[1]}?>"), $value);
     }
 
     /**
@@ -422,9 +420,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.$this->getRawPlaceholder('(\d+)').'/', function ($matches) {
-            return $this->rawBlocks[$matches[1]];
-        }, $result);
+        $result = preg_replace_callback('/'.$this->getRawPlaceholder('(\d+)').'/',
+            fn ($matches) => $this->rawBlocks[$matches[1]], $result);
 
         $this->rawBlocks = [];
 
@@ -497,9 +494,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function compileStatements($value)
     {
         return preg_replace_callback(
-            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) {
-                return $this->compileStatement($match);
-            }, $value
+            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
+            fn ($match) => $this->compileStatement($match), $value
         );
     }
 
@@ -638,9 +634,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         if (is_null($alias)) {
             $alias = str_contains($class, '\\View\\Components\\')
-                            ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(function ($segment) {
-                                return Str::kebab($segment);
-                            })->implode(':')
+                            ? collect(explode('\\', Str::after($class, '\\View\\Components\\')))->map(fn ($segment) => Str::kebab($segment))->implode(':')
                             : Str::kebab(class_basename($class));
         }
 

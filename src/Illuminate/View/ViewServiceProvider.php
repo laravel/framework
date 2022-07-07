@@ -72,9 +72,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerViewFinder()
     {
-        $this->app->bind('view.finder', function ($app) {
-            return new FileViewFinder($app['files'], $app['config']['view.paths']);
-        });
+        $this->app->bind('view.finder', fn ($app) => new FileViewFinder($app['files'], $app['config']['view.paths']));
     }
 
     /**
@@ -126,9 +124,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerFileEngine($resolver)
     {
-        $resolver->register('file', function () {
-            return new FileEngine($this->app['files']);
-        });
+        $resolver->register('file', fn () => new FileEngine($this->app['files']));
     }
 
     /**
@@ -139,9 +135,7 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerPhpEngine($resolver)
     {
-        $resolver->register('php', function () {
-            return new PhpEngine($this->app['files']);
-        });
+        $resolver->register('php', fn () => new PhpEngine($this->app['files']));
     }
 
     /**
@@ -152,8 +146,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerBladeEngine($resolver)
     {
-        $resolver->register('blade', function () {
-            return new CompilerEngine($this->app['blade.compiler'], $this->app['files']);
-        });
+        $resolver->register('blade', fn () => new CompilerEngine($this->app['blade.compiler'], $this->app['files']));
     }
 }
