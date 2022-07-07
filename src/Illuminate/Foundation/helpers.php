@@ -969,3 +969,18 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('jsonResponse')) {
+    /**
+     * Get json response.
+     *
+     * @param array $data
+     * @param int $status
+     * @param array $headers
+     * @param int $options
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+     */
+    function jsonResponse($data = [], $status = 200, array $headers = [], $options = 0) {
+        return response()->json($data, $status, $headers, $options);
+    }
+}
