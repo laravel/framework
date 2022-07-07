@@ -1916,10 +1916,14 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Check boolean column.
+     * Check column not equal.
+     *
+     * @param $column
+     * @param  $value
+     * @return $this
      */
-    public function whereBoolean($column, $value = true)
+    public function whereNotEqual($column, $value)
     {
-        return $this->where($column, $value);
+        return $this->where($column, '!=', $value);
     }
 }
