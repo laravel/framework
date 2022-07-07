@@ -4,7 +4,6 @@ namespace Illuminate\Console\View\Components;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\QuestionHelper;
-use Illuminate\Support\Facades\Blade;
 use ReflectionClass;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use function Termwind\render;
@@ -47,12 +46,29 @@ abstract class Component
      */
     protected function renderView($view, $data, $verbosity)
     {
-        $view = file_get_contents(
-            __DIR__."/../../resources/views/components/$view.blade.php"
-        );
-
         renderUsing($this->output);
-        render((string) Blade::render($view, $data), $verbosity);
+
+        render((string) $this->compile($view, $data), $verbosity);
+    }
+
+    /**
+     * Compile the given view contents.
+     *
+     * @param  string  $view
+     * @param  array  $data
+     * @return void
+     */
+    protected function compile($view, $data)
+    {
+        extract($data);
+
+        ob_start();
+
+        include(__DIR__."/../../resources/views/components/$view.php");
+
+        return tap(ob_get_contents(), function () {
+            ob_end_clean();
+        });
     }
 
     /**

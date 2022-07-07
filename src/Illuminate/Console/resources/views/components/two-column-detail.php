@@ -1,11 +1,11 @@
 <div class="flex mx-2">
     <span>
-        {{ $first }}
+        <?php echo htmlspecialchars($first) ?>
     </span>
     <span class="flex-1 content-repeat-[.] text-gray ml-1"></span>
-    @if ($second !== '')
+    <?php if ($second !== '') { ?>
         <span class="ml-1">
-            {{ $second }}
+            <?php echo htmlspecialchars($second) ?>
         </span>
-    @endif
+    <?php } ?>
 </div>
