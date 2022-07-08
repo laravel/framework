@@ -313,7 +313,11 @@ class Migrator
             return [];
         }
 
-        return $this->resetMigrations($migrations, $paths, $pretend);
+        return tap($this->resetMigrations($migrations, $paths, $pretend), function () {
+            if ($this->output) {
+                $this->output->writeln("");
+            }
+        });
     }
 
     /**

@@ -48,6 +48,8 @@ class FreshCommand extends Command
             '--force' => true,
         ])) == 0);
 
+        $this->newLine();
+
         $this->call('migrate', array_filter([
             '--database' => $database,
             '--path' => $this->input->getOption('path'),
