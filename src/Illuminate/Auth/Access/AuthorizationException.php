@@ -73,6 +73,16 @@ class AuthorizationException extends Exception
     }
 
     /**
+     * Set the HTTP response status code to 404.
+     *
+     * @return $this
+     */
+    public function asNotFound()
+    {
+        return $this->withStatus(404);
+    }
+
+    /**
      * Determine if the HTTP status code has been set.
      *
      * @return bool

@@ -59,7 +59,50 @@ class AuthHandlesAuthorizationTest extends TestCase
 
             public function __invoke()
             {
-                return $this->denyWithStatus(404);
+                return $this->denyWithStatus(418);
+            }
+        };
+
+        try {
+            $class()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame(418, $e->status());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+
+        $class = new class()
+        {
+            use HandlesAuthorization;
+
+            public function __invoke()
+            {
+                return $this->denyWithStatus(418, 'foo', 3);
+            }
+        };
+
+        try {
+            $class()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame(418, $e->status());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+    }
+
+    public function testItCanDenyAsNotFound()
+    {
+        $class = new class()
+        {
+            use HandlesAuthorization;
+
+            public function __invoke()
+            {
+                return $this->denyAsNotFound();
             }
         };
 
@@ -69,6 +112,28 @@ class AuthHandlesAuthorizationTest extends TestCase
         } catch (AuthorizationException $e) {
             $this->assertTrue($e->hasStatus());
             $this->assertSame(404, $e->status());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+
+        $class = new class()
+        {
+            use HandlesAuthorization;
+
+            public function __invoke()
+            {
+                return $this->denyAsNotFound('foo', 3);
+            }
+        };
+
+        try {
+            $class()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame(404, $e->status());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
         }
     }
 }

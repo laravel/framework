@@ -87,6 +87,18 @@ class Response implements Arrayable
     }
 
     /**
+     * Create a new "deny" Response with a 404 HTTP status code.
+     *
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public static function denyAsNotFound($message = null, $code = null)
+    {
+        return static::denyWithStatus(404, $message, $code);
+    }
+
+    /**
      * Determine if the response was allowed.
      *
      * @return bool
@@ -155,6 +167,16 @@ class Response implements Arrayable
         $this->status = $status;
 
         return $this;
+    }
+
+    /**
+     * Set the HTTP response status code to 404.
+     *
+     * @return $this
+     */
+    public function asNotFound()
+    {
+        return $this->withStatus(404);
     }
 
     /**

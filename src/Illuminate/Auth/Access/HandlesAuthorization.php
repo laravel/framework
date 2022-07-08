@@ -40,4 +40,16 @@ trait HandlesAuthorization
     {
         return Response::denyWithStatus($status, $message, $code);
     }
+
+    /**
+     * Deny with a 404 HTTP status code.
+     *
+     * @param  ?string  $message
+     * @param  ?int  $code
+     * @return \Illuminate\Auth\Access\Response
+     */
+    public function denyAsNotFound($message = null, $code = null)
+    {
+        return Response::denyWithStatus(404, $message, $code);
+    }
 }
