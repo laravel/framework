@@ -310,7 +310,7 @@ class ResourceTest extends TestCase
     }
 
     public function testResourcesMayLoadOptionalRelationshipCounts()
-    {   
+    {
         Route::get('/', function () {
             $post = new Post([
                 'id' => 5,
