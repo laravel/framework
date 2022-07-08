@@ -1259,7 +1259,7 @@ class Blueprint
      * Create a new UUID column on the table with a foreign key constraint.
      *
      * @param  string  $column
-     * @param  string|null $table
+     * @param  string|null  $table
      * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
      */
     public function foreignUuid($column, $table = null)

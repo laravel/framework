@@ -12,7 +12,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      * @var \Illuminate\Database\Schema\Blueprint
      */
     protected $blueprint;
-    public $table = NULL;
+    public $table = null;
 
     /**
      * Create a new foreign ID column definition.
@@ -26,7 +26,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         parent::__construct($attributes);
 
         $this->blueprint = $blueprint;
-        $this->table = $attributes['table'] ?? NULL;
+        $this->table = $attributes['table'] ?? null;
     }
 
     /**
