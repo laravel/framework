@@ -40,7 +40,7 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
-        $this->components->info('Removing cached bootstrap files');
+        $this->components->info('Clearing cached bootstrap files.');
 
         collect([
             'events' => fn () => $this->callSilent('event:clear') == 0,
