@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 trait ConditionallyLoadsAttributes
 {
@@ -218,7 +219,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue();
         }
 
-        $attribute = $relationship . '_count';
+        $attribute = Str::finish($relationship, '_count');
 
         if (! $this->resource->hasAttribute($attribute)) {
             return value($default);
@@ -232,7 +233,7 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
-        return value($value);
+        return value($value, $this->resource->{$attribute});
     }
 
     /**
