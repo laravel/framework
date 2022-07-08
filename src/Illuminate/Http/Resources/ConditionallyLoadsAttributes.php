@@ -205,6 +205,37 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a relationship count if it exists.
+     *
+     * @param  string  $relationship
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenCounted($relationship, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue();
+        }
+
+        $attribute = $relationship . '_count';
+
+        if (! $this->resource->hasAttribute($attribute)) {
+            return value($default);
+        }
+
+        if (func_num_args() === 1) {
+            return $this->resource->{$attribute};
+        }
+
+        if (null === $this->resource->{$attribute}) {
+            return;
+        }
+
+        return value($value);
+    }
+
+    /**
      * Execute a callback if the given pivot table has been loaded.
      *
      * @param  string  $table

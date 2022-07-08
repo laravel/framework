@@ -559,6 +559,17 @@ trait HasAttributes
     }
 
     /**
+     * Determine if an attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        return isset($this->attributes[$key]);
+    }
+
+    /**
      * Determine if a get mutator exists for an attribute.
      *
      * @param  string  $key
