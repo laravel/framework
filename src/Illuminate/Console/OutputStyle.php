@@ -122,6 +122,10 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
      */
     public function newLineWritten()
     {
+        if ($this->output instanceof static && $this->output->newLineWritten()) {
+            return true;
+        }
+
         return $this->newLineWritten;
     }
 }
