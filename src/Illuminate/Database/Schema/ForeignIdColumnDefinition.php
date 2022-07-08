@@ -12,6 +12,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      * @var \Illuminate\Database\Schema\Blueprint
      */
     protected $blueprint;
+    public $table = null;
 
     /**
      * Create a new foreign ID column definition.
@@ -25,6 +26,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         parent::__construct($attributes);
 
         $this->blueprint = $blueprint;
+        $this->table = $attributes['table'] ?? null;
     }
 
     /**
@@ -36,7 +38,9 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function constrained($table = null, $column = 'id')
     {
-        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
+        $table = $table ?? $this->table ?? Str::plural(Str::beforeLast($this->name, '_'.$column));
+
+        return $this->references($column)->on($table);
     }
 
     /**
