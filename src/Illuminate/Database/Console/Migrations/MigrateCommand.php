@@ -142,9 +142,9 @@ class MigrateCommand extends BaseCommand
             return;
         }
 
-        $this->components->info('Preparing database.');
+        $this->components->info('Loading stored database schemas.');
 
-        $this->components->task("Loading stored database schema [$path].", function () use ($connection, $path) {
+        $this->components->task($path, function () use ($connection, $path) {
             // Since the schema file will create the "migrations" table and reload it to its
             // proper state, we need to delete it here so we don't get an error that this
             // table already exists when the stored database schema file gets executed.
@@ -154,6 +154,8 @@ class MigrateCommand extends BaseCommand
                 $this->output->write($buffer);
             })->load($path);
         });
+
+        $this->newLine();
 
         // Finally, we will fire an event that this schema has been loaded so developers
         // can perform any post schema load tasks that are necessary in listeners for
