@@ -105,6 +105,8 @@ abstract class Component
             ->getParentClass()
             ->getProperty('questionHelper');
 
+        $property->setAccessible(true);
+
         $currentHelper = $property->isInitialized($this->output)
             ? $property->getValue($this->output)
             : new SymfonyQuestionHelper();
