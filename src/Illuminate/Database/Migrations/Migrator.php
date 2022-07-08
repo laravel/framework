@@ -415,7 +415,7 @@ class Migrator
             }
 
             $this->write(TwoColumnDetail::class, $name);
-            $this->write(BulletList::class, $name, collect($this->getQueries($migration, $method))->map(function ($query) {
+            $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
                 return $query['query'];
             }));
         } catch (SchemaException $e) {
