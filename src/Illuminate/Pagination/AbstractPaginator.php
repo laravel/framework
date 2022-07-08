@@ -609,7 +609,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public static function useBootstrap()
     {
-        static::useBootstrapFour();
+        static::useBootstrapAboveThree(4);
     }
 
     /**
@@ -623,26 +623,16 @@ abstract class AbstractPaginator implements Htmlable
         static::defaultSimpleView('pagination::simple-default');
     }
 
-    /**
-     * Indicate that Bootstrap 4 styling should be used for generated links.
+  /**
+     * Indicate that above Bootstrap v3 styling should be used for generated links.
      *
+     * @param  int  $version
      * @return void
      */
-    public static function useBootstrapFour()
+    public static function useBootstrapAboveThree(int $version)
     {
-        static::defaultView('pagination::bootstrap-4');
-        static::defaultSimpleView('pagination::simple-bootstrap-4');
-    }
-
-    /**
-     * Indicate that Bootstrap 5 styling should be used for generated links.
-     *
-     * @return void
-     */
-    public static function useBootstrapFive()
-    {
-        static::defaultView('pagination::bootstrap-5');
-        static::defaultSimpleView('pagination::simple-bootstrap-5');
+        static::defaultView('pagination::bootstrap-'.$version);
+        static::defaultSimpleView('pagination::simple-bootstrap-'.$version);
     }
 
     /**
