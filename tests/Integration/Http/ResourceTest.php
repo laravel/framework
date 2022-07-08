@@ -304,13 +304,13 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
-                'comments' => 'None'
+                'comments' => 'None',
             ],
         ]);
     }
 
     public function testResourcesMayLoadOptionalRelationshipCounts()
-    {
+    {   
         Route::get('/', function () {
             $post = new Post([
                 'id' => 5,
