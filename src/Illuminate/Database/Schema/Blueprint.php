@@ -870,7 +870,7 @@ class Blueprint
         return $this->bigInteger($column, $autoIncrement, true);
     }
 
-/**
+    /**
      * Create a new unsigned big integer (8-byte) column on the table.
      *
      * @param  string  $column
