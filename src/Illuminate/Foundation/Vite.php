@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation;
 
-use Exception;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -24,41 +23,28 @@ class Vite
         $entrypoints = collect($entrypoints);
         $buildDirectory = Str::start($buildDirectory, '/');
 
-        if (is_file(public_path('/hot'))) {
-            $url = rtrim(file_get_contents(public_path('/hot')));
-
+        if ($hotServer = $this->hotServer()) {
             return new HtmlString(
                 $entrypoints
-                    ->map(fn ($entrypoint) => $this->makeTag("{$url}/{$entrypoint}"))
-                    ->prepend($this->makeScriptTag("{$url}/@vite/client"))
+                    ->map(fn ($entrypoint) => $this->makeTag("$hotServer/$entrypoint"))
+                    ->prepend($this->makeScriptTag("$hotServer/@vite/client"))
                     ->join('')
             );
         }
 
-        $manifestPath = public_path($buildDirectory.'/manifest.json');
-
-        if (! isset($manifests[$manifestPath])) {
-            if (! is_file($manifestPath)) {
-                throw new Exception("Vite manifest not found at: {$manifestPath}");
-            }
-
-            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
-        }
-
-        $manifest = $manifests[$manifestPath];
-
         $tags = collect();
+        $manifest = $this->manifestContents($buildDirectory);
 
         foreach ($entrypoints as $entrypoint) {
             if (! isset($manifest[$entrypoint])) {
-                throw new Exception("Unable to locate file in Vite manifest: {$entrypoint}.");
+                throw new \Exception("Unable to locate file in Vite manifest: {$entrypoint}.");
             }
 
-            $tags->push($this->makeTag(asset("{$buildDirectory}/{$manifest[$entrypoint]['file']}")));
+            $tags->push($this->makeTag(asset("$buildDirectory/{$manifest[$entrypoint]['file']}")));
 
             if (isset($manifest[$entrypoint]['css'])) {
                 foreach ($manifest[$entrypoint]['css'] as $css) {
-                    $tags->push($this->makeStylesheetTag(asset("{$buildDirectory}/{$css}")));
+                    $tags->push($this->makeStylesheetTag(asset("$buildDirectory/$css")));
                 }
             }
 
@@ -66,7 +52,7 @@ class Vite
                 foreach ($manifest[$entrypoint]['imports'] as $import) {
                     if (isset($manifest[$import]['css'])) {
                         foreach ($manifest[$import]['css'] as $css) {
-                            $tags->push($this->makeStylesheetTag(asset("{$buildDirectory}/{$css}")));
+                            $tags->push($this->makeStylesheetTag(asset("$buildDirectory/$css")));
                         }
                     }
                 }
@@ -79,17 +65,39 @@ class Vite
     }
 
     /**
+     * Retrieve a single Vite absolute resource URL.
+     *
+     * @param  string  $resourcePath
+     * @param  string  $buildDirectory
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function resourceUrl($resourcePath, $buildDirectory = 'build')
+    {
+        if ($hotServer = $this->hotServer()) {
+            return "$hotServer/$resourcePath";
+        }
+
+        $manifest = $this->manifestContents($buildDirectory);
+
+        if (! isset($manifest[$resourcePath]['file'])) {
+            throw new \Exception('Unknown Vite entrypoint '.$resourcePath);
+        }
+
+        return asset(Str::start($buildDirectory.'/'.$manifest[$resourcePath]['file'], '/'));
+    }
+
+    /**
      * Generate React refresh runtime script.
      *
      * @return \Illuminate\Support\HtmlString|void
      */
     public function reactRefresh()
     {
-        if (! is_file(public_path('/hot'))) {
+        if (! $hotServer = $this->hotServer()) {
             return;
         }
-
-        $url = rtrim(file_get_contents(public_path('/hot')));
 
         return new HtmlString(
             sprintf(
@@ -102,9 +110,48 @@ class Vite
                     window.__vite_plugin_react_preamble_installed__ = true
                 </script>
                 HTML,
-                $url
+                $hotServer
             )
         );
+    }
+
+    /**
+     * Retrieve our manifest file contents.
+     *
+     * @param  string  $buildDirectory
+     * @return array
+     *
+     * @throws \Exception
+     */
+    protected function manifestContents($buildDirectory = 'build')
+    {
+        static $manifests = [];
+
+        $manifestPath = public_path($buildDirectory.'/manifest.json');
+
+        if (! isset($manifests[$manifestPath])) {
+            if (! is_file($manifestPath)) {
+                throw new \Exception("Vite manifest not found at: {$manifestPath}");
+            }
+
+            $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
+        }
+
+        return $manifests[$manifestPath];
+    }
+
+    /**
+     * Return the path to the Vite hot-reload server when available.
+     *
+     * @return string|null
+     */
+    protected function hotServer(): string|null
+    {
+        if (is_file(public_path('/hot'))) {
+            return rtrim(file_get_contents(public_path('/hot')));
+        }
+
+        return null;
     }
 
     /**

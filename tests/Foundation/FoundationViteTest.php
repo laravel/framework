@@ -101,6 +101,24 @@ class FoundationViteTest extends TestCase
         );
     }
 
+    public function testViteHotModuleSingleFileUriResolution()
+    {
+        $this->makeViteHotFile();
+
+        $result = (new Vite)->resourceUrl('resources/css/app.css');
+
+        $this->assertEquals('http://localhost:3000/resources/css/app.css', $result);
+    }
+
+    public function testViteBuildSingleFileManifestResolution()
+    {
+        $this->makeViteManifest();
+
+        $result = (new Vite)->resourceUrl('resources/css/app.css');
+
+        $this->assertEquals('https://example.com/build/assets/app.versioned.css', $result);
+    }
+
     protected function makeViteManifest()
     {
         app()->singleton('path.public', fn () => __DIR__);
