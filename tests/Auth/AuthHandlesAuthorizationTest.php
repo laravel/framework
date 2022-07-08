@@ -32,7 +32,8 @@ class AuthHandlesAuthorizationTest extends TestCase
 
     public function testDenyHasNullStatus()
     {
-        $class = new class () {
+        $class = new class()
+        {
             use HandlesAuthorization;
 
             public function __invoke()
@@ -52,7 +53,8 @@ class AuthHandlesAuthorizationTest extends TestCase
 
     public function testItCanDenyWithStatus()
     {
-        $class = new class () {
+        $class = new class()
+        {
             use HandlesAuthorization;
 
             public function __invoke()

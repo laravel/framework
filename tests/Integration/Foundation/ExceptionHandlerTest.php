@@ -2,20 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Foundation;
 
-use Closure;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Integration\Auth\User;
-use Orchestra\Testbench\Exceptions\Handler;
 use Orchestra\Testbench\TestCase;
-use Throwable;
 
 class ExceptionHandlerTest extends TestCase
 {
