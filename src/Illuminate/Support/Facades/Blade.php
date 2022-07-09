@@ -23,7 +23,7 @@ namespace Illuminate\Support\Facades;
  * @method static void extend(callable $compiler)
  * @method static void if(string $name, callable $callback)
  * @method static void include(string $path, string|null $alias = null)
- * @method static void beforeCompiler(callable $beforeCompiler)
+ * @method static self beforeCompiler(callable $beforeCompiler)
  * @method static void precompiler(callable $precompiler)
  * @method static void setEchoFormat(string $format)
  * @method static void setPath(string $path)
