@@ -57,6 +57,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * All of the registered beforeCompilers.
      * These compilers will run before the default Blade compiler.
+     *
      * @var array
      */
     protected $beforeCompilers = [];

@@ -287,13 +287,13 @@ class ViewBladeCompilerTest extends TestCase
         });
 
         $this->assertEquals(
-            <<<EOT
+            <<<'EOT'
                 #removed
                 @notRemoveIt
                 #removed
                 <icon name="user" />
             EOT,
-            $compiler->compileString(<<<EOT
+            $compiler->compileString(<<<'EOT'
                 @removeIt
                 @notRemoveIt
                 <x-non-component />
