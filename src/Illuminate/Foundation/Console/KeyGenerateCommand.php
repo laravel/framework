@@ -19,7 +19,8 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
-                    {--force : Force the operation to run when in production}';
+                    {--force : Force the operation to run when in production}
+                    {--initial : Set the key only if not already set}';
 
     /**
      * The name of the console command.
@@ -50,6 +51,11 @@ class KeyGenerateCommand extends Command
 
         if ($this->option('show')) {
             return $this->line('<comment>'.$key.'</comment>');
+        }
+
+        if ($this->option('initial') && $this->isKeyAlreadySet()) {
+            $this->info('Application key is already set.');
+            return;
         }
 
         // Next, we will replace the application key in the environment file so it is
@@ -84,9 +90,7 @@ class KeyGenerateCommand extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        $currentKey = $this->laravel['config']['app.key'];
-
-        if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
+        if ($this->isKeyAlreadySet() && (! $this->confirmToProceed())) {
             return false;
         }
 
@@ -120,5 +124,15 @@ class KeyGenerateCommand extends Command
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
         return "/^APP_KEY{$escaped}/m";
+    }
+
+    /**
+     * Determine if a key already set.
+     *
+     * @return bool
+     */
+    protected function isKeyAlreadySet()
+    {
+        return strlen($this->laravel['config']['app.key']) !== 0;
     }
 }
