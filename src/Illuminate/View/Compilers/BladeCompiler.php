@@ -55,6 +55,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $conditions = [];
 
     /**
+     * All of the registered beforeCompilers.
+     * These compilers will run before the default Blade compiler.
+     * @var array
+     */
+    protected $beforeCompilers = [];
+
+    /**
      * All of the registered precompilers.
      *
      * @var array
@@ -239,6 +246,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function compileString($value)
     {
         [$this->footer, $result] = [[], ''];
+
+        foreach ($this->beforeCompilers as $compiler) {
+            $value = call_user_func($compiler, $value);
+        }
 
         // First we will compile the Blade component tags. This is a precompile style
         // step which compiles the component Blade tags into @component directives
@@ -806,6 +817,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function getCustomDirectives()
     {
         return $this->customDirectives;
+    }
+
+    /**
+     * Register a new beforeCompiler.
+     *
+     * @param  callable  $beforeCompiler
+     * @return self
+     */
+    public function beforeCompiler(callable $beforeCompiler)
+    {
+        $this->beforeCompilers[] = $beforeCompiler;
+
+        return $this;
     }
 
     /**

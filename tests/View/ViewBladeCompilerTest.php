@@ -263,6 +263,46 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertEquals(['frontend.auth' => 'frontend.auth'], $compiler->getAnonymousComponentNamespaces());
     }
 
+    public function testBladeBeforeCompilersIsCalledBeforeTheDefaultProcessing()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+
+        $compiler->component(Icon::class);
+
+        $compiler->beforeCompiler(function (string $value) {
+            return str_replace('@removeIt', '#removed', $value);
+        });
+
+        $compiler->beforeCompiler(function (string $value) {
+            return str_replace('<x-non-component />', '#removed', $value);
+        });
+
+        // add a component proxy
+        $compiler->beforeCompiler(function (string $value) {
+            return preg_replace_callback('/<\s*x[-\:](icons\.)([\w\-\:\.]*)\s*\/>/', function (array $matches) {
+                $icon = $matches[2];
+
+                return "<icon name=\"{$icon}\" />";
+            }, $value);
+        });
+
+        $this->assertEquals(
+            <<<EOT
+                #removed
+                @notRemoveIt
+                #removed
+                <icon name="user" />
+            EOT,
+            $compiler->compileString(<<<EOT
+                @removeIt
+                @notRemoveIt
+                <x-non-component />
+                <x-icons.user />
+            EOT)
+        );
+    }
+
+    /** @return Filesystem */
     protected function getFiles()
     {
         return m::mock(Filesystem::class);
