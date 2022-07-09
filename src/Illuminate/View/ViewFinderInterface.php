@@ -68,4 +68,25 @@ interface ViewFinderInterface
      * @return void
      */
     public function flush();
+
+    /**
+     * Get the active view paths.
+     *
+     * @return array
+     */
+    public function getPaths();
+
+    /**
+     * Get the views that have been located.
+     *
+     * @return array
+     */
+    public function getViews();
+
+    /**
+     * Get the namespace to file path hints.
+     *
+     * @return array
+     */
+    public function getHints();
 }
