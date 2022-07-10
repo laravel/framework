@@ -150,6 +150,22 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'taylor', 'framework' => ['name' => 'Laravel']], Arr::except($array, 'framework.language'));
         $this->assertEquals(['framework' => ['language' => 'PHP']], Arr::except($array, ['name', 'framework.name']));
 
+        $array = ['name' => 'taylor', 'friends' => [['name' => 'Jakob', 'phone' => '1234'], ['name' => 'Nuno', 'phone' => '5678']]];
+        $this->assertEquals(['name' => 'taylor', 'friends' => [['name' => 'Jakob'], ['name' => 'Nuno']]], Arr::except($array, ['friends.*.phone']));
+        $this->assertEquals(['name' => 'taylor', 'friends' => [['phone' => '1234'], ['phone' => '5678']]], Arr::except($array, ['friends.*.name']));
+
+        $array = ['name' => 'Taylor', 'friends' => [['name' => 'Jakob', 'phone' => '1234', 'friends' => [['name' => 'Jakob', 'phone' => '1234'], ['name' => 'Tylor', 'phone' => '5678']]], ['name' => 'Nuno', 'phone' => '5678', 'friends' => [['name' => 'Jakob', 'phone' => '1234'], ['name' => 'Tylor', 'phone' => '5678']]]]];
+        $this->assertEquals(['name' => 'Taylor', 'friends' => [['name' => 'Jakob', 'friends' => [['name' => 'Jakob'], ['name' => 'Tylor']]], ['name' => 'Nuno', 'friends' => [['name' => 'Jakob'], ['name' => 'Tylor']]]]], Arr::except($array, ['friends.*.phone', 'friends.*.friends.*.phone']));
+        $this->assertEquals(['name' => 'Taylor', 'friends' => [['phone' => '1234', 'friends' => [['phone' => '1234'], ['phone' => '5678']]], ['phone' => '5678', 'friends' => [['phone' => '1234'], ['phone' => '5678']]]]], Arr::except($array, ['friends.*.name', 'friends.*.friends.*.name']));
+
+        $array = [['name' => 'Jakob', 'phone' => '1234'], ['name' => 'Nuno', 'phone' => '5678']];
+        $this->assertEquals([['name' => 'Jakob'], ['name' => 'Nuno']], Arr::except($array, ['*.phone']));
+        $this->assertEquals([['phone' => '1234'], ['phone' => '5678']], Arr::except($array, ['*.name']));
+
+        $array = [[['name' => 'Jakob', 'phone' => '1234'], ['name' => 'Taylor', 'phone' => '5678']], [['name' => 'Nuno', 'phone' => '4567'], ['name' => 'Dries', 'phone' => '0987']]];
+        $this->assertEquals([[['name' => 'Jakob'], ['name' => 'Taylor']], [['name' => 'Nuno'], ['name' => 'Dries']]], Arr::except($array, ['*.*.phone']));
+        $this->assertEquals([[['phone' => '1234'], ['phone' => '5678']], [['phone' => '4567'], ['phone' => '0987']]], Arr::except($array, ['*.*.name']));
+
         $array = [1 => 'hAz', 2 => [5 => 'foo', 12 => 'baz']];
         $this->assertEquals([1 => 'hAz'], Arr::except($array, 2));
         $this->assertEquals([1 => 'hAz', 2 => [12 => 'baz']], Arr::except($array, 2.5));

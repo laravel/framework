@@ -286,7 +286,13 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && static::accessible($array[$part])) {
+                if ($part === '*' && static::accessible($array)) {
+                    // handle wildcard within "dot" notation
+                    foreach ($array as &$inner) {
+                        static::forget($inner, implode('.', $parts));
+                    }
+                    continue 2;
+                } elseif (isset($array[$part]) && static::accessible($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
