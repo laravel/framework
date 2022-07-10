@@ -1920,10 +1920,10 @@ class Builder implements BuilderContract
      * Unique data with count.
      *
      * @param $column
-     * @return QueryBuilder
+     * @return Builder
      */
     public function withUniqueCount($column)
     {
-        return $this->query->select('users.*', DB::raw("count($column) as total"))->groupBy($column);
+        return $this->select('users.*', DB::raw("count($column) as total"))->groupBy($column);
     }
 }
