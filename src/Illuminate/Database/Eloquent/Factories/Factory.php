@@ -762,7 +762,7 @@ abstract class Factory
     /**
      * Get a new factory instance for the given model name.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelName
+     * @param  string|<\Illuminate\Database\Eloquent\Model>  $modelName
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public static function factoryForModel(string $modelName)
