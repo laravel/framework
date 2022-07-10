@@ -15,6 +15,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
@@ -1913,5 +1914,16 @@ class Builder implements BuilderContract
     public function __clone()
     {
         $this->query = clone $this->query;
+    }
+
+    /**
+     * Unique data with count.
+     *
+     * @param $column
+     * @return QueryBuilder
+     */
+    public function withUniqueCount($column)
+    {
+        return $this->query->select('users.*', DB::raw("count($column) as total"))->groupBy($column);
     }
 }
