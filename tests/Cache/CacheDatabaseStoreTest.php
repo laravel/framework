@@ -23,7 +23,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn(null);
 
         $this->assertNull($store->get('foo'));
@@ -34,7 +34,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['forget'])->setConstructorArgs($this->getMocks())->getMock();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['expiration' => 1]);
         $store->expects($this->once())->method('forget')->with($this->equalTo('foo'))->willReturn(null);
 
@@ -46,7 +46,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['value' => serialize('bar'), 'expiration' => 999999999999999]);
 
         $this->assertSame('bar', $store->get('foo'));
@@ -57,7 +57,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getPostgresStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn((object) ['value' => base64_encode(serialize('bar')), 'expiration' => 999999999999999]);
 
         $this->assertSame('bar', $store->get('foo'));
@@ -69,7 +69,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefix:foo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
         $result = $store->put('foo', 'bar', 60);
         $this->assertTrue($result);
@@ -81,10 +81,10 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnUsing(function () {
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefix:foo', 'value' => serialize('bar'), 'expiration' => 61])->andReturnUsing(function () {
             throw new Exception;
         });
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize('bar'), 'expiration' => 61])->andReturnTrue();
 
         $result = $store->put('foo', 'bar', 60);
@@ -97,7 +97,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
         $store->expects($this->once())->method('getTime')->willReturn(1);
-        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefix:foo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61])->andReturnTrue();
 
         $result = $store->put('foo', "\0", 60);
         $this->assertTrue($result);
@@ -116,7 +116,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('delete')->once();
 
         $store->forget('foo');
@@ -143,7 +143,7 @@ class CacheDatabaseStoreTest extends TestCase
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn(null);
         $this->assertFalse($store->increment('foo'));
@@ -153,7 +153,7 @@ class CacheDatabaseStoreTest extends TestCase
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn($cache);
         $this->assertFalse($store->increment('foo'));
@@ -163,11 +163,11 @@ class CacheDatabaseStoreTest extends TestCase
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn($cache);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize(3)]);
         $this->assertEquals(3, $store->increment('foo'));
     }
@@ -182,7 +182,7 @@ class CacheDatabaseStoreTest extends TestCase
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn(null);
         $this->assertFalse($store->decrement('foo'));
@@ -192,7 +192,7 @@ class CacheDatabaseStoreTest extends TestCase
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:foo')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn($cache);
         $this->assertFalse($store->decrement('foo'));
@@ -202,11 +202,11 @@ class CacheDatabaseStoreTest extends TestCase
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:bar')->andReturn($table);
         $table->shouldReceive('lockForUpdate')->once()->andReturn($table);
         $table->shouldReceive('first')->once()->andReturn($cache);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('where')->once()->with('key', 'prefixbar')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', 'prefix:bar')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => serialize(2)]);
         $this->assertEquals(2, $store->decrement('bar'));
     }
