@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Console\View;
 
-use Illuminate\Console\View\Components;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -23,7 +23,7 @@ class ComponentsTest extends TestCase
         with(new Components\Alert($output))->render('The application is in the [production] environment');
 
         $this->assertStringContainsString(
-            "THE APPLICATION IS IN THE [PRODUCTION] ENVIRONMENT.",
+            'THE APPLICATION IS IN THE [PRODUCTION] ENVIRONMENT.',
             $output->fetch()
         );
     }
