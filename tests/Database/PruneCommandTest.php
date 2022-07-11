@@ -38,12 +38,22 @@ class PruneCommandTest extends TestCase
         $output = $output->fetch();
 
         $this->assertStringContainsString(
-            '10 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.',
+            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
             $output,
         );
 
         $this->assertStringContainsString(
-            '20 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.',
+            '10 records',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            '20 records',
             $output,
         );
     }
@@ -80,9 +90,16 @@ class PruneCommandTest extends TestCase
 
         $output = $this->artisan(['--model' => PrunableTestSoftDeletedModelWithPrunableRecords::class]);
 
+        $output = $output->fetch();
+
         $this->assertStringContainsString(
-            '2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records have been pruned.',
-            $output->fetch(),
+            'Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            '2 records',
+            $output,
         );
 
         $this->assertEquals(2, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());

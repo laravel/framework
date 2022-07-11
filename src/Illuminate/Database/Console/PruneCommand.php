@@ -56,8 +56,18 @@ class PruneCommand extends Command
             return;
         }
 
-        $events->listen(ModelsPruned::class, function ($event) {
-            $this->components->info("{$event->count} [{$event->model}] records have been pruned.");
+        $prunning = [];
+
+        $events->listen(ModelsPruned::class, function ($event) use (&$prunning) {
+            if (! in_array($event->model, $prunning)) {
+                $prunning[] = $event->model;
+
+                $this->newLine();
+
+                $this->components->info(sprintf('Prunning [%s] records.', $event->model));
+            }
+
+            $this->components->twoColumnDetail($event->model, "{$event->count} records");
         });
 
         $models->each(function ($model) {
