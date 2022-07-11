@@ -165,7 +165,7 @@ class ScheduleRunCommand extends Command
         $summary = $event->getSummaryForDisplay();
 
         $command = $event instanceof CallbackEvent
-            ? (class_exists($summary) ? $summary : 'Closure')
+            ? $summary
             : trim(str_replace($this->phpBinary, '', $event->command));
 
         $description = sprintf(
@@ -199,7 +199,9 @@ class ScheduleRunCommand extends Command
         });
 
         if (! $event instanceof CallbackEvent) {
-            $this->components->bulletList([$event->getSummaryForDisplay()]);
+            $this->components->bulletList([
+                $event->getSummaryForDisplay()
+            ]);
         }
     }
 }

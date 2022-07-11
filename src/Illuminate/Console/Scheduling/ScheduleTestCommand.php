@@ -42,6 +42,8 @@ class ScheduleTestCommand extends Command
      */
     public function handle(Schedule $schedule)
     {
+        $phpBinary = Application::phpBinary();
+
         $commands = $schedule->events();
 
         $commandNames = [];
@@ -55,7 +57,7 @@ class ScheduleTestCommand extends Command
         }
 
         if (! empty($name = $this->option('name'))) {
-            $commandBinary = Application::phpBinary().' '.Application::artisanBinary();
+            $commandBinary = $phpBinary.' '.Application::artisanBinary();
 
             $matches = array_filter($commandNames, function ($commandName) use ($commandBinary, $name) {
                 return trim(str_replace($commandBinary, '', $commandName)) === $name;
@@ -74,9 +76,23 @@ class ScheduleTestCommand extends Command
 
         $event = $commands[$index];
 
-        $this->components->task(sprintf('Running [%s].', $event->getSummaryForDisplay()), function () use ($event) {
-            $event->run($this->laravel);
-        });
+        $summary = $event->getSummaryForDisplay();
+
+        $command = $event instanceof CallbackEvent
+            ? $summary
+            : trim(str_replace($phpBinary, '', $event->command));
+
+        $description = sprintf(
+            'Running [%s]%s',
+            $command,
+            $event->runInBackground ? ' in background' : '',
+        );
+
+        $this->components->task($description, fn () => $event->run($this->laravel));
+
+        if (! $event instanceof CallbackEvent) {
+            $this->components->bulletList([$event->getSummaryForDisplay()]);
+        }
 
         $this->newLine();
     }
