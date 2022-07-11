@@ -1924,6 +1924,6 @@ class Builder implements BuilderContract
      */
     public function withUniqueCount($column)
     {
-        return $this->select('users.*', DB::raw("count($column) as uniqueCount"))->groupBy($column);
+        return $this->select('*', DB::raw("count($column) as uniqueCount"))->groupBy($column);
     }
 }
