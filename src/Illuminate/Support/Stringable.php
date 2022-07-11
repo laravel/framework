@@ -392,6 +392,17 @@ class Stringable implements JsonSerializable
     }
 
     /**
+     * Convert inline Markdown into HTML.
+     *
+     * @param  array  $options
+     * @return static
+     */
+    public function inlineMarkdown(array $options = [])
+    {
+        return new static(Str::inlineMarkdown($this->value, $options));
+    }
+
+    /**
      * Masks a portion of a string with a repeated character.
      *
      * @param  string  $character

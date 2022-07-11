@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -957,6 +958,12 @@ class SupportStringableTest extends TestCase
     {
         $this->assertEquals("<p><em>hello world</em></p>\n", $this->stringable('*hello world*')->markdown());
         $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
+    }
+
+    public function testInlineMarkdown()
+    {
+        $this->assertEquals("<em>hello world</em>\n", $this->stringable('*hello world*')->inlineMarkdown());
+        $this->assertEquals("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", $this->stringable('[**Laravel**](https://laravel.com)')->inlineMarkdown());
     }
 
     public function testMask()
