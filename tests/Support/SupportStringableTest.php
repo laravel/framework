@@ -1041,7 +1041,7 @@ class SupportStringableTest extends TestCase
 
     public function testAcronym()
     {
-        $string = "Acronym is generated Same";
+        $string = 'Acronym is generated Same';
         $this->assertSame(Str::acronym($string), (string) $this->stringable($string)->acronym());
 
         $this->assertSame(Str::acronym($string, true), (string) $this->stringable($string)->acronym(true));

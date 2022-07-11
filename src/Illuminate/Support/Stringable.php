@@ -1124,7 +1124,6 @@ class Stringable implements JsonSerializable
         return (string) $this->value;
     }
 
-
     /**
      * Generates acronym for given string.
      *
