@@ -44,7 +44,7 @@ class ScheduleTestCommandTest extends TestCase
 
         $this->artisan(ScheduleTestCommand::class, ['--name' => 'bar:command'])
             ->assertSuccessful()
-            ->expectsOutputToContain('Running [bar-command]');
+            ->expectsOutputToContain('Running [\'artisan\' bar:command]');
 
         $this->artisan(ScheduleTestCommand::class, ['--name' => BarJobStub::class])
             ->assertSuccessful()
