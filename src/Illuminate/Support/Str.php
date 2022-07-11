@@ -517,6 +517,7 @@ class Str
     public static function inlineMarkdown($string, array $options = [])
     {
         $environment = new Environment($options);
+
         $environment->addExtension(new GithubFlavoredMarkdownExtension());
         $environment->addExtension(new InlinesOnlyExtension());
 
