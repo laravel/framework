@@ -48,8 +48,7 @@ class PackageDiscoverCommand extends Command
 
         collect($manifest->manifest)
             ->map(fn () => fn () => true)
-            ->each(fn ($task, $description) => $this->components->task($description, $task));
-
-        $this->newLine();
+            ->each(fn ($task, $description) => $this->components->task($description, $task))
+            ->whenNotEmpty(fn () => $this->newLine());
     }
 }
