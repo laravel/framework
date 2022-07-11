@@ -1255,15 +1255,16 @@ class Str
     }
 
     /**
-     * Generates acronym for given string
+     * Generates acronym for given string.
      *
      * @param  string  $string
-     * @param  boolean $upper   returns acronym in upper if true
+     * @param  bool  $upper  returns acronym in upper if true
      * @return string
      */
     public static function acronym($string, $upper = false)
     {
         $acronym = preg_replace('/\b(\w)\w*\W*/', '\1', $string);
+
         return $upper ? static::upper($acronym) : $acronym;
     }
 }
