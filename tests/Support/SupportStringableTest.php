@@ -959,6 +959,12 @@ class SupportStringableTest extends TestCase
         $this->assertEquals("<h1>hello world</h1>\n", $this->stringable('# hello world')->markdown());
     }
 
+    public function testInlineMarkdown()
+    {
+        $this->assertEquals("<em>hello world</em>\n", $this->stringable('*hello world*')->inlineMarkdown());
+        $this->assertEquals("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", $this->stringable('[**Laravel**](https://laravel.com)')->inlineMarkdown());
+    }
+
     public function testMask()
     {
         $this->assertSame('tay*************', (string) $this->stringable('taylor@email.com')->mask('*', 3));
