@@ -51,7 +51,7 @@ class RetryCommand extends Command
         $jobsFound = count($ids = $this->getJobIds()) > 0;
 
         if ($jobsFound) {
-            $this->components->info('Retrying failed queue jobs.');
+            $this->components->info('Pushing failed queue jobs back onto the queue.');
         }
 
         foreach ($ids as $id) {
