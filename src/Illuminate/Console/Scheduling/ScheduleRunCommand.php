@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
@@ -78,6 +79,13 @@ class ScheduleRunCommand extends Command
     protected $handler;
 
     /**
+     * The PHP Binary used by the command.
+     *
+     * @var string
+     */
+    protected $phpBinary;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -102,6 +110,7 @@ class ScheduleRunCommand extends Command
         $this->schedule = $schedule;
         $this->dispatcher = $dispatcher;
         $this->handler = $handler;
+        $this->phpBinary = Application::phpBinary();
 
         $this->newLine();
 
@@ -153,10 +162,17 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
+        $summary = $event->getSummaryForDisplay();
+
+        $command = $event instanceof CallbackEvent
+            ? (class_exists($summary) ? $summary : 'Closure')
+            : trim(str_replace($this->phpBinary, '', $event->command));
+
         $description = sprintf(
-            '<fg=gray>%s</> Running [%s]',
+            '<fg=gray>%s</> Running [%s]%s',
             Carbon::now()->format('Y-m-d H:i:s'),
-            $event->getSummaryForDisplay()
+            $command,
+            $event->runInBackground ? ' in background' : '',
         );
 
         $this->components->task($description, function () use ($event) {
@@ -178,6 +194,12 @@ class ScheduleRunCommand extends Command
 
                 $this->handler->report($e);
             }
+
+            return $event->exitCode == 0;
         });
+
+        if (! $event instanceof CallbackEvent) {
+            $this->components->bulletList([$event->getSummaryForDisplay()]);
+        }
     }
 }
