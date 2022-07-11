@@ -1123,4 +1123,16 @@ class Stringable implements JsonSerializable
     {
         return (string) $this->value;
     }
+
+
+    /**
+     * Generates acronym for given string.
+     *
+     * @param  bool  $upper  returns acronym in upper if true
+     * @return static
+     */
+    public function acronym($upper = false)
+    {
+        return new static(Str::acronym($this->value, $upper));
+    }
 }

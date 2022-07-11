@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use PHPUnit\Framework\TestCase;
 
@@ -1036,5 +1037,13 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Foo')->exactly('foo'));
         $this->assertFalse($this->stringable('[]')->exactly([]));
         $this->assertFalse($this->stringable('0')->exactly(0));
+    }
+
+    public function testAcronym()
+    {
+        $string = "Acronym is generated Same";
+        $this->assertSame(Str::acronym($string), (string) $this->stringable($string)->acronym());
+
+        $this->assertSame(Str::acronym($string, true), (string) $this->stringable($string)->acronym(true));
     }
 }
