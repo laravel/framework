@@ -42,9 +42,13 @@ class ScheduleTestCommandTest extends TestCase
         $this->schedule->job(BarJobStub::class);
         $this->schedule->call(fn () => true)->name('callback');
 
+        $expectedOutput = windows_os()
+            ? 'Running ["artisan" bar:command]'
+            : "Running ['artisan' bar:command]";
+
         $this->artisan(ScheduleTestCommand::class, ['--name' => 'bar:command'])
             ->assertSuccessful()
-            ->expectsOutputToContain('Running [\'artisan\' bar:command]');
+            ->expectsOutputToContain($expectedOutput);
 
         $this->artisan(ScheduleTestCommand::class, ['--name' => BarJobStub::class])
             ->assertSuccessful()
