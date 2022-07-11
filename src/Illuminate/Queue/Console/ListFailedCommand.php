@@ -126,8 +126,8 @@ class ListFailedCommand extends Command
     {
         collect($jobs)->each(
             fn ($job) => $this->components->twoColumnDetail(
-                sprintf("<fg=gray>%s</> %s</>", $job[4], $job[0]),
-                sprintf("<fg=gray>%s@%s</> %s", $job[1], $job[2], $job[3])
+                sprintf('<fg=gray>%s</> %s</>', $job[4], $job[0]),
+                sprintf('<fg=gray>%s@%s</> %s', $job[1], $job[2], $job[3])
             ),
         );
     }
