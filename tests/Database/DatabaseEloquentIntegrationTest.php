@@ -621,6 +621,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
+    public function testModelKeys()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $primaryKeys = EloquentTestUser::oldest('id')->modelKeys()->all();
+
+        $this->assertEquals([1, 2], $primaryKeys);
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

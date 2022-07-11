@@ -837,6 +837,16 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the array of with the values of the primary keys.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function modelKeys()
+    {
+        return $this->pluck($this->model->getKeyName());
+    }
+
+    /**
      * Get an array with the values of a given column.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
