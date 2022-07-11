@@ -223,6 +223,7 @@ class Str
         if (is_null($haystack) || is_null($needles)) {
             return false;
         }
+
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
             $needles = array_map('mb_strtolower', (array) $needles);
