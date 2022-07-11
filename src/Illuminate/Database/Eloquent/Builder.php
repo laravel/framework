@@ -837,7 +837,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Get the array of with the values of the primary keys.
+     * Get the array with the values of the primary keys.
      *
      * @return \Illuminate\Support\Collection
      */
