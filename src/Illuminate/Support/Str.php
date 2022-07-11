@@ -222,12 +222,8 @@ class Str
      * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function contains($haystack, $needles, $ignoreCase = false)
+    public static function contains(string $haystack, string $needles, $ignoreCase = false)
     {
-        if (is_null($haystack) || is_null($needles)) {
-            return false;
-        }
-
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
             $needles = array_map('mb_strtolower', (array) $needles);
@@ -250,7 +246,7 @@ class Str
      * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function containsAll($haystack, array $needles, $ignoreCase = false)
+    public static function containsAll(string $haystack, array $needles, $ignoreCase = false)
     {
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
