@@ -1028,6 +1028,18 @@ class SupportStrTest extends TestCase
             Str::createUuidsNormally();
         }
     }
+
+    public function testDefaultAcronymIsGeneratedCorrect()
+    {
+        $this->assertSame('Tfais', Str::acronym('Test for acronym is succeeded'));
+    }
+
+    public function testAcronymWithUpperParameterReturnsInUpperCase()
+    {
+        $this->assertSame('TFAIS', Str::acronym('Test for acronym is succeeded', true));
+
+        $this->assertNotSame('Tfais', Str::acronym('Test for acronym is succeeded', true));
+    }
 }
 
 class StringableObjectStub
