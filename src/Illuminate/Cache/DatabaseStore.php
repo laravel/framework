@@ -360,7 +360,7 @@ class DatabaseStore implements LockProvider, Store
     {
         return $this->prefix;
     }
-    
+
     /**
      * Set the cache key prefix.
      *
