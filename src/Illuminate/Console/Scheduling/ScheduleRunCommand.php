@@ -200,7 +200,7 @@ class ScheduleRunCommand extends Command
 
         if (! $event instanceof CallbackEvent) {
             $this->components->bulletList([
-                $event->getSummaryForDisplay()
+                $event->getSummaryForDisplay(),
             ]);
         }
     }
