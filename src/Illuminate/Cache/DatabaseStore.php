@@ -75,7 +75,7 @@ class DatabaseStore implements LockProvider, Store
                                 $lockLottery = [2, 100])
     {
         $this->table = $table;
-        $this->prefix = $prefix;
+        $this->setPrefix($prefix);
         $this->connection = $connection;
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
@@ -359,6 +359,17 @@ class DatabaseStore implements LockProvider, Store
     public function getPrefix()
     {
         return $this->prefix;
+    }
+    
+    /**
+     * Set the cache key prefix.
+     *
+     * @param  string  $prefix
+     * @return void
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = ! empty($prefix) ? $prefix.':' : '';
     }
 
     /**
