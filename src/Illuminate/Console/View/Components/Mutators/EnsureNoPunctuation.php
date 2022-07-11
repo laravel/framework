@@ -5,7 +5,7 @@ namespace Illuminate\Console\View\Components\Mutators;
 class EnsureNoPunctuation
 {
     /**
-     * Ensures the given string does not end with a dot.
+     * Ensures the given string does not end with punctuation.
      *
      * @param  string  $string
      * @return string

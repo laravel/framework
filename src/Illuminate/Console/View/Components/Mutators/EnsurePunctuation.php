@@ -5,7 +5,7 @@ namespace Illuminate\Console\View\Components\Mutators;
 class EnsurePunctuation
 {
     /**
-     * Ensures the given string ends with a punctuation.
+     * Ensures the given string ends with punctuation.
      *
      * @param  string  $string
      * @return string
