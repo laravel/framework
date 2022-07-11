@@ -1253,4 +1253,16 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+    
+    /**
+     * Generates acronym for given string
+     *
+     * @param  string  $string
+     * @param  boolean $upper   returns acronym in upper if true
+     * @return string
+     */
+    public static function accronym($string, $upper = false)
+    {
+        return preg_replace('/\b(\w)\w*\W*/', '\1', $string);
+    }
 }
