@@ -3,6 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\View\Components\Task;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
@@ -48,18 +49,13 @@ abstract class Seeder
 
             $name = get_class($seeder);
 
-            if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<comment>Seeding:</comment> {$name}");
-            }
-
-            $startTime = microtime(true);
-
-            $seeder->__invoke($parameters);
-
-            $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
-
-            if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<info>Seeded:</info>  {$name} ({$runTime}ms)");
+            if ($silent || ! isset($this->command)) {
+                $seeder->__invoke($parameters);
+            } else {
+                with(new Task($this->command->getOutput()))->render(
+                    $name,
+                    fn () => $seeder->__invoke($parameters),
+                );
             }
 
             static::$called[] = $class;

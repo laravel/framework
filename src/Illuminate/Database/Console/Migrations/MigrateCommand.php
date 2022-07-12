@@ -91,6 +91,8 @@ class MigrateCommand extends BaseCommand
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
             if ($this->option('seed') && ! $this->option('pretend')) {
+                $this->newLine();
+
                 $this->call('db:seed', [
                     '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
                     '--force' => true,
