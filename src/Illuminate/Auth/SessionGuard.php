@@ -770,7 +770,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         return $this->lastAttempted;
     }
-
+    /**
+     * get pure guard name 
+     * @return string
+     */
+    public function getGuardName():string 
+    {
+        return $this->name;
+    }
     /**
      * Get a unique identifier for the auth session value.
      *
