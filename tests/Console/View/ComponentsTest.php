@@ -49,7 +49,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\Error($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString("ERROR  The application is in the [production] environment.", $output->fetch());
+        $this->assertStringContainsString('ERROR  The application is in the [production] environment.', $output->fetch());
     }
 
     public function testInfo()
@@ -58,7 +58,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\Info($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString("INFO  The application is in the [production] environment.", $output->fetch());
+        $this->assertStringContainsString('INFO  The application is in the [production] environment.', $output->fetch());
     }
 
     public function testConfirm()
@@ -118,6 +118,6 @@ class ComponentsTest extends TestCase
 
         with(new Components\Warn($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString("WARN  The application is in the [production] environment.", $output->fetch());
+        $this->assertStringContainsString('WARN  The application is in the [production] environment.', $output->fetch());
     }
 }
