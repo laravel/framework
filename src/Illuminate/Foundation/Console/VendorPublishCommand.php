@@ -246,7 +246,7 @@ class VendorPublishCommand extends Command
             $this->components->twoColumnDetail(sprintf(
                 'File [%s] already exist',
                 str_replace(base_path().'/', '', realpath($to)),
-            ));
+            ), '<fg=yellow;options=bold>SKIPPED</>');
         }
     }
 
