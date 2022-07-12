@@ -5,7 +5,11 @@ namespace Illuminate\Support;
 use Closure;
 use Illuminate\Support\Traits\Macroable;
 use JsonException;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
+use League\CommonMark\MarkdownConverter;
 use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Uuid;
@@ -220,6 +224,10 @@ class Str
      */
     public static function contains($haystack, $needles, $ignoreCase = false)
     {
+        if (is_null($haystack) || is_null($needles)) {
+            return false;
+        }
+
         if ($ignoreCase) {
             $haystack = mb_strtolower($haystack);
             $needles = array_map('mb_strtolower', (array) $needles);
@@ -499,6 +507,25 @@ class Str
     public static function markdown($string, array $options = [])
     {
         $converter = new GithubFlavoredMarkdownConverter($options);
+
+        return (string) $converter->convert($string);
+    }
+
+    /**
+     * Converts inline Markdown into HTML.
+     *
+     * @param  string  $string
+     * @param  array  $options
+     * @return string
+     */
+    public static function inlineMarkdown($string, array $options = [])
+    {
+        $environment = new Environment($options);
+
+        $environment->addExtension(new GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new InlinesOnlyExtension());
+
+        $converter = new MarkdownConverter($environment);
 
         return (string) $converter->convert($string);
     }

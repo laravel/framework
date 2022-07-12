@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Generator;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Schema\MySqlSchemaState;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class DatabaseMySqlSchemaStateTest extends TestCase
 {
@@ -19,19 +21,19 @@ class DatabaseMySqlSchemaStateTest extends TestCase
         $schemaState = new MySqlSchemaState($connection);
 
         // test connectionString
-        $method = new \ReflectionMethod(get_class($schemaState), 'connectionString');
+        $method = new ReflectionMethod(get_class($schemaState), 'connectionString');
         $connString = tap($method)->setAccessible(true)->invoke($schemaState);
 
         self::assertEquals($expectedConnectionString, $connString);
 
         // test baseVariables
-        $method = new \ReflectionMethod(get_class($schemaState), 'baseVariables');
+        $method = new ReflectionMethod(get_class($schemaState), 'baseVariables');
         $variables = tap($method)->setAccessible(true)->invoke($schemaState, $dbConfig);
 
         self::assertEquals($expectedVariables, $variables);
     }
 
-    public function provider(): \Generator
+    public function provider(): Generator
     {
         yield 'default' => [
             ' --user="${:LARAVEL_LOAD_USER}" --password="${:LARAVEL_LOAD_PASSWORD}" --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"', [

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BadMethodCallException;
 use Carbon\Carbon;
 use Faker\Generator;
 use Illuminate\Container\Container;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
@@ -443,7 +445,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ['name' => 'Dayle Rees']
         );
 
-        $class = new \ReflectionClass($factory);
+        $class = new ReflectionClass($factory);
         $prop = $class->getProperty('count');
         $prop->setAccessible(true);
         $value = $prop->getValue($factory);
@@ -622,7 +624,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_dynamic_trashed_state_throws_exception_when_not_a_softdeletes_model()
     {
-        $this->expectException(\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         FactoryTestUserFactory::new()->trashed()->create();
     }
 
