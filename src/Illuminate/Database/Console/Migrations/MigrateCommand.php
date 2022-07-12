@@ -81,7 +81,7 @@ class MigrateCommand extends BaseCommand
             // Next, we will check to see if a path option has been defined. If it has
             // we will use the path relative to the root of this installation folder
             // so that migrations may be run for any path within the applications.
-            $this->migrator->setOutput($this->output)
+            $migrations = $this->migrator->setOutput($this->output)
                     ->run($this->getMigrationPaths(), [
                         'pretend' => $this->option('pretend'),
                         'step' => $this->option('step'),
@@ -91,7 +91,9 @@ class MigrateCommand extends BaseCommand
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
             if ($this->option('seed') && ! $this->option('pretend')) {
-                $this->newLine();
+                if (! empty($migrations)) {
+                    $this->newLine();
+                }
 
                 $this->call('db:seed', [
                     '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
