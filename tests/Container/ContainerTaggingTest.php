@@ -33,6 +33,7 @@ class ContainerTaggingTest extends TestCase
         $container = new Container;
         $container->tag([ContainerImplementationTaggedStub::class, ContainerImplementationTaggedStubTwo::class], ['foo']);
         $this->assertCount(2, $container->tagged('foo'));
+        
 
         $fooResults = [];
         foreach ($container->tagged('foo') as $foo) {
