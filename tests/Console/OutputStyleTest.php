@@ -27,6 +27,17 @@ class OutputStyleTest extends TestCase
         $this->assertTrue($style->newLineWritten());
     }
 
+    public function testDetectsNewLineOnUnderlyingOutput()
+    {
+        $bufferedOutput = new BufferedOutput();
+
+        $underlyingStyle = new OutputStyle(new ArrayInput([]), $bufferedOutput);
+        $style = new OutputStyle(new ArrayInput([]), $underlyingStyle);
+
+        $underlyingStyle->newLine();
+        $this->assertTrue($style->newLineWritten());
+    }
+
     public function testDetectsNewLineOnWrite()
     {
         $bufferedOutput = new BufferedOutput();
