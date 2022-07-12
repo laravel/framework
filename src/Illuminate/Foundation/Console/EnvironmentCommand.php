@@ -41,7 +41,7 @@ class EnvironmentCommand extends Command
     public function handle()
     {
         $this->components->info(sprintf(
-            'The application is in the [%s] environment.',
+            'The application environment is [%s].',
             $this->laravel['env'],
         ));
     }
