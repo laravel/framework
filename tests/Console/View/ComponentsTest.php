@@ -11,11 +11,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ComponentsTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        $this->phpEOL = PHP_EOL;
-    }
-
     protected function tearDown(): void
     {
         m::close();
@@ -54,7 +49,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\Error($output))->render('The application is in the [production] environment');
 
-        $this->assertSame("{$this->phpEOL}   ERROR  The application is in the [production] environment.  {$this->phpEOL}{$this->phpEOL}", $output->fetch());
+        $this->assertStringContainsString("ERROR  The application is in the [production] environment.", $output->fetch());
     }
 
     public function testInfo()
@@ -63,7 +58,7 @@ class ComponentsTest extends TestCase
 
         with(new Components\Info($output))->render('The application is in the [production] environment');
 
-        $this->assertSame("{$this->phpEOL}   INFO  The application is in the [production] environment.  {$this->phpEOL}{$this->phpEOL}", $output->fetch());
+        $this->assertStringContainsString("INFO  The application is in the [production] environment.", $output->fetch());
     }
 
     public function testConfirm()
@@ -123,6 +118,6 @@ class ComponentsTest extends TestCase
 
         with(new Components\Warn($output))->render('The application is in the [production] environment');
 
-        $this->assertSame("{$this->phpEOL}   WARN  The application is in the [production] environment.  {$this->phpEOL}{$this->phpEOL}", $output->fetch());
+        $this->assertStringContainsString("WARN  The application is in the [production] environment.", $output->fetch());
     }
 }
