@@ -24,8 +24,6 @@ class Task extends Component
             Mutators\EnsureRelativePaths::class,
         ]);
 
-        $task = $task ?: fn () => true;
-
         $descriptionWidth = mb_strlen(preg_replace("/\<[\w=#\/\;,:.&,%?]+\>|\\e\[\d+m/", '$1', $description) ?? '');
 
         $this->output->write("  $description ", false, $verbosity);
@@ -35,11 +33,11 @@ class Task extends Component
         $result = false;
 
         try {
-            $result = $task();
+            $result = ($task ?: fn () => true)();
         } catch (Throwable $e) {
             throw $e;
         } finally {
-            $runTime = (microtime(true) - $startTime) > 0.05
+            $runTime = $task
                 ? (' '.number_format((microtime(true) - $startTime) * 1000, 2).'ms')
                 : '';
 
