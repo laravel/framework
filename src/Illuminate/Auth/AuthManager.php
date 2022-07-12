@@ -52,7 +52,13 @@ class AuthManager implements FactoryContract
 
         $this->userResolver = fn ($guard = null) => $this->guard($guard)->user();
     }
-
+    /**
+    * return all available guards
+    * @return array
+    */
+    public function getGuards():array {
+        return $this->guards;
+    }
     /**
      * Attempt to get the guard from the local cache.
      *
