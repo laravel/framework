@@ -262,10 +262,14 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     {
         return collect((array) $messages)
             ->map(function ($message) use ($format, $messageKey) {
+                if (! is_scalar($message) && ! method_exists($message, '__toString')) {
+                    return $message;
+                }
+
                 // We will simply spin through the given messages and transform each one
                 // replacing the :message place holder with the real message allowing
                 // the messages to be easily formatted to each developer's desires.
-                return str_replace([':message', ':key'], [$message, $messageKey], $format);
+                return str_replace([':message', ':key'], [(string) $message, $messageKey], $format);
             })->all();
     }
 
