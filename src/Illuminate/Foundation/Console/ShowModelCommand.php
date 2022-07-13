@@ -111,7 +111,7 @@ class ShowModelCommand extends Command
      * Get the column attributes for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function getAttributes($model)
     {
@@ -138,18 +138,18 @@ class ShowModelCommand extends Command
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Doctrine\DBAL\Schema\Column[]  $columns
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function getVirtualAttributes($model, $columns)
     {
         $class = new ReflectionClass($model);
 
         return collect($class->getMethods())
-            ->filter(fn (\ReflectionMethod $method) => ! $method->isStatic()
+            ->filter(fn (ReflectionMethod $method) => ! $method->isStatic()
                 && ! $method->isAbstract()
                 && $method->getDeclaringClass()->getName() === get_class($model)
             )
-            ->mapWithKeys(function (\ReflectionMethod $method) use ($model) {
+            ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
                     return [Str::snake($matches[1]) => 'Accessor'];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
@@ -176,12 +176,12 @@ class ShowModelCommand extends Command
      * Get the relations from the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function getRelations($model)
     {
         return collect(get_class_methods($model))
-            ->map(fn ($method) => new \ReflectionMethod($model, $method))
+            ->map(fn ($method) => new ReflectionMethod($model, $method))
             ->filter(fn (ReflectionMethod $method) => ! $method->isStatic()
                 && ! $method->isAbstract()
                 && $method->getDeclaringClass()->getName() === get_class($model)
@@ -336,7 +336,7 @@ class ShowModelCommand extends Command
      * Get the model casts, including any date casts.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     protected function getCastsWithDates($model)
     {
