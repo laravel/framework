@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Doctrine\DBAL\Schema\Column;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionClass;
