@@ -282,14 +282,13 @@ class ShowModelCommand extends Command
                 ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
                 ->implode('<fg=gray>,</> '));
 
-            $second = $attribute['type'];
-
-            if ($attribute['cast']) {
-                $second = '<fg=yellow;options=bold>'.$attribute['cast'].'</>';
-            }
+            $second = collect([
+                $attribute['type'],
+                $attribute['cast'] ? '<fg=yellow;options=bold>'.$attribute['cast'].'</>' : null,
+            ])->filter()->implode(' <fg=gray>/</> ');
 
             $this->components->twoColumnDetail(
-                str($first)->trim(), str($second)->when(! class_exists($attribute['cast']))->lower(),
+                str($first)->trim(), $second,
             );
         }
 
