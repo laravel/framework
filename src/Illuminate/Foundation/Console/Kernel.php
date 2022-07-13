@@ -185,12 +185,14 @@ class Kernel implements KernelContract
      * Register a Closure based command with the application.
      *
      * @param  string  $signature
-     * @param  \Closure  $callback
+     * @param  \Closure|callable  $callback
      * @return \Illuminate\Foundation\Console\ClosureCommand
      */
-    public function command($signature, Closure $callback)
+    public function command($signature, $callback)
     {
-        $command = new ClosureCommand($signature, $callback);
+        $command = $callback instanceof Closure
+            ? new ClosureCommand($signature, $callback)
+            : new CallableCommand($signature, $callback);
 
         Artisan::starting(function ($artisan) use ($command) {
             $artisan->add($command);

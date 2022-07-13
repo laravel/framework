@@ -36,6 +36,12 @@ class ArtisanCommandTest extends TestCase
         Artisan::command('contains', function () {
             $this->line('My name is Taylor Otwell');
         });
+
+        Artisan::command('callable-string', [CallableCommand::class, '__invoke']);
+        Artisan::command('callable-default-method', CallableCommand::class);
+        Artisan::command('callable-handle-method', [CallableMethod::class, 'handle']);
+        Artisan::command('callable-at-style', CallableMethod::class.'@handle');
+        Artisan::command('callable-object', CallableObject::class);
     }
 
     public function test_console_command_that_passes()
@@ -143,6 +149,32 @@ class ArtisanCommandTest extends TestCase
         });
     }
 
+    public function test_callable_command_is_callable()
+    {
+        $this->artisan('callable-string')->assertExitCode(0);
+        $this->artisan('callable-default-method')->assertExitCode(0);
+        $this->artisan('callable-handle-method')->assertExitCode(1);
+        $this->artisan('callable-at-style')->assertExitCode(1);
+    }
+
+    public function test_callable_command_is_constructed_once()
+    {
+        $this->assertEquals(0, CallableConstruct::$count);
+
+        Artisan::command('callable-construct', [new CallableConstruct]);
+
+        $this->artisan('callable-construct')->assertExitCode(3);
+
+        $this->assertEquals(1, CallableConstruct::$count);
+    }
+
+    public function test_callable_object_can_be_accessed()
+    {
+        $this->artisan('callable-object')
+            ->expectsOutputToContain('Taylor Otwell')
+            ->assertExitCode(5);
+    }
+
     /**
      * Don't allow Mockery's InvalidCountException to be reported. Mocks setup
      * in PendingCommand cause PHPUnit tearDown() to later throw the exception.
@@ -161,5 +193,55 @@ class ArtisanCommandTest extends TestCase
                 // Ignore mock exception from PendingCommand::expectsOutput().
             }
         }
+    }
+}
+
+class CallableCommand
+{
+    public function __invoke()
+    {
+        return 0;
+    }
+}
+
+class CallableMethod
+{
+    public function handle()
+    {
+        return 1;
+    }
+}
+
+class CallableConstruct
+{
+    public static $count = 0;
+
+    public function __construct()
+    {
+        ++static::$count;
+    }
+
+    public function __invoke()
+    {
+        return 3;
+    }
+}
+
+class CallableObject
+{
+    public $public = 4;
+
+    public function __invoke()
+    {
+        $this->line('My name is Taylor Otwell');
+
+        $this->public = 5;
+
+        return $this->getPublic();
+    }
+
+    public function getPublic()
+    {
+        return $this->public;
     }
 }
