@@ -229,7 +229,7 @@ trait ConditionallyLoadsAttributes
             return $this->resource->{$attribute};
         }
 
-        if (null === $this->resource->{$attribute}) {
+        if ($this->resource->{$attribute} === null) {
             return;
         }
 
