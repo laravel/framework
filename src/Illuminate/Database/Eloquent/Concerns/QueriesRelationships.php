@@ -170,6 +170,23 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a relationship count / exists condition to the query with where clauses.
+     *
+     * Also load the count of the relationship with same condition.
+     *
+     * @param  string  $relation
+     * @param  \Closure|null  $callback
+     * @param  string  $operator
+     * @param  int  $count
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function withCountWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    {
+        return $this->whereHas($relation, $callback, $operator, $count)
+            ->withCount($callback ? [$relation => fn ($query) => $callback($query)] : $relation);
+    }
+
+    /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string  $relation
