@@ -32,9 +32,9 @@ trait RefreshDatabase
      */
     protected function usingInMemoryDatabase()
     {
-        $default = config('database.default');
+        $database = $this->database() ?? config('database.default');
 
-        return config("database.connections.$default.database") === ':memory:';
+        return config("database.connections.$database.database") === ':memory:';
     }
 
     /**
@@ -56,10 +56,12 @@ trait RefreshDatabase
      */
     protected function migrateUsing()
     {
-        return [
+        return array_merge([
             '--seed' => $this->shouldSeed(),
-            '--seeder' => $this->seeder(),
-        ];
+            '--seeder' => $this->seeder()],
+            $this->database() ? ['--database' => $this->database()] : [],
+            $this->path() ? ['--path' => $this->path()] : []
+        );
     }
 
     /**
@@ -125,7 +127,7 @@ trait RefreshDatabase
     protected function connectionsToTransact()
     {
         return property_exists($this, 'connectionsToTransact')
-                            ? $this->connectionsToTransact : [null];
+                            ? $this->connectionsToTransact : [$this->database ?? null];
     }
 
     /**

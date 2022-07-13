@@ -94,4 +94,64 @@ class RefreshDatabaseTest extends TestCase
 
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
+
+	public function testRefreshTestDatabaseWithDatabaseOption()
+    {
+        $this->traitObject->database = 'becca';
+
+        $this->traitObject
+            ->expects($this->once())
+            ->method('artisan')
+            ->with('migrate:fresh', [
+                '--drop-views' => false,
+                '--drop-types' => false,
+                '--seed' => false,
+				'--database' => 'becca',
+            ]);
+
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+    }
+
+	public function testRefreshTestDatabaseWithPathOption()
+    {
+        $this->traitObject->path = 'database/migrations/becca';
+
+        $this->traitObject
+            ->expects($this->once())
+            ->method('artisan')
+            ->with('migrate:fresh', [
+                '--drop-views' => false,
+                '--drop-types' => false,
+                '--seed' => false,
+				'--path' => 'database/migrations/becca',
+            ]);
+
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+    }
+
+	public function testRefreshTestDatabaseWithDatabaseAndPathOption()
+    {
+		$this->traitObject->database = 'becca';
+        $this->traitObject->path = 'database/migrations/becca';
+
+        $this->traitObject
+            ->expects($this->once())
+            ->method('artisan')
+            ->with('migrate:fresh', [
+                '--drop-views' => false,
+                '--drop-types' => false,
+                '--seed' => false,
+				'--database' => 'becca',
+				'--path' => 'database/migrations/becca',
+            ]);
+
+        $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
+
+        $refreshTestDatabaseReflection->invoke($this->traitObject);
+    }
+
 }

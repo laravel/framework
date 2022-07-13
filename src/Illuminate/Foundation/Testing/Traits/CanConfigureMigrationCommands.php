@@ -12,13 +12,17 @@ trait CanConfigureMigrationCommands
     protected function migrateFreshUsing()
     {
         $seeder = $this->seeder();
+        $database = $this->database();
+        $path = $this->path();
 
         return array_merge(
             [
                 '--drop-views' => $this->shouldDropViews(),
                 '--drop-types' => $this->shouldDropTypes(),
             ],
-            $seeder ? ['--seeder' => $seeder] : ['--seed' => $this->shouldSeed()]
+            $seeder ? ['--seeder' => $seeder] : ['--seed' => $this->shouldSeed()],
+            $database ? ['--database' => $database] : [],
+            $path ? ['--path' => $path] : [],
         );
     }
 
@@ -60,5 +64,25 @@ trait CanConfigureMigrationCommands
     protected function seeder()
     {
         return property_exists($this, 'seeder') ? $this->seeder : false;
+    }
+
+    /**
+     * Determine the specific database connection that should be used when refreshing the database
+     *
+     * @return mixed
+     */
+    protected function database()
+    {
+        return property_exists($this, 'database') ? $this->database : false;
+    }
+
+    /**
+     * Determine the specific migration path that should be used when refreshing the database
+     *
+     * @return mixed
+     */
+    protected function path()
+    {
+        return property_exists($this, 'path') ? $this->path : false;
     }
 }
