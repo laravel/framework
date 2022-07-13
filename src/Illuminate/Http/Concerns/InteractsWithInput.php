@@ -344,6 +344,22 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve input from the request as an enum.
+     *
+     * @param  string  $key
+     * @param  string  $enumClass
+     * @return mixed|null
+     */
+    public function enum($key, $enumClass)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        return $enumClass::tryFrom($this->input($key));
+    }
+
+    /**
      * Retrieve input from the request as a collection.
      *
      * @param  array|string|null  $key

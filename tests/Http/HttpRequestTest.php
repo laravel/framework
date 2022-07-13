@@ -625,6 +625,20 @@ class HttpRequestTest extends TestCase
         $request->date('date', 'invalid_format');
     }
 
+    public function testEnumMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'valid_enum_value' => 'test',
+            'invalid_enum_value' => 'invalid',
+        ]);
+
+        $this->assertNull($request->enum('doesnt_exists', TestEnum::class));
+
+        $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
+
+        $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
+    }
+
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
