@@ -119,6 +119,7 @@ class PendingMail
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return \Illuminate\Mail\SentMessage|null
+     *
      * @throws TransportExceptionInterface
      */
     public function send(MailableContract $mailable)

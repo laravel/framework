@@ -38,6 +38,7 @@ interface Mailer
      * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return \Illuminate\Mail\SentMessage|null
+     *
      * @throws TransportExceptionInterface
      */
     public function send($view, array $data = [], $callback = null);
