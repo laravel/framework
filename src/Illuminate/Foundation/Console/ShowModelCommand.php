@@ -266,7 +266,7 @@ class ShowModelCommand extends Command
             'type <fg=gray>/</> <fg=yellow;options=bold>cast</>',
         );
 
-        foreach ($attributes as $key => $attribute) {
+        foreach ($attributes as $attribute) {
             $first = sprintf('%s %s', $attribute['name'], collect(['nullable', 'fillable', 'hidden', 'appended'])
                 ->filter(fn ($property) => $attribute[$property])
                 ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
