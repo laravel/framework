@@ -770,6 +770,29 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('x"null"x', env('foo'));
     }
 
+    public function testGetEnvAsArrayValue()
+    {
+        $_SERVER['foo'] = 'bar,baz';
+
+        $this->assertSame(['bar', 'baz'], env_as_array('foo'));
+    }
+
+    public function testGetEnvAsArrayDefault()
+    {
+        $_SERVER['foo'] = 'bar';
+        $this->assertSame(['bar'], env_as_array(key: 'foo', default: ['baz']));
+
+        unset($_SERVER['foo']);
+        $this->assertSame(['baz'], env_as_array(key: 'foo', default: ['baz']));
+    }
+
+    public function testEnvAsArraySeparator()
+    {
+        $_SERVER['foo'] = 'bar|baz';
+
+        $this->assertSame(['bar', 'baz'], env_as_array('foo', '|'));
+    }
+
     public function testGetFromSERVERFirst()
     {
         $_ENV['foo'] = 'From $_ENV';
