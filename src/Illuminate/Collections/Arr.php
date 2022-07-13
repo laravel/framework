@@ -140,6 +140,53 @@ class Arr
     }
 
     /**
+     * Check if an item or items are empty in an array using "dot" notation
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     *
+     * @throws  InvalidArgumentException
+     */
+    public static function isEmpty($array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if (! $array) {
+            return true;
+        }
+
+        if ($keys === []) {
+            throw new InvalidArgumentException(
+                "Array keys not provided"
+            );
+        }
+
+        foreach ($keys as $key) {
+            $subKeyArray = $array;
+
+            foreach (explode('.', $key) as $segment) {
+                if (static::accessible($subKeyArray) && ! static::exists($subKeyArray, $segment)) {
+                    $segment = ($segment === '') ? "''" : $segment;
+                    $key = ($key === '') ? "''" : $key;
+
+                    throw new \Exception(
+                        "Array key {$segment} of {$key} does not exist"
+                    );
+                } else {
+                    if(empty($subKeyArray[$segment]) || static::accessible($subKeyArray[$segment])) {
+                        $subKeyArray = $subKeyArray[$segment];
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
