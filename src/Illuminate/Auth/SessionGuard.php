@@ -37,7 +37,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @var string
      */
-    public readonly $name;
+    public readonly string $name;
 
     /**
      * The user we last attempted to retrieve.
