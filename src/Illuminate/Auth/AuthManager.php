@@ -54,6 +54,16 @@ class AuthManager implements FactoryContract
     }
 
     /**
+     * get The array of created "drivers".
+     *
+     * @return array
+     */
+    public function getGuards()
+    {
+        return $this->guards;
+    }
+
+    /**
      * Attempt to get the guard from the local cache.
      *
      * @param  string|null  $name
