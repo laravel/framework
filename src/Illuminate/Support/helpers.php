@@ -136,11 +136,11 @@ if (! function_exists('env')) {
 
 if (! function_exists('env_as_array')) {
     /**
-     * Gets the value of an environment variable as array
+     * Gets the value of an environment variable as array.
      *
-     * @param string $key
-     * @param string $separator
-     * @param array $default
+     * @param  string  $key
+     * @param  string  $separator
+     * @param  array  $default
      * @return array
      */
     function env_as_array(string $key, string $separator = ',', array $default = []): array
