@@ -268,12 +268,23 @@ class Handler implements ExceptionHandlerContract
         $context = array_merge(
             $this->exceptionContext($e),
             $this->context(),
-            ['exception' => $e]
+            ['exception' => $this->presentException((string) $e)]
         );
 
         method_exists($logger, $level)
             ? $logger->{$level}($e->getMessage(), $context)
             : $logger->log($level, $e->getMessage(), $context);
+    }
+
+    /**
+     * Present the exception to be logged.
+     *
+     * @param  string  $exception
+     * @return string
+     */
+    public function presentException(string $exception)
+    {
+        return $exception;
     }
 
     /**
