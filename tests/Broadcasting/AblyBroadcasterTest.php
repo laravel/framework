@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Broadcasting\Broadcasters\Ably\Utils;
 
 class AblyBroadcasterTest extends TestCase
 {
@@ -122,9 +123,9 @@ class AblyBroadcasterTest extends TestCase
     public function testGenerateAndValidateToken() {
         $headers = array('alg'=>'HS256','typ'=>'JWT');
         $payload = array('sub'=>'1234567890','name'=>'John Doe', 'admin'=>true, 'exp'=>(time() + 60));
-        $jwtToken = $this->broadcaster->generateJwt($headers, $payload);
+        $jwtToken = Utils::generateJwt($headers, $payload, 'efgh');
 
-        $parsedJwt = AblyBroadcaster::parseJwt($jwtToken);
+        $parsedJwt = Utils::parseJwt($jwtToken);
         self::assertEquals("HS256", $parsedJwt['header']['alg']);
         self::assertEquals("JWT", $parsedJwt['header']['typ']);
 
@@ -134,13 +135,13 @@ class AblyBroadcasterTest extends TestCase
 
 
         $timeFn = function () {return time(); };
-        $jwtIsValid = $this->broadcaster->isJwtValid($jwtToken, $timeFn);
+        $jwtIsValid = Utils::isJwtValid($jwtToken, $timeFn, 'efgh');
         self::assertTrue($jwtIsValid);
     }
 
     public function testShouldGetSignedToken() {
         $token = $this->broadcaster->getSignedToken(null, null, 'user123');
-        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $parsedToken = Utils::parseJwt($token);
         $header = $parsedToken["header"];
         $payload = $parsedToken["payload"];
 
@@ -158,7 +159,7 @@ class AblyBroadcasterTest extends TestCase
 
     public function testShouldGetSignedTokenForGivenChannel() {
         $token = $this->broadcaster->getSignedToken("private:channel", null, 'user123');
-        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $parsedToken = Utils::parseJwt($token);
         $header = $parsedToken["header"];
         $payload = $parsedToken["payload"];
 
@@ -177,7 +178,7 @@ class AblyBroadcasterTest extends TestCase
     public function testShouldHaveUpgradedCapabilitiesForValidToken() {
         $token = $this->broadcaster->getSignedToken("private:channel", null, 'user123');
 
-        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $parsedToken = Utils::parseJwt($token);
         $payload = $parsedToken["payload"];
         self::assertEquals("integer", gettype($payload["iat"]));
         self::assertEquals("integer", gettype($payload["exp"]));
@@ -185,7 +186,7 @@ class AblyBroadcasterTest extends TestCase
         $exp = $payload["exp"];
 
         $token = $this->broadcaster->getSignedToken("private:channel2", $token, 'user123');
-        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $parsedToken = Utils::parseJwt($token);
         $payload = $parsedToken["payload"];
         $expectedCapability = '{"public:*":["subscribe","history","channel-metadata"],"private:channel":["*"],"private:channel2":["*"]}';
         self::assertEquals("user123", $payload["x-ably-clientId"]);
@@ -194,7 +195,7 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals($exp, $payload["exp"]);
 
         $token = $this->broadcaster->getSignedToken("private:channel3", $token, 'user98');
-        $parsedToken = AblyBroadcaster::parseJwt($token);
+        $parsedToken = Utils::parseJwt($token);
         $payload = $parsedToken["payload"];
         $expectedCapability = '{"public:*":["subscribe","history","channel-metadata"],"private:channel":["*"],"private:channel2":["*"],"private:channel3":["*"]}';
         self::assertEquals("user98", $payload["x-ably-clientId"]);
@@ -220,7 +221,7 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals("string", gettype($prevResponse["token"]));
         $expectedToken = $this->broadcaster->getSignedToken("private:test1", null, 42);
         self::assertEquals($expectedToken, $prevResponse["token"]);
-        self::assertTrue($this->broadcaster->isJwtValid($expectedToken, function () {return time();}));
+        self::assertTrue(Utils::isJwtValid($expectedToken, function () {return time();}, 'efgh'));
 
         $response = $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence:test2', $prevResponse["token"])
@@ -229,7 +230,7 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals("string", gettype($response["token"]));
         $expectedToken = $this->broadcaster->getSignedToken("presence:test2", $prevResponse["token"], 42);
         self::assertEquals($expectedToken, $response["token"]);
-        self::assertTrue($this->broadcaster->isJwtValid($expectedToken, function () {return time();}));
+        self::assertTrue(Utils::isJwtValid($expectedToken, function () {return time();}, 'efgh'));
 
         self::assertEquals("array", gettype($response["info"]));
         self::assertEquals(array("userid" => "user1234", "info" => "Hello there"), $response["info"]);

@@ -8,6 +8,7 @@ use Ably\Models\Message as AblyMessage;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Broadcasting\Broadcasters\Ably\Utils;
 
 /**
  * @author Matthew Hall (matthall28@gmail.com)
@@ -92,6 +93,7 @@ class AblyBroadcaster extends Broadcaster
         $connectionId = $request->socket_id;
         $normalizedChannelName = $this->normalizeChannelName($channelName);
         $userId = null;
+        $channelCapability = ['*'];
         $user = $this->retrieveUser($request, $normalizedChannelName);
         if ($user) {
             $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
@@ -104,13 +106,16 @@ class AblyBroadcaster extends Broadcaster
             }
             try {
                 $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
+                if (is_array($userData) && key_exists('capability', $userData)) {
+                    $channelCapability = $userData['capability'];
+                }
             } catch (\Exception $e) {
                 throw new AccessDeniedHttpException("Access denied, " . $this->stringify($channelName, $connectionId, $userId), $e);
             }
         }
 
         try {
-            $signedToken = $this->getSignedToken($channelName, $token, $userId);
+            $signedToken = $this->getSignedToken($channelName, $token, $userId, $channelCapability);
         } catch (\Exception $_) { // excluding exception to avoid exposing private key
             throw new AccessDeniedHttpException("malformed token, " . $this->stringify($channelName, $connectionId, $userId));
         }
@@ -165,7 +170,7 @@ class AblyBroadcaster extends Broadcaster
      * @param $clientId string
      * @return string
      */
-    function getSignedToken($channelName, $token, $clientId)
+    function getSignedToken($channelName, $token, $clientId, $channelCapability = ['*'])
     {
         $header = array(
             "typ" => "JWT",
@@ -179,8 +184,8 @@ class AblyBroadcaster extends Broadcaster
         $serverTimeFn = function () {
             return self::getServerTime();
         };
-        if ($token && $this->isJwtValid($token, $serverTimeFn)) {
-            $payload = self::parseJwt($token)['payload'];
+        if ($token && Utils::isJwtValid($token, $serverTimeFn, $this->getPrivateToken())) {
+            $payload = Utils::parseJwt($token)['payload'];
             $iat = $payload['iat'];
             $exp = $payload['exp'];
             $channelClaims = json_decode($payload['x-ably-capability'], true);
@@ -189,7 +194,7 @@ class AblyBroadcaster extends Broadcaster
             $exp = $iat + 3600;
         }
         if ($channelName) {
-            $channelClaims[$channelName] = ["*"];
+            $channelClaims[$channelName] = $channelCapability;
         }
         $claims = array(
             "iat" => $iat,
@@ -198,7 +203,7 @@ class AblyBroadcaster extends Broadcaster
             "x-ably-capability" => json_encode($channelClaims)
         );
 
-        return $this->generateJwt($header, $claims);
+        return Utils::generateJwt($header, $claims, $this->getPrivateToken());
     }
 
     /**
@@ -301,64 +306,5 @@ class AblyBroadcaster extends Broadcaster
             return "user-id:" . $userId . " " . $message;
         }
         return $message;
-    }
-
-    // JWT related PHP utility functions
-
-    /**
-     * @param $jwt string
-     * @return array
-     */
-    static function parseJwt($jwt)
-    {
-        $tokenParts = explode('.', $jwt);
-        $header = json_decode(base64_decode($tokenParts[0]), true);
-        $payload = json_decode(base64_decode($tokenParts[1]), true);;
-        return array('header' => $header, 'payload' => $payload);
-    }
-
-    /**
-     * @param $headers array
-     * @param $payload array
-     * @return string
-     */
-    function generateJwt($headers, $payload)
-    {
-        $encodedHeaders = self::base64urlEncode(json_encode($headers));
-        $encodedPayload = self::base64urlEncode(json_encode($payload));
-
-        $signature = hash_hmac('SHA256', "$encodedHeaders.$encodedPayload", $this->getPrivateToken(), true);
-        $encodedSignature = self::base64urlEncode($signature);
-
-        return "$encodedHeaders.$encodedPayload.$encodedSignature";
-    }
-
-    /**
-     * @param $jwt string
-     * @param $timeFn
-     * @return bool
-     */
-    function isJwtValid($jwt, $timeFn)
-    {
-        // split the jwt
-        $tokenParts = explode('.', $jwt);
-        $header = $tokenParts[0];
-        $payload = $tokenParts[1];
-        $tokenSignature = $tokenParts[2];
-
-        // check the expiration time - note this will cause an error if there is no 'exp' claim in the jwt
-        $expiration = json_decode(base64_decode($payload))->exp;
-        $isTokenExpired = $expiration <= $timeFn();
-
-        // build a signature based on the header and payload using the secret
-        $signature = hash_hmac('SHA256', $header . "." . $payload, $this->getPrivateToken(), true);
-        $isSignatureValid = self::base64urlEncode($signature) === $tokenSignature;
-
-        return $isSignatureValid && !$isTokenExpired;
-    }
-
-    static function base64urlEncode($str)
-    {
-        return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
     }
 }
