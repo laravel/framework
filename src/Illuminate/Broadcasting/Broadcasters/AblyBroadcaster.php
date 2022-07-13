@@ -105,9 +105,10 @@ class AblyBroadcaster extends Broadcaster
                 throw new AccessDeniedHttpException( "User not authenticated, " . $this->stringify( $channelName, $connectionId ) );
             }
             try {
-                $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
-                if (is_array($userData) && key_exists('capability', $userData)) {
-                    $channelCapability = $userData['capability'];
+                $userChannelMetaData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
+                if (is_array($userChannelMetaData) && array_key_exists('capability', $userChannelMetaData)) {
+                    $channelCapability = $userChannelMetaData['capability'];
+                    unset($userChannelMetaData['capability']);
                 }
             } catch (\Exception $e) {
                 throw new AccessDeniedHttpException("Access denied, " . $this->stringify($channelName, $connectionId, $userId), $e);
@@ -121,8 +122,8 @@ class AblyBroadcaster extends Broadcaster
         }
 
         $response = array('token' => $signedToken);
-        if (isset($userData) && is_array($userData)) {
-            $response['info'] = $userData;
+        if (isset($userChannelMetaData) && is_array($userChannelMetaData) && count($userChannelMetaData) > 0) {
+            $response['info'] = $userChannelMetaData;
         }
         return $response;
     }
