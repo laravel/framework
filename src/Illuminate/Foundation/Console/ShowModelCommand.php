@@ -260,16 +260,6 @@ class ShowModelCommand extends Command
         $this->components->twoColumnDetail('Table', $table);
 
         $this->newLine();
-        $this->components->twoColumnDetail('<fg=green;options=bold>Relations</>');
-
-        foreach ($relations as $relation) {
-            $this->components->twoColumnDetail(
-                $relation['name'].' <fg=gray>'.$relation['type'].'</>',
-                $relation['related']
-            );
-        }
-
-        $this->newLine();
 
         $this->components->twoColumnDetail(
             '<fg=green;options=bold>Attributes</>',
@@ -289,6 +279,17 @@ class ShowModelCommand extends Command
 
             $this->components->twoColumnDetail(
                 str($first)->trim(), $second,
+            );
+        }
+
+        $this->newLine();
+
+        $this->components->twoColumnDetail('<fg=green;options=bold>Relations</>');
+
+        foreach ($relations as $relation) {
+            $this->components->twoColumnDetail(
+                $relation['name'].' <fg=gray>'.$relation['type'].'</>',
+                $relation['related']
             );
         }
 
