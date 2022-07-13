@@ -6,6 +6,7 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Support\Traits\Conditionable;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class PendingMail
 {
@@ -118,6 +119,7 @@ class PendingMail
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return \Illuminate\Mail\SentMessage|null
+     * @throws TransportExceptionInterface
      */
     public function send(MailableContract $mailable)
     {

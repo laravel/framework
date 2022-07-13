@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Mail;
 
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+
 interface Mailer
 {
     /**
@@ -36,6 +38,7 @@ interface Mailer
      * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return \Illuminate\Mail\SentMessage|null
+     * @throws TransportExceptionInterface
      */
     public function send($view, array $data = [], $callback = null);
 }
