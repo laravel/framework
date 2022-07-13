@@ -58,7 +58,7 @@ trait RefreshDatabase
     {
         return array_merge([
             '--seed' => $this->shouldSeed(),
-            '--seeder' => $this->seeder()],
+            '--seeder' => $this->seeder(), ],
             $this->database() ? ['--database' => $this->database()] : [],
             $this->path() ? ['--path' => $this->path()] : []
         );

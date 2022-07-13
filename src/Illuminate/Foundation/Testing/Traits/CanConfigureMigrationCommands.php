@@ -67,7 +67,7 @@ trait CanConfigureMigrationCommands
     }
 
     /**
-     * Determine the specific database connection that should be used when refreshing the database
+     * Determine the specific database connection that should be used when refreshing the database.
      *
      * @return mixed
      */
@@ -77,7 +77,7 @@ trait CanConfigureMigrationCommands
     }
 
     /**
-     * Determine the specific migration path that should be used when refreshing the database
+     * Determine the specific migration path that should be used when refreshing the database.
      *
      * @return mixed
      */

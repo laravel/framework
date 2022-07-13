@@ -95,7 +95,7 @@ class RefreshDatabaseTest extends TestCase
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
 
-	public function testRefreshTestDatabaseWithDatabaseOption()
+    public function testRefreshTestDatabaseWithDatabaseOption()
     {
         $this->traitObject->database = 'becca';
 
@@ -106,7 +106,7 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-				'--database' => 'becca',
+                '--database' => 'becca',
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
@@ -114,7 +114,7 @@ class RefreshDatabaseTest extends TestCase
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
 
-	public function testRefreshTestDatabaseWithPathOption()
+    public function testRefreshTestDatabaseWithPathOption()
     {
         $this->traitObject->path = 'database/migrations/becca';
 
@@ -125,7 +125,7 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-				'--path' => 'database/migrations/becca',
+                '--path' => 'database/migrations/becca',
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
@@ -133,9 +133,9 @@ class RefreshDatabaseTest extends TestCase
         $refreshTestDatabaseReflection->invoke($this->traitObject);
     }
 
-	public function testRefreshTestDatabaseWithDatabaseAndPathOption()
+    public function testRefreshTestDatabaseWithDatabaseAndPathOption()
     {
-		$this->traitObject->database = 'becca';
+        $this->traitObject->database = 'becca';
         $this->traitObject->path = 'database/migrations/becca';
 
         $this->traitObject
@@ -145,8 +145,8 @@ class RefreshDatabaseTest extends TestCase
                 '--drop-views' => false,
                 '--drop-types' => false,
                 '--seed' => false,
-				'--database' => 'becca',
-				'--path' => 'database/migrations/becca',
+                '--database' => 'becca',
+                '--path' => 'database/migrations/becca',
             ]);
 
         $refreshTestDatabaseReflection = $this->__reflectAndSetupAccessibleForProtectedTraitMethod('refreshTestDatabase');
