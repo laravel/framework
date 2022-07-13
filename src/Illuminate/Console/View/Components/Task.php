@@ -42,7 +42,9 @@ class Task extends Component
                 : '';
 
             $runTimeWidth = mb_strlen($runTime);
-            $dots = max(terminal()->width() - $descriptionWidth - $runTimeWidth - 10, 0);
+            $width = min(terminal()->width(), 150);
+            $dots = max($width - $descriptionWidth - $runTimeWidth - 10, 0);
+
             $this->output->write(str_repeat('<fg=gray>.</>', $dots), false, $verbosity);
             $this->output->write("<fg=gray>$runTime</>", false, $verbosity);
 

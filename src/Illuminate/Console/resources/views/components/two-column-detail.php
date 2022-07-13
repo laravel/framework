@@ -1,4 +1,4 @@
-<div class="flex mx-2">
+<div class="flex mx-2 max-w-150">
     <span>
         <?php echo htmlspecialchars($first) ?>
     </span>
