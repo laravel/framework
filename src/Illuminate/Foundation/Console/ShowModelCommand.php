@@ -262,7 +262,7 @@ class ShowModelCommand extends Command
 
         foreach ($relations as $relation) {
             $this->components->twoColumnDetail(
-                ucfirst($relation['name']).' <fg=gray>'.$relation['type'].'</>',
+                $relation['name'].' <fg=gray>'.$relation['type'].'</>',
                 $relation['related']
             );
         }
