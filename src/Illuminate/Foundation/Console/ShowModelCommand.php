@@ -147,9 +147,9 @@ class ShowModelCommand extends Command
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
-                    return [Str::snake($matches[1]) => 'Accessor'];
+                    return [Str::snake($matches[1]) => 'accessor'];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
-                    return [Str::snake($method->getName()) => 'Attribute'];
+                    return [Str::snake($method->getName()) => 'attribute'];
                 } else {
                     return [];
                 }
@@ -307,11 +307,11 @@ class ShowModelCommand extends Command
     protected function getCastType($column, $model)
     {
         if ($model->hasGetMutator($column) || $model->hasSetMutator($column)) {
-            return 'Accessor';
+            return 'accessor';
         }
 
         if ($model->hasAttributeMutator($column)) {
-            return 'Attribute';
+            return 'attribute';
         }
 
         return $this->getCastsWithDates($model)->get($column) ?? null;
