@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +12,6 @@ use ReflectionClass;
 use ReflectionMethod;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Helper\TableCell;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends Command
@@ -80,14 +78,13 @@ class ShowModelCommand extends Command
     {
         if (! interface_exists('Doctrine\DBAL\Driver')) {
             return $this->components->error(
-                'To display model information, you must install the `doctrine/dbal` package using the Composer package manager.'
+                'Displaying model information requires [doctrine/dbal].'
             );
         }
 
         $class = $this->qualifyModel($this->argument('model'));
 
         try {
-            /** @var Model */
             $model = $this->laravel->make($class);
         } catch (BindingResolutionException $e) {
             return $this->components->error($e->getMessage());
@@ -123,10 +120,8 @@ class ShowModelCommand extends Command
                 'name' => $column->getName(),
                 'type' => $this->getColumnType($column),
                 'nullable' => ! $column->getNotnull(),
-                'default' => $this->getColumnDefault($column, $model),
                 'fillable' => $model->isFillable($column->getName()),
                 'hidden' => $this->attributeIsHidden($column->getName(), $model),
-                'appended' => null,
                 'cast' => $this->getCastType($column->getName(), $model),
             ])
             ->merge($this->getVirtualAttributes($model, $columns));
@@ -162,10 +157,8 @@ class ShowModelCommand extends Command
                 'name' => $name,
                 'type' => null,
                 'nullable' => null,
-                'default' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
-                'appended' => $model->hasAppended($name),
                 'cast' => $cast,
             ])
             ->values();
@@ -258,57 +251,47 @@ class ShowModelCommand extends Command
      */
     protected function displayCli($class, $database, $table, $attributes, $relations)
     {
+        $this->newLine();
+
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$class.'</>');
         $this->components->twoColumnDetail('Database', $database);
         $this->components->twoColumnDetail('Table', $table);
 
         $this->newLine();
+        $this->components->twoColumnDetail('<fg=green;options=bold>Relations</>');
 
-        $this->components->table(
-            [
-                'Attribute',
-                'Type',
-                'Nullable',
-                'Default',
-                'Fillable',
-                'Hidden',
-                'Appended',
-                'Cast',
-            ],
-            [
-                ...$attributes->map(fn ($attribute) => collect($attribute)
-                    ->map(fn ($property) => $this->formatForCli($property))
-                    ->all()
-                ),
-                [''],
-                [
-                    '<fg=green;options=bold>Relation</>',
-                    '<fg=green;options=bold>Type</>',
-                    new TableCell('<fg=green;options=bold>Related</>', ['colspan' => 6]),
-                ],
-                ...$relations->map(fn ($relation) => [
-                    $relation['name'],
-                    $relation['type'],
-                    new TableCell($relation['related'], ['colspan' => 6]),
-                ]),
-            ]
+        foreach ($relations as $relation) {
+            $this->components->twoColumnDetail(
+                ucfirst($relation['name']).' <fg=gray>'.$relation['type'].'</>',
+                $relation['related']
+            );
+        }
+
+        $this->newLine();
+
+        $this->components->twoColumnDetail(
+            '<fg=green;options=bold>Attributes</>',
+            'type <fg=gray>/</> <fg=yellow;options=bold>cast</>',
         );
-    }
 
-    /**
-     * Format a value for the CLI.
-     *
-     * @param  bool|null|string  $value
-     * @return string
-     */
-    protected function formatForCli($value)
-    {
-        return match ($value) {
-            true => 'Yes',
-            false => 'No',
-            null => '<fg=gray>-</>',
-            default => $value,
-        };
+        foreach ($attributes as $key => $attribute) {
+            $first = sprintf('%s %s', $attribute['name'], collect(['nullable', 'fillable', 'hidden'])
+                ->filter(fn ($property) => $attribute[$property])
+                ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
+                ->implode('<fg=gray>,</> '));
+
+            $second = $attribute['type'];
+
+            if ($attribute['cast']) {
+                $second = '<fg=yellow;options=bold>'.$attribute['cast'].'</>';
+            }
+
+            $this->components->twoColumnDetail(
+                str($first)->trim(), str($second)->when(! class_exists($attribute['cast']))->lower(),
+            );
+        }
+
+        $this->newLine();
     }
 
     /**
@@ -355,34 +338,9 @@ class ShowModelCommand extends Command
     {
         $name = $column->getType()->getName();
 
-        $details = match (get_class($column->getType())) {
-            DecimalType::class => $column->getPrecision().','.$column->getScale(),
-            default => $column->getLength(),
-        };
-
         $unsigned = $column->getUnsigned() ? ' unsigned' : '';
 
-        if ($details) {
-            return sprintf('%s(%s)%s', $name, $details, $unsigned);
-        }
-
         return sprintf('%s%s', $name, $unsigned);
-    }
-
-    /**
-     * Get the default value for the given column.
-     *
-     * @param  \Doctrine\DBAL\Schema\Column  $column
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string|null
-     */
-    protected function getColumnDefault($column, $model)
-    {
-        if ($column->getAutoincrement()) {
-            return 'increments';
-        }
-
-        return $model->getAttributes()[$column->getName()] ?? $column->getDefault();
     }
 
     /**
