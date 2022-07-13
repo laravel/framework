@@ -123,7 +123,7 @@ class ShowModelCommand extends Command
             ->map(fn (Column $column) => [
                 'name' => $column->getName(),
                 'type' => $this->getColumnType($column),
-                'nullable' => $column->getNotnull(),
+                'nullable' => ! $column->getNotnull(),
                 'default' => $this->getColumnDefault($column, $model),
                 'fillable' => $model->isFillable($column->getName()),
                 'hidden' => $this->attributeIsHidden($column->getName(), $model),
