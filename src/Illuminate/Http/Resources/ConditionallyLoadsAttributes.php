@@ -221,7 +221,7 @@ trait ConditionallyLoadsAttributes
 
         $attribute = Str::finish($relationship, '_count');
 
-        if (! $this->resource->hasAttribute($attribute)) {
+        if (! isset($this->resource->getAttributes()[$attribute])) {
             return value($default);
         }
 
