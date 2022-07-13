@@ -91,17 +91,16 @@ class AblyBroadcaster extends Broadcaster
         $token = $request->token;
         $connectionId = $request->socket_id;
         $normalizedChannelName = $this->normalizeChannelName($channelName);
+        $userId = null;
+        if ($this->isGuardedChannel($channelName)) {
+            $user = $this->retrieveUser($request, $normalizedChannelName);
+            if (!$user) {
+                throw new AccessDeniedHttpException( "User not authenticated, " . $this->stringify( $channelName, $connectionId ) );
+            }
+            $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
+                ? $user->getAuthIdentifierForBroadcasting()
+                : $user->getAuthIdentifier();
 
-        $user = $this->retrieveUser($request, $normalizedChannelName);
-        if ($this->isGuardedChannel($channelName) && !$user) {
-            throw new AccessDeniedHttpException("User not authenticated, " . $this->stringify($channelName, $connectionId));
-        }
-
-        $userId = method_exists($user, 'getAuthIdentifierForBroadcasting')
-            ? $user->getAuthIdentifierForBroadcasting()
-            : $user->getAuthIdentifier();
-
-        if ($channelName) {
             try {
                 $userData = parent::verifyUserCanAccessChannel($request, $normalizedChannelName);
             } catch (\Exception $e) {
@@ -110,7 +109,7 @@ class AblyBroadcaster extends Broadcaster
         }
 
         try {
-            $signedToken = $this->getSignedToken($channelName, $token, strval($userId));
+            $signedToken = $this->getSignedToken($channelName, $token, $userId );
         } catch (\Exception $_) { // excluding exception to avoid exposing private key
             throw new AccessDeniedHttpException("malformed token, " . $this->stringify($channelName, $connectionId, $userId));
         }
