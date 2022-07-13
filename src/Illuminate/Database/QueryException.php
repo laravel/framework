@@ -9,6 +9,13 @@ use Throwable;
 class QueryException extends PDOException
 {
     /**
+     * The database connection name.
+     *
+     * @var string
+     */
+    public $connectionName;
+
+    /**
      * The SQL for the query.
      *
      * @var string
@@ -30,10 +37,11 @@ class QueryException extends PDOException
      * @param  \Throwable  $previous
      * @return void
      */
-    public function __construct($sql, array $bindings, Throwable $previous)
+    public function __construct($sql, array $bindings, Throwable $previous, $connectionName)
     {
         parent::__construct('', 0, $previous);
 
+        $this->connectionName = $connectionName;
         $this->sql = $sql;
         $this->bindings = $bindings;
         $this->code = $previous->getCode();
@@ -54,7 +62,7 @@ class QueryException extends PDOException
      */
     protected function formatMessage($sql, $bindings, Throwable $previous)
     {
-        return $previous->getMessage().' (SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        return $previous->getMessage().' (Connection: '.$this->connectionName.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
     }
 
     /**
