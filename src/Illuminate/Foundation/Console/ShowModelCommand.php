@@ -416,6 +416,10 @@ class ShowModelCommand extends Command
      */
     protected function qualifyModel(string $model)
     {
+        if (class_exists($model)) {
+            return $model;
+        }
+
         $model = ltrim($model, '\\/');
 
         $model = str_replace('/', '\\', $model);
