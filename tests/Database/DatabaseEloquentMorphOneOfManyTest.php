@@ -97,9 +97,11 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
     public function testForceCreateMorphType()
     {
         $product = MorphOneOfManyTestProduct::create();
-        $product->states()->forceCreate([
+        $state = $product->states()->forceCreate([
             'state' => 'active',
         ]);
+
+        $this->assertNotNull($state);
         $this->assertSame(MorphOneOfManyTestProduct::class, $product->current_state->stateful_type);
     }
 
