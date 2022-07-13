@@ -122,6 +122,7 @@ class ShowModelCommand extends Command
                 'nullable' => ! $column->getNotnull(),
                 'fillable' => $model->isFillable($column->getName()),
                 'hidden' => $this->attributeIsHidden($column->getName(), $model),
+                'appended' => null,
                 'cast' => $this->getCastType($column->getName(), $model),
             ])
             ->merge($this->getVirtualAttributes($model, $columns));
@@ -159,6 +160,7 @@ class ShowModelCommand extends Command
                 'nullable' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
+                'appended' => $model->hasAppended($name),
                 'cast' => $cast,
             ])
             ->values();
@@ -275,7 +277,7 @@ class ShowModelCommand extends Command
         );
 
         foreach ($attributes as $key => $attribute) {
-            $first = sprintf('%s %s', $attribute['name'], collect(['nullable', 'fillable', 'hidden'])
+            $first = sprintf('%s %s', $attribute['name'], collect(['nullable', 'fillable', 'hidden', 'appended'])
                 ->filter(fn ($property) => $attribute[$property])
                 ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
                 ->implode('<fg=gray>,</> '));
