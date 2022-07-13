@@ -146,7 +146,7 @@ class Arr
      * @param  string|array  $keys
      * @return bool
      *
-     * @throws  InvalidArgumentException
+     * @throws  InvalidArgumentException|Exception
      */
     public static function isEmpty($array, $keys)
     {
