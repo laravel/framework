@@ -79,7 +79,7 @@ class ScheduleRunCommand extends Command
     protected $handler;
 
     /**
-     * The PHP Binary used by the command.
+     * The PHP binary used by the command.
      *
      * @var string
      */

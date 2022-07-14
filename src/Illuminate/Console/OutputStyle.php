@@ -10,18 +10,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class OutputStyle extends SymfonyStyle implements NewLineAware
 {
     /**
-     * If the last output wrote a new line.
-     *
-     * @var bool
-     */
-    protected $newLineWritten = false;
-
-    /**
      * The output instance.
      *
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     private $output;
+
+    /**
+     * If the last output written wrote a new line.
+     *
+     * @var bool
+     */
+    protected $newLineWritten = false;
 
     /**
      * Create a new Console OutputStyle instance.
@@ -35,6 +35,48 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
         $this->output = $output;
 
         parent::__construct($input, $output);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function write(string|iterable $messages, bool $newline = false, int $options = 0)
+    {
+        $this->newLineWritten = $newline;
+
+        parent::write($messages, $newline, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
+    {
+        $this->newLineWritten = true;
+
+        parent::writeln($messages, $type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function newLine(int $count = 1)
+    {
+        $this->newLineWritten = $count > 0;
+
+        parent::newLine($count);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function newLineWritten()
+    {
+        if ($this->output instanceof static && $this->output->newLineWritten()) {
+            return true;
+        }
+
+        return $this->newLineWritten;
     }
 
     /**
@@ -85,47 +127,5 @@ class OutputStyle extends SymfonyStyle implements NewLineAware
     public function getOutput()
     {
         return $this->output;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write(string|iterable $messages, bool $newline = false, int $options = 0)
-    {
-        $this->newLineWritten = $newline;
-
-        parent::write($messages, $newline, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function writeln(string|iterable $messages, int $type = self::OUTPUT_NORMAL)
-    {
-        $this->newLineWritten = true;
-
-        parent::writeln($messages, $type);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function newLine(int $count = 1)
-    {
-        $this->newLineWritten = $count > 0;
-
-        parent::newLine($count);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function newLineWritten()
-    {
-        if ($this->output instanceof static && $this->output->newLineWritten()) {
-            return true;
-        }
-
-        return $this->newLineWritten;
     }
 }
