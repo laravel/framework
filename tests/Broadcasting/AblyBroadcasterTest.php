@@ -236,6 +236,28 @@ class AblyBroadcasterTest extends TestCase
         self::assertEquals(array("userid" => "user1234", "info" => "Hello there"), $response["info"]);
     }
 
+    public function testCustomChannelCapability() {
+        $this->broadcaster->channel('test1', function () {
+            return true;
+        });
+
+        $this->broadcaster->shouldReceive('validAuthenticationResponse')
+            ->times(1)
+            ->andReturn(array("userid" => "user1234", "info" => "Hello there", "capability" => ['publish', 'subscribe', 'presence']));
+
+        $response = $this->broadcaster->auth(
+            $this->getMockRequestWithUserForChannel('private:test1', null)
+        );
+        self::assertEquals("string", gettype($response["token"]));
+        $expectedToken = $this->broadcaster->getSignedToken("private:test1", null, 42, ['publish', 'subscribe', 'presence']);
+        self::assertEquals($expectedToken, $response["token"]);
+        self::assertTrue(Utils::isJwtValid($expectedToken, function () {return time();}, 'efgh'));
+
+        self::assertEquals("array", gettype($response["info"]));
+        self::assertEquals(array("userid" => "user1234", "info" => "Hello there"), $response["info"]);
+    }
+
+
     public function testShouldFormatChannels() {
         $result = $this->broadcaster->formatChannels(['private-hello']);
         self::assertEquals("private:hello", $result[0]);

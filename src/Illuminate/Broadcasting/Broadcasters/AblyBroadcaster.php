@@ -169,6 +169,7 @@ class AblyBroadcaster extends Broadcaster
      * @param $channelName string
      * @param $token string
      * @param $clientId string
+     * @param string[] $channelCapability
      * @return string
      */
     function getSignedToken($channelName, $token, $clientId, $channelCapability = ['*'])
