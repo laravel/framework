@@ -147,7 +147,6 @@ class SupportArrTest extends TestCase
                 ['name' => 'chair'],
             ],
         ];
-
         $this->assertTrue(Arr::isEmpty($array, 'products.0.name'));
         $this->assertFalse(Arr::isEmpty($array, 'products.1.name'));
 
@@ -157,9 +156,26 @@ class SupportArrTest extends TestCase
                 'label' => ''
             ],
         ];
-
         $this->assertFalse(Arr::isEmpty($array, 'products.name'));
         $this->assertTrue(Arr::isEmpty($array, 'products.label'));
+
+        $array = [
+            'products' => [
+                'name' => 'desk',
+                'label' => 'Cool Desk',
+                'slug' => '/desk'
+            ],
+        ];
+        $this->assertFalse(Arr::isEmpty($array, ['products.name', 'products.label', 'products.slug']));
+
+        $array = [
+            'products' => [
+                'name' => '',
+                'label' => '',
+                'slug' => ''
+            ],
+        ];
+        $this->assertTrue(Arr::isEmpty($array, ['products.name', 'products.label', 'products.slug']));
 
         $this->assertFalse(Arr::isEmpty(new ArrayObject(['foo' => 'bar']), 'foo'));
         $this->assertTrue(Arr::isEmpty([], ['']));
@@ -183,9 +199,9 @@ class SupportArrTest extends TestCase
     {
         $this->expectException(\Exception::class);
 
-        $this->expectExceptionMessage("Array key bar of foo.bar does not exist");
+        $this->expectExceptionMessage('Array key hello of foo.hello does not exist');
 
-        Arr::isEmpty(['foo' => ['bar']], 'foo.bar');
+        Arr::isEmpty(['foo' => ['bar']], 'foo.hello');
     }
 
     public function testIsEmptyArrayKeyBlankDoesNotExistException()
@@ -684,7 +700,7 @@ class SupportArrTest extends TestCase
     {
         $data = ['first' => 'taylor', 'last' => 'otwell'];
         $mapped = Arr::map($data, function ($value, $key) {
-            return $key.'-'.strrev($value);
+            return $key . '-' . strrev($value);
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $mapped);
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
@@ -1052,9 +1068,9 @@ class SupportArrTest extends TestCase
         Arr::forget($array, 1);
         $this->assertEquals(['name' => 'hAz', 2 => 'bAz'], $array);
 
-        $array = [2 => [1 =>'products', 3 => 'users']];
+        $array = [2 => [1 => 'products', 3 => 'users']];
         Arr::forget($array, 2.3);
-        $this->assertEquals([2 => [1 =>'products']], $array);
+        $this->assertEquals([2 => [1 => 'products']], $array);
     }
 
     public function testWrap()
