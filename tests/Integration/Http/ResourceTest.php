@@ -33,6 +33,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
@@ -279,6 +280,59 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalRelationshipCounts()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            return new PostResourceWithOptionalRelationshipCounts($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'comments' => 'None',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayLoadOptionalRelationshipCounts()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+                'authors_count' => 2,
+                'comments_count' => 5,
+            ]);
+
+            return new PostResourceWithOptionalRelationshipCounts($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'authors' => 2,
+                'comments' => '5 comments',
             ],
         ]);
     }
