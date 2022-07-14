@@ -92,8 +92,6 @@ class VendorPublishCommand extends Command
         foreach ($this->tags ?: [null] as $tag) {
             $this->publishTag($tag);
         }
-
-        $this->info('Publishing complete.');
     }
 
     /**
@@ -123,7 +121,7 @@ class VendorPublishCommand extends Command
      */
     protected function promptForProviderOrTag()
     {
-        $choice = $this->choice(
+        $choice = $this->components->choice(
             "Which provider or tag's files would you like to publish?",
             $choices = $this->publishableChoices()
         );
@@ -144,8 +142,8 @@ class VendorPublishCommand extends Command
     {
         return array_merge(
             ['<comment>Publish files from all providers and tags listed below</comment>'],
-            preg_filter('/^/', '<comment>Provider: </comment>', Arr::sort(ServiceProvider::publishableProviders())),
-            preg_filter('/^/', '<comment>Tag: </comment>', Arr::sort(ServiceProvider::publishableGroups()))
+            preg_filter('/^/', '<fg=gray>Provider:</> ', Arr::sort(ServiceProvider::publishableProviders())),
+            preg_filter('/^/', '<fg=gray>Tag:</> ', Arr::sort(ServiceProvider::publishableGroups()))
         );
     }
 
@@ -178,16 +176,23 @@ class VendorPublishCommand extends Command
 
         $pathsToPublish = $this->pathsToPublish($tag);
 
-        foreach ($pathsToPublish as $from => $to) {
-            $this->publishItem($from, $to);
-
-            $published = true;
+        if ($publishing = count($pathsToPublish) > 0) {
+            $this->components->info(sprintf(
+                'Publishing %sassets',
+                $tag ? "[$tag] " : '',
+            ));
         }
 
-        if ($published === false) {
-            $this->comment('No publishable resources for tag ['.$tag.'].');
+        foreach ($pathsToPublish as $from => $to) {
+            $this->publishItem($from, $to);
+        }
+
+        if ($publishing === false) {
+            $this->components->info('No publishable resources for tag ['.$tag.'].');
         } else {
             $this->laravel['events']->dispatch(new VendorTagPublished($tag, $pathsToPublish));
+
+            $this->newLine();
         }
     }
 
@@ -219,7 +224,7 @@ class VendorPublishCommand extends Command
             return $this->publishDirectory($from, $to);
         }
 
-        $this->error("Can't locate path: <{$from}>");
+        $this->components->error("Can't locate path: <{$from}>");
     }
 
     /**
@@ -236,7 +241,12 @@ class VendorPublishCommand extends Command
 
             $this->files->copy($from, $to);
 
-            $this->status($from, $to, 'File');
+            $this->status($from, $to, 'file');
+        } else {
+            $this->components->twoColumnDetail(sprintf(
+                'File [%s] already exist',
+                str_replace(base_path().'/', '', realpath($to)),
+            ), '<fg=yellow;options=bold>SKIPPED</>');
         }
     }
 
@@ -256,7 +266,7 @@ class VendorPublishCommand extends Command
             'to' => new Flysystem(new LocalAdapter($to, $visibility)),
         ]));
 
-        $this->status($from, $to, 'Directory');
+        $this->status($from, $to, 'directory');
     }
 
     /**
@@ -299,10 +309,15 @@ class VendorPublishCommand extends Command
      */
     protected function status($from, $to, $type)
     {
-        $from = str_replace(base_path(), '', realpath($from));
+        $from = str_replace(base_path().'/', '', realpath($from));
 
-        $to = str_replace(base_path(), '', realpath($to));
+        $to = str_replace(base_path().'/', '', realpath($to));
 
-        $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
+        $this->components->task(sprintf(
+            'Copying %s [%s] to [%s]',
+            $type,
+            $from,
+            $to,
+        ));
     }
 }

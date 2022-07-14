@@ -74,6 +74,6 @@ class ViewClearCommand extends Command
             $this->files->delete($view);
         }
 
-        $this->info('Compiled views cleared successfully.');
+        $this->components->info('Compiled views cleared successfully.');
     }
 }

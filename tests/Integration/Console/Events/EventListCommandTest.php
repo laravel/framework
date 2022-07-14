@@ -22,7 +22,7 @@ class EventListCommandTest extends TestCase
     {
         $this->artisan(EventListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput("Your application doesn't have any events matching the given criteria.");
+            ->expectsOutputToContain("Your application doesn't have any events matching the given criteria.");
     }
 
     public function testDisplayEvents()
@@ -37,15 +37,12 @@ class EventListCommandTest extends TestCase
 
         $this->artisan(EventListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('  ExampleSubscriberEventName')
-            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleSubscriber@a')
-            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleSubscriber@b')
-            ->expectsOutput('  Illuminate\Tests\Integration\Console\Events\ExampleBroadcastEvent (ShouldBroadcast)')
-            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleBroadcastListener')
-            ->expectsOutput('  Illuminate\Tests\Integration\Console\Events\ExampleEvent')
-            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleListener')
-            ->expectsOutput('    ⇂ Illuminate\Tests\Integration\Console\Events\ExampleQueueListener (ShouldQueue)')
-            ->expectsOutput('    ⇂ Closure at: '.$unixFilePath.':'.$closureLineNumber);
+            ->expectsOutputToContain('ExampleSubscriberEventName')
+            ->expectsOutputToContain('⇂ Illuminate\Tests\Integration\Console\Events\ExampleSubscriber@a')
+            ->expectsOutputToContain('Illuminate\Tests\Integration\Console\Events\ExampleBroadcastEvent (ShouldBroadcast)')
+            ->expectsOutputToContain('⇂ Illuminate\Tests\Integration\Console\Events\ExampleBroadcastListener')
+            ->expectsOutputToContain('Illuminate\Tests\Integration\Console\Events\ExampleEvent')
+            ->expectsOutputToContain('⇂ Closure at: '.$unixFilePath.':'.$closureLineNumber);
     }
 
     public function testDisplayFilteredEvent()

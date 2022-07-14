@@ -65,6 +65,6 @@ class ForgetCommand extends Command
             $this->argument('key')
         );
 
-        $this->info('The ['.$this->argument('key').'] key has been removed from the cache.');
+        $this->components->info('The ['.$this->argument('key').'] key has been removed from the cache.');
     }
 }

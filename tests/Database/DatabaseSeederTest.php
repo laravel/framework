@@ -46,8 +46,7 @@ class DatabaseSeederTest extends TestCase
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
         $child->shouldReceive('__invoke')->once();
-        $command->shouldReceive('getOutput')->once()->andReturn($output);
-        $output->shouldReceive('writeln')->once();
+        $output->shouldReceive('write')->times(3);
 
         $seeder->call('ClassName');
     }

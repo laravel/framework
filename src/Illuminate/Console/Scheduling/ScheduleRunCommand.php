@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledTaskFailed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
@@ -9,6 +10,7 @@ use Illuminate\Console\Events\ScheduledTaskSkipped;
 use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
@@ -77,6 +79,13 @@ class ScheduleRunCommand extends Command
     protected $handler;
 
     /**
+     * The PHP binary used by the command.
+     *
+     * @var string
+     */
+    protected $phpBinary;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -101,6 +110,9 @@ class ScheduleRunCommand extends Command
         $this->schedule = $schedule;
         $this->dispatcher = $dispatcher;
         $this->handler = $handler;
+        $this->phpBinary = Application::phpBinary();
+
+        $this->newLine();
 
         foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
@@ -119,7 +131,9 @@ class ScheduleRunCommand extends Command
         }
 
         if (! $this->eventsRan) {
-            $this->info('No scheduled commands are ready to run.');
+            $this->components->info('No scheduled commands are ready to run.');
+        } else {
+            $this->newLine();
         }
     }
 
@@ -134,7 +148,9 @@ class ScheduleRunCommand extends Command
         if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
-            $this->line('<info>Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
+            $this->components->info(sprintf(
+                'Skipping [%s], as command already run on another server.', $event->getSummaryForDisplay()
+            ));
         }
     }
 
@@ -146,25 +162,46 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
-        $this->line('<info>['.date('c').'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $summary = $event->getSummaryForDisplay();
 
-        $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
+        $command = $event instanceof CallbackEvent
+            ? $summary
+            : trim(str_replace($this->phpBinary, '', $event->command));
 
-        $start = microtime(true);
+        $description = sprintf(
+            '<fg=gray>%s</> Running [%s]%s',
+            Carbon::now()->format('Y-m-d H:i:s'),
+            $command,
+            $event->runInBackground ? ' in background' : '',
+        );
 
-        try {
-            $event->run($this->laravel);
+        $this->components->task($description, function () use ($event) {
+            $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
 
-            $this->dispatcher->dispatch(new ScheduledTaskFinished(
-                $event,
-                round(microtime(true) - $start, 2)
-            ));
+            $start = microtime(true);
 
-            $this->eventsRan = true;
-        } catch (Throwable $e) {
-            $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
+            try {
+                $event->run($this->laravel);
 
-            $this->handler->report($e);
+                $this->dispatcher->dispatch(new ScheduledTaskFinished(
+                    $event,
+                    round(microtime(true) - $start, 2)
+                ));
+
+                $this->eventsRan = true;
+            } catch (Throwable $e) {
+                $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
+
+                $this->handler->report($e);
+            }
+
+            return $event->exitCode == 0;
+        });
+
+        if (! $event instanceof CallbackEvent) {
+            $this->components->bulletList([
+                $event->getSummaryForDisplay(),
+            ]);
         }
     }
 }

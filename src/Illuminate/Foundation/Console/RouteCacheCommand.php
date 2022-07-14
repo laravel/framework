@@ -63,12 +63,12 @@ class RouteCacheCommand extends Command
      */
     public function handle()
     {
-        $this->call('route:clear');
+        $this->callSilent('route:clear');
 
         $routes = $this->getFreshApplicationRoutes();
 
         if (count($routes) === 0) {
-            return $this->error("Your application doesn't have any routes.");
+            return $this->components->error("Your application doesn't have any routes.");
         }
 
         foreach ($routes as $route) {
@@ -79,7 +79,7 @@ class RouteCacheCommand extends Command
             $this->laravel->getCachedRoutesPath(), $this->buildRouteCacheFile($routes)
         );
 
-        $this->info('Routes cached successfully.');
+        $this->components->info('Routes cached successfully.');
     }
 
     /**
