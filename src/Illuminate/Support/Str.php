@@ -1276,4 +1276,16 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+    
+    /**
+     * Return string after the first occurrence of a given value in the string.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     */
+    public static function stringAfter(string $subject, string $search)
+    {
+        $pos = strpos($subject, $search);
+        return $pos ? mb_substr($subject, $pos + strlen($search), null, 'UTF-8') : false;
+    }
 }
