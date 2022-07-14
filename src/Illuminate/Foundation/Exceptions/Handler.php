@@ -271,6 +271,10 @@ class Handler implements ExceptionHandlerContract
             ['exception' => $e]
         );
 
+        if (method_exists($logger, 'channel')) {
+            $logger = $logger->channel(config('logging.exceptions'));
+        }
+
         method_exists($logger, $level)
             ? $logger->{$level}($e->getMessage(), $context)
             : $logger->log($level, $e->getMessage(), $context);

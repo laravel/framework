@@ -13,6 +13,7 @@ use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Log\LogManager;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\MessageBag;
@@ -51,6 +52,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $this->config = m::mock(Config::class);
 
+        $this->config->shouldReceive('get')->with('logging.exceptions', null)->andReturn(null);
         $this->request = m::mock(stdClass::class);
 
         $this->container = Container::setInstance(new Container);
@@ -75,6 +77,19 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
         $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')])->once();
+
+        $this->handler->report(new RuntimeException('Exception message'));
+    }
+
+    public function testHandlerReportsExceptionLogChannel()
+    {
+        $this->config = m::mock(Config::class);
+        $this->config->shouldReceive('get')->with('logging.exceptions', null)->once()->andReturn('exception_channel');
+        $this->container->instance('config', $this->config);
+        $logger = m::mock(LogManager::class);
+        $this->container->instance(LoggerInterface::class, $logger);
+        $logger->shouldReceive('channel')->with('exception_channel')->once()->andReturn($logger);
+        $logger->shouldReceive('error')->once();
 
         $this->handler->report(new RuntimeException('Exception message'));
     }
