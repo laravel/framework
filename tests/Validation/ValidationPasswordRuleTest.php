@@ -110,7 +110,6 @@ class ValidationPasswordRuleTest extends TestCase
             '123456',
             'password',
             'welcome',
-            'ninja',
             'abc123',
             '123456789',
             '12345678',
