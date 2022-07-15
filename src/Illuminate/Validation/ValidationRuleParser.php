@@ -315,4 +315,3 @@ class ValidationRuleParser
         return in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
     }
 }
-
