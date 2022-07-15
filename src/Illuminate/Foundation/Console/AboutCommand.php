@@ -90,7 +90,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Display the information.
+     * Display the application information.
      *
      * @param  \Illuminate\Support\Collection  $data
      * @return void
@@ -101,7 +101,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Display the information as a detail view.
+     * Display the application information as a detail view.
      *
      * @param  \Illuminate\Support\Collection  $data
      * @return void
@@ -124,7 +124,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Display the information as JSON.
+     * Display the application information as JSON.
      *
      * @param  \Illuminate\Support\Collection  $data
      * @return void
@@ -176,7 +176,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Check whether the given directory has PHP files.
+     * Determine whether the given directory has PHP files.
      *
      * @param  string  $path
      * @return bool
@@ -187,7 +187,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Get the sections passed to the command.
+     * Get the sections provided to the command.
      *
      * @return array
      */
@@ -197,7 +197,7 @@ class AboutCommand extends Command
     }
 
     /**
-     * Add additional data to the output.
+     * Add additional data to the output of the "about" command.
      *
      * @param  string  $section
      * @param  string|array  $data
