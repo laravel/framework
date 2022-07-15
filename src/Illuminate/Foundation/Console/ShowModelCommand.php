@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -113,6 +114,7 @@ class ShowModelCommand extends Command
     {
         $schema = $model->getConnection()->getDoctrineSchemaManager();
         $columns = $schema->listTableColumns($model->getConnection()->getTablePrefix().$model->getTable());
+        $indexes = $schema->listTableIndexes($model->getTable());
 
         return collect($columns)
             ->values()
@@ -122,6 +124,7 @@ class ShowModelCommand extends Command
                 'increments' => $column->getAutoincrement(),
                 'nullable' => ! $column->getNotnull(),
                 'default' => $this->getColumnDefault($column, $model),
+                'unique' => $this->columnIsUnique($column->getName(), $indexes),
                 'fillable' => $model->isFillable($column->getName()),
                 'hidden' => $this->attributeIsHidden($column->getName(), $model),
                 'appended' => null,
@@ -162,6 +165,7 @@ class ShowModelCommand extends Command
                 'increments' => false,
                 'nullable' => null,
                 'default' => null,
+                'unique' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
                 'appended' => $model->hasAppended($name),
@@ -271,7 +275,7 @@ class ShowModelCommand extends Command
         );
 
         foreach ($attributes as $attribute) {
-            $first = sprintf('%s %s', $attribute['name'], collect(['increments', 'nullable', 'fillable', 'hidden', 'appended'])
+            $first = sprintf('%s %s', $attribute['name'], collect(['increments', 'unique', 'nullable', 'fillable', 'hidden', 'appended'])
                 ->filter(fn ($property) => $attribute[$property])
                 ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
                 ->implode('<fg=gray>,</> '));
@@ -392,6 +396,20 @@ class ShowModelCommand extends Command
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the given attribute is unique.
+     *
+     * @param  string  $column
+     * @param  \Doctrine\DBAL\Schema\Index[]  $indexes
+     * @return bool
+     */
+    protected function columnIsUnique($column, $indexes)
+    {
+        return collect($indexes)
+            ->filter(fn (Index $index) => count($index->getColumns()) === 1 && $index->getColumns()[0] === $column)
+            ->contains(fn (Index $index) => $index->isUnique());
     }
 
     /**
