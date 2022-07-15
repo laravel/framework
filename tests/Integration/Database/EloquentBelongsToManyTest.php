@@ -1163,17 +1163,17 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post1 = Post::create(['title' => 'Str::random()']);
         $post2 = Post::create(['title' => Str::random()]);
         $post3 = Post::create(['title' => '']);
-    
+
         $user1->posts()->sync([$post1->uuid, $post2->uuid]);
         $user3->posts()->sync([$post3->uuid]);
-    
+
         $this->assertEquals(
             $post1->title,
             $user1->posts()->valueOr('title', function () {
                 return Str::random();
             })
         );
-    
+
         $fallbackValue = Str::random();
         $this->assertEquals(
             $fallbackValue,
