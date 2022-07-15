@@ -107,4 +107,22 @@ class Composer
 
         return $this;
     }
+
+    /**
+     * Get the version of Composer.
+     *
+     * @return string|null
+     */
+    public function getVersion()
+    {
+        $command = array_merge($this->findComposer(), ['-V']);
+
+        $process = $this->getProcess($command);
+
+        $process->run();
+
+        $output = $process->getOutput();
+
+        return explode(' ', $output)[2] ?? null;
+    }
 }

@@ -20,6 +20,7 @@ use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\WipeCommand;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -92,6 +93,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $commands = [
+        'About' => AboutCommand::class,
         'CacheClear' => CacheClearCommand::class,
         'CacheForget' => CacheForgetCommand::class,
         'ClearCompiled' => ClearCompiledCommand::class,
@@ -206,6 +208,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         }
 
         $this->commands(array_values($commands));
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerAboutCommand()
+    {
+        $this->app->singleton(AboutCommand::class, function ($app) {
+            return new AboutCommand($app['composer']);
+        });
     }
 
     /**
