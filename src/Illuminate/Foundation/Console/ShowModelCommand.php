@@ -7,12 +7,12 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends Command
@@ -113,8 +113,9 @@ class ShowModelCommand extends Command
     protected function getAttributes($model)
     {
         $schema = $model->getConnection()->getDoctrineSchemaManager();
-        $columns = $schema->listTableColumns($model->getConnection()->getTablePrefix().$model->getTable());
-        $indexes = $schema->listTableIndexes($model->getTable());
+        $table = $model->getConnection()->getTablePrefix().$model->getTable();
+        $columns = $schema->listTableColumns($table);
+        $indexes = $schema->listTableIndexes($table);
 
         return collect($columns)
             ->values()
@@ -145,9 +146,9 @@ class ShowModelCommand extends Command
         $class = new ReflectionClass($model);
 
         return collect($class->getMethods())
-            ->filter(fn (ReflectionMethod $method) => ! $method->isStatic()
-                && ! $method->isAbstract()
-                && $method->getDeclaringClass()->getName() === get_class($model)
+            ->reject(fn (ReflectionMethod $method) => $method->isStatic()
+                || $method->isAbstract()
+                || $method->getDeclaringClass()->getName() !== get_class($model)
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
@@ -184,9 +185,9 @@ class ShowModelCommand extends Command
     {
         return collect(get_class_methods($model))
             ->map(fn ($method) => new ReflectionMethod($model, $method))
-            ->filter(fn (ReflectionMethod $method) => ! $method->isStatic()
-                && ! $method->isAbstract()
-                && $method->getDeclaringClass()->getName() === get_class($model)
+            ->reject(fn (ReflectionMethod $method) => $method->isStatic()
+                || $method->isAbstract()
+                || $method->getDeclaringClass()->getName() !== get_class($model)
             )
             ->filter(function (ReflectionMethod $method) {
                 $file = new SplFileObject($method->getFileName());
@@ -200,13 +201,16 @@ class ShowModelCommand extends Command
                 return collect($this->relationMethods)
                     ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
             })
-            ->mapWithKeys(fn (ReflectionMethod $method) => [$method->getName() => $method->invoke($model)])
-            ->map(fn (Relation $relation, string $name) => [
-                'name' => $name,
-                'type' => Str::afterLast(get_class($relation), '\\'),
-                'related' => get_class($relation->getRelated()),
-            ])
-            ->values();
+            ->values()
+            ->map(function (ReflectionMethod $method) use ($model) {
+                $relation = $method->invoke($model);
+
+                return [
+                    'name' => $method->getName(),
+                    'type' => Str::afterLast(get_class($relation), '\\'),
+                    'related' => get_class($relation->getRelated()),
+                ];
+            });
     }
 
     /**
@@ -275,22 +279,27 @@ class ShowModelCommand extends Command
         );
 
         foreach ($attributes as $attribute) {
-            $first = sprintf('%s %s', $attribute['name'], collect(['increments', 'unique', 'nullable', 'fillable', 'hidden', 'appended'])
-                ->filter(fn ($property) => $attribute[$property])
-                ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
-                ->implode('<fg=gray>,</> '));
+            $first = trim(sprintf(
+                '%s %s',
+                $attribute['name'],
+                collect(['increments', 'unique', 'nullable', 'fillable', 'hidden', 'appended'])
+                    ->filter(fn ($property) => $attribute[$property])
+                    ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
+                    ->implode('<fg=gray>,</> ')
+            ));
 
             $second = collect([
                 $attribute['type'],
                 $attribute['cast'] ? '<fg=yellow;options=bold>'.$attribute['cast'].'</>' : null,
             ])->filter()->implode(' <fg=gray>/</> ');
 
-            $this->components->twoColumnDetail(
-                str($first)->trim(), $second,
-            );
+            $this->components->twoColumnDetail($first, $second);
 
-            if ($this->output->isVerbose() && $attribute['default'] !== null) {
-                $this->components->bulletList(["default: {$attribute['default']}"]);
+            if ($attribute['default'] !== null) {
+                $this->components->bulletList(
+                    [sprintf('default: %s', $attribute['default'])],
+                    OutputInterface::VERBOSITY_VERBOSE
+                );
             }
         }
 
@@ -300,7 +309,7 @@ class ShowModelCommand extends Command
 
         foreach ($relations as $relation) {
             $this->components->twoColumnDetail(
-                $relation['name'].' <fg=gray>'.$relation['type'].'</>',
+                sprintf('%s <fg=gray>%s</>', $relation['name'], $relation['type']),
                 $relation['related']
             );
         }
