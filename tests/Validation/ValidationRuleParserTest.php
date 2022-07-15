@@ -80,4 +80,38 @@ class ValidationRuleParserTest extends TestCase
             'password' => ['string', 'max:10'],
         ], $rules);
     }
+
+    public function test_explode_method_parses_string_regex_rule()
+    {
+        $data = ['users' => [['name' => 'Abdlrahman']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['users.*.name' => 'regex:/^(Abdlrahman|james)$/i']
+        );
+
+        $this->assertEquals('regex:/^(Abdlrahman|james)$/i', $exploded->rules['users.0.name'][0]);
+    }
+
+    public function test_explode_method_parses_array_regex_rule()
+    {
+        $data = ['users' => [['name' => 'Abdlrahman']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['users.*.name' => ['regex:/^(Abdlrahman|james)$/i']]
+        );
+
+        $this->assertEquals('regex:/^(Abdlrahman|james)$/i', $exploded->rules['users.0.name'][0]);
+    }
+
+    public function test_explode_method_parses_regex_rule_with_other_array_of_rules()
+    {
+        $data = ['users' => [['name' => 'Abdlrahman']]];
+
+        $exploded = (new ValidationRuleParser($data))->explode(
+            ['users.*.name' => ['ends_with:man', 'regex:/^(Abdlrahman|james)$/i']]
+        );
+
+        $this->assertEquals('ends_with:man', $exploded->rules['users.0.name'][0]);
+        $this->assertEquals('regex:/^(Abdlrahman|james)$/i', $exploded->rules['users.0.name'][1]);
+    }
 }
