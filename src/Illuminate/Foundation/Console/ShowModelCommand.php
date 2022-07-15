@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -340,6 +341,15 @@ class ShowModelCommand extends Command
         $name = $column->getType()->getName();
 
         $unsigned = $column->getUnsigned() ? ' unsigned' : '';
+
+        $details = match (get_class($column->getType())) {
+            DecimalType::class => $column->getPrecision().','.$column->getScale(),
+            default => $column->getLength(),
+        };
+
+        if ($details) {
+            return sprintf('%s(%s)%s', $name, $details, $unsigned);
+        }
 
         return sprintf('%s%s', $name, $unsigned);
     }
