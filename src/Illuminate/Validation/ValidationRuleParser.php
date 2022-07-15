@@ -306,7 +306,7 @@ class ValidationRuleParser
     /**
      * Determine if the rule is a regular expression rule.
      *
-     * @param string $rule
+     * @param  string  $rule
      * @return bool
      */
     protected static function ruleIsRegex(string $rule): bool
