@@ -3882,6 +3882,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => 12], ['x' => 'Regex:/^12$/i']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ['y' => ['z' => 'taylor']]], ['x.*.z' => 'Regex:/^(taylor|james)$/i']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateNotRegex()
@@ -3895,6 +3898,9 @@ class ValidationValidatorTest extends TestCase
 
         // Ensure commas are not interpreted as parameter separators
         $v = new Validator($trans, ['x' => 'foo bar'], ['x' => 'NotRegex:/x{3,}/i']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ['y' => ['z' => 'Abdlrahman']]], ['x.*.z' => 'NotRegex:/^(taylor|james)$/i']);
         $this->assertTrue($v->passes());
     }
 
