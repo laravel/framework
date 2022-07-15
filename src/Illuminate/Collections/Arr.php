@@ -784,6 +784,17 @@ class Arr
     }
 
     /**
+     * Transposes an array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function transpose($array)
+    {
+        return array_map(fn ($k) => static::pluck($array, $k), array_keys(static::first($array)));
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array

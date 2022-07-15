@@ -920,6 +920,15 @@ class SupportArrTest extends TestCase
         $this->assertSame('font-bold mt-4 ml-2', $classes);
     }
 
+    public function testTranspose()
+    {
+        $array = [['foo', 'bar', 'baz'], ['foo2', 'bar2', 'baz2']];
+
+        $array = Arr::transpose($array);
+
+        $this->assertEquals([['foo', 'foo2'], ['bar', 'bar2'], ['baz', 'baz2']], $array);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];
