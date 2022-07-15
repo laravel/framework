@@ -1155,6 +1155,31 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
     }
 
+    public function testValueOrMethod()
+    {
+        $user1 = User::create(['name' => Str::random()]);
+        $user2 = User::create(['name' => Str::random()]);
+        $post1 = Post::create(['title' => Str::random()]);
+        $post2 = Post::create(['title' => Str::random()]);
+    
+        $user1->posts()->sync([$post1->uuid, $post2->uuid]);
+    
+        $this->assertEquals(
+            $post1->title,
+            $user1->posts()->valueOr('title', function () {
+                return Str::random();
+            })
+        );
+    
+        $fallbackValue = Str::random();
+        $this->assertEquals(
+            $fallbackValue,
+            $user2->posts()->valueOr('title', function () use ($fallbackValue) {
+                return $fallbackValue;
+            })
+        );
+    }
+
     public function testUpdateOrCreateQueryBuilderIsolation()
     {
         $user = User::create(['name' => Str::random()]);
