@@ -71,7 +71,6 @@ class ValidationRuleParser
                 $rules[$key] = $this->explodeExplicitRule($rule);
             }
         }
-
         return $rules;
     }
 
@@ -84,7 +83,9 @@ class ValidationRuleParser
     protected function explodeExplicitRule($rule)
     {
         if (is_string($rule)) {
-            return explode('|', $rule);
+            $name = static::parseStringRule($rule)[0];
+
+            return static::ruleIsRegex($name) ? [$rule] : explode('|', $rule);
         } elseif (is_object($rule)) {
             return [$this->prepareRule($rule)];
         }
@@ -305,4 +306,16 @@ class ValidationRuleParser
             })->filter()->flatten(1)->values()->all()];
         })->all();
     }
+
+    /**
+     * Determine if the rule is a regular expression rule.
+     *
+     * @param string $rule
+     * @return bool
+     */
+    protected static function ruleIsRegex(string $rule): bool
+    {
+        return in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
+    }
 }
+
