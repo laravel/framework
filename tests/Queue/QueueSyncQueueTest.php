@@ -87,10 +87,6 @@ class QueueSyncQueueTest extends TestCase
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $sync->setContainer($container);
 
-        SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
-            return ['data' => ['extra' => 'extraValue']];
-        });
-
         try {
             $sync->push(new SyncQueueJobWithMiddleware());
         } catch (LogicException $e) {
@@ -106,10 +102,6 @@ class QueueSyncQueueTest extends TestCase
         $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
         $sync->setContainer($container);
-
-        SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
-            return ['data' => ['extra' => 'extraValue']];
-        });
 
         try {
             $sync->push(new SyncQueueJobWithTerminatingMiddleware());
