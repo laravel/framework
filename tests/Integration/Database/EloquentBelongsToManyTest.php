@@ -1159,10 +1159,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $user1 = User::create(['name' => Str::random()]);
         $user2 = User::create(['name' => Str::random()]);
-        $post1 = Post::create(['title' => Str::random()]);
+        $user3 = User::create(['name' => Str::random()]);
+        $post1 = Post::create(['title' => 'Str::random()']);
         $post2 = Post::create(['title' => Str::random()]);
+        $post3 = Post::create(['title' => '']);
     
         $user1->posts()->sync([$post1->uuid, $post2->uuid]);
+        $user3->posts()->sync([$post3->uuid]);
     
         $this->assertEquals(
             $post1->title,
@@ -1176,6 +1179,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $fallbackValue,
             $user2->posts()->valueOr('title', function () use ($fallbackValue) {
                 return $fallbackValue;
+            })
+        );
+
+        $this->assertEquals(
+            $post3->title,
+            $user3->posts()->valueOr('title', function () {
+                return Str::random();
             })
         );
     }
