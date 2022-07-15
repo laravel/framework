@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Exception;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
@@ -392,7 +393,7 @@ class JsonSettingsCaster implements CastsAttributes
         }
 
         if (! $value instanceof Settings) {
-            throw new \Exception("Attribute `{$key}` with JsonSettingsCaster should be a Settings object");
+            throw new Exception("Attribute `{$key}` with JsonSettingsCaster should be a Settings object");
         }
 
         return $value->toJson();

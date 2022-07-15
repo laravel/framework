@@ -12,6 +12,7 @@ use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Attribute\AsCommand;
+use function Termwind\terminal;
 
 #[AsCommand(name: 'queue:work')]
 class WorkCommand extends Command
@@ -61,6 +62,13 @@ class WorkCommand extends Command
     protected $cache;
 
     /**
+     * Holds the start time of the last processed job, if any.
+     *
+     * @var float|null
+     */
+    protected $latestStartedAt;
+
+    /**
      * Create a new queue work command.
      *
      * @param  \Illuminate\Queue\Worker  $worker
@@ -98,6 +106,10 @@ class WorkCommand extends Command
         // configuration file for the application. We will pull it based on the set
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
+
+        $this->components->info(
+            sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue)))
+        );
 
         return $this->runWorker(
             $connection, $queue
@@ -173,32 +185,19 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status)
     {
-        switch ($status) {
-            case 'starting':
-                return $this->writeStatus($job, 'Processing', 'comment');
-            case 'success':
-                return $this->writeStatus($job, 'Processed', 'info');
-            case 'failed':
-                return $this->writeStatus($job, 'Failed', 'error');
-        }
-    }
+        if ($status == 'starting') {
+            $this->latestStartedAt = microtime(true);
+            $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
 
-    /**
-     * Format the status output for the queue worker.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string  $status
-     * @param  string  $type
-     * @return void
-     */
-    protected function writeStatus(Job $job, $status, $type)
-    {
-        $this->output->writeln(sprintf(
-            "<{$type}>[%s][%s] %s</{$type}> %s",
-            Carbon::now()->format('Y-m-d H:i:s'),
-            $job->getJobId(),
-            str_pad("{$status}:", 11), $job->resolveName()
-        ));
+            return $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+        }
+
+        $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
+        $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - mb_strlen($runTime) - 31, 0);
+
+        $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+        $this->output->write(" <fg=gray>$runTime</>");
+        $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
     }
 
     /**

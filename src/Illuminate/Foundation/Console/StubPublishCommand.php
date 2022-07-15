@@ -82,6 +82,6 @@ class StubPublishCommand extends Command
             }
         }
 
-        $this->info('Stubs published successfully.');
+        $this->components->info('Stubs published successfully.');
     }
 }

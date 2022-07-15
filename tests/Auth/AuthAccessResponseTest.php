@@ -35,6 +35,82 @@ class AuthAccessResponseTest extends TestCase
         $this->assertNull($response->message());
     }
 
+    public function testItSetsEmptyStatusOnExceptionWhenAuthorizing()
+    {
+        try {
+            Response::deny('foo', 3)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertNull($e->status());
+            $this->assertFalse($e->hasStatus());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+    }
+
+    public function testItSetsStatusOnExceptionWhenAuthorizing()
+    {
+        try {
+            Response::deny('foo', 3)->withStatus(418)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(418, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+
+        try {
+            Response::deny('foo', 3)->asNotFound()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+
+        try {
+            Response::denyWithStatus(444)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(444, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+
+        try {
+            Response::denyWithStatus(444, 'foo', 3)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(444, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+
+        try {
+            Response::denyAsNotFound()->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('This action is unauthorized.', $e->getMessage());
+            $this->assertSame(0, $e->getCode());
+        }
+
+        try {
+            Response::denyAsNotFound('foo', 3)->authorize();
+            $this->fail();
+        } catch (AuthorizationException $e) {
+            $this->assertSame(404, $e->status());
+            $this->assertTrue($e->hasStatus());
+            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(3, $e->getCode());
+        }
+    }
+
     public function testAuthorizeMethodThrowsAuthorizationExceptionWhenResponseDenied()
     {
         $response = Response::deny('Some message.', 'some_code');

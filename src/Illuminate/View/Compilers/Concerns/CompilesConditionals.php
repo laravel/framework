@@ -339,6 +339,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile a required block into valid PHP.
+     *
+     * @param  string  $condition
+     * @return string
+     */
+    protected function compileRequired($condition)
+    {
+        return "<?php if{$condition}: echo 'required'; endif; ?>";
+    }
+
+    /**
      * Compile a readonly block into valid PHP.
      *
      * @param  string  $condition

@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 trait ConditionallyLoadsAttributes
 {
@@ -202,6 +203,37 @@ trait ConditionallyLoadsAttributes
         }
 
         return value($value);
+    }
+
+    /**
+     * Retrieve a relationship count if it exists.
+     *
+     * @param  string  $relationship
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    public function whenCounted($relationship, $value = null, $default = null)
+    {
+        if (func_num_args() < 3) {
+            $default = new MissingValue();
+        }
+
+        $attribute = Str::finish($relationship, '_count');
+
+        if (! isset($this->resource->getAttributes()[$attribute])) {
+            return value($default);
+        }
+
+        if (func_num_args() === 1) {
+            return $this->resource->{$attribute};
+        }
+
+        if ($this->resource->{$attribute} === null) {
+            return;
+        }
+
+        return value($value, $this->resource->{$attribute});
     }
 
     /**
