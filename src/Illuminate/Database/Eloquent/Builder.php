@@ -651,6 +651,7 @@ class Builder implements BuilderContract
         if (! is_null($value = $this->value($column))) {
             return $value;
         }
+
         return $callback();
     }
 
