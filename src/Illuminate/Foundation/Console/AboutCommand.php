@@ -86,6 +86,8 @@ class AboutCommand extends Command
             })
             ->pipe(fn ($data) => $this->display($data));
 
+        $this->newLine();
+
         return 0;
     }
 
