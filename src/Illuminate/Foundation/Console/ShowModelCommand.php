@@ -119,6 +119,7 @@ class ShowModelCommand extends Command
             ->map(fn (Column $column) => [
                 'name' => $column->getName(),
                 'type' => $this->getColumnType($column),
+                'increments' => $column->getAutoincrement(),
                 'nullable' => ! $column->getNotnull(),
                 'fillable' => $model->isFillable($column->getName()),
                 'hidden' => $this->attributeIsHidden($column->getName(), $model),
@@ -157,6 +158,7 @@ class ShowModelCommand extends Command
             ->map(fn ($cast, $name) => [
                 'name' => $name,
                 'type' => null,
+                'increments' => false,
                 'nullable' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
@@ -267,7 +269,7 @@ class ShowModelCommand extends Command
         );
 
         foreach ($attributes as $attribute) {
-            $first = sprintf('%s %s', $attribute['name'], collect(['nullable', 'fillable', 'hidden', 'appended'])
+            $first = sprintf('%s %s', $attribute['name'], collect(['increments', 'nullable', 'fillable', 'hidden', 'appended'])
                 ->filter(fn ($property) => $attribute[$property])
                 ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
                 ->implode('<fg=gray>,</> '));
