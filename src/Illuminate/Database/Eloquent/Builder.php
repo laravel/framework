@@ -648,11 +648,7 @@ class Builder implements BuilderContract
      */
     public function valueOr($column, Closure $callback = null)
     {
-        if (!is_null($result = $this->first([$column]))) {
-            return $result;
-        }
-
-        return $callback();
+        return $this->value($column) ?: $callback();;
     }
 
     /**
