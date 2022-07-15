@@ -251,11 +251,7 @@ class ValidationRuleParser
     {
         $rule = strtolower($rule);
 
-        if (in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
-            return [$parameter];
-        }
-
-        return str_getcsv($parameter);
+        return static::ruleIsRegex($rule) ? [$parameter] : str_getcsv($parameter);
     }
 
     /**
