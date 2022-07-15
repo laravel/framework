@@ -121,6 +121,7 @@ class ShowModelCommand extends Command
                 'type' => $this->getColumnType($column),
                 'increments' => $column->getAutoincrement(),
                 'nullable' => ! $column->getNotnull(),
+                'default' => $this->getColumnDefault($column, $model),
                 'fillable' => $model->isFillable($column->getName()),
                 'hidden' => $this->attributeIsHidden($column->getName(), $model),
                 'appended' => null,
@@ -160,6 +161,7 @@ class ShowModelCommand extends Command
                 'type' => null,
                 'increments' => false,
                 'nullable' => null,
+                'default' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
                 'appended' => $model->hasAppended($name),
@@ -282,6 +284,10 @@ class ShowModelCommand extends Command
             $this->components->twoColumnDetail(
                 str($first)->trim(), $second,
             );
+
+            if ($this->output->isVerbose() && $attribute['default'] !== null) {
+                $this->components->bulletList(["default: {$attribute['default']}"]);
+            }
         }
 
         $this->newLine();
@@ -354,6 +360,18 @@ class ShowModelCommand extends Command
         }
 
         return sprintf('%s%s', $name, $unsigned);
+    }
+
+    /**
+     * Get the default value for the given column.
+     *
+     * @param  \Doctrine\DBAL\Schema\Column  $column
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return string|null
+     */
+    protected function getColumnDefault($column, $model)
+    {
+        return $model->getAttributes()[$column->getName()] ?? $column->getDefault();
     }
 
     /**
