@@ -191,7 +191,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @return bool
      */
-    public function has($id)
+    public function has($id):bool
     {
         return $this->bound($id);
     }
