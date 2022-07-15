@@ -361,6 +361,20 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile an autocomplete block into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileAutocomplete($expression)
+    {
+        $parts = explode(',', $this->stripParentheses($expression), 2);
+        $parts[1] = Str::of($parts[1] ?? 'on')->trim()->remove('\'')->remove('"');
+
+        return "<?php if({$parts[0]}): echo 'autocomplete=\"{$parts[1]}\"'; endif; ?>";
+    }
+
+    /**
      * Compile the push statements into valid PHP.
      *
      * @param  string  $expression

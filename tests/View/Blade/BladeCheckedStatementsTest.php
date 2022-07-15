@@ -35,4 +35,25 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testReadonlyStatementsAreCompiled()
+    {
+        $string = '<input @readonly(name(foo(bar)))/>';
+        $expected = "<input <?php if(name(foo(bar))): echo 'readonly'; endif; ?>/>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testAutocompleteStatementsAreCompiled()
+    {
+        $string = '<input @autocomplete(name(foo(bar)), "off")>';
+        $expected = "<input <?php if(name(foo(bar))): echo 'autocomplete=\"off\"'; endif; ?>>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '<input @autocomplete(name(foo(bar)))>';
+        $expected = "<input <?php if(name(foo(bar))): echo 'autocomplete=\"on\"'; endif; ?>>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
