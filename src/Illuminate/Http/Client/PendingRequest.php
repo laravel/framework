@@ -683,7 +683,7 @@ class PendingRequest
     public function post(string $url, $data = [])
     {
         return $this->send('POST', $url, [
-            $this->bodyFormat => $data,
+            $this->bodyFormat => empty($data) ? null : $data,
         ]);
     }
 
@@ -697,7 +697,7 @@ class PendingRequest
     public function patch($url, $data = [])
     {
         return $this->send('PATCH', $url, [
-            $this->bodyFormat => $data,
+            $this->bodyFormat => empty($data) ? null : $data,
         ]);
     }
 
@@ -711,7 +711,7 @@ class PendingRequest
     public function put($url, $data = [])
     {
         return $this->send('PUT', $url, [
-            $this->bodyFormat => $data,
+            $this->bodyFormat => empty($data) ? null : $data,
         ]);
     }
 
@@ -725,7 +725,7 @@ class PendingRequest
     public function delete($url, $data = [])
     {
         return $this->send('DELETE', $url, empty($data) ? [] : [
-            $this->bodyFormat => $data,
+            $this->bodyFormat => empty($data) ? null : $data,
         ]);
     }
 
