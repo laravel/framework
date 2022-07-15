@@ -640,6 +640,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     *  Get a single column's value from the first result of a query or call a callback.
+     *
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  \Closure|null  $callback
+     * @return mixed
+     */
+    public function valueOr($column, Closure $callback = null)
+    {
+        if (!is_null($result = $this->first([$column]))) {
+            return $result;
+        }
+
+        return $callback();
+    }
+
+    /**
      * Get a single column's value from the first result of a query if it's the sole matching record.
      *
      * @param  string|\Illuminate\Database\Query\Expression  $column
