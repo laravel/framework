@@ -71,6 +71,7 @@ class ValidationRuleParser
                 $rules[$key] = $this->explodeExplicitRule($rule);
             }
         }
+
         return $rules;
     }
 
