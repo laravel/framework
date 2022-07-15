@@ -27,7 +27,7 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.test']);
 
-        $sync = new SyncQueue;
+        $sync      = new SyncQueue;
         $container = new Container;
         $sync->setContainer($container);
 
@@ -40,7 +40,7 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.failed']);
 
-        $sync = new SyncQueue;
+        $sync      = new SyncQueue;
         $container = new Container;
         Container::setInstance($container);
         $events = m::mock(Dispatcher::class);
@@ -60,7 +60,7 @@ class QueueSyncQueueTest extends TestCase
 
     public function testCreatesPayloadObject()
     {
-        $sync = new SyncQueue;
+        $sync      = new SyncQueue;
         $container = new Container;
         $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
@@ -75,6 +75,46 @@ class QueueSyncQueueTest extends TestCase
             $sync->push(new SyncQueueJob());
         } catch (LogicException $e) {
             $this->assertSame('extraValue', $e->getMessage());
+        }
+    }
+
+    public function testMiddlewareHandleIsCalled()
+    {
+        $sync      = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $sync->setContainer($container);
+
+        SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['data' => ['extra' => 'extraValue']];
+        });
+
+        try {
+            $sync->push(new SyncQueueJobWithMiddleware());
+        } catch (LogicException $e) {
+            $this->assertSame('Middleware `handle` was called', $e->getMessage());
+        }
+    }
+
+    public function testMiddlewareTerminateIsCalled()
+    {
+        $sync      = new SyncQueue;
+        $container = new Container;
+        $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
+        $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $sync->setContainer($container);
+
+        SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['data' => ['extra' => 'extraValue']];
+        });
+
+        try {
+            $sync->push(new SyncQueueJobWithTerminatingMiddleware());
+        } catch (LogicException $e) {
+            $this->assertSame('Middleware `terminate` was called', $e->getMessage());
         }
     }
 }
@@ -118,6 +158,32 @@ class FailingSyncQueueTestHandler
     }
 }
 
+class SyncQueueMiddleware
+{
+    public function handle()
+    {
+        throw new LogicException('Middleware `handle` was called');
+    }
+
+    public function terminate()
+    {
+        throw new LogicException('Middleware `terminate` was called');
+    }
+}
+
+class SyncQueueMiddlewareWithTerminate
+{
+    public function handle()
+    {
+        // do nothing
+    }
+
+    public function terminate()
+    {
+        throw new LogicException('Middleware `terminate` was called');
+    }
+}
+
 class SyncQueueJob implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -132,5 +198,30 @@ class SyncQueueJob implements ShouldQueue
         $payload = $this->job->payload();
 
         return $payload['data'][$key] ?? null;
+    }
+}
+
+class SyncQueueJobWithMiddleware extends SyncQueueJob
+{
+    public function middleware()
+    {
+        return [
+            SyncQueueMiddleware::class,
+        ];
+    }
+}
+
+class SyncQueueJobWithTerminatingMiddleware extends SyncQueueJob
+{
+    public function handle()
+    {
+        // do nothing
+    }
+
+    public function middleware()
+    {
+        return [
+            SyncQueueMiddlewareWithTerminate::class,
+        ];
     }
 }

@@ -72,6 +72,8 @@ class CallQueuedHandler
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
+        $this->terminateThroughMiddleware($job, $command);
+
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
             $this->ensureSuccessfulBatchJobIsRecorded($command);
@@ -123,6 +125,28 @@ class CallQueuedHandler
                         $command, $this->resolveHandler($job, $command)
                     );
                 });
+    }
+
+    /**
+     * Dispatch the given job / command through its specified middleware.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  mixed  $command
+     * @return mixed
+     */
+    protected function terminateThroughMiddleware(Job $job, $command)
+    {
+        if ($command instanceof \__PHP_Incomplete_Class) {
+            throw new Exception('Job is incomplete class: '.json_encode($command));
+        }
+
+        return (new Pipeline($this->container))->send($command)
+                                               ->through($command->middleware ?? [])
+                                               ->then(function ($command) use ($job) {
+                                                   return $this->dispatcher->dispatchNow(
+                                                       $command, $this->resolveHandler($job, $command)
+                                                   );
+                                               });
     }
 
     /**
