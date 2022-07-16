@@ -55,7 +55,7 @@ class MigrationCreator
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false, $primaryKey)
+    public function create($name, $path, $table = null, $create = false, $primaryKey = 'id')
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
