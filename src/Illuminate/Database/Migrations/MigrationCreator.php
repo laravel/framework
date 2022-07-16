@@ -50,19 +50,19 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
-     * @param  string  $primaryKey
+     * @param  bool  $uuid
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false, $primaryKey = 'id')
+    public function create($name, $path, $table = null, $create = false, $uuid = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create, $primaryKey);
+        $stub = $this->getStub($table, $create, $uuid);
 
         $path = $this->getPath($name, $path);
 
@@ -109,17 +109,17 @@ class MigrationCreator
      *
      * @param  string|null  $table
      * @param  bool  $create
-     * @param  string  $primaryKey
+     * @param  string  $uuid
      * @return string
      */
-    protected function getStub($table, $create, $primaryKey)
+    protected function getStub($table, $create, $uuid)
     {
         if (is_null($table)) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
                             ? $customPath
                             : $this->stubPath().'/migration.stub';
         } elseif ($create) {
-            if($primaryKey === 'uuid'){
+            if($uuid){
                 $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.uuid.stub')
                                 ? $customPath
                                 : $this->stubPath().'/migration.create.uuid.stub';

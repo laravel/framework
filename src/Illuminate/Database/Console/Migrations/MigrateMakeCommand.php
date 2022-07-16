@@ -73,7 +73,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
-        $primaryKey = $this->input->getOption('uuid') ?: 'id';
+        $uuid = $this->input->getOption('uuid') ?: false;
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
@@ -94,7 +94,7 @@ class MigrateMakeCommand extends BaseCommand
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create, $primaryKey);
+        $this->writeMigration($name, $table, $create, $uuid);
 
         $this->composer->dumpAutoloads();
     }
@@ -105,13 +105,13 @@ class MigrateMakeCommand extends BaseCommand
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
-     * @param  string  $primaryKey
+     * @param  bool  $uuid
      * @return string
      */
-    protected function writeMigration($name, $table, $create, $primaryKey)
+    protected function writeMigration($name, $table, $create, $uuid)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create, $primaryKey
+            $name, $this->getMigrationPath(), $table, $create, $uuid
         );
 
         if (! $this->option('fullpath')) {
