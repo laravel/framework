@@ -154,4 +154,15 @@ class Vite
     {
         return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)$/', $path) === 1;
     }
+
+    /**
+     * Determine whether the given path is a JavaScript file.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    protected function isJsPath($path)
+    {
+        return preg_match('/\.(mjs|js|ts|jsx|tsx|json|vue)$/', $path) === 1;
+    }
 }
