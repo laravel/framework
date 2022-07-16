@@ -872,7 +872,7 @@ class Mailable implements MailableContract, Renderable
      * @param  array  $options
      * @return $this
      */
-    public function attach($files, array $options = [])
+    public function attach($file, array $options = [])
     {
         if ($file instanceof Attachable) {
             $file = $file->toMailAttachment();
