@@ -874,25 +874,41 @@ class Mailable implements MailableContract, Renderable
      */
     public function attach($files, array $options = [])
     {
-        if(!is_iterable($files)) {
-            $files = explode(',', $files);
-        };
-        
-        foreach ($files as $file) {
-            if ($file instanceof Attachable) {
-                $file = $file->toMailAttachment();
-            }
-    
-            if ($file instanceof Attachment) {
-                return $file->attachTo($this);
-            }
-    
-            $this->attachments = collect($this->attachments)
-                ->push(compact('file', 'options'))
-                ->unique('file')
-                ->all();
+        if ($file instanceof Attachable) {
+            $file = $file->toMailAttachment();
         }
+    
+        if ($file instanceof Attachment) {
+            return $file->attachTo($this);
+        }
+    
+        $this->attachments = collect($this->attachments)
+            ->push(compact('file', 'options'))
+            ->unique('file')
+            ->all();
 
+        return $this;
+    }
+    
+    /**
+     * Attach multiple files to the message.
+     *
+     * @param  array|object  $files
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachMany($files, array $options = [])
+    {
+        if(is_array($files))
+        {
+            foreach ($files as $file => $options)
+            {
+                $this->attach((is_int($file) ? $options : $file), (is_int($file) ? [] : $options));
+            }
+        } else {
+            $this->attach($files, $options = []);
+        }
+        
         return $this;
     }
 
