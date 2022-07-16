@@ -73,7 +73,7 @@ class MigrateMakeCommand extends BaseCommand
 
         $create = $this->input->getOption('create') ?: false;
 
-        $primaryKey = $this->input->getOption('uuid');
+        $primaryKey = $this->input->getOption('uuid') ?: 'id';
 
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
