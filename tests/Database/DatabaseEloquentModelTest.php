@@ -2362,6 +2362,11 @@ class EloquentModelStub extends Model
         $this->attributes['password_hash'] = sha1($value);
     }
 
+    public function publicIncrement($column, $amount = 1, $extra = [])
+    {
+        return $this->increment($column, $amount, $extra);
+    }
+
     public function belongsToStub()
     {
         return $this->belongsTo(EloquentModelSaveStub::class);
