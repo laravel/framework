@@ -225,7 +225,7 @@ trait AsPivot
      * Set the pivot definitions used during the relationship setup.
      *
      * @param  array  $pivotKeys
-     * @return  $this
+     * @return $this
      */
     public function definePivotKeys(array $pivotKeys)
     {
@@ -235,7 +235,7 @@ trait AsPivot
     }
 
     /**
-     * Get corresponding pivot key for class
+     * Get corresponding pivot key for class.
      *
      * @param  string  $class
      * @return ?string
