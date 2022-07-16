@@ -29,6 +29,13 @@ trait AsPivot
     protected $relatedKey;
 
     /**
+     * List of pivot definitions corresponding to the model used during relationship setup.
+     *
+     * @var array<string, string>
+     */
+    protected $pivotKeys;
+
+    /**
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -212,6 +219,30 @@ trait AsPivot
         $this->relatedKey = $relatedKey;
 
         return $this;
+    }
+
+    /**
+     * Set the pivot definitions used during the relationship setup.
+     *
+     * @param  array  $pivotKeys
+     * @return  $this
+     */
+    public function definePivotKeys(array $pivotKeys)
+    {
+        $this->pivotKeys = $pivotKeys;
+
+        return $this;
+    }
+
+    /**
+     * Get corresponding pivot key for class
+     *
+     * @param  string  $class
+     * @return ?string
+     */
+    protected function getPivotKeyFor(string $class)
+    {
+        return $this->pivotKeys[$class] ?? null;
     }
 
     /**

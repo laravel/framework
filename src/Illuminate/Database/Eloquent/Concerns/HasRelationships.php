@@ -500,11 +500,38 @@ trait HasRelationships
             $table = $this->joiningTable($related, $instance);
         }
 
-        return $this->newBelongsToMany(
+        $pivotTable = $this->resolvePivotTable($table);
+        if ($pivotTable instanceof Pivot) {
+            $foreignPivotKey = $pivotTable->getPivotKeyFor(get_class($this)) ?: $foreignPivotKey;
+            $relatedPivotKey = $pivotTable->getPivotKeyFor($related) ?: $relatedPivotKey;
+            $table = $pivotTable->getTable();
+        }
+
+        $relationInstance = $this->newBelongsToMany(
             $instance->newQuery(), $this, $table, $foreignPivotKey,
             $relatedPivotKey, $parentKey ?: $this->getKeyName(),
             $relatedKey ?: $instance->getKeyName(), $relation
         );
+
+        if ($pivotTable instanceof Pivot) {
+            $relationInstance->using($pivotTable);
+        }
+
+        return $relationInstance;
+    }
+
+    /**
+     * Attempt to resolve the pivot table instance from the given string.
+     *
+     * @param  string  $table
+     */
+    protected function resolvePivotTable(string $table)
+    {
+        if (! str_contains($table, '\\') || ! class_exists($table)) {
+            return $table;
+        }
+
+        return $this->newRelatedInstance($table);
     }
 
     /**
