@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
@@ -819,7 +820,7 @@ class Gate implements GateContract
     public function forUser($user)
     {
         if (is_null($user)) {
-            $user = auth()->user();
+            $user = Auth::user();
         }
         $callback = fn () => $user;
 
