@@ -821,7 +821,6 @@ class Gate implements GateContract
         if (is_null($user)) {
             $user = auth()->user();
         }
-        
         $callback = fn () => $user;
 
         return new static(
