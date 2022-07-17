@@ -142,7 +142,7 @@ interface Gate
     public function forUser($user);
 
     /**
-     * Get all of the defined abilities.
+     * Get all the defined abilities.
      *
      * @return array
      */
