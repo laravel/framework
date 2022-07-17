@@ -3926,6 +3926,20 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection;
         $this->assertNull($c->avg());
+
+        $c = new $collection([['foo' => "4"], ['foo' => "2"]]);
+        $this->assertIsInt($c->avg('foo'));
+        $this->assertEquals(3, $c->avg('foo'));
+
+        $c = new $collection([['foo' => 1], ['foo' => 2]]);
+        $this->assertIsFloat($c->avg('foo'));
+        $this->assertEquals(1.5, $c->avg('foo'));
+
+        $c = new $collection([
+            ['foo' => 1], ['foo' => 2],
+            (object)['foo' => 6]
+        ]);
+        $this->assertEquals(3,$c->avg('foo'));
     }
 
     /**
