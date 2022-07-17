@@ -1914,4 +1914,16 @@ class Builder implements BuilderContract
     {
         $this->query = clone $this->query;
     }
+
+    /**
+     * Add a "where like" clause to the query.
+     *
+     * @param $column
+     * @param $value
+     * @return Builder
+     */
+    public function whereLike($column, $value)
+    {
+        return $this->where($column, 'LIKE', "%{$value}%");
+    }
 }
