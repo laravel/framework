@@ -95,6 +95,7 @@ class Inspiring
             'The biggest battle is the war against ignorance. - Mustafa Kemal Atatürk',
             'Always remember that you are absolutely unique. Just like everyone else. - Margaret Mead',
             'You must be the change you wish to see in the world. - Mahatma Gandhi',
+            'Whatever you are, be a good one. - Abraham Lincoln'
         ])->map(fn ($quote) => static::formatForConsole($quote))->random();
     }
 
