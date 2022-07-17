@@ -222,19 +222,6 @@ trait AsPivot
     }
 
     /**
-     * Set the pivot definitions used during the relationship setup.
-     *
-     * @param  array  $pivotKeys
-     * @return $this
-     */
-    public function definePivotKeys(array $pivotKeys)
-    {
-        $this->pivotKeys = $pivotKeys;
-
-        return $this;
-    }
-
-    /**
      * Get corresponding pivot key for class.
      *
      * @param  string  $class
