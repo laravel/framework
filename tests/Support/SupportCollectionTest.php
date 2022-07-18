@@ -71,6 +71,10 @@ class SupportCollectionTest extends TestCase
         $data = new $collection;
         $result = $data->first(null, 'default');
         $this->assertSame('default', $result);
+
+        $data = new $collection(['foo', 'bar']);
+        $result = $data->first(null, 'default');
+        $this->assertSame('foo', $result);
     }
 
     /**
