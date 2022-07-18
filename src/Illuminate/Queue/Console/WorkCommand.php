@@ -228,15 +228,12 @@ class WorkCommand extends Command
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
-        $label = match ($status) {
-            'success' => '<fg=green;options=bold>DONE</>',
-            'released' => '<fg=yellow;options=bold>FAIL</>',
-            default => '<fg=red;options=bold>FAIL</>',
-        };
 
-        $this->output->writeln(" $label");
-
-        $this->latestStatus = $status;
+        $this->output->writeln(match ($this->latestStatus = $status) {
+            'success' => ' <fg=green;options=bold>DONE</>',
+            'released' => ' <fg=yellow;options=bold>FAIL</>',
+            default => ' <fg=red;options=bold>FAIL</>',
+        });
     }
 
     /**
