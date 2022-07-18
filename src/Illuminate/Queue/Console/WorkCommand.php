@@ -80,6 +80,13 @@ class WorkCommand extends Command
     protected $latestStartedAt;
 
     /**
+     * Holds the status of the last processed job, if any.
+     *
+     * @var string|null
+     */
+    protected $latestStatus;
+
+    /**
      * Create a new queue work command.
      *
      * @param  \Illuminate\Queue\Worker  $worker
@@ -198,9 +205,17 @@ class WorkCommand extends Command
     {
         if ($status == 'starting') {
             $this->latestStartedAt = microtime(true);
+            $this->latestStatus = $status;
+
             $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
 
             return $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+        }
+
+        if ($this->latestStatus != 'starting') {
+            $formattedStartedAt = Carbon::createFromTimestamp($this->latestStartedAt)->format('Y-m-d H:i:s');
+
+            $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
         $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
@@ -209,6 +224,8 @@ class WorkCommand extends Command
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
         $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
+
+        $this->latestStatus = $status;
     }
 
     /**
