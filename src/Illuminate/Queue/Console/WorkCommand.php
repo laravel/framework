@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Worker;
@@ -194,6 +195,10 @@ class WorkCommand extends Command
             $this->writeOutput($event->job, 'success');
         });
 
+        $this->laravel['events']->listen(JobReleased::class, function ($event) {
+            $this->writeOutput($event->job, 'released');
+        });
+
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
             $this->writeOutput($event->job, 'failed');
 
@@ -210,8 +215,6 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status)
     {
-        $this->ensureOutputOfLatestJobStatus($job, $status);
-
         if ($status == 'starting') {
             $this->latestStartedAt = microtime(true);
             $this->latestStatus = $status;
@@ -232,28 +235,15 @@ class WorkCommand extends Command
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
-        $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
+        $label = match($status) {
+            'success' => '<fg=green;options=bold>DONE</>',
+            'released' => '<fg=yellow;options=bold>FAIL</>',
+            default => '<fg=red;options=bold>FAIL</>',
+        };
+
+        $this->output->writeln(" $label");
 
         $this->latestStatus = $status;
-    }
-
-    /**
-     * Ensures there is a status printed on the console for the latest job.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  string  $status
-     * @return void
-     */
-    protected function ensureOutputOfLatestJobStatus($job, $status)
-    {
-        if ($status == 'starting' && $this->latestStatus == 'starting') {
-            $dots = max(terminal()->width() - mb_strlen($this->latestJobName) - 40, 0);
-
-            $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-            $this->output->writeln(' <fg=yellow;options=bold>Retrying later</>');
-        }
-
-        $this->latestJobName = $job->resolveName();
     }
 
     /**
@@ -293,20 +283,5 @@ class WorkCommand extends Command
     protected function downForMaintenance()
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
-    }
-
-    /**
-     * Ensures there is a status printed on the console for the latest job.
-     *
-     * @return void
-     */
-    public function __destruct()
-    {
-        if ($this->latestStatus == 'starting') {
-            $dots = max(terminal()->width() - mb_strlen($this->latestJobName) - 40, 0);
-
-            $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-            $this->output->writeln(' <fg=yellow;options=bold>Retrying later</>');
-        }
     }
 }
