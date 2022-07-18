@@ -3992,6 +3992,20 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection;
         $this->assertNull($c->avg());
+
+        $c = new $collection([['foo' => "4"], ['foo' => "2"]]);
+        $this->assertIsInt($c->avg('foo'));
+        $this->assertEquals(3, $c->avg('foo'));
+
+        $c = new $collection([['foo' => 1], ['foo' => 2]]);
+        $this->assertIsFloat($c->avg('foo'));
+        $this->assertEquals(1.5, $c->avg('foo'));
+
+        $c = new $collection([
+            ['foo' => 1], ['foo' => 2],
+            (object)['foo' => 6]
+        ]);
+        $this->assertEquals(3,$c->avg('foo'));
     }
 
     /**
@@ -4323,6 +4337,7 @@ class SupportCollectionTest extends TestCase
     public function testMode($collection)
     {
         $data = new $collection([1, 2, 3, 4, 4, 5]);
+        $this->assertIsArray($data->mode());
         $this->assertEquals([4], $data->mode());
     }
 
@@ -4337,7 +4352,14 @@ class SupportCollectionTest extends TestCase
             (object) ['foo' => 2],
             (object) ['foo' => 4],
         ]);
+        $data2 = new Collection([
+            ['foo' => 1],
+            ['foo' => 1],
+            ['foo' => 2],
+            ['foo' => 4],
+        ]);
         $this->assertEquals([1], $data->mode('foo'));
+        $this->assertEquals($data2->mode('foo'), $data->mode('foo'));
     }
 
     /**
