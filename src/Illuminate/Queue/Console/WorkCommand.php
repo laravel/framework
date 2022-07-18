@@ -294,4 +294,19 @@ class WorkCommand extends Command
     {
         return $this->option('force') ? false : $this->laravel->isDownForMaintenance();
     }
+
+    /**
+     * Ensures there is a status printed on the console for the latest job.
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+        if ($this->latestStatus == 'starting') {
+            $dots = max(terminal()->width() - mb_strlen($this->latestJobName) - 40, 0);
+
+            $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+            $this->output->writeln(' <fg=yellow;options=bold>Retrying later</>');
+        }
+    }
 }
