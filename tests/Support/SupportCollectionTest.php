@@ -3993,7 +3993,7 @@ class SupportCollectionTest extends TestCase
         $c = new $collection;
         $this->assertNull($c->avg());
 
-        $c = new $collection([['foo' => "4"], ['foo' => "2"]]);
+        $c = new $collection([['foo' => '4'], ['foo' => '2']]);
         $this->assertIsInt($c->avg('foo'));
         $this->assertEquals(3, $c->avg('foo'));
 
@@ -4003,9 +4003,9 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([
             ['foo' => 1], ['foo' => 2],
-            (object)['foo' => 6]
+            (object) ['foo' => 6],
         ]);
-        $this->assertEquals(3,$c->avg('foo'));
+        $this->assertEquals(3, $c->avg('foo'));
     }
 
     /**
