@@ -825,6 +825,22 @@ if (! function_exists('storage_path')) {
     }
 }
 
+if (! function_exists('to_path')) {
+    /**
+     * Create a new redirect response to the given path.
+     *
+     * @param  string  $path
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    function to_path($path, $status = 302, $headers = [], $secure = null)
+    {
+        return redirect()->to($path, $status, $headers, $secure);
+    }
+}
+
 if (! function_exists('to_route')) {
     /**
      * Create a new redirect response to a named route.
