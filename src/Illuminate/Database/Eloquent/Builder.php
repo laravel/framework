@@ -1924,6 +1924,6 @@ class Builder implements BuilderContract
      */
     public function whereLike($column, $value)
     {
-        return $this->where($column, 'LIKE', "%{$value}%");
+        return $this->where($column, 'LIKE', "%$value%");
     }
 }
