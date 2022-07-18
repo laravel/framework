@@ -212,7 +212,7 @@ class WorkCommand extends Command
             return $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
-        if ($this->latestStatus != 'starting') {
+        if ($this->latestStatus && $this->latestStatus != 'starting') {
             $formattedStartedAt = Carbon::createFromTimestamp($this->latestStartedAt)->format('Y-m-d H:i:s');
 
             $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
