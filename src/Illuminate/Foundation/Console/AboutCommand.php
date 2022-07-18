@@ -120,7 +120,7 @@ class AboutCommand extends Command
             foreach ($data as $detail) {
                 [$label, $value] = $detail;
 
-                $this->components->twoColumnDetail($label, $value);
+                $this->components->twoColumnDetail($label, value($value));
             }
         });
     }
@@ -134,7 +134,7 @@ class AboutCommand extends Command
     protected function displayJson($data)
     {
         $output = $data->flatMap(function ($data, $section) {
-            return [(string) Str::of($section)->snake() => collect($data)->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => $item[1]])];
+            return [(string) Str::of($section)->snake() => collect($data)->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => value($item[1])])];
         });
 
         $this->output->writeln(strip_tags(json_encode($output)));
