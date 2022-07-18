@@ -868,6 +868,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
             return $key !== 'id';
         })->all());
+
+        $c = new $collection([1, 2, 3, null, false, '', 0, []]);
+        $this->assertEquals([1, 2, 3], $c->filter()->all());
     }
 
     /**
