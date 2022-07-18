@@ -902,8 +902,7 @@ class SupportCollectionTest extends TestCase
     public function testHigherOrderFilter($collection)
     {
         $c = new $collection([
-            new class
-            {
+            new class {
                 public $name = 'Alex';
 
                 public function active()
@@ -911,8 +910,7 @@ class SupportCollectionTest extends TestCase
                     return true;
                 }
             },
-            new class
-            {
+            new class {
                 public $name = 'John';
 
                 public function active()
@@ -3075,13 +3073,12 @@ class SupportCollectionTest extends TestCase
         $data = new $collection($payload = [
             ['name' => Str::of('Laravel'), 'url' => '1'],
             ['name' => new HtmlString('Laravel'), 'url' => '1'],
-            ['name' => new class()
-            {
+            ['name' => new class() {
                 public function __toString()
                 {
                     return 'Framework';
                 }
-            }, 'url' => '2', ],
+            }, 'url' => '2'],
         ]);
 
         $result = $data->groupBy('name');
@@ -3383,6 +3380,67 @@ class SupportCollectionTest extends TestCase
         ]);
 
         $this->assertTrue($c->contains(function ($value) {
+            return is_null($value);
+        }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testDoesntContain($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertFalse($c->doesntContain(1));
+        $this->assertFalse($c->doesntContain('1'));
+        $this->assertTrue($c->doesntContain(2));
+        $this->assertTrue($c->doesntContain('2'));
+
+        $c = new $collection(['1']);
+        $this->assertFalse($c->doesntContain('1'));
+        $this->assertFalse($c->doesntContain(1));
+
+        $c = new $collection([null]);
+        $this->assertFalse($c->doesntContain(false));
+        $this->assertFalse($c->doesntContain(null));
+        $this->assertFalse($c->doesntContain([]));
+        $this->assertFalse($c->doesntContain(0));
+        $this->assertFalse($c->doesntContain(''));
+
+        $c = new $collection([0]);
+        $this->assertFalse($c->doesntContain(0));
+        $this->assertFalse($c->doesntContain('0'));
+        $this->assertFalse($c->doesntContain(false));
+        $this->assertFalse($c->doesntContain(null));
+
+        $this->assertFalse($c->doesntContain(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertTrue($c->doesntContain(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+        $this->assertFalse($c->doesntContain('v', 1));
+        $this->assertTrue($c->doesntContain('v', 2));
+
+        $c = new $collection(['date', 'class', (object) ['foo' => 50]]);
+
+        $this->assertFalse($c->doesntContain('date'));
+        $this->assertFalse($c->doesntContain('class'));
+        $this->assertTrue($c->doesntContain('foo'));
+
+        $c = new $collection([['a' => false, 'b' => false], ['a' => true, 'b' => false]]);
+
+        $this->assertFalse($c->doesntContain->a);
+        $this->assertTrue($c->doesntContain->b);
+
+        $c = new $collection([
+            null, 1, 2,
+        ]);
+
+        $this->assertFalse($c->doesntContain(function ($value) {
             return is_null($value);
         }));
     }
@@ -4441,7 +4499,7 @@ class SupportCollectionTest extends TestCase
             $data->split(3)->map(function (Collection $chunk) {
                 return $chunk->values()->toArray();
             })->toArray()
-            );
+        );
     }
 
     /**
@@ -4456,7 +4514,7 @@ class SupportCollectionTest extends TestCase
             $data->split(3)->map(function (Collection $chunk) {
                 return $chunk->values()->toArray();
             })->toArray()
-            );
+        );
     }
 
     /**
@@ -4471,7 +4529,7 @@ class SupportCollectionTest extends TestCase
             $data->split(6)->map(function (Collection $chunk) {
                 return $chunk->values()->toArray();
             })->toArray()
-            );
+        );
     }
 
     /**
