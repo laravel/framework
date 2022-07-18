@@ -902,7 +902,8 @@ class SupportCollectionTest extends TestCase
     public function testHigherOrderFilter($collection)
     {
         $c = new $collection([
-            new class {
+            new class
+            {
                 public $name = 'Alex';
 
                 public function active()
@@ -910,7 +911,8 @@ class SupportCollectionTest extends TestCase
                     return true;
                 }
             },
-            new class {
+            new class
+            {
                 public $name = 'John';
 
                 public function active()
@@ -3073,12 +3075,13 @@ class SupportCollectionTest extends TestCase
         $data = new $collection($payload = [
             ['name' => Str::of('Laravel'), 'url' => '1'],
             ['name' => new HtmlString('Laravel'), 'url' => '1'],
-            ['name' => new class() {
+            ['name' => new class()
+            {
                 public function __toString()
                 {
                     return 'Framework';
                 }
-            }, 'url' => '2'],
+            }, 'url' => '2', ],
         ]);
 
         $result = $data->groupBy('name');
