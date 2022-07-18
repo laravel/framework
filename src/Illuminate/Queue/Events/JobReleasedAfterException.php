@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Events;
 
-class JobReleased
+class JobReleasedAfterException
 {
     /**
      * The connection name.
