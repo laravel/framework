@@ -24,16 +24,37 @@ class AblyBroadcaster extends Broadcaster
     protected $ably;
 
     /**
+     * Used for setting expiry of issues tokens
+     * @var int|mixed
+     * @default 1 hr
+     */
+    private int $tokenExpiry = 3600;
+
+    /**
+     * Default channel capabilities, all public channels are by default given subscribe, history and channel-metadata access
+     * @var array|\string[][]
+     */
+    private array $defaultChannelClaims = array(
+        'public:*' => ["subscribe", "history", "channel-metadata"]
+    );
+
+    /**
      * Create a new broadcaster instance.
      *
      * @param \Ably\AblyRest $ably
      * @return void
      */
-    public function __construct(AblyRest $ably)
+    public function __construct(AblyRest $ably, $config)
     {
         $this->ably = $ably;
         if (self::$serverTimeDiff == null) {
             self::setServerTime(round($this->ably->time() / 1000));
+        }
+        if (array_key_exists('disable_public_channels',$config) && $config['disable_public_channels']) {
+            $this->defaultChannelClaims = array();
+        }
+        if(array_key_exists('token_expiry',$config)) {
+            $this->tokenExpiry = $config['token_expiry'];
         }
     }
 
@@ -180,9 +201,7 @@ class AblyBroadcaster extends Broadcaster
             "kid" => $this->getPublicToken()
         );
         // Set capabilities for public channel as per https://ably.com/docs/core-features/authentication#capability-operations
-        $channelClaims = array(
-            'public:*' => ["subscribe", "history", "channel-metadata"]
-        );
+        $channelClaims = $this->defaultChannelClaims;
         $serverTimeFn = function () {
             return self::getServerTime();
         };
@@ -193,7 +212,7 @@ class AblyBroadcaster extends Broadcaster
             $channelClaims = json_decode($payload['x-ably-capability'], true);
         } else {
             $iat = $serverTimeFn();
-            $exp = $iat + 3600;
+            $exp = $iat + $this->tokenExpiry;
         }
         if ($channelName) {
             $channelClaims[$channelName] = $channelCapability;

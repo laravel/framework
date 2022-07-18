@@ -254,7 +254,7 @@ class BroadcastManager implements FactoryContract
         if (array_key_exists('pusher_adapter',$config) && $config['pusher_adapter']) {
             return new AblyBroadcasterDeprecated($this->ably($config));
         }
-        return new AblyBroadcaster($this->ably($config));
+        return new AblyBroadcaster($this->ably($config), $config);
     }
 
     /**
