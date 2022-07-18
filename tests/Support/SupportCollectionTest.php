@@ -1512,6 +1512,11 @@ class SupportCollectionTest extends TestCase
         $items = [['framework' => 'vue'], ['framework' => 'laravel'], ['framework' => 'laravel']];
         $duplicates = $collection::make($items)->duplicates('framework')->all();
         $this->assertSame([2 => 'laravel'], $duplicates);
+
+        // works with key and strict
+        $items = [['Framework' => 'vue'], ['framework' => 'vue'], ['Framework' => 'vue']];
+        $duplicates = $collection::make($items)->duplicates('Framework', true)->all();
+        $this->assertSame([2 => 'vue'], $duplicates);
     }
 
     /**
