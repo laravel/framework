@@ -6,9 +6,9 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleased;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -235,7 +235,7 @@ class WorkCommand extends Command
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
-        $label = match($status) {
+        $label = match ($status) {
             'success' => '<fg=green;options=bold>DONE</>',
             'released' => '<fg=yellow;options=bold>FAIL</>',
             default => '<fg=red;options=bold>FAIL</>',
