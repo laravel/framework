@@ -1783,10 +1783,10 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
-        $model->publicIncrementQuietly('foo', 1);
+        $model->incrementQuietly('foo', 1);
         $this->assertFalse($model->isDirty());
 
-        $model->publicIncrementQuietly('foo', 1, ['category' => 1]);
+        $model->incrementQuietly('foo', 1, ['category' => 1]);
         $this->assertEquals(4, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
@@ -1810,10 +1810,10 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('dispatch')->never()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('dispatch')->never()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
-        $model->publicDecrementQuietly('foo', 1);
+        $model->decrementQuietly('foo', 1);
         $this->assertFalse($model->isDirty());
 
-        $model->publicDecrementQuietly('foo', 1, ['category' => 1]);
+        $model->decrementQuietly('foo', 1, ['category' => 1]);
         $this->assertEquals(2, $model->foo);
         $this->assertEquals(1, $model->category);
         $this->assertTrue($model->isDirty('category'));
@@ -2365,16 +2365,6 @@ class EloquentModelStub extends Model
     public function publicIncrement($column, $amount = 1, $extra = [])
     {
         return $this->increment($column, $amount, $extra);
-    }
-
-    public function publicIncrementQuietly($column, $amount = 1, $extra = [])
-    {
-        return $this->incrementQuietly($column, $amount, $extra);
-    }
-
-    public function publicDecrementQuietly($column, $amount = 1, $extra = [])
-    {
-        return $this->decrementQuietly($column, $amount, $extra);
     }
 
     public function belongsToStub()

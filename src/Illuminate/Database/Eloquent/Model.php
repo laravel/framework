@@ -929,7 +929,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array  $extra
      * @return int
      */
-    protected function incrementQuietly($column, $amount = 1, array $extra = [])
+    public function incrementQuietly($column, $amount = 1, array $extra = [])
     {
         return static::withoutEvents(function () use ($column, $amount, $extra) {
             return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
@@ -944,7 +944,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array  $extra
      * @return int
      */
-    protected function decrementQuietly($column, $amount = 1, array $extra = [])
+    public function decrementQuietly($column, $amount = 1, array $extra = [])
     {
         return static::withoutEvents(function () use ($column, $amount, $extra) {
             return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
