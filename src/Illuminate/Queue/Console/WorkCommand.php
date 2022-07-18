@@ -74,13 +74,6 @@ class WorkCommand extends Command
     protected $cache;
 
     /**
-     * Holds the last processed job name, if any.
-     *
-     * @var string|null
-     */
-    protected $latestJobName;
-
-    /**
      * Holds the start time of the last processed job, if any.
      *
      * @var float|null
