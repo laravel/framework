@@ -201,7 +201,7 @@ class AblyBroadcaster extends Broadcaster
         $claims = array(
             "iat" => $iat,
             "exp" => $exp,
-            "x-ably-clientId" => strval($clientId),
+            "x-ably-clientId" => $clientId ? strval($clientId) : null,
             "x-ably-capability" => json_encode($channelClaims)
         );
 
