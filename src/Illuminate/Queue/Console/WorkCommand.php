@@ -73,6 +73,13 @@ class WorkCommand extends Command
     protected $cache;
 
     /**
+     * Holds the last processed job name, if any.
+     *
+     * @var string|null
+     */
+    protected $latestJobName;
+
+    /**
      * Holds the start time of the last processed job, if any.
      *
      * @var float|null
@@ -203,6 +210,8 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status)
     {
+        $this->ensureOutputOfLatestJobStatus($job, $status);
+
         if ($status == 'starting') {
             $this->latestStartedAt = microtime(true);
             $this->latestStatus = $status;
@@ -226,6 +235,25 @@ class WorkCommand extends Command
         $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
 
         $this->latestStatus = $status;
+    }
+
+    /**
+     * Ensures there is a status printed on the console for the latest job.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $status
+     * @return void
+     */
+    protected function ensureOutputOfLatestJobStatus($job, $status)
+    {
+        if ($status == 'starting' && $this->latestStatus == 'starting') {
+            $dots = max(terminal()->width() - mb_strlen($this->latestJobName) - 40, 0);
+
+            $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+            $this->output->writeln(' <fg=yellow;options=bold>Retrying later</>');
+        }
+
+        $this->latestJobName = $job->resolveName();
     }
 
     /**
