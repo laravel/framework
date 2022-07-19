@@ -41,6 +41,19 @@ trait InteractsWithTime
     }
 
     /**
+     * Begin traveling into the past.
+     *
+     * @param  int  $value
+     * @return \Illuminate\Foundation\Testing\Wormhole
+     */
+    public function travelIntoThePast($value)
+    {
+        $this->assertGreaterThanOrEqual(1, $value, 'The given value should be a positive integer');
+
+        return new Wormhole($value * -1);
+    }
+
+    /**
      * Travel to another time.
      *
      * @param  \DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null  $date
