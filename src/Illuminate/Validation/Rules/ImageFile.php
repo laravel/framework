@@ -12,7 +12,7 @@ class ImageFile extends File
     /**
      * The dimension constraints for the uploaded file.
      *
-     * @param Dimensions $dimensions
+     * @param  Dimensions  $dimensions
      */
     public function dimensions($dimensions)
     {
