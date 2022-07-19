@@ -1,6 +1,35 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.20.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.21.0...9.x)
+
+
+## [v9.21.0](https://github.com/laravel/framework/compare/v9.20.0...v9.21.0) - 2022-07-19
+
+### Added
+- Added inspiring quote ([#43180](https://github.com/laravel/framework/pull/43180), [#43189](https://github.com/laravel/framework/pull/43189))
+- Introducing a fresh new look for Artisan ([#43065](https://github.com/laravel/framework/pull/43065))
+- Added whenCounted to JsonResource ([#43101](https://github.com/laravel/framework/pull/43101))
+- Artisan model:show command ([#43156](https://github.com/laravel/framework/pull/43156))
+- Artisan `about` Command ([#43147](https://github.com/laravel/framework/pull/43147), [51b5eda](https://github.com/laravel/framework/commit/51b5edaa2f8dfb0acb520ecb394706ade2200a35), [#43225](https://github.com/laravel/framework/pull/43225), [#43276](https://github.com/laravel/framework/pull/43276))
+- Adds enum casting to Request ([#43239](https://github.com/laravel/framework/pull/43239))
+
+### Revert
+- Revert ["Fix default parameter bug in routes"](https://github.com/laravel/framework/pull/42942) ([#43208](https://github.com/laravel/framework/pull/43208))
+- Revert route change PR ([#43255](https://github.com/laravel/framework/pull/43255))
+
+### Fixed
+- Fix transaction attempts counter for sqlsrv ([#43176](https://github.com/laravel/framework/pull/43176))
+
+### Changed
+- Make assertDatabaseHas failureDescription more multibyte character friendly ([#43181](https://github.com/laravel/framework/pull/43181))
+- ValidationException summarize only when use strings ([#43177](https://github.com/laravel/framework/pull/43177))
+- Improve mode function in collection ([#43240](https://github.com/laravel/framework/pull/43240))
+- clear Facade resolvedInstances in queue worker resetScope callback ([#43215](https://github.com/laravel/framework/pull/43215))
+- Improves queue:work command ([#43252](https://github.com/laravel/framework/pull/43252))
+- Remove null default attributes names when UPDATED_AT or CREATED_AT is null at Model::replicate ([#43279](https://github.com/laravel/framework/pull/43279))
+- Protect against ambiguous columns ([#43278](https://github.com/laravel/framework/pull/43278))
+- Use readpast query hint instead of holdlock for sqlsrv database queue ([#43259](https://github.com/laravel/framework/pull/43259))
+- Vendor publish flag that restricts to only existing files ([#43212](https://github.com/laravel/framework/pull/43212))
 
 
 ## [v9.20.0](https://github.com/laravel/framework/compare/v9.19.0...v9.20.0) - 2022-07-13
