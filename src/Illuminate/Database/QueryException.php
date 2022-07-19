@@ -13,7 +13,7 @@ class QueryException extends PDOException
      *
      * @var string
      */
-    protected $connectionName;
+    public $connectionName;
 
     /**
      * The SQL for the query.
