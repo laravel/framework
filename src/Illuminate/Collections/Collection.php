@@ -979,21 +979,22 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  (callable(TValue): int)|int|null  $number
+     * @param  bool  $preserveKeys
      * @return static<int, TValue>|TValue
      *
      * @throws \InvalidArgumentException
      */
-    public function random($number = null)
+    public function random($number = null, $preserveKeys = false)
     {
         if (is_null($number)) {
             return Arr::random($this->items);
         }
 
         if (is_callable($number)) {
-            return new static(Arr::random($this->items, $number($this)));
+            return new static(Arr::random($this->items, $number($this), $preserveKeys));
         }
 
-        return new static(Arr::random($this->items, $number));
+        return new static(Arr::random($this->items, $number, $preserveKeys));
     }
 
     /**
