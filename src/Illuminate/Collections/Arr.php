@@ -827,7 +827,7 @@ class Arr
      * Increment the value at a given key, and return the new value.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
+     * @param  string|int  $key
      * @param  int|float $value
      * @return int|float
      */
@@ -842,7 +842,7 @@ class Arr
      * Decrement the value at a given key, and return the new value.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
+     * @param  string|int  $key
      * @param  int|float $value
      * @return int|float
      */
