@@ -18,6 +18,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+if (PHP_VERSION_ID >= 80100) {
+    include 'Enums.php';
+}
+
 class HttpRequestTest extends TestCase
 {
     protected function tearDown(): void
@@ -623,6 +627,23 @@ class HttpRequestTest extends TestCase
         ]);
 
         $request->date('date', 'invalid_format');
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testEnumMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'valid_enum_value' => 'test',
+            'invalid_enum_value' => 'invalid',
+        ]);
+
+        $this->assertNull($request->enum('doesnt_exists', TestEnum::class));
+
+        $this->assertEquals(TestEnum::test, $request->enum('valid_enum_value', TestEnum::class));
+
+        $this->assertNull($request->enum('invalid_enum_value', TestEnum::class));
     }
 
     public function testArrayAccess()
