@@ -123,6 +123,10 @@ class Composer
 
         $output = $process->getOutput();
 
+        if (preg_match('/(\d+(\.\d+){2})/', $output, $version)) {
+            return $version[1];
+        }
+
         return explode(' ', $output)[2] ?? null;
     }
 }
