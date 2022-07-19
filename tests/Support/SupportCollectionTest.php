@@ -2286,9 +2286,19 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf($collection, $random);
         $this->assertCount(2, $random);
 
+        $random = $data->random(2, true);
+        $this->assertInstanceOf($collection, $random);
+        $this->assertCount(2, $random);
+        $this->assertCount(2, array_intersect_assoc($random->all(), $data->all()));
+
         $random = $data->random(fn ($items) => min(10, count($items)));
         $this->assertInstanceOf($collection, $random);
         $this->assertCount(6, $random);
+
+        $random = $data->random(fn ($items) => min(10, count($items) - 1), true);
+        $this->assertInstanceOf($collection, $random);
+        $this->assertCount(5, $random);
+        $this->assertCount(5, array_intersect_assoc($random->all(), $data->all()));
     }
 
     /**
