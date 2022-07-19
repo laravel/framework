@@ -32,6 +32,7 @@ class ConditionableTest extends TestCase
         }));
     }
 
+    
     public function testUnless(): void
     {
         $this->assertInstanceOf(HigherOrderWhenProxy::class, TestConditionableModel::query()->unless(true));
