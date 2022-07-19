@@ -231,7 +231,7 @@ class Factory
     }
 
     /**
-     * Indicate that an exception should not be thrown if any request is not faked.
+     * Indicate that an exception should be thrown if any request is not faked.
      *
      * @param  bool  $prevent
      * @return $this
