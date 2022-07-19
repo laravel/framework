@@ -8,12 +8,16 @@ use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends Command
@@ -35,6 +39,13 @@ class ShowModelCommand extends Command
      * @deprecated
      */
     protected static $defaultName = 'model:show';
+
+    /**
+     * The Composer instance.
+     *
+     * @var \Illuminate\Support\Composer
+     */
+    protected $composer;
 
     /**
      * The console command description.
@@ -72,6 +83,19 @@ class ShowModelCommand extends Command
     ];
 
     /**
+     * Create a new command instance.
+     *
+     * @param  \Illuminate\Support\Composer  $composer
+     * @return void
+     */
+    public function __construct(Composer $composer)
+    {
+        parent::__construct();
+
+        $this->composer = $composer;
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
@@ -79,9 +103,11 @@ class ShowModelCommand extends Command
     public function handle()
     {
         if (! interface_exists('Doctrine\DBAL\Driver')) {
-            return $this->components->error(
-                'Displaying model information requires [doctrine/dbal].'
-            );
+            if (! $this->components->confirm('Displaying model information requires [doctrine/dbal]. Do you wish to install it as a dev dependency?')) {
+                return 1;
+            }
+
+            return $this->installDependencies();
         }
 
         $class = $this->qualifyModel($this->argument('model'));
@@ -425,6 +451,37 @@ class ShowModelCommand extends Command
         return collect($indexes)
             ->filter(fn (Index $index) => count($index->getColumns()) === 1 && $index->getColumns()[0] === $column)
             ->contains(fn (Index $index) => $index->isUnique());
+    }
+
+    /**
+     * Install the command needed dependencies.
+     *
+     * @return void
+     * @throws \Symfony\Component\Process\Exception\ProcessSignaledException
+     */
+    protected function installDependencies()
+    {
+        $command = collect($this->composer->findComposer())
+            ->push('require doctrine/dbal --dev')
+            ->implode(' ');
+
+        $process = Process::fromShellCommandline($command, null, null, null, null);
+
+        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
+            try {
+                $process->setTty(true);
+            } catch (RuntimeException $e) {
+                $this->components->warning($e->getMessage());
+            }
+        }
+
+        try {
+            $process->run(fn ($type, $line) => $this->output->write($line));
+        } catch (ProcessSignaledException $e) {
+            if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
+                throw $e;
+            }
+        }
     }
 
     /**
