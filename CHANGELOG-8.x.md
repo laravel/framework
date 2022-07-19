@@ -1,6 +1,16 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.19...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.20...8.x)
+
+
+## [v8.83.20 (2022-07-19)](https://github.com/laravel/framework/compare/v8.83.19...v8.83.20)
+
+### Fixed
+- Fixed transaction attempts counter for sqlsrv ([#43176](https://github.com/laravel/framework/pull/43176))
+
+### Changed
+- Clear Facade resolvedInstances in queue worker resetScope callback ([#43215](https://github.com/laravel/framework/pull/43215))
+- Protect against ambiguous columns ([#43278](https://github.com/laravel/framework/pull/43278))
 
 
 ## [v8.83.19 (2022-07-13)](https://github.com/laravel/framework/compare/v8.83.18...v8.83.19)
