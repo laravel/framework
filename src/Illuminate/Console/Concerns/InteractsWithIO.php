@@ -285,8 +285,9 @@ trait InteractsWithIO
     /**
      * Write a string as tips output.
      *
-     * @param $string
-     * @param null $verbosity
+     * @param  string  $string
+     * @param  null  $verbosity
+     * @return void
      */
     public function tip($string, $verbosity = null)
     {
