@@ -32,6 +32,7 @@ class AblyBroadcaster extends Broadcaster
 
     /**
      * Default channel capabilities, all public channels are by default given subscribe, history and channel-metadata access
+     * Set as per https://ably.com/docs/core-features/authentication#capability-operations
      * @var array|\string[][]
      */
     private array $defaultChannelClaims = array(
