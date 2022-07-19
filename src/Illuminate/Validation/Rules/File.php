@@ -66,16 +66,16 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $validator;
 
     /**
-     * The callback that will generate the "default" version of the restrict file rule.
+     * The callback that will generate the "default" version of the file rule.
      *
      * @var string|array|callable|null
      */
     public static $defaultCallback;
 
     /**
-     * Set the default callback to be used for determining the restrict file default rules.
+     * Set the default callback to be used for determining the file default rules.
      *
-     * If no arguments are passed, the default restrict file rule configuration will be returned.
+     * If no arguments are passed, the default file rule configuration will be returned.
      *
      * @param  static|callable|null  $callback
      * @return static|null
@@ -94,17 +94,17 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Get the default configuration of the restrict file rule.
+     * Get the default configuration of the file rule.
      *
      * @return static
      */
     public static function default()
     {
-        $restrictFile = is_callable(static::$defaultCallback)
+        $file = is_callable(static::$defaultCallback)
             ? call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
-        return $restrictFile instanceof Rule ? $restrictFile : new self();
+        return $file instanceof Rule ? $file : new self();
     }
 
     /**
@@ -115,11 +115,11 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function types($mimetypes)
     {
-        $restrictFile = new static();
+        $file = new static();
 
-        $restrictFile->allowedMimetypes = (array) $mimetypes;
+        $file->allowedMimetypes = (array) $mimetypes;
 
-        return $restrictFile;
+        return $file;
     }
 
     /**
