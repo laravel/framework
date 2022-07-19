@@ -115,7 +115,7 @@ class Composer
      */
     public function getVersion()
     {
-        $command = array_merge($this->findComposer(), ['-V','--no-ansi']);
+        $command = array_merge($this->findComposer(), ['-V', '--no-ansi']);
 
         $process = $this->getProcess($command);
 
