@@ -835,6 +835,7 @@ class Arr
     {
         $value += Arr::get($array, $key, 0);
         Arr::set($array, $key, $value);
+
         return $value;
     }
 
