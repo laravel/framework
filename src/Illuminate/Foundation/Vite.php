@@ -27,6 +27,12 @@ class Vite
         if (is_file(public_path('/hot'))) {
             $url = rtrim(file_get_contents(public_path('/hot')));
 
+            $customUrl = app('config')->get('app.vite_hot_proxy_url');
+
+            if (! empty($customUrl)) {
+                $url = $customUrl;
+            }
+
             return new HtmlString(
                 $entrypoints
                     ->map(fn ($entrypoint) => $this->makeTag("{$url}/{$entrypoint}"))
@@ -90,6 +96,12 @@ class Vite
         }
 
         $url = rtrim(file_get_contents(public_path('/hot')));
+
+        $customUrl = app('config')->get('app.vite_hot_proxy_url');
+
+        if (! empty($customUrl)) {
+            $url = $customUrl;
+        }
 
         return new HtmlString(
             sprintf(
