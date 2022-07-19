@@ -21,7 +21,7 @@ class SupportArrTest extends TestCase
 
         $this->assertFalse(Arr::accessible(null));
         $this->assertFalse(Arr::accessible('abc'));
-        $this->assertFalse(Arr::accessible(new stdClass()));
+        $this->assertFalse(Arr::accessible(new stdClass));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
@@ -1003,7 +1003,7 @@ class SupportArrTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
-        $object = new stdClass();
+        $object = new stdClass;
         $object->value = 'a';
         $this->assertEquals(['a'], Arr::wrap($string));
         $this->assertEquals($array, Arr::wrap($array));
@@ -1017,7 +1017,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([false], Arr::wrap([false]));
         $this->assertEquals([0], Arr::wrap(0));
 
-        $obj = new stdClass();
+        $obj = new stdClass;
         $obj->value = 'a';
         $obj = unserialize(serialize($obj));
         $this->assertEquals([$obj], Arr::wrap($obj));
