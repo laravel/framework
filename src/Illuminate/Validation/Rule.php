@@ -6,11 +6,14 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\Dimensions;
 use Illuminate\Validation\Rules\ExcludeIf;
+use Illuminate\Validation\Rules\ExcludeUnless;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Rules\ProhibitedUnless;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Rules\RequiredUnless;
 use Illuminate\Validation\Rules\Unique;
 
 class Rule
@@ -106,6 +109,17 @@ class Rule
     }
 
     /**
+     * Get a required_unless constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\RequiredUnless
+     */
+    public static function requiredUnless($callback)
+    {
+        return new RequiredUnless($callback);
+    }
+
+    /**
      * Get a exclude_if constraint builder instance.
      *
      * @param  callable|bool  $callback
@@ -117,6 +131,17 @@ class Rule
     }
 
     /**
+     * Get a exclude_unless constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\ExcludeUnless
+     */
+    public static function excludeUnless($callback)
+    {
+        return new ExcludeUnless($callback);
+    }
+
+    /**
      * Get a prohibited_if constraint builder instance.
      *
      * @param  callable|bool  $callback
@@ -125,6 +150,17 @@ class Rule
     public static function prohibitedIf($callback)
     {
         return new ProhibitedIf($callback);
+    }
+
+    /**
+     * Get a prohibited_unless constraint builder instance.
+     *
+     * @param  callable|bool  $callback
+     * @return \Illuminate\Validation\Rules\ProhibitedUnless
+     */
+    public static function prohibitedUnless($callback)
+    {
+        return new ProhibitedUnless($callback);
     }
 
     /**
