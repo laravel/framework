@@ -828,7 +828,7 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int  $key
-     * @param  int|float $value
+     * @param  int|float  $value
      * @return int|float
      */
     public static function increment($array, $key, $value = 1)
@@ -843,7 +843,7 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int  $key
-     * @param  int|float $value
+     * @param  int|float  $value
      * @return int|float
      */
     public static function decrement($array, $key, $value = 1)
