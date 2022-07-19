@@ -66,7 +66,7 @@ class EventListCommand extends Command
                     $this->components->info(
                         'Listener'
                     ),
-                    sprintf('    <fg=#6C7280>%s</>', $listener)
+                    sprintf('    <fg=#22a308>%s</>', $listener),
                 ]),
             ])->flatten()->filter()->prepend('')->push('')->toArray()
         );
