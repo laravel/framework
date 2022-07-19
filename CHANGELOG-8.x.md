@@ -1,6 +1,16 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.18...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.19...8.x)
+
+
+## [v8.83.19 (2022-07-13)](https://github.com/laravel/framework/compare/v8.83.18...v8.83.19)
+
+### Fixed
+- Fixed forceCreate on MorphMany not returning newly created object ([#42996](https://github.com/laravel/framework/pull/42996))
+- Prevent double throwing chained exception on sync queue ([#42950](https://github.com/laravel/framework/pull/42950))
+
+### Changed
+- Disable Column Statistics for php artisan schema:dump on MariaDB ([#43027](https://github.com/laravel/framework/pull/43027))
 
 
 ## [v8.83.18 (2022-06-28)](https://github.com/laravel/framework/compare/v8.83.17...v8.83.18)
