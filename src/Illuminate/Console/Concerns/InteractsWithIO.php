@@ -283,6 +283,17 @@ trait InteractsWithIO
     }
 
     /**
+     * Write a string as tips output.
+     *
+     * @param $string
+     * @param null $verbosity
+     */
+    public function tip($string, $verbosity = null)
+    {
+        $this->line($string, 'bg=blue;fg=white', $verbosity);
+    }
+
+    /**
      * Write a string as standard output.
      *
      * @param  string  $string
