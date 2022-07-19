@@ -45,7 +45,7 @@ class VendorPublishCommand extends Command
      * @var string
      */
     protected $signature = 'vendor:publish
-                    {--existing : Publish and overwrite only existing files}
+                    {--existing : Publish and overwrite only the files that have already been published}
                     {--force : Overwrite any existing files}
                     {--all : Publish assets for all service providers without prompt}
                     {--provider= : The service provider that has assets you want to publish}
@@ -238,10 +238,8 @@ class VendorPublishCommand extends Command
      */
     protected function publishFile($from, $to)
     {
-        if (
-            (! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
-            || ($this->option('existing') && $this->files->exists($to))
-        ) {
+        if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
+            || ($this->option('existing') && $this->files->exists($to))) {
             $this->createParentDirectory(dirname($to));
 
             $this->files->copy($from, $to);
