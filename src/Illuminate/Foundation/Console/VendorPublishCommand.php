@@ -44,7 +44,9 @@ class VendorPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'vendor:publish {--force : Overwrite any existing files}
+    protected $signature = 'vendor:publish
+                    {--existing : Publish and overwrite only the files that have already been published}
+                    {--force : Overwrite any existing files}
                     {--all : Publish assets for all service providers without prompt}
                     {--provider= : The service provider that has assets you want to publish}
                     {--tag=* : One or many tags that have assets you want to publish}';
@@ -236,17 +238,25 @@ class VendorPublishCommand extends Command
      */
     protected function publishFile($from, $to)
     {
-        if (! $this->files->exists($to) || $this->option('force')) {
+        if ((! $this->option('existing') && (! $this->files->exists($to) || $this->option('force')))
+            || ($this->option('existing') && $this->files->exists($to))) {
             $this->createParentDirectory(dirname($to));
 
             $this->files->copy($from, $to);
 
             $this->status($from, $to, 'file');
         } else {
-            $this->components->twoColumnDetail(sprintf(
-                'File [%s] already exist',
-                str_replace(base_path().'/', '', realpath($to)),
-            ), '<fg=yellow;options=bold>SKIPPED</>');
+            if ($this->option('existing')) {
+                $this->components->twoColumnDetail(sprintf(
+                    'File [%s] does not exist',
+                    str_replace(base_path().'/', '', $to),
+                ), '<fg=yellow;options=bold>SKIPPED</>');
+            } else {
+                $this->components->twoColumnDetail(sprintf(
+                    'File [%s] already exists',
+                    str_replace(base_path().'/', '', realpath($to)),
+                ), '<fg=yellow;options=bold>SKIPPED</>');
+            }
         }
     }
 
@@ -280,7 +290,13 @@ class VendorPublishCommand extends Command
         foreach ($manager->listContents('from://', true) as $file) {
             $path = Str::after($file['path'], 'from://');
 
-            if ($file['type'] === 'file' && (! $manager->fileExists('to://'.$path) || $this->option('force'))) {
+            if (
+                $file['type'] === 'file'
+                && (
+                    (! $this->option('existing') && (! $manager->fileExists('to://'.$path) || $this->option('force')))
+                    || ($this->option('existing') && $manager->fileExists('to://'.$path))
+                )
+            ) {
                 $manager->write('to://'.$path, $manager->read($file['path']));
             }
         }
