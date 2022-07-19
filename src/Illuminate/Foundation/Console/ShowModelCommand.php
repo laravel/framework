@@ -472,7 +472,7 @@ class ShowModelCommand extends Command
             try {
                 $process->setTty(true);
             } catch (RuntimeException $e) {
-                $this->components->warning($e->getMessage());
+                $this->components->warn($e->getMessage());
             }
         }
 
