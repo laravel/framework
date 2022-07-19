@@ -17,11 +17,11 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::accessible([]));
         $this->assertTrue(Arr::accessible([1, 2]));
         $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
-        $this->assertTrue(Arr::accessible(new Collection));
+        $this->assertTrue(Arr::accessible(new Collection()));
 
         $this->assertFalse(Arr::accessible(null));
         $this->assertFalse(Arr::accessible('abc'));
-        $this->assertFalse(Arr::accessible(new stdClass));
+        $this->assertFalse(Arr::accessible(new stdClass()));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
@@ -1003,7 +1003,7 @@ class SupportArrTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
-        $object = new stdClass;
+        $object = new stdClass();
         $object->value = 'a';
         $this->assertEquals(['a'], Arr::wrap($string));
         $this->assertEquals($array, Arr::wrap($array));
@@ -1017,7 +1017,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([false], Arr::wrap([false]));
         $this->assertEquals([0], Arr::wrap(0));
 
-        $obj = new stdClass;
+        $obj = new stdClass();
         $obj->value = 'a';
         $obj = unserialize(serialize($obj));
         $this->assertEquals([$obj], Arr::wrap($obj));
@@ -1111,5 +1111,47 @@ class SupportArrTest extends TestCase
                 'key' => 1,
             ],
         ], Arr::prependKeysWith($array, 'test.'));
+    }
+
+    public function testIncrement()
+    {
+        $array = [
+            'id' => '123',
+            'data' => '456',
+            'list' => [1, 2, 3],
+            'meta' => [
+                'key' => 1.333,
+            ],
+            'string' => 'foo',
+        ];
+
+        $this->assertEquals(124, Arr::increment($array, 'id'));
+        $this->assertEquals(3, Arr::increment($array, 'list.0', 2));
+        $this->assertEquals(2.666, Arr::increment($array, 'meta.key', 1.333));
+        $this->assertEquals(1, Arr::increment($array, 'missing', 1));
+
+        $this->expectException(\TypeError::class);
+        Arr::increment($array, 'string', 1);
+    }
+
+    public function testDecrement()
+    {
+        $array = [
+            'id' => '123',
+            'data' => '456',
+            'list' => [1, 2, 3],
+            'meta' => [
+                'key' => 1.333,
+            ],
+            'string' => 'foo',
+        ];
+
+        $this->assertEquals(122, Arr::decrement($array, 'id'));
+        $this->assertEquals(-1, Arr::decrement($array, 'list.0', 2));
+        $this->assertEquals(0, Arr::decrement($array, 'meta.key', 1.333));
+        $this->assertEquals(-1, Arr::decrement($array, 'missing', 1));
+
+        $this->expectException(\TypeError::class);
+        Arr::decrement($array, 'string', 1);
     }
 }

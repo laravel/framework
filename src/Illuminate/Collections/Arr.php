@@ -822,4 +822,32 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Increment the value at a given key, and return the new value.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  int|float $value
+     * @return int|float
+     */
+    public static function increment($array, $key, $value = 1)
+    {
+        $value += Arr::get($array, $key, 0);
+        Arr::set($array, $key, $value);
+        return $value;
+    }
+
+    /**
+     * Decrement the value at a given key, and return the new value.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  int|float $value
+     * @return int|float
+     */
+    public static function decrement($array, $key, $value = 1)
+    {
+        return Arr::increment($array, $key, $value * -1);
+    }
 }
