@@ -28,14 +28,14 @@ class AblyBroadcaster extends Broadcaster
      * @var int|mixed
      * @default 1 hr
      */
-    private int $tokenExpiry = 3600;
+    private $tokenExpiry = 3600;
 
     /**
      * Default channel capabilities, all public channels are by default given subscribe, history and channel-metadata access
      * Set as per https://ably.com/docs/core-features/authentication#capability-operations
      * @var array|\string[][]
      */
-    private array $defaultChannelClaims = array(
+    private $defaultChannelClaims = array(
         'public:*' => ["subscribe", "history", "channel-metadata"]
     );
 
