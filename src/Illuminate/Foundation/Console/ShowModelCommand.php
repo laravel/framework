@@ -103,7 +103,7 @@ class ShowModelCommand extends Command
     public function handle()
     {
         if (! interface_exists('Doctrine\DBAL\Driver')) {
-            if (! $this->components->confirm('Displaying model information requires [doctrine/dbal]. Do you wish to install it as a dev dependency?')) {
+            if (! $this->components->confirm('Displaying model information requires [doctrine/dbal]. Do you wish to install it?')) {
                 return 1;
             }
 
@@ -463,7 +463,7 @@ class ShowModelCommand extends Command
     protected function installDependencies()
     {
         $command = collect($this->composer->findComposer())
-            ->push('require doctrine/dbal --dev')
+            ->push('require doctrine/dbal')
             ->implode(' ');
 
         $process = Process::fromShellCommandline($command, null, null, null, null);
