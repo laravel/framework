@@ -877,19 +877,19 @@ class Mailable implements MailableContract, Renderable
         if ($file instanceof Attachable) {
             $file = $file->toMailAttachment();
         }
-    
+
         if ($file instanceof Attachment) {
             return $file->attachTo($this);
         }
-    
+
         $this->attachments = collect($this->attachments)
-            ->push(compact('file', 'options'))
-            ->unique('file')
-            ->all();
+                    ->push(compact('file', 'options'))
+                    ->unique('file')
+                    ->all();
 
         return $this;
     }
-    
+
     /**
      * Attach multiple files to the message.
      *
@@ -908,7 +908,7 @@ class Mailable implements MailableContract, Renderable
         } else {
             $this->attach($files, $options = []);
         }
-        
+
         return $this;
     }
 
