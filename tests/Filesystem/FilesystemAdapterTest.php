@@ -521,4 +521,36 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertSame($filesystemAdapter->files(), ['body.txt', 'existing.txt', 'file.txt', 'file1.txt']);
     }
+
+    public function testSupportsTemporaryUrl()
+    {
+        $localAdapter = new class($this->tempDir) extends LocalFilesystemAdapter
+        {
+            public function getTemporaryUrl($path, Carbon $expiration, $options): string
+            {
+                return $path.$expiration->toString().implode('', $options);
+            }
+        };
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $localAdapter);
+
+        $this->assertTrue($filesystemAdapter->supportsTemporaryUrl());
+    }
+
+    public function testSupportsTemporaryUrlWithCustomCallback()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $filesystemAdapter->buildTemporaryUrlsUsing(function ($path, Carbon $expiration, $options) {
+            return $path.$expiration->toString().implode('', $options);
+        });
+
+        $this->assertTrue($filesystemAdapter->supportsTemporaryUrl());
+    }
+
+    public function testSupportsTemporaryUrlForAdapterWithoutTemporaryUrlSupport()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertFalse($filesystemAdapter->supportsTemporaryUrl());
+    }
 }
