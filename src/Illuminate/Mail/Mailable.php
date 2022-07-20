@@ -893,20 +893,17 @@ class Mailable implements MailableContract, Renderable
     /**
      * Attach multiple files to the message.
      *
-     * @param  array|object  $files
-     * @param  array  $options
+     * @param  array  $files
      * @return $this
      */
-    public function attachMany($files, array $options = [])
+    public function attachMany($files)
     {
-        if(is_array($files))
-        {
-            foreach ($files as $file => $options)
-            {
-                $this->attach((is_int($file) ? $options : $file), (is_int($file) ? [] : $options));
+        foreach ($files as $file => $options) {
+            if (is_int($file)) {
+                $this->attach($options);
+            } else {
+                $this->attach($file, $options);
             }
-        } else {
-            $this->attach($files, $options = []);
         }
 
         return $this;
