@@ -437,7 +437,7 @@ class ShowModelCommand extends Command
      */
     protected function qualifyModel(string $model)
     {
-        if (class_exists($model)) {
+        if (str_contains($model, '\\') && class_exists($model)) {
             return $model;
         }
 
