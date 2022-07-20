@@ -1834,6 +1834,24 @@ class DatabaseEloquentModelTest extends TestCase
         $model->replicate();
     }
 
+    public function testReplicateQuietlyCreatesANewModelInstanceWithSameAttributeValuesAndIsQuiet()
+    {
+        $model = new EloquentModelStub;
+        $model->id = 'id';
+        $model->foo = 'bar';
+        $model->created_at = new DateTime;
+        $model->updated_at = new DateTime;
+        $replicated = $model->replicateQuietly();
+
+        $model->setEventDispatcher($events = m::mock(Dispatcher::class));
+        $events->shouldReceive('dispatch')->never()->with('eloquent.replicating: '.get_class($model), $model)->andReturn(true);
+
+        $this->assertNull($replicated->id);
+        $this->assertSame('bar', $replicated->foo);
+        $this->assertNull($replicated->created_at);
+        $this->assertNull($replicated->updated_at);
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock(EloquentModelStub::class.'[newQueryWithoutRelationships]');

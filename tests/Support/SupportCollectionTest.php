@@ -71,6 +71,10 @@ class SupportCollectionTest extends TestCase
         $data = new $collection;
         $result = $data->first(null, 'default');
         $this->assertSame('default', $result);
+
+        $data = new $collection(['foo', 'bar']);
+        $result = $data->first(null, 'default');
+        $this->assertSame('foo', $result);
     }
 
     /**
@@ -868,6 +872,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
             return $key !== 'id';
         })->all());
+
+        $c = new $collection([1, 2, 3, null, false, '', 0, []]);
+        $this->assertEquals([1, 2, 3], $c->filter()->all());
     }
 
     /**
@@ -1512,6 +1519,11 @@ class SupportCollectionTest extends TestCase
         $items = [['framework' => 'vue'], ['framework' => 'laravel'], ['framework' => 'laravel']];
         $duplicates = $collection::make($items)->duplicates('framework')->all();
         $this->assertSame([2 => 'laravel'], $duplicates);
+
+        // works with key and strict
+        $items = [['Framework' => 'vue'], ['framework' => 'vue'], ['Framework' => 'vue']];
+        $duplicates = $collection::make($items)->duplicates('Framework', true)->all();
+        $this->assertSame([2 => 'vue'], $duplicates);
     }
 
     /**
@@ -3390,6 +3402,67 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testDoesntContain($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertFalse($c->doesntContain(1));
+        $this->assertFalse($c->doesntContain('1'));
+        $this->assertTrue($c->doesntContain(2));
+        $this->assertTrue($c->doesntContain('2'));
+
+        $c = new $collection(['1']);
+        $this->assertFalse($c->doesntContain('1'));
+        $this->assertFalse($c->doesntContain(1));
+
+        $c = new $collection([null]);
+        $this->assertFalse($c->doesntContain(false));
+        $this->assertFalse($c->doesntContain(null));
+        $this->assertFalse($c->doesntContain([]));
+        $this->assertFalse($c->doesntContain(0));
+        $this->assertFalse($c->doesntContain(''));
+
+        $c = new $collection([0]);
+        $this->assertFalse($c->doesntContain(0));
+        $this->assertFalse($c->doesntContain('0'));
+        $this->assertFalse($c->doesntContain(false));
+        $this->assertFalse($c->doesntContain(null));
+
+        $this->assertFalse($c->doesntContain(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertTrue($c->doesntContain(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+
+        $this->assertFalse($c->doesntContain('v', 1));
+        $this->assertTrue($c->doesntContain('v', 2));
+
+        $c = new $collection(['date', 'class', (object) ['foo' => 50]]);
+
+        $this->assertFalse($c->doesntContain('date'));
+        $this->assertFalse($c->doesntContain('class'));
+        $this->assertTrue($c->doesntContain('foo'));
+
+        $c = new $collection([['a' => false, 'b' => false], ['a' => true, 'b' => false]]);
+
+        $this->assertFalse($c->doesntContain->a);
+        $this->assertTrue($c->doesntContain->b);
+
+        $c = new $collection([
+            null, 1, 2,
+        ]);
+
+        $this->assertFalse($c->doesntContain(function ($value) {
+            return is_null($value);
+        }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testSome($collection)
     {
         $c = new $collection([1, 3, 5]);
@@ -3926,6 +3999,20 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection;
         $this->assertNull($c->avg());
+
+        $c = new $collection([['foo' => '4'], ['foo' => '2']]);
+        $this->assertIsInt($c->avg('foo'));
+        $this->assertEquals(3, $c->avg('foo'));
+
+        $c = new $collection([['foo' => 1], ['foo' => 2]]);
+        $this->assertIsFloat($c->avg('foo'));
+        $this->assertEquals(1.5, $c->avg('foo'));
+
+        $c = new $collection([
+            ['foo' => 1], ['foo' => 2],
+            (object) ['foo' => 6],
+        ]);
+        $this->assertEquals(3, $c->avg('foo'));
     }
 
     /**
@@ -4257,6 +4344,7 @@ class SupportCollectionTest extends TestCase
     public function testMode($collection)
     {
         $data = new $collection([1, 2, 3, 4, 4, 5]);
+        $this->assertIsArray($data->mode());
         $this->assertEquals([4], $data->mode());
     }
 
@@ -4271,7 +4359,14 @@ class SupportCollectionTest extends TestCase
             (object) ['foo' => 2],
             (object) ['foo' => 4],
         ]);
+        $data2 = new Collection([
+            ['foo' => 1],
+            ['foo' => 1],
+            ['foo' => 2],
+            ['foo' => 4],
+        ]);
         $this->assertEquals([1], $data->mode('foo'));
+        $this->assertEquals($data2->mode('foo'), $data->mode('foo'));
     }
 
     /**
@@ -4441,7 +4536,7 @@ class SupportCollectionTest extends TestCase
             $data->split(3)->map(function (Collection $chunk) {
                 return $chunk->values()->toArray();
             })->toArray()
-            );
+        );
     }
 
     /**
@@ -4456,7 +4551,7 @@ class SupportCollectionTest extends TestCase
             $data->split(3)->map(function (Collection $chunk) {
                 return $chunk->values()->toArray();
             })->toArray()
-            );
+        );
     }
 
     /**
@@ -4471,7 +4566,7 @@ class SupportCollectionTest extends TestCase
             $data->split(6)->map(function (Collection $chunk) {
                 return $chunk->values()->toArray();
             })->toArray()
-            );
+        );
     }
 
     /**

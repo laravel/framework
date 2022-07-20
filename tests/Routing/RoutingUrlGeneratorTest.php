@@ -369,28 +369,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertSame('/foo/test-slug', $url->route('routable', $model, false));
-        $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
         $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
-    }
-
-    public function testRoutableInterfaceRoutingWithUrlDefaults()
-    {
-        $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            Request::create('http://www.foo.com/')
-        );
-
-        $url->defaults(['locale' => 'baz']);
-        $route = new Route(['GET'], '{locale}/foo/{bar:slug}', ['as' => 'routable']);
-        $routes->add($route);
-
-        $model = new RoutableInterfaceStub;
-        $model->key = 'routable';
-
-        $this->assertSame('/baz/foo/test-slug', $url->route('routable', $model, false));
-        $this->assertSame('/baz/foo/test-slug', $url->route('routable', [$model], false));
-        $this->assertSame('/baz/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+        $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
     }
 
     public function testRoutableInterfaceRoutingAsQueryString()
@@ -411,8 +391,15 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo?foo=routable', $url->route('query-string', ['foo' => $model], false));
     }
 
+    /**
+     * @todo Fix bug related to route keys
+     *
+     * @link https://github.com/laravel/framework/pull/42425
+     */
     public function testRoutableInterfaceRoutingWithSeparateBindingFieldOnlyForSecondParameter()
     {
+        $this->markTestSkipped('See https://github.com/laravel/framework/pull/43255');
+
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')

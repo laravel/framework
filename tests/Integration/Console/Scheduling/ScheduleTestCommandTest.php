@@ -17,7 +17,6 @@ class ScheduleTestCommandTest extends TestCase
 
         Carbon::setTestNow(now()->startOfYear());
 
-        $this->timestamp = now()->startOfYear()->format('c');
         $this->schedule = $this->app->make(Schedule::class);
     }
 
@@ -25,7 +24,7 @@ class ScheduleTestCommandTest extends TestCase
     {
         $this->artisan(ScheduleTestCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('No scheduled commands have been defined.');
+            ->expectsOutputToContain('No scheduled commands have been defined.');
     }
 
     public function testRunNoMatchingCommand()
@@ -34,7 +33,7 @@ class ScheduleTestCommandTest extends TestCase
 
         $this->artisan(ScheduleTestCommand::class, ['--name' => 'missing:command'])
             ->assertSuccessful()
-            ->expectsOutput('No matching scheduled command found.');
+            ->expectsOutputToContain('No matching scheduled command found.');
     }
 
     public function testRunUsingNameOption()
@@ -43,17 +42,21 @@ class ScheduleTestCommandTest extends TestCase
         $this->schedule->job(BarJobStub::class);
         $this->schedule->call(fn () => true)->name('callback');
 
+        $expectedOutput = windows_os()
+            ? 'Running ["artisan" bar:command]'
+            : "Running ['artisan' bar:command]";
+
         $this->artisan(ScheduleTestCommand::class, ['--name' => 'bar:command'])
             ->assertSuccessful()
-            ->expectsOutput(sprintf('[%s] Running scheduled command: bar-command', $this->timestamp));
+            ->expectsOutputToContain($expectedOutput);
 
         $this->artisan(ScheduleTestCommand::class, ['--name' => BarJobStub::class])
             ->assertSuccessful()
-            ->expectsOutput(sprintf('[%s] Running scheduled command: %s', $this->timestamp, BarJobStub::class));
+            ->expectsOutputToContain(sprintf('Running [%s]', BarJobStub::class));
 
         $this->artisan(ScheduleTestCommand::class, ['--name' => 'callback'])
             ->assertSuccessful()
-            ->expectsOutput(sprintf('[%s] Running scheduled command: callback', $this->timestamp));
+            ->expectsOutputToContain('Running [callback]');
     }
 
     public function testRunUsingChoices()
@@ -70,7 +73,7 @@ class ScheduleTestCommandTest extends TestCase
                 [Application::formatCommandString('bar:command'), BarJobStub::class, 'callback'],
                 true
             )
-            ->expectsOutput(sprintf('[%s] Running scheduled command: callback', $this->timestamp));
+            ->expectsOutputToContain('Running [callback]');
     }
 
     protected function tearDown(): void
