@@ -524,8 +524,9 @@ class FilesystemAdapterTest extends TestCase
 
     public function testSupportsTemporaryUrl()
     {
-        $localAdapter = new class($this->tempDir) extends LocalFilesystemAdapter {
-            function getTemporaryUrl($path, Carbon $expiration, $options): string
+        $localAdapter = new class($this->tempDir) extends LocalFilesystemAdapter
+        {
+            public function getTemporaryUrl($path, Carbon $expiration, $options): string
             {
                 return $path.$expiration->toString().implode('', $options);
             }
