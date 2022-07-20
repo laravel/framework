@@ -165,10 +165,23 @@ class AboutCommand extends Command
             'Views' => $this->hasPhpFiles($this->laravel->storagePath('framework/views')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
         ]);
 
+        $logChannel = config('logging.default');
+        $logChannelDriver = config('logging.channels.'.$logChannel.'.driver');
+
+        if ($logChannelDriver === 'stack') {
+            $secondary = collect(config('logging.channels.'.$logChannel.'.channels'))
+                ->implode(', ');
+
+            $logs = '<fg=yellow;options=bold>'.$logChannel.'</> <fg=gray;options=bold>/</> '.$secondary;
+        } else {
+            $logs = $logChannel;
+        }
+
         static::add('Drivers', array_filter([
             'Broadcasting' => config('broadcasting.default'),
             'Cache' => config('cache.default'),
             'Database' => config('database.default'),
+            'Logs' => $logs,
             'Mail' => config('mail.default'),
             'Octane' => config('octane.server'),
             'Queue' => config('queue.default'),
