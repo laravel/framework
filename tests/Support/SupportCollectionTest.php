@@ -1652,6 +1652,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['name' => 'Mateus', 'age' => 18]);
         $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new $collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
+
+        $c = new $collection(['name' => 'taylor', 'family' => 'otwell', 'age' => 26]);
+        $this->assertEquals(['name' => 'taylor', 'family' => 'otwell'], $c->intersectByKeys(new $collection(['height' => 180, 'name' => 'amir', 'family' => 'moharami']))->all());
     }
 
     /**
