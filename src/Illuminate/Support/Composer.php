@@ -65,7 +65,7 @@ class Composer
      *
      * @return array
      */
-    protected function findComposer()
+    public function findComposer()
     {
         if ($this->files->exists($this->workingPath.'/composer.phar')) {
             return [$this->phpBinary(), 'composer.phar'];
