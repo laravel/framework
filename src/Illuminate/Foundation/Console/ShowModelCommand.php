@@ -103,7 +103,7 @@ class ShowModelCommand extends Command
     public function handle()
     {
         if (! interface_exists('Doctrine\DBAL\Driver')) {
-            if (! $this->components->confirm('Displaying model information requires the [doctrine/dbal] package. Would you like to install it?')) {
+            if (! $this->components->confirm('Displaying model information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
                 return 1;
             }
 
