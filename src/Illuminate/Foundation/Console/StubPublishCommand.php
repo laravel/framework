@@ -90,7 +90,7 @@ class StubPublishCommand extends Command
         ];
 
         foreach ($files as $from => $to) {
-            if (! $this->option('existing') && (! file_exists($to) || $this->option('force'))
+            if ((! $this->option('existing') && (! file_exists($to) || $this->option('force')))
                 || ($this->option('existing') && file_exists($to))) {
                 file_put_contents($to, file_get_contents($from));
             }
