@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -201,16 +202,21 @@ class ShowModelCommand extends Command
                 return collect($this->relationMethods)
                     ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
             })
-            ->values()
             ->map(function (ReflectionMethod $method) use ($model) {
                 $relation = $method->invoke($model);
+
+                if (! $relation instanceof Relation) {
+                    return null;
+                }
 
                 return [
                     'name' => $method->getName(),
                     'type' => Str::afterLast(get_class($relation), '\\'),
                     'related' => get_class($relation->getRelated()),
                 ];
-            });
+            })
+            ->filter()
+            ->values();
     }
 
     /**
@@ -345,10 +351,10 @@ class ShowModelCommand extends Command
      */
     protected function getCastsWithDates($model)
     {
-        return collect([
-            ...collect($model->getDates())->flip()->map(fn () => 'datetime'),
-            ...$model->getCasts(),
-        ]);
+        return collect($model->getDates())
+            ->flip()
+            ->map(fn () => 'datetime')
+            ->merge($model->getCasts());
     }
 
     /**
@@ -431,7 +437,7 @@ class ShowModelCommand extends Command
      */
     protected function qualifyModel(string $model)
     {
-        if (class_exists($model)) {
+        if (str_contains($model, '\\') && class_exists($model)) {
             return $model;
         }
 
