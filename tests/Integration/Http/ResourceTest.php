@@ -317,6 +317,7 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
                 'authors_count' => 2,
                 'comments_count' => 5,
+                'favourited_posts_count' => 1,
             ]);
 
             return new PostResourceWithOptionalRelationshipCounts($post);
@@ -332,6 +333,7 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'authors' => 2,
+                'favourite_posts' => 1,
                 'comments' => '5 comments',
             ],
         ]);

@@ -219,7 +219,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue();
         }
 
-        $attribute = Str::finish($relationship, '_count');
+        $attribute = (string) Str::of($relationship)->snake()->finish('_count');
 
         if (! isset($this->resource->getAttributes()[$attribute])) {
             return value($default);
