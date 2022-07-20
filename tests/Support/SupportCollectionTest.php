@@ -2162,7 +2162,7 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($data->has('third'));
         $this->assertTrue($data->has(['first', 'second']));
         $this->assertFalse($data->has(['third', 'first']));
-        $this->assertTrue($data->has('first','second'));
+        $this->assertTrue($data->has('first', 'second'));
     }
 
     /**
