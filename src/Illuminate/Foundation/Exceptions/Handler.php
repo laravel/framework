@@ -6,6 +6,10 @@ use Closure;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Console\View\Components\Info;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Contracts\Foundation\ExceptionRenderer;
@@ -13,6 +17,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\RecordsNotFoundException;
+use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +28,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
@@ -30,6 +36,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
@@ -718,6 +725,15 @@ class Handler implements ExceptionHandlerContract
      */
     public function renderForConsole($output, Throwable $e)
     {
+        if ($e instanceof CommandNotFoundException) {
+            with(new Error($output))->render(Str::before($e->getMessage(), "\n\n"));
+            with(new TwoColumnDetail($output))->render(Str::betweenFirst($e->getMessage(), "\n\n", "\n"), ':');
+            with(new BulletList($output))->render($e->getAlternatives());
+            with(new Info($output))->render('Create a new Artisan command with [php artisan '.ConsoleMakeCommand::getDefaultName().']');
+
+            return;
+        }
+
         (new ConsoleApplication)->renderThrowable($e, $output);
     }
 
