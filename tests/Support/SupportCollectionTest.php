@@ -2162,6 +2162,7 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($data->has('third'));
         $this->assertTrue($data->has(['first', 'second']));
         $this->assertFalse($data->has(['third', 'first']));
+        $this->assertTrue($data->has('first', 'second'));
     }
 
     /**
@@ -2176,6 +2177,8 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($data->hasAny(['first', 'second']));
         $this->assertTrue($data->hasAny(['first', 'fourth']));
         $this->assertFalse($data->hasAny(['third', 'fourth']));
+        $this->assertFalse($data->hasAny('third', 'fourth'));
+        $this->assertFalse($data->hasAny([]));
     }
 
     /**
