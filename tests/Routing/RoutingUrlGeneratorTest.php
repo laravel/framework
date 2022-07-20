@@ -14,6 +14,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
+if (PHP_VERSION_ID >= 80100) {
+    include_once 'Enums.php';
+}
+
 class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
@@ -846,6 +850,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->expectExceptionMessage('reserved');
 
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testRouteGenerationWithBackedEnums()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo/{bar}', ['as' => 'foo.bar']);
+        $routes->add($namedRoute);
+
+        $this->assertSame('http://www.foo.com/foo/fruits', $url->route('foo.bar', CategoryBackedEnum::Fruits));
     }
 }
 
