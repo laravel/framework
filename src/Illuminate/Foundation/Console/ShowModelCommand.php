@@ -41,13 +41,6 @@ class ShowModelCommand extends Command
     protected static $defaultName = 'model:show';
 
     /**
-     * The Composer instance.
-     *
-     * @var \Illuminate\Support\Composer
-     */
-    protected $composer;
-
-    /**
      * The console command description.
      *
      * @var string
@@ -62,6 +55,13 @@ class ShowModelCommand extends Command
     protected $signature = 'model:show {model : The model to show}
                 {--database= : The database connection to use}
                 {--json : Output the model as JSON}';
+
+    /**
+     * The Composer instance.
+     *
+     * @var \Illuminate\Support\Composer
+     */
+    protected $composer;
 
     /**
      * The methods that can be called in a model to indicate a relation.
@@ -103,7 +103,7 @@ class ShowModelCommand extends Command
     public function handle()
     {
         if (! interface_exists('Doctrine\DBAL\Driver')) {
-            if (! $this->components->confirm('Displaying model information requires [doctrine/dbal]. Do you wish to install it?')) {
+            if (! $this->components->confirm('Displaying model information requires the [doctrine/dbal] package. Would you like to install it?')) {
                 return 1;
             }
 
@@ -454,7 +454,36 @@ class ShowModelCommand extends Command
     }
 
     /**
-     * Install the command needed dependencies.
+     * Qualify the given model class base name.
+     *
+     * @param  string  $model
+     * @return string
+     *
+     * @see \Illuminate\Console\GeneratorCommand
+     */
+    protected function qualifyModel(string $model)
+    {
+        if (str_contains($model, '\\') && class_exists($model)) {
+            return $model;
+        }
+
+        $model = ltrim($model, '\\/');
+
+        $model = str_replace('/', '\\', $model);
+
+        $rootNamespace = $this->laravel->getNamespace();
+
+        if (Str::startsWith($model, $rootNamespace)) {
+            return $model;
+        }
+
+        return is_dir(app_path('Models'))
+            ? $rootNamespace.'Models\\'.$model
+            : $rootNamespace.$model;
+    }
+
+    /**
+     * Install the command's dependencies.
      *
      * @return void
      *
@@ -483,34 +512,5 @@ class ShowModelCommand extends Command
                 throw $e;
             }
         }
-    }
-
-    /**
-     * Qualify the given model class base name.
-     *
-     * @param  string  $model
-     * @return string
-     *
-     * @see \Illuminate\Console\GeneratorCommand
-     */
-    protected function qualifyModel(string $model)
-    {
-        if (str_contains($model, '\\') && class_exists($model)) {
-            return $model;
-        }
-
-        $model = ltrim($model, '\\/');
-
-        $model = str_replace('/', '\\', $model);
-
-        $rootNamespace = $this->laravel->getNamespace();
-
-        if (Str::startsWith($model, $rootNamespace)) {
-            return $model;
-        }
-
-        return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
     }
 }
