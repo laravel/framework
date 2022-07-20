@@ -56,15 +56,15 @@ class PruneCommand extends Command
             return;
         }
 
-        $prunning = [];
+        $pruning = [];
 
-        $events->listen(ModelsPruned::class, function ($event) use (&$prunning) {
-            if (! in_array($event->model, $prunning)) {
-                $prunning[] = $event->model;
+        $events->listen(ModelsPruned::class, function ($event) use (&$pruning) {
+            if (! in_array($event->model, $pruning)) {
+                $pruning[] = $event->model;
 
                 $this->newLine();
 
-                $this->components->info(sprintf('Prunning [%s] records.', $event->model));
+                $this->components->info(sprintf('Pruning [%s] records.', $event->model));
             }
 
             $this->components->twoColumnDetail($event->model, "{$event->count} records");
