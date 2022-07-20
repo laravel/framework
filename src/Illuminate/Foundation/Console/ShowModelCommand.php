@@ -345,10 +345,9 @@ class ShowModelCommand extends Command
      */
     protected function getCastsWithDates($model)
     {
-        return collect([
-            ...collect($model->getDates())->flip()->map(fn () => 'datetime'),
-            ...$model->getCasts(),
-        ]);
+        return collect(
+            array_fill_keys($model->getDates(), 'datetime')
+        )->merge($model->getCasts());
     }
 
     /**
