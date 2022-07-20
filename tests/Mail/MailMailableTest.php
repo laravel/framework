@@ -510,27 +510,27 @@ class MailMailableTest extends TestCase
                 {
                     return Attachment::fromPath('/foo.jpg')->as('bar')->withMime('image/png');
                 }
-            }
+            },
         ]);
 
         $this->assertCount(3, $mailable->attachments);
         $this->assertSame([
             'file' => '/forge.svg',
-            'options' => []
+            'options' => [],
         ], $mailable->attachments[0]);
         $this->assertSame([
             'file' => '/vapor.svg',
             'options' => [
                 'as' => 'Vapor Logo.svg',
                 'mime' => 'text/css',
-            ]
+            ],
         ], $mailable->attachments[1]);
         $this->assertSame([
             'file' => '/foo.jpg',
             'options' => [
                 'as' => 'bar',
                 'mime' => 'image/png',
-            ]
+            ],
         ], $mailable->attachments[2]);
     }
 
