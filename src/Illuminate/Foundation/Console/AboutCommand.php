@@ -160,7 +160,7 @@ class AboutCommand extends Command
     /**
      * Gather information about the application.
      *
-     * @return array
+     * @return void
      */
     protected function gatherApplicationInformation()
     {
