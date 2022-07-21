@@ -522,7 +522,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame($filesystemAdapter->files(), ['body.txt', 'existing.txt', 'file.txt', 'file1.txt']);
     }
 
-    public function testSupportsTemporaryUrl()
+    public function testProvidesTemporaryUrls()
     {
         $localAdapter = new class($this->tempDir) extends LocalFilesystemAdapter
         {
@@ -533,10 +533,10 @@ class FilesystemAdapterTest extends TestCase
         };
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $localAdapter);
 
-        $this->assertTrue($filesystemAdapter->supportsTemporaryUrl());
+        $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
-    public function testSupportsTemporaryUrlWithCustomCallback()
+    public function testProvidesTemporaryUrlsWithCustomCallback()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
@@ -544,13 +544,13 @@ class FilesystemAdapterTest extends TestCase
             return $path.$expiration->toString().implode('', $options);
         });
 
-        $this->assertTrue($filesystemAdapter->supportsTemporaryUrl());
+        $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
-    public function testSupportsTemporaryUrlForAdapterWithoutTemporaryUrlSupport()
+    public function testProvidesTemporaryUrlsForAdapterWithoutTemporaryUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
-        $this->assertFalse($filesystemAdapter->supportsTemporaryUrl());
+        $this->assertFalse($filesystemAdapter->providesTemporaryUrls());
     }
 }
