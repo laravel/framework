@@ -495,7 +495,10 @@ trait InteractsWithPivotTable
 
             $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
 
-            return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
+            return $pivot->setPivotKeys(
+                $this->getQualifiedForeignPivotKeyName(),
+                $this->getQualifiedRelatedPivotKeyName()
+            );
         });
     }
 
@@ -512,7 +515,10 @@ trait InteractsWithPivotTable
             $this->parent, $attributes, $this->table, $exists, $this->using
         );
 
-        return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
+        return $pivot->setPivotKeys(
+            $this->getQualifiedForeignPivotKeyName(),
+            $this->getQualifiedRelatedPivotKeyName()
+        );
     }
 
     /**
