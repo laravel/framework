@@ -980,7 +980,7 @@ if (! function_exists('is_nulls')) {
     function is_nulls(array $data)
     {
         foreach ($data as $item) {
-            if (!is_null($item)) {
+            if (! is_null($item)) {
                 return false;
             }
         }
