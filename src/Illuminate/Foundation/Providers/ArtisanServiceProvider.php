@@ -19,6 +19,7 @@ use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Database\Console\ShowCommand;
 use Illuminate\Database\Console\WipeCommand;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
@@ -102,6 +103,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigClear' => ConfigClearCommand::class,
         'Db' => DbCommand::class,
         'DbPrune' => PruneCommand::class,
+        'DbShow' => ShowCommand::class,
         'DbWipe' => WipeCommand::class,
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
@@ -380,6 +382,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerDbPruneCommand()
     {
         $this->app->singleton(PruneCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbShowCommand()
+    {
+        $this->app->singleton(ShowCommand::class);
     }
 
     /**
