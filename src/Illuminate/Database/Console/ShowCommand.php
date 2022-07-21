@@ -318,6 +318,6 @@ class ShowCommand extends Command
     {
         $database ??= config('database.default');
 
-        return config('database.connections.'.$database);
+        return Arr::except(config('database.connections.'.$database), ['password']);
     }
 }
