@@ -72,15 +72,32 @@ class AboutCommand extends Command
     {
         $this->gatherApplicationInformation();
 
-        collect(static::$data)->sortBy(function ($data, $key) {
-            $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
+        collect(static::$data)
+            ->map(fn ($items) => collect($items)
+                ->map(function ($value) {
+                    if (is_array($value)) {
+                        return [$value];
+                    }
 
-            if ($index === false) {
-                return 99;
-            }
+                    if (is_string($value)) {
+                        $value = $this->laravel->make($value);
+                    }
 
-            return $index;
-        })
+                    return collect($this->laravel->call($value))
+                        ->map(fn ($value, $key) => [$key, $value])
+                        ->values()
+                        ->all();
+                })->flatten(1)->all()
+            )
+            ->sortBy(function ($data, $key) {
+                $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
+
+                if ($index === false) {
+                    return 99;
+                }
+
+                return $index;
+            })
             ->filter(function ($data, $key) {
                 return $this->option('only') ? in_array(Str::of($key)->lower()->snake(), $this->sections()) : true;
             })
@@ -215,7 +232,7 @@ class AboutCommand extends Command
      * Add additional data to the output of the "about" command.
      *
      * @param  string  $section
-     * @param  string|array  $data
+     * @param  callable|string|array  $data
      * @param  string|null  $value
      * @return void
      */
@@ -225,6 +242,8 @@ class AboutCommand extends Command
             foreach ($data as $key => $value) {
                 self::$data[$section][] = [$key, $value];
             }
+        } elseif (is_callable($data) || class_exists($data)) {
+            self::$data[$section][] = $data;
         } else {
             self::$data[$section][] = [$data, $value];
         }
