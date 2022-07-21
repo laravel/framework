@@ -142,17 +142,16 @@ class ShowCommand extends AbstractDatabaseCommand
         $this->newLine();
 
         if ($tables->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb) / <fg=yellow;options=bold>Rows</>');
+            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb) <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>');
 
             $tables->each(function ($table) {
-                $tableSize = null;
                 if ($tableSize = $table['size']) {
-
+                    $tableSize = number_format($tableSize / 1024 / 1024, 2);
                 }
 
                 $this->components->twoColumnDetail(
                     $table['table']. ($this->output->isVerbose() ? ' <fg=gray>' . $table['engine'].'</>' : null),
-                    number_format($table['size'] / 1024 / 1024, 2).' / <fg=yellow;options=bold>'.number_format($table['rows']).'</>'
+                    ($tableSize ? $tableSize . ' <fg=gray;options=bold>/</> ' : '— <fg=gray;options=bold>/</> ').'<fg=yellow;options=bold>'.number_format($table['rows']).'</>'
                 );
 
                 if ($this->output->isVerbose()) {
