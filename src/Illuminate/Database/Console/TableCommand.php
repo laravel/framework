@@ -17,9 +17,9 @@ class TableCommand extends ShowCommand
      *
      * @var string
      */
-    protected $signature = 'db:table 
+    protected $signature = 'db:table
                             {table : Tha name of the table}
-                            {--database : The database to use}';
+                            {--database= : The database to use}';
 
     /**
      * The console command description.
