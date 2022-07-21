@@ -298,6 +298,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['foo', 'bar']);
         $this->assertSame('bar', $c->last());
+
+        $c = new $collection([]);
+        $this->assertNull($c->last());
     }
 
     /**
@@ -310,10 +313,16 @@ class SupportCollectionTest extends TestCase
             return $value < 250;
         });
         $this->assertEquals(200, $result);
+
         $result = $data->last(function ($value, $key) {
             return $key < 2;
         });
         $this->assertEquals(200, $result);
+
+        $result = $data->last(function ($value) {
+            return $value > 300;
+        });
+        $this->assertNull($result);
     }
 
     /**
@@ -326,6 +335,12 @@ class SupportCollectionTest extends TestCase
             return $value === 'baz';
         }, 'default');
         $this->assertSame('default', $result);
+
+        $data = new $collection(['foo', 'bar', 'Bar']);
+        $result = $data->last(function ($value) {
+            return $value === 'bar';
+        }, 'default');
+        $this->assertSame('bar', $result);
     }
 
     /**
