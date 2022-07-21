@@ -231,7 +231,7 @@ trait QueriesRelationships
         }
 
         foreach ($types as &$type) {
-            $type = $this->model::getActualClassNameForMorph($type) ?? Relation::getMorphedModel($type) ?? $type;
+            $type = $this->model::getActualClassNameForMorph($type) ?? $type;
         }
 
         return $this->where(function ($query) use ($relation, $callback, $operator, $count, $types) {
