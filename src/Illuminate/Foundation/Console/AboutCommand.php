@@ -162,7 +162,7 @@ class AboutCommand extends Command
      */
     protected function gatherApplicationInformation()
     {
-        static::add('Environment', [
+        static::add('Environment', fn () => [
             'Laravel Version' => $this->laravel->version(),
             'PHP Version' => phpversion(),
             'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
@@ -173,7 +173,7 @@ class AboutCommand extends Command
             'Maintenance Mode' => $this->laravel->isDownForMaintenance() ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
         ]);
 
-        static::add('Cache', [
+        static::add('Cache', fn () => [
             'Config' => file_exists($this->laravel->bootstrapPath('cache/config.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
             'Routes' => file_exists($this->laravel->bootstrapPath('cache/routes-v7.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
             'Events' => file_exists($this->laravel->bootstrapPath('cache/events.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
@@ -192,7 +192,7 @@ class AboutCommand extends Command
             $logs = $logChannel;
         }
 
-        static::add('Drivers', array_filter([
+        static::add('Drivers', fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
             'Cache' => config('cache.default'),
             'Database' => config('database.default'),
