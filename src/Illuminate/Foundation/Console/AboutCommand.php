@@ -87,7 +87,7 @@ class AboutCommand extends Command
                         ->map(fn ($value, $key) => [$key, $value])
                         ->values()
                         ->all();
-                })->flatten(1)->all()
+                })->flatten(1)
             )
             ->sortBy(function ($data, $key) {
                 $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
@@ -132,13 +132,11 @@ class AboutCommand extends Command
 
             $this->components->twoColumnDetail('  <fg=green;options=bold>'.$section.'</>');
 
-            sort($data);
-
-            foreach ($data as $detail) {
+            $data->sort()->each(function ($detail) {
                 [$label, $value] = $detail;
 
                 $this->components->twoColumnDetail($label, value($value));
-            }
+            });
         });
     }
 
@@ -151,7 +149,7 @@ class AboutCommand extends Command
     protected function displayJson($data)
     {
         $output = $data->flatMap(function ($data, $section) {
-            return [(string) Str::of($section)->snake() => collect($data)->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => value($item[1])])];
+            return [(string) Str::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => value($item[1])])];
         });
 
         $this->output->writeln(strip_tags(json_encode($output)));
