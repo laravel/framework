@@ -130,14 +130,15 @@ class ShowCommand extends Command
         $this->newLine();
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$platform['name'].'</>');
+        $this->components->twoColumnDetail('Database', Arr::get($platform['config'], 'database'));
         $this->components->twoColumnDetail('Host', Arr::get($platform['config'], 'host'));
         $this->components->twoColumnDetail('Port', Arr::get($platform['config'], 'port'));
         $this->components->twoColumnDetail('Username', Arr::get($platform['config'], 'username'));
         $this->components->twoColumnDetail('URL', Arr::get($platform['config'], 'url'));
         $this->components->twoColumnDetail('Open Connections', $platform['open_connections']);
-        $this->components->twoColumnDetail('Total Tables', $tables->count());
+        $this->components->twoColumnDetail('Tables', $tables->count());
         if ($tableSizeSum = $tables->sum('size')) {
-            $this->components->twoColumnDetail('Total Table Size', number_format($tables->sum('size') / 1024 / 1024, 2) . 'Mb');
+            $this->components->twoColumnDetail('Total Size', number_format($tables->sum('size') / 1024 / 1024, 2) . 'Mb');
         }
 
         $this->newLine();
@@ -152,7 +153,7 @@ class ShowCommand extends Command
                 }
 
                 $this->components->twoColumnDetail(
-                    $table['table']. ' <fg=gray>' . $table['engine'].'</>',
+                    $table['table']. ($this->output->isVerbose() ? ' <fg=gray>' . $table['engine'].'</>' : null),
                     number_format($table['size'] / 1024 / 1024, 2).' / <fg=yellow;options=bold>'.number_format($table['rows']).'</>'
                 );
 
