@@ -969,3 +969,22 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('is_nulls')) {
+    /**
+     * Check multiple column is null.
+     *
+     * @param  array  $data
+     * @return bool
+     */
+    function is_nulls(array $data)
+    {
+        foreach ($data as $item) {
+            if (!is_null($item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
