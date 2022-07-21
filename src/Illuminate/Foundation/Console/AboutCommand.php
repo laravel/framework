@@ -72,15 +72,32 @@ class AboutCommand extends Command
     {
         $this->gatherApplicationInformation();
 
-        collect(static::$data)->sortBy(function ($data, $key) {
-            $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
+        collect(static::$data)
+            ->map(fn ($items) => collect($items)
+                ->map(function ($value) {
+                    if (is_array($value)) {
+                        return [$value];
+                    }
 
-            if ($index === false) {
-                return 99;
-            }
+                    if (is_string($value)) {
+                        $value = $this->laravel->make($value);
+                    }
 
-            return $index;
-        })
+                    return collect($this->laravel->call($value))
+                        ->map(fn ($value, $key) => [$key, $value])
+                        ->values()
+                        ->all();
+                })->flatten(1)
+            )
+            ->sortBy(function ($data, $key) {
+                $index = array_search($key, ['Environment', 'Cache', 'Drivers']);
+
+                if ($index === false) {
+                    return 99;
+                }
+
+                return $index;
+            })
             ->filter(function ($data, $key) {
                 return $this->option('only') ? in_array(Str::of($key)->lower()->snake(), $this->sections()) : true;
             })
@@ -115,13 +132,11 @@ class AboutCommand extends Command
 
             $this->components->twoColumnDetail('  <fg=green;options=bold>'.$section.'</>');
 
-            sort($data);
-
-            foreach ($data as $detail) {
+            $data->sort()->each(function ($detail) {
                 [$label, $value] = $detail;
 
                 $this->components->twoColumnDetail($label, value($value));
-            }
+            });
         });
     }
 
@@ -134,7 +149,7 @@ class AboutCommand extends Command
     protected function displayJson($data)
     {
         $output = $data->flatMap(function ($data, $section) {
-            return [(string) Str::of($section)->snake() => collect($data)->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => value($item[1])])];
+            return [(string) Str::of($section)->snake() => $data->mapWithKeys(fn ($item, $key) => [(string) Str::of($item[0])->lower()->snake() => value($item[1])])];
         });
 
         $this->output->writeln(strip_tags(json_encode($output)));
@@ -143,11 +158,11 @@ class AboutCommand extends Command
     /**
      * Gather information about the application.
      *
-     * @return array
+     * @return void
      */
     protected function gatherApplicationInformation()
     {
-        static::add('Environment', [
+        static::add('Environment', fn () => [
             'Laravel Version' => $this->laravel->version(),
             'PHP Version' => phpversion(),
             'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
@@ -158,7 +173,7 @@ class AboutCommand extends Command
             'Maintenance Mode' => $this->laravel->isDownForMaintenance() ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF',
         ]);
 
-        static::add('Cache', [
+        static::add('Cache', fn () => [
             'Config' => file_exists($this->laravel->bootstrapPath('cache/config.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
             'Routes' => file_exists($this->laravel->bootstrapPath('cache/routes-v7.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
             'Events' => file_exists($this->laravel->bootstrapPath('cache/events.php')) ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>',
@@ -177,7 +192,7 @@ class AboutCommand extends Command
             $logs = $logChannel;
         }
 
-        static::add('Drivers', array_filter([
+        static::add('Drivers', fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
             'Cache' => config('cache.default'),
             'Database' => config('database.default'),
@@ -215,7 +230,7 @@ class AboutCommand extends Command
      * Add additional data to the output of the "about" command.
      *
      * @param  string  $section
-     * @param  string|array  $data
+     * @param  callable|string|array  $data
      * @param  string|null  $value
      * @return void
      */
@@ -225,6 +240,8 @@ class AboutCommand extends Command
             foreach ($data as $key => $value) {
                 self::$data[$section][] = [$key, $value];
             }
+        } elseif (is_callable($data) || ($value === null && class_exists($data))) {
+            self::$data[$section][] = $data;
         } else {
             self::$data[$section][] = [$data, $value];
         }
