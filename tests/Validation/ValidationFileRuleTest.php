@@ -148,10 +148,10 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
-    public function testExactly()
+    public function testSize()
     {
         $this->fails(
-            File::default()->exactly(1024),
+            File::default()->size(1024),
             [
                 UploadedFile::fake()->create('foo.txt', 1025),
                 UploadedFile::fake()->create('foo.txt', 1023),
@@ -160,7 +160,7 @@ class ValidationFileRuleTest extends TestCase
         );
 
         $this->passes(
-            File::default()->exactly(1024),
+            File::default()->size(1024),
             UploadedFile::fake()->create('foo.txt', 1024),
         );
     }
@@ -187,16 +187,16 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
-    public function testAtLeast()
+    public function testMin()
     {
         $this->fails(
-            File::default()->atLeast(1024),
+            File::default()->min(1024),
             UploadedFile::fake()->create('foo.txt', 1023),
             ['validation.min.file']
         );
 
         $this->passes(
-            File::default()->atLeast(1024),
+            File::default()->min(1024),
             [
                 UploadedFile::fake()->create('foo.txt', 1024),
                 UploadedFile::fake()->create('foo.txt', 1025),
@@ -205,52 +205,18 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
-    public function testLargerThan()
+    public function testMax()
     {
         $this->fails(
-            File::default()->largerThan(1024),
-            UploadedFile::fake()->create('foo.txt', 1024),
-            ['validation.min.file']
-        );
-
-        $this->passes(
-            File::default()->largerThan(1024),
-            [
-                UploadedFile::fake()->create('foo.txt', 1025),
-                UploadedFile::fake()->create('foo.txt', 2048),
-            ]
-        );
-    }
-
-    public function testAtMost()
-    {
-        $this->fails(
-            File::default()->atMost(1024),
+            File::default()->max(1024),
             UploadedFile::fake()->create('foo.txt', 1025),
             ['validation.max.file']
         );
 
         $this->passes(
-            File::default()->atMost(1024),
+            File::default()->max(1024),
             [
                 UploadedFile::fake()->create('foo.txt', 1024),
-                UploadedFile::fake()->create('foo.txt', 1023),
-                UploadedFile::fake()->create('foo.txt', 512),
-            ]
-        );
-    }
-
-    public function testSmallerThan()
-    {
-        $this->fails(
-            File::default()->smallerThan(1024),
-            UploadedFile::fake()->create('foo.txt', 1024),
-            ['validation.max.file']
-        );
-
-        $this->passes(
-            File::default()->smallerThan(1024),
-            [
                 UploadedFile::fake()->create('foo.txt', 1023),
                 UploadedFile::fake()->create('foo.txt', 512),
             ]
@@ -283,7 +249,7 @@ class ValidationFileRuleTest extends TestCase
         $this->assertInstanceOf(File::class, File::default());
 
         File::defaults(function () {
-            return File::types('txt')->atMost(12 * 1024);
+            return File::types('txt')->max(12 * 1024);
         });
 
         $this->fails(

@@ -17,7 +17,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     use Macroable;
 
     /**
-     * The mimetypes that the given file should match. This array may also contain file extensions.
+     * The MIME types that the given file should match. This array may also contain file extensions.
      *
      * @var array
      */
@@ -108,21 +108,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Limit the uploaded file to the given mimetypes or file extensions.
-     *
-     * @param  string|array<int, string>  $mimetypes
-     * @return static
-     */
-    public static function types($mimetypes)
-    {
-        $file = new static();
-
-        $file->allowedMimetypes = (array) $mimetypes;
-
-        return $file;
-    }
-
-    /**
      * Limit the uploaded file to only image types.
      *
      * @return ImageFile
@@ -133,12 +118,23 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Limit the uploaded file to the given MIME types or file extensions.
+     *
+     * @param  string|array<int, string>  $mimetypes
+     * @return static
+     */
+    public static function types($mimetypes)
+    {
+        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+    }
+
+    /**
      * Indicate that the uploaded file should be exactly a certain size in kilobytes.
      *
      * @param  int  $kilobytes
      * @return $this
      */
-    public function exactly($kilobytes)
+    public function size($kilobytes)
     {
         $this->minimumFileSize = $kilobytes;
         $this->maximumFileSize = $kilobytes;
@@ -167,22 +163,9 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * @param  int  $kilobytes
      * @return $this
      */
-    public function atLeast($kilobytes)
+    public function min($kilobytes)
     {
         $this->minimumFileSize = $kilobytes;
-
-        return $this;
-    }
-
-    /**
-     * Indicate that the uploaded file must be larger than the given number of kilobytes.
-     *
-     * @param  int  $kilobytes
-     * @return $this
-     */
-    public function largerThan($kilobytes)
-    {
-        $this->minimumFileSize = $kilobytes + 1;
 
         return $this;
     }
@@ -193,7 +176,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * @param  int  $kilobytes
      * @return $this
      */
-    public function atMost($kilobytes)
+    public function max($kilobytes)
     {
         $this->maximumFileSize = $kilobytes;
 
@@ -201,33 +184,16 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Indicate that the uploaded file must be smaller than the given number of kilobytes.
+     * Specify additional validation rules that should be merged with the default rules during validation.
      *
-     * @param  int  $kilobytes
+     * @param  string|array  $rules
      * @return $this
      */
-    public function smallerThan($kilobytes)
+    public function rules($rules)
     {
-        $this->maximumFileSize = $kilobytes - 1;
+        $this->customRules = array_merge($this->customRules, Arr::wrap($rules));
 
         return $this;
-    }
-
-    /**
-     * Adds the given failures, and return false.
-     *
-     * @param  array|string  $messages
-     * @return bool
-     */
-    protected function fail($messages)
-    {
-        $messages = collect(Arr::wrap($messages))->map(function ($message) {
-            return $this->validator->getTranslator()->get($message);
-        })->all();
-
-        $this->messages = array_merge($this->messages, $messages);
-
-        return false;
     }
 
     /**
@@ -309,16 +275,20 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Specify additional validation rules that should be merged with the default rules during validation.
+     * Adds the given failures and return false.
      *
-     * @param  string|array  $rules
-     * @return $this
+     * @param  array|string  $messages
+     * @return bool
      */
-    public function rules($rules)
+    protected function fail($messages)
     {
-        $this->customRules = array_merge($this->customRules, Arr::wrap($rules));
+        $messages = collect(Arr::wrap($messages))->map(function ($message) {
+            return $this->validator->getTranslator()->get($message);
+        })->all();
 
-        return $this;
+        $this->messages = array_merge($this->messages, $messages);
+
+        return false;
     }
 
     /**
