@@ -15,6 +15,7 @@ use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
+use Illuminate\Foundation\Vite;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Facades\Date;
@@ -556,6 +557,22 @@ if (! function_exists('mix')) {
     function mix($path, $manifestDirectory = '')
     {
         return app(Mix::class)(...func_get_args());
+    }
+}
+
+if (! function_exists('vite')) {
+    /**
+     * Get the path to a versioned Vite file.
+     *
+     * @param  string|string[]  $entrypoints
+     * @param  string  $buildDirectory
+     * @return \Illuminate\Support\HtmlString
+     *
+     * @throws \Exception
+     */
+    function vite($path, $manifestDirectory = '')
+    {
+        return app(Vite::class)(...func_get_args());
     }
 }
 
