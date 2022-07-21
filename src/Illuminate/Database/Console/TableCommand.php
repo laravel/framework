@@ -4,13 +4,10 @@ namespace Illuminate\Database\Console;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
-use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Str;
 
-class TableCommand extends ShowCommand
+class TableCommand extends AbstractDatabaseCommand
 {
     /**
      * The name and signature of the console command.
