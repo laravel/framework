@@ -3786,6 +3786,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
         $this->assertEquals(['name', 'framework'], $c->keys()->all());
+
+        $c = new $collection(['taylor', 'laravel']);
+        $this->assertEquals([0, 1], $c->keys()->all());
     }
 
     /**
