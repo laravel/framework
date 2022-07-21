@@ -108,10 +108,12 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
-
-        if ($this->option('pivot')) {
-            $table = Str::singular($table);
+        if (!$table = $this->option('table')) {
+            $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+    
+            if ($this->option('pivot')) {
+                $table = Str::singular($table);
+            }
         }
 
         $this->call('make:migration', [
@@ -176,14 +178,18 @@ class ModelMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('pivot')) {
-            return $this->resolveStubPath('/stubs/model.pivot.stub');
+            $stub = '/stubs/model.pivot.stub';
+        } elseif ($this->option('morph-pivot')) {
+            $stub = '/stubs/model.morph-pivot.stub';
+        } else {
+            $stub = '/stubs/model.stub';
         }
 
-        if ($this->option('morph-pivot')) {
-            return $this->resolveStubPath('/stubs/model.morph-pivot.stub');
+        if ($this->option('table')) {
+            $stub = str_replace('.stub', '.table.stub', $stub);
         }
 
-        return $this->resolveStubPath('/stubs/model.stub');
+        return $this->resolveStubPath($stub);
     }
 
     /**
@@ -230,6 +236,39 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
+            ['table', null, InputOption::VALUE_OPTIONAL, 'Table name if it does not follow naming convention'],
         ];
+    }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function buildClass($name)
+    {
+        $stub = parent::buildClass($name);
+
+        if (!$this->option('table')) {
+            return $stub;
+        }
+        
+        return $this->setTableName($stub);
+    }
+
+    /**
+     * Set table name for model from `table` option.
+     * 
+     * @param  string  $stub
+     * @return string
+     */
+    protected function setTableName($stub)
+    {
+        $table = $this->option('table');
+
+        return str_replace(['{{ tableName }}', '{{tableName}}'], $table, $stub);
     }
 }

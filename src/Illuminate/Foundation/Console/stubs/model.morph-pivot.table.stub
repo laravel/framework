@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Relations\MorphPivot;
+
+class {{ class }} extends MorphPivot
+{
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = '{{ tableName }}';
+}
