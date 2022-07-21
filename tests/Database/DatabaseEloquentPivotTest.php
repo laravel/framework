@@ -124,7 +124,10 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
         $query = m::mock(stdClass::class);
-        $query->shouldReceive('where')->once()->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
+        $query->shouldReceive('where')->once()->with([
+            $pivot->getTable() . '.foreign' => 'foreign.value',
+            $pivot->getTable() . '.other' => 'other.value'
+        ])->andReturn($query);
         $query->shouldReceive('delete')->once()->andReturn(true);
         $pivot->expects($this->once())->method('newQueryWithoutRelationships')->willReturn($query);
 
