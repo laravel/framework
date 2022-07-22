@@ -241,57 +241,51 @@ class ServeCommand extends Command
      */
     protected function handleProcessOutput()
     {
-        return function ($type, $buffer) {
-            foreach (explode(PHP_EOL, $buffer) as $line) {
-                if (str($line)->contains('started')) {
-                    $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
-                    $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
-                    $this->newLine();
+        return fn ($type, $buffer) => str($buffer)->explode(PHP_EOL)->each(function ($line) {
+            $parts = explode(']', $line);
 
-                    continue;
+            if (str($line)->contains('started')) {
+                $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
+                $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
+                $this->newLine();
+            } elseif (str($line)->contains('Accepted')) {
+                $startDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
+                preg_match('/\:(\d+)/', $parts[1], $matches);
+
+                $this->requestsPool[$matches[1]] = [$startDate, false];
+            } elseif (str($line)->contains(['[200]: GET'])) {
+                preg_match('/\:(\d+)/', $parts[1], $matches);
+                $this->requestsPool[$matches[1]][1] = trim(explode('[200]: GET', $line)[1]);
+            } elseif (str($line)->contains('Closing')) {
+                preg_match('/\:(\d+)/', $parts[1], $matches);
+
+                $request = $this->requestsPool[$matches[1]];
+                [$startDate, $file] = $request;
+
+                $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
+
+                unset($this->requestsPool[$matches[1]]);
+
+                [$date, $time] = explode(' ', $formattedStartedAt);
+                $this->output->write("  <fg=gray>$date</> $time");
+
+                $endDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
+                $runTime = $endDate->diffInSeconds($startDate);
+
+                if ($file) {
+                    $this->output->write($file = " $file");
                 }
 
-                $parts = explode(']', $line);
-
-                if (str($line)->contains('Accepted')) {
-                    $startDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
-                    preg_match('/\:(\d+)/', $parts[1], $matches);
-
-                    $this->requestsPool[$matches[1]] = $startDate;
-
-                    continue;
-                }
-
-                if (str($line)->contains('Closing')) {
-                    preg_match('/\:(\d+)/', $parts[1], $matches);
-
-                    $startDate = $this->requestsPool[$matches[1]];
-                    $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
-
-                    unset($this->requestsPool[$matches[1]]);
-
-                    [$date, $time] = explode(' ', $formattedStartedAt);
-                    $this->output->write("  <fg=gray>$date</> $time");
-
-                    $endDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
-                    $runTime = $endDate->diffInSeconds($startDate);
-
-                    $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($runTime) - 9, 0);
-
-                    $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
-                    $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
-
-                    continue;
-                }
-
-                if (str($line)->contains(['Closed without sending a request', ']: '])) {
-                    continue;
-                }
-
-                if (! empty($line)) {
-                    $this->components->warn($line);
-                }
+                $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
+                $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+                $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
+            } elseif (str($line)->contains(['Closed without sending a request', ']: '])) {
+                // ..
+            } elseif (isset($parts[1])) {
+                $this->components->warn($parts[1]);
+            } elseif (! empty($line)) {
+                $this->components->warn($line);
             }
-        };
+        });
     }
 }
