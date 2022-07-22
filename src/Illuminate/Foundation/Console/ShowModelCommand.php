@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
+use UnitEnum;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends Command
@@ -329,7 +330,7 @@ class ShowModelCommand extends Command
 
             if ($attribute['default'] !== null) {
                 $this->components->bulletList(
-                    [sprintf('default: %s', $attribute['default'])],
+                    [sprintf('default: %s', $attribute['default'] instanceof UnitEnum ? $attribute['default']->name : $attribute['default'])],
                     OutputInterface::VERBOSITY_VERBOSE
                 );
             }
