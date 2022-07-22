@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use BackedEnum;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
@@ -420,6 +421,7 @@ class ShowModelCommand extends Command
         $attributeDefault = $model->getAttributes()[$column->getName()] ?? null;
 
         return match (true) {
+            $attributeDefault instanceof BackedEnum => $attributeDefault->value,
             $attributeDefault instanceof UnitEnum => $attributeDefault->name,
             default => $attributeDefault ?? $column->getDefault(),
         };
