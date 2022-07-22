@@ -110,33 +110,33 @@ abstract class AbstractDatabaseCommand extends Command
      * Get the number of open connections for a Postgres database.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return mixed
+     * @return int
      */
     protected function getPgsqlConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->selectOne('select count(*) as connections from pg_stat_activity')->connections;
+        return (int) $connection->selectOne('select count(*) as connections from pg_stat_activity')->connections;
     }
 
     /**
      * Get the number of open connections for a MySQL database.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return mixed
+     * @return int
      */
     protected function getMySQLConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->selectOne($connection->raw('show status where variable_name = "threads_connected"'))->Value;
+        return (int) $connection->selectOne($connection->raw('show status where variable_name = "threads_connected"'))->Value;
     }
 
     /**
      * Get the number of open connections for an SQL Server database.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return mixed
+     * @return int
      */
     protected function getSqlServerConnectionCount(ConnectionInterface $connection)
     {
-        return $connection->selectOne('SELECT COUNT(*) connections FROM sys.dm_exec_sessions WHERE status = ?', ['running'])->connections;
+        return (int) $connection->selectOne('SELECT COUNT(*) connections FROM sys.dm_exec_sessions WHERE status = ?', ['running'])->connections;
     }
 
     /**
