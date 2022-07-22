@@ -37,7 +37,6 @@ class DynamoDbLock extends Lock
         if ($this->seconds > 0) {
             return $this->dynamo->add($this->name, $this->owner, $this->seconds);
         } else {
-            // default to 1 day
             return $this->dynamo->add($this->name, $this->owner, 86400);
         }
     }
