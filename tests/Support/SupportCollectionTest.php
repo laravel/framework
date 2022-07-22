@@ -298,6 +298,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['foo', 'bar']);
         $this->assertSame('bar', $c->last());
+
+        $c = new $collection([]);
+        $this->assertNull($c->last());
     }
 
     /**
@@ -310,10 +313,16 @@ class SupportCollectionTest extends TestCase
             return $value < 250;
         });
         $this->assertEquals(200, $result);
+
         $result = $data->last(function ($value, $key) {
             return $key < 2;
         });
         $this->assertEquals(200, $result);
+
+        $result = $data->last(function ($value) {
+            return $value > 300;
+        });
+        $this->assertNull($result);
     }
 
     /**
@@ -326,6 +335,12 @@ class SupportCollectionTest extends TestCase
             return $value === 'baz';
         }, 'default');
         $this->assertSame('default', $result);
+
+        $data = new $collection(['foo', 'bar', 'Bar']);
+        $result = $data->last(function ($value) {
+            return $value === 'bar';
+        }, 'default');
+        $this->assertSame('bar', $result);
     }
 
     /**
@@ -1652,6 +1667,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['name' => 'Mateus', 'age' => 18]);
         $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new $collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
+
+        $c = new $collection(['name' => 'taylor', 'family' => 'otwell', 'age' => 26]);
+        $this->assertEquals(['name' => 'taylor', 'family' => 'otwell'], $c->intersectByKeys(new $collection(['height' => 180, 'name' => 'amir', 'family' => 'moharami']))->all());
     }
 
     /**
@@ -3768,6 +3786,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['name' => 'taylor', 'framework' => 'laravel']);
         $this->assertEquals(['name', 'framework'], $c->keys()->all());
+
+        $c = new $collection(['taylor', 'laravel']);
+        $this->assertEquals([0, 1], $c->keys()->all());
     }
 
     /**
