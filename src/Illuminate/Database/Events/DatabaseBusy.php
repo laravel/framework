@@ -16,17 +16,17 @@ class DatabaseBusy
      *
      * @var int
      */
-    public $connections;
+    public $openConnections;
 
     /**
      * Create a new event instance.
      *
      * @param  string  $database
-     * @param  int  $connections
+     * @param  int  $openConnections
      */
-    public function __construct($database, $connections)
+    public function __construct($database, $openConnections)
     {
         $this->database = $database;
-        $this->connections = $connections;
+        $this->openConnections = $openConnections;
     }
 }
