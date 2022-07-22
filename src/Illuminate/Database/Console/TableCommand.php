@@ -19,7 +19,7 @@ class TableCommand extends AbstractDatabaseCommand
      * @var string
      */
     protected $signature = 'db:table
-                            {table : The name of the table}
+                            {table? : The name of the table}
                             {--database= : The database to use}
                             {--json : Output the database as JSON}';
 
@@ -41,7 +41,11 @@ class TableCommand extends AbstractDatabaseCommand
 
         $connection = $connections->connection($this->input->getOption('database'));
         $schema = $connection->getDoctrineSchemaManager();
-        $table = $schema->listTableDetails($table = $this->argument('table'));
+        $table = $this->argument('table') ?: $this->components->choice(
+            'Which table would you like to view?',
+            collect($schema->listTables())->flatMap(fn (Table $table) => [$table->getName()])->toArray()
+        );
+        $table = $schema->listTableDetails($table);
 
         $columns = $this->collectColumns($table);
         $indexes = $this->collectIndexes($table);
