@@ -115,7 +115,7 @@ class MonitorCommand extends Command
     }
 
     /**
-     * Display the failed jobs in the console.
+     * Display the queue sizes in the console.
      *
      * @param  \Illuminate\Support\Collection  $queues
      * @return void
