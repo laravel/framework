@@ -19,7 +19,9 @@ class ShowCommand extends AbstractDatabaseCommand
      * @var string
      */
     protected $signature = 'db:show {--database= : The database connection to use}
-                {--json : Output the database as JSON}';
+                {--json : Output the database as JSON}
+                {--with-counts : Show the table row count <bg=red;options=bold> Note: This can be an expensive operation on larger databases </>};
+                {--with-views : Show the database views <bg=red;options=bold> Note: This can be an expensive operation on larger databases </>}';
 
     /**
      * The console command description.
@@ -41,18 +43,18 @@ class ShowCommand extends AbstractDatabaseCommand
         $connection = $connections->connection($database = $this->input->getOption('database'));
         $schema = $connection->getDoctrineSchemaManager();
 
-        $tables = $this->collectTables($connection, $schema);
-        $views = $this->collectViews($connection, $schema);
-
         $data = [
             'platform' => [
                 'config' => $this->getConfigFromDatabase($database),
                 'name' => $this->getPlatformName($schema->getDatabasePlatform(), $database),
                 'open_connections' => $this->getConnectionCount($connection),
             ],
-            'tables' => $tables,
-            'views' => $views,
+            'tables' => $this->collectTables($connection, $schema),
         ];
+
+        if ($this->option('with-views')) {
+            $data['views'] = $this->collectViews($connection, $schema);
+        }
 
         $this->display($data);
 
@@ -71,7 +73,7 @@ class ShowCommand extends AbstractDatabaseCommand
         return collect($schema->listTables())->map(fn (Table $table, $index) => [
             'table' => $table->getName(),
             'size' => $this->getTableSize($connection, $table->getName()),
-            'rows' => $connection->table($table->getName())->count(),
+            'rows' => $this->option('with-counts') ? $connection->table($table->getName())->count() : null,
             'engine' => rescue(fn () => $table->getOption('engine')),
             'comment' => $table->getComment(),
         ]);
@@ -127,7 +129,7 @@ class ShowCommand extends AbstractDatabaseCommand
     {
         $platform = $data['platform'];
         $tables = $data['tables'];
-        $views = $data['views'];
+        $views = $data['views'] ?? null;
 
         $this->newLine();
 
@@ -146,7 +148,7 @@ class ShowCommand extends AbstractDatabaseCommand
         $this->newLine();
 
         if ($tables->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb) <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>');
+            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)'.($this->option('with-counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
 
             $tables->each(function ($table) {
                 if ($tableSize = $table['size']) {
@@ -155,7 +157,7 @@ class ShowCommand extends AbstractDatabaseCommand
 
                 $this->components->twoColumnDetail(
                     $table['table'].($this->output->isVerbose() ? ' <fg=gray>'.$table['engine'].'</>' : null),
-                    ($tableSize ? $tableSize.' <fg=gray;options=bold>/</> ' : '— <fg=gray;options=bold>/</> ').'<fg=yellow;options=bold>'.number_format($table['rows']).'</>'
+                    ($tableSize ? $tableSize : '—').($this->option('with-counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>'.number_format($table['rows']).'</>' : '')
                 );
 
                 if ($this->output->isVerbose()) {
@@ -170,7 +172,7 @@ class ShowCommand extends AbstractDatabaseCommand
             $this->newLine();
         }
 
-        if ($views->isNotEmpty()) {
+        if ($views && $views->isNotEmpty()) {
             $this->components->twoColumnDetail('<fg=green;options=bold>View</>', '<fg=green;options=bold>Rows</>');
 
             $views->each(fn ($view) => $this->components->twoColumnDetail($view['view'], number_format($view['rows'])));
