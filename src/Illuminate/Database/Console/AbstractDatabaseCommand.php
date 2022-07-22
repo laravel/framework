@@ -5,6 +5,9 @@ namespace Illuminate\Database\Console;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Arr;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -42,10 +45,10 @@ abstract class AbstractDatabaseCommand extends Command
      */
     protected function getTableSize(ConnectionInterface $connection, string $table)
     {
-        return match (class_basename($connection)) {
-            'MySqlConnection' => $this->getMySQLTableSize($connection, $table),
-            'PostgresConnection' => $this->getPgsqlTableSize($connection, $table),
-            'SqliteConnection' => $this->getSqliteTableSize($connection, $table),
+        return match (true) {
+            $connection instanceof MySqlConnection => $this->getMySQLTableSize($connection, $table),
+            $connection instanceof PostgresConnection => $this->getPgsqlTableSize($connection, $table),
+            $connection instanceof SQLiteConnection => $this->getSqliteTableSize($connection, $table),
             default => null,
         };
     }
@@ -158,7 +161,7 @@ abstract class AbstractDatabaseCommand extends Command
     /**
      * Ensure the dependencies for the database commands are available.
      *
-     * @return int
+     * @return int|null
      */
     protected function ensureDependenciesExist()
     {
