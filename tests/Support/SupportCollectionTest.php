@@ -2819,6 +2819,13 @@ class SupportCollectionTest extends TestCase
      */
     public function testMap($collection)
     {
+        $data = new $collection([1, 2, 3]);
+        $mapped = $data->map(function ($item, $key) {
+            return $item * 2;
+        });
+        $this->assertEquals([2, 4, 6], $mapped->all());
+        $this->assertEquals([1, 2, 3], $data->all());
+
         $data = new $collection(['first' => 'taylor', 'last' => 'otwell']);
         $data = $data->map(function ($item, $key) {
             return $key.'-'.strrev($item);
@@ -2933,6 +2940,7 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertEquals([1 => [0, 4], 2 => [1, 3], 3 => [2]], $groups->toArray());
+        $this->assertEquals([1, 2, 3, 2, 1], $data->all());
     }
 
     /**
