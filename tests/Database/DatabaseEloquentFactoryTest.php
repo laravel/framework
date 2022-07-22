@@ -377,7 +377,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
         unset($_SERVER['__test.role.creating-role']);
     }
-    
+
     public function test_belongs_to_many_relationship_with_existing_model_instances_using_array()
     {
         $roles = FactoryTestRoleFactory::times(3)
