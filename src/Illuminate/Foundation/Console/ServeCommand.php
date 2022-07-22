@@ -244,19 +244,19 @@ class ServeCommand extends Command
         return fn ($type, $buffer) => str($buffer)->explode(PHP_EOL)->each(function ($line) {
             $parts = explode(']', $line);
 
-            if (str($line)->contains('started')) {
+            if (str($line)->contains('Development Server (http')) {
                 $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
                 $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
                 $this->newLine();
-            } elseif (str($line)->contains('Accepted')) {
+            } elseif (str($line)->contains(' Accepted')) {
                 $startDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
                 preg_match('/\:(\d+)/', $parts[1], $matches);
 
                 $this->requestsPool[$matches[1]] = [$startDate, false];
-            } elseif (str($line)->contains(['[200]: GET'])) {
+            } elseif (str($line)->contains([' [200]: GET '])) {
                 preg_match('/\:(\d+)/', $parts[1], $matches);
                 $this->requestsPool[$matches[1]][1] = trim(explode('[200]: GET', $line)[1]);
-            } elseif (str($line)->contains('Closing')) {
+            } elseif (str($line)->contains(' Closing')) {
                 preg_match('/\:(\d+)/', $parts[1], $matches);
 
                 $request = $this->requestsPool[$matches[1]];
