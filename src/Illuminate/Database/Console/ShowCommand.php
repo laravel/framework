@@ -8,7 +8,9 @@ use Doctrine\DBAL\Schema\View;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Arr;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'db:show')]
 class ShowCommand extends AbstractDatabaseCommand
 {
     /**

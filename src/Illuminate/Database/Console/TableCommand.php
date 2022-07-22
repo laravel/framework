@@ -3,10 +3,14 @@
 namespace Illuminate\Database\Console;
 
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Table;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'db:table')]
 class TableCommand extends AbstractDatabaseCommand
 {
     /**
@@ -15,8 +19,9 @@ class TableCommand extends AbstractDatabaseCommand
      * @var string
      */
     protected $signature = 'db:table
-                            {table : Tha name of the table}
-                            {--database= : The database to use}';
+                            {table : The name of the table}
+                            {--database= : The database to use}
+                            {--json : Output the database as JSON}';
 
     /**
      * The console command description.
@@ -32,94 +37,195 @@ class TableCommand extends AbstractDatabaseCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
-        $connection = $connections->connection($database = $this->input->getOption('database'));
+        $this->ensureDependenciesExist();
 
+        $connection = $connections->connection($this->input->getOption('database'));
         $schema = $connection->getDoctrineSchemaManager();
         $table = $schema->listTableDetails($table = $this->argument('table'));
 
-        $columns = collect($table->getColumns())->map(fn (Column $column) => [
+        $columns = $this->collectColumns($table);
+        $indexes = $this->collectIndexes($table);
+        $foreignKeys = $this->collectForeignKeys($table);
+
+        $data = [
+            'table' => [
+                'name' => $table->getName(),
+                'columns' => $columns->count(),
+                'size' => $this->getTableSize($connection, $table->getName()),
+            ],
+            'columns' => $columns,
+            'indexes' => $indexes,
+            'foreign_keys' => $foreignKeys,
+        ];
+
+        $this->display($data);
+
+        return 0;
+    }
+
+    /**
+     * Collect the columns within the table.
+     *
+     * @param  \Doctrine\DBAL\Schema\Table  $table
+     * @return \Illuminate\Support\Collection
+     */
+    protected function collectColumns(Table $table)
+    {
+        return collect($table->getColumns())->map(fn (Column $column) => [
             'column' => $column->getName(),
-            'attributes' => $this->getAttributes($column),
+            'attributes' => $this->getAttributesForColumn($column),
             'default' => $column->getDefault(),
             'type' => $column->getType()->getName(),
         ]);
+    }
+
+    /**
+     * Collect the indexes within the table.
+     *
+     * @param  \Doctrine\DBAL\Schema\Table  $table
+     * @return \Illuminate\Support\Collection
+     */
+    protected function collectIndexes(Table $table)
+    {
+        return collect($table->getIndexes())->map(fn (Index $index) => [
+            'name' => $index->getName(),
+            'columns' => collect($index->getColumns()),
+            'attributes' => $this->getAttributesForIndex($index),
+        ]);
+    }
+
+    /**
+     * Collect the foreign keys within the table.
+     *
+     * @param  \Doctrine\DBAL\Schema\Table  $table
+     * @return \Illuminate\Support\Collection
+     */
+    protected function collectForeignKeys(Table $table)
+    {
+        return collect($table->getForeignKeys())->map(fn (ForeignKeyConstraint $foreignKey) => [
+            'name' => $foreignKey->getName(),
+            'local_table' => $table->getName(),
+            'local_columns' => collect($foreignKey->getLocalColumns()),
+            'foreign_table' => $foreignKey->getForeignTableName(),
+            'foreign_columns' => collect($foreignKey->getForeignColumns()),
+            'on_update' => Str::lower(rescue(fn () => $foreignKey->getOption('onUpdate'), 'N/A')),
+            'on_delete' => Str::lower(rescue(fn () => $foreignKey->getOption('onDelete'), 'N/A')),
+        ]);
+    }
+
+    /**
+     * Get the attributes for a table column.
+     *
+     * @param  \Doctrine\DBAL\Schema\Column  $column
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getAttributesForColumn(Column $column)
+    {
+        return collect([
+            $column->getAutoincrement() ? 'autoincrement' : null,
+            'type' => $column->getType()->getName(),
+            $column->getUnsigned() ? 'unsigned' : null,
+            ! $column->getNotNull() ? 'nullable' : null,
+        ])->filter();
+    }
+
+    /**
+     * Get the attributes for a table index.
+     *
+     * @param  \Doctrine\DBAL\Schema\Index  $index
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getAttributesForIndex(Index $index)
+    {
+        return collect([
+            'compound' => count($index->getColumns()) > 1,
+            'unique' => $index->isUnique(),
+            'primary' => $index->isPrimary(),
+        ])->filter()->keys()->map(fn ($attribute) => Str::lower($attribute));
+    }
+
+    /**
+     * Render the database information.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    protected function display(array $data)
+    {
+        $this->option('json') ? $this->displayJson($data) : $this->displayCli($data);
+    }
+
+    /**
+     * Render the database information as JSON.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    protected function displayJson(array $data)
+    {
+        $this->output->writeln(json_encode($data));
+    }
+
+    /**
+     * Render the database information for the CLI.
+     *
+     * @param  array  $data
+     * @return void
+     */
+    protected function displayCli(array $data)
+    {
+        $table = $data['table'];
+        $columns = $data['columns'];
+        $indexes = $data['indexes'];
+        $foreignKeys = $data['foreign_keys'];
 
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>' . $table->getName() . '</>');
-        $this->components->twoColumnDetail('Columns', $columns->count());
-        $this->components->twoColumnDetail('Size', number_format($this->getTableSize($connection, $table->getName()) / 1024 / 1024, 2) . 'Mb');
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.$table['name'].'</>');
+        $this->components->twoColumnDetail('Columns', $table['columns']);
+        if ($size = $table['size']) {
+            $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'Mb');
+        }
 
         $this->newLine();
 
         if ($columns->isNotEmpty()) {
             $this->components->twoColumnDetail('<fg=green;options=bold>Column</>', 'Type');
 
-            $columns->each(function ($column) use ($table) {
+            $columns->each(function ($column) {
                 $this->components->twoColumnDetail(
-                    $column['column'] . ' <fg=gray>' . $column['attributes'] . '</>',
-                    ($column['default'] ? '<fg=gray>' . $column['default'] . '</> ' : '') . '' . $column['type'] . ''
+                    $column['column'].' <fg=gray>'.$column['attributes']->implode(', ').'</>',
+                    ($column['default'] ? '<fg=gray>'.$column['default'].'</> ' : '').''.$column['type'].''
                 );
             });
 
             $this->newLine();
         }
-
-        $indexes = collect($table->getIndexes());
 
         if ($indexes->isNotEmpty()) {
             $this->components->twoColumnDetail('<fg=green;options=bold>Indexes</>');
 
             $indexes->each(function ($index) {
-                $columns = implode(', ', $index->getColumns());
                 $this->components->twoColumnDetail(
-                    "{$index->getName()} <fg=gray>{$columns}</>",
-                    $this->getIndexAttributes($index)
+                    $index['name'].' <fg=gray>'.$index['columns']->implode(', ').'</>',
+                    $index['attributes']->implode(', ')
                 );
             });
 
             $this->newLine();
         }
-
-        $foreignKeys = collect($table->getForeignKeys());
 
         if ($foreignKeys->isNotEmpty()) {
             $this->components->twoColumnDetail('<fg=green;options=bold>Foreign Keys</>', 'On Update / On Delete');
 
             $foreignKeys->each(function ($foreignKey) {
-                $localKeys = implode(', ', $foreignKey->getLocalColumns());
-                $foreignKeys = implode(', ', $foreignKey->getForeignColumns());
-
                 $this->components->twoColumnDetail(
-                    $foreignKey->getName() . " <fg=gray;options=bold>$localKeys reference $foreignKeys on {$foreignKey->getForeignTableName()}</>",
-                    Str::lower($foreignKey->getOption('onUpdate') . ' / ' . $foreignKey->getOption('onDelete')),
+                    $foreignKey['name'].' <fg=gray;options=bold>'.$foreignKey['local_columns']->implode(', ').' references '.$foreignKey['foreign_columns']->implode(', ').' on '.$foreignKey['foreign_table'].'</>',
+                    $foreignKey['on_update'].' / '.$foreignKey['on_delete'],
                 );
             });
 
             $this->newLine();
         }
-
-        return 0;
-    }
-
-    public function getAttributes(Column $column)
-    {
-        return collect([
-            $column->getAutoincrement() ? 'autoincrement' : null,
-            'type' => $column->getType()->getName(),
-            $column->getUnsigned() ? 'unsigned' : null,
-            !$column->getNotNull() ? 'nullable' : null,
-        ])->filter()->implode(', ');
-    }
-
-    protected function getIndexAttributes(Index $index)
-    {
-        return Str::lower(
-            collect([
-                'compound' => count($index->getColumns()) > 1,
-                'unique' => $index->isUnique(),
-                'primary' => $index->isPrimary(),
-            ])->filter()->keys()->implode(', ')
-        );
     }
 }
