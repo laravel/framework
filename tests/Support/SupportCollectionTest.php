@@ -2204,7 +2204,7 @@ class SupportCollectionTest extends TestCase
             ['brand' => 'Tesla', 'color' => 'black'],
             ['brand' => 'Pagani', 'color' => 'orange'],
         ]);
-    
+        
         $this->assertEquals(['Tesla' => 'black', 'Pagani' => 'orange'], $data->pluck('color', 'brand')->all());
     }
 
