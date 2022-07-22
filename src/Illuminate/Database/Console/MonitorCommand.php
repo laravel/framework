@@ -17,7 +17,7 @@ class MonitorCommand extends AbstractDatabaseCommand
      */
     protected $signature = 'db:monitor
                 {--databases= : The names of the databases to monitor}
-                {--max=5 : The maximum number of connections that can be open before an event is dispatched}';
+                {--max= : The maximum number of connections that can be open before an event is dispatched}';
 
     /**
      * The name of the console command.
@@ -76,7 +76,9 @@ class MonitorCommand extends AbstractDatabaseCommand
 
         $this->displayConnections($databases);
 
-        $this->dispatchEvents($databases);
+        if ($this->option('max')) {
+            $this->dispatchEvents($databases);
+        }
     }
 
     /**
@@ -92,10 +94,12 @@ class MonitorCommand extends AbstractDatabaseCommand
                 $database = $this->laravel['config']['database.default'];
             }
 
+            $maxConnections = $this->option('max');
+
             return [
                 'database' => $database,
                 'connections' => $connections = $this->getConnectionCount($this->connection->connection($database)),
-                'status' => $connections >= $this->option('max') ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',
+                'status' => $maxConnections && $connections >= $maxConnections ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',
             ];
         });
     }
