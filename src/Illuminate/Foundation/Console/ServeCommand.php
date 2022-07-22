@@ -3,11 +3,13 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Env;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use function Termwind\terminal;
 
 #[AsCommand(name: 'serve')]
 class ServeCommand extends Command
@@ -45,6 +47,13 @@ class ServeCommand extends Command
     protected $portOffset = 0;
 
     /**
+     * Holds the list of requests being handled, and their start date.
+     *
+     * @var array<int, \Illuminate\Support\Carbon>
+     */
+    protected $requestsPool;
+
+    /**
      * The environment variables that should be passed from host machine to the PHP server process.
      *
      * @var string[]
@@ -69,8 +78,6 @@ class ServeCommand extends Command
      */
     public function handle()
     {
-        $this->line("<info>Starting Laravel development server:</info> http://{$this->host()}:{$this->port()}");
-
         $environmentFile = $this->option('env')
                             ? base_path('.env').'.'.$this->option('env')
                             : base_path('.env');
@@ -93,7 +100,9 @@ class ServeCommand extends Command
                 filemtime($environmentFile) > $environmentLastModified) {
                 $environmentLastModified = filemtime($environmentFile);
 
-                $this->comment('Environment modified. Restarting server...');
+                $this->newLine();
+
+                $this->components->info('Environment modified. Restarting server...');
 
                 $process->stop(5);
 
@@ -130,9 +139,7 @@ class ServeCommand extends Command
             return in_array($key, static::$passthroughVariables) ? [$key => $value] : [$key => false];
         })->all());
 
-        $process->start(function ($type, $buffer) {
-            $this->output->write($buffer);
-        });
+        $process->start($this->handleProcessOutput());
 
         return $process;
     }
@@ -225,5 +232,58 @@ class ServeCommand extends Command
             ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
             ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
         ];
+    }
+
+    /**
+     * Returns a "callable" to handle the process output.
+     *
+     * @return callable(string, string): void
+     */
+    protected function handleProcessOutput()
+    {
+        return function ($type, $buffer) {
+            foreach (explode(PHP_EOL, $buffer) as $line) {
+                if (str($line)->contains('started')) {
+                    $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
+                    $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
+                    $this->newLine();
+
+                    continue;
+                }
+
+                $parts = explode(']', $line);
+
+                if (str($line)->contains('Accepted')) {
+                    $startDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
+                    preg_match('/\:(\d+)/', $parts[1], $matches);
+
+                    $this->requestsPool[$matches[1]] = $startDate;
+
+                    continue;
+                }
+
+                if (str($line)->contains('Closing')) {
+                    preg_match('/\:(\d+)/', $parts[1], $matches);
+
+                    $startDate = $this->requestsPool[$matches[1]];
+                    $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
+
+                    unset($this->requestsPool[$matches[1]]);
+
+                    [$date, $time] = explode(' ', $formattedStartedAt);
+                    $this->output->write("  <fg=gray>$date</> $time");
+
+                    $endDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
+                    $runTime = $endDate->diffInSeconds($startDate);
+
+                    $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($runTime) - 9, 0);
+
+                    $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
+                    $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
+
+                    continue;
+                }
+            }
+        };
     }
 }
