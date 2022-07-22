@@ -1376,10 +1376,10 @@ trait HasAttributes
             return $this->dates;
         }
 
-        $defaults = [
+        $defaults = array_filter([
             $this->getCreatedAtColumn(),
             $this->getUpdatedAtColumn(),
-        ];
+        ]);
 
         return array_unique(array_merge($this->dates, $defaults));
     }
