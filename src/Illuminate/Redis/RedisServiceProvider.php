@@ -21,9 +21,7 @@ class RedisServiceProvider extends ServiceProvider implements DeferrableProvider
             return new RedisManager($app, Arr::pull($config, 'client', 'phpredis'), $config);
         });
 
-        $this->app->bind('redis.connection', function ($app) {
-            return $app['redis']->connection();
-        });
+        $this->app->bind('redis.connection', fn ($app) => $app['redis']->connection());
     }
 
     /**
