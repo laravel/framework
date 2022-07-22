@@ -16,6 +16,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\MonitorCommand as DatabaseMonitorCommand;
 use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
@@ -103,6 +104,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigCache' => ConfigCacheCommand::class,
         'ConfigClear' => ConfigClearCommand::class,
         'Db' => DbCommand::class,
+        'DbMonitor' => DatabaseMonitorCommand::class,
         'DbPrune' => PruneCommand::class,
         'DbShow' => ShowCommand::class,
         'DbTable' => DatabaseTableCommand::class,
@@ -375,6 +377,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerDbCommand()
     {
         $this->app->singleton(DbCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDbMonitorCommand()
+    {
+        $this->app->singleton(DatabaseMonitorCommand::class);
     }
 
     /**
