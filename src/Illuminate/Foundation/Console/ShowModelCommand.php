@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use BackedEnum;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
@@ -330,7 +331,7 @@ class ShowModelCommand extends Command
 
             if ($attribute['default'] !== null) {
                 $this->components->bulletList(
-                    [sprintf('default: %s', $attribute['default'] instanceof UnitEnum ? $attribute['default']->name : $attribute['default'])],
+                    [sprintf('default: %s', $attribute['default'])],
                     OutputInterface::VERBOSITY_VERBOSE
                 );
             }
@@ -413,11 +414,17 @@ class ShowModelCommand extends Command
      *
      * @param  \Doctrine\DBAL\Schema\Column  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string|null
+     * @return mixed|null
      */
     protected function getColumnDefault($column, $model)
     {
-        return $model->getAttributes()[$column->getName()] ?? $column->getDefault();
+        $attributeDefault = $model->getAttributes()[$column->getName()] ?? null;
+
+        return match (true) {
+            $attributeDefault instanceof BackedEnum => $attributeDefault->value,
+            $attributeDefault instanceof UnitEnum => $attributeDefault->name,
+            default => $attributeDefault ?? $column->getDefault(),
+        };
     }
 
     /**
