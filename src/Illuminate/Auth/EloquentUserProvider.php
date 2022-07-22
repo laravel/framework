@@ -49,7 +49,7 @@ class EloquentUserProvider implements UserProvider
         $model = $this->createModel();
 
         return $this->newModelQuery($model)
-                    ->where($model->qualifyColumn($model->getAuthIdentifierName()), $identifier)
+                    ->where($model->getAuthIdentifierName(), $identifier)
                     ->first();
     }
 
@@ -65,7 +65,7 @@ class EloquentUserProvider implements UserProvider
         $model = $this->createModel();
 
         $retrievedModel = $this->newModelQuery($model)->where(
-            $model->qualifyColumn($model->getAuthIdentifierName()), $identifier
+            $model->getAuthIdentifierName(), $identifier
         )->first();
 
         if (! $retrievedModel) {
