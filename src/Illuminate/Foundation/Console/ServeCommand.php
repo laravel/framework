@@ -283,6 +283,14 @@ class ServeCommand extends Command
 
                     continue;
                 }
+
+                if (str($line)->contains('Closed without sending a request')) {
+                    continue;
+                }
+
+                if (isset($parts[1])) {
+                    $this->components->warn($parts[1]);
+                }
             }
         };
     }
