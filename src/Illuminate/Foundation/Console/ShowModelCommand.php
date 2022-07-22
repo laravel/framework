@@ -330,7 +330,7 @@ class ShowModelCommand extends Command
 
             if ($attribute['default'] !== null) {
                 $this->components->bulletList(
-                    [sprintf('default: %s', $attribute['default'] instanceof UnitEnum? $attribute['default']->name : $attribute['default'])],
+                    [sprintf('default: %s', $attribute['default'] instanceof UnitEnum ? $attribute['default']->name : $attribute['default'])],
                     OutputInterface::VERBOSITY_VERBOSE
                 );
             }
