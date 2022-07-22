@@ -61,7 +61,7 @@ class MonitorCommand extends Command
     protected $headers = ['Connection', 'Queue', 'Size', 'Status'];
 
     /**
-     * Create a new queue listen command.
+     * Create a new queue monitor command.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
