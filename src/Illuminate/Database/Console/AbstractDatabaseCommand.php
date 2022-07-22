@@ -6,6 +6,9 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Illuminate\Console\Command;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Arr;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 abstract class AbstractDatabaseCommand extends Command
 {
@@ -18,7 +21,7 @@ abstract class AbstractDatabaseCommand extends Command
      */
     protected function getPlatformName(AbstractPlatform $platform, $database)
     {
-        return match(class_basename($platform)) {
+        return match (class_basename($platform)) {
             'MySQLPlatform' => 'MySQL <= 5',
             'MySQL57Platform' => 'MySQL 5.7',
             'MySQL80Platform' => 'MySQL 8',
@@ -39,7 +42,7 @@ abstract class AbstractDatabaseCommand extends Command
      */
     protected function getTableSize(ConnectionInterface $connection, string $table)
     {
-        return match(class_basename($connection)) {
+        return match (class_basename($connection)) {
             'MySqlConnection' => $this->getMySQLTableSize($connection, $table),
             'PostgresConnection' => $this->getPgsqlTableSize($connection, $table),
             'SqliteConnection' => $this->getSqliteTableSize($connection, $table),
@@ -98,7 +101,7 @@ abstract class AbstractDatabaseCommand extends Command
      */
     protected function getConnectionCount(ConnectionInterface $connection)
     {
-        return match(class_basename($connection)) {
+        return match (class_basename($connection)) {
             'MySqlConnection' => $this->getMySQLConnectionCount($connection),
             'PostgresConnection' => $this->getPgsqlConnectionCount($connection),
             'SqlServerConnection' => $this->getSqlServerConnectionCount($connection),
@@ -150,5 +153,53 @@ abstract class AbstractDatabaseCommand extends Command
         $database ??= config('database.default');
 
         return Arr::except(config('database.connections.'.$database), ['password']);
+    }
+
+    /**
+     * Ensure the dependencies for the database commands are available.
+     *
+     * @return int
+     */
+    protected function ensureDependenciesExist()
+    {
+        if (! interface_exists('Doctrine\DBAL\Driver')) {
+            if (! $this->components->confirm('Displaying model information requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
+                return 1;
+            }
+
+            return $this->installDependencies();
+        }
+    }
+
+    /**
+     * Install the command's dependencies.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessSignaledException
+     */
+    protected function installDependencies()
+    {
+        $command = collect($this->composer->findComposer())
+            ->push('require doctrine/dbal')
+            ->implode(' ');
+
+        $process = Process::fromShellCommandline($command, null, null, null, null);
+
+        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
+            try {
+                $process->setTty(true);
+            } catch (RuntimeException $e) {
+                $this->components->warn($e->getMessage());
+            }
+        }
+
+        try {
+            $process->run(fn ($type, $line) => $this->output->write($line));
+        } catch (ProcessSignaledException $e) {
+            if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
+                throw $e;
+            }
+        }
     }
 }

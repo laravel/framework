@@ -34,6 +34,8 @@ class ShowCommand extends AbstractDatabaseCommand
      */
     public function handle(ConnectionResolverInterface $connections)
     {
+        $this->ensureDependenciesExist();
+
         $connection = $connections->connection($database = $this->input->getOption('database'));
         $schema = $connection->getDoctrineSchemaManager();
 
@@ -68,7 +70,7 @@ class ShowCommand extends AbstractDatabaseCommand
             'table' => $table->getName(),
             'size' => $this->getTableSize($connection, $table->getName()),
             'rows' => $connection->table($table->getName())->count(),
-            'engine' => rescue(fn() => $table->getOption('engine')),
+            'engine' => rescue(fn () => $table->getOption('engine')),
             'comment' => $table->getComment(),
         ]);
     }
@@ -84,7 +86,7 @@ class ShowCommand extends AbstractDatabaseCommand
     {
         return collect($schema->listViews())
             ->reject(fn (View $view) => str($view->getName())
-            ->startsWith(['pg_catalog', 'information_schema', 'spt_']))
+                ->startsWith(['pg_catalog', 'information_schema', 'spt_']))
             ->map(fn (View $view) => [
                 'view' => $view->getName(),
                 'rows' => $connection->table($view->getName())->count(),
@@ -136,7 +138,7 @@ class ShowCommand extends AbstractDatabaseCommand
         $this->components->twoColumnDetail('Open Connections', $platform['open_connections']);
         $this->components->twoColumnDetail('Tables', $tables->count());
         if ($tableSizeSum = $tables->sum('size')) {
-            $this->components->twoColumnDetail('Total Size', number_format($tables->sum('size') / 1024 / 1024, 2) . 'Mb');
+            $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'Mb');
         }
 
         $this->newLine();
@@ -150,8 +152,8 @@ class ShowCommand extends AbstractDatabaseCommand
                 }
 
                 $this->components->twoColumnDetail(
-                    $table['table']. ($this->output->isVerbose() ? ' <fg=gray>' . $table['engine'].'</>' : null),
-                    ($tableSize ? $tableSize . ' <fg=gray;options=bold>/</> ' : '— <fg=gray;options=bold>/</> ').'<fg=yellow;options=bold>'.number_format($table['rows']).'</>'
+                    $table['table'].($this->output->isVerbose() ? ' <fg=gray>'.$table['engine'].'</>' : null),
+                    ($tableSize ? $tableSize.' <fg=gray;options=bold>/</> ' : '— <fg=gray;options=bold>/</> ').'<fg=yellow;options=bold>'.number_format($table['rows']).'</>'
                 );
 
                 if ($this->output->isVerbose()) {
