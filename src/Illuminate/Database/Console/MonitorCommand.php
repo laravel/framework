@@ -4,7 +4,6 @@ namespace Illuminate\Database\Console;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Events\DatabaseBusy;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -128,7 +127,8 @@ class MonitorCommand extends AbstractDatabaseCommand
      * @param  \Illuminate\Support\Collection  $databases
      * @return void
      */
-    protected function dispatchEvents($databases) {
+    protected function dispatchEvents($databases)
+    {
         $databases->each(function ($database) {
             if ($database['status'] === '<fg=green;options=bold>OK</>') {
                 return;
