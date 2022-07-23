@@ -879,7 +879,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function pop($count = 1)
     {
         if ($count <= 0) {
-           return;
+            return;
         }
 
         if ($count === 1) {
