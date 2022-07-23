@@ -3099,6 +3099,11 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['d'], $data->nth(4, 3)->all());
         $this->assertEquals(['c', 'e'], $data->nth(2, 2)->all());
         $this->assertEquals(['c', 'd', 'e', 'f'], $data->nth(1, 2)->all());
+        $this->assertEquals(['c', 'd', 'e', 'f'], $data->nth(1, 2)->all());
+        $this->assertEquals(['e', 'f'], $data->nth(1, -2)->all());
+        $this->assertEquals(['c', 'e'], $data->nth(2, -4)->all());
+        $this->assertEquals(['e'], $data->nth(4, -2)->all());
+        $this->assertEquals(['e'], $data->nth(2, -2)->all());
     }
 
     /**
