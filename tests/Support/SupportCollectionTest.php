@@ -4112,14 +4112,40 @@ class SupportCollectionTest extends TestCase
      */
     public function testCombineWithArray($collection)
     {
+        $c = new $collection([1, 2, 3]);
+        $actual = $c->combine([4, 5, 6])->toArray();
         $expected = [
             1 => 4,
             2 => 5,
             3 => 6,
         ];
 
-        $c = new $collection(array_keys($expected));
-        $actual = $c->combine(array_values($expected))->toArray();
+        $this->assertSame($expected, $actual);
+
+        $c = new $collection(['name', 'family']);
+        $actual = $c->combine([1 => 'taylor', 2 => 'otwell'])->toArray();
+        $expected = [
+            'name' => 'taylor',
+            'family' => 'otwell',
+        ];
+
+        $this->assertSame($expected, $actual);
+
+        $c = new $collection([1 => 'name', 2 => 'family']);
+        $actual = $c->combine(['taylor', 'otwell'])->toArray();
+        $expected = [
+            'name' => 'taylor',
+            'family' => 'otwell',
+        ];
+
+        $this->assertSame($expected, $actual);
+
+        $c = new $collection([1 => 'name', 2 => 'family']);
+        $actual = $c->combine([2 => 'taylor', 3 => 'otwell'])->toArray();
+        $expected = [
+            'name' => 'taylor',
+            'family' => 'otwell',
+        ];
 
         $this->assertSame($expected, $actual);
     }
