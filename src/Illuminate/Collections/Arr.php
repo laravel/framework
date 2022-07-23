@@ -839,7 +839,7 @@ class Arr
                 },
                 $depth_array
             );
-            
+
             return max($depth_array);
         } else {
             return 0;
