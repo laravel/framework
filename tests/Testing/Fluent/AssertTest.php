@@ -768,7 +768,7 @@ class AssertTest extends TestCase
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Property [bar] was marked as invalid using a closure.');
 
-        $assert->where('bar', function ($value) {
+        $assert->whereNot('bar', function ($value) {
             return $value === 'baz';
         });
     }
