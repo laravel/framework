@@ -878,6 +878,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function pop($count = 1)
     {
+        if ($count <= 0) {
+           return;
+        }
+
         if ($count === 1) {
             return array_pop($this->items);
         }

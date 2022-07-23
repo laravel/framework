@@ -371,6 +371,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(new Collection(['baz', 'bar', 'foo']), (new Collection(['foo', 'bar', 'baz']))->pop(6));
     }
 
+    public function testPopDontChangeCollectionWhenPassCountNegativeOrZero()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $this->assertNull($c->pop(0));
+        $this->assertEquals(['foo', 'bar', 'baz'], $c->all());
+
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $this->assertNull($c->pop(-4));
+        $this->assertEquals(['foo', 'bar', 'baz'], $c->all());
+    }
+
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);
