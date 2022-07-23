@@ -822,4 +822,26 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Finds the depth of an array, if the array passed is empty it will return 0
+     *
+     * @param  mixed $array
+     * @return void
+     */
+    public static function depth($array)
+    {
+        if (is_array($array) && !empty($array)) {
+            $depth_array = array_keys(static::dot($array));
+            $depth_array = array_map(
+                function ($value) {
+                    return substr_count($value, '.') + 1;
+                },
+                $depth_array
+            );
+            return max($depth_array);
+        } else {
+            return 0;
+        }
+    }
 }
