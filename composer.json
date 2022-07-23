@@ -44,7 +44,7 @@
         "symfony/var-dumper": "^5.4",
         "tijsverkoyen/css-to-inline-styles": "^2.2.2",
         "vlucas/phpdotenv": "^5.4.1",
-        "voku/portable-ascii": "^1.6.1"
+        "voku/portable-ascii": "^2.0"
     },
     "replace": {
         "illuminate/auth": "self.version",
