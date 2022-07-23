@@ -159,12 +159,12 @@ class AssertTest extends TestCase
             'data' => [
                 [
                     'id' => 1,
-                    'name' => 'Taylor'
+                    'name' => 'Taylor',
                 ],
                 [
                     'id' => 2,
-                    'name' => 'Nuno'
-                ]
+                    'name' => 'Nuno',
+                ],
             ],
         ]);
 
@@ -180,12 +180,12 @@ class AssertTest extends TestCase
             'data' => [
                 [
                     'id' => 1,
-                    'name' => 'Taylor'
+                    'name' => 'Taylor',
                 ],
                 [
                     'id' => 2,
-                    'name' => 'Mateus'
-                ]
+                    'name' => 'Mateus',
+                ],
             ],
         ]);
 
@@ -204,12 +204,12 @@ class AssertTest extends TestCase
             'data' => [
                 [
                     'id' => 1,
-                    'name' => 'Taylor'
+                    'name' => 'Taylor',
                 ],
                 [
                     'id' => 2,
-                    'name' => 'Mateus'
-                ]
+                    'name' => 'Mateus',
+                ],
             ],
         ]);
 
@@ -225,12 +225,12 @@ class AssertTest extends TestCase
             'data' => [
                 [
                     'id' => 1,
-                    'name' => 'Taylor'
+                    'name' => 'Taylor',
                 ],
                 [
                     'id' => 2,
-                    'name' => 'Mateus'
-                ]
+                    'name' => 'Mateus',
+                ],
             ],
         ]);
 
