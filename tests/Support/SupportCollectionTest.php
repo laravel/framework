@@ -3684,6 +3684,12 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
 
         $this->assertSame('foo', $c->pull(0));
+        $this->assertSame('bar', $c->pull(1));
+
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertNull($c->pull(-1));
+        $this->assertNull($c->pull(2));
     }
 
     public function testPullRemovesItemFromCollection()
@@ -3691,6 +3697,8 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
         $c->pull(0);
         $this->assertEquals([1 => 'bar'], $c->all());
+        $c->pull(1);
+        $this->assertEquals([], $c->all());
     }
 
     public function testPullRemovesItemFromNestedCollection()
