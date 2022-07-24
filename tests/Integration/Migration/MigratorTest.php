@@ -106,7 +106,6 @@ class MigratorTest extends TestCase
 
     protected function expectCount($message): void
     {
-        // TODO Update assertions
         $this->output->shouldReceive('writeln')->once()->with(m::on(
             fn ($argument) => str($argument)->contains($message),
         ), m::any());
