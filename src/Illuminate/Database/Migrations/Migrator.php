@@ -180,9 +180,12 @@ class Migrator
             }
         }
 
-        $this->output->newLine(1);
+        $this->newLine();
 
-        $this->write(Count::class, 'Ran ['.count($migrations).'] migration(s)');
+        $this->write(
+            Count::class,
+            'Ran ['.count($migrations).'] '.str('migration')->plural(count($migrations)),
+        );
 
         $this->fireMigrationEvent(new MigrationsEnded('up'));
     }
@@ -294,9 +297,12 @@ class Migrator
             );
         }
 
-        $this->output->newLine(1);
+        $this->newLine();
 
-        $this->write(Count::class, 'Rolled back ['.count($migrations).'] migration(s)');
+        $this->write(
+            Count::class,
+            'Rolled back ['.count($migrations).'] '.str('migration')->plural(count($migrations)),
+        );
 
         $this->fireMigrationEvent(new MigrationsEnded('down'));
 
@@ -739,6 +745,16 @@ class Migrator
         with(new $component(
             $this->output ?: new NullOutput()
         ))->render(...$arguments);
+    }
+
+    /**
+     * Write a new line to the console's output.
+     *
+     * @return void
+     */
+    protected function newLine()
+    {
+        $this->output?->newLine();
     }
 
     /**

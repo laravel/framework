@@ -32,6 +32,9 @@ class MigratorTest extends TestCase
         $this->expectTask('2015_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2016_10_04_000000_modify_people_table', 'DONE');
 
+        $this->expectNewLine();
+        $this->expectCount('Ran <options=bold>[3]</> migration(s)');
+
         $this->subject->run([__DIR__.'/fixtures']);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
@@ -64,6 +67,9 @@ class MigratorTest extends TestCase
         $this->expectTask('2015_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2014_10_12_000000_create_people_table', 'DONE');
 
+        $this->expectNewLine();
+        $this->expectCount('Rolled back <options=bold>[3]</> migration(s)');
+
         $this->subject->rollback([__DIR__.'/fixtures']);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
@@ -85,9 +91,25 @@ class MigratorTest extends TestCase
         $this->expectTwoColumnDetail('2016_10_04_000000_modify_people_table');
         $this->expectBulletList(['alter table "people" add column "last_name" varchar']);
 
+        $this->expectNewLine();
+        $this->expectCount('Ran <options=bold>[3]</> migration(s)');
+
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('people'));
+    }
+
+    private function expectNewLine(): void
+    {
+        $this->output->shouldReceive('newLine');
+    }
+
+    protected function expectCount($message): void
+    {
+        // TODO Update assertions
+        $this->output->shouldReceive('writeln')->once()->with(m::on(
+            fn ($argument) => str($argument)->contains($message),
+        ), m::any());
     }
 
     protected function expectInfo($message): void
