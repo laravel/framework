@@ -69,6 +69,16 @@ class StatusCommand extends BaseCommand
                     fn ($migration) => $this->components->twoColumnDetail($migration[0], $migration[1])
                 );
 
+                $runMigrationsCount = $migrations
+                    ->filter(fn ($migration) => str_contains($migration[1], 'Ran'))
+                    ->count();
+
+                $this->newLine();
+
+                $this->components->count('Total migrations: ['.$migrations->count().']');
+                $this->components->count('Ran migrations: ['.$runMigrationsCount.']');
+                $this->components->count('Pending migrations: ['.$migrations->count() - $runMigrationsCount.']');
+
                 $this->newLine();
             } else {
                 $this->components->info('No migrations found');
