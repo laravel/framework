@@ -600,7 +600,7 @@ class BelongsToMany extends Relation
      */
     public function firstOrNew(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->related->where($attributes)->first())) {
+        if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance(array_merge($attributes, $values));
         }
 
