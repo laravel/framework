@@ -180,6 +180,8 @@ class Migrator
             }
         }
 
+        $this->output->newLine(1);
+
         $this->write(Count::class, 'Ran ['.count($migrations).'] migration(s)');
 
         $this->fireMigrationEvent(new MigrationsEnded('up'));
@@ -291,6 +293,8 @@ class Migrator
                 $options['pretend'] ?? false
             );
         }
+
+        $this->output->newLine(1);
 
         $this->write(Count::class, 'Rolled back ['.count($migrations).'] migration(s)');
 
