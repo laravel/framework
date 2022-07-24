@@ -1986,6 +1986,22 @@ class SupportCollectionTest extends TestCase
         $reversed = $data->reverse();
 
         $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
+
+        $data = new $collection([1, 2, 3]);
+        $reversed = $data->reverse();
+
+        $this->assertSame([2 => 3, 1 => 2, 0 => 1], $reversed->all());
+        $this->assertInstanceOf($collection, $reversed);
+
+        $data = new $collection([6 =>'name', 5=>'family', 7=>'skill']);
+        $reversed = $data->reverse();
+
+        $this->assertSame([7 => 'skill', 5 => 'family', 6 => 'name'], $reversed->all());
+
+        $data = new $collection([6 => 'name', 5 => 'family', [], 7 => 'skill']);
+        $reversed = $data->reverse();
+        
+        $this->assertSame([7 => 'skill', 5 => 'family', 6 => 'name'], $reversed->all());
     }
 
     /**
