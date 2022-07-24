@@ -33,7 +33,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2016_10_04_000000_modify_people_table', 'DONE');
 
         $this->expectNewLine();
-        $this->expectCount('Ran <options=bold>[3]</> migration(s)');
+        $this->expectCount('Ran <options=bold>[3]</> migrations');
 
         $this->subject->run([__DIR__.'/fixtures']);
 
@@ -68,7 +68,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2014_10_12_000000_create_people_table', 'DONE');
 
         $this->expectNewLine();
-        $this->expectCount('Rolled back <options=bold>[3]</> migration(s)');
+        $this->expectCount('Rolled back <options=bold>[3]</> migrations');
 
         $this->subject->rollback([__DIR__.'/fixtures']);
 
@@ -92,7 +92,7 @@ class MigratorTest extends TestCase
         $this->expectBulletList(['alter table "people" add column "last_name" varchar']);
 
         $this->expectNewLine();
-        $this->expectCount('Ran <options=bold>[3]</> migration(s)');
+        $this->expectCount('Ran <options=bold>[3]</> migrations');
 
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
