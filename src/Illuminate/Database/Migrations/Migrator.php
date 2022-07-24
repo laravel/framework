@@ -4,6 +4,7 @@ namespace Illuminate\Database\Migrations;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Console\View\Components\Count;
 use Illuminate\Console\View\Components\Error;
 use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Task;
@@ -179,6 +180,8 @@ class Migrator
             }
         }
 
+        $this->write(Count::class, 'Ran ['.count($migrations).'] migration(s)');
+
         $this->fireMigrationEvent(new MigrationsEnded('up'));
     }
 
@@ -288,6 +291,8 @@ class Migrator
                 $options['pretend'] ?? false
             );
         }
+
+        $this->write(Count::class, 'Rolled back ['.count($migrations).'] migration(s)');
 
         $this->fireMigrationEvent(new MigrationsEnded('down'));
 
