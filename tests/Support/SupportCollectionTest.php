@@ -1348,6 +1348,12 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['a', 'b', 'c']);
         $this->assertEquals(['a', 'd', 'e'], $c->replace([1 => 'd', 2 => 'e'])->all());
+
+        $c = new $collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'd', 'e', 'f', 'g'], $c->replace([1 => 'd', 2 => 'e', 3 => 'f', 4 => 'g'])->all());
+
+        $c = new $collection(['name' => 'amir', 'family' => 'otwell']);
+        $this->assertEquals(['name' => 'taylor', 'family' => 'otwell', 'age' => 26], $c->replace(['name' => 'taylor', 'age' => 26])->all());
     }
 
     /**
@@ -1359,6 +1365,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(
             ['a', 'd', 'e'],
             $c->replace(new $collection([1 => 'd', 2 => 'e']))->all()
+        );
+
+        $c = new $collection(['a', 'b', 'c']);
+        $this->assertEquals(
+            ['a', 'd', 'e', 'f', 'g'],
+            $c->replace(new $collection([1 => 'd', 2 => 'e', 3 => 'f', 4 => 'g']))->all()
+        );
+
+        $c = new $collection(['name' => 'amir', 'family' => 'otwell']);
+        $this->assertEquals(
+            ['name' => 'taylor', 'family' => 'otwell', 'age' => 26],
+            $c->replace(new $collection(['name' => 'taylor', 'age' => 26]))->all()
         );
     }
 
@@ -1378,6 +1396,9 @@ class SupportCollectionTest extends TestCase
     {
         $c = new $collection(['a', 'b', ['c', 'd']]);
         $this->assertEquals(['z', 'b', ['c', 'e']], $c->replaceRecursive(['z', 2 => [1 => 'e']])->all());
+
+        $c = new $collection(['a', 'b', ['c', 'd']]);
+        $this->assertEquals(['z', 'b', ['c', 'e'], 'f'], $c->replaceRecursive(['z', 2 => [1 => 'e'], 'f'])->all());
     }
 
     /**
