@@ -50,5 +50,7 @@ class PackageDiscoverCommand extends Command
             ->keys()
             ->each(fn ($description) => $this->components->task($description))
             ->whenNotEmpty(fn () => $this->newLine());
+
+        $this->components->count('Discovered ['.count($manifest->manifest).'] packages');
     }
 }
