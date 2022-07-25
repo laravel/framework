@@ -3,11 +3,10 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
+class DatabaseEloquentBelongsToManyFirstOrNewTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -49,28 +48,19 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         });
     }
 
-    public function testBelongsToChunkById()
-    {
-        $this->seedData();
-
-        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
-        $i = 0;
-
-        $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
-            $i++;
-            $this->assertEquals($i, $collection->first()->aid);
-        });
-
-        $this->assertSame(3, $i);
-    }
-
     public function testBelongsToManyFirstOrNew()
     {
         $this->seedData();
 
-        $user = BelongsToManyChunkByIdTestTestUser::query()->where("id",2)->first();
+        $user2 = BelongsToManyFirstOrNewTestUser::query()->where("id",2)->first();
 
-        $this->assertSame($user->articles()->first()->aid, $user->articles()->firstOrNew()->aid);
+        $this->assertSame($user2->articles()->first()->aid, $user2->articles()->firstOrNew()->aid);
+
+        $user3 = BelongsToManyFirstOrNewTestUser::query()->where("id",3)->first();
+        $this->assertInstanceOf(BelongsToManyFirstOrNewTestArticle::class, $user3->articles()->firstOrNew());
+        $this->assertNull($user3->articles()->firstOrNew()->aid);
+
+
     }
 
     /**
@@ -90,22 +80,18 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
      */
     protected function seedData()
     {
-        $user = BelongsToManyChunkByIdTestTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        BelongsToManyChunkByIdTestTestArticle::query()->insert([
-            ['aid' => 1, 'title' => 'Another title'],
-            ['aid' => 2, 'title' => 'Another title'],
-            ['aid' => 3, 'title' => 'Another title'],
+        $user = BelongsToManyFirstOrNewTestUser::create(['id' => 1, 'email' => 'user1@gmail.com']);
+        $user2 = BelongsToManyFirstOrNewTestUser::create(['id' => 2, 'email' => 'user2@gmail.com']);
+        BelongsToManyFirstOrNewTestUser::create(['id' => 3, 'email' => 'user3@gmail.com']);
+
+        BelongsToManyFirstOrNewTestArticle::query()->insert([
+            ['aid' => 1, 'title' => 'Article of user1'],
+            ['aid' => 2, 'title' => 'Article of user2'],
+            ['aid' => 3, 'title' => 'Another article of user2'],
         ]);
 
-        $user->articles()->sync([3, 1, 2]);
-
-        $another_user = BelongsToManyChunkByIdTestTestUser::create(['id' => 2, 'email' => 'another-user@gmail.com']);
-        BelongsToManyChunkByIdTestTestArticle::query()->insert([
-            ['aid' => 4, 'title' => 'Article of another-user'],
-            ['aid' => 5, 'title' => 'Another article of another-user'],
-        ]);
-
-        $another_user->articles()->sync([4, 5]);
+        $user->articles()->sync([1]);
+        $user2->articles()->sync([2, 3]);
     }
 
     /**
@@ -129,7 +115,7 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
     }
 }
 
-class BelongsToManyChunkByIdTestTestUser extends Eloquent
+class BelongsToManyFirstOrNewTestUser extends Eloquent
 {
     protected $table = 'users';
     protected $fillable = ['id', 'email'];
@@ -137,11 +123,11 @@ class BelongsToManyChunkByIdTestTestUser extends Eloquent
 
     public function articles()
     {
-        return $this->belongsToMany(BelongsToManyChunkByIdTestTestArticle::class, 'article_user', 'user_id', 'article_id');
+        return $this->belongsToMany(BelongsToManyFirstOrNewTestArticle::class, 'article_user', 'user_id', 'article_id');
     }
 }
 
-class BelongsToManyChunkByIdTestTestArticle extends Eloquent
+class BelongsToManyFirstOrNewTestArticle extends Eloquent
 {
     protected $primaryKey = 'aid';
     protected $table = 'articles';
