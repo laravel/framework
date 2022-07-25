@@ -52,11 +52,11 @@ class DatabaseEloquentBelongsToManyFirstOrNewTest extends TestCase
     {
         $this->seedData();
 
-        $user2 = BelongsToManyFirstOrNewTestUser::query()->where('id',2)->first();
+        $user2 = BelongsToManyFirstOrNewTestUser::query()->where('id', 2)->first();
 
         $this->assertSame($user2->articles()->first()->aid, $user2->articles()->firstOrNew()->aid);
 
-        $user3 = BelongsToManyFirstOrNewTestUser::query()->where('id',3)->first();
+        $user3 = BelongsToManyFirstOrNewTestUser::query()->where('id', 3)->first();
         $this->assertInstanceOf(BelongsToManyFirstOrNewTestArticle::class, $user3->articles()->firstOrNew());
         $this->assertNull($user3->articles()->firstOrNew()->aid);
 
