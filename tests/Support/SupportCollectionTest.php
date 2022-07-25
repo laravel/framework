@@ -2000,7 +2000,7 @@ class SupportCollectionTest extends TestCase
 
         $data = new $collection([6 => 'name', 5 => 'family', [], 7 => 'skill']);
         $reversed = $data->reverse();
-        
+
         $this->assertSame([7 => 'skill', 5 => 'family', 6 => 'name'], $reversed->all());
     }
 
