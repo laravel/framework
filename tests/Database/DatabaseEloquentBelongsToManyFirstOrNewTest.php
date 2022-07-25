@@ -59,8 +59,6 @@ class DatabaseEloquentBelongsToManyFirstOrNewTest extends TestCase
         $user3 = BelongsToManyFirstOrNewTestUser::query()->where('id', 3)->first();
         $this->assertInstanceOf(BelongsToManyFirstOrNewTestArticle::class, $user3->articles()->firstOrNew());
         $this->assertNull($user3->articles()->firstOrNew()->aid);
-
-
     }
 
     /**
