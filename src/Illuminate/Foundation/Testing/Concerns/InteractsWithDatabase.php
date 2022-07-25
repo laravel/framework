@@ -167,7 +167,7 @@ trait InteractsWithDatabase
     /**
      * Cast a JSON string to a database compatible type.
      *
-     * @param  array|string  $value
+     * @param  array|object|string  $value
      * @return \Illuminate\Database\Query\Expression
      */
     public function castAsJson($value)
