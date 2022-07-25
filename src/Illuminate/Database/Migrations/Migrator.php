@@ -20,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrator
@@ -730,9 +731,9 @@ class Migrator
      */
     protected function write($component, ...$arguments)
     {
-        if ($this->output) {
-            with(new $component($this->output))->render(...$arguments);
-        }
+        with(new $component(
+            $this->output ?: new NullOutput()
+        ))->render(...$arguments);
     }
 
     /**

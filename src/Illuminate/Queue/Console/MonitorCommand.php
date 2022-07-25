@@ -50,7 +50,7 @@ class MonitorCommand extends Command
     protected $headers = ['Connection', 'Queue', 'Size', 'Status'];
 
     /**
-     * Create a new queue listen command.
+     * Create a new queue monitor command.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
@@ -104,7 +104,7 @@ class MonitorCommand extends Command
     }
 
     /**
-     * Display the failed jobs in the console.
+     * Display the queue sizes in the console.
      *
      * @param  \Illuminate\Support\Collection  $queues
      * @return void
@@ -133,7 +133,7 @@ class MonitorCommand extends Command
     protected function dispatchEvents(Collection $queues)
     {
         foreach ($queues as $queue) {
-            if ($queue['status'] == 'OK') {
+            if ($queue['status'] == '<fg=green;options=bold>OK</>') {
                 continue;
             }
 

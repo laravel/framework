@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Support\Carbon;
@@ -67,6 +68,13 @@ class WorkCommand extends Command
      * @var float|null
      */
     protected $latestStartedAt;
+
+    /**
+     * Holds the status of the last processed job, if any.
+     *
+     * @var string|null
+     */
+    protected $latestStatus;
 
     /**
      * Create a new queue work command.
@@ -169,6 +177,10 @@ class WorkCommand extends Command
             $this->writeOutput($event->job, 'success');
         });
 
+        $this->laravel['events']->listen(JobReleasedAfterException::class, function ($event) {
+            $this->writeOutput($event->job, 'released_after_exception');
+        });
+
         $this->laravel['events']->listen(JobFailed::class, function ($event) {
             $this->writeOutput($event->job, 'failed');
 
@@ -187,9 +199,17 @@ class WorkCommand extends Command
     {
         if ($status == 'starting') {
             $this->latestStartedAt = microtime(true);
+            $this->latestStatus = $status;
+
             $formattedStartedAt = Carbon::now()->format('Y-m-d H:i:s');
 
             return $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
+        }
+
+        if ($this->latestStatus && $this->latestStatus != 'starting') {
+            $formattedStartedAt = Carbon::createFromTimestamp($this->latestStartedAt)->format('Y-m-d H:i:s');
+
+            $this->output->write("  <fg=gray>{$formattedStartedAt}</> {$job->resolveName()}");
         }
 
         $runTime = number_format((microtime(true) - $this->latestStartedAt) * 1000, 2).'ms';
@@ -197,7 +217,12 @@ class WorkCommand extends Command
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
-        $this->output->writeln($status == 'success' ? ' <fg=green;options=bold>DONE</>' : ' <fg=red;options=bold>FAIL</>');
+
+        $this->output->writeln(match ($this->latestStatus = $status) {
+            'success' => ' <fg=green;options=bold>DONE</>',
+            'released_after_exception' => ' <fg=yellow;options=bold>FAIL</>',
+            default => ' <fg=red;options=bold>FAIL</>',
+        });
     }
 
     /**

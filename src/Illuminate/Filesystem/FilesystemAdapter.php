@@ -671,6 +671,16 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Determine if temporary URLs can be generated.
+     *
+     * @return bool
+     */
+    public function providesTemporaryUrls()
+    {
+        return method_exists($this->adapter, 'getTemporaryUrl') || isset($this->temporaryUrlCallback);
+    }
+
+    /**
      * Get a temporary URL for the file at the given path.
      *
      * @param  string  $path

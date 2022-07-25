@@ -83,10 +83,10 @@ abstract class Component
         foreach ($mutators as $mutator) {
             if (is_iterable($data)) {
                 foreach ($data as $key => $value) {
-                    $data[$key] = resolve($mutator)->__invoke($value);
+                    $data[$key] = app($mutator)->__invoke($value);
                 }
             } else {
-                $data = resolve($mutator)->__invoke($data);
+                $data = app($mutator)->__invoke($data);
             }
         }
 

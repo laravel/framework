@@ -20,6 +20,7 @@ use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Database\Console\WipeCommand;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -55,6 +56,7 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ScopeMakeCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\ShowModelCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Foundation\Console\StubPublishCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
@@ -91,6 +93,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      * @var array
      */
     protected $commands = [
+        'About' => AboutCommand::class,
         'CacheClear' => CacheClearCommand::class,
         'CacheForget' => CacheForgetCommand::class,
         'ClearCompiled' => ClearCompiledCommand::class,
@@ -132,6 +135,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleClearCache' => ScheduleClearCacheCommand::class,
         'ScheduleTest' => ScheduleTestCommand::class,
         'ScheduleWork' => ScheduleWorkCommand::class,
+        'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'Up' => UpCommand::class,
         'ViewCache' => ViewCacheCommand::class,
@@ -204,6 +208,18 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         }
 
         $this->commands(array_values($commands));
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerAboutCommand()
+    {
+        $this->app->singleton(AboutCommand::class, function ($app) {
+            return new AboutCommand($app['composer']);
+        });
     }
 
     /**
@@ -1000,6 +1016,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerScheduleWorkCommand()
     {
         $this->app->singleton(ScheduleWorkCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerShowModelCommand()
+    {
+        $this->app->singleton(ShowModelCommand::class);
     }
 
     /**
