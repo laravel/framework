@@ -41,7 +41,12 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
             $this->uniqueFor = $event->uniqueFor;
         }
 
-        $this->uniqueId = $event->uniqueId();
+        $this->uniqueId = get_class($event);
+        if (method_exists($event, 'uniqueId')) {
+            $this->uniqueId = $event->uniqueId();
+        } elseif (property_exists($event, 'uniqueId')) {
+            $this->uniqueId = $event->uniqueId;
+        }
 
         if (method_exists($event, 'uniqueVia')) {
             $this->uniqueVia = $event->uniqueVia();
