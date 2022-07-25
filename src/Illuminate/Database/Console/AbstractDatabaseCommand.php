@@ -41,7 +41,7 @@ abstract class AbstractDatabaseCommand extends Command
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
-     * @return null
+     * @return int|null
      */
     protected function getTableSize(ConnectionInterface $connection, string $table)
     {
