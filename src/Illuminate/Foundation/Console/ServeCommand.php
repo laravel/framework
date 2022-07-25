@@ -47,7 +47,7 @@ class ServeCommand extends Command
     protected $portOffset = 0;
 
     /**
-     * Holds the list of requests being handled, and their start date.
+     * The list of requests being handled and their start time.
      *
      * @var array<int, \Illuminate\Support\Carbon>
      */
@@ -220,21 +220,6 @@ class ServeCommand extends Command
     }
 
     /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', Env::get('SERVER_HOST', '127.0.0.1')],
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
-            ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
-            ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
-        ];
-    }
-
-    /**
      * Returns a "callable" to handle the process output.
      *
      * @return callable(string, string): void
@@ -247,45 +232,65 @@ class ServeCommand extends Command
             if (str($line)->contains('Development Server (http')) {
                 $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
                 $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
+
                 $this->newLine();
             } elseif (str($line)->contains(' Accepted')) {
                 $startDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
+
                 preg_match('/\:(\d+)/', $parts[1], $matches);
 
                 $this->requestsPool[$matches[1]] = [$startDate, false];
             } elseif (str($line)->contains([' [200]: GET '])) {
                 preg_match('/\:(\d+)/', $parts[1], $matches);
+
                 $this->requestsPool[$matches[1]][1] = trim(explode('[200]: GET', $line)[1]);
             } elseif (str($line)->contains(' Closing')) {
                 preg_match('/\:(\d+)/', $parts[1], $matches);
 
                 $request = $this->requestsPool[$matches[1]];
-                [$startDate, $file] = $request;
 
+                [$startDate, $file] = $request;
                 $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
 
                 unset($this->requestsPool[$matches[1]]);
 
                 [$date, $time] = explode(' ', $formattedStartedAt);
+
                 $this->output->write("  <fg=gray>$date</> $time");
 
-                $endDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
-                $runTime = $endDate->diffInSeconds($startDate);
+                $runTime = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['))
+                                ->diffInSeconds($startDate);
 
                 if ($file) {
                     $this->output->write($file = " $file");
                 }
 
                 $dots = max(terminal()->width() - mb_strlen($formattedStartedAt) - mb_strlen($file) - mb_strlen($runTime) - 9, 0);
+
                 $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
                 $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
             } elseif (str($line)->contains(['Closed without sending a request', ']: '])) {
-                // ..
+                // ...
             } elseif (isset($parts[1])) {
                 $this->components->warn($parts[1]);
             } elseif (! empty($line)) {
                 $this->components->warn($line);
             }
         });
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', Env::get('SERVER_HOST', '127.0.0.1')],
+            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', Env::get('SERVER_PORT')],
+            ['tries', null, InputOption::VALUE_OPTIONAL, 'The max number of ports to attempt to serve from', 10],
+            ['no-reload', null, InputOption::VALUE_NONE, 'Do not reload the development server on .env file changes'],
+        ];
     }
 }
