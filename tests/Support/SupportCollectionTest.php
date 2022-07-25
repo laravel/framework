@@ -2173,6 +2173,44 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testPluckWithDotNotation($collection)
+    {
+        $data = new $collection([
+            [
+                'name' => 'amir',
+                'skill' => [
+                    'backend' => ['php', 'python'],
+                ],
+            ],
+            [
+                'name' => 'taylor',
+                'skill' => [
+                    'backend' => ['php', 'asp', 'java'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([['php', 'python'], ['php', 'asp', 'java']], $data->pluck('skill.backend')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPluckDuplicateKeysExist($collection)
+    {
+        $data = new collection([
+            ['brand' => 'Tesla', 'color' => 'red'],
+            ['brand' => 'Pagani', 'color' => 'white'],
+            ['brand' => 'Tesla', 'color' => 'black'],
+            ['brand' => 'Pagani', 'color' => 'orange'],
+        ]);
+
+        $this->assertEquals(['Tesla' => 'black', 'Pagani' => 'orange'], $data->pluck('color', 'brand')->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testHas($collection)
     {
         $data = new $collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
@@ -2819,6 +2857,13 @@ class SupportCollectionTest extends TestCase
      */
     public function testMap($collection)
     {
+        $data = new $collection([1, 2, 3]);
+        $mapped = $data->map(function ($item, $key) {
+            return $item * 2;
+        });
+        $this->assertEquals([2, 4, 6], $mapped->all());
+        $this->assertEquals([1, 2, 3], $data->all());
+
         $data = new $collection(['first' => 'taylor', 'last' => 'otwell']);
         $data = $data->map(function ($item, $key) {
             return $key.'-'.strrev($item);
@@ -2933,6 +2978,7 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertEquals([1 => [0, 4], 2 => [1, 3], 3 => [2]], $groups->toArray());
+        $this->assertEquals([1, 2, 3, 2, 1], $data->all());
     }
 
     /**
@@ -3053,6 +3099,11 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['d'], $data->nth(4, 3)->all());
         $this->assertEquals(['c', 'e'], $data->nth(2, 2)->all());
         $this->assertEquals(['c', 'd', 'e', 'f'], $data->nth(1, 2)->all());
+        $this->assertEquals(['c', 'd', 'e', 'f'], $data->nth(1, 2)->all());
+        $this->assertEquals(['e', 'f'], $data->nth(1, -2)->all());
+        $this->assertEquals(['c', 'e'], $data->nth(2, -4)->all());
+        $this->assertEquals(['e'], $data->nth(4, -2)->all());
+        $this->assertEquals(['e'], $data->nth(2, -2)->all());
     }
 
     /**
@@ -3633,6 +3684,12 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
 
         $this->assertSame('foo', $c->pull(0));
+        $this->assertSame('bar', $c->pull(1));
+
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertNull($c->pull(-1));
+        $this->assertNull($c->pull(2));
     }
 
     public function testPullRemovesItemFromCollection()
@@ -3640,6 +3697,8 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
         $c->pull(0);
         $this->assertEquals([1 => 'bar'], $c->all());
+        $c->pull(1);
+        $this->assertEquals([], $c->all());
     }
 
     public function testPullRemovesItemFromNestedCollection()
@@ -4066,14 +4125,40 @@ class SupportCollectionTest extends TestCase
      */
     public function testCombineWithArray($collection)
     {
+        $c = new $collection([1, 2, 3]);
+        $actual = $c->combine([4, 5, 6])->toArray();
         $expected = [
             1 => 4,
             2 => 5,
             3 => 6,
         ];
 
-        $c = new $collection(array_keys($expected));
-        $actual = $c->combine(array_values($expected))->toArray();
+        $this->assertSame($expected, $actual);
+
+        $c = new $collection(['name', 'family']);
+        $actual = $c->combine([1 => 'taylor', 2 => 'otwell'])->toArray();
+        $expected = [
+            'name' => 'taylor',
+            'family' => 'otwell',
+        ];
+
+        $this->assertSame($expected, $actual);
+
+        $c = new $collection([1 => 'name', 2 => 'family']);
+        $actual = $c->combine(['taylor', 'otwell'])->toArray();
+        $expected = [
+            'name' => 'taylor',
+            'family' => 'otwell',
+        ];
+
+        $this->assertSame($expected, $actual);
+
+        $c = new $collection([1 => 'name', 2 => 'family']);
+        $actual = $c->combine([2 => 'taylor', 3 => 'otwell'])->toArray();
+        $expected = [
+            'name' => 'taylor',
+            'family' => 'otwell',
+        ];
 
         $this->assertSame($expected, $actual);
     }

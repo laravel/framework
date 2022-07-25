@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use BackedEnum;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
@@ -16,6 +17,7 @@ use ReflectionMethod;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
+use UnitEnum;
 
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends AbstractDatabaseCommand
@@ -406,11 +408,17 @@ class ShowModelCommand extends AbstractDatabaseCommand
      *
      * @param  \Doctrine\DBAL\Schema\Column  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string|null
+     * @return mixed|null
      */
     protected function getColumnDefault($column, $model)
     {
-        return $model->getAttributes()[$column->getName()] ?? $column->getDefault();
+        $attributeDefault = $model->getAttributes()[$column->getName()] ?? null;
+
+        return match (true) {
+            $attributeDefault instanceof BackedEnum => $attributeDefault->value,
+            $attributeDefault instanceof UnitEnum => $attributeDefault->name,
+            default => $attributeDefault ?? $column->getDefault(),
+        };
     }
 
     /**
