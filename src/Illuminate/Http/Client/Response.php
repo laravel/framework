@@ -160,7 +160,6 @@ class Response implements ArrayAccess
         return $this->status() === 200;
     }
     
-    
     /**
      * Determine if the response code was "Not Found".
      *
