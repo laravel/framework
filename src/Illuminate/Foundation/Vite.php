@@ -9,6 +9,20 @@ use Illuminate\Support\Str;
 class Vite
 {
     /**
+     * The callback to be used when making script tags.
+     *
+     * @var \Closure|null
+     */
+    protected static $scriptTagCallback;
+
+    /**
+     * The callback to be used when making stylesheet tags.
+     *
+     * @var \Closure|null
+     */
+    protected static $stylesheetTagCallback;
+
+    /**
      * Generate Vite tags for an entrypoint.
      *
      * @param  string|string[]  $entrypoints
@@ -130,7 +144,22 @@ class Vite
      */
     protected function makeScriptTag($url)
     {
+        if (isset(static::$scriptTagCallback)) {
+            return (static::$scriptTagCallback)($url);
+        }
+
         return sprintf('<script type="module" src="%s"></script>', $url);
+    }
+
+    /**
+     * Specify a callback to be used when making script tags.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function makeScriptTagUsing($callback)
+    {
+        static::$scriptTagCallback = $callback;
     }
 
     /**
@@ -141,7 +170,22 @@ class Vite
      */
     protected function makeStylesheetTag($url)
     {
+        if (isset(static::$stylesheetTagCallback)) {
+            return (static::$stylesheetTagCallback)($url);
+        }
+
         return sprintf('<link rel="stylesheet" href="%s" />', $url);
+    }
+
+    /**
+     * Specify a callback to be used when making stylesheet tags.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function makeStylesheetTagUsing($callback)
+    {
+        static::$stylesheetTagCallback = $callback;
     }
 
     /**

@@ -24,6 +24,8 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest();
         $this->cleanViteHotFile();
         m::close();
+        Vite::makeScriptTagUsing(null);
+        Vite::makeStylesheetTagUsing(null);
     }
 
     public function testViteWithJsOnly()
@@ -96,6 +98,42 @@ class FoundationViteTest extends TestCase
         $this->assertSame(
             '<script type="module" src="http://localhost:3000/@vite/client"></script>'
             .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $result->toHtml()
+        );
+    }
+
+    public function testViteCustomScriptTagGeneration()
+    {
+        $this->makeViteHotFile();
+
+        Vite::makeScriptTagUsing(function (string $url) {
+            return sprintf('<script type="module" src="%s" defer></script>', $url);
+        });
+
+        $result = (new Vite)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client" defer></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js" defer></script>',
+            $result->toHtml()
+        );
+    }
+
+    public function testViteCustomStylesheetTagGeneration()
+    {
+        $this->makeViteHotFile();
+
+        Vite::makeStylesheetTagUsing(function (string $url) {
+            return sprintf('<link rel="stylesheet" href="%s" crossorigin />', $url);
+        });
+
+        $result = (new Vite)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" crossorigin />'
             .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
             $result->toHtml()
         );
