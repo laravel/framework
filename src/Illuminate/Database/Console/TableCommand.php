@@ -207,7 +207,7 @@ class TableCommand extends AbstractDatabaseCommand
         }
 
         if ($indexes->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Indexes</>');
+            $this->components->twoColumnDetail('<fg=green;options=bold>Index</>');
 
             $indexes->each(function ($index) {
                 $this->components->twoColumnDetail(
@@ -220,7 +220,7 @@ class TableCommand extends AbstractDatabaseCommand
         }
 
         if ($foreignKeys->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Foreign Keys</>', 'On Update / On Delete');
+            $this->components->twoColumnDetail('<fg=green;options=bold>Foreign Key</>', 'On Update / On Delete');
 
             $foreignKeys->each(function ($foreignKey) {
                 $this->components->twoColumnDetail(
