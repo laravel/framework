@@ -159,6 +159,17 @@ class Response implements ArrayAccess
     {
         return $this->status() === 200;
     }
+    
+    
+    /**
+     * Determine if the response code was "Not Found".
+     *
+     * @return bool
+     */
+    public function notFound()
+    {
+        return $this->status() === 404;
+    }
 
     /**
      * Determine if the response was a redirect.
