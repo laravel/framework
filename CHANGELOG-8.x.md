@@ -1,9 +1,15 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.21...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.22...8.x)
 
 
-## [v8.83.21 (2022-07-20)](https://github.com/laravel/framework/compare/v8.83.20...v8.83.21)
+## [v8.83.22 (2022-07-22)](https://github.com/laravel/framework/compare/v8.83.21...v8.83.22)
+
+### Revert
+- Revert ["Protect against ambiguous columns"](https://github.com/laravel/framework/pull/43278) ([#43362](https://github.com/laravel/framework/pull/43362))
+
+
+## [v8.83.21 (2022-07-21)](https://github.com/laravel/framework/compare/v8.83.20...v8.83.21)
 
 ### Revert
 - Revert of ["Prevent double throwing chained exception on sync queue"](https://github.com/laravel/framework/pull/42950) ([#43354](https://github.com/laravel/framework/pull/43354))
