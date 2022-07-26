@@ -844,6 +844,18 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testAdd()
+    {
+        $c = new Collection([]);
+        $this->assertEquals([1], $c->add(1)->values()->all());
+        $this->assertEquals([1, 2], $c->add(2)->values()->all());
+        $this->assertEquals([1, 2, ''], $c->add('')->values()->all());
+        $this->assertEquals([1, 2, '', null], $c->add(null)->values()->all());
+        $this->assertEquals([1, 2, '', null, false], $c->add(false)->values()->all());
+        $this->assertEquals([1, 2, '', null, false, []], $c->add([])->values()->all());
+        $this->assertEquals([1, 2, '', null, false, [], 'name'], $c->add('name')->values()->all());
+    }
+
     /**
      * @dataProvider collectionClassProvider
      */
