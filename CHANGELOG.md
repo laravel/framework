@@ -1,6 +1,18 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.21.3...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.21.4...9.x)
+
+
+## [v9.21.4](https://github.com/laravel/framework/compare/v9.21.3...v9.21.4) - 2022-07-21
+
+### Added
+- Added `Illuminate/Filesystem/FilesystemAdapter::supportsTemporaryUrl()` ([#43317](https://github.com/laravel/framework/pull/43317))
+
+### Fixed
+- Fixes confirm component default value ([#43334](https://github.com/laravel/framework/pull/43334))
+
+### Changed
+- Improves console output when command not found ([#43323](https://github.com/laravel/framework/pull/43323))
 
 
 ## [v9.21.3](https://github.com/laravel/framework/compare/v9.21.2...v9.21.3) - 2022-07-20
