@@ -130,6 +130,27 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
     }
 
+    public function testDropColumnIfExists()
+    {
+        $this->schemaBuilder()->create('pandemic_table', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('stay_home');
+            $table->string('covid19');
+            $table->string('wear_mask');
+        });
+
+        $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'undefined_column'));
+
+        $this->schemaBuilder()->dropColumnsIfExists('pandemic_table', ['stay_home', 'undefined_column']);
+        $this->schemaBuilder()->dropColumnsIfExists('pandemic_table', 'wear_mask');
+
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'undefined_column'));
+    }
+
     private function schemaBuilder()
     {
         return $this->db->connection()->getSchemaBuilder();

@@ -298,6 +298,24 @@ class Builder
     }
 
     /**
+     * Drop columns if exists from a table schema.
+     *
+     * @param  string  $table
+     * @param  string|array  $columns
+     * @return void
+     */
+    public function dropColumnsIfExists($table, $columns)
+    {
+        array_map(function ($column) use ($table) {
+            if ($this->hasColumn($table, $column)) {
+                $this->table($table, function (Blueprint $blueprint) use ($column) {
+                    $blueprint->dropColumn($column);
+                });
+            }
+        }, is_array($columns) ? $columns : [$columns]);
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void
