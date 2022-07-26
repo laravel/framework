@@ -1,6 +1,15 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.21.5...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.21.6...9.x)
+
+
+## [v9.21.6](https://github.com/laravel/framework/compare/v9.21.5...v9.21.6) - 2022-07-22
+
+### Revert
+- Revert ["Protect against ambiguous columns"](https://github.com/laravel/framework/pull/43278) ([#43362](https://github.com/laravel/framework/pull/43362))
+
+### Fixed
+- Fixes default attribute value when using enums on model:show ([#43360](https://github.com/laravel/framework/pull/43360))
 
 
 ## [v9.21.5](https://github.com/laravel/framework/compare/v9.21.4...v9.21.5) - 2022-07-21
