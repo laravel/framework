@@ -1,6 +1,19 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.21.4...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.21.5...9.x)
+
+
+## [v9.21.5](https://github.com/laravel/framework/compare/v9.21.4...v9.21.5) - 2022-07-21
+
+### Added
+- Adds fluent File validation rule ([#43271](https://github.com/laravel/framework/pull/43271))
+
+### Revert
+- Revert ["Prevent double throwing chained exception on sync queue"](https://github.com/laravel/framework/pull/42950) ([#43354](https://github.com/laravel/framework/pull/43354))
+
+
+### Changed
+- Allow section payload to be lazy in the "about" command ([#43329](https://github.com/laravel/framework/pull/43329))
 
 
 ## [v9.21.4](https://github.com/laravel/framework/compare/v9.21.3...v9.21.4) - 2022-07-21
