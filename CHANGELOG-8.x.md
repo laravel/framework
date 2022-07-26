@@ -1,6 +1,12 @@
 # Release Notes for 8.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v8.83.20...8.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v8.83.21...8.x)
+
+
+## [v8.83.21 (2022-07-20)](https://github.com/laravel/framework/compare/v8.83.20...v8.83.21)
+
+### Revert
+- Revert of ["Prevent double throwing chained exception on sync queue"](https://github.com/laravel/framework/pull/42950) ([#43354](https://github.com/laravel/framework/pull/43354))
 
 
 ## [v8.83.20 (2022-07-19)](https://github.com/laravel/framework/compare/v8.83.19...v8.83.20)
