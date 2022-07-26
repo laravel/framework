@@ -573,7 +573,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Sets the locale for the request instance.
+     * Set the locale for the request instance.
      *
      * @param  string  $locale
      * @return void
@@ -584,7 +584,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Sets the default locale for the request instance.
+     * Set the default locale for the request instance.
      *
      * @param  string  $locale
      * @return void
