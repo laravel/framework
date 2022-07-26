@@ -167,7 +167,10 @@ class BroadcastManager implements FactoryContract
         }
 
         $this->app->make('queue')->connection($event->connection ?? null)->pushOn(
-            $queue, $event instanceof ShouldBeUnique ? new UniqueBroadcastEvent(clone $event) : new BroadcastEvent(clone $event)
+            $queue,
+            $event instanceof ShouldBeUnique
+                    ? new UniqueBroadcastEvent(clone $event)
+                    : new BroadcastEvent(clone $event)
         );
     }
 

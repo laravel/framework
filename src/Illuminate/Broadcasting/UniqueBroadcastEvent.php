@@ -7,21 +7,21 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
 {
     /**
-     * How long the lock should last in seconds
-     *
-     * @var int
-     */
-    public $uniqueFor;
-
-    /**
-     * Identifier for lock
+     * The unique lock identifier.
      *
      * @var mixed
      */
     public $uniqueId;
 
     /**
-     * Cache repository that should be used for lock
+     * The number of seconds the unique lock should be maintained.
+     *
+     * @var int
+     */
+    public $uniqueFor;
+
+    /**
+     * The cache repository implementation that should be used to obtain unique locks.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
@@ -35,17 +35,18 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
      */
     public function __construct($event)
     {
-        if (method_exists($event, 'uniqueFor')) {
-            $this->uniqueFor = $event->uniqueFor();
-        } elseif (property_exists($event, 'uniqueFor')) {
-            $this->uniqueFor = $event->uniqueFor;
-        }
-
         $this->uniqueId = get_class($event);
+
         if (method_exists($event, 'uniqueId')) {
             $this->uniqueId = $event->uniqueId();
         } elseif (property_exists($event, 'uniqueId')) {
             $this->uniqueId = $event->uniqueId;
+        }
+
+        if (method_exists($event, 'uniqueFor')) {
+            $this->uniqueFor = $event->uniqueFor();
+        } elseif (property_exists($event, 'uniqueFor')) {
+            $this->uniqueFor = $event->uniqueFor;
         }
 
         if (method_exists($event, 'uniqueVia')) {
