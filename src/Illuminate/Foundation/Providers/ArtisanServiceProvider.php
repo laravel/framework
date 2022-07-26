@@ -28,6 +28,7 @@ use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
+use Illuminate\Foundation\Console\DocsCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\EventCacheCommand;
@@ -154,6 +155,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ComponentMake' => ComponentMakeCommand::class,
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
+        'Docs' => DocsCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
         'EventMake' => EventMakeCommand::class,
         'ExceptionMake' => ExceptionMakeCommand::class,
@@ -390,6 +392,16 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     protected function registerDbWipeCommand()
     {
         $this->app->singleton(WipeCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerDocsCommand()
+    {
+        $this->app->singleton(DocsCommand::class);
     }
 
     /**

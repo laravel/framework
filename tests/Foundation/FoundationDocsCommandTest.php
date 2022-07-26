@@ -325,6 +325,8 @@ Working directory: expected-working-directory');
 
     protected function command()
     {
+        $this->app->forgetInstance(DocsCommand::class);
+
         return $this->app->make(DocsCommand::class)
             ->setVersion('8.30.12')
             ->setUrlOpener(function ($url) {
