@@ -406,22 +406,6 @@ if (! function_exists('dispatch_sync')) {
     }
 }
 
-if (! function_exists('dispatch_now')) {
-    /**
-     * Dispatch a command to its appropriate handler in the current process.
-     *
-     * @param  mixed  $job
-     * @param  mixed  $handler
-     * @return mixed
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     */
-    function dispatch_now($job, $handler = null)
-    {
-        return app(Dispatcher::class)->dispatchNow($job, $handler);
-    }
-}
-
 if (! function_exists('encrypt')) {
     /**
      * Encrypt the given value.

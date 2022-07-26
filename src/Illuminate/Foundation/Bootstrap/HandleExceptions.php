@@ -82,21 +82,6 @@ class HandleExceptions
      * @param  string  $message
      * @param  string  $file
      * @param  int  $line
-     * @return void
-     *
-     * @deprecated Use handleDeprecationError instead.
-     */
-    public function handleDeprecation($message, $file, $line)
-    {
-        $this->handleDeprecationError($message, $file, $line);
-    }
-
-    /**
-     * Reports a deprecation to the "deprecations" logger.
-     *
-     * @param  string  $message
-     * @param  string  $file
-     * @param  int  $line
      * @param  int  $level
      * @return void
      */

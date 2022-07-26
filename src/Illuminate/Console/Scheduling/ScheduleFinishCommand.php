@@ -18,17 +18,6 @@ class ScheduleFinishCommand extends Command
     protected $signature = 'schedule:finish {id} {code=0}';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     *
-     * @deprecated
-     */
-    protected static $defaultName = 'schedule:finish';
-
-    /**
      * The console command description.
      *
      * @var string

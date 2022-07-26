@@ -248,6 +248,10 @@ class Migrator
             return $this->repository->getMigrations($steps);
         }
 
+        if (($batch = $options['batch'] ?? 0) > 0) {
+            return $this->repository->getMigrationsByBatch($batch);
+        }
+
         return $this->repository->getLast();
     }
 

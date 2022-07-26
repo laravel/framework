@@ -20,9 +20,6 @@ class DatabaseEloquentMorphToTest extends TestCase
         m::close();
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function testLookupDictionaryIsProperlyConstructedForEnums()
     {
         $relation = $this->getRelation();
