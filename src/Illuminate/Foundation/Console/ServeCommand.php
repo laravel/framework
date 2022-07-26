@@ -226,7 +226,7 @@ class ServeCommand extends Command
      */
     protected function handleProcessOutput()
     {
-        return fn ($type, $buffer) => str($buffer)->explode(PHP_EOL)->each(function ($line) {
+        return fn ($type, $buffer) => str($buffer)->explode("\n")->each(function ($line) {
             $parts = explode(']', $line);
 
             if (str($line)->contains('Development Server (http')) {
