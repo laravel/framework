@@ -1164,6 +1164,15 @@ class SupportCollectionTest extends TestCase
     /**
      * @dataProvider collectionClassProvider
      */
+    public function testValuesResetKey($collection)
+    {
+        $data = new $collection([1 => 'a', 2 => 'b', 3 => 'c']);
+        $this->assertEquals([0 => 'a', 1 => 'b', 2 => 'c'], $data->values()->all());
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
     public function testValue($collection)
     {
         $c = new $collection([['id' => 1, 'name' => 'Hello'], ['id' => 2, 'name' => 'World']]);
