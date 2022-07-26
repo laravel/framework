@@ -109,8 +109,6 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     public function testDropColumnWithTablePrefix()
     {
-        $this->db->connection()->setTablePrefix('test_');
-
         $this->schemaBuilder()->create('pandemic_table', function (Blueprint $table) {
             $table->integer('id');
             $table->string('stay_home');
@@ -128,6 +126,24 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->schemaBuilder()->dropColumns('pandemic_table', ['covid19', 'wear_mask']);
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
+    }
+
+    public function test_123()
+    {
+        $this->db->connection();
+
+        $this->schemaBuilder()->create('pandemic_table', function (Blueprint $table) {
+            $table->integer('id');
+            $table->string('stay_home');
+            $table->string('covid19');
+            $table->string('wear_mask');
+        });
+
+        // drop single columns
+        $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
+        $this->schemaBuilder()->dropColumnIfExists('pandemic_table', 'stay_home');
+        $this->schemaBuilder()->dropColumnIfExists('pandemic_table', 'undefined_column');
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
     }
 
     private function schemaBuilder()
