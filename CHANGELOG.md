@@ -1,6 +1,14 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.21.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.21.2...9.x)
+
+
+## [v9.21.2](https://github.com/laravel/framework/compare/v9.21.1...v9.21.2) - 2022-07-20
+
+### Fixed
+- Fixes queue:monitor command dispatching QueueBusy ([#43320](https://github.com/laravel/framework/pull/43320))
+- Ensure relation names are properly "snaked" in JsonResource::whenCounted() method ([#43322](https://github.com/laravel/framework/pull/43322))
+- Fixed Bootstrap 5 pagination ([#43319](https://github.com/laravel/framework/pull/43319))
 
 
 ## [v9.21.1](https://github.com/laravel/framework/compare/v9.21.0...v9.21.1) - 2022-07-20
