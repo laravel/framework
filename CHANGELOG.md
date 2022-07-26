@@ -1,6 +1,22 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.21.0...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.21.1...9.x)
+
+
+## [v9.21.1](https://github.com/laravel/framework/compare/v9.21.0...v9.21.1) - 2022-07-20
+
+### Added
+- Added "Logs" driver to the about command ([#43307](https://github.com/laravel/framework/pull/43307))
+- Allows to install doctrine/dbal from model:show command ([#43288](https://github.com/laravel/framework/pull/43288))
+- Added to stub publish command flag that restricts to only existing files ([#43314](https://github.com/laravel/framework/pull/43314))
+
+### Fixed
+- Fixes for model:show command ([#43301](https://github.com/laravel/framework/pull/43301))
+
+### Changed
+- Handle varying composer -V output ([#43286](https://github.com/laravel/framework/pull/43286))
+- Replace resolve() with app() for Lumen compatible ([#43312](https://github.com/laravel/framework/pull/43312))
+- Allow using backed enums as route parameters ([#43294](https://github.com/laravel/framework/pull/43294))
 
 
 ## [v9.21.0](https://github.com/laravel/framework/compare/v9.20.0...v9.21.0) - 2022-07-19
