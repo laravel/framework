@@ -120,13 +120,20 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
         // drop single columns
         $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'unknown_column'));
         $this->schemaBuilder()->dropColumns('pandemic_table', 'stay_home');
+        $this->schemaBuilder()->dropColumns('pandemic_table', 'unkown_column');
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'unkown_column'));
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'stay_home'));
 
         // drop multiple columns
         $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
+        $this->assertTrue($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'unkown_column'));
         $this->schemaBuilder()->dropColumns('pandemic_table', ['covid19', 'wear_mask']);
+        $this->schemaBuilder()->dropColumns('pandemic_table', ['stay_home', 'unkown_column']);
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'wear_mask'));
+        $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'unkown_column'));
         $this->assertFalse($this->schemaBuilder()->hasColumn('pandemic_table', 'covid19'));
     }
 

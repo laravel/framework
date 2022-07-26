@@ -292,9 +292,13 @@ class Builder
      */
     public function dropColumns($table, $columns)
     {
-        $this->table($table, function (Blueprint $blueprint) use ($columns) {
-            $blueprint->dropColumn($columns);
-        });
+        array_map(function ($column) use ($table) {
+            if ($this->hasColumn($table, $column)) {
+                $this->table($table, function (Blueprint $blueprint) use ($column) {
+                    $blueprint->dropColumn($column);
+                });
+            }
+        }, is_array($columns) ? $columns : [$columns]);
     }
 
     /**
