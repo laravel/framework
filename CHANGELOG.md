@@ -1,6 +1,23 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.21.6...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.22.0...9.x)
+
+
+## [v9.22.0](https://github.com/laravel/framework/compare/v9.21.6...v9.22.0) - 2022-07-26
+
+### Added
+- Added ability to attach an array of files in MailMessage ([#43080](https://github.com/laravel/framework/pull/43080))
+- Added conditional lines to MailMessage ([#43387](https://github.com/laravel/framework/pull/43387))
+- Add support for multiple hash algorithms to `Illuminate/Filesystem/Filesystem::hash()` ([#43407](https://github.com/laravel/framework/pull/43407))
+
+### Fixed
+- Fixes for model:show when attribute default is an enum ([#43370](https://github.com/laravel/framework/pull/43370))
+- Fixed DynamoDB locks with 0 seconds duration ([#43365](https://github.com/laravel/framework/pull/43365))
+- Fixed overriding global locale ([#43426](https://github.com/laravel/framework/pull/43426))
+
+### Changed
+- Round milliseconds in console output runtime ([#43400](https://github.com/laravel/framework/pull/43400))
+- Improves serve Artisan command ([#43375](https://github.com/laravel/framework/pull/43375))
 
 
 ## [v9.21.6](https://github.com/laravel/framework/compare/v9.21.5...v9.21.6) - 2022-07-22
