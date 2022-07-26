@@ -9,12 +9,33 @@ use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Composer;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 abstract class AbstractDatabaseCommand extends Command
 {
+    /**
+     * The Composer instance.
+     *
+     * @var \Illuminate\Support\Composer
+     */
+    protected $composer;
+
+    /**
+     * Create a new command instance.
+     *
+     * @param  \Illuminate\Support\Composer  $composer
+     * @return void
+     */
+    public function __construct(Composer $composer)
+    {
+        parent::__construct();
+
+        $this->composer = $composer;
+    }
+
     /**
      * Get a human-readable platform name.
      *

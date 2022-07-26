@@ -10,7 +10,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Console\AbstractDatabaseCommand;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
@@ -57,13 +56,6 @@ class ShowModelCommand extends AbstractDatabaseCommand
                 {--json : Output the model as JSON}';
 
     /**
-     * The Composer instance.
-     *
-     * @var \Illuminate\Support\Composer
-     */
-    protected $composer;
-
-    /**
      * The methods that can be called in a model to indicate a relation.
      *
      * @var array
@@ -81,19 +73,6 @@ class ShowModelCommand extends AbstractDatabaseCommand
         'morphToMany',
         'morphedByMany',
     ];
-
-    /**
-     * Create a new command instance.
-     *
-     * @param  \Illuminate\Support\Composer  $composer
-     * @return void
-     */
-    public function __construct(Composer $composer)
-    {
-        parent::__construct();
-
-        $this->composer = $composer;
-    }
 
     /**
      * Execute the console command.
