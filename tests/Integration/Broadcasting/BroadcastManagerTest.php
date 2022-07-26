@@ -46,7 +46,7 @@ class BroadcastManagerTest extends TestCase
 
         Bus::assertNotDispatched(UniqueBroadcastEvent::class);
         Queue::assertPushed(UniqueBroadcastEvent::class);
-        
+
         $lockKey = 'laravel_unique_job:'.UniqueBroadcastEvent::class.TestEventUnique::class;
         $this->assertTrue($this->app->get(Cache::class)->lock($lockKey, 10)->get());
     }
