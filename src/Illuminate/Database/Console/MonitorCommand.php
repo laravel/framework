@@ -16,7 +16,7 @@ class MonitorCommand extends AbstractDatabaseCommand
      * @var string
      */
     protected $signature = 'db:monitor
-                {databases : The names of the databases to monitor}
+                {--databases= : The names of the databases to monitor}
                 {--max= : The maximum number of connections that can be open before an event is dispatched}';
 
     /**
@@ -72,7 +72,7 @@ class MonitorCommand extends AbstractDatabaseCommand
      */
     public function handle()
     {
-        $databases = $this->parseDatabases($this->argument('databases'));
+        $databases = $this->parseDatabases($this->option('databases'));
 
         $this->displayConnections($databases);
 
