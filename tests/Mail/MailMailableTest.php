@@ -497,6 +497,43 @@ class MailMailableTest extends TestCase
         $this->assertStringContainsString('X-Tag: foo', $sentMessage->toString());
     }
 
+    public function testItCanAttachMultipleFiles()
+    {
+        $mailable = new WelcomeMailableStub;
+
+        $mailable->attachMany([
+            '/forge.svg',
+            '/vapor.svg' => ['as' => 'Vapor Logo.svg', 'mime' => 'text/css'],
+            new class() implements Attachable
+            {
+                public function toMailAttachment()
+                {
+                    return Attachment::fromPath('/foo.jpg')->as('bar')->withMime('image/png');
+                }
+            },
+        ]);
+
+        $this->assertCount(3, $mailable->attachments);
+        $this->assertSame([
+            'file' => '/forge.svg',
+            'options' => [],
+        ], $mailable->attachments[0]);
+        $this->assertSame([
+            'file' => '/vapor.svg',
+            'options' => [
+                'as' => 'Vapor Logo.svg',
+                'mime' => 'text/css',
+            ],
+        ], $mailable->attachments[1]);
+        $this->assertSame([
+            'file' => '/foo.jpg',
+            'options' => [
+                'as' => 'bar',
+                'mime' => 'image/png',
+            ],
+        ], $mailable->attachments[2]);
+    }
+
     public function testItAttachesFilesViaAttachableContractFromPath()
     {
         $mailable = new WelcomeMailableStub;

@@ -94,13 +94,6 @@ class Route
     protected $originalParameters;
 
     /**
-     * The parameters to exlude when determining the route's parameter names.
-     *
-     * @var array
-     */
-    public $excludedParameters = [];
-
-    /**
      * Indicates "trashed" models can be retrieved when resolving implicit model bindings for this route.
      *
      * @var bool
@@ -514,11 +507,9 @@ class Route
     {
         preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
-        return array_values(array_filter(array_map(function ($m) {
+        return array_map(function ($m) {
             return trim($m, '?');
-        }, $matches[1]), function ($parameterName) {
-            return ! array_key_exists($parameterName, $this->excludedParameters);
-        }));
+        }, $matches[1]);
     }
 
     /**
@@ -544,17 +535,9 @@ class Route
      */
     public function bindingFieldFor($parameter)
     {
-        if (is_int($parameter)) {
-            $parameters = $this->parameterNames();
+        $fields = is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
 
-            if (! isset($parameters[$parameter])) {
-                return null;
-            }
-
-            $parameter = $parameters[$parameter];
-        }
-
-        return $this->bindingFields[$parameter] ?? null;
+        return $fields[$parameter] ?? null;
     }
 
     /**

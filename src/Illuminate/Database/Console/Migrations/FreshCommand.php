@@ -39,12 +39,16 @@ class FreshCommand extends Command
 
         $database = $this->input->getOption('database');
 
-        $this->call('db:wipe', array_filter([
+        $this->newLine();
+
+        $this->components->task('Dropping all tables', fn () => $this->callSilent('db:wipe', array_filter([
             '--database' => $database,
             '--drop-views' => $this->option('drop-views'),
             '--drop-types' => $this->option('drop-types'),
             '--force' => true,
-        ]));
+        ])) == 0);
+
+        $this->newLine();
 
         $this->call('migrate', array_filter([
             '--database' => $database,
@@ -86,6 +90,8 @@ class FreshCommand extends Command
      */
     protected function runSeeder($database)
     {
+        $this->newLine();
+
         $this->call('db:seed', array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',

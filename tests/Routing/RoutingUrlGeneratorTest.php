@@ -14,6 +14,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
+if (PHP_VERSION_ID >= 80100) {
+    include_once 'Enums.php';
+}
+
 class RoutingUrlGeneratorTest extends TestCase
 {
     public function testBasicGeneration()
@@ -369,28 +373,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertSame('/foo/test-slug', $url->route('routable', $model, false));
-        $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
         $this->assertSame('/foo/test-slug', $url->route('routable', ['bar' => $model], false));
-    }
-
-    public function testRoutableInterfaceRoutingWithUrlDefaults()
-    {
-        $url = new UrlGenerator(
-            $routes = new RouteCollection,
-            Request::create('http://www.foo.com/')
-        );
-
-        $url->defaults(['locale' => 'baz']);
-        $route = new Route(['GET'], '{locale}/foo/{bar:slug}', ['as' => 'routable']);
-        $routes->add($route);
-
-        $model = new RoutableInterfaceStub;
-        $model->key = 'routable';
-
-        $this->assertSame('/baz/foo/test-slug', $url->route('routable', $model, false));
-        $this->assertSame('/baz/foo/test-slug', $url->route('routable', [$model], false));
-        $this->assertSame('/baz/foo/test-slug', $url->route('routable', ['bar' => $model], false));
+        $this->assertSame('/foo/test-slug', $url->route('routable', [$model], false));
     }
 
     public function testRoutableInterfaceRoutingAsQueryString()
@@ -411,8 +395,15 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo?foo=routable', $url->route('query-string', ['foo' => $model], false));
     }
 
+    /**
+     * @todo Fix bug related to route keys
+     *
+     * @link https://github.com/laravel/framework/pull/42425
+     */
     public function testRoutableInterfaceRoutingWithSeparateBindingFieldOnlyForSecondParameter()
     {
+        $this->markTestSkipped('See https://github.com/laravel/framework/pull/43255');
+
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
@@ -859,6 +850,22 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->expectExceptionMessage('reserved');
 
         Request::create($url->signedRoute('foo', ['expires' => 253402300799]));
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testRouteGenerationWithBackedEnums()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/foo/{bar}', ['as' => 'foo.bar']);
+        $routes->add($namedRoute);
+
+        $this->assertSame('http://www.foo.com/foo/fruits', $url->route('foo.bar', CategoryBackedEnum::Fruits));
     }
 }
 

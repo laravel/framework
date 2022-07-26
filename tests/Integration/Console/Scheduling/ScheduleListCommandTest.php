@@ -25,7 +25,7 @@ class ScheduleListCommandTest extends TestCase
     {
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
-            ->expectsOutput('No scheduled tasks have been defined.');
+            ->expectsOutputToContain('No scheduled tasks have been defined.');
     }
 
     public function testDisplaySchedule()
