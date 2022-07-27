@@ -2066,6 +2066,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($now->isSameSecond($user->updated_at));
     }
 
+    public function testUpdatingMulitpleModelsFromQueryBuilderIgnoresUpdatedTimestamp()
+    {
+        $now = now();
+        Carbon::setTestNow($now);
+
+        User::query()->create(['email' => 'pat@domain.com']);
+        User::query()->create(['email' => 'eve@domain.com']);
+
+        Carbon::setTestNow($now->copy()->addDays(3));
+
+        User::withoutUpdatedTimestamp(function () {
+            User::query()->update(['name' => 'Twins']);
+        });
+
+        $this->assertTrue($now->isSameSecond(User::first()->updated_at));
+    }
+
     public function testIgnoringUpdatedTimestampIgnoresModal()
     {
         $before = Carbon::now();

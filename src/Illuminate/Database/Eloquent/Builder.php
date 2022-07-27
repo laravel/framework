@@ -1067,7 +1067,8 @@ class Builder implements BuilderContract
     protected function addUpdatedAtColumn(array $values)
     {
         if (! $this->model->usesTimestamps() ||
-            is_null($this->model->getUpdatedAtColumn())) {
+            is_null($this->model->getUpdatedAtColumn()) ||
+            $this->model::isIgnoringUpdatedTimestamp()) {
             return $values;
         }
 
