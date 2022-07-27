@@ -92,7 +92,7 @@ class ComponentMakeCommand extends GeneratorCommand
         file_put_contents(
             $path,
             '<div>
-    <!-- '.Inspiring::quote().' -->
+    <!-- '.Inspiring::quotes()->random().' -->
 </div>'
         );
 
@@ -112,7 +112,7 @@ class ComponentMakeCommand extends GeneratorCommand
         if ($this->option('inline')) {
             return str_replace(
                 ['DummyView', '{{ view }}'],
-                "<<<'blade'\n<div>\n    <!-- ".Inspiring::quote()." -->\n</div>\nblade",
+                "<<<'blade'\n<div>\n    <!-- ".Inspiring::quotes()->random()." -->\n</div>\nblade",
                 parent::buildClass($name)
             );
         }
