@@ -1126,7 +1126,7 @@ class Builder implements BuilderContract
      */
     protected function addUpdatedAtToUpsertColumns(array $update)
     {
-        if (! $this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps() || $this->model::isIgnoringUpdatedTimestamp()) {
             return $update;
         }
 

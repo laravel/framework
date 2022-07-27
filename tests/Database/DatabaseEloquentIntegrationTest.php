@@ -79,6 +79,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->timestamps();
         });
 
+        $this->schema()->create('users_with_unique_email', function ($table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->string('email')->unique();
+            $table->timestamps();
+        });
+
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->create('users', function ($table) {
                 $table->increments('id');
@@ -2066,6 +2073,34 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($now->isSameSecond($user->updated_at));
     }
 
+    public function testUpsertingModelsIgnoresUpdatedTimestampForThoseModelsThatAlreadyExist()
+    {
+        $now = now();
+        Carbon::setTestNow($now);
+
+        $taylor = UserWithUniqueEmail::create(['email' => 'taylor@laravel.com', 'name' => 'Taylor']);
+
+        Carbon::setTestNow($future = $now->copy()->addDays(3));
+
+        UserWithUniqueEmail::withoutUpdatedTimestamp(function () {
+            UserWithUniqueEmail::upsert([
+                ['email' => 'taylor@laravel.com', 'name' => 'Taylor Otwell'],
+                ['email' => 'pat@domain.com', 'name' => 'Patrick'],
+            ], ['email'], ['name']);
+        });
+
+        $pat = UserWithUniqueEmail::where(['email' => 'pat@domain.com'])->firstOrFail();
+        $taylor->refresh();
+
+        $this->assertTrue($now->isSameSecond($taylor->updated_at));
+        $this->assertTrue($now->isSameSecond($taylor->created_at));
+        $this->assertSame('Taylor Otwell', $taylor->name);
+        $this->assertTrue($future->isSameSecond($pat->updated_at));
+        $this->assertTrue($future->isSameSecond($pat->created_at));
+        $this->assertSame('Patrick', $pat->name);
+        $this->assertSame('pat@domain.com', $pat->email);
+    }
+
     public function testUpdatingMulitpleModelsFromQueryBuilderIgnoresUpdatedTimestamp()
     {
         $now = now();
@@ -2443,4 +2478,9 @@ class EloquentTouchingComment extends Eloquent
     {
         return $this->belongsTo(EloquentTouchingPost::class, 'post_id');
     }
+}
+
+class UserWithUniqueEmail extends EloquentTestUser
+{
+    protected $table = 'users_with_unique_email';
 }
