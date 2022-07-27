@@ -1889,6 +1889,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         );
     }
 
+    public function testWithoutTouchingStillUpdatesTheSameModel()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylor@laravel.com']);
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () use ($user) {
+            $user->update(['email' => 'taylorotwell@gmail.com']);
+        });
+
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at));
+    }
+
     public function testUpdatingChildPostRespectsNoTouchingDefinition()
     {
         $before = Carbon::now();
