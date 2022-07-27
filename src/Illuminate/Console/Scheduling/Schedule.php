@@ -9,6 +9,7 @@ use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -135,6 +136,26 @@ class Schedule
         return $this->exec(
             Application::formatCommandString($command), $parameters
         );
+    }
+
+    /**
+     * Add a new queued command callback event to the schedule.
+     *
+     * @param  object|string  $job
+     * @param  array  $parameters
+     * @param  string|null  $queue
+     * @param  string|null  $connection
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
+     */
+    public function queuedCommand($command, array $parameters = [], $queue = null, $connection = null)
+    {
+        return $this->call(function () use ($command, $parameters, $queue, $connection) {
+            Container::getInstance()
+                ->make(Kernel::class)
+                ->queue($command, $parameters)
+                ->onQueue($queue)
+                ->onConnection($connection);
+        });
     }
 
     /**
