@@ -153,6 +153,96 @@ class AssertTest extends TestCase
         });
     }
 
+    public function testAssertHasWithWhereNotDoesNotFail()
+    {
+        $assert = AssertableJson::fromArray([
+            'data' => [
+                [
+                    'id' => 1,
+                    'name' => 'Taylor',
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Nuno',
+                ],
+            ],
+        ]);
+
+        $assert->has('data', function ($bar) {
+            $bar->has(2)
+                ->each(fn ($json) => $json->whereNot('id', 3)->etc());
+        });
+    }
+
+    public function testAssertHasWithWhereNotFails()
+    {
+        $assert = AssertableJson::fromArray([
+            'data' => [
+                [
+                    'id' => 1,
+                    'name' => 'Taylor',
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Mateus',
+                ],
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [data.1.id] contains a value that should be missing: [id, 2]');
+
+        $assert->has('data', function ($bar) {
+            $bar->has(2)
+                ->each(fn ($json) => $json->whereNot('id', 2)->etc());
+        });
+    }
+
+    public function testAssertHasWithWhereNotDoesNotFailClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'data' => [
+                [
+                    'id' => 1,
+                    'name' => 'Taylor',
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Mateus',
+                ],
+            ],
+        ]);
+
+        $assert->has('data', function ($bar) {
+            $bar->has(2)
+                ->each(fn ($json) => $json->whereNot('id', fn ($value) => $value === 3)->etc());
+        });
+    }
+
+    public function testAssertHasWithWhereNotFailsClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'data' => [
+                [
+                    'id' => 1,
+                    'name' => 'Taylor',
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'Mateus',
+                ],
+            ],
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [data.1.id] was marked as invalid using a closure.');
+
+        $assert->has('data', function ($bar) {
+            $bar->has(2)
+                ->each(fn ($json) => $json->whereNot('id', fn ($value) => $value === 2)->etc());
+        });
+    }
+
     public function testAssertCount()
     {
         $assert = AssertableJson::fromArray([
@@ -623,6 +713,64 @@ class AssertTest extends TestCase
         $this->expectExceptionMessage('Property [example.nested] does not match the expected value.');
 
         $assert->where('example.nested', 'another-value');
+    }
+
+    public function testAssertWhereDoesNotMatchValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $assert->whereNot('bar', 'different_value');
+    }
+
+    public function testAssertWhereNotFailsWhenMatchingValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] contains a value that should be missing: [bar, value]');
+
+        $assert->whereNot('bar', 'value');
+    }
+
+    public function testAssertWhereNotFailsWhenNotMissing()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [baz] does not exist.');
+
+        $assert->whereNot('baz', 'value');
+    }
+
+    public function testAssertWhereNotUsingClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'baz',
+        ]);
+
+        $assert->whereNot('bar', function ($value) {
+            return $value === 'foo';
+        });
+    }
+
+    public function testAssertWhereNotFailsWhenMatchesValueUsingClosure()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'baz',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] was marked as invalid using a closure.');
+
+        $assert->whereNot('bar', function ($value) {
+            return $value === 'baz';
+        });
     }
 
     public function testScope()

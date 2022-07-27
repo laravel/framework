@@ -48,6 +48,49 @@ trait Matching
     }
 
     /**
+     * Asserts that the property does not match the expected value.
+     *
+     * @param  string  $key
+     * @param  mixed|\Closure  $expected
+     * @return $this
+     */
+    public function whereNot(string $key, $expected): self
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        if ($expected instanceof Closure) {
+            PHPUnit::assertFalse(
+                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
+            );
+
+            return $this;
+        }
+
+        if ($expected instanceof Arrayable) {
+            $expected = $expected->toArray();
+        }
+
+        $this->ensureSorted($expected);
+        $this->ensureSorted($actual);
+
+        PHPUnit::assertNotSame(
+            $expected,
+            $actual,
+            sprintf(
+                'Property [%s] contains a value that should be missing: [%s, %s]',
+                $this->dotPath($key),
+                $key,
+                $expected
+            )
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that all properties match their expected values.
      *
      * @param  array  $bindings
