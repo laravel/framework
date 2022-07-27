@@ -2061,6 +2061,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Model::isIgnoringTouch());
     }
 
+    public function testRelationshipMethodsWhileIgnoringUpdatedTimestamp()
+    {
+        $now = now();
+        Carbon::setTestNow($now);
+        $user = UserWithUniqueEmail::create(['id' => 1, 'email' => 'taylor@laravel.com']);
+
+        Carbon::setTestNow($future = $now->copy()->addDays(3));
+
+        UserWithUniqueEmail::withoutUpdatedTimestamp(function () {
+            UserWithUniqueEmail::query()->updateOrCreate(['id' => 1], ['email' => 'taylorotwell@gmail.com']);
+            UserWithUniqueEmail::query()->firstOrCreate(['email' => 'pat@domain.com'], ['name' => 'Pat']);
+        });
+
+        $pat = UserWithUniqueEmail::query()->firstWhere('email', 'pat@domain.com');
+        $this->assertTrue($now->isSameDay($user->fresh()->updated_at));
+        $this->assertTrue($future->isSameDay($pat->updated_at));
+    }
+
     public function testCreatingModelWhileIgnoringUpdatesStillSetsUpdatedColumn()
     {
         $now = now();
@@ -2089,7 +2107,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             ], ['email'], ['name']);
         });
 
-        $pat = UserWithUniqueEmail::where(['email' => 'pat@domain.com'])->firstOrFail();
+        $pat = UserWithUniqueEmail::firstWhere('email', 'pat@domain.com');
         $taylor->refresh();
 
         $this->assertTrue($now->isSameSecond($taylor->updated_at));
