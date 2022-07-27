@@ -57,7 +57,7 @@ class MonitorCommand extends AbstractDatabaseCommand
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $connection
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     *                                                           * @param  \Illuminate\Support\Composer  $composer
+     * @param  \Illuminate\Support\Composer  $composer
      */
     public function __construct(ConnectionResolverInterface $connection, Dispatcher $events, Composer $composer)
     {
