@@ -152,7 +152,7 @@ class SupportConditionableTest extends TestCase
             })
             ->log('two')
             ->unless()->has('init')->log('three')
-            ->unless()->has('missing')->log('four');;
+            ->unless()->has('missing')->log('four');
 
         $this->assertSame(['init', 'two', 'four'], $logger->values);
     }

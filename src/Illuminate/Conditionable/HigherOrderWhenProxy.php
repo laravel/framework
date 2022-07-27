@@ -46,7 +46,7 @@ class HigherOrderWhenProxy
     /**
      * Set the condition on the proxy.
      *
-     * @param bool $condition
+     * @param  bool  $condition
      * @return $this
      */
     public function condition($condition)
