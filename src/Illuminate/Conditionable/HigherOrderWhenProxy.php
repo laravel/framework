@@ -19,16 +19,54 @@ class HigherOrderWhenProxy
     protected $condition;
 
     /**
+     * Tracks whether the proxy has a condition.
+     *
+     * @var bool
+     */
+    protected $hasCondition = false;
+
+    /**
+     * Determine whether the condition should be negated.
+     *
+     * @var bool
+     */
+    protected $negateCondition;
+
+    /**
      * Create a new proxy instance.
      *
      * @param  mixed  $target
-     * @param  bool  $condition
      * @return void
      */
-    public function __construct($target, $condition)
+    public function __construct($target)
     {
         $this->target = $target;
+    }
+
+    /**
+     * Set the condition on the proxy.
+     *
+     * @param bool $condition
+     * @return $this
+     */
+    public function condition($condition)
+    {
         $this->condition = $condition;
+        $this->hasCondition = true;
+
+        return $this;
+    }
+
+    /**
+     * Negate the condition.
+     *
+     * @return $this
+     */
+    public function negateCondition()
+    {
+        $this->negateCondition = true;
+
+        return $this;
     }
 
     /**
@@ -53,6 +91,12 @@ class HigherOrderWhenProxy
      */
     public function __call($method, $parameters)
     {
+        if (! $this->hasCondition) {
+            $condition = $this->target->{$method}(...$parameters);
+
+            return $this->condition($this->negateCondition ? ! $condition : $condition);
+        }
+
         return $this->condition
             ? $this->target->{$method}(...$parameters)
             : $this->target;

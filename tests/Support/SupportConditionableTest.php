@@ -125,9 +125,11 @@ class SupportConditionableTest extends TestCase
             ->when(function ($logger) {
                 return $logger->has('missing');
             })
-            ->log('two');
+            ->log('two')
+            ->when()->has('init')->log('three')
+            ->when()->has('missing')->log('four');
 
-        $this->assertSame(['init', 'one'], $logger->values);
+        $this->assertSame(['init', 'one', 'three'], $logger->values);
     }
 
     public function testUnlessProxy()
@@ -148,9 +150,11 @@ class SupportConditionableTest extends TestCase
             ->unless(function ($logger) {
                 return $logger->has('missing');
             })
-            ->log('two');
+            ->log('two')
+            ->unless()->has('init')->log('three')
+            ->unless()->has('missing')->log('four');;
 
-        $this->assertSame(['init', 'two'], $logger->values);
+        $this->assertSame(['init', 'two', 'four'], $logger->values);
     }
 }
 
