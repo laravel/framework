@@ -171,6 +171,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the filled statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileFilled($expression)
+    {
+        return "<?php if (! empty({$expression})): ?>";
+    }
+
+    /**
      * Compile the else-if statements into valid PHP.
      *
      * @param  string  $expression
@@ -207,6 +218,16 @@ trait CompilesConditionals
      * @return string
      */
     protected function compileEndunless()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-filled statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndfilled()
     {
         return '<?php endif; ?>';
     }
