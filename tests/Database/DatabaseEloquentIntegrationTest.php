@@ -2054,6 +2054,36 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse(Model::isIgnoringTouch());
     }
 
+    public function testCreatingModelWhileIgnoringUpdatesStillSetsUpdatedColumn()
+    {
+        $now = now();
+        Carbon::setTestNow($now);
+
+        EloquentTouchingUser::withoutUpdatedTimestamp(function () use (&$user) {
+            $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylor@laravel.com']);
+        });
+
+        $this->assertTrue($now->isSameSecond($user->updated_at));
+    }
+
+    public function testIgnoringUpdatedTimestampIgnoresModal()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylor@laravel.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Title A', 'user_id' => 1]);
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutUpdatedTimestamp(function () use ($user, $post) {
+            $user->update(['email' => 'taylorotwell@gmail.com']);
+            $post->update(['name' => 'Title B']);
+        });
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($future->isSameDay($post->updated_at));
+    }
+
     public function testPivotsCanBeRefreshed()
     {
         EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);

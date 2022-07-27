@@ -3,8 +3,11 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\Integration\Database\Fixtures\Post;
+use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentTimestampsTest extends TestCase
@@ -100,6 +103,106 @@ class DatabaseEloquentTimestampsTest extends TestCase
         ]);
 
         $this->assertEquals($now->toDateTimeString(), $user->updated_at->toDateTimeString());
+    }
+
+    public function testCanNestIgnoreUpdatedTimestampsCalls()
+    {
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+
+        User::withoutUpdatedTimestamp(function () {
+            $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+            $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+            $this->assertTrue(User::isIgnoringUpdatedTimestamp());
+            Post::withoutUpdatedTimestamp(function () {
+                $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+                $this->assertTrue(User::isIgnoringUpdatedTimestamp());
+                $this->assertTrue(Post::isIgnoringUpdatedTimestamp());
+            });
+            $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+        });
+
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+    }
+
+    public function testArrayOfModelsCanHaveUpdatedTimestampIgnored()
+    {
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+
+        Model::withoutUpdatedTimestampOn([User::class, Post::class], function () {
+            $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+            $this->assertTrue(User::isIgnoringUpdatedTimestamp());
+            $this->assertTrue(Post::isIgnoringUpdatedTimestamp());
+        });
+
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+    }
+
+    public function testWhenBaseModelIsIgnoringUpdatedTimestampsAllModelsAreIgnored()
+    {
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+
+        Model::withoutUpdatedTimestamp(function () {
+            $this->assertTrue(Model::isIgnoringUpdatedTimestamp());
+            $this->assertTrue(User::isIgnoringUpdatedTimestamp());
+            $this->assertTrue(Post::isIgnoringUpdatedTimestamp());
+        });
+
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+    }
+
+    public function testWhenASingleModelIsIgnoringUpdatedTimestampsOnlyItIsIgnored()
+    {
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+
+        User::withoutUpdatedTimestamp(function () {
+            $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+            $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+            $this->assertTrue(User::isIgnoringUpdatedTimestamp());
+        });
+
+        $this->assertFalse(Post::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(User::isIgnoringUpdatedTimestamp());
+        $this->assertFalse(Model::isIgnoringUpdatedTimestamp());
+    }
+
+    public function testWithoutUpdatedTimestampCallback()
+    {
+        new UserWithCreatedAndUpdated(['id' => 1]);
+
+        $called = false;
+
+        UserWithCreatedAndUpdated::withoutUpdatedTimestamp(function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertTrue($called);
+    }
+
+    public function testWithoutUpdatedTimestampOnCallback()
+    {
+        new UserWithCreatedAndUpdated(['id' => 1]);
+
+        $called = false;
+
+        UserWithCreatedAndUpdated::withoutUpdatedTimestampOn([UserWithCreatedAndUpdated::class], function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertTrue($called);
     }
 
     /**

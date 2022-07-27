@@ -14,6 +14,13 @@ trait HasTimestamps
     public $timestamps = true;
 
     /**
+     * The list of models classes that should not have timestamps updated on update.
+     *
+     * @var array
+     */
+    protected static $ignoreUpdatedTimestamp = [];
+
+    /**
      * Update the model's update timestamp.
      *
      * @param  string|null  $attribute
@@ -47,7 +54,7 @@ trait HasTimestamps
 
         $updatedAtColumn = $this->getUpdatedAtColumn();
 
-        if (! is_null($updatedAtColumn) && ! $this->isDirty($updatedAtColumn)) {
+        if (! is_null($updatedAtColumn) && ! $this->isDirty($updatedAtColumn) && (! $this->exists || ! static::isIgnoringUpdatedTimestamp())) {
             $this->setUpdatedAt($time);
         }
 
@@ -154,5 +161,56 @@ trait HasTimestamps
     public function getQualifiedUpdatedAtColumn()
     {
         return $this->qualifyColumn($this->getUpdatedAtColumn());
+    }
+
+    /**
+     * Disables setting the updated timestamp column for the current class during given callback scope.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function withoutUpdatedTimestamp(callable $callback)
+    {
+        static::withoutUpdatedTimestampOn([static::class], $callback);
+    }
+
+    /**
+     * Disables setting the updated timestamp column for the given model classes during given callback scope.
+     *
+     * @param  array  $models
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function withoutUpdatedTimestampOn(array $models, $callback)
+    {
+        static::$ignoreUpdatedTimestamp = array_values(array_merge(static::$ignoreUpdatedTimestamp, $models));
+
+        try {
+            $callback();
+        } finally {
+            static::$ignoreUpdatedTimestamp = array_values(array_diff(static::$ignoreUpdatedTimestamp, $models));
+        }
+    }
+
+    /**
+     * Determine if the model is ignoring the updated timestamp.
+     *
+     * @return bool
+     */
+    public static function isIgnoringUpdatedTimestamp($class = null)
+    {
+        $class = $class ?: static::class;
+
+        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
+            return true;
+        }
+
+        foreach (static::$ignoreUpdatedTimestamp as $ignoredClass) {
+            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
