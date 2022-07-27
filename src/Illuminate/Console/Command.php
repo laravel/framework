@@ -118,7 +118,7 @@ class Command extends SymfonyCommand
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
-        $this->components = new Factory($this->output);
+        $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
 
         return parent::run(
             $this->input = $input, $this->output
