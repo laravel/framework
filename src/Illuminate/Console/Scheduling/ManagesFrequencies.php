@@ -186,6 +186,19 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every two hours at a given offset in the hour.
+     *
+     * @return $this
+     */
+    public function everyTwoHoursAt($offset)
+    {
+        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
+        return $this->spliceIntoPosition(1, $offset)
+            ->spliceIntoPosition(2, '*/2');
+    }
+
+    /**
      * Schedule the event to run every three hours.
      *
      * @return $this
@@ -194,6 +207,19 @@ trait ManagesFrequencies
     {
         return $this->spliceIntoPosition(1, 0)
                     ->spliceIntoPosition(2, '*/3');
+    }
+
+    /**
+     * Schedule the event to run every three hours at a given offset in the hour.
+     *
+     * @return $this
+     */
+    public function everyThreeHoursAt($offset)
+    {
+        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
+        return $this->spliceIntoPosition(1, $offset)
+            ->spliceIntoPosition(2, '*/3');
     }
 
     /**
@@ -208,6 +234,19 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every four hours at a given offset in the hour.
+     *
+     * @return $this
+     */
+    public function everyFourHoursAt($offset)
+    {
+        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
+        return $this->spliceIntoPosition(1, $offset)
+            ->spliceIntoPosition(2, '*/4');
+    }
+
+    /**
      * Schedule the event to run every six hours.
      *
      * @return $this
@@ -216,6 +255,43 @@ trait ManagesFrequencies
     {
         return $this->spliceIntoPosition(1, 0)
                     ->spliceIntoPosition(2, '*/6');
+    }
+
+    /**
+     * Schedule the event to run every six hours at a given offset in the hour.
+     *
+     * @return $this
+     */
+    public function everySixHoursAt($offset)
+    {
+        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
+        return $this->spliceIntoPosition(1, $offset)
+            ->spliceIntoPosition(2, '*/6');
+    }
+
+    /**
+     * Schedule the event to run every eight hours.
+     *
+     * @return $this
+     */
+    public function everyEightHours()
+    {
+        return $this->spliceIntoPosition(1, 0)
+            ->spliceIntoPosition(2, '*/8');
+    }
+
+    /**
+     * Schedule the event to run every eight hours at a given offset in the hour.
+     *
+     * @return $this
+     */
+    public function everyEightHoursAt($offset)
+    {
+        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+
+        return $this->spliceIntoPosition(1, $offset)
+            ->spliceIntoPosition(2, '*/8');
     }
 
     /**
