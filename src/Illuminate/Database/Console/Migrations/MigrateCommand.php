@@ -181,6 +181,10 @@ class MigrateCommand extends BaseCommand
             return $this->option('schema-path');
         }
 
+        if ($connection->getConfig('schema_path') !== null) {
+            return database_path($connection->getConfig('schema_path'));
+        }
+
         if (file_exists($path = database_path('schema/'.$connection->getName().'-schema.dump'))) {
             return $path;
         }
