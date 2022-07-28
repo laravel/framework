@@ -84,8 +84,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $callback = $this->valueRetriever($callback);
 
-        $items = $this->map(fn($value) => $callback($value))
-            ->filter(fn($value) => !is_null($value));
+        $items = $this->map(fn ($value) => $callback($value))
+            ->filter(fn ($value) => !is_null($value));
 
         if ($count = $items->count()) {
             return $items->sum() / $count;
@@ -326,10 +326,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     protected function duplicateComparator($strict)
     {
         if ($strict) {
-            return fn($a, $b) => $a === $b;
+            return fn ($a, $b) => $a === $b;
         }
 
-        return fn($a, $b) => $a == $b;
+        return fn ($a, $b) => $a == $b;
 
     }
 
@@ -1089,7 +1089,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $chunks = floor(($this->count() - $size) / $step) + 1;
 
-        return static::times($chunks, fn($number) => $this->slice(($number - 1) * $step, $size));
+        return static::times($chunks, fn ($number) => $this->slice(($number - 1) * $step, $size));
     }
 
     /**
@@ -1570,7 +1570,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function zip($items)
     {
-        $arrayableItems = array_map(fn($items) => $this->getArrayableItems($items), func_get_args());
+        $arrayableItems = array_map(fn ($items) => $this->getArrayableItems($items), func_get_args());
 
         $params = array_merge(
             [fn() => new static(func_get_args()), $this->items],
