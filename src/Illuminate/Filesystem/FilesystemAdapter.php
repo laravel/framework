@@ -854,13 +854,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * Get the configuration values.
+     * Get an option from the configuration options.
      *
-     * @return array
+     * @param  string|null  $option
+     * @return mixed
      */
-    public function getConfig()
+    public function getConfig($option = null)
     {
-        return $this->config;
+        return Arr::get($this->config, $option);
     }
 
     /**

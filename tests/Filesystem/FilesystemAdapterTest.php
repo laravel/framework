@@ -424,6 +424,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('Hello World', $filesystemAdapter->getFoo());
     }
 
+    public function testGetConfig()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['foo' => 'bar']);
+        $this->assertSame(['foo' => 'bar'], $filesystemAdapter->getConfig());
+        $this->assertSame('bar', $filesystemAdapter->getConfig('foo'));
+    }
+
     public function testTemporaryUrlWithCustomCallback()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
