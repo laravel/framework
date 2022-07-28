@@ -158,7 +158,7 @@ class SupportConditionableTest extends TestCase
             ->unless()->has('missing')->log('four')
             ->unless()->toggle->log('five')
             ->toggle()
-            ->unless()->toggle->log('six');;
+            ->unless()->toggle->log('six');
 
         $this->assertSame(['init', 'two', 'four', 'five'], $logger->values);
     }
