@@ -83,6 +83,17 @@ class FrequencyTest extends TestCase
         $this->assertSame('0 */3 * * *', $this->event->everyThreeHours()->getExpression());
         $this->assertSame('0 */4 * * *', $this->event->everyFourHours()->getExpression());
         $this->assertSame('0 */6 * * *', $this->event->everySixHours()->getExpression());
+        $this->assertSame('0 */8 * * *', $this->event->everyEightHours()->getExpression());
+        $this->assertSame('10 */2 * * *', $this->event->everyTwoHoursAt(10)->getExpression());
+        $this->assertSame('15,45 */2 * * *', $this->event->everyTwoHoursAt([15,45])->getExpression());
+        $this->assertSame('10 */3 * * *', $this->event->everyThreeHoursAt(10)->getExpression());
+        $this->assertSame('15,45 */3 * * *', $this->event->everyThreeHoursAt([15,45])->getExpression());
+        $this->assertSame('10 */4 * * *', $this->event->everyFourHoursAt(10)->getExpression());
+        $this->assertSame('15,45 */4 * * *', $this->event->everyFourHoursAt([15,45])->getExpression());
+        $this->assertSame('10 */6 * * *', $this->event->everySixHoursAt(10)->getExpression());
+        $this->assertSame('15,45 */6 * * *', $this->event->everySixHoursAt([15,45])->getExpression());
+        $this->assertSame('10 */8 * * *', $this->event->everyEightHoursAt(10)->getExpression());
+        $this->assertSame('15,45 */8 * * *', $this->event->everyEightHoursAt([15,45])->getExpression());
     }
 
     public function testMonthly()
