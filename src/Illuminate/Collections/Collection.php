@@ -85,7 +85,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $callback = $this->valueRetriever($callback);
 
         $items = $this->map(fn ($value) => $callback($value))
-            ->filter(fn ($value) => !is_null($value));
+            ->filter(fn ($value) => ! is_null($value));
 
         if ($count = $items->count()) {
             return $items->sum() / $count;
@@ -1573,7 +1573,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $arrayableItems = array_map(fn ($items) => $this->getArrayableItems($items), func_get_args());
 
         $params = array_merge(
-            [fn() => new static(func_get_args()), $this->items],
+            [fn () => new static(func_get_args()), $this->items],
             $arrayableItems);
 
         return new static(array_map(...$params));
