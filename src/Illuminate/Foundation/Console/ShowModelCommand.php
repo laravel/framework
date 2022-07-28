@@ -508,7 +508,7 @@ class ShowModelCommand extends Command
     }
 
     /**
-     * Map short returns to their full names
+     * Map short returns to their full names.
      *
      * @param  string  $returnType
      * @return string
