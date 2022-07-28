@@ -14,6 +14,13 @@ use JsonSerializable;
 class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, PaginatorContract
 {
     /**
+     * The total number of items before slicing.
+     *
+     * @var int
+     */
+    protected $total;
+
+    /**
      * Determine if there are more items in the data source.
      *
      * @return bool
@@ -67,7 +74,9 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     {
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
 
-        $this->hasMore = $this->items->count() > $this->perPage;
+        $this->total = $this->items->count();
+
+        $this->hasMore = $this->total > $this->perPage;
 
         $this->items = $this->items->slice(0, $this->perPage);
     }
@@ -108,6 +117,16 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         return static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
             'paginator' => $this,
         ]));
+    }
+
+    /**
+     * Get the total number of items being paginated.
+     *
+     * @return int
+     */
+    public function total()
+    {
+        return $this->total;
     }
 
     /**
