@@ -227,39 +227,37 @@ class ServeCommand extends Command
     protected function handleProcessOutput()
     {
         return fn ($type, $buffer) => str($buffer)->explode("\n")->each(function ($line) {
-            $parts = explode(']', $line);
-
             if (str($line)->contains('Development Server (http')) {
                 $this->components->info("Server running on [http://{$this->host()}:{$this->port()}].");
                 $this->comment('  <fg=yellow;options=bold>Press Ctrl+C to stop the server</>');
 
                 $this->newLine();
             } elseif (str($line)->contains(' Accepted')) {
-                $startDate = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['));
+                $requestPort = $this->getRequestPortFromLine($line);
 
-                preg_match('/\:(\d+)/', $parts[1], $matches);
-
-                $this->requestsPool[$matches[1]] = [$startDate, false];
+                $this->requestsPool[$requestPort] = [
+                    $this->getDateFromLine($line),
+                    false,
+                ];
             } elseif (str($line)->contains([' [200]: GET '])) {
-                preg_match('/\:(\d+)/', $parts[1], $matches);
+                $requestPort = $this->getRequestPortFromLine($line);
 
-                $this->requestsPool[$matches[1]][1] = trim(explode('[200]: GET', $line)[1]);
+                $this->requestsPool[$requestPort][1] = trim(explode('[200]: GET', $line)[1]);
             } elseif (str($line)->contains(' Closing')) {
-                preg_match('/\:(\d+)/', $parts[1], $matches);
-
-                $request = $this->requestsPool[$matches[1]];
+                $requestPort = $this->getRequestPortFromLine($line);
+                $request = $this->requestsPool[$requestPort];
 
                 [$startDate, $file] = $request;
+
                 $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
 
-                unset($this->requestsPool[$matches[1]]);
+                unset($this->requestsPool[$requestPort]);
 
                 [$date, $time] = explode(' ', $formattedStartedAt);
 
                 $this->output->write("  <fg=gray>$date</> $time");
 
-                $runTime = Carbon::createFromFormat('D M d H:i:s Y', ltrim($parts[0], '['))
-                                ->diffInSeconds($startDate);
+                $runTime = $this->getDateFromLine($line)->diffInSeconds($startDate);
 
                 if ($file) {
                     $this->output->write($file = " $file");
@@ -269,14 +267,39 @@ class ServeCommand extends Command
 
                 $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
                 $this->output->writeln(" <fg=gray>~ {$runTime}s</>");
-            } elseif (str($line)->contains(['Closed without sending a request', ']: '])) {
+            } elseif (str($line)->contains(['Closed without sending a request'])) {
                 // ...
-            } elseif (isset($parts[1])) {
-                $this->components->warn($parts[1]);
             } elseif (! empty($line)) {
-                $this->components->warn($line);
+                $warning = explode('] ', $line);
+                $this->components->warn(count($warning) > 1 ? $warning[1] : $warning[0]);
             }
         });
+    }
+
+    /**
+     * Get the date from the given PHP server output.
+     *
+     * @param  string  $line
+     * @return \Illuminate\Support\Carbon
+     */
+    protected function getDateFromLine($line)
+    {
+        preg_match('/^\[([^\]]+)\]/', $line, $matches);
+
+        return Carbon::createFromFormat('D M d H:i:s Y', $matches[1]);
+    }
+
+    /**
+     * Get the request port from the given PHP server output.
+     *
+     * @param  string  $line
+     * @return int
+     */
+    protected function getRequestPortFromLine($line)
+    {
+        preg_match('/:(\d+)\s(?:(?:\w+$)|(?:\[.*))/', $line, $matches);
+
+        return (int) $matches[1];
     }
 
     /**
