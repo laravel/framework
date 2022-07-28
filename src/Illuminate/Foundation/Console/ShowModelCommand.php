@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -179,27 +180,43 @@ class ShowModelCommand extends Command
                 || $method->isAbstract()
                 || $method->getDeclaringClass()->getName() !== get_class($model)
             )
-            ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
+            ->map(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
-                    return [Str::snake($matches[1]) => 'accessor'];
+                    return [
+                        Str::snake($matches[1]) => 'accessor',
+                        'type' => $this->mapReturnType($method->getReturnType()?->getName()),
+                    ];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
-                    return [Str::snake($method->getName()) => 'attribute'];
-                } else {
-                    return [];
+                    $closure = call_user_func($method->getClosure($model), 1);
+                    $type = null;
+                    if (! is_null($closure->get)) {
+                        $function = new ReflectionFunction($closure->get);
+                        if ($function->hasReturnType()) {
+                            $type = $this->mapReturnType($function->getReturnType()->getName());
+                        }
+                    }
+
+                    return [
+                        Str::snake($method->getName()) => 'attribute',
+                        'type' => $type,
+                    ];
                 }
+
+                return [];
             })
-            ->reject(fn ($cast, $name) => collect($columns)->has($name))
-            ->map(fn ($cast, $name) => [
-                'name' => $name,
-                'type' => null,
+            ->reject(fn ($attr) => collect($columns)->has(array_key_first($attr)))
+            ->reject(fn ($attr) => empty($attr))
+            ->map(fn ($attr) => [
+                'name' => array_key_first($attr),
+                'type' => $attr[array_key_last($attr)],
                 'increments' => false,
                 'nullable' => null,
                 'default' => null,
                 'unique' => null,
-                'fillable' => $model->isFillable($name),
-                'hidden' => $this->attributeIsHidden($name, $model),
-                'appended' => $model->hasAppended($name),
-                'cast' => $cast,
+                'fillable' => $model->isFillable(array_key_first($attr)),
+                'hidden' => $this->attributeIsHidden(array_key_first($attr), $model),
+                'appended' => $model->hasAppended(array_key_first($attr)),
+                'cast' => $attr[array_key_first($attr)],
             ])
             ->values();
     }
@@ -488,6 +505,22 @@ class ShowModelCommand extends Command
         return is_dir(app_path('Models'))
             ? $rootNamespace.'Models\\'.$model
             : $rootNamespace.$model;
+    }
+
+    /**
+     * Map short returns to their full names
+     *
+     * @param  string  $returnType
+     * @return string
+     */
+    protected function mapReturnType(string $returnType): string
+    {
+        $mappings = [
+            'int' => 'integer',
+            'bool' => 'boolean',
+        ];
+
+        return isset($mappings[$returnType]) ? $mappings[$returnType] : $returnType;
     }
 
     /**
