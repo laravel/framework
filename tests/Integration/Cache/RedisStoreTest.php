@@ -83,22 +83,6 @@ class RedisStoreTest extends TestCase
     /**
      * @dataProvider extendedRedisConnectionDataProvider
      */
-    public function testItCanAddWithTtl($connection)
-    {
-        $this->markTestIncomplete('Needs support in the RedisStore first.');
-
-        $repository = $this->getRepository($connection);
-
-        $result = $repository->add('foo', 'test test test', 10);
-        $this->assertTrue($result);
-        $this->assertSame('test test test', $repository->get('foo'));
-        $result = $repository->forget('foo');
-        $this->assertTrue($result);
-    }
-
-    /**
-     * @dataProvider extendedRedisConnectionDataProvider
-     */
     public function testItCanPut($connection)
     {
         $repository = $this->getRepository($connection);
