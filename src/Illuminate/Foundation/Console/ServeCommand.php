@@ -246,7 +246,9 @@ class ServeCommand extends Command
             } elseif (str($line)->contains(' Closing')) {
                 $requestPort = $this->getRequestPortFromLine($line);
                 $request = $this->requestsPool[$requestPort];
+
                 [$startDate, $file] = $request;
+
                 $formattedStartedAt = $startDate->format('Y-m-d H:i:s');
 
                 unset($this->requestsPool[$requestPort]);
@@ -275,7 +277,7 @@ class ServeCommand extends Command
     }
 
     /**
-     * Returns the date from the given PHP Built-in server output.
+     * Get the date from the given PHP server output.
      *
      * @param  string  $line
      * @return \Illuminate\Support\Carbon
@@ -288,7 +290,7 @@ class ServeCommand extends Command
     }
 
     /**
-     * Returns the request port from the given PHP Built-in server output.
+     * Get the request port from the given PHP server output.
      *
      * @param  string  $line
      * @return int
