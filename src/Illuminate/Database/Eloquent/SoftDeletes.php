@@ -114,18 +114,40 @@ trait SoftDeletes
             return false;
         }
 
+        $this->runRestore();
+
+        return true;
+    }
+
+    /**
+     * Perform the actual restore query on this model instance.
+     *
+     * @return void
+     */
+    public function runRestore()
+    {
+        $query = $this->setKeysForSaveQuery($this->newModelQuery());
+
+        $columns = [$this->getDeletedAtColumn() => null];
+
         $this->{$this->getDeletedAtColumn()} = null;
+
+        if ($this->timestamps && !is_null($this->getUpdatedAtColumn())) {
+            $time = $this->freshTimestamp();
+
+            $this->{$this->getUpdatedAtColumn()} = $time;
+
+            $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
+        }
 
         // Once we have saved the model, we will fire the "restored" event so this
         // developer will do anything they need to after a restore operation is
         // totally finished. Then we will return the result of the save call.
         $this->exists = true;
 
-        $result = $this->save();
+        $query->update($columns);
 
         $this->fireModelEvent('restored', false);
-
-        return $result;
     }
 
     /**
