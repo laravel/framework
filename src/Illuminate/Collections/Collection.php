@@ -330,7 +330,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         return fn ($a, $b) => $a == $b;
-
     }
 
     /**
