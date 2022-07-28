@@ -77,6 +77,12 @@ class HigherOrderWhenProxy
      */
     public function __get($key)
     {
+        if (! $this->hasCondition) {
+            $condition = $this->target->{$key};
+
+            return $this->condition($this->negateConditionOnCapture ? ! $condition : $condition);
+        }
+
         return $this->condition
             ? $this->target->{$key}
             : $this->target;
