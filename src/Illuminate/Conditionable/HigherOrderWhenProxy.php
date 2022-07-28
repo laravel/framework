@@ -30,7 +30,7 @@ class HigherOrderWhenProxy
      *
      * @var bool
      */
-    protected $negateCondition;
+    protected $negateConditionOnCapture;
 
     /**
      * Create a new proxy instance.
@@ -62,9 +62,9 @@ class HigherOrderWhenProxy
      *
      * @return $this
      */
-    public function negateCondition()
+    public function negateConditionOnCapture()
     {
-        $this->negateCondition = true;
+        $this->negateConditionOnCapture = true;
 
         return $this;
     }
@@ -94,7 +94,7 @@ class HigherOrderWhenProxy
         if (! $this->hasCondition) {
             $condition = $this->target->{$method}(...$parameters);
 
-            return $this->condition($this->negateCondition ? ! $condition : $condition);
+            return $this->condition($this->negateConditionOnCapture ? ! $condition : $condition);
         }
 
         return $this->condition
