@@ -270,7 +270,10 @@ class ShowModelCommand extends Command
         $formatted = [];
 
         foreach($listeners as $key => $observerMethods) {
-            $formatted[] = ['event' => $extractVerb($key), 'observer' => $observerMethods];
+            $formatted[] = [
+                'event' => $extractVerb($key),
+                'observer' => array_map(fn ($obs) => is_string($obs) ? $obs : 'Closure', $observerMethods),
+            ];
         }
 
         return collect($formatted);
