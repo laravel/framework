@@ -10,10 +10,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Throwable;
 
+#[AsCommand(name: 'docs')]
 class DocsCommand extends Command
 {
     /**
@@ -24,11 +26,22 @@ class DocsCommand extends Command
     protected $signature = 'docs {page? : The documentation page to open} {section? : The section of the page to open}';
 
     /**
+     * The name of the console command.
+     *
+     * This name is used to identify the command during lazy loading.
+     *
+     * @var string|null
+     *
+     * @deprecated
+     */
+    protected static $defaultName = 'docs';
+
+    /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Access the Laravel documentation with ease.';
+    protected $description = 'Access the Laravel documentation';
 
     /**
      * The console command help text.
@@ -38,21 +51,21 @@ class DocsCommand extends Command
     protected $help = 'If you would like to perform a content search against the documention, you may call: <fg=green>php artisan docs -- </><fg=green;options=bold;>search query here</>';
 
     /**
-     * The HTTP client.
+     * The HTTP client instance
      *
      * @var \Illuminate\Http\Client\Factory
      */
     protected $http;
 
     /**
-     * The cache.
+     * The cache repository implementation.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cache;
 
     /**
-     * The custom url opener.
+     * The custom URL opener.
      *
      * @var callable|null
      */
@@ -72,13 +85,33 @@ class DocsCommand extends Command
      */
     protected $systemOsFamily = PHP_OS_FAMILY;
 
+    /**
+     * Create a new command instance.
+     *
+     * @param  \Illuminate\Http\Client\Factory  $http
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @return void
+     */
     public function __construct(Http $http, Cache $cache)
     {
         parent::__construct();
 
         $this->http = $http;
-
         $this->cache = $cache;
+    }
+
+    /**
+     * Configure the current command.
+     *
+     * @return void
+     */
+    protected function configure()
+    {
+        parent::configure();
+
+        if ($this->isSearching()) {
+            $this->ignoreValidationErrors();
+        }
     }
 
     /**
@@ -231,7 +264,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * Guess the page the user is requesting to open.
+     * Guess the page the user is attempting to open.
      *
      * @return ?string
      */
@@ -279,7 +312,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * Guess the section the user is requesting to open.
+     * Guess the section the user is attempting to open.
      *
      * @param  string  $page
      * @return ?string
@@ -305,7 +338,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * Open the URL.
+     * Open the URL in the user's browser.
      *
      * @param  string  $url
      * @return void
@@ -387,7 +420,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * The documentation.
+     * Get the documentation index as a collection.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -401,7 +434,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * Refresh the documentation.
+     * Refresh the cached copy of the documentation index.
      *
      * @return void
      */
@@ -415,7 +448,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * Fetch the documentation.
+     * Fetch the documentation index from the Laravel website.
      *
      * @return \Illuminate\Http\Client\Response
      */
@@ -425,7 +458,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * The version of the docs to open.
+     * Determine the version of the docs to open.
      *
      * @return string
      */
@@ -435,7 +468,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * The search to perform.
+     * The search query the user provided.
      *
      * @return string
      */
@@ -452,20 +485,6 @@ class DocsCommand extends Command
     protected function isSearching()
     {
         return ($_SERVER['argv'][2] ?? null) === '--';
-    }
-
-    /**
-     * Configures the current command.
-     *
-     * @return void
-     */
-    protected function configure()
-    {
-        parent::configure();
-
-        if ($this->isSearching()) {
-            $this->ignoreValidationErrors();
-        }
     }
 
     /**
