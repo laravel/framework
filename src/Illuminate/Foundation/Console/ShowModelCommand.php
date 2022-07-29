@@ -251,6 +251,7 @@ class ShowModelCommand extends Command
     /**
      * Get the Observers watching this model.
      * @return Illuminate\Support\Collection
+     * 
      */
     protected function getObservers($model)
     {
@@ -269,7 +270,7 @@ class ShowModelCommand extends Command
 
         $formatted = [];
 
-        foreach($listeners as $key => $observerMethods) {
+        foreach ($listeners as $key => $observerMethods) {
             $formatted[] = [
                 'event' => $extractVerb($key),
                 'observer' => array_map(fn ($obs) => is_string($obs) ? $obs : 'Closure', $observerMethods),
@@ -377,9 +378,11 @@ class ShowModelCommand extends Command
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Eloquent Observers</>');
 
-        if ($observers->count()) foreach ($observers as $observer) {
-            $this->components->twoColumnDetail(
-                sprintf('%s', $observer['event']), implode(', ', $observer['observer']));
+        if ($observers->count()) {
+            foreach ($observers as $observer) {
+                $this->components->twoColumnDetail(
+                    sprintf('%s', $observer['event']), implode(', ', $observer['observer']));
+            }
         }
 
         $this->newLine();
