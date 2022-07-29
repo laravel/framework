@@ -120,6 +120,21 @@ trait InteractsWithContainer
             {
                 return '';
             }
+
+            public function useIntegrityKey()
+            {
+                return $this;
+            }
+
+            public function useScriptTagAttributes()
+            {
+                return $this;
+            }
+
+            public function useStyleTagAttributes()
+            {
+                return $this;
+            }
         });
 
         return $this;
