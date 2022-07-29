@@ -51,7 +51,7 @@ class DocsCommand extends Command
     protected $help = 'If you would like to perform a content search against the documention, you may call: <fg=green>php artisan docs -- </><fg=green;options=bold;>search query here</>';
 
     /**
-     * The HTTP client instance
+     * The HTTP client instance.
      *
      * @var \Illuminate\Http\Client\Factory
      */
