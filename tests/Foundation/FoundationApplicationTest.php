@@ -67,6 +67,7 @@ class FoundationApplicationTest extends TestCase
         $app->register($provider = new class($app) extends ServiceProvider
         {
             public $singletons = [
+                NonContractBackedClass::class,
                 AbstractClass::class => ConcreteClass::class,
             ];
         });
@@ -77,6 +78,11 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertInstanceOf(ConcreteClass::class, $instance);
         $this->assertSame($instance, $app->make(AbstractClass::class));
+
+        $instance = $app->make(NonContractBackedClass::class);
+
+        $this->assertInstanceOf(NonContractBackedClass::class, $instance);
+        $this->assertSame($instance, $app->make(NonContractBackedClass::class));
     }
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
@@ -609,6 +615,11 @@ abstract class AbstractClass
 }
 
 class ConcreteClass extends AbstractClass
+{
+    //
+}
+
+class NonContractBackedClass
 {
     //
 }
