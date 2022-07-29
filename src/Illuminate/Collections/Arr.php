@@ -558,7 +558,7 @@ class Arr
 
         try {
             $items = array_map($callback, $array, $keys);
-        } catch (ArgumentCountError) {
+        } catch (ArgumentCountError $e) {
             $items = array_map($callback, $array);
         }
 
