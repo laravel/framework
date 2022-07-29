@@ -19,7 +19,7 @@ class HigherOrderWhenProxy
     protected $condition;
 
     /**
-     * Tracks whether the proxy has a condition.
+     * Indicates whether the proxy has a condition.
      *
      * @var bool
      */
@@ -51,14 +51,13 @@ class HigherOrderWhenProxy
      */
     public function condition($condition)
     {
-        $this->condition = $condition;
-        $this->hasCondition = true;
+        [$this->condition, $this->hasCondition] = [$condition, true];
 
         return $this;
     }
 
     /**
-     * Negate the condition.
+     * Indicate that the condition should be negated.
      *
      * @return $this
      */
