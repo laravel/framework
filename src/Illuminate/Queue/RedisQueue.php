@@ -46,7 +46,9 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $blockFor = null;
 
     /**
-     * The batch size of expired jobs migration.
+     * The batch size to use when migrating delayed / expired jobs onto the primary queue.
+     *
+     * Negative values are infinite.
      *
      * @var int
      */
