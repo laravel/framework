@@ -130,6 +130,7 @@ class ShowModelCommand extends Command
             $model->getConnection()->getTablePrefix().$model->getTable(),
             $this->getAttributes($model),
             $this->getRelations($model),
+            $this->getObservers($model),
         );
     }
 
@@ -248,6 +249,34 @@ class ShowModelCommand extends Command
     }
 
     /**
+     * Get the Observers watching this model.
+     * @return Illuminate\Support\Collection
+     */
+    protected function getObservers($model)
+    {
+        $listeners = $this->getLaravel()->make('events')->getRawListeners();
+
+        // Distill down to Eloquent observers relevant to this model.
+        $listeners = array_filter($listeners, function ($v, $key) use ($model) {
+            return Str::startsWith($key, 'eloquent.') && Str::endsWith($key, $model::class);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        // Format as Eloquent verb => Observer methods
+        $extractVerb = function ($key) {
+            preg_match('/eloquent.([a-zA-Z]+)\: /', $key, $matches);
+            return $matches[1] ?? '?';
+        };
+
+        $formatted = [];
+
+        foreach($listeners as $key => $observerMethods) {
+            $formatted[] = ['event' => $extractVerb($key), 'observer' => $observerMethods];
+        }
+
+        return collect($formatted);
+    }
+
+    /**
      * Render the model information.
      *
      * @param  string  $class
@@ -255,13 +284,14 @@ class ShowModelCommand extends Command
      * @param  string  $table
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function display($class, $database, $table, $attributes, $relations)
+    protected function display($class, $database, $table, $attributes, $relations, $observers)
     {
         $this->option('json')
-            ? $this->displayJson($class, $database, $table, $attributes, $relations)
-            : $this->displayCli($class, $database, $table, $attributes, $relations);
+            ? $this->displayJson($class, $database, $table, $attributes, $relations, $observers)
+            : $this->displayCli($class, $database, $table, $attributes, $relations, $observers);
     }
 
     /**
@@ -272,9 +302,10 @@ class ShowModelCommand extends Command
      * @param  string  $table
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayJson($class, $database, $table, $attributes, $relations)
+    protected function displayJson($class, $database, $table, $attributes, $relations, $observers)
     {
         $this->output->writeln(
             collect([
@@ -283,6 +314,7 @@ class ShowModelCommand extends Command
                 'table' => $table,
                 'attributes' => $attributes,
                 'relations' => $relations,
+                'observers' => $observers,
             ])->toJson()
         );
     }
@@ -295,9 +327,10 @@ class ShowModelCommand extends Command
      * @param  string  $table
      * @param  \Illuminate\Support\Collection  $attributes
      * @param  \Illuminate\Support\Collection  $relations
+     * @param  \Illuminate\Support\Collection  $observers
      * @return void
      */
-    protected function displayCli($class, $database, $table, $attributes, $relations)
+    protected function displayCli($class, $database, $table, $attributes, $relations, $observers)
     {
         $this->newLine();
 
@@ -335,6 +368,15 @@ class ShowModelCommand extends Command
                     OutputInterface::VERBOSITY_VERBOSE
                 );
             }
+        }
+
+        $this->newLine();
+
+        $this->components->twoColumnDetail('<fg=green;options=bold>Eloquent Observers</>');
+
+        if ($observers->count()) foreach ($observers as $observer) {
+            $this->components->twoColumnDetail(
+                sprintf('%s', $observer['event']), implode(', ', $observer['observer']));
         }
 
         $this->newLine();
