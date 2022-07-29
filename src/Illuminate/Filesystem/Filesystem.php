@@ -6,6 +6,7 @@ use ErrorException;
 use FilesystemIterator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use SplFileObject;
@@ -15,6 +16,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Filesystem
 {
+    use Conditionable;
     use Macroable;
 
     /**
