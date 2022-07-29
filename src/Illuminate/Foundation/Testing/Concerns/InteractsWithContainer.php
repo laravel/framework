@@ -126,12 +126,12 @@ trait InteractsWithContainer
                 return $this;
             }
 
-            public function useAttributesForScriptTag()
+            public function useScriptTagAttributes()
             {
                 return $this;
             }
 
-            public function useAttributesForStylesheetTag()
+            public function useStyleTagAttributes()
             {
                 return $this;
             }

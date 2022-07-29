@@ -31,11 +31,21 @@ class Vite
     protected $scriptTagAttributesResolvers = [];
 
     /**
-     * The stylesheet tag attributes resolvers.
+     * The style tag attributes resolvers.
      *
      * @var array
      */
-    protected $stylesheetTagAttributesResolvers = [];
+    protected $styleTagAttributesResolvers = [];
+
+    /**
+     * Get the Content Security Policy nonce applied to all generated tags.
+     *
+     * @return string|null
+     */
+    public function cspNonce()
+    {
+        return $this->nonce;
+    }
 
     /**
      * Generate or set a Content Security Policy nonce to apply to all generated tags.
@@ -46,16 +56,6 @@ class Vite
     public function useCspNonce($nonce = null)
     {
         return $this->nonce = $nonce ?? Str::random(40);
-    }
-
-    /**
-     * Get the Content Security Policy nonce applied to all generated tags.
-     *
-     * @return string|null
-     */
-    public function cspNonce()
-    {
-        return $this->nonce;
     }
 
     /**
@@ -77,7 +77,7 @@ class Vite
      * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
      * @return $this
      */
-    public function useAttributesForScriptTag($attributes)
+    public function useScriptTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
             $attributes = fn () => $attributes;
@@ -89,18 +89,18 @@ class Vite
     }
 
     /**
-     * Use the given callback to resolve attributes for stylesheet tags.
+     * Use the given callback to resolve attributes for style tags.
      *
      * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
      * @return $this
      */
-    public function useAttributesForStylesheetTag($attributes)
+    public function useStyleTagAttributes($attributes)
     {
         if (! is_callable($attributes)) {
             $attributes = fn () => $attributes;
         }
 
-        $this->stylesheetTagAttributesResolvers[] = $attributes;
+        $this->styleTagAttributesResolvers[] = $attributes;
 
         return $this;
     }
@@ -187,35 +187,6 @@ class Vite
     }
 
     /**
-     * Generate React refresh runtime script.
-     *
-     * @return \Illuminate\Support\HtmlString|void
-     */
-    public function reactRefresh()
-    {
-        if (! is_file(public_path('/hot'))) {
-            return;
-        }
-
-        $url = rtrim(file_get_contents(public_path('/hot')));
-
-        return new HtmlString(
-            sprintf(
-                <<<'HTML'
-                <script type="module">
-                    import RefreshRuntime from '%s/@react-refresh'
-                    RefreshRuntime.injectIntoGlobalHook(window)
-                    window.$RefreshReg$ = () => {}
-                    window.$RefreshSig$ = () => (type) => type
-                    window.__vite_plugin_react_preamble_installed__ = true
-                </script>
-                HTML,
-                $url
-            )
-        );
-    }
-
-    /**
      * Make tag for the given chunk.
      *
      * @param  string  $src
@@ -231,7 +202,7 @@ class Vite
             && $this->integrityKey !== false
             && ! array_key_exists($this->integrityKey, $chunk ?? [])
             && $this->scriptTagAttributesResolvers === []
-            && $this->stylesheetTagAttributesResolvers === []) {
+            && $this->styleTagAttributesResolvers === []) {
             return $this->makeTag($url);
         }
 
@@ -285,7 +256,7 @@ class Vite
             ? ['integrity' => $chunk[$this->integrityKey] ?? false]
             : [];
 
-        foreach ($this->stylesheetTagAttributesResolvers as $resolver) {
+        foreach ($this->styleTagAttributesResolvers as $resolver) {
             $attributes = array_merge($attributes, $resolver($src, $url, $chunk, $manifest));
         }
 
@@ -396,5 +367,34 @@ class Vite
             ->map(fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')
             ->values()
             ->all();
+    }
+
+    /**
+     * Generate React refresh runtime script.
+     *
+     * @return \Illuminate\Support\HtmlString|void
+     */
+    public function reactRefresh()
+    {
+        if (! is_file(public_path('/hot'))) {
+            return;
+        }
+
+        $url = rtrim(file_get_contents(public_path('/hot')));
+
+        return new HtmlString(
+            sprintf(
+                <<<'HTML'
+                <script type="module">
+                    import RefreshRuntime from '%s/@react-refresh'
+                    RefreshRuntime.injectIntoGlobalHook(window)
+                    window.$RefreshReg$ = () => {}
+                    window.$RefreshSig$ = () => (type) => type
+                    window.__vite_plugin_react_preamble_installed__ = true
+                </script>
+                HTML,
+                $url
+            )
+        );
     }
 }

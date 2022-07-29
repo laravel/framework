@@ -272,10 +272,10 @@ class FoundationViteTest extends TestCase
     public function testItCanSpecifyArbitraryAttributesForScriptTagsWhenBuilt()
     {
         $this->makeViteManifest();
-        ViteFacade::useAttributesForScriptTag([
+        ViteFacade::useScriptTagAttributes([
             'general' => 'attribute',
         ]);
-        ViteFacade::useAttributesForScriptTag(function ($src, $url, $chunk, $manifest) {
+        ViteFacade::useScriptTagAttributes(function ($src, $url, $chunk, $manifest) {
             $this->assertSame('resources/js/app.js', $src);
             $this->assertSame('https://example.com/build/assets/app.versioned.js', $url);
             $this->assertSame(['file' => 'assets/app.versioned.js'], $chunk);
@@ -334,10 +334,10 @@ class FoundationViteTest extends TestCase
     public function testItCanSpecifyArbitraryAttributesForStylesheetTagsWhenBuild()
     {
         $this->makeViteManifest();
-        ViteFacade::useAttributesForStylesheetTag([
+        ViteFacade::useStyleTagAttributes([
             'general' => 'attribute',
         ]);
-        ViteFacade::useAttributesForStylesheetTag(function ($src, $url, $chunk, $manifest) {
+        ViteFacade::useStyleTagAttributes(function ($src, $url, $chunk, $manifest) {
             $this->assertSame('resources/css/app.css', $src);
             $this->assertSame('https://example.com/build/assets/app.versioned.css', $url);
             $this->assertSame(['file' => 'assets/app.versioned.css'], $chunk);
@@ -393,14 +393,14 @@ class FoundationViteTest extends TestCase
     public function testItCanSpecifyArbitraryAttributesForScriptTagsWhenHotModuleReloading()
     {
         $this->makeViteHotFile();
-        ViteFacade::useAttributesForScriptTag([
+        ViteFacade::useScriptTagAttributes([
             'general' => 'attribute',
         ]);
         $expectedArguments = [
             ['src' => '@vite/client', 'url' => 'http://localhost:3000/@vite/client'],
             ['src' => 'resources/js/app.js', 'url' => 'http://localhost:3000/resources/js/app.js'],
         ];
-        ViteFacade::useAttributesForScriptTag(function ($src, $url, $chunk, $manifest) use (&$expectedArguments) {
+        ViteFacade::useScriptTagAttributes(function ($src, $url, $chunk, $manifest) use (&$expectedArguments) {
             $args = array_shift($expectedArguments);
 
             $this->assertSame($args['src'], $src);
@@ -429,10 +429,10 @@ class FoundationViteTest extends TestCase
     public function testItCanSpecifyArbitraryAttributesForStylesheetTagsWhenHotModuleReloading()
     {
         $this->makeViteHotFile();
-        ViteFacade::useAttributesForStylesheetTag([
+        ViteFacade::useStyleTagAttributes([
             'general' => 'attribute',
         ]);
-        ViteFacade::useAttributesForStylesheetTag(function ($src, $url, $chunk, $manifest) {
+        ViteFacade::useStyleTagAttributes(function ($src, $url, $chunk, $manifest) {
             $this->assertSame('resources/css/app.css', $src);
             $this->assertSame('http://localhost:3000/resources/css/app.css', $url);
             $this->assertNull($chunk);
@@ -459,11 +459,11 @@ class FoundationViteTest extends TestCase
     public function testItCanOverrideAllAttributes()
     {
         $this->makeViteManifest();
-        ViteFacade::useAttributesForStylesheetTag([
+        ViteFacade::useStyleTagAttributes([
             'rel' => 'expected-rel',
             'href' => 'expected-href',
         ]);
-        ViteFacade::useAttributesForScriptTag([
+        ViteFacade::useScriptTagAttributes([
             'type' => 'expected-type',
             'src' => 'expected-src',
         ]);
