@@ -250,8 +250,8 @@ class ShowModelCommand extends Command
 
     /**
      * Get the Observers watching this model.
+     *
      * @return Illuminate\Support\Collection
-     * 
      */
     protected function getObservers($model)
     {
