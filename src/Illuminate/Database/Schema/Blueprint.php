@@ -1051,6 +1051,7 @@ class Blueprint
             }
             $allowed = $cases;
         }
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
