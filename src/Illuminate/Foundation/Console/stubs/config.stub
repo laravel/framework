@@ -7,7 +7,7 @@ return [
     | {{ class }} Config File
     |--------------------------------------------------------------------------
     |
-    | This file is for storing the credentials of the {{ class }} application
+    | This file is for storing the configurable of {{ class }}
     |
     */
 
