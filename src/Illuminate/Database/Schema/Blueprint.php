@@ -1032,11 +1032,24 @@ class Blueprint
      * Create a new enum column on the table.
      *
      * @param  string  $column
-     * @param  array  $allowed
+     * @param  array|string  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, array $allowed)
+    public function enum($column, array|string $allowed)
     {
+        if(is_string($allowed)){
+            if(!enum_exists($allowed)){
+                throw new \InvalidArgumentException("$allowed is not a recognized Enum");
+            }
+            if(!is_subclass_of($allowed,'\BackedEnum')){
+                throw new \InvalidArgumentException("$allowed is not a Backed Enum. Only Backed Enums are supported at this time");
+            }
+            $cases = array();
+            foreach ($allowed::cases() as $case){
+                array_push($cases,$case->value);
+            }
+            $allowed = $cases;
+        }
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
