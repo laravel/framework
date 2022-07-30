@@ -127,6 +127,85 @@ class FileLoader implements Loader
     }
 
     /**
+     * Add all path sub paths
+     * including all sub folders inside path 
+     * @param string $path
+     * @return array
+     */
+    public function withSubsPaths($paths)
+    {
+        return collect($paths)
+            ->reduce(function ($output, $path) {
+
+                // remove last baclk slash form dir path before pushed
+                array_push($output, "{$this->files->dirname($path)}/{$this->files->basename($path)}");
+
+                if ($this->files->exists($path)) {
+
+                    $subs = $this->files->directories($path);
+                    foreach ($subs as $sub) {
+                        // remove last baclk slash form dir path before pushed
+                        array_push($output, "{$this->files->dirname($sub)}/{$this->files->basename($sub)}");
+                    }
+                }
+
+                return $output;
+            }, []);
+    }
+
+    /**
+     * Add path sub files
+     * including all files inside path 
+     * @param string $path
+     * @param string $locale
+     * @param string $extention
+     * @return array
+     */
+    public function withSubsFiles($path, $locale, $extention)
+    {
+        $files = ["{$path}/{$locale}.{$extention}"];
+
+        if ($this->files->exists("{$path}/{$locale}")) {
+
+            $subFiles = collect($this->files->allFiles("{$path}/{$locale}"))
+                ->reduce(function ($output, $file) use ($extention) {
+
+                    if ($this->files->isFile($file) && $file->getExtension() == $extention) {
+                        array_push($output, $file->getBasename());
+                    }
+
+                    return $output;
+                }, []);
+
+            foreach ($subFiles as $file) {
+                array_push($files, "{$path}/{$locale}/{$file}");
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Load file translations
+     * @param string $path
+     * @return array
+     */
+
+    public function loadFileTranslations($path)
+    {
+        if ($this->files->exists($path)) {
+
+            $decoded = json_decode($this->files->get($path), true);
+
+            if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException("Translation file [{$path}] contains an invalid JSON structure.");
+            }
+
+            return $decoded;
+        }
+    }
+
+    /**
      * Load a locale from the given JSON file path.
      *
      * @param  string  $locale
@@ -136,17 +215,18 @@ class FileLoader implements Loader
      */
     protected function loadJsonPaths($locale)
     {
-        return collect(array_merge($this->jsonPaths, [$this->path]))
+        return collect($this->withSubsPaths(array_merge($this->jsonPaths, [$this->path])))
             ->reduce(function ($output, $path) use ($locale) {
-                if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-                    $decoded = json_decode($this->files->get($full), true);
 
-                    if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
-                        throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
+                foreach ($this->withSubsFiles($path, $locale, 'json') as $file) {
+
+                    $translations = $this->loadFileTranslations($file);
+
+                    if (is_array($translations)) {
+                        $output = array_merge($output, $translations);
                     }
-
-                    $output = array_merge($output, $decoded);
                 }
+
 
                 return $output;
             }, []);
