@@ -1041,13 +1041,13 @@ class Blueprint
             if (! enum_exists($allowed)) {
                 throw new \InvalidArgumentException("$allowed is not a recognized Enum");
             }
-            if (! is_subclass_of($allowed,'\BackedEnum')) {
+            if (! is_subclass_of($allowed, '\BackedEnum')) {
                 throw new \InvalidArgumentException("$allowed is not a Backed Enum. Only Backed Enums are supported at this time");
             }
 
             $cases = [];
             foreach ($allowed::cases() as $case) {
-                array_push($cases,$case->value);
+                array_push($cases, $case->value);
             }
             $allowed = $cases;
         }
