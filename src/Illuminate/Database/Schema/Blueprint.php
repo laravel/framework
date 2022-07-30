@@ -1038,10 +1038,10 @@ class Blueprint
     public function enum($column, array|string $allowed)
     {
         if (is_string($allowed)) {
-            if (!enum_exists($allowed)) {
+            if (! enum_exists($allowed)) {
                 throw new \InvalidArgumentException("$allowed is not a recognized Enum");
             }
-            if (!is_subclass_of($allowed,'\BackedEnum')) {
+            if (! is_subclass_of($allowed,'\BackedEnum')) {
                 throw new \InvalidArgumentException("$allowed is not a Backed Enum. Only Backed Enums are supported at this time");
             }
 
