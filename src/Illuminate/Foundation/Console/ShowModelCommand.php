@@ -481,13 +481,23 @@ class ShowModelCommand extends Command
 
         $rootNamespace = $this->laravel->getNamespace();
 
-        if (Str::startsWith($model, $rootNamespace)) {
+        $pattern = is_dir(app_path('Models'))
+            ? app_path('Models').DIRECTORY_SEPARATOR.$model.'.php'
+            : app_path().DIRECTORY_SEPARATOR.$model.'.php';
+
+        $modelPath = glob($pattern);
+
+        if (! count($modelPath)) {
             return $model;
         }
 
-        return is_dir(app_path('Models'))
-            ? $rootNamespace.'Models\\'.$model
-            : $rootNamespace.$model;
+        //get namespace from model path
+        $classes = get_declared_classes();
+        include $modelPath[0];
+        $model = array_diff(get_declared_classes(), $classes);
+        $model = reset($model);
+
+        return $model;
     }
 
     /**
