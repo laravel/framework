@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\Types;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Database\Connection;
@@ -281,6 +282,17 @@ class ModelMakeCommand extends GeneratorCommand
         }
 
         $columns = $schema->listTableColumns($table);
+        $phpDoc = $this->buildPhpDocForColumns($columns);
+
+        return str_replace('{{ phpDoc }}', $phpDoc, $builtClass);
+    }
+
+    /**
+     * @param Column[] $columns
+     * @return string
+     */
+    public function buildPhpDocForColumns($columns): string
+    {
         $phpDocStr = '/**';
 
         foreach ($columns as $column) {
@@ -292,9 +304,7 @@ class ModelMakeCommand extends GeneratorCommand
             );
         }
 
-        $phpDocStr .= "\n*/";
-
-        return str_replace('{{ phpDoc }}', $phpDocStr, $builtClass);
+        return $phpDocStr . "\n*/";
     }
 
     /**
@@ -305,32 +315,27 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function resolveColumnType($columm): string
     {
-        $type = match (strtolower($columm->getType()->getName())) {
-            'int', 'tinyint', 'smallint',
-            'mediumint', 'bigint', 'integer', 'bit' => 'int',
+        $phpType = match ($columm->getType()->getName()) {
+            Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
+            Types::STRING, Types::TEXT, Types::BINARY, Types::GUID => 'string',
+            Types::ARRAY, Types::JSON, Types::SIMPLE_ARRAY => 'array',
+            Types::FLOAT, Types::DECIMAL => 'float',
+            Types::OBJECT => 'object',
+            Types::BOOLEAN => 'bool',
 
-            'float', 'double', 'decimal', 'dec' => 'float',
-
-            'bool', 'boolean' => 'bool',
-
-            // would be string if you don't add 'casts'
-            'date', 'datetime', 'timestamp', 'time', 'year' => '\Carbon\Carbon|string',
-
-            'char', 'string', 'varchar',
-            'text', 'tinytext', 'mediumtext',
-            'longtext', 'enum', 'binary', 'varbinary', 'set' => 'string',
-
-            // would be string if you don't add 'casts', default to array
-            'json', 'jsonb' => 'array|string',
+            Types::DATE_MUTABLE,
+            Types::TIME_MUTABLE,
+            Types::DATETIME_MUTABLE,
+            Types::DATETIMETZ_MUTABLE => '\Carbon\Carbon|string',
 
             default => 'mixed',
         };
 
-        if (!$columm->getNotnull()) {
-            $type .= '|null';
+        if (!$columm->getNotnull() && $phpType !== 'mixed') {
+            $phpType .= '|null';
         }
 
-        return $type;
+        return $phpType;
     }
 
     /**

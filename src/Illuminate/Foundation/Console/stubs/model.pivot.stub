@@ -4,6 +4,7 @@ namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
+{{ phpDoc }}
 class {{ class }} extends Pivot
 {
     //

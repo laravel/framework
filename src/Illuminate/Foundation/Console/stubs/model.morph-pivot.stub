@@ -4,6 +4,7 @@ namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 
+{{ phpDoc }}
 class {{ class }} extends MorphPivot
 {
     //
