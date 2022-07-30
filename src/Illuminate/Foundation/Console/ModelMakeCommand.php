@@ -308,7 +308,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Resolve from DB type to PHP type
+     * Resolve from DB type to PHP type.
      *
      * @param  Column  $columm
      * @return string
