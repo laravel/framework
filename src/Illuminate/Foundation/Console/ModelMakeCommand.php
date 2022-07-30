@@ -262,7 +262,7 @@ class ModelMakeCommand extends GeneratorCommand
         $builtClass = parent::buildClass($name);
         $builtClassWithoutPhpDoc = str_replace("\n{{ phpDoc }}", '', $builtClass);
 
-        if (!$this->option('phpdoc')) {
+        if (! $this->option('phpdoc')) {
             return $builtClassWithoutPhpDoc;
         }
 
@@ -277,7 +277,7 @@ class ModelMakeCommand extends GeneratorCommand
         $schema = $this->databaseConnection->getDoctrineSchemaManager();
         $table = $this->getTableName();
 
-        if (!$schema->tablesExist($table)) {
+        if (! $schema->tablesExist($table)) {
             return $builtClassWithoutPhpDoc;
         }
 
@@ -288,7 +288,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * @param Column[] $columns
+     * @param  Column[]  $columns
      * @return string
      */
     public function buildPhpDocForColumns($columns): string
@@ -300,17 +300,17 @@ class ModelMakeCommand extends GeneratorCommand
                 '%s* @property %s %s',
                 "\n",
                 $this->resolveColumnType($column),
-                '$' . $column->getName()
+                '$'.$column->getName()
             );
         }
 
-        return $phpDocStr . "\n*/";
+        return $phpDocStr."\n*/";
     }
 
     /**
      * Resolve from DB type to PHP type
      *
-     * @param Column $columm
+     * @param  Column  $columm
      * @return string
      */
     protected function resolveColumnType($columm): string
@@ -331,7 +331,7 @@ class ModelMakeCommand extends GeneratorCommand
             default => 'mixed',
         };
 
-        if (!$columm->getNotnull() && $phpType !== 'mixed') {
+        if (! $columm->getNotnull() && $phpType !== 'mixed') {
             $phpType .= '|null';
         }
 
