@@ -2,11 +2,18 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Doctrine\DBAL\Schema\Column;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Database\Connection;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 
 #[AsCommand(name: 'make:model')]
 class ModelMakeCommand extends GeneratorCommand
@@ -44,6 +51,14 @@ class ModelMakeCommand extends GeneratorCommand
      * @var string
      */
     protected $type = 'Model';
+
+    public function __construct(
+        Filesystem $files,
+        private Connection $databaseConnection,
+        private Composer $composer
+    ) {
+        parent::__construct($files);
+    }
 
     /**
      * Execute the console command.
@@ -108,16 +123,23 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
+        $table = $this->getTableName();
+
+        $this->call('make:migration', [
+            'name' => "create_{$table}_table",
+            '--create' => $table,
+        ]);
+    }
+
+    protected function getTableName()
+    {
         $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
 
         if ($this->option('pivot')) {
             $table = Str::singular($table);
         }
 
-        $this->call('make:migration', [
-            'name' => "create_{$table}_table",
-            '--create' => $table,
-        ]);
+        return $table;
     }
 
     /**
@@ -195,8 +217,8 @@ class ModelMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
@@ -230,6 +252,116 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
+            ['phpdoc', null, InputOption::VALUE_NONE, 'Indicates if the generated model should have phpDoc for fields'],
         ];
+    }
+
+    public function buildClass($name)
+    {
+        $builtClass = parent::buildClass($name);
+        $builtClassWithoutPhpDoc = str_replace("\n{{ phpDoc }}", '', $builtClass);
+
+        if (!$this->option('phpdoc')) {
+            return $builtClassWithoutPhpDoc;
+        }
+
+        if (! interface_exists('Doctrine\DBAL\Driver')) {
+            if (! $this->components->confirm('Create model with phpDoc properties requires requires the Doctrine DBAL (doctrine/dbal) package. Would you like to install it?')) {
+                return 1;
+            }
+
+            return $this->installDependencies();
+        }
+
+        $schema = $this->databaseConnection->getDoctrineSchemaManager();
+        $table = $this->getTableName();
+
+        if (!$schema->tablesExist($table)) {
+            return $builtClassWithoutPhpDoc;
+        }
+
+        $columns = $schema->listTableColumns($table);
+        $phpDocStr = '/**';
+
+        foreach ($columns as $column) {
+            $phpDocStr .= sprintf(
+                '%s* @property %s %s',
+                "\n",
+                $this->resolveColumnType($column),
+                '$' . $column->getName()
+            );
+        }
+
+        $phpDocStr .= "\n*/";
+
+        return str_replace('{{ phpDoc }}', $phpDocStr, $builtClass);
+    }
+
+    /**
+     * Resolve from DB type to PHP type
+     *
+     * @param Column $columm
+     * @return string
+     */
+    protected function resolveColumnType($columm): string
+    {
+        $type = match (strtolower($columm->getType()->getName())) {
+            'int', 'tinyint', 'smallint',
+            'mediumint', 'bigint', 'integer', 'bit' => 'int',
+
+            'float', 'double', 'decimal', 'dec' => 'float',
+
+            'bool', 'boolean' => 'bool',
+
+            // would be string if you don't add 'casts'
+            'date', 'datetime', 'timestamp', 'time', 'year' => '\Carbon\Carbon|string',
+
+            'char', 'string', 'varchar',
+            'text', 'tinytext', 'mediumtext',
+            'longtext', 'enum', 'binary', 'varbinary', 'set' => 'string',
+
+            // would be string if you don't add 'casts', default to array
+            'json', 'jsonb' => 'array|string',
+
+            default => 'mixed',
+        };
+
+        if (!$columm->getNotnull()) {
+            $type .= '|null';
+        }
+
+        return $type;
+    }
+
+    /**
+     * Install the command's dependencies.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessSignaledException
+     */
+    protected function installDependencies()
+    {
+        $command = collect($this->composer->findComposer())
+            ->push('require doctrine/dbal')
+            ->implode(' ');
+
+        $process = Process::fromShellCommandline($command, null, null, null, null);
+
+        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
+            try {
+                $process->setTty(true);
+            } catch (RuntimeException $e) {
+                $this->components->warn($e->getMessage());
+            }
+        }
+
+        try {
+            $process->run(fn ($type, $line) => $this->output->write($line));
+        } catch (ProcessSignaledException $e) {
+            if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
+                throw $e;
+            }
+        }
     }
 }

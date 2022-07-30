@@ -5,6 +5,7 @@ namespace {{ namespace }};
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+{{ phpDoc }}
 class {{ class }} extends Model
 {
     use HasFactory;
