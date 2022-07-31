@@ -235,6 +235,21 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
+    public function testCanGetMorphMapKey()
+    {
+        Relation::morphMap(['user' => 'App\Models\User']);
+
+        $this->assertEquals('user', Relation::getMorphMapKey('App\Models\User'));
+
+        Relation::morphMap([3 => 'App\Models\Model']);
+
+        $this->assertEquals(3, Relation::getMorphMapKey('App\Models\Model'));
+
+        Relation::morphMap(['not_found' => 'App\Models\NotFound']);
+
+        $this->assertFalse(Relation::getMorphMapKey('App\Models\NotFound'));
+    }
+
     public function testWithoutRelations()
     {
         $original = new EloquentNoTouchingModelStub;
