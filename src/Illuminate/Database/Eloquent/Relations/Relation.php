@@ -476,6 +476,17 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Get the morphed model key.
+     *
+     * @param string $class
+     * @return int|string|false
+     */
+    public static function getMorphedModelKey($class) 
+    {
+        return array_search($class, static::$morphMap);
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
