@@ -738,7 +738,7 @@ trait HasRelationships
         }
 
         if (Relation::requiresMorphMap()) {
-            throw new ClassMorphViolationException($this);
+            throw new ClassMorphViolationException(new static);
         }
 
         return static::class;
