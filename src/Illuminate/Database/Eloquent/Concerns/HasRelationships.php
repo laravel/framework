@@ -725,7 +725,7 @@ trait HasRelationships
      *
      * @return string
      */
-    public function getMorphClass()
+    public static function getMorphClass()
     {
         $morphMap = Relation::morphMap();
 
