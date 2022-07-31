@@ -48,8 +48,9 @@ class ConfigMakeCommand extends GeneratorCommand
             return;
         }
 
-        if ($this->option('clear-config'))
+        if ($this->option('clear-config')) {
             $this->call('config:clear');
+        }
     }
 
     /**
