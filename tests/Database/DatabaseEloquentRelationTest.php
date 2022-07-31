@@ -247,7 +247,7 @@ class DatabaseEloquentRelationTest extends TestCase
 
         Relation::morphMap(['not_found' => 'App\Models\NotFound']);
 
-        $this->assertFalse(Relation::getMorphedModelAlias('App\Models\NotFound'));
+        $this->assertFalse(Relation::getMorphedModelAlias('App\Models\ModelNotFound'));
     }
 
     public function testWithoutRelations()
