@@ -749,7 +749,7 @@ trait HasRelationships
      *
      * @return int|string|false
      */
-    public static function morphMapAlias()
+    public static function morphAlias()
     {
         return Relation::getMorphedModelAlias(static::class);
     }
