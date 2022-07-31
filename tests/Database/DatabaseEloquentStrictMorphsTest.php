@@ -24,8 +24,6 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
         $model = new TestModel;
 
         $model->getMorphClass();
-
-        TestModel::getMorphClass();
     }
 
     public function testStrictModeDoesNotThrowExceptionWhenMorphMap()
