@@ -751,7 +751,7 @@ trait HasRelationships
      */
     public static function morphMapAlias()
     {
-        return Relation::getMorphedModelKey(static::class);
+        return Relation::getMorphedModelAlias(static::class);
     }
 
     /**

@@ -476,12 +476,12 @@ abstract class Relation implements BuilderContract
     }
 
     /**
-     * Get the morphed model key.
+     * Get the morphed model alias.
      *
      * @param string $class
      * @return int|string|false
      */
-    public static function getMorphedModelKey($class) 
+    public static function getMorphedModelAlias($class) 
     {
         return array_search($class, static::$morphMap);
     }
