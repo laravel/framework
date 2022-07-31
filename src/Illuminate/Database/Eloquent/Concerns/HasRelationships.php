@@ -745,7 +745,7 @@ trait HasRelationships
     }
 
     /**
-     * Get Morph Map Alias
+     * Get Morph Map Alias.
      *
      * @return int|string|false
      */
