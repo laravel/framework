@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'make:config')]
 class ConfigMakeCommand extends GeneratorCommand
@@ -43,15 +44,18 @@ class ConfigMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if (parent::handle() === false && ! $this->option('force')) {
+        if (parent::handle() === false) {
             return;
         }
 
-        $this->call('cache:clear');
+        if ($this->option('clear-config'))
+            $this->call('config:clear');
     }
 
     /**
-     * @inheritDoc
+     * Get the stub file for the generator.
+     *
+     * @return string
      */
     protected function getStub()
     {
@@ -71,8 +75,26 @@ class ConfigMakeCommand extends GeneratorCommand
             : __DIR__.$stub;
     }
 
+    /**
+     * Get the destination class path.
+     *
+     * @param  string  $name
+     * @return string
+     */
     protected function getPath($name)
     {
         return $this->laravel['path.config'].'/'.$this->argument('name').'.php';
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['clear-config', 'c', InputOption::VALUE_NONE, 'Clear the config cache after creating the config file.'],
+        ];
     }
 }
