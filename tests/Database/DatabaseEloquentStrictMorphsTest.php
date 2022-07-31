@@ -36,6 +36,8 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
 
         $morphName = $model->getMorphClass();
         $this->assertSame('test', $morphName);
+
+        $this->assertSame('test', TestModel::morphAlias());
     }
 
     public function testMapsCanBeEnforcedInOneMethod()
