@@ -745,6 +745,16 @@ trait HasRelationships
     }
 
     /**
+     * Get Morph Map Alias
+     *
+     * @return int|string|false
+     */
+    public static function morphMapAlias()
+    {
+        return Relation::getMorphedModelKey(static::class);
+    }
+
+    /**
      * Create a new model instance for a related model.
      *
      * @param  string  $class
