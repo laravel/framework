@@ -22,4 +22,21 @@ class Pivot extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * The columns to eager load on every query.
+     *
+     * @var array
+     */
+    protected $withColumns = [];
+
+    /**
+     * Get the columns to eager load on every query.
+     *
+     * @return array
+     */
+    public function getDefaultColumns()
+    {
+        return $this->withColumns;
+    }
 }
