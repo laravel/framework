@@ -45,7 +45,7 @@ class CliDumper extends BaseCliDumper
 
         switch ($type) {
             case 'boolean':
-                $style = sprintf('boolean-%s',  $value = $value ? 'true' : 'false');
+                $style = sprintf('boolean-%s', $value = $value ? 'true' : 'false');
                 break;
         }
 
