@@ -52,7 +52,7 @@ class AblyBroadcaster extends Broadcaster
             self::setServerTime(round($this->ably->time() / 1000));
         }
         if (array_key_exists('disable_public_channels',$config) && $config['disable_public_channels']) {
-            $this->defaultChannelClaims = array();
+            $this->defaultChannelClaims = array('public:*' => ["channel-metadata"]);
         }
         if(array_key_exists('token_expiry',$config)) {
             $this->tokenExpiry = $config['token_expiry'];
