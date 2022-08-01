@@ -39,10 +39,10 @@ jobs:
         php: ['8.0', '8.1']
         stability: [prefer-lowest, prefer-stable]
         experimental: [false]
-      include:
-        - php: '8.2'
-          stability: prefer-stable
-          experimental: true
+        include:
+          - php: '8.2'
+            stability: prefer-stable
+            experimental: true
 
     continue-on-error: ${{ matrix.experimental }}
 
@@ -114,10 +114,10 @@ jobs:
         php: ['8.0', '8.1']
         stability: [prefer-lowest, prefer-stable]
         experimental: [false]
-      include:
-        - php: '8.2'
-          stability: prefer-stable
-          experimental: true
+        include:
+          - php: '8.2'
+            stability: prefer-stable
+            experimental: true
 
     continue-on-error: ${{ matrix.experimental }}
 
