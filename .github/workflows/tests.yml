@@ -3,8 +3,8 @@ name: tests
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
+  # schedule:
+  #   - cron: '0 0 * * *'
 
 jobs:
   linux_tests:
@@ -38,6 +38,13 @@ jobs:
       matrix:
         php: ['8.0', '8.1']
         stability: [prefer-lowest, prefer-stable]
+        experimental: [false]
+      include:
+        - php: '8.2'
+          stability: prefer-stable
+          experimental: true
+
+    continue-on-error: ${{ matrix.experimental }}
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 
@@ -106,6 +113,13 @@ jobs:
       matrix:
         php: ['8.0', '8.1']
         stability: [prefer-lowest, prefer-stable]
+        experimental: [false]
+      include:
+        - php: '8.2'
+          stability: prefer-stable
+          experimental: true
+
+    continue-on-error: ${{ matrix.experimental }}
 
     name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - Windows
 
