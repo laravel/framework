@@ -41,7 +41,7 @@ jobs:
         experimental: [false]
         include:
           - php: '8.2'
-            stability: prefer-stable
+            stability: prefer-stable --ignore-platform-reqs
             experimental: true
 
     continue-on-error: ${{ matrix.experimental }}
@@ -116,7 +116,7 @@ jobs:
         experimental: [false]
         include:
           - php: '8.2'
-            stability: prefer-stable
+            stability: prefer-stable --ignore-platform-reqs
             experimental: true
 
     continue-on-error: ${{ matrix.experimental }}
