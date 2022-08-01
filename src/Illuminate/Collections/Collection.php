@@ -1705,4 +1705,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Get an instance of the base support collection from this collection by converting each of the items into array
+     *
+     * @return static<int, TValue>
+     */
+    public function clean()
+    {
+        return new self($this->toArray());
+    }
 }

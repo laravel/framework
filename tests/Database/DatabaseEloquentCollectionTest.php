@@ -591,6 +591,19 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertContainsOnly('bool', $commentsExists);
     }
 
+    public function testConvertItemsToArrayAndReturnsABaseCollection()
+    {
+        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1]);
+        $model1->makeVisible('id');
+
+        $modelCollection = new Collection([$model1]);
+        $cleanArray = $modelCollection->clean();
+
+        $this->assertEquals(BaseCollection::class, get_class($cleanArray));
+        $this->assertIsArray($cleanArray[0]);
+        $this->assertEquals($model1->toArray(), $cleanArray[0]);
+    }
+
     /**
      * Helpers...
      */
