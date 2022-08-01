@@ -24,6 +24,7 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Console\CastMakeCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
+use Illuminate\Foundation\Console\CliDumper;
 use Illuminate\Foundation\Console\ComponentMakeCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
@@ -85,6 +86,11 @@ use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
+use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
+use Symfony\Component\VarDumper\VarDumper;
 
 class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -192,9 +198,28 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
      */
     public function register()
     {
+        $this->registerVarDumperHandler();
+
         $this->registerCommands(array_merge(
             $this->commands, $this->devCommands
         ));
+    }
+
+    /**
+     * Register the CLI Dumper as Var Dumpler Handler.
+     *
+     * @return void
+     */
+    protected function registerVarDumperHandler()
+    {
+        $varDumperFormat = $_SERVER['VAR_DUMPER_FORMAT'] ?? null;
+
+        if ($varDumperFormat == 'cli' || in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
+            $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
+            $dumper = new ContextualizedDumper(new CliDumper(), [new SourceContextProvider()]);
+
+            VarDumper::setHandler(fn ($var) => $dumper->dump($cloner->cloneVar($var)));
+        }
     }
 
     /**
