@@ -259,6 +259,23 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Create a Collection of new instances of the related model.
+     *
+     * @param  iterable  $records
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function createMany(iterable $records)
+    {
+        $instances = $this->related->newCollection();
+
+        foreach ($records as $record) {
+            $instances->push($this->create($record));
+        }
+
+        return $instances;
+    }
+
+    /**
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array  $column
