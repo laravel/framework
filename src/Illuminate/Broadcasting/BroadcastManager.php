@@ -173,7 +173,7 @@ class BroadcastManager implements FactoryContract
         if ($event instanceof ShouldBeUnique) {
             $broadcastEvent = new UniqueBroadcastEvent(clone $event);
 
-            if (! (new UniqueLock(Container::getInstance()->make(Cache::class)))->acquire($broadcastEvent)) {
+            if (! (new UniqueLock($this->app->make(Cache::class)))->acquire($broadcastEvent)) {
                 return;
             }
         }
