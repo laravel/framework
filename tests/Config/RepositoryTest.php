@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
 class RepositoryTest extends TestCase
@@ -135,6 +136,23 @@ class RepositoryTest extends TestCase
     public function testGetWithDefault()
     {
         $this->assertSame('default', $this->repository->get('not-exist', 'default'));
+    }
+
+    public function testCollect()
+    {
+        $this->assertInstanceOf(Collection::class, $this->repository->collect('associate'));
+        $this->assertSame(['x' => 'xxx', 'y' => 'yyy'], $this->repository->collect('associate')->toArray());
+        $this->assertSame(['aaa', 'zzz'], $this->repository->collect('array')->toArray());
+        $this->assertSame(['bar'], $this->repository->collect('foo')->toArray());
+        $this->assertSame([true], $this->repository->collect('boolean')->toArray());
+        $this->assertSame([], $this->repository->collect('null')->toArray());
+        $this->assertSame([], $this->repository->collect('not-exist')->toArray());
+    }
+
+    public function testCollectWithDefault()
+    {
+        $this->assertSame(['foo', 'bar', 'baz'], $this->repository->collect('not-exist', ['foo', 'bar', 'baz'])->toArray());
+        $this->assertSame(['foo', 'bar', 'baz'], $this->repository->collect('not-exist', Collection::make(['foo', 'bar', 'baz']))->toArray());
     }
 
     public function testSet()

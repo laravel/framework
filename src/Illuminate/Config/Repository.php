@@ -5,6 +5,7 @@ namespace Illuminate\Config;
 use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -72,6 +73,18 @@ class Repository implements ArrayAccess, ConfigContract
         }
 
         return $config;
+    }
+
+    /**
+     * Get the specified configuration value as a Collection.
+     *
+     * @param  string  $key
+     * @param  iterable  $default
+     * @return Collection
+     */
+    public function collect($key, $default = [])
+    {
+        return Collection::make(Arr::get($this->items, $key, $default));
     }
 
     /**
