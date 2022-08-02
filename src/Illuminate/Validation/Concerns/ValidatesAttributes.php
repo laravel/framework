@@ -1977,6 +1977,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the attribute does not end with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDoesntEndWith($attribute, $value, $parameters)
+    {
+        return ! Str::endsWith($value, $parameters);
+    }
+
+    /**
      * Validate that an attribute is a string.
      *
      * @param  string  $attribute
