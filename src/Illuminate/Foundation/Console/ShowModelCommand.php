@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Types\DecimalType;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Database\Console\AbstractDatabaseCommand;
+use Illuminate\Database\Console\DatabaseInspectionCommand;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UnitEnum;
 
 #[AsCommand(name: 'model:show')]
-class ShowModelCommand extends AbstractDatabaseCommand
+class ShowModelCommand extends DatabaseInspectionCommand
 {
     /**
      * The console command name.

@@ -11,24 +11,24 @@ use Illuminate\Support\Arr;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:show')]
-class ShowCommand extends AbstractDatabaseCommand
+class ShowCommand extends DatabaseInspectionCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'db:show {--database= : The database connection to use}
-                {--json : Output the database as JSON}
-                {--with-counts : Show the table row count <bg=red;options=bold> Note: This can be an expensive operation on larger databases </>};
-                {--with-views : Show the database views <bg=red;options=bold> Note: This can be an expensive operation on larger databases </>}';
+    protected $signature = 'db:show {--database= : The database connection}
+                {--json : Output the database information as JSON}
+                {--counts : Show the table row count <bg=red;options=bold> Note: This can be slow on large databases </>};
+                {--views : Show the database views <bg=red;options=bold> Note: This can be slow on large databases </>}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Show information about a database';
+    protected $description = 'Display information about the given database';
 
     /**
      * Execute the console command.
@@ -41,6 +41,7 @@ class ShowCommand extends AbstractDatabaseCommand
         $this->ensureDependenciesExist();
 
         $connection = $connections->connection($database = $this->input->getOption('database'));
+
         $schema = $connection->getDoctrineSchemaManager();
 
         $data = [
@@ -49,10 +50,10 @@ class ShowCommand extends AbstractDatabaseCommand
                 'name' => $this->getPlatformName($schema->getDatabasePlatform(), $database),
                 'open_connections' => $this->getConnectionCount($connection),
             ],
-            'tables' => $this->collectTables($connection, $schema),
+            'tables' => $this->tables($connection, $schema),
         ];
 
-        if ($this->option('with-views')) {
+        if ($this->option('views')) {
             $data['views'] = $this->collectViews($connection, $schema);
         }
 
@@ -62,25 +63,25 @@ class ShowCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Collect the tables within the database.
+     * Get information regarding the tables within the database.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
      * @return \Illuminate\Support\Collection
      */
-    protected function collectTables(ConnectionInterface $connection, AbstractSchemaManager $schema)
+    protected function tables(ConnectionInterface $connection, AbstractSchemaManager $schema)
     {
         return collect($schema->listTables())->map(fn (Table $table, $index) => [
             'table' => $table->getName(),
             'size' => $this->getTableSize($connection, $table->getName()),
-            'rows' => $this->option('with-counts') ? $connection->table($table->getName())->count() : null,
+            'rows' => $this->option('counts') ? $connection->table($table->getName())->count() : null,
             'engine' => rescue(fn () => $table->getOption('engine')),
             'comment' => $table->getComment(),
         ]);
     }
 
     /**
-     * Collect the views within the database.
+     * Get information regarding the views within the database.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
@@ -105,7 +106,7 @@ class ShowCommand extends AbstractDatabaseCommand
      */
     protected function display(array $data)
     {
-        $this->option('json') ? $this->displayJson($data) : $this->displayCli($data);
+        $this->option('json') ? $this->displayJson($data) : $this->displayForCli($data);
     }
 
     /**
@@ -120,12 +121,12 @@ class ShowCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Render the database information for the CLI.
+     * Render the database information formatted for the CLI.
      *
      * @param  array  $data
      * @return void
      */
-    protected function displayCli(array $data)
+    protected function displayForCli(array $data)
     {
         $platform = $data['platform'];
         $tables = $data['tables'];
@@ -141,6 +142,7 @@ class ShowCommand extends AbstractDatabaseCommand
         $this->components->twoColumnDetail('URL', Arr::get($platform['config'], 'url'));
         $this->components->twoColumnDetail('Open Connections', $platform['open_connections']);
         $this->components->twoColumnDetail('Tables', $tables->count());
+
         if ($tableSizeSum = $tables->sum('size')) {
             $this->components->twoColumnDetail('Total Size', number_format($tableSizeSum / 1024 / 1024, 2).'Mb');
         }
@@ -148,7 +150,7 @@ class ShowCommand extends AbstractDatabaseCommand
         $this->newLine();
 
         if ($tables->isNotEmpty()) {
-            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)'.($this->option('with-counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
+            $this->components->twoColumnDetail('<fg=green;options=bold>Table</>', 'Size (Mb)'.($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>Rows</>' : ''));
 
             $tables->each(function ($table) {
                 if ($tableSize = $table['size']) {
@@ -157,7 +159,7 @@ class ShowCommand extends AbstractDatabaseCommand
 
                 $this->components->twoColumnDetail(
                     $table['table'].($this->output->isVerbose() ? ' <fg=gray>'.$table['engine'].'</>' : null),
-                    ($tableSize ? $tableSize : '—').($this->option('with-counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>'.number_format($table['rows']).'</>' : '')
+                    ($tableSize ? $tableSize : '—').($this->option('counts') ? ' <fg=gray;options=bold>/</> <fg=yellow;options=bold>'.number_format($table['rows']).'</>' : '')
                 );
 
                 if ($this->output->isVerbose()) {

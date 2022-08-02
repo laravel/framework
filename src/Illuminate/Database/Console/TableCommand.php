@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:table')]
-class TableCommand extends AbstractDatabaseCommand
+class TableCommand extends DatabaseInspectionCommand
 {
     /**
      * The name and signature of the console command.
@@ -20,15 +20,15 @@ class TableCommand extends AbstractDatabaseCommand
      */
     protected $signature = 'db:table
                             {table? : The name of the table}
-                            {--database= : The database to use}
-                            {--json : Output the database as JSON}';
+                            {--database= : The database connection}
+                            {--json : Output the table information as JSON}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Show information about the given database table';
+    protected $description = 'Display information about the given database table';
 
     /**
      * Execute the console command.
@@ -40,16 +40,19 @@ class TableCommand extends AbstractDatabaseCommand
         $this->ensureDependenciesExist();
 
         $connection = $connections->connection($this->input->getOption('database'));
+
         $schema = $connection->getDoctrineSchemaManager();
+
         $table = $this->argument('table') ?: $this->components->choice(
-            'Which table would you like to view?',
+            'Which table would you like to inspect?',
             collect($schema->listTables())->flatMap(fn (Table $table) => [$table->getName()])->toArray()
         );
+
         $table = $schema->listTableDetails($table);
 
-        $columns = $this->collectColumns($table);
-        $indexes = $this->collectIndexes($table);
-        $foreignKeys = $this->collectForeignKeys($table);
+        $columns = $this->columns($table);
+        $indexes = $this->indexes($table);
+        $foreignKeys = $this->foreignKeys($table);
 
         $data = [
             'table' => [
@@ -68,52 +71,18 @@ class TableCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Collect the columns within the table.
+     * Get the information regarding the table's columns.
      *
      * @param  \Doctrine\DBAL\Schema\Table  $table
      * @return \Illuminate\Support\Collection
      */
-    protected function collectColumns(Table $table)
+    protected function columns(Table $table)
     {
         return collect($table->getColumns())->map(fn (Column $column) => [
             'column' => $column->getName(),
             'attributes' => $this->getAttributesForColumn($column),
             'default' => $column->getDefault(),
             'type' => $column->getType()->getName(),
-        ]);
-    }
-
-    /**
-     * Collect the indexes within the table.
-     *
-     * @param  \Doctrine\DBAL\Schema\Table  $table
-     * @return \Illuminate\Support\Collection
-     */
-    protected function collectIndexes(Table $table)
-    {
-        return collect($table->getIndexes())->map(fn (Index $index) => [
-            'name' => $index->getName(),
-            'columns' => collect($index->getColumns()),
-            'attributes' => $this->getAttributesForIndex($index),
-        ]);
-    }
-
-    /**
-     * Collect the foreign keys within the table.
-     *
-     * @param  \Doctrine\DBAL\Schema\Table  $table
-     * @return \Illuminate\Support\Collection
-     */
-    protected function collectForeignKeys(Table $table)
-    {
-        return collect($table->getForeignKeys())->map(fn (ForeignKeyConstraint $foreignKey) => [
-            'name' => $foreignKey->getName(),
-            'local_table' => $table->getName(),
-            'local_columns' => collect($foreignKey->getLocalColumns()),
-            'foreign_table' => $foreignKey->getForeignTableName(),
-            'foreign_columns' => collect($foreignKey->getForeignColumns()),
-            'on_update' => Str::lower(rescue(fn () => $foreignKey->getOption('onUpdate'), 'N/A')),
-            'on_delete' => Str::lower(rescue(fn () => $foreignKey->getOption('onDelete'), 'N/A')),
         ]);
     }
 
@@ -134,6 +103,21 @@ class TableCommand extends AbstractDatabaseCommand
     }
 
     /**
+     * Get the information regarding the table's indexes.
+     *
+     * @param  \Doctrine\DBAL\Schema\Table  $table
+     * @return \Illuminate\Support\Collection
+     */
+    protected function indexes(Table $table)
+    {
+        return collect($table->getIndexes())->map(fn (Index $index) => [
+            'name' => $index->getName(),
+            'columns' => collect($index->getColumns()),
+            'attributes' => $this->getAttributesForIndex($index),
+        ]);
+    }
+
+    /**
      * Get the attributes for a table index.
      *
      * @param  \Doctrine\DBAL\Schema\Index  $index
@@ -149,18 +133,37 @@ class TableCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Render the database information.
+     * Get the information regarding the table's foreign keys.
+     *
+     * @param  \Doctrine\DBAL\Schema\Table  $table
+     * @return \Illuminate\Support\Collection
+     */
+    protected function foreignKeys(Table $table)
+    {
+        return collect($table->getForeignKeys())->map(fn (ForeignKeyConstraint $foreignKey) => [
+            'name' => $foreignKey->getName(),
+            'local_table' => $table->getName(),
+            'local_columns' => collect($foreignKey->getLocalColumns()),
+            'foreign_table' => $foreignKey->getForeignTableName(),
+            'foreign_columns' => collect($foreignKey->getForeignColumns()),
+            'on_update' => Str::lower(rescue(fn () => $foreignKey->getOption('onUpdate'), 'N/A')),
+            'on_delete' => Str::lower(rescue(fn () => $foreignKey->getOption('onDelete'), 'N/A')),
+        ]);
+    }
+
+    /**
+     * Render the table information.
      *
      * @param  array  $data
      * @return void
      */
     protected function display(array $data)
     {
-        $this->option('json') ? $this->displayJson($data) : $this->displayCli($data);
+        $this->option('json') ? $this->displayJson($data) : $this->displayForCli($data);
     }
 
     /**
-     * Render the database information as JSON.
+     * Render the table information as JSON.
      *
      * @param  array  $data
      * @return void
@@ -171,22 +174,22 @@ class TableCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Render the database information for the CLI.
+     * Render the table information formatted for the CLI.
      *
      * @param  array  $data
      * @return void
      */
-    protected function displayCli(array $data)
+    protected function displayForCli(array $data)
     {
-        $table = $data['table'];
-        $columns = $data['columns'];
-        $indexes = $data['indexes'];
-        $foreignKeys = $data['foreign_keys'];
+        [$table, $columns, $indexes, $foreignKeys] = [
+            $data['table'], $data['columns'], $data['indexes'], $data['foreign_keys']
+        ];
 
         $this->newLine();
 
         $this->components->twoColumnDetail('<fg=green;options=bold>'.$table['name'].'</>');
         $this->components->twoColumnDetail('Columns', $table['columns']);
+
         if ($size = $table['size']) {
             $this->components->twoColumnDetail('Size', number_format($size / 1024 / 1024, 2).'Mb');
         }

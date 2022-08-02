@@ -14,7 +14,7 @@ use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
-abstract class AbstractDatabaseCommand extends Command
+abstract class DatabaseInspectionCommand extends Command
 {
     /**
      * The Composer instance.
@@ -26,18 +26,18 @@ abstract class AbstractDatabaseCommand extends Command
     /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Support\Composer  $composer
+     * @param  \Illuminate\Support\Composer|null  $composer
      * @return void
      */
-    public function __construct(Composer $composer)
+    public function __construct(Composer $composer = null)
     {
         parent::__construct();
 
-        $this->composer = $composer;
+        $this->composer = $composer ?? $this->laravel->make(Composer::class);
     }
 
     /**
-     * Get a human-readable platform name.
+     * Get a human-readable platform name for the given platform.
      *
      * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  string  $database
@@ -68,7 +68,7 @@ abstract class AbstractDatabaseCommand extends Command
     {
         return match (true) {
             $connection instanceof MySqlConnection => $this->getMySQLTableSize($connection, $table),
-            $connection instanceof PostgresConnection => $this->getPgsqlTableSize($connection, $table),
+            $connection instanceof PostgresConnection => $this->getPostgresTableSize($connection, $table),
             $connection instanceof SQLiteConnection => $this->getSqliteTableSize($connection, $table),
             default => null,
         };
@@ -96,7 +96,7 @@ abstract class AbstractDatabaseCommand extends Command
      * @param  string  $table
      * @return mixed
      */
-    protected function getPgsqlTableSize(ConnectionInterface $connection, string $table)
+    protected function getPostgresTableSize(ConnectionInterface $connection, string $table)
     {
         return $connection->selectOne('SELECT pg_total_relation_size(?) AS size;', [
             $table,
@@ -126,48 +126,15 @@ abstract class AbstractDatabaseCommand extends Command
     protected function getConnectionCount(ConnectionInterface $connection)
     {
         return match (class_basename($connection)) {
-            'MySqlConnection' => $this->getMySQLConnectionCount($connection),
-            'PostgresConnection' => $this->getPgsqlConnectionCount($connection),
-            'SqlServerConnection' => $this->getSqlServerConnectionCount($connection),
+            'MySqlConnection' => (int) $connection->selectOne($connection->raw('show status where variable_name = "threads_connected"'))->Value,
+            'PostgresConnection' => (int) $connection->selectOne('select count(*) as connections from pg_stat_activity')->connections,
+            'SqlServerConnection' => (int) $connection->selectOne('SELECT COUNT(*) connections FROM sys.dm_exec_sessions WHERE status = ?', ['running'])->connections,
             default => null,
         };
     }
 
     /**
-     * Get the number of open connections for a Postgres database.
-     *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return int
-     */
-    protected function getPgsqlConnectionCount(ConnectionInterface $connection)
-    {
-        return (int) $connection->selectOne('select count(*) as connections from pg_stat_activity')->connections;
-    }
-
-    /**
-     * Get the number of open connections for a MySQL database.
-     *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return int
-     */
-    protected function getMySQLConnectionCount(ConnectionInterface $connection)
-    {
-        return (int) $connection->selectOne($connection->raw('show status where variable_name = "threads_connected"'))->Value;
-    }
-
-    /**
-     * Get the number of open connections for an SQL Server database.
-     *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @return int
-     */
-    protected function getSqlServerConnectionCount(ConnectionInterface $connection)
-    {
-        return (int) $connection->selectOne('SELECT COUNT(*) connections FROM sys.dm_exec_sessions WHERE status = ?', ['running'])->connections;
-    }
-
-    /**
-     * Get the connection details from the configuration.
+     * Get the connection configuration details for the given connection.
      *
      * @param  string  $database
      * @return array

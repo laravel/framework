@@ -9,7 +9,7 @@ use Illuminate\Support\Composer;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:monitor')]
-class MonitorCommand extends AbstractDatabaseCommand
+class MonitorCommand extends DatabaseInspectionCommand
 {
     /**
      * The name and signature of the console command.
@@ -17,7 +17,7 @@ class MonitorCommand extends AbstractDatabaseCommand
      * @var string
      */
     protected $signature = 'db:monitor
-                {--databases= : The names of the databases to monitor}
+                {--databases= : The database connections to monitor}
                 {--max= : The maximum number of connections that can be open before an event is dispatched}';
 
     /**
@@ -53,7 +53,7 @@ class MonitorCommand extends AbstractDatabaseCommand
     protected $events;
 
     /**
-     * Create a new db monitor command.
+     * Create a new command instance.
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $connection
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
@@ -107,7 +107,7 @@ class MonitorCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Display the databases and their connections in the console.
+     * Display the databases and their connection counts in the console.
      *
      * @param  \Illuminate\Support\Collection  $databases
      * @return void
@@ -128,7 +128,7 @@ class MonitorCommand extends AbstractDatabaseCommand
     }
 
     /**
-     * Fire the monitoring events.
+     * Dispatch the database monitoring events.
      *
      * @param  \Illuminate\Support\Collection  $databases
      * @return void

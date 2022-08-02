@@ -5,28 +5,28 @@ namespace Illuminate\Database\Events;
 class DatabaseBusy
 {
     /**
-     * The database configuration key.
+     * The database connection name.
      *
      * @var string
      */
-    public $database;
+    public $connectionName;
 
     /**
      * The number of open connections.
      *
      * @var int
      */
-    public $openConnections;
+    public $connections;
 
     /**
      * Create a new event instance.
      *
-     * @param  string  $database
-     * @param  int  $openConnections
+     * @param  string  $connectionName
+     * @param  int  $connections
      */
-    public function __construct($database, $openConnections)
+    public function __construct($connectionName, $connections)
     {
-        $this->database = $database;
-        $this->openConnections = $openConnections;
+        $this->connectionName = $connectionName;
+        $this->connections = $connections;
     }
 }
