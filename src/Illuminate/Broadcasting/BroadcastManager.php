@@ -11,7 +11,6 @@ use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Bus\UniqueLock;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -173,7 +172,7 @@ class BroadcastManager implements FactoryContract
         if ($event instanceof ShouldBeUnique) {
             $broadcastEvent = new UniqueBroadcastEvent(clone $event);
 
-            if (! (new UniqueLock($this->app->make(Cache::class)))->acquire($broadcastEvent)) {
+            if (! (new UniqueLock($broadcastEvent->uniqueVia ?? $this->app->make(Cache::class)))->acquire($broadcastEvent)) {
                 return;
             }
         }
