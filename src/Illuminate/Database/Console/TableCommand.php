@@ -182,7 +182,7 @@ class TableCommand extends DatabaseInspectionCommand
     protected function displayForCli(array $data)
     {
         [$table, $columns, $indexes, $foreignKeys] = [
-            $data['table'], $data['columns'], $data['indexes'], $data['foreign_keys']
+            $data['table'], $data['columns'], $data['indexes'], $data['foreign_keys'],
         ];
 
         $this->newLine();
