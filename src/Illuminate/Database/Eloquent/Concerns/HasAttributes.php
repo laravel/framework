@@ -729,12 +729,12 @@ trait HasAttributes
             case 'boolean':
                 return (bool) $value;
             case 'object':
-                return $this->fromJson($value, true);
+                return $this->fromJson($value ?? '', true);
             case 'array':
             case 'json':
-                return $this->fromJson($value);
+                return $this->fromJson($value ?? '');
             case 'collection':
-                return new BaseCollection($this->fromJson($value));
+                return new BaseCollection($this->fromJson($value ?? ''));
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
@@ -1144,8 +1144,8 @@ trait HasAttributes
 
         return $this->fromJson(
             $this->isEncryptedCastable($key)
-                ? $this->fromEncryptedString($this->attributes[$key])
-                : $this->attributes[$key]
+                ? $this->fromEncryptedString($this->attributes[$key]) ?? ''
+                : $this->attributes[$key] ?? ''
         );
     }
 
@@ -1950,7 +1950,7 @@ trait HasAttributes
                 $this->fromDateTime($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
             return $this->fromJson($attribute) ===
-                $this->fromJson($original);
+                $this->fromJson($original ?? '');
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
                 return false;
