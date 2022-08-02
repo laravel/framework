@@ -10,10 +10,13 @@ use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -166,12 +169,16 @@ class BroadcastManager implements FactoryContract
             $queue = $event->queue;
         }
 
-        $this->app->make('queue')->connection($event->connection ?? null)->pushOn(
-            $queue,
-            $event instanceof ShouldBeUnique
-                    ? new UniqueBroadcastEvent(clone $event)
-                    : new BroadcastEvent(clone $event)
-        );
+        $broadcastEvent = new BroadcastEvent(clone $event);
+        if ($event instanceof ShouldBeUnique) {
+            $broadcastEvent = new UniqueBroadcastEvent(clone $event);
+
+            if (! (new UniqueLock(Container::getInstance()->make(Cache::class)))->acquire($broadcastEvent)) {
+                return;
+            }
+        }
+
+        $this->app->make('queue')->connection($event->connection ?? null)->pushOn($queue, $broadcastEvent);
     }
 
     /**
