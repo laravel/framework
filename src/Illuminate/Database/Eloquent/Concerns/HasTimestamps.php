@@ -89,7 +89,7 @@ trait HasTimestamps
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Illuminate\Support\Carbon
+     * @return \Illuminate\Support\Carbon|\Illuminate\Support\CarbonImmutable
      */
     public function freshTimestamp()
     {

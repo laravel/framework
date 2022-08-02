@@ -280,7 +280,7 @@ class ServeCommand extends Command
      * Get the date from the given PHP server output.
      *
      * @param  string  $line
-     * @return \Illuminate\Support\Carbon
+     * @return \Illuminate\Support\Carbon|\Illuminate\Support\CarbonImmutable
      */
     protected function getDateFromLine($line)
     {

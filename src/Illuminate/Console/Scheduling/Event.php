@@ -897,7 +897,7 @@ class Event
      * @param  \DateTimeInterface|string  $currentTime
      * @param  int  $nth
      * @param  bool  $allowCurrentDate
-     * @return \Illuminate\Support\Carbon
+     * @return \Illuminate\Support\Carbon|\Illuminate\Support\CarbonImmutable
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {

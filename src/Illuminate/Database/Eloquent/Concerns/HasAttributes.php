@@ -1258,7 +1258,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
+     * @return \Illuminate\Support\Carbon|\Illuminate\Support\CarbonImmutable
      */
     protected function asDate($value)
     {
@@ -1269,7 +1269,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Support\Carbon
+     * @return \Illuminate\Support\Carbon|\Illuminate\Support\CarbonImmutable
      */
     protected function asDateTime($value)
     {
