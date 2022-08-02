@@ -1189,7 +1189,7 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value, ! $asObject);
+        return json_decode($value ?? '', ! $asObject);
     }
 
     /**
