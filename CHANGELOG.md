@@ -1,6 +1,27 @@
 # Release Notes for 9.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v9.22.1...9.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v9.23.0...9.x)
+
+
+## [v9.23.0](https://github.com/laravel/framework/compare/v9.22.1...v9.23.0) - 2022-08-02
+
+### Added
+- Added whereNot method to Fluent JSON testing matchers ([#43383](https://github.com/laravel/framework/pull/43383))
+- Added deleteQuietly method to Model and use arrow func for related methods ([#43447](https://github.com/laravel/framework/pull/43447))
+- Added conditionable trait to Filesystem adapters ([#43450](https://github.com/laravel/framework/pull/43450))
+- Introduce artisan docs command ([#43357](https://github.com/laravel/framework/pull/43357))
+- Added Support CSP nonce, SRI, and arbitrary attributes with Vite ([#43442](https://github.com/laravel/framework/pull/43442))
+- Support conditionables that get condition from target object ([#43449](https://github.com/laravel/framework/pull/43449))
+- Added `whereIn` to  `Illuminate/Routing/RouteRegistrar::allowedAttributes` ([#43509](https://github.com/laravel/framework/pull/43509))
+
+### Fixed
+- Prevent redis crash when large number of jobs are scheduled for a specific time ([#43310](https://github.com/laravel/framework/pull/43310))
+
+### Changed
+- Make Command components Factory extensible ([#43439](https://github.com/laravel/framework/pull/43439))
+- Solve Blade component showing quote formatted for the console ([#43446](https://github.com/laravel/framework/pull/43446))
+- Improves output capture from serve command ([#43461](https://github.com/laravel/framework/pull/43461))
+- Allow terser singleton bindings ([#43469](https://github.com/laravel/framework/pull/43469))
 
 
 ## [v9.22.1](https://github.com/laravel/framework/compare/v9.22.0...v9.22.1) - 2022-07-26
