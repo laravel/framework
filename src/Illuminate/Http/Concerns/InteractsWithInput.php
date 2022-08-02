@@ -328,7 +328,7 @@ trait InteractsWithInput
      * @param  string  $key
      * @param  string|null  $format
      * @param  string|null  $tz
-     * @return \Illuminate\Support\Carbon|null
+     * @return \Illuminate\Support\Carbon|\Illuminate\Support\CarbonImmutable|null
      */
     public function date($key, $format = null, $tz = null)
     {
