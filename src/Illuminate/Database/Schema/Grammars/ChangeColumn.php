@@ -155,7 +155,7 @@ class ChangeColumn
     {
         $type = strtolower($type);
 
-        return Type::getType(match ($type) {
+        return Type::getType(Type::hasType($type) ? $type : match ($type) {
             'biginteger' => 'bigint',
             'smallinteger' => 'smallint',
             'mediumtext', 'longtext' => 'text',
