@@ -397,7 +397,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             // Expecting something similar to:
             // Illuminate\Database\QueryException
             //   SQLSTATE[42000]: Syntax error or access violation: 1426 Too big precision 10 specified for 'my_timestamp'. Maximum is 6....
-            $this->fail('test_it_does_not_set_precision_higher_than_supported_when_renaming_timestamps has failed. Error: ' . $e->getMessage());
+            $this->fail('test_it_does_not_set_precision_higher_than_supported_when_renaming_timestamps has failed. Error: '.$e->getMessage());
         }
     }
 
