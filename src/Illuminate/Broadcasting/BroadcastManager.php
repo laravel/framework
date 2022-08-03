@@ -168,12 +168,30 @@ class BroadcastManager implements FactoryContract
             $queue = $event->queue;
         }
 
-        if ($event instanceof ShouldBeUnique &&
-            ! (new UniqueLock(method_exists($event, 'uniqueVia') ? $event->uniqueVia() : $this->app->make(Cache::class)))->acquire($event)) {
+        if ($this->mustBeUniqueAndCannotAcquireLock($event)) {
             return;
         }
 
         $this->app->make('queue')->connection($event->connection ?? null)->pushOn($queue, new BroadcastEvent(clone $event));
+    }
+
+    /**
+     * Determine if the broadcastable event must be unique and determine if we can acquire the necessary lock.
+     *
+     * @param  mixed  $event
+     * @return bool
+     */
+    protected function mustBeUniqueAndCannotAcquireLock($event)
+    {
+        if (! $event instanceof ShouldBeUnique) {
+            return false;
+        }
+
+        return ! (new UniqueLock(
+            method_exists($event, 'uniqueVia')
+                ? $event->uniqueVia()
+                : $this->app->make(Cache::class)
+        ))->acquire($event);
     }
 
     /**
