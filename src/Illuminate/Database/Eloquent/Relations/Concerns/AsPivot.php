@@ -29,6 +29,13 @@ trait AsPivot
     protected $relatedKey;
 
     /**
+     * The columns to eager load on every query.
+     *
+     * @var array
+     */
+    protected $withColumns = [];
+
+    /**
      * Create a new pivot model instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
@@ -329,5 +336,15 @@ trait AsPivot
         $this->relations = [];
 
         return $this;
+    }
+
+    /**
+     * Get the columns to eager load on every query.
+     *
+     * @return array
+     */
+    public function getDefaultColumns()
+    {
+        return $this->withColumns;
     }
 }
