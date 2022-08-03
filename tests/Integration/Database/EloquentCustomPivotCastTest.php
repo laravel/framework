@@ -147,6 +147,14 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $pivot = $project->collaborators()->newPivot();
 
         $this->assertEquals(['permissions' => ['create', 'update']], $pivot->toArray());
+
+        $user = CustomPivotCastTestUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $pivot = $user->projects()->newPivot();
+
+        $this->assertEquals(['permissions' => ['create', 'update']], $pivot->toArray());
     }
 }
 
@@ -154,6 +162,13 @@ class CustomPivotCastTestUser extends Model
 {
     public $table = 'users';
     public $timestamps = false;
+
+    public function projects()
+    {
+        return $this->belongsToMany(
+            CustomPivotCastTestProject::class, 'project_users', 'user_id', 'project_id'
+        )->using(CustomPivotCastTestCollaborator::class);
+    }
 }
 
 class CustomPivotCastTestProject extends Model
@@ -165,7 +180,7 @@ class CustomPivotCastTestProject extends Model
     {
         return $this->belongsToMany(
             CustomPivotCastTestUser::class, 'project_users', 'project_id', 'user_id'
-        )->using(CustomPivotCastTestCollaborator::class)->withPivot('permissions');
+        )->using(CustomPivotCastTestCollaborator::class);
     }
 }
 
@@ -177,5 +192,9 @@ class CustomPivotCastTestCollaborator extends Pivot
 
     protected $casts = [
         'permissions' => 'json',
+    ];
+
+    protected $withColumns = [
+        'permissions',
     ];
 }
