@@ -519,7 +519,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $match[0] = $this->$method(Arr::get($match, 3));
         }
 
-        return isset($match[3]) ? $match[0] : $match[0];
+        return $match[0];
     }
 
     /**
