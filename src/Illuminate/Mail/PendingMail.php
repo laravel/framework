@@ -128,11 +128,12 @@ class PendingMail
      * Push the given mailable onto the queue.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @param  string|null  $queue
      * @return mixed
      */
-    public function queue(MailableContract $mailable)
+    public function queue(MailableContract $mailable, $queue = null)
     {
-        return $this->mailer->queue($this->fill($mailable));
+        return $this->mailer->queue($this->fill($mailable), $queue);
     }
 
     /**

@@ -33,10 +33,11 @@ class PendingMailFake extends PendingMail
      * Push the given mailable onto the queue.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @param  string|null  $queue
      * @return mixed
      */
-    public function queue(Mailable $mailable)
+    public function queue(Mailable $mailable, $queue = null)
     {
-        return $this->mailer->queue($this->fill($mailable));
+        return $this->mailer->queue($this->fill($mailable), $queue);
     }
 }
