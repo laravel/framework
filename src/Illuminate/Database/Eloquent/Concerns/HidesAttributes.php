@@ -78,6 +78,19 @@ trait HidesAttributes
     }
 
     /**
+     * Merge new visible attributes with existing visible attributes on the model.
+     *
+     * @param  array<string>  $visible
+     * @return $this
+     */
+    public function mergeVisible(array $visible)
+    {
+        $this->visible = array_merge($this->visible, $visible);
+
+        return $this;
+    }
+
+    /**
      * Make the given, typically hidden, attributes visible.
      *
      * @param  array<string>|string|null  $attributes
