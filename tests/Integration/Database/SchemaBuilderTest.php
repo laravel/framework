@@ -95,21 +95,23 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
 
         Schema::create('test', function ($table) {
-            $table->dateTime('datetime_column');
+            $table->dateTime('datetime_column_foo');
+            $table->dateTime('datetime_column_bar');
+            $table->dateTime('datetime_column_baz');
         });
 
         if (in_array($this->driver, ['pgsql', 'mysql'])) {
             $blueprint = new Blueprint('test', function ($table) {
-                $table->timestamp('datetime_column')->change();
+                $table->timestamp('datetime_column_foo')->change();
             });
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
             $expected = $this->driver === 'mysql'
-                ? ['ALTER TABLE test CHANGE datetime_column datetime_column TIMESTAMP NOT NULL']
+                ? ['ALTER TABLE test CHANGE datetime_column_foo datetime_column_foo TIMESTAMP NOT NULL']
                 : [
-                    'ALTER TABLE test ALTER datetime_column TYPE TIMESTAMP(0) WITHOUT TIME ZONE',
-                    'ALTER TABLE test ALTER datetime_column SET NOT NULL',
+                    'ALTER TABLE test ALTER datetime_column_foo TYPE TIMESTAMP(0) WITHOUT TIME ZONE',
+                    'ALTER TABLE test ALTER datetime_column_foo SET NOT NULL',
                 ];
 
             $this->assertEquals($expected, $queries);
@@ -117,14 +119,14 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         if ($this->driver === 'pgsql') {
             $blueprint = new Blueprint('test', function ($table) {
-                $table->timestampTz('datetime_column')->change();
+                $table->timestampTz('datetime_column_bar')->change();
             });
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
             $expected = [
-                'ALTER TABLE test ALTER datetime_column TYPE TIMESTAMP(0) WITH TIME ZONE',
-                'ALTER TABLE test ALTER datetime_column SET NOT NULL',
+                'ALTER TABLE test ALTER datetime_column_bar TYPE TIMESTAMP(0) WITH TIME ZONE',
+                'ALTER TABLE test ALTER datetime_column_bar SET NOT NULL',
             ];
 
             $this->assertEquals($expected, $queries);
@@ -132,12 +134,12 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         if ($this->driver === 'sqlsrv') {
             $blueprint = new Blueprint('test', function ($table) {
-                $table->dateTimeTz('datetime_column')->change();
+                $table->dateTimeTz('datetime_column_baz')->change();
             });
 
             $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
 
-            $expected = ['ALTER TABLE test ALTER COLUMN datetime_column DATETIMEOFFSET(6) NOT NULL'];
+            $expected = ['ALTER TABLE test ALTER COLUMN datetime_column_baz DATETIMEOFFSET(6) NOT NULL'];
 
             $this->assertEquals($expected, $queries);
         }
