@@ -292,7 +292,7 @@ Working directory: expected-working-directory');
         $this->app[Kernel::class]->registerCommand($this->command()->setUrlOpener(null)->setSystemOsFamily('Laravel OS'));
 
         $this->artisan('docs validation')
-            ->expectsOutputToContain('Unable to open the URL on your system. You will need to open it yourself.')
+            ->expectsOutputToContain('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.')
             ->assertSuccessful();
     }
 
