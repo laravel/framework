@@ -4,14 +4,12 @@ namespace Illuminate\Database\DBAL;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MariaDb1027Platform;
-use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
-use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Doctrine\DBAL\Platforms\SQLServer2012Platform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Types\PhpDateTimeMappingType;
 use Doctrine\DBAL\Types\Type;
 
@@ -26,12 +24,10 @@ class TimestampType extends Type implements PhpDateTimeMappingType
     {
         return match (get_class($platform)) {
             MySQLPlatform::class,
-            MySQL57Platform::class,
             MySQL80Platform::class,
-            MariaDb1027Platform::class => $this->getMySqlPlatformSQLDeclaration($column),
-            PostgreSQL94Platform::class,
-            PostgreSQL100Platform::class => $this->getPostgresPlatformSQLDeclaration($column),
-            SQLServer2012Platform::class => $this->getSqlServerPlatformSQLDeclaration($column),
+            MariaDBPlatform::class => $this->getMySqlPlatformSQLDeclaration($column),
+            PostgreSQLPlatform::class => $this->getPostgresPlatformSQLDeclaration($column),
+            SQLServerPlatform::class => $this->getSqlServerPlatformSQLDeclaration($column),
             SqlitePlatform::class => 'DATETIME',
             default => throw new DBALException('Invalid platform: '. substr(strrchr(get_class($platform), '\\'), 1)),
         };
