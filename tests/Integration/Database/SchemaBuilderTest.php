@@ -119,7 +119,7 @@ class SchemaBuilderTest extends DatabaseTestCase
 
             $expected = [
                 'ALTER TABLE test ALTER datetime_column TYPE TIMESTAMP(0) WITH TIME ZONE',
-                'ALTER TABLE test ALTER datetime_column SET NOT NULL',
+                'ALTER TABLE test ALTER datetime_column DROP DEFAULT',
             ];
 
             $this->assertEquals($expected, $queries);
