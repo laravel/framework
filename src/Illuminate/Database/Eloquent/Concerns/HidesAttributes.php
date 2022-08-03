@@ -42,6 +42,19 @@ trait HidesAttributes
     }
 
     /**
+     * Merge new hidden attributes with existing hidden attributes on the model.
+     *
+     * @param  array<string>  $hidden
+     * @return $this
+     */
+    public function mergeHidden(array $hidden)
+    {
+        $this->hidden = array_merge($this->hidden, $hidden);
+
+        return $this;
+    }
+
+    /**
      * Get the visible attributes for the model.
      *
      * @return array<string>
