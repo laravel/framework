@@ -35,19 +35,9 @@ class TimestampType extends Type implements PhpDateTimeMappingType
      */
     protected function getMySqlPlatformSQLDeclaration(array $fieldDeclaration)
     {
-        $columnType = 'TIMESTAMP';
-
-        if ($fieldDeclaration['precision']) {
-            $columnType = 'TIMESTAMP('.$fieldDeclaration['precision'].')';
-        }
-
-        $notNull = $fieldDeclaration['notnull'] ?? false;
-
-        if (! $notNull) {
-            return $columnType.' NULL';
-        }
-
-        return $columnType;
+        return $fieldDeclaration['precision'] ?? false
+                    ? 'TIMESTAMP('.$fieldDeclaration['precision'].')'
+                    : 'TIMESTAMP';
     }
 
     /**

@@ -129,6 +129,12 @@ class ChangeColumn
             $options['fixed'] = true;
         }
 
+        if ($fluent['type'] === 'timestamp') {
+            $options['platformOptions'] = [
+                'version' => true,
+            ];
+        }
+
         if (static::doesntNeedCharacterOptions($fluent['type'])) {
             $options['customSchemaOptions'] = [
                 'collation' => '',
@@ -156,6 +162,8 @@ class ChangeColumn
             'binary' => 'blob',
             'uuid' => 'guid',
             'char' => 'string',
+            'timestamp' => 'datetime',
+            'timestamptz' => 'datetimetz',
             default => $type,
         });
     }
@@ -189,6 +197,7 @@ class ChangeColumn
             'boolean',
             'date',
             'dateTime',
+            'dateTimeTz',
             'decimal',
             'double',
             'float',
@@ -197,6 +206,8 @@ class ChangeColumn
             'mediumInteger',
             'smallInteger',
             'time',
+            'timestamp',
+            'timestampTz',
             'tinyInteger',
         ]);
     }

@@ -87,4 +87,49 @@ class SchemaBuilderTest extends DatabaseTestCase
         $this->assertArrayHasKey(TinyInteger::NAME, Type::getTypesMap());
         $this->assertSame('tinyinteger', Schema::getColumnType('test', 'test_column'));
     }
+
+    public function testChangingDateTimeAndTimestampColumns()
+    {
+        if (! in_array($this->driver, ['pgsql', 'mysql', 'sqlsrv'])) {
+            $this->markTestSkipped('Test requires PostgreSQL, MySQL or SQLServer connection.');
+        }
+
+        Schema::create('test', function ($table) {
+            $table->dateTime('datetime_column');
+        });
+
+        if (in_array($this->driver, ['pgsql', 'mysql'])) {
+            $blueprint = new Blueprint('test', function ($table) {
+                $table->timestamp('datetime_column')->change();
+            });
+
+            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+            $expected = $this->driver === 'mysql'
+                ? ['ALTER TABLE test CHANGE datetime_column datetime_column TIMESTAMP NOT NULL']
+                : ['ALTER TABLE test CHANGE datetime_column datetime_column TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL'];
+        }
+
+        if ($this->driver === 'pgsql') {
+            $blueprint = new Blueprint('test', function ($table) {
+                $table->timestampTz('datetime_column')->change();
+            });
+
+            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+            $expected = ['ALTER TABLE test CHANGE datetime_column datetime_column TIMESTAMP(0) WITH TIME ZONE NOT NULL'];
+        }
+
+        if ($this->driver === 'sqlsrv') {
+            $blueprint = new Blueprint('test', function ($table) {
+                $table->dateTimeTz('datetime_column')->change();
+            });
+
+            $queries = $blueprint->toSql($this->getConnection(), $this->getConnection()->getSchemaGrammar());
+
+            $expected = ['ALTER TABLE test CHANGE datetime_column datetime_column DATETIMEOFFSET(6) NOT NULL'];
+        }
+
+        $this->assertEquals($expected, $queries);
+    }
 }
