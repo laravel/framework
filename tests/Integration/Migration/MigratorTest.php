@@ -120,7 +120,7 @@ class MigratorTest extends TestCase
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(function ($argument) use ($elements) {
             foreach ($elements as $element) {
-                if (! str($argument)->contains("⇂ $element")) {
+                if (! str($argument)->contains($element)) {
                     return false;
                 }
             }
