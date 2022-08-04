@@ -110,19 +110,21 @@ class Vite
      *
      * @param  string|string[]  $entrypoints
      * @param  string  $buildDirectory
+     * @param  string  $hotPath
      * @return \Illuminate\Support\HtmlString
      *
      * @throws \Exception
      */
-    public function __invoke($entrypoints, $buildDirectory = 'build')
+    public function __invoke($entrypoints, $buildDirectory = 'build', $hotPath = 'hot')
     {
         static $manifests = [];
 
         $entrypoints = collect($entrypoints);
         $buildDirectory = Str::start($buildDirectory, '/');
+        $hotPath = Str::start($hotPath, '/');
 
-        if (is_file(public_path('/hot'))) {
-            $url = rtrim(file_get_contents(public_path('/hot')));
+        if (is_file(public_path($hotPath))) {
+            $url = rtrim(file_get_contents(public_path($hotPath)));
 
             return new HtmlString(
                 $entrypoints
