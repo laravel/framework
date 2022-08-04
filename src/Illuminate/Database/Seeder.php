@@ -61,6 +61,10 @@ abstract class Seeder
             static::$called[] = $class;
         }
 
+        if (! $silent && $this->command->getOutput()) {
+            $this->command->getOutput()->writeln('');
+        }
+
         return $this;
     }
 

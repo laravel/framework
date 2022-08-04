@@ -132,8 +132,6 @@ class RefreshCommand extends Command
      */
     protected function runSeeder($database)
     {
-        $this->newLine();
-
         $this->call('db:seed', array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
