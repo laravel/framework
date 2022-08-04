@@ -882,8 +882,8 @@ trait HasAttributes
      */
     protected function isImmutableCustomDateTimeCast($cast)
     {
-        return strncmp($cast, 'immutable_date:', 15) === 0 ||
-               strncmp($cast, 'immutable_datetime:', 19) === 0;
+        return str_starts_with($cast, 'immutable_date:') ||
+                str_starts_with($cast, 'immutable_datetime:');
     }
 
     /**
