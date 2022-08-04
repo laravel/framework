@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
@@ -16,6 +15,13 @@ use RuntimeException;
 
 class ChangeColumn
 {
+    /**
+     * The database platform instance.
+     *
+     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
+     */
+    protected static $platform;
+
     /**
      * Compile a change column command into a series of SQL statements.
      *
@@ -37,11 +43,11 @@ class ChangeColumn
         }
 
         $schema = $connection->getDoctrineSchemaManager();
-        $databasePlatform = $schema->getDatabasePlatform();
+        static::$platform = $databasePlatform = $schema->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', Types::STRING);
 
         $tableDiff = static::getChangedDiff(
-            $grammar, $blueprint, $schema, $databasePlatform
+            $grammar, $blueprint, $schema
         );
 
         if ($tableDiff !== false) {
@@ -57,19 +63,14 @@ class ChangeColumn
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @return \Doctrine\DBAL\Schema\TableDiff|bool
      */
-    protected static function getChangedDiff(
-        $grammar,
-        Blueprint $blueprint,
-        SchemaManager $schema,
-        AbstractPlatform $platform
-    ) {
+    protected static function getChangedDiff($grammar, Blueprint $blueprint, SchemaManager $schema)
+    {
         $current = $schema->listTableDetails($grammar->getTablePrefix().$blueprint->getTable());
 
         return (new Comparator)->diffTable(
-            $current, static::getTableWithColumnChanges($blueprint, $platform, $current)
+            $current, static::getTableWithColumnChanges($blueprint, $current)
         );
     }
 
@@ -77,16 +78,15 @@ class ChangeColumn
      * Get a copy of the given Doctrine table after making the column changes.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  \Doctrine\DBAL\Schema\Table  $table
      * @return \Doctrine\DBAL\Schema\Table
      */
-    protected static function getTableWithColumnChanges(Blueprint $blueprint, AbstractPlatform $platform, Table $table)
+    protected static function getTableWithColumnChanges(Blueprint $blueprint, Table $table)
     {
         $table = clone $table;
 
         foreach ($blueprint->getChangedColumns() as $fluent) {
-            $column = static::getDoctrineColumn($platform, $table, $fluent);
+            $column = static::getDoctrineColumn($table, $fluent);
 
             // Here we will spin through each fluent column definition and map it to the proper
             // Doctrine column definitions - which is necessary because Laravel and Doctrine
@@ -109,28 +109,26 @@ class ChangeColumn
     /**
      * Get the Doctrine column instance for a column change.
      *
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  \Doctrine\DBAL\Schema\Table  $table
      * @param  \Illuminate\Support\Fluent  $fluent
      * @return \Doctrine\DBAL\Schema\Column
      */
-    protected static function getDoctrineColumn(AbstractPlatform $platform, Table $table, Fluent $fluent)
+    protected static function getDoctrineColumn(Table $table, Fluent $fluent)
     {
         return $table->changeColumn(
-            $fluent['name'], static::getDoctrineColumnChangeOptions($platform, $fluent)
+            $fluent['name'], static::getDoctrineColumnChangeOptions($fluent)
         )->getColumn($fluent['name']);
     }
 
     /**
      * Get the Doctrine column change options.
      *
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  \Illuminate\Support\Fluent  $fluent
      * @return array
      */
-    protected static function getDoctrineColumnChangeOptions(AbstractPlatform $platform, Fluent $fluent)
+    protected static function getDoctrineColumnChangeOptions(Fluent $fluent)
     {
-        $dcType = static::getDoctrineColumnType($platform, $fluent['type']);
+        $dcType = static::getDoctrineColumnType($fluent['type']);
 
         $options = ['type' => $dcType];
 
@@ -171,11 +169,10 @@ class ChangeColumn
     /**
      * Get the doctrine column type.
      *
-     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  string  $type
      * @return \Doctrine\DBAL\Types\Type
      */
-    protected static function getDoctrineColumnType(AbstractPlatform $platform, $type)
+    protected static function getDoctrineColumnType($type)
     {
         $type = strtolower($type);
 
@@ -189,7 +186,7 @@ class ChangeColumn
 
         return Type::getType(Type::hasType($type)
             ? $type
-            : $platform->getDoctrineTypeMapping($type)
+            : static::$platform->getDoctrineTypeMapping($type)
         );
     }
 
