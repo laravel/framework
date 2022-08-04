@@ -12,6 +12,7 @@ use Illuminate\Database\Console\DatabaseInspectionCommand;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -152,18 +153,18 @@ class ShowModelCommand extends DatabaseInspectionCommand
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
-                    $type = $method->hasReturnType() ? ':' . $this->mapReturnType($method->getReturnType()->getName()) : null;
+                    $type = $method->hasReturnType() ? ':'.$this->mapReturnType($method->getReturnType()->getName()) : null;
 
-                    return [Str::snake($matches[1]) => 'accessor' . $type];
+                    return [Str::snake($matches[1]) => 'accessor'.$type];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
                     $closure = call_user_func($method->getClosure($model), 1);
                     $type = null;
                     if (! is_null($closure->get)) {
                         $function = new ReflectionFunction($closure->get);
-                        $type = $function->hasReturnType() ? ':' . $this->mapReturnType($function->getReturnType()->getName()) : null;
+                        $type = $function->hasReturnType() ? ':'.$this->mapReturnType($function->getReturnType()->getName()) : null;
                     }
 
-                    return [Str::snake($method->getName()) => 'attribute' . $type];
+                    return [Str::snake($method->getName()) => 'attribute'.$type];
                 }
 
                 return [];
