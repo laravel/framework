@@ -65,8 +65,7 @@ class ChangeColumn
         Blueprint $blueprint,
         SchemaManager $schema,
         AbstractPlatform $platform
-    )
-    {
+    ) {
         $current = $schema->listTableDetails($grammar->getTablePrefix().$blueprint->getTable());
 
         return (new Comparator)->diffTable(
