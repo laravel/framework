@@ -146,19 +146,27 @@ class ShowModelCommand extends DatabaseInspectionCommand
         $class = new ReflectionClass($model);
 
         return collect($class->getMethods())
-            ->reject(
-                fn (ReflectionMethod $method) => $method->isStatic()
-                    || $method->isAbstract()
-                    || $method->getDeclaringClass()->getName() !== get_class($model)
+            ->reject(fn (ReflectionMethod $method) => $method->isStatic()
+                || $method->isAbstract()
+                || $method->getDeclaringClass()->getName() !== get_class($model)
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
-                    return [Str::snake($matches[1]) => 'accessor'];
+                    $type = $method->hasReturnType() ? ':' . $this->mapReturnType($method->getReturnType()->getName()) : null;
+
+                    return [Str::snake($matches[1]) => 'accessor' . $type];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
-                    return [Str::snake($method->getName()) => 'attribute'];
-                } else {
-                    return [];
+                    $closure = call_user_func($method->getClosure($model), 1);
+                    $type = null;
+                    if (! is_null($closure->get)) {
+                        $function = new ReflectionFunction($closure->get);
+                        $type = $function->hasReturnType() ? ':' . $this->mapReturnType($function->getReturnType()->getName()) : null;
+                    }
+
+                    return [Str::snake($method->getName()) => 'attribute' . $type];
                 }
+
+                return [];
             })
             ->reject(fn ($cast, $name) => collect($columns)->has($name))
             ->map(fn ($cast, $name) => [
@@ -461,5 +469,21 @@ class ShowModelCommand extends DatabaseInspectionCommand
         return is_dir(app_path('Models'))
             ? $rootNamespace.'Models\\'.$model
             : $rootNamespace.$model;
+    }
+
+    /**
+     * Map short returns to their full names.
+     *
+     * @param  string  $returnType
+     * @return string
+     */
+    protected function mapReturnType(string $returnType): string
+    {
+        $mappings = [
+            'int' => 'integer',
+            'bool' => 'boolean',
+        ];
+
+        return isset($mappings[$returnType]) ? $mappings[$returnType] : $returnType;
     }
 }
