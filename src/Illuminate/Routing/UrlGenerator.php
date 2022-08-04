@@ -255,7 +255,13 @@ class UrlGenerator implements UrlGeneratorContract
         // for asset paths, but only for routes to endpoints in the application.
         $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
 
-        return $this->removeIndex($root).'/'.trim($path, '/');
+
+        $postfix = trim($path, '/');
+        if ($root === '/') {
+            return "/$postfix";
+        }
+
+        return $this->removeIndex($root).'/'. $postfix;
     }
 
     /**
