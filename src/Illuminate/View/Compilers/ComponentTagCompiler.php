@@ -574,7 +574,7 @@ class ComponentTagCompiler
      */
     protected function parseComponentTagClassStatements(string $attributeString)
     {
-         return preg_replace_callback(
+        return preg_replace_callback(
              '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
                  if ($match[1] === 'class') {
                      $match[2] = str_replace('"', "'", $match[2]);
