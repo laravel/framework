@@ -286,7 +286,7 @@ trait HasAttributes
             }
 
             if ($attributes[$key] && ($this->isCustomDateTimeCast($value) ||
-                    $this->isImmutableCustomDateTimeCast($value))) {
+                $this->isImmutableCustomDateTimeCast($value))) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
 
@@ -588,8 +588,8 @@ trait HasAttributes
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
         return static::$attributeMutatorCache[get_class($this)][$key] =
-            $returnType instanceof ReflectionNamedType &&
-            $returnType->getName() === Attribute::class;
+                    $returnType instanceof ReflectionNamedType &&
+                    $returnType->getName() === Attribute::class;
     }
 
     /**
@@ -663,12 +663,12 @@ trait HasAttributes
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
         } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-            static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
             $value = $value instanceof DateTimeInterface
-                ? $this->serializeDate($value)
-                : $value;
+                        ? $this->serializeDate($value)
+                        : $value;
         } else {
             $value = $this->mutateAttribute($key, $value);
         }
@@ -688,36 +688,6 @@ trait HasAttributes
 
         return $this;
     }
-
-
-
-    /**
-     * return cast attribute
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    public function castType($castType,$key,$value)
-    {
-        return match($castType) {
-            'int','integer' =>(int) $value,
-            'real','float','double' => $this->fromFloat($value),
-            'decimal' => $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]),
-            'string' => (string) $value,
-            'bool','boolean' => (bool) $value,
-            'object' => $this->fromJson($value, true),
-            'array','json' => $this->fromJson($value),
-            'collection' => new BaseCollection($this->fromJson($value)),
-            'date' => $this->asDate($value),
-            'datetime','custom_datetime' => $this->asDateTime($value),
-            'immutable_date' => $this->asDate($value)->toImmutable(),
-            'immutable_custom_datetime','immutable_datetime' => $this->asDateTime($value)->toImmutable(),
-            'timestamp' => $this->asTimestamp($value)
-        };
-    }
-
-
-
 
     /**
      * Cast an attribute to a native PHP type.
@@ -743,10 +713,41 @@ trait HasAttributes
             $castType = Str::after($castType, 'encrypted:');
         }
 
-        if ($this->castType($castType,$key,$value)){
-            return  $this->castType($castType,$key,$value);
+        switch ($castType) {
+            case 'int':
+            case 'integer':
+                return (int) $value;
+            case 'real':
+            case 'float':
+            case 'double':
+                return $this->fromFloat($value);
+            case 'decimal':
+                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
+            case 'string':
+                return (string) $value;
+            case 'bool':
+            case 'boolean':
+                return (bool) $value;
+            case 'object':
+                return $this->fromJson($value, true);
+            case 'array':
+            case 'json':
+                return $this->fromJson($value);
+            case 'collection':
+                return new BaseCollection($this->fromJson($value));
+            case 'date':
+                return $this->asDate($value);
+            case 'datetime':
+            case 'custom_datetime':
+                return $this->asDateTime($value);
+            case 'immutable_date':
+                return $this->asDate($value)->toImmutable();
+            case 'immutable_custom_datetime':
+            case 'immutable_datetime':
+                return $this->asDateTime($value)->toImmutable();
+            case 'timestamp':
+                return $this->asTimestamp($value);
         }
-
 
         if ($this->isEnumCastable($key)) {
             return $this->getEnumCastableAttributeValue($key, $value);
@@ -870,7 +871,7 @@ trait HasAttributes
     protected function isCustomDateTimeCast($cast)
     {
         return str_starts_with($cast, 'date:') ||
-            str_starts_with($cast, 'datetime:');
+                str_starts_with($cast, 'datetime:');
     }
 
     /**
@@ -882,7 +883,7 @@ trait HasAttributes
     protected function isImmutableCustomDateTimeCast($cast)
     {
         return strncmp($cast, 'immutable_date:', 15) === 0 ||
-            strncmp($cast, 'immutable_datetime:', 19) === 0;
+               strncmp($cast, 'immutable_datetime:', 19) === 0;
     }
 
     /**
@@ -985,9 +986,9 @@ trait HasAttributes
         $returnType = (new ReflectionMethod($this, $method))->getReturnType();
 
         return static::$setAttributeMutatorCache[$class][$key] =
-            $returnType instanceof ReflectionNamedType &&
-            $returnType->getName() === Attribute::class &&
-            is_callable($this->{$method}()->set);
+                    $returnType instanceof ReflectionNamedType &&
+                    $returnType->getName() === Attribute::class &&
+                    is_callable($this->{$method}()->set);
     }
 
     /**
@@ -2070,15 +2071,15 @@ trait HasAttributes
     {
         static::$getAttributeMutatorCache[$class] =
             collect($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($class))
-                ->mapWithKeys(function ($match) {
-                    return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
-                })->all();
+                    ->mapWithKeys(function ($match) {
+                        return [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true];
+                    })->all();
 
         static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))
-            ->merge($attributeMutatorMethods)
-            ->map(function ($match) {
-                return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
-            })->all();
+                ->merge($attributeMutatorMethods)
+                ->map(function ($match) {
+                    return lcfirst(static::$snakeAttributes ? Str::snake($match) : $match);
+                })->all();
     }
 
     /**
