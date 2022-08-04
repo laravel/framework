@@ -475,8 +475,8 @@ trait EnumeratesValues
         $failed = [];
 
         $callback = func_num_args() === 1
-                ? $this->valueRetriever($key)
-                : $this->operatorForWhere(...func_get_args());
+            ? $this->valueRetriever($key)
+            : $this->operatorForWhere(...func_get_args());
 
         foreach ($this as $key => $item) {
             if ($callback($item, $key)) {
@@ -941,8 +941,8 @@ trait EnumeratesValues
     public function __toString()
     {
         return $this->escapeWhenCastingToString
-                    ? e($this->toJson())
-                    : $this->toJson();
+            ? e($this->toJson())
+            : $this->toJson();
     }
 
     /**
@@ -1013,6 +1013,22 @@ trait EnumeratesValues
         return (array) $items;
     }
 
+
+    public function operatorMatch($operator,$retrieved,$value)
+    {
+        return match ($operator) {
+            '=','==' => $retrieved == $value,
+            '!=','<>' =>  $retrieved != $value,
+            'NaN' => NAN,
+            '<' =>    $retrieved < $value,
+            '>' =>    $retrieved > $value,
+            '<=' =>   $retrieved <= $value,
+            '>=' =>   $retrieved >= $value,
+            '===' =>  $retrieved === $value,
+            '!==' =>  $retrieved !== $value,
+        };
+    }
+
     /**
      * Get an operator checker callback.
      *
@@ -1050,19 +1066,7 @@ trait EnumeratesValues
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '!=':
-                case '<>':  return $retrieved != $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '===': return $retrieved === $value;
-                case '!==': return $retrieved !== $value;
-            }
+            $this->operatorMatch($operator,$retrieved,$value);
         };
     }
 
