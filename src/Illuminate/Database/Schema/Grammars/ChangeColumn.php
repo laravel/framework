@@ -139,6 +139,10 @@ class ChangeColumn
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
+        if ($fluent['type'] === 'binary') {
+            $options['length'] = AbstractMySQLPlatform::LENGTH_LIMIT_BLOB;
+        }
+
         if ($fluent['type'] === 'char') {
             $options['fixed'] = true;
         }
