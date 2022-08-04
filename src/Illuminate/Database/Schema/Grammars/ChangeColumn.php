@@ -149,6 +149,12 @@ class ChangeColumn
             ];
         }
 
+        if ($fluent['type'] === 'jsonb') {
+            $options['platformOptions'] = [
+                'jsonb' => true,
+            ];
+        }
+
         if (static::doesntNeedCharacterOptions($dcType->getName())) {
             $options['customSchemaOptions'] = [
                 'collation' => '',
