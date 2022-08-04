@@ -2,10 +2,13 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as SchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
@@ -35,10 +38,10 @@ class ChangeColumn
 
         $schema = $connection->getDoctrineSchemaManager();
         $databasePlatform = $schema->getDatabasePlatform();
-        $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
+        $databasePlatform->registerDoctrineTypeMapping('enum', Types::STRING);
 
         $tableDiff = static::getChangedDiff(
-            $grammar, $blueprint, $schema
+            $grammar, $blueprint, $schema, $databasePlatform
         );
 
         if ($tableDiff !== false) {
@@ -54,14 +57,20 @@ class ChangeColumn
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Doctrine\DBAL\Schema\AbstractSchemaManager  $schema
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @return \Doctrine\DBAL\Schema\TableDiff|bool
      */
-    protected static function getChangedDiff($grammar, Blueprint $blueprint, SchemaManager $schema)
+    protected static function getChangedDiff(
+        $grammar,
+        Blueprint $blueprint,
+        SchemaManager $schema,
+        AbstractPlatform $platform
+    )
     {
         $current = $schema->listTableDetails($grammar->getTablePrefix().$blueprint->getTable());
 
         return (new Comparator)->diffTable(
-            $current, static::getTableWithColumnChanges($blueprint, $current)
+            $current, static::getTableWithColumnChanges($blueprint, $platform, $current)
         );
     }
 
@@ -69,15 +78,16 @@ class ChangeColumn
      * Get a copy of the given Doctrine table after making the column changes.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  \Doctrine\DBAL\Schema\Table  $table
      * @return \Doctrine\DBAL\Schema\Table
      */
-    protected static function getTableWithColumnChanges(Blueprint $blueprint, Table $table)
+    protected static function getTableWithColumnChanges(Blueprint $blueprint, AbstractPlatform $platform, Table $table)
     {
         $table = clone $table;
 
         foreach ($blueprint->getChangedColumns() as $fluent) {
-            $column = static::getDoctrineColumn($table, $fluent);
+            $column = static::getDoctrineColumn($platform, $table, $fluent);
 
             // Here we will spin through each fluent column definition and map it to the proper
             // Doctrine column definitions - which is necessary because Laravel and Doctrine
@@ -100,28 +110,32 @@ class ChangeColumn
     /**
      * Get the Doctrine column instance for a column change.
      *
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  \Doctrine\DBAL\Schema\Table  $table
      * @param  \Illuminate\Support\Fluent  $fluent
      * @return \Doctrine\DBAL\Schema\Column
      */
-    protected static function getDoctrineColumn(Table $table, Fluent $fluent)
+    protected static function getDoctrineColumn(AbstractPlatform $platform, Table $table, Fluent $fluent)
     {
         return $table->changeColumn(
-            $fluent['name'], static::getDoctrineColumnChangeOptions($fluent)
+            $fluent['name'], static::getDoctrineColumnChangeOptions($platform, $fluent)
         )->getColumn($fluent['name']);
     }
 
     /**
      * Get the Doctrine column change options.
      *
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  \Illuminate\Support\Fluent  $fluent
      * @return array
      */
-    protected static function getDoctrineColumnChangeOptions(Fluent $fluent)
+    protected static function getDoctrineColumnChangeOptions(AbstractPlatform $platform, Fluent $fluent)
     {
-        $options = ['type' => static::getDoctrineColumnType($fluent['type'])];
+        $dcType = static::getDoctrineColumnType($platform, $fluent['type']);
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
+        $options = ['type' => $dcType];
+
+        if ($dcType->getName() === Types::TEXT) {
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
@@ -129,7 +143,13 @@ class ChangeColumn
             $options['fixed'] = true;
         }
 
-        if (static::doesntNeedCharacterOptions($fluent['type'])) {
+        if ($fluent['type'] === 'timestamp') {
+            $options['platformOptions'] = [
+                'version' => true,
+            ];
+        }
+
+        if (static::doesntNeedCharacterOptions($dcType->getName())) {
             $options['customSchemaOptions'] = [
                 'collation' => '',
                 'charset' => '',
@@ -142,22 +162,26 @@ class ChangeColumn
     /**
      * Get the doctrine column type.
      *
+     * @param  \Doctrine\DBAL\Platforms\AbstractPlatform  $platform
      * @param  string  $type
      * @return \Doctrine\DBAL\Types\Type
      */
-    protected static function getDoctrineColumnType($type)
+    protected static function getDoctrineColumnType(AbstractPlatform $platform, $type)
     {
         $type = strtolower($type);
 
-        return Type::getType(match ($type) {
-            'biginteger' => 'bigint',
-            'smallinteger' => 'smallint',
-            'mediumtext', 'longtext' => 'text',
-            'binary' => 'blob',
-            'uuid' => 'guid',
-            'char' => 'string',
+        $type = match ($type) {
+            'biginteger' => Types::BIGINT,
+            'smallinteger' => Types::SMALLINT,
+            'binary' => Types::BLOB,
+            'uuid' => Types::GUID,
             default => $type,
-        });
+        };
+
+        return Type::getType(Type::hasType($type)
+            ? $type
+            : $platform->getDoctrineTypeMapping($type)
+        );
     }
 
     /**
@@ -169,9 +193,10 @@ class ChangeColumn
     protected static function calculateDoctrineTextLength($type)
     {
         return match ($type) {
-            'mediumText' => 65535 + 1,
-            'longText' => 16777215 + 1,
-            default => 255 + 1,
+            'tinyText' => AbstractMySQLPlatform::LENGTH_LIMIT_TINYTEXT,
+            'text' => AbstractMySQLPlatform::LENGTH_LIMIT_TEXT,
+            'mediumText' => AbstractMySQLPlatform::LENGTH_LIMIT_MEDIUMTEXT,
+            default => null,
         };
     }
 
@@ -183,22 +208,7 @@ class ChangeColumn
      */
     protected static function doesntNeedCharacterOptions($type)
     {
-        return in_array($type, [
-            'bigInteger',
-            'binary',
-            'boolean',
-            'date',
-            'dateTime',
-            'decimal',
-            'double',
-            'float',
-            'integer',
-            'json',
-            'mediumInteger',
-            'smallInteger',
-            'time',
-            'tinyInteger',
-        ]);
+        return ! in_array($type, [Types::STRING, Types::TEXT]);
     }
 
     /**
