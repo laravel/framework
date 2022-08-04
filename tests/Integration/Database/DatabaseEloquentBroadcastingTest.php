@@ -38,9 +38,9 @@ class DatabaseEloquentBroadcastingTest extends DatabaseTestCase
 
         Event::assertDispatched(function (BroadcastableModelEventOccurred $event) {
             return $event->model instanceof TestEloquentBroadcastUser
-                    && count($event->broadcastOn()) === 1
-                    && $event->model->name === 'Taylor'
-                    && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model->id}";
+                && count($event->broadcastOn()) === 1
+                && $event->model->name === 'Taylor'
+                && $event->broadcastOn()[0]->name == "private-Illuminate.Tests.Integration.Database.TestEloquentBroadcastUser.{$event->model->id}";
         });
     }
 
@@ -231,10 +231,10 @@ class TestEloquentBroadcastUserOnSpecificEventsOnly extends Model
 
     public function broadcastOn($event)
     {
-        switch ($event) {
-            case 'created':
-                return [$this];
-        }
+
+        return  match($event) {
+            'created' => [$this],
+        };
     }
 }
 
@@ -246,10 +246,9 @@ class TestEloquentBroadcastUserWithSpecificBroadcastName extends Model
 
     public function broadcastAs($event)
     {
-        switch ($event) {
-            case 'created':
-                return 'foo';
-        }
+        return  match($event) {
+            'created' => 'foo',
+        };
     }
 }
 
@@ -261,9 +260,8 @@ class TestEloquentBroadcastUserWithSpecificBroadcastPayload extends Model
 
     public function broadcastWith($event)
     {
-        switch ($event) {
-            case 'created':
-                return ['foo' => 'bar'];
-        }
+        return  match($event) {
+            'created' => ['foo' => 'bar'],
+        };
     }
 }

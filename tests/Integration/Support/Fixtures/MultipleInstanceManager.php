@@ -63,19 +63,18 @@ class MultipleInstanceManager extends BaseMultipleInstanceManager
      */
     public function getInstanceConfig($name)
     {
-        switch ($name) {
-            case 'foo':
-                return [
-                    'driver' => 'foo',
-                    'foo-option' => 'option-value',
-                ];
-            case 'bar':
-                return [
-                    'driver' => 'bar',
-                    'bar-option' => 'option-value',
-                ];
-            default:
-                return [];
-        }
+        $instanceConfig = match($name) {
+            'foo' => [
+                'driver' => 'foo',
+                'foo-option' => 'option-value',
+            ],
+            'bar' => [
+                'driver' => 'bar',
+                'bar-option' => 'option-value',
+            ],
+            default => [],
+        };
+
+        return $instanceConfig;
     }
 }
