@@ -166,6 +166,13 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The cache of the converted cast types.
+     *
+     * @var array
+     */
+    protected static $castTypeCache = [];
+
+    /**
      * The encrypter instance that is used to encrypt attributes.
      *
      * @var \Illuminate\Contracts\Encryption\Encrypter
@@ -818,19 +825,23 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
-            return 'custom_datetime';
+        $castType = $this->getCasts()[$key];
+
+        if (isset(static::$castTypeCache[$castType])) {
+            return static::$castTypeCache[$castType];
         }
 
-        if ($this->isImmutableCustomDateTimeCast($this->getCasts()[$key])) {
-            return 'immutable_custom_datetime';
+        if ($this->isCustomDateTimeCast($castType)) {
+            $convertedCastType = 'custom_datetime';
+        } elseif ($this->isImmutableCustomDateTimeCast($castType)) {
+            $convertedCastType = 'immutable_custom_datetime';
+        } elseif ($this->isDecimalCast($castType)) {
+            $convertedCastType = 'decimal';
+        } else {
+            $convertedCastType = trim(strtolower($castType));
         }
 
-        if ($this->isDecimalCast($this->getCasts()[$key])) {
-            return 'decimal';
-        }
-
-        return trim(strtolower($this->getCasts()[$key]));
+        return static::$castTypeCache[$castType] = $convertedCastType;
     }
 
     /**
