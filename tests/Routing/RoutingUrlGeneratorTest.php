@@ -54,6 +54,18 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
+    public function testAssetGenerationWithEmptyAssetRoot()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/index.php/'),
+            ''
+        );
+
+        $this->assertSame('/foo/bar', $url->asset('foo/bar'));
+        $this->assertSame('/foo/bar', $url->asset('foo/bar', true));
+    }
+
     public function testBasicGenerationWithHostFormatting()
     {
         $url = new UrlGenerator(
