@@ -219,7 +219,7 @@ class DatabaseConnectorTest extends TestCase
     public function testPostgresApplicationUseAlternativeDatabaseName()
     {
         $dsn = 'pgsql:dbname=\'baz\'';
-        $config = ['database' => 'bar', 'database_connect' => 'baz'];
+        $config = ['database' => 'bar', 'connect_via_database' => 'baz'];
         $connector = $this->getMockBuilder(PostgresConnector::class)->onlyMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock(stdClass::class);
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->willReturn(['options']);
