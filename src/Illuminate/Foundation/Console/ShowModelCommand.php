@@ -154,9 +154,11 @@ class ShowModelCommand extends DatabaseInspectionCommand
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
                     $type = $this->determineAccessorType($method);
+
                     return [Str::snake($matches[1]) => 'accessor'.$type];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
                     $type = $this->determineAttributeType($method);
+
                     return [Str::snake($method->getName()) => 'attribute'.$type];
                 }
 
@@ -340,12 +342,14 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $accessor = 'get'.$method.'Attribute';
             $method = new ReflectionMethod($model, $accessor);
             $type = $this->determineAccessorType($method);
+
             return 'accessor'.$type;
         }
 
         if ($model->hasAttributeMutator($column)) {
             $method = new ReflectionMethod($model, $column);
             $type = $this->determineAttributeType($method);
+
             return 'attribute'.$type;
         }
 
