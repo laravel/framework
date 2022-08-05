@@ -451,7 +451,7 @@ trait HasAttributes
         // attribute's underlying array. This takes care of properly nesting an
         // attribute in the array's value in the case of deeply nested items.
         if (str_contains($key, '->')) {
-            return $this->getJsonAttribute($key);
+            return $this->getJsonAttributeValue($key);
         }
 
         return $this->getRelationValue($key);
@@ -1068,7 +1068,7 @@ trait HasAttributes
      * @param  string  $key
      * @return mixed
      */
-    public function getJsonAttribute($key)
+    public function getJsonAttributeValue($key)
     {
         [$key, $path] = explode('->', $key, 2);
 
