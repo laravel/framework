@@ -66,8 +66,7 @@ trait Prunable
     }
 
     /**
-     * Boolean not hard delete model results
-     *
+     * Boolean to determine method of deletion.
      * @return bool
      */
     protected function softPrune(): bool
