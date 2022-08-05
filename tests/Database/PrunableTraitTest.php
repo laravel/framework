@@ -39,7 +39,7 @@ class PrunableTraitTest extends TestCase
         );
     }
 
-    protected function modelProvider()
+    public function modelProvider()
     {
         return [
             [
