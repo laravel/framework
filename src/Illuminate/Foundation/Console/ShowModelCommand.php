@@ -153,17 +153,10 @@ class ShowModelCommand extends DatabaseInspectionCommand
             )
             ->mapWithKeys(function (ReflectionMethod $method) use ($model) {
                 if (preg_match('/^get(.*)Attribute$/', $method->getName(), $matches) === 1) {
-                    $type = $method->hasReturnType() ? ':'.$this->mapReturnType($method->getReturnType()->getName()) : null;
-
+                    $type = $this->determineAccessorType($method);
                     return [Str::snake($matches[1]) => 'accessor'.$type];
                 } elseif ($model->hasAttributeMutator($method->getName())) {
-                    $closure = call_user_func($method->getClosure($model), 1);
-                    $type = null;
-                    if (! is_null($closure->get)) {
-                        $function = new ReflectionFunction($closure->get);
-                        $type = $function->hasReturnType() ? ':'.$this->mapReturnType($function->getReturnType()->getName()) : null;
-                    }
-
+                    $type = $this->determineAttributeType($method);
                     return [Str::snake($method->getName()) => 'attribute'.$type];
                 }
 
@@ -343,11 +336,17 @@ class ShowModelCommand extends DatabaseInspectionCommand
     protected function getCastType($column, $model)
     {
         if ($model->hasGetMutator($column) || $model->hasSetMutator($column)) {
-            return 'accessor';
+            $method = str_replace('_', '', ucwords($column, '_'));
+            $accessor = 'get'.$method.'Attribute';
+            $method = new ReflectionMethod($model, $accessor);
+            $type = $this->determineAccessorType($method);
+            return 'accessor'.$type;
         }
 
         if ($model->hasAttributeMutator($column)) {
-            return 'attribute';
+            $method = new ReflectionMethod($model, $column);
+            $type = $this->determineAttributeType($method);
+            return 'attribute' .$type;
         }
 
         return $this->getCastsWithDates($model)->get($column) ?? null;
@@ -486,5 +485,36 @@ class ShowModelCommand extends DatabaseInspectionCommand
         ];
 
         return isset($mappings[$returnType]) ? $mappings[$returnType] : $returnType;
+    }
+
+    /**
+     * Determine accessor type
+     *
+     * @param  ReflectionMethod  $method
+     * @return string|null
+     */
+    protected function determineAccessorType(ReflectionMethod $method)
+    {
+        return $method->hasReturnType() ? ':'.$this->mapReturnType($method->getReturnType()->getName()) : null;
+    }
+
+    /**
+     * Determine the Attribute method closure return type
+     *
+     * @param  ReflectionMethod  $method
+     * @return string|null
+     */
+    protected function determineAttributeType(ReflectionMethod $method): ?string
+    {
+        $closure = call_user_func($method->getClosure(new $method->class), 1);
+
+        $type = null;
+
+        if (! is_null($closure->get)) {
+            $function = new ReflectionFunction($closure->get);
+            $type = $function->hasReturnType() ? ':'.$this->mapReturnType($function->getReturnType()->getName()) : null;
+        }
+
+        return $type;
     }
 }
