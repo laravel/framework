@@ -262,7 +262,7 @@ trait Queueable
     }
 
     /**
-     * Invoke all the chain's failed job callbacks.
+     * Invoke all of the chain's failed job callbacks.
      *
      * @param  \Throwable  $e
      * @return void
