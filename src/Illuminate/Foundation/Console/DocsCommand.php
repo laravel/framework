@@ -401,9 +401,9 @@ class DocsCommand extends Command
         }
 
         $binaryExecutable = [
-            'Darwin' => 'open', 
-            'Windows' => 'start', 
-            'Linux' => 'xdg-open'
+            'Darwin' => 'open',
+            'Windows' => 'start',
+            'Linux' => 'xdg-open',
         ][$this->systemOsFamily];
 
         $process = tap(Process::fromShellCommandline($binaryExecutable.' '.escapeshellcmd($url)))->run();
