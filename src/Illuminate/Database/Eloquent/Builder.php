@@ -1541,7 +1541,9 @@ class Builder implements BuilderContract
      */
     protected function createSelectWithConstraint($name)
     {
-        return [explode(':', $name)[0], static function ($query) use ($name) {
+        [$attribute, $columns] = explode(':', $name);
+
+        return [$attribute, static function ($query) use ($columns) {
             $query->select(array_map(static function ($column) use ($query) {
                 if (str_contains($column, '.')) {
                     return $column;
@@ -1550,7 +1552,7 @@ class Builder implements BuilderContract
                 return $query instanceof BelongsToMany
                         ? $query->getRelated()->getTable().'.'.$column
                         : $column;
-            }, explode(',', explode(':', $name)[1])));
+            }, explode(',', $columns)));
         }];
     }
 
