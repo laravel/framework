@@ -31,7 +31,6 @@ class PrunableTraitTest extends TestCase
      */
     public function testPrunableTraitDeletesOnBoolFlag(string $model, $expected)
     {
-
         (new $model())->pruneAll();
 
         $this->assertEquals(
