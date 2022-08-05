@@ -864,7 +864,10 @@ abstract class Factory
         }
 
         if (str_starts_with($method, 'for')) {
-            return $this->for($factory->state($parameters[0] ?? []), $relationship);
+            return $this->for(
+                $parameters[0] instanceof Model ? $parameters[0] : $factory->state($parameters[0] ?? []),
+                $relationship
+            );
         } elseif (str_starts_with($method, 'has')) {
             return $this->has(
                 $factory

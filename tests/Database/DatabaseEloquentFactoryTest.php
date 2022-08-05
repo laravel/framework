@@ -574,7 +574,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_dynamic_has_and_for_methods()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model.'Factory';
+            return $model . 'Factory';
         });
 
         $user = FactoryTestUserFactory::new()->hasPosts(3)->create();
@@ -589,6 +589,43 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertInstanceOf(FactoryTestUser::class, $post->author);
         $this->assertSame('Taylor Otwell', $post->author->name);
         $this->assertCount(2, $post->comments);
+    }
+
+    public function test_dynamic_has_and_for_methods_with_existing_model_instance()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model . 'Factory';
+        });
+
+        $user = FactoryTestUserFactory::new()->hasPosts(3)->create();
+
+        $this->assertCount(3, $user->posts);
+
+        $post = FactoryTestPostFactory::new()
+            ->forAuthor(['name' => 'Taylor Otwell'])
+            ->hasComments(2)
+            ->create();
+
+        $this->assertInstanceOf(FactoryTestUser::class, $post->author);
+        $this->assertSame('Taylor Otwell', $post->author->name);
+        $this->assertCount(2, $post->comments);
+    }
+
+    public function test_belongs_to_relationship_with_existing_model_instance_with_dynamic_relationship_name()
+    {
+        Factory::guessFactoryNamesUsing(function ($model) {
+            return $model . 'Factory';
+        });
+        $user = FactoryTestUserFactory::new(['name' => 'Taylor Otwell'])->create();
+        $posts = FactoryTestPostFactory::times(3)
+            ->forAuthor($user)
+            ->create();
+
+        $this->assertCount(3, $posts->filter(function ($post) use ($user) {
+            return $post->factoryTestUser->is($user);
+        }));
+        $this->assertCount(1, FactoryTestUser::all());
+        $this->assertCount(3, FactoryTestPost::all());
     }
 
     public function test_can_be_macroable()
