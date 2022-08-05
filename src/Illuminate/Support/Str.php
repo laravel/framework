@@ -418,6 +418,45 @@ class Str
 
         return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', $value) > 0;
     }
+    
+    /**
+     * Join items into a human readable list (e.g. "one, two, three, and four")
+     * Uses different glue strings when there are only two elements and for
+     * the final element. Defaults to joining using the Oxford comma.
+     *
+     * 1 item will return: $item
+     * 2 items will return: $item1 . $dyadicGlue . $item2
+     * 3+ items will return: $item1 . $glue . $item2 . $lastGlue . $item3
+     */
+    public static function join(iterable $items, string $glue = ', ', string $lastGlue = ', and ', $dyadicGlue = ' and '): string
+    {
+        $result = '';
+        $i = 0;
+        $total = count($items);
+        foreach ($items as $item) {
+            $i++;
+
+            // Only add glue if we're not on the first item
+            if ($i !== 1) {
+                // Add diadic glue between the first and last item
+                if ($i === 2 && $total === 2) {
+                    $result .= $dyadicGlue;
+
+                // Add the last glue if we're on the last item
+                } elseif ($i === $total) {
+                    $result .= $lastGlue;
+
+                // Add the normal glue otherwise
+                } else {
+                    $result .= $glue;
+                }
+            }
+
+            $result .= $item;
+        }
+
+        return $result;
+    }
 
     /**
      * Convert a string to kebab case.
