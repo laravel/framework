@@ -346,7 +346,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
         if ($model->hasAttributeMutator($column)) {
             $method = new ReflectionMethod($model, $column);
             $type = $this->determineAttributeType($method);
-            return 'attribute' .$type;
+            return 'attribute'.$type;
         }
 
         return $this->getCastsWithDates($model)->get($column) ?? null;
@@ -488,7 +488,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
-     * Determine accessor type
+     * Determine accessor type.
      *
      * @param  ReflectionMethod  $method
      * @return string|null
@@ -499,7 +499,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     }
 
     /**
-     * Determine the Attribute method closure return type
+     * Determine the Attribute method closure return type.
      *
      * @param  ReflectionMethod  $method
      * @return string|null
