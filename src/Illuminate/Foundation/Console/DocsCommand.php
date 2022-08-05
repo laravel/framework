@@ -400,7 +400,12 @@ class DocsCommand extends Command
             return;
         }
 
-        $binaryExecutable = ['Darwin' => 'open', 'Windows' => 'start', 'Linux' => 'xdg-open'][$this->systemOsFamily];
+        $binaryExecutable = [
+            'Darwin' => 'open', 
+            'Windows' => 'start', 
+            'Linux' => 'xdg-open'
+        ][$this->systemOsFamily];
+
         $process = tap(Process::fromShellCommandline($binaryExecutable.' '.escapeshellcmd($url)))->run();
 
         if (! $process->isSuccessful()) {
