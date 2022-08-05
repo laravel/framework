@@ -133,6 +133,18 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Merge a value based on a falsy condition.
+     *
+     * @param  bool  $condition
+     * @param  mixed  $value
+     * @return \Illuminate\Http\Resources\MergeValue|mixed
+     */
+    protected function mergeUnless($condition, $value)
+    {
+        return ! $condition ? new MergeValue(value($value)) : new MissingValue;
+    }
+
+    /**
      * Merge the given attributes.
      *
      * @param  array  $attributes
