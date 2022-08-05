@@ -49,7 +49,7 @@ class PrunableTraitTest extends TestCase
             ],
             [
                 PrunableTestForceDeletes::class,
-                0
+                0,
             ]
         ];
     }
