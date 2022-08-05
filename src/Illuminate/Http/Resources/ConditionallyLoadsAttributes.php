@@ -121,7 +121,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Merge a value based on a given condition.
+     * Merge a value if the given condition is truthy.
      *
      * @param  bool  $condition
      * @param  mixed  $value
@@ -133,7 +133,7 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Merge a value based on a falsy condition.
+     * Merge a value unless the given condition is truthy.
      *
      * @param  bool  $condition
      * @param  mixed  $value
