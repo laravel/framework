@@ -75,6 +75,13 @@ trait HasAttributes
     protected $attributeCastCache = [];
 
     /**
+     * The array of columns that will be hided from the observers.
+     *
+     * @var array
+     */
+    protected $hideFromObserve = [];
+
+    /**
      * The built-in, primitive cast types supported by Eloquent.
      *
      * @var string[]
@@ -1908,7 +1915,7 @@ trait HasAttributes
         $dirty = [];
 
         foreach ($this->getAttributes() as $key => $value) {
-            if (! $this->originalIsEquivalent($key)) {
+            if (! $this->originalIsEquivalent($key) && ! in_array($key, $this->hideFromObserve)) {
                 $dirty[$key] = $value;
             }
         }
