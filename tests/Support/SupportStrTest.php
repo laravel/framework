@@ -327,6 +327,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('/test/string', Str::start('//test/string', '/'));
     }
 
+    public function testStrEnd()
+    {
+        $this->assertSame('/test/string/', Str::end('/test/string', '/'));
+        $this->assertSame('/test/string/', Str::end('/test/string/', '/'));
+        $this->assertSame('/test/string/', Str::end('/test/string//', '/'));
+        $this->assertSame('//test//string/', Str::end('//test//string//', '/'));
+    }
+
     public function testFlushCache()
     {
         $reflection = new ReflectionClass(Str::class);

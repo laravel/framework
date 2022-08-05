@@ -892,6 +892,20 @@ class Str
     }
 
     /**
+     * End a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $postfix
+     * @return string
+     */
+    public static function end($value, $postfix)
+    {
+        $quoted = preg_quote($postfix, '/');
+
+        return preg_replace('/('.$quoted.')+$/u', '', $value).$postfix;
+    }
+
+    /**
      * Convert the given string to upper-case.
      *
      * @param  string  $value
