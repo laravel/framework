@@ -1225,6 +1225,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(21, $model->id);
     }
 
+    public function testGettingJSONAttributes()
+    {
+        $model = new EloquentModelStub(['meta' => json_encode(['name' => 'foo', 'size' => ['width' => 'baz']])]);
+
+        $this->assertEquals('foo', $model->{'meta->name'});
+        $this->assertEquals('baz', $model->{'meta->size->width'});
+    }
+
     public function testFillingJSONAttributes()
     {
         $model = new EloquentModelStub;

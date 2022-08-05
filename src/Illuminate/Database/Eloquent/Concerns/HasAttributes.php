@@ -447,6 +447,13 @@ trait HasAttributes
             return;
         }
 
+        // If this attribute contains a JSON ->, we'll get the proper value in the
+        // attribute's underlying array. This takes care of properly nesting an
+        // attribute in the array's value in the case of deeply nested items.
+        if (str_contains($key, '->')) {
+            return $this->getJsonAttribute($key);
+        }
+
         return $this->getRelationValue($key);
     }
 
@@ -1053,6 +1060,19 @@ trait HasAttributes
     {
         return in_array($key, $this->getDates(), true) ||
             $this->isDateCastable($key);
+    }
+
+    /**
+     * Get a given JSON attribute from the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getJsonAttribute($key)
+    {
+        [$key, $path] = explode('->', $key, 2);
+
+        return Arr::get($this->getArrayAttributeByKey($key), str_replace('->', '.', $path));
     }
 
     /**
