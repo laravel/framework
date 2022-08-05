@@ -25,7 +25,6 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
  * @method \Illuminate\Routing\RouteRegistrar scopeBindings()
  * @method \Illuminate\Routing\RouteRegistrar where(array  $where)
- * @method \Illuminate\Routing\RouteRegistrar whereIn(array|string  $parameters, array  $values)
  * @method \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string  $middleware)
  */
 class RouteRegistrar
@@ -68,7 +67,6 @@ class RouteRegistrar
         'prefix',
         'scopeBindings',
         'where',
-        'whereIn',
         'withoutMiddleware',
     ];
 

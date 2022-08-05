@@ -12,6 +12,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -351,7 +352,7 @@ class DocsCommand extends Command
             } elseif (in_array($this->systemOsFamily, ['Darwin', 'Windows', 'Linux'])) {
                 $this->openViaBuiltInStrategy($url);
             } else {
-                $this->components->warn('Unable to open the URL on your system. You will need to open it yourself.');
+                $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
             }
         })($url);
     }
@@ -387,11 +388,19 @@ class DocsCommand extends Command
      */
     protected function openViaBuiltInStrategy($url)
     {
-        $process = tap(Process::fromShellCommandline(match ($this->systemOsFamily) {
+        $binary = (new ExecutableFinder())->find(match ($this->systemOsFamily) {
             'Darwin' => 'open',
             'Windows' => 'start',
             'Linux' => 'xdg-open',
-        }.' '.escapeshellarg($url)))->run();
+        });
+
+        if ($binary === null) {
+            $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
+
+            return;
+        }
+
+        $process = tap(Process::fromShellCommandline($binary.' '.escapeshellarg($url)))->run();
 
         if (! $process->isSuccessful()) {
             throw new ProcessFailedException($process);

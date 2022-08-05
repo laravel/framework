@@ -112,6 +112,10 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
+                                @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
+                            (?:
                                 \{\{\s*\\\$attributes(?:[^}]+?)?\s*\}\}
                             )
                             |
@@ -164,6 +168,10 @@ class ComponentTagCompiler
                     (?:
                         \s+
                         (?:
+                            (?:
+                                @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
                             (?:
                                 \{\{\s*\\\$attributes(?:[^}]+?)?\s*\}\}
                             )
@@ -433,6 +441,10 @@ class ComponentTagCompiler
                         \s+
                         (?:
                             (?:
+                                @(?:class)(\( (?: (?>[^()]+) | (?-1) )* \))
+                            )
+                            |
+                            (?:
                                 \{\{\s*\\\$attributes(?:[^}]+?)?\s*\}\}
                             )
                             |
@@ -487,7 +499,7 @@ class ComponentTagCompiler
     protected function getAttributesFromAttributeString(string $attributeString)
     {
         $attributeString = $this->parseAttributeBag($attributeString);
-
+        $attributeString = $this->parseComponentTagClassStatements($attributeString);
         $attributeString = $this->parseBindAttributes($attributeString);
 
         $pattern = '/
@@ -552,6 +564,27 @@ class ComponentTagCompiler
         /x";
 
         return preg_replace($pattern, ' :attributes="$1"', $attributeString);
+    }
+
+    /**
+     * Parse @class statements in a given attribute string into their fully-qualified syntax.
+     *
+     * @param  string  $attributeString
+     * @return string
+     */
+    protected function parseComponentTagClassStatements(string $attributeString)
+    {
+        return preg_replace_callback(
+             '/@(class)(\( ( (?>[^()]+) | (?2) )* \))/x', function ($match) {
+                 if ($match[1] === 'class') {
+                     $match[2] = str_replace('"', "'", $match[2]);
+
+                     return ":class=\"\Illuminate\Support\Arr::toCssClasses{$match[2]}\"";
+                 }
+
+                 return $match[0];
+             }, $attributeString
+        );
     }
 
     /**
