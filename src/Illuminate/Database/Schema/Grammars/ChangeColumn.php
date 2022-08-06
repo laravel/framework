@@ -128,11 +128,11 @@ class ChangeColumn
      */
     protected static function getDoctrineColumnChangeOptions(Fluent $fluent)
     {
-        $dcType = static::getDoctrineColumnType($fluent['type']);
+        $doctrineType = static::getDoctrineColumnType($fluent['type']);
 
-        $options = ['type' => $dcType];
+        $options = ['type' => $doctrineType];
 
-        if ($dcType->getName() === Types::TEXT) {
+        if ($doctrineType->getName() === Types::TEXT) {
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 
@@ -156,7 +156,7 @@ class ChangeColumn
             ];
         }
 
-        if (static::doesntNeedCharacterOptions($dcType->getName())) {
+        if (static::doesntNeedCharacterOptions($doctrineType->getName())) {
             $options['customSchemaOptions'] = [
                 'collation' => '',
                 'charset' => '',
