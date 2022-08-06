@@ -178,7 +178,9 @@ class ChangeColumn
 
         $type = match ($type) {
             'biginteger' => Types::BIGINT,
+            'mediuminteger' => 'mediumint',
             'smallinteger' => Types::SMALLINT,
+            'tinyinteger' => 'tinyint',
             'binary' => Types::BLOB,
             'uuid' => Types::GUID,
             default => $type,
