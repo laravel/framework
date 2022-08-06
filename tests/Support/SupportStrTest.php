@@ -427,6 +427,7 @@ class SupportStrTest extends TestCase
 
     public function testJoin()
     {
+        $this->assertSame('', Str::join([]));
         $this->assertSame('bob', Str::join(['bob']));
         $this->assertSame('bob and joe', Str::join(['bob', 'joe']));
         $this->assertSame('bob, joe, and sally', Str::join(['bob', 'joe', 'sally']));
