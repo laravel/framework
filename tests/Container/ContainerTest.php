@@ -217,7 +217,6 @@ class ContainerTest extends TestCase
         $this->assertSame('text', $container['something']);
         unset($container['something']);
         $this->assertFalse(isset($container['something']));
-
     }
 
     public function testAliases()
