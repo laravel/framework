@@ -1124,9 +1124,13 @@ class Validator implements ValidatorContract
         $response = (new ValidationRuleParser($this->data))
                             ->explode(ValidationRuleParser::filterConditionalRules($rules, $this->data));
 
-        $this->rules = array_merge_recursive(
-            $this->rules, $response->rules
-        );
+        if (empty($this->rules)) {
+            $this->rules = $response->rules;
+        } else {
+            $this->rules = array_merge(
+                $this->rules, $response->rules
+            );
+        }
 
         $this->implicitAttributes = array_merge(
             $this->implicitAttributes, $response->implicitAttributes
