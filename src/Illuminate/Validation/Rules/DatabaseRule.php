@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
@@ -200,7 +201,11 @@ trait DatabaseRule
     protected function formatWheres()
     {
         return collect($this->wheres)->map(function ($where) {
-            return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
+            $value = $where['value'];
+            if (function_exists('enum_exists') && $value instanceof BackedEnum) {
+                $value = $value->value;
+            }
+            return $where['column'].','.'"'.str_replace('"', '""', $value).'"';
         })->implode(',');
     }
 }
