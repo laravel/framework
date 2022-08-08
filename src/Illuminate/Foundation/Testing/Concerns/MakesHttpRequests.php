@@ -103,6 +103,18 @@ trait MakesHttpRequests
     }
 
     /**
+     * Remove the authorization token from the request.
+     *
+     * @return $this
+     */
+    public function withoutToken()
+    {
+        unset($this->defaultHeaders['Authorization']);
+
+        return $this;
+    }
+
+    /**
      * Flush all the configured headers.
      *
      * @return $this

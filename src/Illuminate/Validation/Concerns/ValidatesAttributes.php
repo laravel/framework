@@ -1951,6 +1951,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the attribute does not start with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDoesntStartWith($attribute, $value, $parameters)
+    {
+        return ! Str::startsWith($value, $parameters);
+    }
+
+    /**
      * Validate the attribute ends with a given substring.
      *
      * @param  string  $attribute
@@ -1961,6 +1974,19 @@ trait ValidatesAttributes
     public function validateEndsWith($attribute, $value, $parameters)
     {
         return Str::endsWith($value, $parameters);
+    }
+
+    /**
+     * Validate the attribute does not end with a given substring.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDoesntEndWith($attribute, $value, $parameters)
+    {
+        return ! Str::endsWith($value, $parameters);
     }
 
     /**

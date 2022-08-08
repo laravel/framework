@@ -4,6 +4,7 @@ namespace Illuminate\Auth\Access;
 
 use Closure;
 use Exception;
+use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -592,7 +593,7 @@ class Gate implements GateContract
     {
         if ($this->container->bound(Dispatcher::class)) {
             $this->container->make(Dispatcher::class)->dispatch(
-                new Events\GateEvaluated($user, $ability, $result, $arguments)
+                new GateEvaluated($user, $ability, $result, $arguments)
             );
         }
     }

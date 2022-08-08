@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use BadMethodCallException;
 use Carbon\Carbon;
 use Faker\Generator;
 use Illuminate\Container\Container;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Tests\Database\Fixtures\Models\Money\Price;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class DatabaseEloquentFactoryTest extends TestCase
 {
@@ -376,6 +378,29 @@ class DatabaseEloquentFactoryTest extends TestCase
         unset($_SERVER['__test.role.creating-role']);
     }
 
+    public function test_belongs_to_many_relationship_with_existing_model_instances_using_array()
+    {
+        $roles = FactoryTestRoleFactory::times(3)
+            ->afterCreating(function ($role) {
+                $_SERVER['__test.role.creating-role'] = $role;
+            })
+            ->create();
+        FactoryTestUserFactory::times(3)
+            ->hasAttached($roles->toArray(), ['admin' => 'Y'], 'roles')
+            ->create();
+
+        $this->assertCount(3, FactoryTestRole::all());
+
+        $user = FactoryTestUser::latest()->first();
+
+        $this->assertCount(3, $user->roles);
+        $this->assertSame('Y', $user->roles->first()->pivot->admin);
+
+        $this->assertInstanceOf(Eloquent::class, $_SERVER['__test.role.creating-role']);
+
+        unset($_SERVER['__test.role.creating-role']);
+    }
+
     public function test_belongs_to_many_relationship_with_existing_model_instances_with_relationship_name_implied_from_model()
     {
         $roles = FactoryTestRoleFactory::times(3)
@@ -443,7 +468,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ['name' => 'Dayle Rees']
         );
 
-        $class = new \ReflectionClass($factory);
+        $class = new ReflectionClass($factory);
         $prop = $class->getProperty('count');
         $prop->setAccessible(true);
         $value = $prop->getValue($factory);
@@ -622,7 +647,7 @@ class DatabaseEloquentFactoryTest extends TestCase
 
     public function test_dynamic_trashed_state_throws_exception_when_not_a_softdeletes_model()
     {
-        $this->expectException(\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         FactoryTestUserFactory::new()->trashed()->create();
     }
 

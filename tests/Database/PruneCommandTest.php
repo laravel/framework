@@ -35,21 +35,37 @@ class PruneCommandTest extends TestCase
     {
         $output = $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
 
-        $this->assertEquals(<<<'EOF'
-10 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.
-20 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records have been pruned.
+        $output = $output->fetch();
 
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            '10 records',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            '20 records',
+            $output,
+        );
     }
 
     public function testPrunableTestModelWithoutPrunableRecords()
     {
         $output = $this->artisan(['--model' => PrunableTestModelWithoutPrunableRecords::class]);
 
-        $this->assertEquals(<<<'EOF'
-No prunable [Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords] records found.
-
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            'No prunable [Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords] records found.',
+            $output->fetch()
+        );
     }
 
     public function testPrunableSoftDeletedModelWithPrunableRecords()
@@ -74,10 +90,17 @@ EOF, str_replace("\r", '', $output->fetch()));
 
         $output = $this->artisan(['--model' => PrunableTestSoftDeletedModelWithPrunableRecords::class]);
 
-        $this->assertEquals(<<<'EOF'
-2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records have been pruned.
+        $output = $output->fetch();
 
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            'Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            '2 records',
+            $output,
+        );
 
         $this->assertEquals(2, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
@@ -86,20 +109,20 @@ EOF, str_replace("\r", '', $output->fetch()));
     {
         $output = $this->artisan(['--model' => NonPrunableTestModel::class]);
 
-        $this->assertEquals(<<<'EOF'
-No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.
-
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            'No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.',
+            $output->fetch(),
+        );
     }
 
     public function testNonPrunableTestWithATrait()
     {
         $output = $this->artisan(['--model' => NonPrunableTrait::class]);
 
-        $this->assertEquals(<<<'EOF'
-No prunable models found.
-
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            'No prunable models found.',
+            $output->fetch(),
+        );
     }
 
     public function testTheCommandMayBePretended()
@@ -128,10 +151,10 @@ EOF, str_replace("\r", '', $output->fetch()));
             '--pretend' => true,
         ]);
 
-        $this->assertEquals(<<<'EOF'
-3 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records will be pruned.
-
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            '3 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records will be pruned.',
+            $output->fetch(),
+        );
 
         $this->assertEquals(5, PrunableTestModelWithPrunableRecords::count());
     }
@@ -161,10 +184,10 @@ EOF, str_replace("\r", '', $output->fetch()));
             '--pretend' => true,
         ]);
 
-        $this->assertEquals(<<<'EOF'
-2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records will be pruned.
-
-EOF, str_replace("\r", '', $output->fetch()));
+        $this->assertStringContainsString(
+            '2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records will be pruned.',
+            $output->fetch(),
+        );
 
         $this->assertEquals(4, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }

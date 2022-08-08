@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
@@ -243,5 +244,34 @@ class FoundationHelpersTest extends TestCase
         });
 
         $this->assertSame('expected', mix('asset.png'));
+    }
+
+    public function testFakeReturnsSameInstance()
+    {
+        app()->instance('config', new ConfigRepository([]));
+
+        $this->assertSame(fake(), fake());
+        $this->assertSame(fake(), fake('en_US'));
+        $this->assertSame(fake('en_AU'), fake('en_AU'));
+        $this->assertNotSame(fake('en_US'), fake('en_AU'));
+
+        app()->flush();
+    }
+
+    public function testFakeUsesLocale()
+    {
+        mt_srand(12345, MT_RAND_PHP);
+        app()->instance('config', new ConfigRepository([]));
+
+        // Should fallback to en_US
+        $this->assertSame('Arkansas', fake()->state());
+        $this->assertSame('Australian Capital Territory', fake('en_AU')->state());
+        $this->assertSame('Guadeloupe', fake('fr_FR')->region());
+
+        app()->instance('config', new ConfigRepository(['app' => ['faker_locale' => 'en_AU']]));
+        mt_srand(4, MT_RAND_PHP);
+
+        // Should fallback to en_US
+        $this->assertSame('Australian Capital Territory', fake()->state());
     }
 }
