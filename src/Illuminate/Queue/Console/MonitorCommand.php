@@ -61,7 +61,7 @@ class MonitorCommand extends Command
     protected $headers = ['Connection', 'Queue', 'Size', 'Status'];
 
     /**
-     * Create a new queue listen command.
+     * Create a new queue monitor command.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
@@ -109,20 +109,30 @@ class MonitorCommand extends Command
                 'connection' => $connection,
                 'queue' => $queue,
                 'size' => $size = $this->manager->connection($connection)->size($queue),
-                'status' => $size >= $this->option('max') ? '<fg=red>ALERT</>' : 'OK',
+                'status' => $size >= $this->option('max') ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',
             ];
         });
     }
 
     /**
-     * Display the failed jobs in the console.
+     * Display the queue sizes in the console.
      *
      * @param  \Illuminate\Support\Collection  $queues
      * @return void
      */
     protected function displaySizes(Collection $queues)
     {
-        $this->table($this->headers, $queues);
+        $this->newLine();
+
+        $this->components->twoColumnDetail('<fg=gray>Queue name</>', '<fg=gray>Size / Status</>');
+
+        $queues->each(function ($queue) {
+            $status = '['.$queue['size'].'] '.$queue['status'];
+
+            $this->components->twoColumnDetail($queue['queue'], $status);
+        });
+
+        $this->newLine();
     }
 
     /**
@@ -134,7 +144,7 @@ class MonitorCommand extends Command
     protected function dispatchEvents(Collection $queues)
     {
         foreach ($queues as $queue) {
-            if ($queue['status'] == 'OK') {
+            if ($queue['status'] == '<fg=green;options=bold>OK</>') {
                 continue;
             }
 

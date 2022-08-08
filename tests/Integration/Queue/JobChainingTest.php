@@ -13,7 +13,7 @@ use Orchestra\Testbench\TestCase;
 
 class JobChainingTest extends TestCase
 {
-    public static $catchCallbackCount = 0;
+    public static $catchCallbackRan = false;
 
     protected function getEnvironmentSetUp($app)
     {
@@ -31,6 +31,7 @@ class JobChainingTest extends TestCase
         JobChainingTestFirstJob::$ran = false;
         JobChainingTestSecondJob::$ran = false;
         JobChainingTestThirdJob::$ran = false;
+        static::$catchCallbackRan = false;
     }
 
     public function testJobsCanBeChainedOnSuccess()
@@ -148,54 +149,17 @@ class JobChainingTest extends TestCase
 
     public function testCatchCallbackIsCalledOnFailure()
     {
-        self::$catchCallbackCount = 0;
-
         Bus::chain([
             new JobChainingTestFirstJob,
             new JobChainingTestFailingJob,
             new JobChainingTestSecondJob,
         ])->catch(static function () {
-            self::$catchCallbackCount++;
+            self::$catchCallbackRan = true;
         })->dispatch();
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
-        $this->assertSame(1, static::$catchCallbackCount);
+        $this->assertTrue(static::$catchCallbackRan);
         $this->assertFalse(JobChainingTestSecondJob::$ran);
-    }
-
-    public function testCatchCallbackIsCalledOnceOnSyncQueue()
-    {
-        self::$catchCallbackCount = 0;
-
-        try {
-            Bus::chain([
-                new JobChainingTestFirstJob(),
-                new JobChainingTestThrowJob(),
-                new JobChainingTestSecondJob(),
-            ])->catch(function () {
-                self::$catchCallbackCount++;
-            })->onConnection('sync')->dispatch();
-        } finally {
-            $this->assertTrue(JobChainingTestFirstJob::$ran);
-            $this->assertSame(1, static::$catchCallbackCount);
-            $this->assertFalse(JobChainingTestSecondJob::$ran);
-        }
-
-        self::$catchCallbackCount = 0;
-
-        try {
-            Bus::chain([
-                new JobChainingTestFirstJob(),
-                new JobChainingTestThrowJob(),
-                new JobChainingTestSecondJob(),
-            ])->catch(function () {
-                self::$catchCallbackCount++;
-            })->onConnection('sync')->dispatch();
-        } finally {
-            $this->assertTrue(JobChainingTestFirstJob::$ran);
-            $this->assertSame(1, static::$catchCallbackCount);
-            $this->assertFalse(JobChainingTestSecondJob::$ran);
-        }
     }
 
     public function testChainJobsUseSameConfig()

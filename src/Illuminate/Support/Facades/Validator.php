@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Contracts\Validation\Validator make(array $data, array $rules, array $messages = [], array $customAttributes = [])
+ * @method static \Illuminate\Contracts\Validation\Validator|\Illuminate\Validation\Validator make(array $data, array $rules, array $messages = [], array $customAttributes = [])
  * @method static void includeUnvalidatedArrayKeys()
  * @method static void excludeUnvalidatedArrayKeys()
  * @method static void extend(string $rule, \Closure|string $extension, string $message = null)

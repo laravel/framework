@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -478,12 +479,14 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function toRoute($route, $parameters, $absolute)
     {
-        $route->excludedParameters = $this->getDefaultParameters();
-
         $parameters = collect(Arr::wrap($parameters))->map(function ($value, $key) use ($route) {
-            return $value instanceof UrlRoutable && $route->bindingFieldFor($key)
+            $value = $value instanceof UrlRoutable && $route->bindingFieldFor($key)
                     ? $value->{$route->bindingFieldFor($key)}
                     : $value;
+
+            return function_exists('enum_exists') && $value instanceof BackedEnum
+                ? $value->value
+                : $value;
         })->all();
 
         return $this->routeUrl()->to(
