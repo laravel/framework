@@ -4,7 +4,6 @@ namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\View\Components\TwoColumnDetail;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
