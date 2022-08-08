@@ -448,9 +448,9 @@ class ContainerTest extends TestCase
         $container->alias('foo', 'bar');
         $container->alias('bar', 'baz');
         $this->assertSame('ConcreteStub', $container->getAlias('baz'));
-        $this->assertTrue( $container->isAlias('baz'));
-        $this->assertTrue( $container->isAlias('bar'));
-        $this->assertTrue( $container->isAlias('foo'));
+        $this->assertTrue($container->isAlias('baz'));
+        $this->assertTrue($container->isAlias('bar'));
+        $this->assertTrue($container->isAlias('foo'));
     }
 
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
