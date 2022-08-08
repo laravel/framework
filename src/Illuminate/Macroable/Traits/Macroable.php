@@ -5,6 +5,7 @@ namespace Illuminate\Support\Traits;
 use BadMethodCallException;
 use Closure;
 use ReflectionClass;
+use ReflectionFunction;
 use ReflectionMethod;
 
 trait Macroable
@@ -118,7 +119,14 @@ trait Macroable
         $macro = static::$macros[$method];
 
         if ($macro instanceof Closure) {
-            $macro = $macro->bindTo($this, static::class);
+            $fn = new ReflectionFunction($macro);
+            $bindable = $fn->getClosureScopeClass() === null || $fn->getClosureThis() !== null;
+
+            if ($bindable) {
+                $macro = $macro->bindTo($this, static::class);
+            } else {
+                $macro = $macro->bindTo(null, static::class);
+            }
         }
 
         return $macro(...$parameters);
