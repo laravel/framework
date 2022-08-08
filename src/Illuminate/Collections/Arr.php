@@ -148,7 +148,7 @@ class Arr
      *
      * @throws  InvalidArgumentException|Exception
      */
-    public static function isEmpty($array, $keys)
+    public static function empty($array, $keys)
     {
         $keys = (array) $keys;
 

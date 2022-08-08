@@ -139,7 +139,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'foo' => ['bar' => 'baz', 'baz' => ['a' => 'b']]], $array);
     }
 
-    public function testIsEmpty()
+    public function testEmpty()
     {
         $array = [
             'products' => [
@@ -147,8 +147,8 @@ class SupportArrTest extends TestCase
                 ['name' => 'chair'],
             ],
         ];
-        $this->assertTrue(Arr::isEmpty($array, 'products.0.name'));
-        $this->assertFalse(Arr::isEmpty($array, 'products.1.name'));
+        $this->assertTrue(Arr::empty($array, 'products.0.name'));
+        $this->assertFalse(Arr::empty($array, 'products.1.name'));
 
         $array = [
             'products' => [
@@ -156,8 +156,8 @@ class SupportArrTest extends TestCase
                 'label' => ''
             ],
         ];
-        $this->assertFalse(Arr::isEmpty($array, 'products.name'));
-        $this->assertTrue(Arr::isEmpty($array, 'products.label'));
+        $this->assertFalse(Arr::empty($array, 'products.name'));
+        $this->assertTrue(Arr::empty($array, 'products.label'));
 
         $array = [
             'products' => [
@@ -166,7 +166,7 @@ class SupportArrTest extends TestCase
                 'slug' => '/desk'
             ],
         ];
-        $this->assertFalse(Arr::isEmpty($array, ['products.name', 'products.label', 'products.slug']));
+        $this->assertFalse(Arr::empty($array, ['products.name', 'products.label', 'products.slug']));
 
         $array = [
             'products' => [
@@ -175,42 +175,42 @@ class SupportArrTest extends TestCase
                 'slug' => ''
             ],
         ];
-        $this->assertTrue(Arr::isEmpty($array, ['products.name', 'products.label', 'products.slug']));
+        $this->assertTrue(Arr::empty($array, ['products.name', 'products.label', 'products.slug']));
 
-        $this->assertFalse(Arr::isEmpty(new ArrayObject(['foo' => 'bar']), 'foo'));
-        $this->assertTrue(Arr::isEmpty([], ['']));
-        $this->assertFalse(Arr::isEmpty(['hello'], '0'));
-        $this->assertFalse(Arr::isEmpty(['' => 'some'], ''));
-        $this->assertTrue(Arr::isEmpty([], [null]));
-        $this->assertTrue(Arr::isEmpty(null, [null]));
-        $this->assertTrue(Arr::isEmpty([''], '0'));
+        $this->assertFalse(Arr::empty(new ArrayObject(['foo' => 'bar']), 'foo'));
+        $this->assertTrue(Arr::empty([], ['']));
+        $this->assertFalse(Arr::empty(['hello'], '0'));
+        $this->assertFalse(Arr::empty(['' => 'some'], ''));
+        $this->assertTrue(Arr::empty([], [null]));
+        $this->assertTrue(Arr::empty(null, [null]));
+        $this->assertTrue(Arr::empty([''], '0'));
     }
 
-    public function testIsEmptyArrayKeysNotProvidedException()
+    public function testEmptyArrayKeysNotProvidedException()
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->expectExceptionMessage('Array keys not provided');
 
-        Arr::isEmpty(['hello'], []);
+        Arr::empty(['hello'], []);
     }
 
-    public function testIsEmptyArrayKeyDoesNotExistException()
+    public function testEmptyArrayKeyDoesNotExistException()
     {
         $this->expectException(\Exception::class);
 
         $this->expectExceptionMessage('Array key hello of foo.hello does not exist');
 
-        Arr::isEmpty(['foo' => ['bar']], 'foo.hello');
+        Arr::empty(['foo' => ['bar']], 'foo.hello');
     }
 
-    public function testIsEmptyArrayKeyBlankDoesNotExistException()
+    public function testEmptyArrayKeyBlankDoesNotExistException()
     {
         $this->expectException(\Exception::class);
 
-        $this->expectExceptionMessage("Array key '' of '' does not exist");
+        $this->expectExceptionMessage('Array key \'\' of \'\' does not exist');
 
-        Arr::isEmpty(['hello' => 'some'], '');
+        Arr::empty(['hello' => 'some'], '');
     }
 
     public function testExcept()
