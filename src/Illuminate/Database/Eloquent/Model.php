@@ -1993,7 +1993,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 ? $relationship->resolveRouteBindingQuery($relationship, $value, $field)
                 : $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
     }
-    
+
     /**
      * Retrieve the child model relationship.
      *
