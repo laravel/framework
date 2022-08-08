@@ -1995,7 +1995,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Retrieve the child model relationship.
+     * Retrieve the child route model binding relationship name for the given child type.
      *
      * @param  string  $childType
      * @return string
