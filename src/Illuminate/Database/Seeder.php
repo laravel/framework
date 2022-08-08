@@ -3,7 +3,7 @@
 namespace Illuminate\Database;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\View\Components\Task;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Support\Arr;
@@ -49,20 +49,29 @@ abstract class Seeder
 
             $name = get_class($seeder);
 
-            if ($silent || ! isset($this->command)) {
-                $seeder->__invoke($parameters);
-            } else {
-                with(new Task($this->command->getOutput()))->render(
+            if ($silent === false && isset($this->command)) {
+                with(new TwoColumnDetail($this->command->getOutput()))->render(
                     $name,
-                    fn () => $seeder->__invoke($parameters),
+                    '<fg=yellow;options=bold>RUNNING</>'
                 );
             }
 
-            static::$called[] = $class;
-        }
+            $startTime = microtime(true);
 
-        if (! $silent && $this->command->getOutput()) {
-            $this->command->getOutput()->writeln('');
+            $seeder->__invoke($parameters);
+
+            if ($silent === false && isset($this->command)) {
+                $runTime = number_format((microtime(true) - $startTime) * 1000, 2);
+
+                with(new TwoColumnDetail($this->command->getOutput()))->render(
+                    $name,
+                    "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>"
+                );
+
+                $this->command->getOutput()->writeln('');
+            }
+
+            static::$called[] = $class;
         }
 
         return $this;
