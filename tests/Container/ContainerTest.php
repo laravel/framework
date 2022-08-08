@@ -493,6 +493,16 @@ class ContainerTest extends TestCase
         $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
     }
 
+    public function testResolvingWithArrayOfMixedParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerMixedPrimitiveStub::class, ['first' => 1, 'last' => 2, 'third' => 3]);
+        $this->assertSame(1, $instance->first);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
+        $this->assertSame(2, $instance->last);
+        $this->assertFalse(isset($instance->third));
+    }
+
     public function testResolvingWithUsingAnInterface()
     {
         $container = new Container;
