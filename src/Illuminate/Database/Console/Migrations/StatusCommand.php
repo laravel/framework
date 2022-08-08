@@ -51,7 +51,7 @@ class StatusCommand extends BaseCommand
     {
         return $this->migrator->usingConnection($this->option('database'), function () {
             if (! $this->migrator->repositoryExists()) {
-                $this->error('Migration table not found.');
+                $this->components->error('Migration table not found.');
 
                 return 1;
             }
@@ -61,9 +61,17 @@ class StatusCommand extends BaseCommand
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
             if (count($migrations = $this->getStatusFor($ran, $batches)) > 0) {
-                $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
+                $this->newLine();
+
+                $this->components->twoColumnDetail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
+
+                $migrations->each(
+                    fn ($migration) => $this->components->twoColumnDetail($migration[0], $migration[1])
+                );
+
+                $this->newLine();
             } else {
-                $this->error('No migrations found');
+                $this->components->info('No migrations found');
             }
         });
     }
@@ -81,9 +89,15 @@ class StatusCommand extends BaseCommand
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
-                        return in_array($migrationName, $ran)
-                                ? ['<info>Yes</info>', $migrationName, $batches[$migrationName]]
-                                : ['<fg=red>No</fg=red>', $migrationName];
+                        $status = in_array($migrationName, $ran)
+                            ? '<fg=green;options=bold>Ran</>'
+                            : '<fg=yellow;options=bold>Pending</>';
+
+                        if (in_array($migrationName, $ran)) {
+                            $status = '['.$batches[$migrationName].'] '.$status;
+                        }
+
+                        return [$migrationName, $status];
                     });
     }
 

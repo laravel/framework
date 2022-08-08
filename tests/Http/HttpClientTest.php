@@ -478,6 +478,7 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->get('https://example.com');
         $this->assertSame(['fact' => 'Cats are great!'], $response->json());
+        $this->assertSame('application/json', $response->header('Content-Type'));
         $this->assertSame(200, $response->status());
 
         $response = $this->factory->get('https://example.com');
@@ -1614,5 +1615,18 @@ class HttpClientTest extends TestCase
                 $request->url() === 'http://foo.com/json' &&
                 $request->hasHeader('Authorization', 'Bearer GET /json HTTP/1.1');
         });
+    }
+
+    public function testItCanSetAllowMaxRedirects(): void
+    {
+        $request = new PendingRequest($this->factory);
+
+        $request = $request->withOptions(['allow_redirects' => ['max' => 5]]);
+
+        $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 5]], $request->getOptions());
+
+        $request = $request->maxRedirects(10);
+
+        $this->assertSame(['connect_timeout' => 10, 'http_errors' => false, 'timeout' => 30, 'allow_redirects' => ['max' => 10]], $request->getOptions());
     }
 }

@@ -295,7 +295,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Determine if a key exists in the collection.
      *
-     * @param  (callable(TModel, TKey): bool)|TModel|string  $key
+     * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool

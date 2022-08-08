@@ -100,6 +100,14 @@ abstract class GeneratorCommand extends Command
         'while',
         'xor',
         'yield',
+        '__CLASS__',
+        '__DIR__',
+        '__FILE__',
+        '__FUNCTION__',
+        '__LINE__',
+        '__METHOD__',
+        '__NAMESPACE__',
+        '__TRAIT__',
     ];
 
     /**
@@ -139,7 +147,7 @@ abstract class GeneratorCommand extends Command
         // language and that the class name will actually be valid. If it is not valid we
         // can error now and prevent from polluting the filesystem using invalid files.
         if ($this->isReservedName($this->getNameInput())) {
-            $this->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
+            $this->components->error('The name "'.$this->getNameInput().'" is reserved by PHP.');
 
             return false;
         }
@@ -154,7 +162,7 @@ abstract class GeneratorCommand extends Command
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
-            $this->error($this->type.' already exists!');
+            $this->components->error($this->type.' already exists.');
 
             return false;
         }
@@ -166,11 +174,15 @@ abstract class GeneratorCommand extends Command
 
         $this->files->put($path, $this->sortImports($this->buildClass($name)));
 
-        $this->info($this->type.' created successfully.');
+        $info = $this->type;
 
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            $this->handleTestCreation($path);
+            if ($this->handleTestCreation($path)) {
+                $info .= ' and test';
+            }
         }
+
+        $this->components->info($info.' created successfully.');
     }
 
     /**
@@ -343,7 +355,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function sortImports($stub)
     {
-        if (preg_match('/(?P<imports>(?:use [^;]+;$\n?)+)/m', $stub, $match)) {
+        if (preg_match('/(?P<imports>(?:use [^;{]+;$\n?)+)/m', $stub, $match)) {
             $imports = explode("\n", trim($match['imports']));
 
             sort($imports);

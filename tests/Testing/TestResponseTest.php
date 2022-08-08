@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
@@ -116,7 +117,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasEloquentCollection()
     {
-        $collection = new \Illuminate\Database\Eloquent\Collection([
+        $collection = new EloquentCollection([
             new TestModel(['id' => 1]),
             new TestModel(['id' => 2]),
             new TestModel(['id' => 3]),
@@ -132,7 +133,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasEloquentCollectionRespectsOrder()
     {
-        $collection = new \Illuminate\Database\Eloquent\Collection([
+        $collection = new EloquentCollection([
             new TestModel(['id' => 3]),
             new TestModel(['id' => 2]),
             new TestModel(['id' => 1]),
@@ -150,7 +151,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasEloquentCollectionRespectsType()
     {
-        $actual = new \Illuminate\Database\Eloquent\Collection([
+        $actual = new EloquentCollection([
             new TestModel(['id' => 1]),
             new TestModel(['id' => 2]),
         ]);
@@ -160,7 +161,7 @@ class TestResponseTest extends TestCase
             'gatherData' => ['foos' => $actual],
         ]);
 
-        $expected = new \Illuminate\Database\Eloquent\Collection([
+        $expected = new EloquentCollection([
             new AnotherTestModel(['id' => 1]),
             new AnotherTestModel(['id' => 2]),
         ]);
@@ -172,7 +173,7 @@ class TestResponseTest extends TestCase
 
     public function testAssertViewHasEloquentCollectionRespectsSize()
     {
-        $actual = new \Illuminate\Database\Eloquent\Collection([
+        $actual = new EloquentCollection([
             new TestModel(['id' => 1]),
             new TestModel(['id' => 2]),
         ]);
@@ -1650,9 +1651,6 @@ class TestResponseTest extends TestCase
         );
     }
 
-    /**
-     * @group 1
-     */
     public function testResponseCanBeReturnedAsCollection()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -1834,6 +1832,25 @@ class TestResponseTest extends TestCase
                 'foo is required',
             ],
         ]));
+
+        $response = TestResponse::fromBaseResponse(new Response());
+
+        $response->assertSessionHasErrors(['foo']);
+    }
+
+    public function testAssertJsonSerializedSessionHasErrors()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1), null, 'json'));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'foo' => [
+                'foo is required',
+            ],
+        ]));
+
+        $store->save(); // Required to serialize error bag to JSON
 
         $response = TestResponse::fromBaseResponse(new Response());
 

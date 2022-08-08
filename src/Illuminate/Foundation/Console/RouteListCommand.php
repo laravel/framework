@@ -104,11 +104,11 @@ class RouteListCommand extends Command
         $this->router->flushMiddlewareGroups();
 
         if (! $this->router->getRoutes()->count()) {
-            return $this->error("Your application doesn't have any routes.");
+            return $this->components->error("Your application doesn't have any routes.");
         }
 
         if (empty($routes = $this->getRoutes())) {
-            return $this->error("Your application doesn't have any routes matching the given criteria.");
+            return $this->components->error("Your application doesn't have any routes matching the given criteria.");
         }
 
         $this->displayRoutes($routes);
@@ -400,7 +400,7 @@ class RouteListCommand extends Command
                 $spaces,
                 preg_replace('#({[^}]+})#', '<fg=yellow>$1</>', $uri),
                 $dots,
-                str_replace('   ', ' › ', $action),
+                str_replace('   ', ' › ', $action ?? ''),
             ), $this->output->isVerbose() && ! empty($middleware) ? "<fg=#6C7280>$middleware</>" : null];
         })
             ->flatten()

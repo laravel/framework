@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Exception;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -470,6 +471,53 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testRandomStringFactoryCanBeSet()
+    {
+        Str::createRandomStringsUsing(fn ($length) => 'length:'.$length);
+
+        $this->assertSame('length:7', Str::random(7));
+        $this->assertSame('length:7', Str::random(7));
+
+        Str::createRandomStringsNormally();
+
+        $this->assertNotSame('length:7', Str::random());
+    }
+
+    public function testItCanSpecifyASequenceOfRandomStringsToUtilise()
+    {
+        Str::createRandomStringsUsingSequence([
+            0 => 'x',
+            // 1 => just generate a random one here...
+            2 => 'y',
+            3 => 'z',
+            // ... => continue to generate random strings...
+        ]);
+
+        $this->assertSame('x', Str::random());
+        $this->assertSame(16, mb_strlen(Str::random()));
+        $this->assertSame('y', Str::random());
+        $this->assertSame('z', Str::random());
+        $this->assertSame(16, mb_strlen(Str::random()));
+        $this->assertSame(16, mb_strlen(Str::random()));
+
+        Str::createRandomStringsNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForARandomStringSequence()
+    {
+        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new Exception('Out of random strings.'));
+        Str::random();
+        Str::random();
+
+        try {
+            $this->expectExceptionMessage('Out of random strings.');
+            Str::random();
+            $this->fail();
+        } finally {
+            Str::createRandomStringsNormally();
+        }
+    }
+
     public function testReplace()
     {
         $this->assertSame('foo bar laravel', Str::replace('baz', 'laravel', 'foo bar baz'));
@@ -850,6 +898,12 @@ class SupportStrTest extends TestCase
         $this->assertSame("<h1>hello world</h1>\n", Str::markdown('# hello world'));
     }
 
+    public function testInlineMarkdown()
+    {
+        $this->assertSame("<em>hello world</em>\n", Str::inlineMarkdown('*hello world*'));
+        $this->assertSame("<a href=\"https://laravel.com\"><strong>Laravel</strong></a>\n", Str::inlineMarkdown('[**Laravel**](https://laravel.com)'));
+    }
+
     public function testRepeat()
     {
         $this->assertSame('aaaaa', Str::repeat('a', 5));
@@ -890,6 +944,95 @@ class SupportStrTest extends TestCase
     public function testTransliterateStrict(string $value, string $expected): void
     {
         $this->assertSame($expected, Str::transliterate($value, '?', true));
+    }
+
+    public function testItCanFreezeUuids()
+    {
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+        $this->assertNotSame(Str::uuid(), Str::uuid());
+
+        $uuid = Str::freezeUuids();
+
+        $this->assertSame($uuid, Str::uuid());
+        $this->assertSame(Str::uuid(), Str::uuid());
+        $this->assertSame((string) $uuid, (string) Str::uuid());
+        $this->assertSame((string) Str::uuid(), (string) Str::uuid());
+
+        Str::createUuidsNormally();
+
+        $this->assertNotSame(Str::uuid(), Str::uuid());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+    }
+
+    public function testItCanFreezeUuidsInAClosure()
+    {
+        $uuids = [];
+
+        $uuid = Str::freezeUuids(function ($uuid) use (&$uuids) {
+            $uuids[] = $uuid;
+            $uuids[] = Str::uuid();
+            $uuids[] = Str::uuid();
+        });
+
+        $this->assertSame($uuid, $uuids[0]);
+        $this->assertSame((string) $uuid, (string) $uuids[0]);
+        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
+        $this->assertSame($uuids[0], $uuids[1]);
+        $this->assertSame((string) $uuids[0], (string) $uuids[1]);
+        $this->assertSame($uuids[1], $uuids[2]);
+        $this->assertSame((string) $uuids[1], (string) $uuids[2]);
+        $this->assertNotSame(Str::uuid(), Str::uuid());
+        $this->assertNotSame((string) Str::uuid(), (string) Str::uuid());
+
+        Str::createUuidsNormally();
+    }
+
+    public function testItCanSpecifyASequenceOfUuidsToUtilise()
+    {
+        Str::createUuidsUsingSequence([
+            0 => ($zeroth = Str::uuid()),
+            1 => ($first = Str::uuid()),
+            // just generate a random one here...
+            3 => ($third = Str::uuid()),
+            // continue to generate random uuids...
+        ]);
+
+        $retrieved = Str::uuid();
+        $this->assertSame($zeroth, $retrieved);
+        $this->assertSame((string) $zeroth, (string) $retrieved);
+
+        $retrieved = Str::uuid();
+        $this->assertSame($first, $retrieved);
+        $this->assertSame((string) $first, (string) $retrieved);
+
+        $retrieved = Str::uuid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        $retrieved = Str::uuid();
+        $this->assertSame($third, $retrieved);
+        $this->assertSame((string) $third, (string) $retrieved);
+
+        $retrieved = Str::uuid();
+        $this->assertFalse(in_array($retrieved, [$zeroth, $first, $third], true));
+        $this->assertFalse(in_array((string) $retrieved, [(string) $zeroth, (string) $first, (string) $third], true));
+
+        Str::createUuidsNormally();
+    }
+
+    public function testItCanSpecifyAFallbackForASequence()
+    {
+        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn () => throw new Exception('Out of Uuids.'));
+        Str::uuid();
+        Str::uuid();
+
+        try {
+            $this->expectExceptionMessage('Out of Uuids.');
+            Str::uuid();
+            $this->fail();
+        } finally {
+            Str::createUuidsNormally();
+        }
     }
 }
 

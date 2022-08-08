@@ -34,7 +34,7 @@
     "suggest": {
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "illuminate/http": "Required for handling uploaded files (^7.0).",
-        "league/flysystem": "Required to use the Flysystem local driver (^3.0).",
+        "league/flysystem": "Required to use the Flysystem local driver (^3.0.16).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.0).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.0).",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.0).",
