@@ -386,8 +386,9 @@ trait EnumeratesValues
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable(TValue, TKey): mixed  $callback
-     * @return static<int, mixed>
+     * @template T
+     * @param  callable(TValue, TKey): T  $callback
+     * @return (T is iterable ? static<int, value-of<T>> : static<int, mixed>)
      */
     public function flatMap(callable $callback)
     {

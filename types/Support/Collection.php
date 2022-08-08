@@ -592,6 +592,25 @@ assertType('Illuminate\Support\Collection<int, mixed>', $collection::make(['stri
         return 1;
     }));
 
+assertType('Illuminate\Support\Collection<int, string>', $collection::make([['string'], ['string2']])
+    ->flatMap(function ($string, $int) {
+        assertType('array{string}', $string);
+        assertType('int', $int);
+
+        /** @var array{string} $string */
+        return $string;
+    }));
+
+assertType('Illuminate\Support\Collection<int, string>', $collection::make([$collection::make(['test']), $collection::make(['test'])])
+    ->flatMap(function ($string, $int) {
+        assertType('Illuminate\Support\Collection<int, string>', $string);
+        assertType('int', $int);
+
+        /** @var Illuminate\Support\Collection<int, string> $string */
+        return $string;
+    }));
+
+
 assertType('Illuminate\Support\Collection<int, User>', $collection->mapInto(User::class));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->merge([2]));
