@@ -452,6 +452,18 @@ class ContainerTest extends TestCase
         $this->assertSame('ConcreteStub', $container->getAlias('foo'));
     }
 
+    public function testGetAliasRecursive()
+    {
+        $container = new Container;
+        $container->alias('ConcreteStub', 'foo');
+        $container->alias('foo', 'bar');
+        $container->alias('bar', 'baz');
+        $this->assertSame('ConcreteStub', $container->getAlias('baz'));
+        $this->assertTrue($container->isAlias('baz'));
+        $this->assertTrue($container->isAlias('bar'));
+        $this->assertTrue($container->isAlias('foo'));
+    }
+
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
         $this->expectException('LogicException');
