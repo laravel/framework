@@ -40,6 +40,14 @@ if (! function_exists('abort')) {
         } elseif ($code instanceof Responsable) {
             throw new HttpResponseException($code->toResponse(request()));
         }
+        
+        if (config('app.debug')) {
+            $dt = debug_backtrace();
+            $trace = reset($dt);
+            $prefix = "[$code] {$trace['file']}::{$trace['line']} $message";
+
+            app()->abort(403, $prefix, $headers);
+        }
 
         app()->abort($code, $message, $headers);
     }
