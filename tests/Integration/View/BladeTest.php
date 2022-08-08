@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\View;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
 
@@ -28,6 +29,13 @@ class BladeTest extends TestCase
         $component = new HelloComponent('Taylor');
 
         $this->assertSame('Hello Taylor', Blade::renderComponent($component));
+    }
+
+    public function test_rendering_large_blade_component_instance()
+    {
+        $component = new LargeComponent();
+
+        $this->assertSame($component->contents, Blade::renderComponent($component));
     }
 
     public function test_basic_blade_rendering()
@@ -140,5 +148,20 @@ class HelloComponent extends Component
     public function render()
     {
         return 'Hello {{ $name }}';
+    }
+}
+
+class LargeComponent extends Component
+{
+    public $contents;
+
+    public function __construct()
+    {
+        $this->contents = Str::random(PHP_MAXPATHLEN);
+    }
+
+    public function render()
+    {
+        return $this->contents;
     }
 }
