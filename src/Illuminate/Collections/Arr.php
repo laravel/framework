@@ -140,13 +140,13 @@ class Arr
     }
 
     /**
-     * Check if an item or items are empty in an array using "dot" notation
+     * Check if an item or items are empty in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|array  $keys
      * @return bool
      *
-     * @throws  InvalidArgumentException|Exception
+     * @throws InvalidArgumentException|Exception
      */
     public static function empty($array, $keys)
     {
@@ -158,7 +158,7 @@ class Arr
 
         if ($keys === []) {
             throw new InvalidArgumentException(
-                "Array keys not provided"
+                'Array keys not provided'
             );
         }
 
@@ -174,7 +174,7 @@ class Arr
                         "Array key {$segment} of {$key} does not exist"
                     );
                 } else {
-                    if(empty($subKeyArray[$segment]) || static::accessible($subKeyArray[$segment])) {
+                    if (empty($subKeyArray[$segment]) || static::accessible($subKeyArray[$segment])) {
                         $subKeyArray = $subKeyArray[$segment];
                     } else {
                         return false;

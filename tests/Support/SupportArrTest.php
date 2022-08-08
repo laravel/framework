@@ -143,7 +143,7 @@ class SupportArrTest extends TestCase
     {
         $array = [
             'products' => [
-                ['name' => '',],
+                ['name' => ''],
                 ['name' => 'chair'],
             ],
         ];
@@ -153,7 +153,7 @@ class SupportArrTest extends TestCase
         $array = [
             'products' => [
                 'name' => 'desk',
-                'label' => ''
+                'label' => '',
             ],
         ];
         $this->assertFalse(Arr::empty($array, 'products.name'));
@@ -163,7 +163,7 @@ class SupportArrTest extends TestCase
             'products' => [
                 'name' => 'desk',
                 'label' => 'Cool Desk',
-                'slug' => '/desk'
+                'slug' => '/desk',
             ],
         ];
         $this->assertFalse(Arr::empty($array, ['products.name', 'products.label', 'products.slug']));
@@ -172,7 +172,7 @@ class SupportArrTest extends TestCase
             'products' => [
                 'name' => '',
                 'label' => '',
-                'slug' => ''
+                'slug' => '',
             ],
         ];
         $this->assertTrue(Arr::empty($array, ['products.name', 'products.label', 'products.slug']));
