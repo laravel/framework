@@ -199,11 +199,22 @@ class ContainerTest extends TestCase
     public function testArrayAccess()
     {
         $container = new Container;
+        $this->assertFalse(isset($container['something']));
         $container['something'] = function () {
             return 'foo';
         };
         $this->assertTrue(isset($container['something']));
+        $this->assertNotEmpty($container['something']);
         $this->assertSame('foo', $container['something']);
+        unset($container['something']);
+        $this->assertFalse(isset($container['something']));
+
+        //test offsetSet when it's not instanceof Closure
+        $container = new Container;
+        $container['something'] = 'text';
+        $this->assertTrue(isset($container['something']));
+        $this->assertNotEmpty($container['something']);
+        $this->assertSame('text', $container['something']);
         unset($container['something']);
         $this->assertFalse(isset($container['something']));
     }
