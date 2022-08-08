@@ -75,10 +75,14 @@ trait SoftDeletes
     /**
      * Perform the actual delete query on this model instance.
      *
-     * @return void
+     * @return bool|null
      */
     protected function runSoftDelete()
     {
+        if ($this->fireModelEvent('trashing') === false) {
+            return false;
+        }
+
         $query = $this->setKeysForSaveQuery($this->newModelQuery());
 
         $time = $this->freshTimestamp();
@@ -146,6 +150,17 @@ trait SoftDeletes
     public function trashed()
     {
         return ! is_null($this->{$this->getDeletedAtColumn()});
+    }
+
+    /**
+     * Register a "softDeleting" model event callback with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function softDeleting($callback)
+    {
+        static::registerModelEvent('trashing', $callback);
     }
 
     /**
