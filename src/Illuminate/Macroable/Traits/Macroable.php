@@ -119,8 +119,9 @@ trait Macroable
         $macro = static::$macros[$method];
 
         if ($macro instanceof Closure) {
-            $fn = new ReflectionFunction($macro);
-            $bindable = $fn->getClosureScopeClass() === null || $fn->getClosureThis() !== null;
+            $reflection = new ReflectionFunction($macro);
+
+            $bindable = $reflection->getClosureScopeClass() === null || $reflection->getClosureThis() !== null;
 
             if ($bindable) {
                 $macro = $macro->bindTo($this, static::class);
