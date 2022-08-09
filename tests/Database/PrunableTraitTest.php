@@ -32,57 +32,6 @@ class PrunableTraitTest extends TestCase
         $this->setUpDatabase();
     }
 
-    public function testPrunableDeletesRecordsMatchingCondition()
-    {
-        (new PrunableTestModel())->pruneAll();
-
-        $this->assertEquals(
-            collect(
-                [
-                    3,
-                    4
-                ]
-            ),
-            PrunableTestModel::withTrashed()->pluck('id')
-        );
-    }
-
-    public function testPrunableEmitsEvents()
-    {
-        $this->dispatchSpy
-            ->shouldReceive('dispatch')
-            ->withArgs(function(ModelsPruned $modelsPruned) {
-                $this->assertEquals(
-                    [$modelsPruned->count, $modelsPruned->model],
-                    [2, 'Illuminate\Tests\Database\PrunableTestModel']
-                );
-                return true;
-            });
-
-        (new PrunableTestModel())->pruneAll();
-
-        $this->assertEquals(
-            collect(
-                [3, 4]
-            ),
-            PrunableTestModel::withTrashed()->pluck('id')
-        );
-    }
-
-    public function testPrunableCallsPruningHook()
-    {
-        $this->expectExceptionMessage('thrown from pruning hook');
-
-        $class = new class extends PrunableTestModel {
-            public function pruning()
-            {
-                throw new Exception('thrown from pruning hook');
-            }
-        };
-
-        $class->pruneAll();
-    }
-
     protected function setUpDatabase()
     {
         $db = new DB;
@@ -105,6 +54,26 @@ class PrunableTraitTest extends TestCase
             ['id' =>  3, 'created_at' => '2021-12-03 00:00:00', 'deleted_at' => null],
             ['id' =>  4, 'created_at' => '2021-12-03 00:00:00', 'deleted_at' => '2021-12-02 00:00:00'],
         ]);
+    }
+
+    public function testPrunableTraitEmitsEventsAndDeletes()
+    {
+        (new PrunableTestModel())->pruneAll();
+
+        $this->dispatchSpy
+            ->shouldHaveReceived('dispatch')
+            ->withArgs(function (ModelsPruned $modelsPruned) {
+                $this->assertEquals(
+                    [$modelsPruned->count, $modelsPruned->model],
+                    [2, 'Illuminate\Tests\Database\PrunableTestModel']
+                );
+                return true;
+            });
+
+        $this->assertEquals(
+            collect([3, 4]),
+            PrunableTestModel::withTrashed()->pluck('id')
+        );
     }
 }
 
