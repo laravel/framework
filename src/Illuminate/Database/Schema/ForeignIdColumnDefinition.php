@@ -35,6 +35,7 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     public function withTable(string $table): static
     {
         $this->table = $table;
+
         return $this;
     }
 
