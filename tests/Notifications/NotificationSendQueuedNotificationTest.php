@@ -83,7 +83,6 @@ class NotifiableUser extends Model
 
 class NotificationWithDefaultName extends Notification
 {
-
 }
 
 class NotificationWithOverriddenName extends Notification
