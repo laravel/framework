@@ -1982,6 +1982,16 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertEquals([1 => 'dayle', 0 => 'taylor'], $data->all());
+
+        $data = new $collection(['a' => ['sort' => 2], 'b' => ['sort' => 1]]);
+        $data = $data->sortBy([['sort', 'asc']]);
+
+        $this->assertEquals(['b' => ['sort' => 1], 'a' => ['sort' => 2]], $data->all());
+
+        $data = new $collection([['sort' => 2], ['sort' => 1]]);
+        $data = $data->sortBy([['sort', 'asc']]);
+
+        $this->assertEquals([1 => ['sort' => 1], 0 => ['sort' => 2]], $data->all());
     }
 
     /**
